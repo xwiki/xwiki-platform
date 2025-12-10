@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -424,6 +425,216 @@ class LiveDataIT
         viewPage.waitForNotificationSuccessMessage("Delete Success");
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+    }
+
+    @Test
+    @Order(4)
+    void filterWithRelationalDBList(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "DBList");
+        DatabaseListClassEditElement dbListClassEditElement =
+            classEditPage.getDatabaseListClassEditElement("myList");
+        dbListClassEditElement.setMultiSelect(true);
+        dbListClassEditElement.setMetaProperty("relationalStorage", "true");
+        dbListClassEditElement.setMetaProperty("displayType", "input");
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with multiple selections and no selections.
+        // First, first two options selected.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
+        // Second, third option selected.
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
+        // Third, no option selected.
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter by Option1 should return only Doc1.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option1 Option2");
+        // Filter by Option3 should return only Doc2.
+        tableLayout.filterColumn("myList", "Option3", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option3");
+    }
+
+    /**
+     * Test filtering with a StaticList property that has multiple selection enabled but doesn't use relational
+     * storage. This uses StringListProperty which stores values in a CLOB column on Oracle.
+     */
+    @Test
+    @Order(5)
+    void filterWithNonRelationalStaticList(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "StaticList");
+        StaticListClassEditElement staticListClassEditElement =
+            classEditPage.getStaticListClassEditElement("myList");
+        staticListClassEditElement.setMultiSelect(true);
+
+        staticListClassEditElement.setMetaProperty("displayType", "input");
+        // Don't configure any static values to explicitly test the used values fetching.
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with multiple selections and no selections.
+        // First, the first two options are selected.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
+        // Second, third option selected.
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
+        // Third, no option selected.
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
+        // Third, many options selected to test large CLOB value filtering.
+        DocumentReference doc4Ref = new DocumentReference("Doc4", testReference.getLastSpaceReference());
+        StringJoiner manyOptions = new StringJoiner("|");
+        for (int i = 1; i <= 1000; i++) {
+            manyOptions.add("Option" + i);
+        }
+        testUtils.rest().addObject(doc4Ref, testUtils.serializeReference(testReference), "myList",
+            manyOptions.toString());
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(4);
+
+        // Filter by Option1 should return Doc1 and Doc4.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow("myList", "Option1 Option2");
+        tableLayout.assertRow("doc.name", "Doc4");
+
+        // Filter by Option3 should return Doc2 and Doc4.
+        tableLayout.filterColumn("myList", "Option3", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow("myList", "Option3");
+        tableLayout.assertRow("doc.name", "Doc4");
+
+        // Filter by (empty) should return only Doc3.
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
+
+        // Filter by Option100 should return only Doc4.
+        tableLayout.filterColumn("myList", "Option100", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc4");
+    }
+
+    /**
+     * Test filtering with a single-select StringProperty. This is stored in a VARCHAR column for small values or CLOB
+     * for large values (on Oracle).
+     */
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @Order(6)
+    void filterWithSingleSelectStringProperty(boolean largeStorage, TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "StaticList");
+        StaticListClassEditElement staticListClassEditElement =
+            classEditPage.getStaticListClassEditElement("myList");
+        // Single select - this will use StringProperty.
+        staticListClassEditElement.setMultiSelect(false);
+        staticListClassEditElement.setMetaProperty("displayType", "input");
+        // Using large storage will make the property use CLOB storage on databases that differentiate between
+        // VARCHAR and CLOB (like Oracle).
+        staticListClassEditElement.setMetaProperty("largeStorage", Boolean.toString(largeStorage));
+        // Don't configure any static values to explicitly test the used values fetching.
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with different selections.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1");
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        String option2 = "Option2";
+        if (largeStorage) {
+            // Use a large value to test that it actually works with a very large value with more than 4k characters.
+            option2 += StringUtils.repeat("A", 5000);
+        }
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", option2);
+
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        String option3 = "Option3";
+        if (largeStorage) {
+            // Use a large value that has less than 4k characters but more than 4k bytes.
+            // We don't just append Unicode characters because this would make the URI too large when filtering the Live
+            // Data as the filters are passed in the URL (should be fixed in the future). So we append a mix of 3.6k
+            // ASCII and 200 Unicode characters.
+            option3 += StringUtils.repeat("B", 3600) + StringUtils.repeat("⟷", 200);
+            // Sanity check to ensure we have more than 4k bytes.
+            assertTrue(option3.getBytes().length > 4000);
+        }
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference), "myList", option3);
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter by Option1 should return only Doc1.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc1");
+
+        // For the long values, we only use a part of the value to filter.
+        // Users won't type such long values in a real filter - the long value support is mostly for storing several
+        // values in the multiselect scenario, not really for single select.
+        String option2Filter = largeStorage ? option2.substring(0, 20) : option2;
+        // We can't filter directly using filterColumn as it expects an exact match. So we use the SuggestInputElement
+        // directly.
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter("myList"));
+        suggestInputElement.clearSelectedSuggestions().sendKeys(option2Filter).waitForNonTypedSuggestions();
+        suggestInputElement.selectByVisibleText(option2);
+        // Filter by Option2 should return only Doc2.
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc2");
+
+        String option3Filter = largeStorage ? option3.substring(0, 20) : option3;
+        // Filter by Option3 should return only Doc3.
+        suggestInputElement.clearSelectedSuggestions().sendKeys(option3Filter).waitForNonTypedSuggestions();
+        suggestInputElement.selectByVisibleText(option3);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

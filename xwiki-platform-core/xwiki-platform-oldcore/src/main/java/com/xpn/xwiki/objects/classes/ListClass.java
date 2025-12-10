@@ -575,6 +575,9 @@ public abstract class ListClass extends PropertyClass
         BaseProperty lprop;
 
         // FIXME: this if is actually wrong: it means a multiselect static list cannot be stored with a large storage.
+        // But on the other hand, large storage is quite bad for performance, so if really needed we should ideally
+        // find a better solution than simply using a larger storage.
+        // Any change of this logic might need to be mirrored in UsedValuesListQueryBuilder and LiveTableResultsMacros.
         if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {

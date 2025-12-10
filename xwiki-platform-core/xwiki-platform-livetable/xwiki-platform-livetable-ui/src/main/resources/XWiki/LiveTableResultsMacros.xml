@@ -597,6 +597,7 @@
   #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
     #set($tableName = 'LargeStringProperty')
   #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass' || $propType == 'PageClass')
+    ## The following logic is mirrored from ListClass and might need to be updated when the logic in ListClass changes.
     #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
     #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
     #set($largeStorage = $propClass.get($colname).getProperty('largeStorage').getValue())

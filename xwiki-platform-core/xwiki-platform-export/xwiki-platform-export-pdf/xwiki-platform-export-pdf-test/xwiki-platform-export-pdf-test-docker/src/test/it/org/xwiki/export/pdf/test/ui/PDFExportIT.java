@@ -804,13 +804,13 @@ class PDFExportIT
     void codeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
-        // We always disable WCAG validation.
+        // We disable WCAG validation.
         // Here, the test `scrollable-region-focusable` fails while this is now a browser feature in Chrome.
         // The docker tests run on Chrome.
-        // See https://github.com/dequelabs/axe-core/issues/4788
+        // Once https://github.com/dequelabs/axe-core/issues/4788 is fixed, we might be able to remove this workaround.
         setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
-        // We set back the WCAG validation in the state it was in before this BasePage initialization.
+        // We set back the WCAG validation in the state it was in before this BasePage instantiation.
         setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
@@ -1651,6 +1651,14 @@ class PDFExportIT
     @Order(34)
     void autoScaleTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
+        boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
+        // We disable WCAG validation.
+        // Here, the test `scrollable-region-focusable` fails while this is now a browser feature in Chrome.
+        // The docker tests run on Chrome.
+        // Once https://github.com/dequelabs/axe-core/issues/4788 is fixed, we might be able to remove this workaround.
+        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
+        // We set back the WCAG validation in the state it was in before this BasePage instantiation.
+        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 

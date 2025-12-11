@@ -26,6 +26,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.EntityType;
@@ -53,7 +55,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 {
     private static final long serialVersionUID = 1L;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseObject.class);
+
     private String guid;
+    private BaseClass sourceXClass;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -573,5 +578,54 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     {
         ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);
         return objectEvaluator.evaluate(this);
+    }
+
+    /**
+     * @return the actual XClass defining that object.
+     */
+    public BaseClass getSourceXClass()
+    {
+        return sourceXClass;
+    }
+
+    /**
+     * @param sourceXClass see {@link #getSourceXClass()}.
+     * @return the current instance.
+     */
+    public BaseObject setSourceXClass(BaseClass sourceXClass)
+    {
+        this.sourceXClass = sourceXClass;
+        return this;
+    }
+
+    @Override
+    public BaseClass getXClass(XWikiContext context)
+    {
+        if (getSourceXClass() != null) {
+            return getSourceXClass();
+        } else {
+            return super.getXClass(context);
+        }
+    }
+
+    @Override
+    public void removeField(String name)
+    {
+        if (getSourceXClass() != null) {
+            getSourceXClass().removeField(name);
+        }
+        super.removeField(name);
+    }
+
+    @Override
+    public void addField(String name, PropertyInterface element)
+    {
+        if (getSourceXClass() != null && getSourceXClass().getField(name) == null) {
+            // TODO: We should probably have a way to find the PropertyClass from the given element, but right
+            // now we don't have any API for that AFAIK
+            // Note: we could throw an exception, but it's breaking plenty of tests...
+            LOGGER.warn("Adding field [{}] in object while it does not exist in source class.", name);
+        }
+        super.addField(name, element);
     }
 }

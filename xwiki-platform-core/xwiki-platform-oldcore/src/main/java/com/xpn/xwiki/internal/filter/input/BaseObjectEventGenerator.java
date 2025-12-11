@@ -72,7 +72,7 @@ public class BaseObjectEventGenerator
     public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
         DocumentInstanceInputProperties properties) throws FilterException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiContext context = this.xcontextProvider.get();
 
         // > WikiObject
 
@@ -88,7 +88,7 @@ public class BaseObjectEventGenerator
 
         // Object class
 
-        BaseClass xclass = xobject.getXClass(xcontext);
+        BaseClass xclass = xobject.getXClass(context);
         ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
 
         // Properties

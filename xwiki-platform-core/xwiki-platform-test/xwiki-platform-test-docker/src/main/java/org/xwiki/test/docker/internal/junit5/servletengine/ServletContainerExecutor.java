@@ -225,7 +225,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
         //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
         //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
-        StringBuilder violations = new StringBuilder("RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+        StringBuilder violations =
+            new StringBuilder("RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
         if (jettyVersion.compareTo(V12_1) >= 0) {
             // Jetty 12.1+ forbids the use of fragments in URIs by default
             violations.append(",FRAGMENT");

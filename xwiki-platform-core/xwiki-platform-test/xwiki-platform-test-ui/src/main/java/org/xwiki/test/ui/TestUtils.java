@@ -2923,11 +2923,17 @@ public class TestUtils
         }
 
         /**
-         * @since 15.2RC1
-         * @since 15.1
-         * @since 14.10.6
+         * Add a new object to an existing or new page.
+         *
+         * @param documentReference the document where to add the object
+         * @param className the class name of the object to add
+         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
+         * @since 16.10.16
+         * @since 17.4.8
+         * @since 17.10.1
+         * @since 18.0.0RC1
          */
-        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+        public void addObject(EntityReference documentReference, String className, Object... properties)
             throws Exception
         {
             // Make sure the page exist (object add fail otherwise)
@@ -2938,16 +2944,16 @@ public class TestUtils
             }
 
             // Create the object
-            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            org.xwiki.rest.model.jaxb.Object jaxbObject = object(documentReference, className);
             for (int i = 0; i < properties.length; i += 2) {
                 String name = (String) properties[i + 0];
                 Object value = properties[i + 1];
 
-                rightsObject.withProperties(RestTestUtils.property(name, value));
+                jaxbObject.withProperties(RestTestUtils.property(name, value));
             }
 
             // Add the object
-            add(rightsObject);
+            add(jaxbObject);
         }
 
         /**

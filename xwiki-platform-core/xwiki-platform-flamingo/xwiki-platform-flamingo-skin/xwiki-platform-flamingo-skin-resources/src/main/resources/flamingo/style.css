@@ -1,10 +1,14 @@
 /*!
+#set($css = "#template('css/style.css.vm')")
 ## Get the compiled LESS code
-#set($css = $services.lesscss.compileSkinFile('style.less.vm'))
+#set($cssFromLess = $services.lesscss.compileSkinFile('style.less.vm'))
 ## Remove the useless part
-#set($index = $css.indexOf('.not-sent-to-the-browser-from-this-point'))
+#set($index = $cssFromLess.indexOf('.not-sent-to-the-browser-from-this-point'))
 #if($index >= 0)
-  #set($css = $css.substring(0, $index))
+  #set($cssFromLess = $cssFromLess.substring(0, $index))
 #end
 ## Display the CSS
-*/$!css
+ */
+$!css
+/* Start of the LESS styles.*/
+$!cssFromLess

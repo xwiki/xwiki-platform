@@ -1,0 +1,5 @@
+#macro (_includeCSS $cssFilename)
+#template("css/${cssFilename}")
+#end
+
+#_includeCSS("users.css")

@@ -58,7 +58,7 @@ catalog:
   "@vue/test-utils": 2.4.6
   "@vue/tsconfig": 0.8.1
   bootstrap-icons: 1.13.1
-  dompurify: 3.3.0
+  dompurify: 3.3.1
   eslint: 9.39.1
   eslint-config-prettier: 10.1.8
   eslint-import-resolver-typescript: 4.4.4

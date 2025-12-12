@@ -47,7 +47,6 @@
 @import "tables";
 @import "tree";
 @import "type";
-@import "users";
 @import "vertical-menus";
 @import "xlist";
 // In order to let custom skins easily override styling, we import a custom.less that is empty by default.

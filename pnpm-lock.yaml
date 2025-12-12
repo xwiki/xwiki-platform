@@ -127,8 +127,8 @@ catalogs:
       specifier: 25.5.3
       version: 25.5.3
     inversify:
-      specifier: 7.10.4
-      version: 7.10.4
+      specifier: 7.10.6
+      version: 7.10.6
     jiti:
       specifier: 2.6.1
       version: 2.6.1
@@ -328,7 +328,7 @@ importers:
         version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
@@ -592,7 +592,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -681,7 +681,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
@@ -745,7 +745,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -779,7 +779,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -930,7 +930,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -991,7 +991,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -1022,7 +1022,7 @@ importers:
         version: link:../../../dev/config
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1074,7 +1074,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1108,7 +1108,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1240,7 +1240,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1383,7 +1383,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       inversify:
         specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
+        version: 7.10.6(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2004,8 +2004,8 @@ packages:
   '@inversifyjs/common@1.5.2':
     resolution: {integrity: sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==}
 
-  '@inversifyjs/container@1.14.1':
-    resolution: {integrity: sha512-OFSlXXFgEk2zSV4ZCapJeVc0jtN+DxiXB1Szz2AManOFEhFc9uiUFBUJ8XxOy4SuIAYPNNLW55F6owm/birqvg==}
+  '@inversifyjs/container@1.14.3':
+    resolution: {integrity: sha512-dt9JwumXFpIQx2hbsCouDLdZ6sVMvkdUcwyM8hugRbXMCxSJ3nDd2pjdE4MGWyfWP/61zDiAXCiff+2jVrhcmw==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
@@ -3954,8 +3954,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  inversify@7.10.4:
-    resolution: {integrity: sha512-slBB4OeGHNR4yxAz/ChzFrFK9QKtZ+P+Ys0aYMv0nYc05eiB5hk1oqlHhgCZ13tiDj4806tF1LW3NQPcJjmipQ==}
+  inversify@7.10.6:
+    resolution: {integrity: sha512-pjJfyS9KS5Q4aIKx2Mc/mPnyxMParygddMY66irM+IIZUv3+Qp9pjEu+rMmUYPxGqaX2QgDIU/pH1t2eb3xodw==}
 
   is-array-buffer@3.0.5:
     resolution: {integrity: sha512-DDfANUiiG2wC1qawP66qlTugJeL5HyzMpfr8lLK+jMQirGzNod0B12cFB/9q838Ru27sBwfw78/rdoU7RERz6A==}
@@ -6326,7 +6326,7 @@ snapshots:
 
   '@inversifyjs/common@1.5.2': {}
 
-  '@inversifyjs/container@1.14.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/container@1.14.3(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
       '@inversifyjs/core': 9.1.1(reflect-metadata@0.2.2)
@@ -8578,10 +8578,10 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
-  inversify@7.10.4(reflect-metadata@0.2.2):
+  inversify@7.10.6(reflect-metadata@0.2.2):
     dependencies:
       '@inversifyjs/common': 1.5.2
-      '@inversifyjs/container': 1.14.1(reflect-metadata@0.2.2)
+      '@inversifyjs/container': 1.14.3(reflect-metadata@0.2.2)
       '@inversifyjs/core': 9.1.1(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - reflect-metadata

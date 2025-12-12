@@ -139,6 +139,7 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     public void disable()
     {
         this.enabled = false;
+
         disableChildren();
     }
 

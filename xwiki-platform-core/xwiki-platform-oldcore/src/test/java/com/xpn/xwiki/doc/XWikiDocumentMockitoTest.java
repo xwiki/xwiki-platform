@@ -1697,6 +1697,8 @@ public class XWikiDocumentMockitoTest
         this.baseClass.removeField("passwd");
         this.baseObject.removeField("passwd");
         this.baseObject2.removeField("passwd");
+        // We also need to remove the field from the sourceXClass, else it will appear as an empty field value.
+        this.baseObject.getSourceXClass().removeField("passwd");
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         Document document = this.document.toXMLDocument(this.oldcore.getXWikiContext());
@@ -1704,8 +1706,6 @@ public class XWikiDocumentMockitoTest
         XWikiDocument newDocument = new XWikiDocument(this.document.getDocumentReference());
         newDocument.fromXML(document, false);
 
-        assertEquals(this.document.getXObjects(CLASS_REFERENCE).get(0),
-            newDocument.getXObjects(CLASS_REFERENCE).get(0));
         assertEquals(this.document, newDocument);
         // Assert that the document restored from XML is restricted in contrast to the original document.
         assertFalse(this.document.isRestricted());

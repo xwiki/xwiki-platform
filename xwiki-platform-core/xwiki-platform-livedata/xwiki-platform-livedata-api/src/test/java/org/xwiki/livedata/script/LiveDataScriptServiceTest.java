@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.script;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,10 +40,15 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -105,23 +109,25 @@ class LiveDataScriptServiceTest
         LiveDataQuery.Source source = new LiveDataQuery.Source("liveTable");
         source.setParameter("translationPrefix", "xe.userdirectory.");
         source.setParameter("className", "XWiki.XWikiUsers");
-        LiveDataQuery query = new LiveDataQuery();
-        query.setProperties(List.of("_avatar", "doc.name", "first_name", "last_name"));
-        query.setSource(source);
 
         LiveDataSource liveDataSource = mock(LiveDataSource.class);
         LiveDataEntryStore queries = mock(LiveDataEntryStore.class);
         LiveData liveData = mock(LiveData.class);
 
         when(liveDataSource.getEntries()).thenReturn(queries);
-        when(queries.get(query)).thenReturn(liveData);
+        when(queries.get(any(LiveDataQuery.class))).thenReturn(liveData);
         when(this.sourceManager.get(source)).thenReturn(Optional.of(liveDataSource));
 
         LiveData result = this.scriptService.query(Map.of("id", "users",
             "properties", "_avatar,doc.name,first_name,last_name",
             "source", "liveTable",
             "sourceParameters", "className=XWiki.XWikiUsers&translationPrefix=xe.userdirectory."));
-        verify(queries).get(query);
+        verify(queries).get(assertArg(
+            liveDataQuery -> assertEquals(
+                "{\"properties\":[\"_avatar\",\"doc.name\",\"first_name\",\"last_name\"],\"source\":"
+                    + "{\"id\":\"liveTable\",\"translationPrefix\":\"xe.userdirectory.\","
+                    + "\"className\":\"XWiki.XWikiUsers\"}}",
+                new ObjectMapper().writeValueAsString(liveDataQuery))));
         assertSame(liveData, result);
     }
 }

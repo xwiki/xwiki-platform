@@ -415,7 +415,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
             String imageVersion = String.format("LO-%S", officeVersion);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
-                .withImageNameFilter(imageName)
+                .withReferenceFilter(imageName)
                 .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
                 .exec();
 

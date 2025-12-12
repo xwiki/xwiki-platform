@@ -24,15 +24,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 
 /**
  * Test saving and downloading of attachments.
@@ -49,15 +44,14 @@ public final class StoreTestUtils
     }
 
     /** Method to easily do a post request to the site. */
-    public static HttpMethod doPost(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static HttpMethod doPost(final String address, final XWikiCredentials userNameAndPassword,
         final Map<String, String> parameters) throws IOException
     {
-        final HttpClient client = new HttpClient();
-        final PostMethod method = new PostMethod(address);
+        final XWikiHTTPClient client = new XWikiHTTPClient();
+        final HttpPost method = new HttpPost(address);
 
         if (userNameAndPassword != null) {
-            client.getState().setCredentials(AuthScope.ANY, userNameAndPassword);
-            client.getParams().setAuthenticationPreemptive(true);
+            client.setDefaultCredentials(userNameAndPassword);
         }
 
         if (parameters != null) {
@@ -69,7 +63,7 @@ public final class StoreTestUtils
         return method;
     }
 
-    public static HttpMethod doUpload(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static HttpMethod doUpload(final String address, final HTTPCredentials userNameAndPassword,
         final Map<String, byte[]> uploads) throws IOException
     {
         final HttpClient client = new HttpClient();
@@ -90,23 +84,5 @@ public final class StoreTestUtils
 
         client.executeMethod(method);
         return method;
-    }
-
-    /**
-     * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
-     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
-     * to hexadecimal, and spaces are substituted by '+'.
-     * 
-     * @param s
-     * @since 3.2M1
-     */
-    public static String escapeURL(String s)
-    {
-        try {
-            return URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // should not happen
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -383,6 +383,7 @@ public class Utils
         return createURI(baseURI, resourceClass, Arrays.asList(pathElements), null);
     }
 
+<<<<<<< HEAD
     /**
      * Creates an URI to access the specified resource. The given path elements are encoded before being inserted into
      * the resource path.
@@ -395,6 +396,8 @@ public class Utils
      * @since 17.4.8
      * @since 16.10.15
      */
+=======
+>>>>>>> 18aa8e19745 (XWIKI-22584: Stop using http client 3 in XWiki Standard)
     public static URI createURI(URI baseURI, java.lang.Class<?> resourceClass, List<Object> pathElements,
         Map<String, Object> queryParameters)
     {

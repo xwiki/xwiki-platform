@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,24 +37,22 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.validator.Validator;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarPackage;
@@ -68,24 +68,16 @@ public class AbstractValidationTest extends TestCase
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractValidationTest.class);
 
-    protected HttpClient client;
+    protected XWikiHTTPClient client;
 
     protected Target target;
 
-    protected String credentials;
-
-    public AbstractValidationTest(String name, Target target, HttpClient client, String credentials)
+    public AbstractValidationTest(String name, Target target, XWikiHTTPClient client)
     {
         super(name);
 
         this.target = target;
         this.client = client;
-        this.credentials = credentials;
-    }
-
-    protected GetMethod createGetMethod()
-    {
-        return new GetMethod(getTargetURL(this.target));
     }
 
     protected String getTargetURL(Target target)
@@ -124,56 +116,34 @@ public class AbstractValidationTest extends TestCase
         }
     }
 
-    protected GetMethod getResponse() throws Exception
+    protected byte[] getResponseBody() throws Exception
     {
-        GetMethod method = createGetMethod();
+        String originalURI = getTargetURL(this.target);
 
-        method.setFollowRedirects(true);
-        method.getParams().setSoTimeout(30000);
-
-        if (this.credentials != null) {
-            method.setDoAuthentication(true);
-            method.addRequestHeader("Authorization",
-                "Basic " + new String(Base64.encodeBase64(this.credentials.getBytes())));
-        }
-
-        // Execute the method.
-        try {
-            String originalURI = method.getURI().toString();
-
-            int statusCode = this.client.executeMethod(method);
+        return this.client.executeGet(originalURI, (response, context) -> {
+            // Get the current URI
+            URI uri;
+            try {
+                uri = context.getRequest().getUri();
+            } catch (URISyntaxException e) {
+                throw new HttpException("Failed to access latest request URI", e);
+            }
 
             String uriMessage;
-            if (!originalURI.equals(method.getURI().toString())) {
-                uriMessage = String.format("[%s] (redirected to [%s])", originalURI, method.getURI());
+            if (!originalURI.equals(uri.toString())) {
+                uriMessage = String.format("[%s] (redirected to [%s])", originalURI, uri);
             } else {
-                uriMessage = String.format("[%s]", method.getURI());
+                uriMessage = String.format("[%s]", uri);
             }
 
             // We accept status codes 200 and 423 as valid. HTTP code 423 is sent when trying to perform an action on
             // a protected page and thus it's valid.
-            assertTrue(String.format("Method %s failed with status [%s]", uriMessage, method.getStatusLine()),
+            int statusCode = response.getCode();
+            assertTrue(String.format("Method %s failed with status [%s]", uriMessage, response.getReasonPhrase()),
                 statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_LOCKED);
 
-            // Read the response body.
-            return method;
-        } catch (Exception e) {
-            method.releaseConnection();
-
-            throw new Exception(String.format("Failed to get response for URL [%s]", method.getURI()), e);
-        }
-    }
-
-    protected byte[] getResponseBody() throws Exception
-    {
-        GetMethod method = getResponse();
-
-        try {
-            // Read the response body.
-            return method.getResponseBody();
-        } finally {
-            method.releaseConnection();
-        }
+            return EntityUtils.toByteArray(response.getEntity());
+        });
     }
 
     public static Test suite(Class< ? extends AbstractValidationTest> validationTest, Validator validator)
@@ -183,20 +153,22 @@ public class AbstractValidationTest extends TestCase
 
         suite.setName(validator.getName());
 
-        HttpClient adminClient = new HttpClient();
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         // The code that prevents circular redirects (HttpMethodDirector#processRedirectResponse) ignores the query
         // string when comparing the redirect location with the current location. The browser doesn't behave like this
         // and we have pages that redirect to themselves with different query string parameters.
-        adminClient.getParams().setBooleanParameter(HttpClientParams.ALLOW_CIRCULAR_REDIRECTS, true);
+        requestConfigBuilder.setCircularRedirectsAllowed(true);
         // Limit the number of redirects because we don't detect circular redirect any more.
-        adminClient.getParams().setIntParameter(HttpClientParams.MAX_REDIRECTS, 3);
-        Credentials defaultcreds = new UsernamePasswordCredentials("Admin", "admin");
-        adminClient.getState().setCredentials(AuthScope.ANY, defaultcreds);
+        requestConfigBuilder.setMaxRedirects(3);
+
+        XWikiHTTPClient adminClient =
+            new XWikiHTTPClient(XWikiHTTPClient.builder().setDefaultRequestConfig(requestConfigBuilder.build()));
+        adminClient.setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
 
         addXarFiles(validationTest, validator, suite, adminClient);
         addURLsForAdmin(validationTest, validator, suite, adminClient);
 
-        HttpClient guestClient = new HttpClient();
+        XWikiHTTPClient guestClient = new XWikiHTTPClient();
 
         addURLsForGuest(validationTest, validator, suite, guestClient);
 
@@ -204,49 +176,49 @@ public class AbstractValidationTest extends TestCase
     }
 
     protected static void addURLsForAdmin(Class< ? extends AbstractValidationTest> validationTest, Validator validator,
-        TestSuite suite, HttpClient client) throws Exception
+        TestSuite suite, XWikiHTTPClient client) throws Exception
     {
-        addURLs("urlsToTestAsAdmin", validationTest, validator, suite, client, "Admin:admin");
+        addURLs("urlsToTestAsAdmin", validationTest, validator, suite, client);
     }
 
     protected static void addURLsForGuest(Class< ? extends AbstractValidationTest> validationTest, Validator validator,
-        TestSuite suite, HttpClient client) throws Exception
+        TestSuite suite, XWikiHTTPClient client) throws Exception
     {
-        addURLs("urlsToTestAsGuest", validationTest, validator, suite, client, null);
+        addURLs("urlsToTestAsGuest", validationTest, validator, suite, client);
     }
 
     protected static void addURLs(String property, Class< ? extends AbstractValidationTest> validationTest,
-        Validator validator, TestSuite suite, HttpClient client, String credentials) throws Exception
+        Validator validator, TestSuite suite, XWikiHTTPClient client) throws Exception
     {
         String urlsToTest = System.getProperty(property);
 
         if (urlsToTest != null) {
             for (String url : urlsToTest.split("\\s")) {
                 if (StringUtils.isNotEmpty(url)) {
-                    suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class,
-                        String.class).newInstance(new URLPathTarget(url), client, validator, credentials));
+                    suite.addTest(validationTest.getConstructor(Target.class, XWikiHTTPClient.class, Validator.class,
+                        String.class).newInstance(new URLPathTarget(url), client, validator));
                 }
             }
         }
     }
 
     protected static void documents(String property, Class< ? extends AbstractValidationTest> validationTest,
-        Validator validator, TestSuite suite, HttpClient client, String credentials) throws Exception
+        Validator validator, TestSuite suite, XWikiHTTPClient client) throws Exception
     {
         String urlsToTest = System.getProperty(property);
 
         if (urlsToTest != null) {
             for (String url : urlsToTest.split("\\s")) {
                 if (StringUtils.isNotEmpty(url)) {
-                    suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class,
-                        String.class).newInstance(new URLPathTarget(url), client, validator, credentials));
+                    suite.addTest(validationTest.getConstructor(Target.class, XWikiHTTPClient.class, Validator.class,
+                        String.class).newInstance(new URLPathTarget(url), client, validator));
                 }
             }
         }
     }
 
     protected static void addXarFiles(Class< ? extends AbstractValidationTest> validationTest, Validator validator,
-        TestSuite suite, HttpClient client) throws Exception
+        TestSuite suite, XWikiHTTPClient client) throws Exception
     {
         String path = System.getProperty("pathToDocuments");
         String patternFilter = System.getProperty("documentsToTest");
@@ -278,8 +250,8 @@ public class AbstractValidationTest extends TestCase
 
         for (DocumentReference documentReference : readXarContents(path, patternFilter, skipTechnicalPages,
             whitelistedClassesList)) {
-            suite.addTest(validationTest.getConstructor(Target.class, HttpClient.class, Validator.class, String.class)
-                .newInstance(new DocumentReferenceTarget(documentReference), client, validator, "Admin:admin"));
+            suite.addTest(validationTest.getConstructor(Target.class, XWikiHTTPClient.class, Validator.class, String.class)
+                .newInstance(new DocumentReferenceTarget(documentReference), client, validator));
         }
     }
 

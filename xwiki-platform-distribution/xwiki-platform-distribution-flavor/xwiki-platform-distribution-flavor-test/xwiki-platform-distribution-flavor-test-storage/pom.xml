@@ -35,13 +35,16 @@ Functional tests to prove that documents, objects, properties and attachments ca
 safely under all foreseeable conditions.
   </description>
   <dependencies>
-
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>

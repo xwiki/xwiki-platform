@@ -307,7 +307,7 @@
   #end
   #extendQueryString($url $queryStringParameters)
   &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"
-    #if ($facetValue.name != '')data-facet-value="$escapetool.xml($facetValue.name)"#end&gt;
+    #if ($facetValue.name != '')data-facetvalue="$escapetool.xml($facetValue.name)"#end&gt;
     #if ($facetValue.name == '')
       #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
       #if (!$services.localization.get($facetPrettyValueKey))

@@ -41,6 +41,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
@@ -2021,5 +2023,25 @@ public class XWikiDocumentMockitoTest
         document.setHidden(true);
 
         assertFalse(document.isMetaDataDirty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void readFromTemplate(boolean enforceRequiredRights) throws XWikiException
+    {
+        XWikiDocument templateDocument = new XWikiDocument(new DocumentReference("Wiki", "Space", "Template"));
+        String title = "Test Template";
+        templateDocument.setTitle(title);
+        String content = "Test Content";
+        templateDocument.setContent(content);
+        templateDocument.setEnforceRequiredRights(enforceRequiredRights);
+        templateDocument.setSyntax(Syntax.XWIKI_2_0);
+        this.oldcore.getSpyXWiki().saveDocument(templateDocument, "", false, this.oldcore.getXWikiContext());
+
+        this.document.readFromTemplate(templateDocument.getDocumentReference(), this.oldcore.getXWikiContext());
+
+        assertEquals(enforceRequiredRights, this.document.isEnforceRequiredRights());
+        assertEquals(title, this.document.getTitle());
+        assertEquals(content, this.document.getContent());
     }
 }

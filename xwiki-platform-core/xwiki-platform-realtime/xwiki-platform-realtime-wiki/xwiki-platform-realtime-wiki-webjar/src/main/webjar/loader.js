@@ -29,7 +29,7 @@ define('xwiki-realtime-wikiEditor-loader', [
     // FIXME: Don't hard-code the field name. We should be able to edit any document field (e.g. TextArea xobject
     // properties), not just the document content.
     field: 'content',
-    href: '&editor=wiki&force=1',
+    href: '&editor=wiki',
     name: 'Wiki',
     compatible: ['wiki', 'wysiwyg']
   };

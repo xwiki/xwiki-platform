@@ -19,12 +19,19 @@
  */
 package org.xwiki.security.requiredrights.test.ui;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.security.requiredrights.test.po.RequiredRightsPreEditCheckElement;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -81,7 +88,14 @@ class RequiredRightsIT
 
         setup.loginAsSuperAdmin();
 
-        setup.gotoPage(testReference, "edit");
+        // Ensure that even if we try forcing edit, we still get the warning as we're missing the CSRF token.
+        // While gotoPage adds a form_token parameter, the force parameter checks against the force_token parameter.
+        setup.gotoPage(testReference, "edit", Map.of("force", "1"));
+
+        ForceEditLockPage forceEditLockPage = new ForceEditLockPage();
+        assertEquals("Warning", forceEditLockPage.getTitle());
+        assertThat(forceEditLockPage.getBody(), containsString(
+            "Editing this page may result in the execution of currently disabled scripts that could be malicious."));
 
         RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
             .toggleDetails();
@@ -97,5 +111,12 @@ class RequiredRightsIT
         requiredRightsPreEditCheckElement.waitForDetailedMessage(1, "Content\n"
             + "the velocity script to execute\n"
             + "macro2");
+
+        forceEditLockPage.clickForceEdit();
+        WikiEditPage wikiEditPage = new WikiEditPage();
+        String newContent = "New content";
+        wikiEditPage.setContent(newContent);
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals(newContent, viewPage.getContent());
     }
 }

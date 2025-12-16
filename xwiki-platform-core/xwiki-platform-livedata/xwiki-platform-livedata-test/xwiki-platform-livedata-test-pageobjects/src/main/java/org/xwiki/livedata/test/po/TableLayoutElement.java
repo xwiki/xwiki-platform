@@ -517,48 +517,73 @@ public class TableLayoutElement extends BaseElement
         WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
-        if (classes.contains("filter-list")) {
-            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
-                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                // Wait for the suggestions on selectize fields only if this is explicitly asked.
-                suggestInputElement.clearSelectedSuggestions().sendKeys(content);
-                if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
-                    suggestInputElement.waitForSuggestions().selectByVisibleText(content);
-                } else {
-                    suggestInputElement.selectTypedText();
-                }
-            } else {
-                new Select(element).selectByVisibleText(content);
-            }
-        } else if (classes.contains("filter-text")) {
-            element.clear();
-            if (content.isEmpty()) {
-                // Make sure we generate some actual key events so LD notices the empty filter.
-                element.sendKeys(" ", Keys.BACK_SPACE);
-            } else {
-                element.sendKeys(content);
-            }
-            try {
-                // Wait for the duration of the debounce, to make sure the text filtering process is started before
-                // continuing.
-                Thread.sleep(250);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        } else if (classes.contains("filter-date")) {
-            element.click();
-            DateRangePicker picker = new DateRangePicker(element);
-            if (StringUtils.isNotBlank(content)) {
-                element.clear();
-                element.sendKeys(content);
-                picker.applyRange();
-            } else {
-                picker.clearRange();
-            }
+        String filterType = classes.stream().filter(it -> it.startsWith("filter-")).findFirst()
+            .orElseThrow(() -> new IllegalStateException("No filter type found for column: " + columnLabel));
+        switch (filterType) {
+            case "filter-list" -> filterListColumn(content, options, element);
+            case "filter-text" -> filterTextColumn(content, element);
+            case "filter-date" -> filterDateColumn(content, element);
+            case "filter-boolean" -> filterBooleanColumn(content, element);
+            default -> throw new IllegalStateException("Unsupported filter type: " + filterType);
         }
 
         if (wait) {
             waitUntilReady();
+        }
+    }
+
+    private static void filterListColumn(String content, Map<String, Object> options, WebElement filterElement)
+    {
+        if (filterElement.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+            SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
+            // Wait for the suggestions on selectize fields only if this is explicitly asked.
+            suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+            if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+                suggestInputElement.waitForSuggestions().selectByVisibleText(content);
+            } else {
+                suggestInputElement.selectTypedText();
+            }
+        } else {
+            new Select(filterElement).selectByVisibleText(content);
+        }
+    }
+
+    private static void filterBooleanColumn(String content, WebElement filterElement)
+    {
+        SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
+        suggestInputElement.clear().sendKeys(content);
+        suggestInputElement.waitForNonTypedSuggestions();
+        suggestInputElement.selectByVisibleText(content);
+    }
+
+    private static void filterTextColumn(String content, WebElement filterElement)
+    {
+        filterElement.clear();
+        if (content.isEmpty()) {
+            // Make sure we generate some actual key events so LD notices the empty filter.
+            filterElement.sendKeys(" ", Keys.BACK_SPACE);
+        } else {
+            filterElement.sendKeys(content);
+        }
+        try {
+            // Wait for the duration of the debounce, to make sure the text filtering process is started before
+            // continuing.
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void filterDateColumn(String content, WebElement element)
+    {
+        element.click();
+        DateRangePicker picker = new DateRangePicker(element);
+        if (StringUtils.isNotBlank(content)) {
+            element.clear();
+            element.sendKeys(content);
+            picker.applyRange();
+        } else {
+            picker.clearRange();
         }
     }
 

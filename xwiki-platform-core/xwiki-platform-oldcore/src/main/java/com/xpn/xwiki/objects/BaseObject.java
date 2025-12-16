@@ -54,6 +54,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     private static final long serialVersionUID = 1L;
 
     private String guid;
+    private BaseClass sourceXClass;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -573,5 +574,33 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     {
         ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);
         return objectEvaluator.evaluate(this);
+    }
+
+    /**
+     * @return the actual XClass defining that object.
+     */
+    public BaseClass getSourceXClass()
+    {
+        return sourceXClass;
+    }
+
+    /**
+     * @param sourceXClass see {@link #getSourceXClass()}.
+     * @return the current instance.
+     */
+    public BaseObject setSourceXClass(BaseClass sourceXClass)
+    {
+        this.sourceXClass = sourceXClass;
+        return this;
+    }
+
+    @Override
+    public BaseClass getXClass(XWikiContext context)
+    {
+        if (getSourceXClass() != null) {
+            return getSourceXClass();
+        } else {
+            return super.getXClass(context);
+        }
     }
 }

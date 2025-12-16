@@ -61,7 +61,7 @@ export type BlockNoteConcreteMacro = {
 
 // @beta
 export type BlockNoteViewWrapperProps = {
-    blockNoteOptions?: Partial<Omit<DefaultEditorOptionsType, "schema" | "collaboration">>;
+    blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">>;
     theme?: "light" | "dark";
     lang: EditorLanguage;
     content: BlockType[];
@@ -78,6 +78,9 @@ export type BlockNoteViewWrapperProps = {
     };
     onChange?: (editor: EditorType) => void;
     linkEditionCtx: LinkEditionContext;
+    overrides?: {
+        imageEdition?: ImageEditionOverrideFn;
+    };
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -668,6 +671,9 @@ export function createDictionary(lang: EditorLanguage): {
 };
 
 // @beta
+export type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
+
+// @beta
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
 
 // @beta
@@ -697,6 +703,9 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
+export type ImageEditionOverrideFn = (image: BlockOfType<"image">, update: (newProps: Partial<BlockOfType<"image">["props"]>) => void) => void;
+
+// @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta (undocumented)
@@ -723,10 +732,6 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 //
 // @beta
 export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
-
-// Warnings were encountered during analysis:
-//
-// dist/components/BlockNoteViewWrapper.d.ts:17:5 - (ae-forgotten-export) The symbol "DefaultEditorOptionsType" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -18,26 +18,55 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { useComponentsContext } from "@blocknote/react";
-import { useState } from "react";
+import { useBlockNoteEditor, useComponentsContext } from "@blocknote/react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
 import type { LinkEditionContext } from "../../misc/linkSuggest";
 
-export type CustomImageToolbarProps = {
+type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;
   linkEditionCtx: LinkEditionContext;
+  imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
+
+/**
+ * Interceptor for the image edition mechanism
+ *
+ * @since 0.26
+ * @beta
+ */
+type ImageEditionOverrideFn = (
+  image: BlockOfType<"image">,
+  update: (newProps: Partial<BlockOfType<"image">["props"]>) => void,
+) => void;
 
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
   linkEditionCtx,
+  imageEditionOverrideFn,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
+  const editor = useBlockNoteEditor();
 
   const [showLinkEditor, setShowLinkEditor] = useState(false);
+
+  const updateImageProps = useCallback(
+    (newProps: Partial<BlockOfType<"image">["props"]>) => {
+      editor.updateBlock(currentBlock, { props: newProps });
+    },
+    [currentBlock, editor],
+  );
+
+  const openEditor = useCallback(() => {
+    if (imageEditionOverrideFn) {
+      imageEditionOverrideFn(currentBlock, updateImageProps);
+    } else {
+      setShowLinkEditor(true);
+    }
+  }, [imageEditionOverrideFn, currentBlock, editor]);
 
   return (
     <>
@@ -49,7 +78,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
             className="bn-button"
             label={t("blocknote.imageToolbar.buttons.edit")}
             icon={<RiPencilLine />}
-            onClick={() => setShowLinkEditor(true)}
+            onClick={openEditor}
           />
         </Components.Generic.Popover.Trigger>
         <Components.Generic.Popover.Content
@@ -72,3 +101,5 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
     </>
   );
 };
+
+export type { CustomImageToolbarProps, ImageEditionOverrideFn };

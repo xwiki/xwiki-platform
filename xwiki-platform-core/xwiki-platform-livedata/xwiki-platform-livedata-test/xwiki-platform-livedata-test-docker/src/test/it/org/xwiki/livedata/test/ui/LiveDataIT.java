@@ -755,7 +755,8 @@ class LiveDataIT
         // Create a test page.
         DocumentReference testPageDocumentReference =
             new DocumentReference("TestPage", testReference.getLastSpaceReference());
-        testUtils.rest().savePage(testPageDocumentReference, "", "Test Page");
+        String testPageTitle = "Test Page";
+        testUtils.rest().savePage(testPageDocumentReference, "", testPageTitle);
         String content = """
             {{liveData
                 id="test"
@@ -765,13 +766,20 @@ class LiveDataIT
             }}{{/liveData}}
             """.formatted(
                 testUtils.serializeReference(testReference.getLocalDocumentReference().getParent()));
-        testUtils.createPage(testReference, content, "Live Data Test");
+        String liveDataTitle = "enforceRequiredRights LiveData";
+        testUtils.createPage(testReference, content, liveDataTitle);
 
         TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
-        assertEquals(2, tableLayout.countRows());
-        tableLayout.assertRow(DOC_TITLE_COLUMN, "Live Data Test");
-        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
-        tableLayout.filterColumn(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, liveDataTitle);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
+
+        // Test sorting on the enforceRequiredRights column.
+        tableLayout.sortBy(ENFORCE_REQUIRED_RIGHTS_COLUMN);
+        // Ensure that both rows are still present.
+        tableLayout.waitUntilRowCountEqualsTo(2);
+
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, testPageTitle);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
 
@@ -780,7 +788,7 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(0);
         tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE, true);
         tableLayout.waitUntilRowCountEqualsTo(1);
-        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
 
         // Remove the required rights filter to edit the value (the edit action of the page object doesn't like when
@@ -795,7 +803,7 @@ class LiveDataIT
         // Change the filter to check that setting the filter to TRUE now returns the page.
         tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true);
         tableLayout.waitUntilRowCountEqualsTo(1);
-        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
     }
 

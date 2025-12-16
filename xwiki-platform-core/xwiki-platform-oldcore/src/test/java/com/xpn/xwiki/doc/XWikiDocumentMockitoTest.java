@@ -1698,7 +1698,7 @@ public class XWikiDocumentMockitoTest
         this.baseObject.removeField("passwd");
         this.baseObject2.removeField("passwd");
         // We also need to remove the field from the sourceXClass, else it will appear as an empty field value.
-        this.baseObject.getSourceXClass().removeField("passwd");
+        //this.baseObject.getSourceXClass().removeField("passwd");
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         Document document = this.document.toXMLDocument(this.oldcore.getXWikiContext());

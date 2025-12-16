@@ -459,11 +459,11 @@ public class TableLayoutElement extends BaseElement
             }
 
             // Cells are displayed. And they are loaded.
-            if (isEmpty() || !areCellsLoaded()) {
+            if ((expectedRowCount > 0 && isEmpty()) || !areCellsLoaded()) {
                 return false;
             }
 
-            // And the count of row is greater than the expected count.
+            // And the count of row is equal to the expected count.
             int count = countRows();
             LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
             return count == expectedRowCount;
@@ -784,7 +784,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding document or XClass
+     * property
      * @param newValue the new value of the field
      */
     public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
@@ -797,7 +798,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding document or XClass
+     * property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @since 13.5RC1
      * @since 13.4.1
@@ -993,7 +995,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding XClass or document
+     * property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @param save if the edit shall be saved (if false, the edit is cancelled)
      */
@@ -1013,7 +1016,17 @@ public class TableLayoutElement extends BaseElement
         element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
 
         // Selector of the edited field.
-        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        By selector;
+        // Document properties don't have a name attribute on their input, so we need to handle them differently.
+        // When we should have different editable properties in XWiki standard, we should generalize this to also
+        // support other types of properties that don't start with "doc.".
+        if (fieldName.startsWith("doc.")) {
+            // At the moment, all included displayers in LiveData except for XObject properties use an input without a
+            // name attribute.
+            selector = By.cssSelector("input");
+        } else {
+            selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        }
 
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);

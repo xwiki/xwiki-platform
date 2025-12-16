@@ -776,19 +776,24 @@ class LiveDataIT
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
 
         // Test the filter on the enforceRequiredRights column.
-        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true);
         tableLayout.waitUntilRowCountEqualsTo(0);
-        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE, true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
+
+        // Remove the required rights filter to edit the value (the edit action of the page object doesn't like when
+        // the row disappears after an edit).
+        new SuggestInputElement(tableLayout.getFilter(ENFORCE_REQUIRED_RIGHTS_COLUMN)).clear().hideSuggestions();
+        tableLayout.waitUntilRowCountEqualsTo(1);
 
         // Edit the enforceRequiredRights column.
-        tableLayout.editCell(ENFORCE_REQUIRED_RIGHTS_COLUMN, 1, ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
-        tableLayout.waitUntilRowCountEqualsTo(0);
+        tableLayout.editCell(ENFORCE_REQUIRED_RIGHTS_COLUMN, 1, ENFORCE_REQUIRED_RIGHTS_COLUMN,
+            Boolean.TRUE.toString());
 
-        // Change the filter to see the updated value.
-        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        // Change the filter to check that setting the filter to TRUE now returns the page.
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);

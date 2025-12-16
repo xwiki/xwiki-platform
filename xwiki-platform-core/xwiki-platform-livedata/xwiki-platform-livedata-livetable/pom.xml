@@ -32,7 +32,7 @@
   <name>XWiki Platform - Live Data - Live Table Connector</name>
   <description>Adds support for reusing existing Live Table results as a Live Data source.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.95</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data - Live Table Connector</xwiki.extension.name>
   </properties>

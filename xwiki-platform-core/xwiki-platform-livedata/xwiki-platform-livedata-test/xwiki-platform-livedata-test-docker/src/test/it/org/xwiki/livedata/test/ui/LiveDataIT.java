@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import org.apache.hc.core5.net.PercentCodec;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,6 +42,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Page;
@@ -643,6 +645,98 @@ class LiveDataIT
         suggestInputElement.selectByVisibleText(option3);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
+    }
+
+    @Test
+    @Order(7)
+    void livedataLivetableTableLayoutWithCustomClass(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // Custom page content that sets the class on the individual properties. We filter the documents based on the
+        // space.
+        List<String> properties = List.of(DOC_TITLE_COLUMN, NAME_COLUMN, CHOICE_COLUMN);
+        String encodedReference =
+            PercentCodec.RFC3986.encode(testUtils.serializeReference(testReference.getLocalDocumentReference()));
+        EntityReference localSpaceReference = testReference.getLocalDocumentReference().getParent();
+        String content =
+            """
+                {{liveData
+                    id="test"
+                    properties="%s"
+                    limit="5"
+                    source="liveTable"
+                    sourceParameters="translationPrefix=&location=%s&%s_class=%s&%s_class=%s"
+                /}}
+                """.formatted(
+                String.join(",", properties),
+                PercentCodec.RFC3986.encode(testUtils.serializeReference(localSpaceReference)),
+                NAME_COLUMN,
+                encodedReference,
+                CHOICE_COLUMN,
+                encodedReference
+                );
+        testUtils.rest().savePage(testReference, content, "Custom Class");
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+        // Create another page without XObject so we can test adding an object.
+        DocumentReference noXObjectPage = new DocumentReference("NoXObject", testReference.getLastSpaceReference());
+        testUtils.rest().savePage(noXObjectPage, "", "No XObject");
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        // Test the Live Data content. We should have 5 rows: 3 XObjects + 1 No XObject + the result page.
+        assertEquals(5, tableLayout.countRows());
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_A);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
+
+        // Make sure that we have a selectized filter for the choice column.
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
+        suggestInputElement.click().waitForNonTypedSuggestions();
+        assertTrue(suggestInputElement.getSuggestions().stream().anyMatch(s -> s.getLabel().equals(CHOICE_A)));
+        // Filter by Choice A should return only Lynda.
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Clear the filter again.
+        suggestInputElement.clearSelectedSuggestions();
+        // Wait for all rows to be back.
+        tableLayout.waitUntilRowCountEqualsTo(5);
+
+        // Edit the choice column of Lynda.
+        // Filter the table to Lynda.
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, "O1", true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_C);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Edit the choice column of the "No XObject" page.
+        // Filter the table to "No XObject".
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, "No XObject", true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_D);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+        // The name should still be empty.
+        tableLayout.assertRow(NAME_COLUMN, "");
+
+        // Edit the name column of the "No XObject" page.
+        String newName = "New Name";
+        tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, newName);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, newName);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

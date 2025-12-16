@@ -53,6 +53,7 @@ import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.LevelsClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -123,6 +124,58 @@ class LiveTableLiveDataPropertyStoreTest
         defaultConfig.getMeta().getPropertyDescriptors().add(docTitle);
 
         when(this.defaultConfigProvider.get()).thenReturn(defaultConfig);
+    }
+
+    @Test
+    void getExtraProperty() throws Exception
+    {
+        String propertyClass = "Property.Class";
+        this.propertyStore.getParameters().put("property_class", propertyClass);
+        this.propertyStore.getParameters().put("non_existing_property_class", propertyClass);
+        String inaccessiblePropertyClass = "Property.OtherClass";
+        this.propertyStore.getParameters().put("property_other_class", inaccessiblePropertyClass);
+
+        DocumentReference propertyClassReference = new DocumentReference("wiki", "Property", "Class");
+        DocumentReference inaccessiblePropertyClassReference = new DocumentReference("wiki", "Property", "OtherClass");
+        when(this.currentDocumentReferenceResolver.resolve(propertyClass)).thenReturn(propertyClassReference);
+        when(this.currentDocumentReferenceResolver.resolve(inaccessiblePropertyClass))
+            .thenReturn(inaccessiblePropertyClassReference);
+        when(this.localEntityReferenceSerializer.serialize(propertyClassReference)).thenReturn(propertyClass);
+        when(this.localEntityReferenceSerializer.serialize(inaccessiblePropertyClassReference))
+            .thenReturn(inaccessiblePropertyClass);
+        when(this.authorization.hasAccess(Right.VIEW, propertyClassReference)).thenReturn(true);
+
+        XWikiDocument propertyClassDocument = mock();
+        when(this.xwiki.getDocument(propertyClassReference, this.xcontext)).thenReturn(propertyClassDocument);
+
+        BaseClass xclass = mock();
+        when(propertyClassDocument.getXClass()).thenReturn(xclass);
+        when(xclass.getDocumentReference()).thenReturn(propertyClassReference);
+
+        StringClass stringField = mock();
+        when(stringField.getName()).thenReturn("property");
+        when(stringField.getTranslatedPrettyName(this.xcontext)).thenReturn("Property");
+        when(stringField.getHint()).thenReturn("My test property");
+        when(stringField.getClassType()).thenReturn("String");
+
+        when(xclass.get("property")).thenReturn(stringField);
+
+        LiveDataPropertyDescriptor descriptor0 = new LiveDataPropertyDescriptor();
+        descriptor0.setId("doc.title");
+
+        LiveDataPropertyDescriptor expectedDescriptor  = new LiveDataPropertyDescriptor();
+        expectedDescriptor.setId("property");
+        expectedDescriptor.setName("Property");
+        expectedDescriptor.setDescription("My test property");
+        expectedDescriptor.setType("String");
+        LiveDataPropertyDescriptor.DisplayerDescriptor displayer1 =
+            new LiveDataPropertyDescriptor.DisplayerDescriptor();
+        displayer1.setId("xObjectProperty");
+        expectedDescriptor.setDisplayer(displayer1);
+
+        assertEquals(List.of(descriptor0, expectedDescriptor), this.propertyStore.get());
+
+        verify(this.authorization).hasAccess(Right.VIEW, inaccessiblePropertyClassReference);
     }
 
     @Test

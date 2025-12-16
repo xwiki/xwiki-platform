@@ -28,8 +28,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -41,8 +41,6 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Represents the user Notifications tab.
@@ -134,11 +132,11 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("_", System.currentTimeMillis())
             .build();
         try {
-            GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
-            if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
-                String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
+            CloseableHttpResponse response = testUtils.rest().executeGet(attemptURI);
+            if (Set.of(200, 202).contains(response.getCode())) {
+                String responseBody = EntityUtils.toString(response.getEntity());
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
-                return getOptionalLong(String.valueOf(map.get("unread")), responseBody);
+                return getOptionalLong(String.valueOf(map.get("unread"))    );
             } else {
                 return Optional.empty();
             }
@@ -147,7 +145,7 @@ public class NotificationsTrayPage extends ViewPage
         }
     }
 
-    private static Optional<Long> getOptionalLong(String str, String responseBody)
+    private static Optional<Long> getOptionalLong(String str)
     {
         try {
             return Optional.of(Long.parseLong(str));

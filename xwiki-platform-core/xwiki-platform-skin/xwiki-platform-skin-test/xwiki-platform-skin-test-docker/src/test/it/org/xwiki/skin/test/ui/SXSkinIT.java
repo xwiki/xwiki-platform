@@ -21,7 +21,7 @@ package org.xwiki.skin.test.ui;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -41,10 +41,8 @@ class SXSkinIT
     {
         URI uri = new URI(setup.getURL("Main", "WebHome", "sx", "resource=../../WEB-INF/xwiki.cfg"));
 
-        GetMethod response = setup.rest().executeGet(uri);
-
-        assertNotEquals(200, response.getStatusCode());
-
-        response.releaseConnection();
+        try (CloseableHttpResponse response = setup.rest().executeGet(uri)) {
+            assertNotEquals(200, response.getCode());
+        }
      }
 }

@@ -27,12 +27,10 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +49,8 @@ import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.Assert.assertEquals;
 
 public class ObjectsResourceIT extends AbstractHttpIT
 {
@@ -78,11 +78,11 @@ public class ObjectsResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
-        GetMethod getMethod =
-            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
         Link link = getFirstLinkByRelation(page, Relations.OBJECTS);
 
         /* Create a tag object if it doesn't exist yet */
@@ -90,10 +90,9 @@ public class ObjectsResourceIT extends AbstractHttpIT
             Object object = objectFactory.createObject();
             object.setClassName("XWiki.TagClass");
 
-            PostMethod postMethod = executePostXml(
-                buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), object,
+            response = executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName), object,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-            Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_CREATED, response.getCode());
         }
     }
 
@@ -101,27 +100,27 @@ public class ObjectsResourceIT extends AbstractHttpIT
     @Test
     public void testRepresentation() throws Exception
     {
-        GetMethod getMethod =
-            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
         Link link = getFirstLinkByRelation(page, Relations.OBJECTS);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertFalse(objects.getObjectSummaries().isEmpty());
 
         for (ObjectSummary objectSummary : objects.getObjectSummaries()) {
             link = getFirstLinkByRelation(objectSummary, Relations.OBJECT);
-            getMethod = executeGet(link.getHref());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            response = executeGet(link.getHref());
+            assertEquals(HttpStatus.SC_OK, response.getCode());
 
-            Object object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Object object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
             checkLinks(objectSummary);
 
@@ -134,9 +133,9 @@ public class ObjectsResourceIT extends AbstractHttpIT
     @Test
     public void testGETNotExistingObject() throws Exception
     {
-        GetMethod getMethod = executeGet(
-            buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, "NOTEXISTING", 0).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, "NOTEXISTING", 0));
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getCode());
     }
 
     public Property getProperty(Object object, String propertyName)
@@ -162,22 +161,22 @@ public class ObjectsResourceIT extends AbstractHttpIT
         object.setClassName("XWiki.TagClass");
         object.getProperties().add(property);
 
-        PostMethod postMethod =
-            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), object,
+        CloseableHttpResponse response =
+            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName), object,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, response.getCode());
 
-        object = (Object) unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+        object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Assert.assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
+        assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            object.getClassName(), object.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            object.getClassName(), object.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Assert.assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
+        assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
     }
 
     @Test
@@ -191,10 +190,10 @@ public class ObjectsResourceIT extends AbstractHttpIT
         Object object = objectFactory.createObject();
         object.getProperties().add(property);
 
-        PostMethod postMethod =
-            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), object,
+        CloseableHttpResponse response =
+            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName), object,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_BAD_REQUEST, postMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_BAD_REQUEST, response.getCode());
     }
 
     @Test
@@ -209,9 +208,9 @@ public class ObjectsResourceIT extends AbstractHttpIT
         object.setClassName("XWiki.TagClass");
         object.getProperties().add(property);
 
-        PostMethod postMethod =
-            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), object);
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_UNAUTHORIZED, postMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName), object);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getCode());
     }
 
     @Test
@@ -221,25 +220,25 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
         Object objectToBePut = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBePut.getClassName(), objectToBePut.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces,
+            this.pageName, objectToBePut.getClassName(), objectToBePut.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Object objectSummary = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Object objectSummary = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
         getProperty(objectSummary, "tags").setValue(TAG_VALUE);
 
-        PutMethod putMethod = executePutXml(
+        response = executePutXml(
             buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBePut.getClassName(),
-                objectToBePut.getNumber()).toString(),
+                objectToBePut.getNumber()),
             objectSummary, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-        Object updatedObjectSummary = (Object) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+        Object updatedObjectSummary = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Assert.assertEquals(TAG_VALUE, getProperty(updatedObjectSummary, "tags").getValue());
-        Assert.assertEquals(objectSummary.getClassName(), updatedObjectSummary.getClassName());
-        Assert.assertEquals(objectSummary.getNumber(), updatedObjectSummary.getNumber());
+        assertEquals(TAG_VALUE, getProperty(updatedObjectSummary, "tags").getValue());
+        assertEquals(objectSummary.getClassName(), updatedObjectSummary.getClassName());
+        assertEquals(objectSummary.getNumber(), updatedObjectSummary.getNumber());
     }
 
     @Test
@@ -249,25 +248,25 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
         Object objectToBePut = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBePut.getClassName(), objectToBePut.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces,
+            this.pageName, objectToBePut.getClassName(), objectToBePut.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Object object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Object object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
         String originalTagValue = getProperty(object, "tags").getValue();
         getProperty(object, "tags").setValue(TAG_VALUE);
 
-        PutMethod putMethod = executePutXml(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBePut.getClassName(), objectToBePut.getNumber()).toString(), object);
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_UNAUTHORIZED, putMethod.getStatusCode());
+        response = executePutXml(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            objectToBePut.getClassName(), objectToBePut.getNumber()), object);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getCode());
 
-        getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBePut.getClassName(), objectToBePut.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            objectToBePut.getClassName(), objectToBePut.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Assert.assertEquals(originalTagValue, getProperty(object, "tags").getValue());
+        assertEquals(originalTagValue, getProperty(object, "tags").getValue());
     }
 
     @Test
@@ -275,15 +274,15 @@ public class ObjectsResourceIT extends AbstractHttpIT
     {
         Object objectToBeDeleted = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        DeleteMethod deleteMethod = executeDelete(
+        CloseableHttpResponse response = executeDelete(
             buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBeDeleted.getClassName(),
-                objectToBeDeleted.getNumber()).toString(),
+                objectToBeDeleted.getNumber()),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NO_CONTENT, response.getCode());
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()));
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getCode());
     }
 
     @Test
@@ -291,13 +290,13 @@ public class ObjectsResourceIT extends AbstractHttpIT
     {
         Object objectToBeDeleted = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        DeleteMethod deleteMethod = executeDelete(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_UNAUTHORIZED, deleteMethod.getStatusCode());
+        CloseableHttpResponse response = executeDelete(buildURI(ObjectResource.class, getWiki(), this.spaces,
+            this.pageName, objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getCode());
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
     }
 
     @Test
@@ -308,18 +307,18 @@ public class ObjectsResourceIT extends AbstractHttpIT
         /* Make sure that an Object with the TagClass exists. */
         createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod =
-            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
         Link link = getFirstLinkByRelation(page, Relations.OBJECTS);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertFalse(objects.getObjectSummaries().isEmpty());
 
@@ -329,10 +328,10 @@ public class ObjectsResourceIT extends AbstractHttpIT
             if (objectSummary.getClassName().equals("XWiki.TagClass")) {
                 link = getFirstLinkByRelation(objectSummary, Relations.OBJECT);
                 Assert.assertNotNull(link);
-                getMethod = executeGet(link.getHref());
-                Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+                response = executeGet(link.getHref());
+                assertEquals(HttpStatus.SC_OK, response.getCode());
 
-                currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+                currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
                 break;
             }
         }
@@ -350,19 +349,19 @@ public class ObjectsResourceIT extends AbstractHttpIT
         Property newTags = objectFactory.createProperty();
         newTags.setValue(TAG_VALUE);
 
-        PutMethod putMethod = executePutXml(tagsPropertyLink.getHref(), newTags,
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        response = executePutXml(tagsPropertyLink.getHref(), newTags, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-        getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            currentObject.getClassName(), currentObject.getNumber()).toString());
-        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            currentObject.getClassName(), currentObject.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
         tagsProperty = getProperty(currentObject, "tags");
 
-        Assert.assertEquals(TAG_VALUE, tagsProperty.getValue());
+        assertEquals(TAG_VALUE, tagsProperty.getValue());
     }
 
     @Test
@@ -373,18 +372,18 @@ public class ObjectsResourceIT extends AbstractHttpIT
         /* Make sure that an Object with the TagClass exists. */
         createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod =
-            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
         Link link = getFirstLinkByRelation(page, Relations.OBJECTS);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertFalse(objects.getObjectSummaries().isEmpty());
 
@@ -394,10 +393,10 @@ public class ObjectsResourceIT extends AbstractHttpIT
             if (objectSummary.getClassName().equals("XWiki.TagClass")) {
                 link = getFirstLinkByRelation(objectSummary, Relations.OBJECT);
                 Assert.assertNotNull(link);
-                getMethod = executeGet(link.getHref());
-                Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+                response = executeGet(link.getHref());
+                assertEquals(HttpStatus.SC_OK, response.getCode());
 
-                currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+                currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
                 break;
             }
         }
@@ -412,40 +411,38 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
         Assert.assertNotNull(tagsPropertyLink);
 
-        PutMethod putMethod = executePut(tagsPropertyLink.getHref(), TAG_VALUE, MediaType.TEXT_PLAIN,
+        response = executePut(tagsPropertyLink.getHref(), TAG_VALUE, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-        getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            currentObject.getClassName(), currentObject.getNumber()).toString());
-        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            currentObject.getClassName(), currentObject.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
         tagsProperty = getProperty(currentObject, "tags");
 
-        Assert.assertEquals(TAG_VALUE, tagsProperty.getValue());
+        assertEquals(TAG_VALUE, tagsProperty.getValue());
     }
 
     private Object createObjectIfDoesNotExists(String className, List<String> spaces, String pageName) throws Exception
     {
         createPageIfDoesntExist(spaces, pageName, "");
 
-        GetMethod getMethod = executeGet(buildURI(ObjectsResource.class, getWiki(), spaces, pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(ObjectsResource.class, getWiki(), spaces, pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
 
         for (ObjectSummary objectSummary : objects.getObjectSummaries()) {
             if (objectSummary.getClassName().equals(className)) {
                 Link link = getFirstLinkByRelation(objectSummary, Relations.OBJECT);
                 Assert.assertNotNull(link);
-                getMethod = executeGet(link.getHref());
-                Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+                response = executeGet(link.getHref());
+                assertEquals(HttpStatus.SC_OK, response.getCode());
 
-                Object object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-
-                return object;
+                return (Object) unmarshaller.unmarshal(response.getEntity().getContent());
             }
         }
 
@@ -453,11 +450,11 @@ public class ObjectsResourceIT extends AbstractHttpIT
         Object object = objectFactory.createObject();
         object.setClassName(className);
 
-        PostMethod postMethod = executePostXml(buildURI(ObjectsResource.class, getWiki(), spaces, pageName).toString(),
-            object, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
+        response = executePostXml(buildURI(ObjectsResource.class, getWiki(), spaces, pageName), object,
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_CREATED, response.getCode());
 
-        object = (Object) unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+        object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
         return object;
     }
@@ -469,29 +466,26 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
         Object objectToBePut = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            objectToBePut.getClassName(), objectToBePut.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces,
+            this.pageName, objectToBePut.getClassName(), objectToBePut.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Object object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Object object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        NameValuePair[] nameValuePairs = new NameValuePair[1];
-        nameValuePairs[0] = new NameValuePair("property#tags", TAG_VALUE);
-
-        PostMethod postMethod = executePostForm(
+        response = executePostForm(
             String.format("%s?method=PUT",
                 buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBePut.getClassName(),
-                    objectToBePut.getNumber()).toString()),
-            nameValuePairs, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+                    objectToBePut.getNumber())),
+            List.of(new BasicNameValuePair("property#tags", TAG_VALUE)),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
 
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-        Object updatedObjectSummary = (Object) unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+        Object updatedObjectSummary = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Assert.assertEquals(TAG_VALUE, getProperty(updatedObjectSummary, "tags").getValue());
-        Assert.assertEquals(object.getClassName(), updatedObjectSummary.getClassName());
-        Assert.assertEquals(object.getNumber(), updatedObjectSummary.getNumber());
+        assertEquals(TAG_VALUE, getProperty(updatedObjectSummary, "tags").getValue());
+        assertEquals(object.getClassName(), updatedObjectSummary.getClassName());
+        assertEquals(object.getNumber(), updatedObjectSummary.getNumber());
     }
 
     @Test
@@ -499,58 +493,52 @@ public class ObjectsResourceIT extends AbstractHttpIT
     {
         final String TAG_VALUE = "TAG";
 
-        NameValuePair[] nameValuePairs = new NameValuePair[2];
-        nameValuePairs[0] = new NameValuePair("className", "XWiki.TagClass");
-        nameValuePairs[1] = new NameValuePair("property#tags", TAG_VALUE);
+        CloseableHttpResponse response =
+            executePostForm(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName),
+                List.of(new BasicNameValuePair("className", "XWiki.TagClass"),
+                    new BasicNameValuePair("property#tags", TAG_VALUE)),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_CREATED, response.getCode());
 
-        PostMethod postMethod = executePostForm(
-            buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), nameValuePairs,
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
+        Object object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        Object object = (Object) unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+        assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
 
-        Assert.assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            object.getClassName(), object.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        GetMethod getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            object.getClassName(), object.getNumber()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        object = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
-        object = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-
-        Assert.assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
+        assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
     }
 
     @Test
     public void testPOSTObjectFormUrlEncodedNoCSRF() throws Exception
     {
         final String tagValue = "TAG";
-        NameValuePair[] nameValuePairs = new NameValuePair[2];
         String className = "XWiki.TagClass";
-        nameValuePairs[0] = new NameValuePair("className", className);
-        nameValuePairs[1] = new NameValuePair("property#tags", tagValue);
 
         String objectGetURI = buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName, className);
 
         // Count objects before to ensure nothing is added on the failed request.
-        GetMethod getMethod = executeGet(objectGetURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        CloseableHttpResponse response = executeGet(objectGetURI);
+        assertEquals(HttpStatus.SC_OK, response.getCode());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
         int numObjects = objects.getObjectSummaries().size();
 
-        PostMethod postMethod = executePostForm(
-            buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName), nameValuePairs,
+        response = executePostForm(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName),
+            List.of(new BasicNameValuePair("className", className), new BasicNameValuePair("property#tags", tagValue)),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword(), null);
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_FORBIDDEN, postMethod.getStatusCode());
-        Assert.assertEquals("Invalid or missing form token.", postMethod.getResponseBodyAsString());
+        assertEquals(HttpStatus.SC_FORBIDDEN, response.getCode());
+        assertEquals("Invalid or missing form token.", EntityUtils.toString(response.getEntity()));
 
-        getMethod = executeGet(objectGetURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(objectGetURI);
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertEquals(numObjects, objects.getObjectSummaries().size());
+        objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
+        assertEquals(numObjects, objects.getObjectSummaries().size());
     }
-
 
     @Test
     public void testPUTPropertyFormUrlEncoded() throws Exception
@@ -560,18 +548,18 @@ public class ObjectsResourceIT extends AbstractHttpIT
         /* Make sure that an Object with the TagClass exists. */
         createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
-        GetMethod getMethod =
-            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
         Link link = getFirstLinkByRelation(page, Relations.OBJECTS);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Objects objects = (Objects) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Objects objects = (Objects) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertFalse(objects.getObjectSummaries().isEmpty());
 
@@ -581,10 +569,10 @@ public class ObjectsResourceIT extends AbstractHttpIT
             if (objectSummary.getClassName().equals("XWiki.TagClass")) {
                 link = getFirstLinkByRelation(objectSummary, Relations.OBJECT);
                 Assert.assertNotNull(link);
-                getMethod = executeGet(link.getHref());
-                Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+                response = executeGet(link.getHref());
+                assertEquals(HttpStatus.SC_OK, response.getCode());
 
-                currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+                currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
                 break;
             }
         }
@@ -599,23 +587,20 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
         Assert.assertNotNull(tagsPropertyLink);
 
-        NameValuePair[] nameValuePairs = new NameValuePair[1];
-        nameValuePairs[0] = new NameValuePair("property#tags", TAG_VALUE);
+        response = executePostForm(String.format("%s?method=PUT", tagsPropertyLink.getHref()),
+            List.of(new BasicNameValuePair("property#tags", TAG_VALUE)),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-        PostMethod postMethod =
-            executePostForm(String.format("%s?method=PUT", tagsPropertyLink.getHref()), nameValuePairs,
-                TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getStatusCode());
+        response = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
+            currentObject.getClassName(), currentObject.getNumber()));
+        assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
-            currentObject.getClassName(), currentObject.getNumber()).toString());
-        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-
-        currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
         tagsProperty = getProperty(currentObject, "tags");
 
-        Assert.assertEquals(TAG_VALUE, tagsProperty.getValue());
+        assertEquals(TAG_VALUE, tagsProperty.getValue());
     }
 
     @Test
@@ -630,32 +615,31 @@ public class ObjectsResourceIT extends AbstractHttpIT
             Property property = getProperty(objectToBePut, "tags");
             property.setValue(value);
 
-            PutMethod putMethod = executePutXml(
+            CloseableHttpResponse response = executePutXml(
                 buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBePut.getClassName(),
-                    objectToBePut.getNumber()).toString(),
+                    objectToBePut.getNumber()),
                 objectToBePut, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-            Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_ACCEPTED, response.getCode());
 
-            GetMethod getMethod =
-                executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            response = executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+            assertEquals(HttpStatus.SC_OK, response.getCode());
 
-            Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Page page = (Page) unmarshaller.unmarshal(response.getEntity().getContent());
 
             versionToValueMap.put(page.getVersion(), value);
         }
 
         for (String version : versionToValueMap.keySet()) {
-            GetMethod getMethod = executeGet(buildURI(ObjectAtPageVersionResource.class, getWiki(), this.spaces,
-                this.pageName, version, objectToBePut.getClassName(), objectToBePut.getNumber()).toString());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            CloseableHttpResponse response = executeGet(buildURI(ObjectAtPageVersionResource.class, getWiki(),
+                this.spaces, this.pageName, version, objectToBePut.getClassName(), objectToBePut.getNumber()));
+            assertEquals(HttpStatus.SC_OK, response.getCode());
 
-            Object currentObject = (Object) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Object currentObject = (Object) unmarshaller.unmarshal(response.getEntity().getContent());
 
             Property property = getProperty(currentObject, "tags");
 
-            Assert.assertEquals(versionToValueMap.get(version), property.getValue());
+            assertEquals(versionToValueMap.get(version), property.getValue());
 
             checkLinks(currentObject);
             for (Property p : currentObject.getProperties()) {
@@ -687,40 +671,40 @@ public class ObjectsResourceIT extends AbstractHttpIT
             createObjectIfDoesNotExists(className, spaces2, pageName2);
 
             // Test: basic retrieval
-            GetMethod getMethod = executeGet(
+            CloseableHttpResponse response = executeGet(
                 buildURI(AllObjectsForClassNameResource.class, getWiki(), className));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            Objects objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(HttpStatus.SC_OK, response.getCode());
+            Objects objects = (Objects) this.unmarshaller.unmarshal(response.getEntity().getContent());
             Assert.assertTrue(objects.getObjectSummaries().size() >= 2);
 
             // Test: pagination with number=2
-            getMethod = executeGet(
+            response = executeGet(
                 buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=2");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(HttpStatus.SC_OK, response.getCode());
+            objects = (Objects) this.unmarshaller.unmarshal(response.getEntity().getContent());
             Assert.assertEquals(2, objects.getObjectSummaries().size());
 
             String secondPage = objects.getObjectSummaries().get(1).getPageName();
 
             // Test: pagination with number=1 and start=1
-            getMethod = executeGet(
+            response = executeGet(
                 buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=1&start=1");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(HttpStatus.SC_OK, response.getCode());
+            objects = (Objects) this.unmarshaller.unmarshal(response.getEntity().getContent());
             Assert.assertEquals(1, objects.getObjectSummaries().size());
             Assert.assertEquals(secondPage, objects.getObjectSummaries().get(0).getPageName());
 
             // Test: error for number=-1
-            getMethod = executeGet(
+            response = executeGet(
                 buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=-1");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            Assert.assertEquals(400, response.getCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(response.getEntity()));
 
             // Test: error for number=1001
-            getMethod = executeGet(
+            response = executeGet(
                 buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=1001");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            Assert.assertEquals(400, response.getCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(response.getEntity()));
         } finally {
             this.testUtils.rest().delete(ref1);
             this.testUtils.rest().delete(ref2);

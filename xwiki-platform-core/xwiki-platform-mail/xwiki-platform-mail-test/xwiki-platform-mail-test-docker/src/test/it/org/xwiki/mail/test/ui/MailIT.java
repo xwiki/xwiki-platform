@@ -28,13 +28,13 @@ import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
@@ -216,7 +216,7 @@ class MailIT
         // We also add an attachment to the Mail Template page to verify that it is sent in the mail
         ByteArrayInputStream bais = new ByteArrayInputStream("Content of attachment".getBytes());
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
-            new UsernamePasswordCredentials("superadmin", "pass"));
+            new XWikiCredentials("superadmin", "pass"));
 
         String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
             testConfiguration.getServletEngine().getInternalIP(),

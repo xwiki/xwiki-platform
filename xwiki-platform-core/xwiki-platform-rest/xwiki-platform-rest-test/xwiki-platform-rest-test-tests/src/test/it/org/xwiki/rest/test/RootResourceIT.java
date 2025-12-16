@@ -19,8 +19,8 @@
  */
 package org.xwiki.rest.test;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.rest.Relations;
@@ -35,10 +35,10 @@ public class RootResourceIT extends AbstractHttpIT
     @Test
     public void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(RootResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(getFullUri(RootResource.class));
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Link link = getFirstLinkByRelation(xwiki, Relations.WIKIS);
         Assert.assertNotNull(link);

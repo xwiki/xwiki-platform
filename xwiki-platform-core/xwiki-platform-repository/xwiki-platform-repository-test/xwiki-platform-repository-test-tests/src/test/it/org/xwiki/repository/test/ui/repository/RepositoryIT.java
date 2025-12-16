@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +40,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.Resources;
@@ -73,8 +73,7 @@ import static org.junit.Assert.fail;
  */
 public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 {
-    public static final UsernamePasswordCredentials USER_CREDENTIALS =
-        new UsernamePasswordCredentials("Author", "password");
+    public static final XWikiCredentials USER_CREDENTIALS = new XWikiCredentials("Author", "password");
 
     private static final String IDPREFIX = "prefix-";
 

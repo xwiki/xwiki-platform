@@ -1,15 +1,21 @@
 {
   "private": true,
   "name": "@xwiki/platform-node",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "api-extractor:ci": "nx run-many -t api-extractor:ci -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "api-extractor:local": "nx run-many -t api-extractor:local -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "build": "nx run-many -t build -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "deploy": "node scripts/deploy.js",
     "lint": "nx run-many -t lint -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "publint": "pnpm --filter \"./**\" -r exec publint --pack pnpm --strict ",
     "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@eslint/config-helpers": "catalog:",
     "@eslint/js": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "eslint": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
@@ -20,6 +26,7 @@
     "eslint-plugin-tsdoc": "catalog:",
     "eslint-plugin-vue": "catalog:",
     "globals": "catalog:",
+    "publint": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",

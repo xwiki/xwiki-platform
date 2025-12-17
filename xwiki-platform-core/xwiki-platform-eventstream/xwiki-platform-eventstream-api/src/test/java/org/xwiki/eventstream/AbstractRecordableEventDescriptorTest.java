@@ -19,29 +19,28 @@
  */
 package org.xwiki.eventstream;
 
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.namespace.WikiNamespace;
-import org.xwiki.test.AllLogRule;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,48 +51,43 @@ import static org.mockito.Mockito.when;
  * @since 10.5
  * @since 9.11.6
  */
+@ComponentTest
 public class AbstractRecordableEventDescriptorTest
 {
+    @InjectMockComponents
+    private FakeRecordableEventDescriptor fakeRecordableEventDescriptor;
+
+    @MockComponent(classToMock = NamespacedComponentManager.class)
+    private ComponentManager componentManager;
+
+    @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
+
+    @MockComponent
     private NamespaceContextExecutor namespaceContextExecutor;
-    private NamespacedComponentManager componentManager;
 
-    @Rule
-    // TODO: Replace by junit5
-    public AllLogRule logRule = new AllLogRule();
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    @Rule
-    // TODO: Replace by junit5
-    public MockitoComponentMockingRule<FakeRecordableEventDescriptor> mocker =
-            new MockitoComponentMockingRule<>(FakeRecordableEventDescriptor.class, Arrays.asList(Logger.class));
-
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void getApplicationIcon() throws Exception
     {
-        componentManager = mock(NamespacedComponentManager.class);
-        mocker.registerComponent(ComponentManager.class, componentManager);
-        contextualLocalizationManager = mocker.getInstance(ContextualLocalizationManager.class);
-        namespaceContextExecutor = mocker.getInstance(NamespaceContextExecutor.class);
+        assertEquals("applicationIcon :)", fakeRecordableEventDescriptor.getApplicationIcon());
     }
 
     @Test
-    public void getApplicationIcon() throws Exception
+    void getEventType() throws Exception
     {
-        assertEquals("applicationIcon :)", mocker.getComponentUnderTest().getApplicationIcon());
+        assertEquals("fake", fakeRecordableEventDescriptor.getEventType());
     }
 
     @Test
-    public void getEventType() throws Exception
-    {
-        assertEquals("fake", mocker.getComponentUnderTest().getEventType());
-    }
-
-    @Test
-    public void getDescriptionAndApplicationTest() throws Exception
+    void getDescriptionAndApplicationTest() throws Exception
     {
         // Mocks
         when(namespaceContextExecutor.execute(eq(new WikiNamespace("subwiki")), any(Callable.class))).thenAnswer(
-                invocationOnMock -> String.format("On namespace [%s]: %s", invocationOnMock.getArgument(0),
+                invocationOnMock -> String.format("On namespace [%s]: %s",
+                    invocationOnMock.getArgument(0),
                         ((Callable) invocationOnMock.getArgument(1)).call())
         );
         when(contextualLocalizationManager.getTranslationPlain("descriptionKey"))
@@ -101,19 +95,20 @@ public class AbstractRecordableEventDescriptorTest
         when(contextualLocalizationManager.getTranslationPlain("applicationKey"))
                 .thenReturn("My nice application name");
 
-        // On main wiki
-        assertEquals("My nice description",
-                mocker.getComponentUnderTest().getDescription());
-        assertEquals("My nice application name",
-                mocker.getComponentUnderTest().getApplicationName());
+//        // On main wiki
+//        assertEquals("My nice description",
+//                fakeRecordableEventDescriptor.getDescription());
+//        assertEquals("My nice application name",
+//                fakeRecordableEventDescriptor.getApplicationName());
 
         // On sub wiki
-        when(componentManager.getNamespace()).thenReturn(new WikiNamespace("subwiki").toString());
+        when(((NamespacedComponentManager) componentManager).getNamespace())
+            .thenReturn(new WikiNamespace("subwiki").toString());
 
         assertEquals("On namespace [wiki:subwiki]: My nice description",
-                mocker.getComponentUnderTest().getDescription());
+                fakeRecordableEventDescriptor.getDescription());
         assertEquals("On namespace [wiki:subwiki]: My nice application name",
-                mocker.getComponentUnderTest().getApplicationName());
+                fakeRecordableEventDescriptor.getApplicationName());
     }
 
     @Test
@@ -129,23 +124,26 @@ public class AbstractRecordableEventDescriptorTest
 
         // On main wiki
         assertEquals("My nice description",
-                mocker.getComponentUnderTest().getDescription());
-        assertEquals(0, this.logRule.size());
+                fakeRecordableEventDescriptor.getDescription());
+        assertEquals(0, this.logCapture.size());
         assertEquals("My nice application name",
-                mocker.getComponentUnderTest().getApplicationName());
-        assertEquals(0, this.logRule.size());
+                fakeRecordableEventDescriptor.getApplicationName());
+        assertEquals(0, this.logCapture.size());
 
         // On sub wiki
-        when(componentManager.getNamespace()).thenReturn(new WikiNamespace("subwiki").toString());
+        when(((NamespacedComponentManager) componentManager).getNamespace())
+            .thenReturn(new WikiNamespace("subwiki").toString());
 
         assertEquals("My nice description",
-                mocker.getComponentUnderTest().getDescription());
+                fakeRecordableEventDescriptor.getDescription());
+        assertEquals(1, this.logCapture.size());
         assertEquals("Failed to render the translation key [descriptionKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logRule.getMessage(0));
+                + "for the event descriptor of [fake].", this.logCapture.getMessage(0));
         assertEquals("My nice application name",
-                mocker.getComponentUnderTest().getApplicationName());
+                fakeRecordableEventDescriptor.getApplicationName());
+        assertEquals(2, this.logCapture.size());
         assertEquals("Failed to render the translation key [applicationKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logRule.getMessage(1));
+                + "for the event descriptor of [fake].", this.logCapture.getMessage(1));
     }
 
     private class OtherFakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor

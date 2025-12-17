@@ -155,6 +155,10 @@ administration.section.analytics.status.hint=确定 Google Analytics™ 中的�
 admin.social=社交
 admin.social.description=社交功能的配置。
 
+# Network category
+admin.network=网络
+admin.network.description=网络相关功能。
+
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=分段显示
 XWiki.ConfigurableClass_heading=标题

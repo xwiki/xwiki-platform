@@ -55,7 +55,6 @@ import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerStatesMixin from "./displayerStatesMixin.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
-
 export default {
 
   name: "displayer-xobject-property",
@@ -89,7 +88,7 @@ export default {
         const $ = this.jQuery;
         $(document).trigger("xwiki:actions:beforeSave");
         const fields = $(this.$refs.xObjectPropertyEdit).find(":input").serializeArray();
-        const className = this.data.query.source.className;
+        const className = this.getClassName();
 
         const data = {};
         fields.forEach(field => {
@@ -118,6 +117,15 @@ export default {
       }
     },
 
+    getClassName() {
+      const classNameProperty = this.propertyId + '_class';
+      if (classNameProperty in this.data.query.source) {
+        return this.data.query.source[classNameProperty];
+      } else {
+        return this.data.query.source.className;
+      }
+    },
+
     /**
      * Takes an update method and retrieves its content.
      *
@@ -128,7 +136,7 @@ export default {
     update(updateMethod) {
       this.isLoading = true;
       const documentName = this.logic.getEntryId(this.entry);
-      const className = this.data.query.source.className;
+      const className = this.getClassName();
       const property = this.propertyId;
       return updateMethod(documentName, className, property);
     },

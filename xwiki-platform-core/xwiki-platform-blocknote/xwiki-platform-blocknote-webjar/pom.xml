@@ -38,6 +38,12 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
      <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>
+    {
+      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
+      "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
+    }
+    </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->

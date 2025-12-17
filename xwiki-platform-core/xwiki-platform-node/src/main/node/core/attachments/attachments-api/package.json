@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-attachments-api",
-  "version": "17.10.0",
+  "version": "18.0.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -19,6 +19,7 @@
     }
   },
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
@@ -34,6 +35,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",

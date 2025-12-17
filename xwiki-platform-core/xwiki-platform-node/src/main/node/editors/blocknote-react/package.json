@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-editors-blocknote-react",
-  "version": "17.10.0",
+  "version": "18.0.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -25,6 +25,7 @@
   },
   "main": "./src/index.tsx",
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
@@ -59,6 +60,7 @@
     "react-icons": "catalog:"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@playwright/experimental-ct-react": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/react": "catalog:",

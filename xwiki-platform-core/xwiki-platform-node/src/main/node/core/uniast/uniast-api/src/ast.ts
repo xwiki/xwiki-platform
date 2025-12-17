@@ -61,8 +61,12 @@ type Block =
        * @beta
        */
       type: "macroBlock";
-      name: string;
-      params: Record<string, boolean | number | string>;
+
+      /**
+       * @since 0.24-rc-1
+       * @beta
+       */
+      call: MacroInvocation;
     };
 
 /**
@@ -136,6 +140,24 @@ type TableCell = {
 };
 
 /**
+ * @since 0.24-rc-1
+ * @beta
+ */
+type MacroInvocation = {
+  id: string;
+  params: Record<string, boolean | number | string>;
+  body:
+    | { type: "none" }
+    | { type: "raw"; content: string }
+    // NOTE: This one is for blocks, it should be changed to { type: "blocks", blocks: Block[] } when BlockNote supports nesting
+    // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+    | { type: "inlineContents"; inlineContents: InlineContent[] }
+    // NOTE: This one is for inline contents, it should be changed to { type: "inlineContents", inlineContents: InlineContent[] } when BlockNote supports nesting
+    // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+    | { type: "inlineContent"; inlineContent: InlineContent };
+};
+
+/**
  * @since 0.16
  * @beta
  */
@@ -149,8 +171,12 @@ type InlineContent =
        * @beta
        */
       type: "inlineMacro";
-      name: string;
-      params: Record<string, boolean | number | string>;
+
+      /**
+       * @since 0.24-rc-1
+       * @beta
+       */
+      call: MacroInvocation;
     };
 
 /**
@@ -210,6 +236,7 @@ export type {
   Link,
   LinkTarget,
   ListItem,
+  MacroInvocation,
   TableCell,
   TableColumn,
   Text,

@@ -21,24 +21,19 @@
 import { DefaultMarkdownToUniAstConverter } from "../markdown/default-markdown-to-uni-ast-converter";
 import { DefaultUniAstToMarkdownConverter } from "../markdown/default-uni-ast-to-markdown-converter";
 import { EntityType } from "@xwiki/platform-model-api";
-import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
 import { matches, mock } from "vitest-mock-extended";
 import type { MarkdownParserConfiguration } from "../markdown/internal-links/parser/markdown-parser-configuration";
 import type { ParserConfigurationResolver } from "../markdown/internal-links/parser/parser-configuration-resolver";
 import type { InternalLinksSerializer } from "../markdown/internal-links/serializer/internal-links-serializer";
 import type { InternalLinksSerializerResolver } from "../markdown/internal-links/serializer/internal-links-serializer-resolver";
+import type { MacrosService } from "@xwiki/platform-macros-service";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParser,
   ModelReferenceParserOptions,
   ModelReferenceParserProvider,
-  ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
 // eslint-disable-next-line max-statements
@@ -81,22 +76,13 @@ function init() {
 
   modelReferenceParserProvider.get.mockReturnValue(modelReferenceParser);
 
-  const modelReferenceSerializerProvider =
-    mock<ModelReferenceSerializerProvider>();
-
-  const remoteURLParserProvider = mock<RemoteURLParserProvider>();
-
-  const remoteURLSerializerProvider = mock<RemoteURLSerializerProvider>();
-
   const modelReferenceHandlerProvider = mock<ModelReferenceHandlerProvider>();
-
-  const containerMock = mock<Container>();
 
   const parserConfigurationResolver = mock<ParserConfigurationResolver>();
   const markdownParserConfiguration = mock<MarkdownParserConfiguration>();
-  markdownParserConfiguration.supportFlexmarkInternalLinks.mockReturnValue(
-    false,
-  );
+
+  markdownParserConfiguration.supportFlexmarkInternalLinks = true;
+
   parserConfigurationResolver.get.mockReturnValue(markdownParserConfiguration);
 
   const internalLinksSerializerResolver =
@@ -120,47 +106,42 @@ function init() {
     Promise.resolve(internalLinksSerializer),
   );
 
-  containerMock.get
-    .calledWith("ModelReferenceParserProvider")
-    .mockReturnValue(modelReferenceParserProvider);
+  const macrosService = mock<MacrosService>();
 
-  containerMock.get
-    .calledWith("ModelReferenceSerializerProvider")
-    .mockReturnValue(modelReferenceSerializerProvider);
+  macrosService.get.mockImplementation((id) => {
+    if (Object.hasOwn(TEST_MACROS, id)) {
+      return TEST_MACROS[id];
+    }
 
-  containerMock.get
-    .calledWith("RemoteURLParserProvider")
-    .mockReturnValue(remoteURLParserProvider);
-
-  containerMock.get
-    .calledWith("RemoteURLSerializerProvider")
-    .mockReturnValue(remoteURLSerializerProvider);
-
-  containerMock.get
-    .calledWith("ModelReferenceHandlerProvider")
-    .mockReturnValue(modelReferenceHandlerProvider);
+    throw new Error("Unknown macro ID in test: " + id);
+  });
 
   return {
     modelReferenceParserProvider,
     modelReferenceHandlerProvider,
-    remoteURLSerializerProvider,
     parserConfigurationResolver,
     internalLinksSerializerResolver,
+    macrosService,
   };
 }
 
+// eslint-disable-next-line max-statements
 describe("MarkdownToUniAstConverter", () => {
   const {
     modelReferenceParserProvider,
     modelReferenceHandlerProvider,
     parserConfigurationResolver,
     internalLinksSerializerResolver,
+    macrosService,
   } = init();
+
   const mdToUniAst = new DefaultMarkdownToUniAstConverter(
     modelReferenceParserProvider,
     modelReferenceHandlerProvider,
     parserConfigurationResolver,
+    macrosService,
   );
+
   const uniAstToMd = new DefaultUniAstToMarkdownConverter(
     internalLinksSerializerResolver,
   );
@@ -1047,9 +1028,12 @@ describe("MarkdownToUniAstConverter", () => {
                 type: "text",
               },
               {
-                name: "someInlineMacro",
-                params: {},
                 type: "inlineMacro",
+                call: {
+                  id: "someInlineMacro",
+                  params: {},
+                  body: { type: "none" },
+                },
               },
               {
                 content: " F",
@@ -1065,106 +1049,346 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse various macros syntaxes", async () => {
+  test("parse various contentless macros syntaxes", async () => {
     await testTwoWayConversion({
       startingFrom: [
-        "{{macro/}}",
-        "{{ macro/}}",
-        "{{macro /}}",
-        "{{  macro  / }}",
-        "{{macro param1=1/}}",
-        '{{macro param1="1"/}}',
-        "{{macro param1=1 /}}",
-        '{{macro param1="1" /}}',
-        '{{macro param1="1" param2="2" /}}',
-        '{{macro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
-        '{{macro param1="some \\\\" escaped quote and }} closing braces and \\\\\\ escaped backslashes" /}}',
+        "{{someBlockMacro/}}",
+        "{{ someBlockMacro/}}",
+        "{{someBlockMacro /}}",
+        "{{  someBlockMacro  / }}",
+        "{{someBlockMacro param1=1/}}",
+        '{{someBlockMacro param1="1"/}}',
+        "{{someBlockMacro param1=1 /}}",
+        '{{someBlockMacro param1="1" /}}',
+        '{{someBlockMacro param1="1" param2="2" /}}',
+        '{{someBlockMacro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
       ].join("\n\n"),
       convertsBackTo: [
-        "{{macro /}}",
-        "{{macro /}}",
-        "{{macro /}}",
-        "{{macro /}}",
-        '{{macro param1="1" /}}',
-        '{{macro param1="1" /}}',
-        '{{macro param1="1" /}}',
-        '{{macro param1="1" /}}',
-        '{{macro param1="1" param2="2" /}}',
-        '{{macro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
-        '{{macro param1="some \\\\" escaped quote and }} closing braces and \\\\\\ escaped backslashes" /}}',
+        "{{someBlockMacro /}}",
+        "{{someBlockMacro /}}",
+        "{{someBlockMacro /}}",
+        "{{someBlockMacro /}}",
+        '{{someBlockMacro param1="1" /}}',
+        '{{someBlockMacro param1="1" /}}',
+        '{{someBlockMacro param1="1" /}}',
+        '{{someBlockMacro param1="1" /}}',
+        '{{someBlockMacro param1="1" param2="2" /}}',
+        '{{someBlockMacro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
       ].join("\n\n"),
       withUniAst: {
         blocks: [
           {
-            name: "macro",
-            params: {},
             type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {},
+              body: { type: "none" },
+            },
           },
           {
-            name: "macro",
-            params: {},
             type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {},
+              body: { type: "none" },
+            },
           },
           {
-            name: "macro",
-            params: {},
             type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {},
+              body: { type: "none" },
+            },
           },
           {
-            name: "macro",
-            params: {},
             type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {},
+              body: { type: "none" },
+            },
           },
           {
-            name: "macro",
-            params: {
-              param1: "1",
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "1",
+              },
+              body: { type: "none" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "1",
+              },
+              body: { type: "none" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "1",
+              },
+              body: { type: "none" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "1",
+              },
+              body: { type: "none" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "1",
+                param2: "2",
+              },
+              body: { type: "none" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacro",
+              params: {
+                param1: "param1Value",
+                param2: "param2Value",
+                param3: "param3Value",
+              },
+              body: { type: "none" },
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  test("parse various contentful macros syntaxes", async () => {
+    await testTwoWayConversion({
+      startingFrom: [
+        "{{someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{ someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent }}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{  someBlockMacroWithContent  }}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent param1=1}}Hello **world**{{/someBlockMacroWithContent}}",
+        '{{someBlockMacroWithContent param1="1"}}Hello **world**{{/someBlockMacroWithContent}}',
+        "{{someBlockMacroWithContent param1=1 }}Hello **world**{{/someBlockMacroWithContent}}",
+        '{{someBlockMacroWithContent param1="1" }}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="1" param2="2" }}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="param1Value" param2="param2Value" param3="param3Value" }}Hello **world**{{/someBlockMacroWithContent}}',
+      ].join("\n\n"),
+      convertsBackTo: [
+        "{{someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}Hello **world**{{/someBlockMacroWithContent}}",
+        '{{someBlockMacroWithContent param1="1"}}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="1"}}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="1"}}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="1"}}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="1" param2="2"}}Hello **world**{{/someBlockMacroWithContent}}',
+        '{{someBlockMacroWithContent param1="param1Value" param2="param2Value" param3="param3Value"}}Hello **world**{{/someBlockMacroWithContent}}',
+      ].join("\n\n"),
+      withUniAst: {
+        blocks: [
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {},
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {},
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {},
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {},
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "1",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "1",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "1",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "1",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "1",
+                param2: "2",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+          {
+            type: "macroBlock",
+            call: {
+              id: "someBlockMacroWithContent",
+              params: {
+                param1: "param1Value",
+                param2: "param2Value",
+                param3: "param3Value",
+              },
+              body: { type: "raw", content: "Hello **world**" },
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  test("parse various ambiguous macro syntaxes", async () => {
+    await testTwoWayConversion({
+      startingFrom: [
+        '{{someBlockMacro param1="some \\" escaped quote and }} closing braces and \\\\ escaped backslashes" /}}',
+        '{{someBlockMacroWithContent param1="some \\" escaped quote and }} closing braces and \\\\ escaped backslashes" }}Hello **world**{{/someBlockMacroWithContent}}',
+        "{{someBlockMacroWithContent}}{{someBlockMacro /}}{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}{{someBlockMacroWithContent}}{{/someBlockMacroWithContent}}{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}`{{/someBlockMacroWithContent}}`{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}```{{/someBlockMacroWithContent}}```{{/someBlockMacroWithContent}}",
+      ].join("\n\n"),
+      convertsBackTo: [
+        '{{someBlockMacro param1="some \\" escaped quote and }} closing braces and \\\\ escaped backslashes" /}}',
+        '{{someBlockMacroWithContent param1="some \\" escaped quote and }} closing braces and \\\\ escaped backslashes"}}Hello **world**{{/someBlockMacroWithContent}}',
+        "{{someBlockMacroWithContent}}{{someBlockMacro /}}{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}{{someBlockMacroWithContent}}{{/someBlockMacroWithContent}}{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}`{{/someBlockMacroWithContent}}`{{/someBlockMacroWithContent}}",
+        "{{someBlockMacroWithContent}}```{{/someBlockMacroWithContent}}```{{/someBlockMacroWithContent}}",
+      ].join("\n\n"),
+      withUniAst: {
+        blocks: [
+          {
+            call: {
+              body: { type: "none" },
+              id: "someBlockMacro",
+              params: {
+                param1:
+                  'some " escaped quote and }} closing braces and \\ escaped backslashes',
+              },
             },
             type: "macroBlock",
           },
           {
-            name: "macro",
-            params: {
-              param1: "1",
+            call: {
+              body: { type: "raw", content: "Hello **world**" },
+              id: "someBlockMacroWithContent",
+              params: {
+                param1:
+                  'some " escaped quote and }} closing braces and \\ escaped backslashes',
+              },
             },
             type: "macroBlock",
           },
           {
-            name: "macro",
-            params: {
-              param1: "1",
+            call: {
+              body: {
+                type: "raw",
+                content: "{{someBlockMacro /}}",
+              },
+              id: "someBlockMacroWithContent",
+              params: {},
             },
             type: "macroBlock",
           },
           {
-            name: "macro",
-            params: {
-              param1: "1",
+            call: {
+              body: {
+                type: "raw",
+                content:
+                  "{{someBlockMacroWithContent}}{{/someBlockMacroWithContent}}",
+              },
+              id: "someBlockMacroWithContent",
+              params: {},
             },
             type: "macroBlock",
           },
           {
-            name: "macro",
-            params: {
-              param1: "1",
-              param2: "2",
+            call: {
+              body: {
+                type: "raw",
+                content: "`{{/someBlockMacroWithContent}}`",
+              },
+              id: "someBlockMacroWithContent",
+              params: {},
             },
             type: "macroBlock",
           },
           {
-            name: "macro",
-            params: {
-              param1: "param1Value",
-              param2: "param2Value",
-              param3: "param3Value",
-            },
-            type: "macroBlock",
-          },
-          {
-            name: "macro",
-            params: {
-              param1:
-                'some " escaped quote and }} closing braces and \\ escaped backslashes',
+            call: {
+              body: {
+                type: "raw",
+                content: "```{{/someBlockMacroWithContent}}```",
+              },
+              id: "someBlockMacroWithContent",
+              params: {},
             },
             type: "macroBlock",
           },
@@ -1173,3 +1397,90 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 });
+
+const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {
+  someBlockMacro: {
+    infos: {
+      id: "someBlockMacro",
+      name: "-",
+      description: "-",
+      params: {
+        param1: { type: "string", optional: true },
+        param2: { type: "string", optional: true },
+        param3: { type: "string", optional: true },
+      },
+      paramsDescription: {},
+      defaultParameters: false,
+      bodyType: "none",
+    },
+    renderAs: "block",
+    render: (params) => [
+      {
+        type: "paragraph",
+        styles: {},
+        content: [
+          { type: "text", content: "Param 1 = " + params.body1, styles: {} },
+          { type: "text", content: "Param 2 = " + params.body2, styles: {} },
+          { type: "text", content: "Param 3 = " + params.body3, styles: {} },
+        ],
+      },
+    ],
+  },
+
+  someBlockMacroWithContent: {
+    infos: {
+      id: "someBlockMacroWithContent",
+      name: "-",
+      description: "-",
+      params: {
+        param1: { type: "string", optional: true },
+        param2: { type: "string", optional: true },
+        param3: { type: "string", optional: true },
+      },
+      paramsDescription: {},
+      defaultParameters: false,
+      bodyType: "raw",
+    },
+    renderAs: "block",
+    render: (params, body) => [
+      {
+        type: "paragraph",
+        styles: {},
+        content: [
+          { type: "text", styles: {}, content: body ?? "" },
+          { type: "text", content: "Param 1 = " + params.body1, styles: {} },
+          { type: "text", content: "Param 2 = " + params.body2, styles: {} },
+          { type: "text", content: "Param 3 = " + params.body3, styles: {} },
+        ],
+      },
+    ],
+  },
+
+  someInlineMacro: {
+    infos: {
+      id: "someInlineMacro",
+      name: "-",
+      description: "-",
+      params: {},
+      paramsDescription: {},
+      defaultParameters: false,
+      bodyType: "none",
+    },
+    renderAs: "inline",
+    render: () => [{ type: "text", styles: {}, content: "Inline macro" }],
+  },
+
+  someInlineMacroWithContent: {
+    infos: {
+      id: "someInlineMacro",
+      name: "-",
+      description: "-",
+      params: {},
+      paramsDescription: {},
+      defaultParameters: false,
+      bodyType: "raw",
+    },
+    renderAs: "inline",
+    render: (_, body) => [{ type: "text", styles: {}, content: body ?? "" }],
+  },
+};

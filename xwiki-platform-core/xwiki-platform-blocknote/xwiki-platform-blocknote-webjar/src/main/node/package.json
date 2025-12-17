@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0",
+    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --max-warnings=0",
     "test:unit": "vitest --run"
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "@xwiki/platform-editors-blocknote-headless": "workspace:*",
     "@xwiki/platform-editors-blocknote-react": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
+    "@xwiki/platform-macros-service": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",

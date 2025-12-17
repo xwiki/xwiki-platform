@@ -22,7 +22,7 @@ require(['jquery'], function ($) {
     constructor()
     {
       let self = this;
-      self._insertTagFunction = self._defaultInsertTag;
+      self._insertTagMap = {};
     }
 
    /**
@@ -32,8 +32,10 @@ require(['jquery'], function ($) {
     * @param insertTagFunction the function used for overriding, which needs to take 4 parameters (see
     * _defaultInsertTag) for the example.
     */
-    setInsertTagFunction(insertTagFunction) {
-      this._insertTagFunction = insertTagFunction;
+    setInsertTagFunction(insertTagFunction, textarea) {
+      if (textarea !== undefined) {
+        this._insertTagMap[textarea.id] = insertTagFunction;
+      }
     }
 
     _defaultInsertTag(textarea, tagOpen, tagClose, sampleText) {
@@ -87,7 +89,7 @@ require(['jquery'], function ($) {
             title: item.speedTip
           });
           button.on('click', function () {
-            self._insertTagFunction(textarea[0],
+            self._getInsertTagFunction(textarea[0], self)(textarea[0],
               self._unescapeLineBreaks(item.tagOpen),
               self._unescapeLineBreaks(item.tagClose),
               item.sampleText);
@@ -98,6 +100,14 @@ require(['jquery'], function ($) {
         textarea.before(buttonMenu);
         configElement.addClass('initialized');
         $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
+      }
+    }
+
+    _getInsertTagFunction(textarea, self) {
+      if (self._insertTagMap[textarea.id] !== undefined) {
+        return self._insertTagMap[textarea.id];
+      } else {
+        return self._defaultInsertTag;
       }
     }
 

@@ -218,6 +218,53 @@ function objectEntries<O extends Record<string, unknown>>(
 }
 
 /**
+ * Produce an HTML string representing an element
+ *
+ * @param tagName - The element's tag name
+ * @param attrs - The element's attributes
+ * @param content - The element's inner HTML content
+ *
+ * @returns - The string representation of the HTML element
+ *
+ * @since 0.24-rc-1
+ * @beta
+ */
+function produceHtmlEl(
+  tagName: string,
+  attrs: Record<string, string | undefined>,
+  innerHTML: string | false,
+): string {
+  const el = document.createElement(tagName);
+
+  for (const [name, value] of Object.entries(attrs)) {
+    if (value !== undefined) {
+      el.setAttribute(name, value);
+    }
+  }
+
+  if (innerHTML !== false) {
+    el.innerHTML = innerHTML;
+  }
+
+  return el.outerHTML;
+}
+
+/**
+ * Escape HTML-specific characters in a string
+ *
+ * @param str - The string to escape
+ *
+ * @returns - The HTML-safe string
+ *
+ * @since 0.24-rc-1
+ * @beta
+ */
+function escapeHtml(str: string): string {
+  // NOTE: instantiating XMLSerializer is extremely cheap, so it's not a problem even in a hot loop
+  return new XMLSerializer().serializeToString(document.createTextNode(str));
+}
+
+/**
  * Generic tree structure type.
  * @since 0.23
  * @beta
@@ -229,8 +276,10 @@ type TreeNode<T> = T & {
 export {
   assertInArray,
   assertUnreachable,
+  escapeHtml,
   filterMap,
   objectEntries,
+  produceHtmlEl,
   provideTypeInference,
   tryFallible,
   tryFallibleOrError,

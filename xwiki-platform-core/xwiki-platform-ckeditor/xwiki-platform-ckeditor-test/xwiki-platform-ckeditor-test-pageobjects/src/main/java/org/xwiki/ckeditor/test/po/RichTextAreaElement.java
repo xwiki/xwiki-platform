@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -179,32 +179,27 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             try {
                 getActiveElement().sendKeys(keysToSend);
-                maybeForceSelectionChange();
             } finally {
                 maybeSwitchToDefaultContent();
+                forceSelectionChange();
             }
         }
     }
 
-    private void maybeForceSelectionChange()
+    /**
+     * CKEditor updates its internal selection state asynchronously (with a delay) after a change occurs in the editing
+     * area. This means the selection returned by CKEditor is not always up-to-date right after typing. This is
+     * especially problematic during test execution when keyboard events are simulated in quick succession. We have code
+     * both on the test framework side and on the CKEditor side that relies on the selection. When this code is executed
+     * right after sending keys to the editing area the outcome is not always the same, leading to test instability. We
+     * prevent this by forcing CKEditor to update its selection state.
+     */
+    private void forceSelectionChange()
     {
-        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
-        if (!this.isFrame && browserName.contains("firefox")) {
-            // When editing in-place in Firefox, the selection (caret position) is not updated if the editor is losing
-            // focus immediately after some text has been typed. This happens for instance if you type and then quickly
-            // switch to a different browser tab. When you get back the caret is before the newly typed text instead of
-            // after it. Same happens if you type and then quickly focus another element on the same page (e.g. another
-            // form field). This is a CKEditor bug, which you can reproduce using the CKEditor 4 demo, after selecting
-            // the "Inline" mode. The workaround we found is to force CKEditor to acknowledge the selection change right
-            // after typing, before the editor loses focus. Note that we could have waited for the "selectionChange"
-            // event to be fired after typing, but its documentation says: "this event is fired only when selection's
-            // start element (container of a selecion start) changes, not on every possible selection change", which
-            // means this event is not triggered when we type.
-            getDriver().executeScript("""
-                const name = arguments[0];
-                const editor = CKEDITOR.instances[name];
-                editor.selectionChange(true);""", this.editor.getName());
-        }
+        getDriver().executeScript("""
+            const name = arguments[0];
+            const editor = CKEDITOR.instances[name];
+            editor.selectionChange(true);""", this.editor.getName());
     }
 
     /**
@@ -260,7 +255,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getContent(), html);
+                return Strings.CS.contains(getContent(), html);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -285,7 +280,33 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getText(), textFragment);
+                return Strings.CS.contains(getText(), textFragment);
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        }, timeout);
+    }
+
+    /**
+     * Waits until the rich text area has the specified plain text.
+     * 
+     * @param textFragment the text to wait for
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public void waitUntilTextIs(String text)
+    {
+        waitUntilTextIs(text, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextIs(String text, int timeout)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return Objects.equals(getText(), text);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -300,22 +321,18 @@ public class RichTextAreaElement extends BaseElement
     private WebElement getActiveElement()
     {
         WebElement rootEditableElement = getRootEditableElement();
-        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
-        if (browserName.contains("firefox")) {
-            // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
-            // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
-            // of it using the arrow keys (as if the editing scope is set to that nested editable).
-            focus(rootEditableElement);
-            return rootEditableElement;
-        } else {
-            // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
-            // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
-            // inline the characters we type will be inserted outside the macro content nested editable).
-            WebElement activeElement = getDriver().switchTo().activeElement();
-            boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
-                .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
-            return rootEditableElementIsOrContainsActiveElement ? activeElement : rootEditableElement;
+        // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
+        // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
+        // inline the characters we type will be inserted outside the macro content nested editable).
+        WebElement activeElement = getDriver().switchTo().activeElement();
+        boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
+            .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
+        if (!rootEditableElementIsOrContainsActiveElement) {
+            activeElement = rootEditableElement;
         }
+        // Firefox ignores the sent keys if the target element is not focused.
+        focus(activeElement);
+        return activeElement;
     }
 
     /**
@@ -365,8 +382,8 @@ public class RichTextAreaElement extends BaseElement
     {
         try {
             WebElement rootEditableElement = getRootEditableElement();
-            getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
+            getDriver().waitUntilCondition(driver -> Objects.equals(placeholder,
+                rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -511,6 +528,7 @@ public class RichTextAreaElement extends BaseElement
             script.append("document.body.append(fileInput);\n");
             script.append("return fileInput;\n");
             WebElement fileInput = (WebElement) getDriver().executeScript(script.toString());
+            assert fileInput != null;
 
             // Set the file input value.
             String absolutePath = Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath();
@@ -635,7 +653,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return !StringUtils.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
+                return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -708,11 +726,11 @@ public class RichTextAreaElement extends BaseElement
             // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
             // text area is implemented using an iframe. Here's what we tried:
             // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
-            //   and so on)
+            // and so on)
             // * clicking the image before dragging it
             // * clicking the rich text area before dragging the image
             // * use the root editable element as the drop target, and consider the offsets relative to the top left
-            //   corner of the rich text area
+            // corner of the rich text area
             // * calling perform() after each action
             // * switching to the top frame and dropping on the iframe element used by the rich text area
             getDriver().createActions()

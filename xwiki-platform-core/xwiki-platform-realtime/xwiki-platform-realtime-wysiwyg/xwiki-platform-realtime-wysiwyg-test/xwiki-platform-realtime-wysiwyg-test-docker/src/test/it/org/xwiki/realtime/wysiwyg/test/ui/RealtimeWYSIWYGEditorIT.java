@@ -2586,6 +2586,206 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("superadmin", historyPane.getCurrentAuthor());
     }
 
+    @Test
+    @Order(26)
+    void undoRedoAlone(TestUtils setup, TestReference testReference) {
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        assertTrue(firstEditor.getToolBar().isUndoDisabled());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstTextArea.sendKeys("1");
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+        
+        firstTextArea.sendKeys("2", Keys.LEFT);
+        firstTextArea.waitUntilLocalChangesArePushed();
+        
+        // Select "1" and replace it.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.LEFT));
+        firstTextArea.sendKeys("3");
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("1");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("");
+        assertTrue(firstEditor.getToolBar().isUndoDisabled());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("1");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("32");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstTextArea.sendKeys("4");
+        firstTextArea.waitUntilLocalChangesArePushed();
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+        assertEquals("142", firstTextArea.getText());
+    }
+
+    @Test
+    @Order(27)
+    void localUndoRedo(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab (standalone).
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        // Save the page in order to be able to edit in in-place in the second browser tab.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+        firstTextArea.sendKeys("one |", Keys.LEFT);
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab (in-place).
+        RealtimeInplaceEditablePage inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        RealtimeCKEditor secondEditor = new RealtimeCKEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilTextContains("|");
+        secondTextArea.sendKeys(Keys.END, " red");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("red");
+        firstTextArea.sendKeys("two ");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("two");
+        secondTextArea.sendKeys(" green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("green");
+        firstTextArea.sendKeys(Keys.HOME);
+        // Select "one" and replace.
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        firstTextArea.sendKeys("1");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("1");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT));
+        // Select "red" and replace.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        secondTextArea.sendKeys("-");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("-");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one two | - green");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one | - green");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        firstTextArea.waitUntilTextIs("one two | - green");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextIs("one two | - green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one two | red green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one two | red");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one two | red green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextIs("one two | red green");
+        firstTextArea.sendKeys("[");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("[");
+
+        // Verify we can still redo local changes after a remote change is received.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | red");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | red green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | - green");
+
+        // Verify the care position after a redo/undo sequence.
+        secondTextArea.sendKeys("]");
+        assertEquals("one[ two | -] green", secondTextArea.getText());
+    }
+
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();

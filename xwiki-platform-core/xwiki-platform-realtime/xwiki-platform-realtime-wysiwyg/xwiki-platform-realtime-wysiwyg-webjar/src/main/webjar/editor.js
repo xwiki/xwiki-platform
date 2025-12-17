@@ -211,6 +211,18 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     focus() {
       throw new Error('Not implemented!');
     }
+
+    /**
+     * Overwrite the default undo/redo handling of the editor.
+     *
+     * @param {Object} historyHandler an object that implements the {canUndo, undo, canRedo, redo} interface
+     * @returns {Object} an object containing the {@code destroy} function, which can be used to restore the default
+     *   undo/redo handling, and the {@code updateState} function, which can be used to enable/disable the undo/redo
+     *   actions
+     */
+    handleHistory(historyHandler) {
+      throw new Error('Not implemented!');
+    }
   }
 
   return Editor;

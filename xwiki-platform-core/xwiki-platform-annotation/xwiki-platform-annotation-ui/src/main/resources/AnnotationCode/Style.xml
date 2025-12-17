@@ -269,20 +269,21 @@
      The highlights can happen in the middle of words, and it would look odd. */
   padding: 0;
   cursor: pointer;
-  &amp;:hover, &amp;:focus {
+  &amp;.hovered,
+  &amp;.hovered .annotation-highlight, &amp;.hovered .selection-highlight {
     /* We want to increase the accent on the element when hovered. 
-       The btn warning background color does that without reducing contrast with the default text color too much. */
+       The btn warning background color does that without reducing contrast with the default text color too much. 
+       We use this class set dynamically in JS instead of pseudo classes because we want highlights to span multiple
+       marks across text blocks. */
+    /* We repeat the selector because of nested annotation marks. */
     background-color: var(--btn-warning-bg);
   }
 }
 
-/* Reset the styles so that the button doesn't distract from the text. */
-.annotation-highlight &gt; button.annotation-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  text-align: left;
-  white-space-collapse: preserve;
+/* Reset the styles so that the action link doesn't distract from the text. */
+.annotation &gt; a.annotation-toggle {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Annotation boxes */

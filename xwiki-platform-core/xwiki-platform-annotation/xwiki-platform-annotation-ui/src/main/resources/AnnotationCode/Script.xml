@@ -166,11 +166,13 @@ XWiki.Selection = Class.create({
       return;
     }
     this.range = window.getSelection().getRangeAt(0);
-    // ignore if the selection is in the passed container
+    // ignore if the selection is not in the passed container
     if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
       return;
     }
     this.selectionText = this.range.toString();
+    this.selectionText = this.selectionText.replace(
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))",'')
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
     }
@@ -190,14 +192,13 @@ XWiki.Selection = Class.create({
 
   // these functions are here because they depend on selection
 
-  highlightSelection : function(color) {
+  highlightSelection : function() {
     if (!this.range) {
       // there should be some selection at this point
       return;
     }
     // create an annotation highlight span around this content
     var highlightWrapperTemplate = new Element('mark', {
-      'style': 'background-color: ' + color, 
       'class': 'selection-highlight'
     });
     // get all the text nodes of this range
@@ -999,15 +1000,31 @@ XWiki.Annotation = Class.create({
     // All the highlights elements fulfill the same role so there's little point extending every single one.
     // It could be detrimental for the user experience to have to tab through all of the buttons.
     let firstSpanContent = allSpans[0].textContent;
-    let toggleButton = document.createElement('button');
+    let toggleButton = document.createElement('a');
+    toggleButton.href="#";
     toggleButton.id = 'ID' + ann.annotationId;
     toggleButton.addClassName('annotation-toggle');
+    toggleButton.addClassName('force-no-underline');
     toggleButton.textContent = firstSpanContent;
     allSpans[0].innerHTML = '';
     allSpans[0].appendChild(toggleButton);
     // Add the onclick listener on every span of this annotation.
     allSpans.forEach(markNode =&gt; markNode.addEventListener('click', (event) =&gt;
       this.onMarkerClick(event, ann.annotationId)));
+    let onMarkerHover = function(event, allSpans) {
+      allSpans.forEach((span) =&gt; span.classList.add('hovered'));
+    };
+    let onMarkerHoverLeft = function(event, allSpans) {
+      allSpans.forEach((span) =&gt; span.classList.remove('hovered'));
+    };
+    // Add the hover listener on every span to highlight every part of its annotation
+    allSpans.forEach(function(markNode){
+      markNode.addEventListener('mouseover', (event) =&gt; onMarkerHover(event, allSpans));
+      markNode.addEventListener('mouseout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
+    });
+    // Only the first span button can be focused with the keyboard.
+    toggleButton.addEventListener('focus', (event) =&gt; onMarkerHover(event, allSpans));
+    toggleButton.addEventListener('focusout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
   },
 
   /**
@@ -1017,18 +1034,12 @@ XWiki.Annotation = Class.create({
    * @param ann object holding information about the annotation
    */
   markAnnotation: function(markedNode, ann) {
-    let wrapper;
-    let parentNode = markedNode.parentElement;
-    let wrapperQuery = document.querySelectorAll('.ID' + ann.annotationId);
-    if(wrapperQuery.length === 0) {
-      wrapper = document.createElement('mark');
-      wrapper.addClassName('annotation');
-      wrapper.addClassName('ID' + ann.annotationId);
-      parentNode.replaceChild(wrapper, markedNode);
-    } else {
-      wrapper=wrapperQuery[0];
-      parentNode.removeChild(markedNode);
-    }
+    var wrapper = document.createElement('mark');
+    wrapper.addClassName('annotation');
+    wrapper.addClassName('ID' + ann.annotationId);
+
+    var parentNode = markedNode.parentElement;
+    parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);
   },
 
@@ -1186,9 +1197,9 @@ XWiki.Annotation = Class.create({
    * was deleted.
    */
   removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("mark.annotation, button.annotation-toggle, mark.selection-highlight")
+    document.querySelectorAll("mark.annotation, a.annotation-toggle, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span[id^='annotation-toggle-description-']").forEach(description => description.remove());
+    document.querySelectorAll("span[id^='annotation-toggle-description-']").forEach(description =&gt; description.remove());
     this.fetchedAnnotations = false;
   },
 
@@ -1624,7 +1635,7 @@ XWiki.Annotation = Class.create({
     document.fire('xwiki:actions:cancel');
 
     // Remove all the places where the bubble id is used as an attribute on other elements.
-    document.querySelectorAll('[aria-details="' + bubble.id + '"]').forEach((mark) => {
+    document.querySelectorAll('[aria-details="' + bubble.id + '"]').forEach((mark) =&gt; {
       mark.removeAttribute('aria-details');
     });
 
@@ -1748,8 +1759,7 @@ XWiki.Annotation = Class.create({
   },
 
   displayAnnotationCreationForm : function() {
-    // TODO: get this color from the color theme
-    this.selectionService.highlightSelection('#FFEE99');
+    this.selectionService.highlightSelection();
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
     this.createPanel = this.displayLoadingBubble(position.left, position.top, false);

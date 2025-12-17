@@ -390,7 +390,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseObject bobj = newCustomClassInstance(context);
         DocumentReference classReference = getDocumentReference();
         bobj.setXClassReference(classReference.removeParent(classReference.getWikiReference()));
-        bobj.setSourceXClass(this);
 
         return bobj;
     }
@@ -1351,7 +1350,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass bclass = context.getWiki().getXClass(classReference, context);
         BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(fallback);
         object.setXClassReference(classReference);
-        object.setSourceXClass(bclass);
 
         return object;
     }

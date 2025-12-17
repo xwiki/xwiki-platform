@@ -31,7 +31,7 @@
         // selection when the Source mode is active. In that case we take the selection directly from the plain text
         // area used for editing the source. We'll have to update this code when and if we'll add support for syntax
         // highlighting to the Source area.
-        const selection = editor.getSelection();
+        const selection = editor.getSelection(/* force real selection */ true);
         const domRanges = selection?.getRanges().map(range => {
           const domRange = range.startContainer.$.ownerDocument.createRange();
           domRange.setStart(range.startContainer.$, range.startOffset);

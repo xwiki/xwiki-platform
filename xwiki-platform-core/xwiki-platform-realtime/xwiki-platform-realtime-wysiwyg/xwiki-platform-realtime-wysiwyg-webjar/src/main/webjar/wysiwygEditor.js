@@ -29,11 +29,12 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-crypto',
   'xwiki-realtime-document',
   'xwiki-realtime-wysiwyg-patches',
+  'xwiki-realtime-wysiwyg-editHistory',
   'xwiki-l10n!xwiki-realtime-messages'
 ], function (
   /* jshint maxparams:false */
   $, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto, xwikiDocument, Patches,
-  Messages
+  EditHistory, Messages
 ) {
   'use strict';
 
@@ -628,6 +629,8 @@ define('xwiki-realtime-wysiwyg', [
         // Use the remote content as the initial content, since this is the first time we connect.
         await this._onRemote(info);
       }
+
+      this._connection.editHistory = new EditHistory(this._patchedEditor);
     }
 
     _onLocal(localContent) {
@@ -636,7 +639,7 @@ define('xwiki-realtime-wysiwyg', [
       }
       if (typeof localContent !== 'string') {
         // Get the local content from the editor.
-        localContent = this._patchedEditor.getHyperJSON();
+        localContent = this._getLocalContent();
       }
       let remoteContent = this._connection.chainpad.getUserDoc();
       if (localContent === remoteContent) {
@@ -658,6 +661,20 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
+    _getLocalContent() {
+      if (this._connection.editHistory) {
+        // Also save the current state in the edit history.
+        try {
+          return this._connection.editHistory.saveState(/* local change */ true);
+        } catch (e) {
+          console.error("Failed to save the current state in the edit history.", e);
+          // Fall back to getting the content directly from the editor.
+        }
+      }
+
+      return this._patchedEditor.getHyperJSON();
+    }
+
     async _onRemote(info) {
       if (this._connection.status !== ConnectionStatus.CONNECTED) {
         return;
@@ -675,6 +692,7 @@ define('xwiki-realtime-wysiwyg', [
         // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they
         // had to be reloaded, e.g. rendering macros have to be rendered server-side).
         await this._patchedEditor.setHyperJSON(remoteContent);
+        this._connection.editHistory?.saveState(/* local change */ false);
 
         const localContent = this._patchedEditor.getHyperJSON();
         if (localContent !== remoteContent) {
@@ -768,6 +786,9 @@ define('xwiki-realtime-wysiwyg', [
       // Stop the autosave (and leave the saver Netflux channel associated with the edited document).
       await this._saver?.stop();
 
+      // Revert to the default edit history, which doesn't distinguish between local and remote changes.
+      this._connection.editHistory?.destroy();
+
       // Remove the realtime edit toolbar.
       this._connection.toolbar.destroy();
 
@@ -837,25 +858,13 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _merge(previous, next, current) {
-      /* jshint camelcase:false */
-      const debug = ChainPad.Common.global.REALTIME_DEBUG = ChainPad.Common.global.REALTIME_DEBUG || {};
-      const previousParseError = debug.ot_parseError;
-      const previousApplyError = debug.ot_applyError;
-      delete debug.ot_parseError;
-      delete debug.ot_applyError;
       try {
         return Patches.merge(previous, next, current);
-      } finally {
-        // Merged failed.
-        this._connection.lastMergeFailed = debug.ot_parseError || debug.ot_applyError;
-
-        // Restore the previous errors.
-        if (!debug.ot_parseError) {
-          debug.ot_parseError = previousParseError;
-        }
-        if (!debug.ot_applyError) {
-          debug.ot_applyError = previousApplyError;
-        }
+      } catch (error) {
+        console.debug('Failed to perform 3-way merge: ', {error, previous, next, current});
+        this._connection.lastMergeFailed = true;
+        // Keep the next version.
+        return next;
       }
     }
 

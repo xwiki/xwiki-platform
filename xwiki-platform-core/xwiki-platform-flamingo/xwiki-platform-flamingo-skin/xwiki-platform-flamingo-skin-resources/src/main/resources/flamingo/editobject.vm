@@ -98,8 +98,18 @@
       <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
         #foreach ($prop in $deprecatedProperties)
-          <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-          <dd class="disabled">${escapetool.xml($prop.value)}</dd>
+          <dt class="disabled property-name"><label>${escapetool.xml($prop.name)}:</label></dt>
+          #if ($objecttool.instanceOf($prop.property, 'com.xpn.xwiki.objects.PasswordProperty'))
+            <dd class="disabled obfuscated property-value" data-property-name="$escapetool.xml($prop.name)">
+              <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+                $services.icon.renderHTML('info')
+              </span>
+            </dd>
+          #else
+            <dd class="disabled property-value" data-property-name="$escapetool.xml($prop.name)">
+              ${escapetool.xml($prop.value)}
+            </dd>
+          #end
         #end
       </dl>
       <div>

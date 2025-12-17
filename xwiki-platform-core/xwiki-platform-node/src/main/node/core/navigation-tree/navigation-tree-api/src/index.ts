@@ -32,8 +32,12 @@ type NavigationTreeNode = {
   /** the id of a node, used by the NavigationTreeSource to access children */
   id: string;
   label: string;
-  /** the location of the corresponding page on Cristal */
-  location: SpaceReference | DocumentReference;
+  /**
+   * The location of the corresponding page on Cristal.
+   * @since 0.25
+   * @beta
+   */
+  location: SpaceReference;
   url: string;
   has_children: boolean;
   /**

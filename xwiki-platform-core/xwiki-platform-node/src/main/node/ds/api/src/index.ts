@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { navigationTreePropsDefaults } from "./XNavigationTree";
-import { navigationTreeSelectPropsDefaults } from "./XNavigationTreeSelect";
 import type { AlertActions, AlertProps, AlterAction } from "./XAlert";
 import type { AvatarProps } from "./XAvatar";
 import type {
@@ -39,8 +37,6 @@ import type { LoadProps } from "./XLoad";
 import type { MenuProps } from "./XMenu";
 import type { MenuItemProps } from "./XMenuItem";
 import type { MenuLabelProps } from "./XMenuLabel";
-import type { NavigationTreeProps } from "./XNavigationTree";
-import type { NavigationTreeSelectProps } from "./XNavigationTreeSelect";
 import type { SelectProps } from "./XSelect";
 import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
@@ -93,16 +89,15 @@ type AbstractElements = {
   XMenu: DefineComponent<MenuProps & HTMLAttributes>;
   XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
   XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
-  XNavigationTree: DefineComponent<NavigationTreeProps & HTMLAttributes>;
-  XNavigationTreeSelect: DefineComponent<
-    NavigationTreeSelectProps & HTMLAttributes
-  >;
   XSelect: DefineComponent<SelectProps & HTMLAttributes>;
   XTab: DefineComponent<TabProps & HTMLAttributes>;
   XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
   XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
-  XTree: DefineComponent<TreeProps & HTMLAttributes>;
+  XTree: DefineComponent<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TreeProps<DisplayableTreeNode & any> & HTMLAttributes
+  >;
 };
 
 // Expose all the abstract components types. For instance: props, actions, model value.
@@ -129,8 +124,6 @@ export type {
   MenuItemProps,
   MenuLabelProps,
   MenuProps,
-  NavigationTreeProps,
-  NavigationTreeSelectProps,
   SelectProps,
   TabGroupProps,
   TabPanelProps,
@@ -138,8 +131,6 @@ export type {
   TextFieldProps,
   TreeProps,
 };
-
-export { navigationTreePropsDefaults, navigationTreeSelectPropsDefaults };
 
 // Inspired from what shoelace is doing to expose the types of their web components in Vue.
 declare module "vue" {

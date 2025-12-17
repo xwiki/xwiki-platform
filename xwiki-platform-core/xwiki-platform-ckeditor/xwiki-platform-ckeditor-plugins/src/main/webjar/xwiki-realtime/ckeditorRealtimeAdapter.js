@@ -515,6 +515,36 @@ define('xwiki-ckeditor-realtime-adapter', [
     focus() {
       this._ckeditor.focus();
     }
+
+    /** @inheritdoc */
+    handleHistory(handler) {
+      const commandListener = this._ckeditor.on('beforeCommandExec', (event) => {
+        if (event.data.name === 'undo' || event.data.name === 'redo') {
+          // Disable the default undo / redo behavior.
+          this._ckeditor.undoManager.enabled = false;
+          handler[event.data.name].call(handler);
+        }
+      });
+
+      const originalOnChange = this._ckeditor.undoManager.onChange;
+      this._ckeditor.undoManager.onChange = () => {
+        // Keep the default behavior disabled.
+        this._ckeditor.undoManager.enabled = false;
+        this._ckeditor.commands.undo.setState(handler.canUndo() ? this._CKEDITOR.TRISTATE_OFF
+          : this._CKEDITOR.TRISTATE_DISABLED);
+        this._ckeditor.commands.redo.setState(handler.canRedo() ? this._CKEDITOR.TRISTATE_OFF
+          : this._CKEDITOR.TRISTATE_DISABLED);
+      };
+
+      return {
+        destroy: () => {
+          commandListener.removeListener();
+          this._ckeditor.undoManager.onChange = originalOnChange;
+        },
+
+        updateState: () => this._ckeditor.undoManager.onChange()
+      };
+    }
   }
 
   return CKEditorAdapter;

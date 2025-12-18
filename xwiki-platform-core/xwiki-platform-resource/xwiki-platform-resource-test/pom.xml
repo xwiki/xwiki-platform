@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-resource</artifactId>
-    <version>17.10.1-SNAPSHOT</version>
+    <version>17.10.1</version>
   </parent>
   <artifactId>xwiki-platform-resource-test</artifactId>
   <name>XWiki Platform - Resource - Tests - Parent POM</name>
@@ -42,6 +42,6 @@
   </modules>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.1</tag>
   </scm>
 </project>

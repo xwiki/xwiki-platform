@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>17.10.1-SNAPSHOT</version>
+    <version>17.10.1</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -134,6 +134,6 @@
   </build>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.1</tag>
   </scm>
 </project>

@@ -158,9 +158,8 @@ public class XWikiAttachmentContent implements Cloneable
      * Note that {@link #clone()} never copy the actual content of the instance.
      * @param skipContent {@code false} to also copy the content while performing the clone.
      * @return a clone with the copied content or not depending on the parameter.
-     * @since 17.2.0RC1
-     * @since 16.10.5
-     * @since 16.4.7
+     * @since 17.10.2
+     * @since 18.0.0RC1
      */
     @Unstable
     public XWikiAttachmentContent clone(boolean skipContent)
@@ -168,7 +167,9 @@ public class XWikiAttachmentContent implements Cloneable
         XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
         if (!skipContent) {
             try {
-                clone.setContent(getContentInputStream(), true);
+                boolean contentDirty = this.isContentDirty();
+                clone.setContent(getContentInputStream());
+                clone.setContentDirty(contentDirty);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to clone data to storage.", e);
             }
@@ -335,34 +336,14 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
-        setContent(is, false);
-    }
-
-    /**
-     * Set the content of the attachment from an InputStream.
-     *
-     * @param is the input stream that will be read
-     * @param skipDirty don't change the dirty flag: use {@code true} when using this method for cloning an already
-     * existing attachment content.
-     * @throws IOException when an error occurs during streaming operation
-     * @since 17.2.0RC1
-     * @since 16.10.5
-     * @since 16.4.7
-     */
-    @Unstable
-    public void setContent(InputStream is, boolean skipDirty) throws IOException
-    {
         OutputStream fios = getContentOutputStream();
         try {
             IOUtils.copy(is, fios);
         } finally {
             fios.close();
         }
-
-        if (!skipDirty) {
-            // Indicate the content has been modified
-            setContentDirty(true);
-        }
+        // Indicate the content has been modified
+        setContentDirty(true);
     }
 
     /**
@@ -394,7 +375,7 @@ public class XWikiAttachmentContent implements Cloneable
      * @deprecated This method doesn't perform any action anymore. Call {@link #getAttachment()} and
      * {@link XWikiAttachment#setDoc(XWikiDocument)} instead.
      */
-    @Deprecated(since = "17.2.0RC1")
+    @Deprecated(since = "18.0.0RC1,17.10.2")
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
     }

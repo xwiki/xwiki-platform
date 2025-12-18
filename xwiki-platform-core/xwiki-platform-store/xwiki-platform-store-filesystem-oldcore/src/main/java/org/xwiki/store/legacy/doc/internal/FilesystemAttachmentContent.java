@@ -90,7 +90,9 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         XWikiAttachmentContent clone = new FilesystemAttachmentContent(this);
         if (!skipContent) {
             try {
-                clone.setContent(getContentInputStream(), true);
+                boolean contentDirty = this.isContentDirty();
+                clone.setContent(getContentInputStream());
+                clone.setContentDirty(contentDirty);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to clone data to storage.", e);
             }

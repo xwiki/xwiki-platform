@@ -106,8 +106,7 @@ public class PageWithPanels extends BasePage
         panelToggle.click();
     }
     public int getPanelWidth(String panelSide) {
-        WebElement panels = (Objects.equals(panelSide, RIGHT)) ? 
-            rightPanels : leftPanels;
+        WebElement panels = Objects.equals(panelSide, RIGHT) ? rightPanels : leftPanels;
         return panels.getSize().getWidth();
     }
     public void resizePanel(String panelSide, int panelSizeDiff) {

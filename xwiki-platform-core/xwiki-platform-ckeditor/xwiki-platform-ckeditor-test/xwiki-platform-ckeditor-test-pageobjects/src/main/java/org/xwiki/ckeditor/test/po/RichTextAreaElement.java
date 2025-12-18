@@ -291,8 +291,8 @@ public class RichTextAreaElement extends BaseElement
 
     /**
      * Waits until the rich text area has the specified plain text.
-     * 
-     * @param textFragment the text to wait for
+     *
+     * @param text the text to wait for
      * @since 17.10.2
      * @since 17.4.8
      * @since 16.10.16

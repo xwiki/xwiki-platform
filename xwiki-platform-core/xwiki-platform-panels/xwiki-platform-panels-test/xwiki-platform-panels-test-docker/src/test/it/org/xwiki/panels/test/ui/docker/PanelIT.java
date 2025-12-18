@@ -190,7 +190,7 @@ class PanelIT
         testUtils.setWikiPreference("showLeftPanels", "1");
         String testMethodName = testReference.getLastSpaceReference().getName();
         String testClassName = testReference.getSpaceReferences().get(0).getName();
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         PageWithPanels panelPage = new PageWithPanels();
         // Check the initial state
         assertTrue(panelPage.hasLeftPanels());

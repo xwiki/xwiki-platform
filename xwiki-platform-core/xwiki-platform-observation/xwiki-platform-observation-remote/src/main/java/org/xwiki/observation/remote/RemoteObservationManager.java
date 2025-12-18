@@ -35,14 +35,14 @@ import org.xwiki.stability.Unstable;
 public interface RemoteObservationManager
 {
     /**
-     * Send a event in the different network channels.
+     * Send an event to all cluster members.
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate {@link org.xwiki.observation.ObservationManager}.
      *
-     * @param event the event
+     * @param localEvent the event to send
      */
-    void notify(LocalEventData event);
+    void notify(LocalEventData localEvent);
 
     /**
      * Inject a remote event in the local {@link org.xwiki.observation.ObservationManager}.
@@ -50,9 +50,9 @@ public interface RemoteObservationManager
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate network.
      *
-     * @param event the event
+     * @param remoteEvent the event
      */
-    void notify(RemoteEventData event);
+    void notify(RemoteEventData remoteEvent);
 
     /**
      * Stop a running channel.

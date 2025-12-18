@@ -163,6 +163,7 @@ com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
 org.xwiki.internal.web.EffectiveAuthorSetterListener
 org.xwiki.internal.web.GetDocExistValidator
 org.xwiki.internal.web.ViewDocExistValidator
+org.xwiki.internal.web.PageTemplateRequiredRightsChecker
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass
 com.xpn.xwiki.objects.meta.DateMetaClass

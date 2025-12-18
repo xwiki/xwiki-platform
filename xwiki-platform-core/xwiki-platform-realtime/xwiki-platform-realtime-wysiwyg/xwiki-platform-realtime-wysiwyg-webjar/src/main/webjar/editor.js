@@ -101,7 +101,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
      *   restored
      */
-    async restoreSelection(ranges) {
+    restoreSelection(ranges) {
       throw new Error('Not implemented!');
     }
 
@@ -209,6 +209,18 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * Moves the selection focus to the editing area space in the editor.
      */
     focus() {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Overwrite the default undo/redo handling of the editor.
+     *
+     * @param {Object} historyHandler an object that implements the {canUndo, undo, canRedo, redo} interface
+     * @returns {Object} an object containing the {@code destroy} function, which can be used to restore the default
+     *   undo/redo handling, and the {@code updateState} function, which can be used to enable/disable the undo/redo
+     *   actions
+     */
+    handleHistory(historyHandler) {
       throw new Error('Not implemented!');
     }
   }

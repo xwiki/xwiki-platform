@@ -71,6 +71,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- To test required rights with page templates -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to execute tests on subwikis -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

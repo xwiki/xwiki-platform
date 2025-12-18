@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-document-api",
-  "version": "17.10.0",
+  "version": "18.0.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -21,6 +21,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
@@ -38,6 +39,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",

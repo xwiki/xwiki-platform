@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -73,6 +75,8 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
 {
     private static final String EQUALS_OPERATOR = "equals";
 
+    private static final String CLASS_SUFFIX = "_class";
+
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -97,14 +101,28 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
-        List<LiveDataPropertyDescriptor> properties = new ArrayList<>();
-        properties.addAll(getDocumentProperties());
-        try {
-            properties.addAll(getClassProperties());
-        } catch (Exception e) {
-            throw new LiveDataException("Failed to retrieve class properties.", e);
+        List<LiveDataPropertyDescriptor> properties = new ArrayList<>(getDocumentProperties());
+        properties.addAll(getClassProperties());
+        for (var parameter : getParameters().entrySet()) {
+            String key = parameter.getKey();
+            // Load property descriptors for properties of extra classes that are specified in the form
+            // <property>_class=My.Class.
+            if (key.endsWith(CLASS_SUFFIX) && parameter.getValue() instanceof String className) {
+                String propertyName = StringUtils.removeEnd(key, CLASS_SUFFIX);
+                getPropertyDescriptor(className, propertyName).ifPresent(properties::add);
+            }
         }
         return properties;
+    }
+
+    private Optional<LiveDataPropertyDescriptor> getPropertyDescriptor(String className, String propertyName)
+        throws LiveDataException
+    {
+        return getAccessibleDocument(className).stream()
+            .map(classDoc -> (PropertyClass) classDoc.getXClass().get(propertyName))
+            .filter(Objects::nonNull)
+            .map(this::getLiveDataPropertyDescriptor)
+            .findFirst();
     }
 
     private Collection<LiveDataPropertyDescriptor> getDocumentProperties()
@@ -113,26 +131,43 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         return this.defaultConfigProvider.get().getMeta().getPropertyDescriptors();
     }
 
-    private List<LiveDataPropertyDescriptor> getClassProperties() throws Exception
+    private List<LiveDataPropertyDescriptor> getClassProperties() throws LiveDataException
     {
         Object className = getParameters().get("className");
-        if (className instanceof String) {
-            DocumentReference classReference = this.currentDocumentReferenceResolver.resolve((String) className);
+        if (className instanceof String classReference) {
             return getClassProperties(classReference);
         } else {
             return Collections.emptyList();
         }
     }
 
-    private List<LiveDataPropertyDescriptor> getClassProperties(DocumentReference classReference) throws Exception
+    private List<LiveDataPropertyDescriptor> getClassProperties(String classReference) throws LiveDataException
     {
-        if (this.authorization.hasAccess(Right.VIEW, classReference)) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            XWikiDocument classDoc = xcontext.getWiki().getDocument(classReference, xcontext);
-            return classDoc.getXClass().getEnabledProperties().stream().map(this::getLiveDataPropertyDescriptor)
-                .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
+        return getAccessibleDocument(classReference)
+            .map(document ->
+                document.getXClass()
+                    .getEnabledProperties()
+                    .stream()
+                    .map(this::getLiveDataPropertyDescriptor)
+                    .toList())
+            .orElse(List.of());
+    }
+
+    private Optional<XWikiDocument> getAccessibleDocument(String documentReference) throws LiveDataException
+    {
+        try {
+            DocumentReference reference = this.currentDocumentReferenceResolver.resolve(documentReference);
+            if (this.authorization.hasAccess(Right.VIEW, reference)) {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return Optional.of(xcontext.getWiki().getDocument(reference, xcontext));
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            throw new LiveDataException(
+                "Failed to retrieve document [%s] to retrieve properties for Live Data.".formatted(documentReference),
+                e
+            );
         }
     }
 

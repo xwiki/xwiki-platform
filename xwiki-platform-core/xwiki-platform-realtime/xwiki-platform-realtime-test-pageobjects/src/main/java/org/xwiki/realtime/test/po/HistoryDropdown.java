@@ -24,7 +24,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -85,8 +84,9 @@ public class HistoryDropdown extends BaseElement
      */
     public HistoryDropdown waitForVersion(String versionNumber)
     {
-        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(
-            By.cssSelector(".realtime-version[data-version*=\"\\\"" + versionNumber + "\\\"\"]")));
+        By versionSelector = By.cssSelector(".realtime-version[data-version*=\"\\\"" + versionNumber + "\\\"\"]");
+        // The dropdown might be closed so we cannot wait for visibility.
+        getDriver().waitUntilCondition(driver -> getDriver().findElementWithoutScrolling(versionSelector));
         return this;
     }
 

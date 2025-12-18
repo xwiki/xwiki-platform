@@ -59,7 +59,10 @@ type MacroBlock =
       params: Record<string, boolean | number | string>;
     }
   | { type: "rawHtml"; html: string }
-  | { type: "macroBlockEditableArea" };
+  | {
+      type: "macroBlockEditableArea";
+      styles: MacroBlockStyles;
+    };
 
 /**
  * Styles for a `MacroBlock`

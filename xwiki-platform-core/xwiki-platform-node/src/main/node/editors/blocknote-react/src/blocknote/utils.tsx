@@ -25,10 +25,13 @@ import {
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
 import type {
-  CustomBlockConfig,
+  BlockConfig,
   CustomInlineContentConfig,
+  DefaultInlineContentSchema,
+  DefaultStyleSchema,
+  InlineContent,
   InlineContentSchema,
-  PartialBlock,
+  PartialBlockFromConfig,
   PartialInlineContent,
   PropSchema,
   PropSpec,
@@ -44,7 +47,7 @@ import type {
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
 import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
-import type { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 
 /**
  * Create a custom block to use in the BlockNote editor
@@ -57,17 +60,17 @@ import type { ReactNode } from "react";
  * @internal
  */
 function createCustomBlockSpec<
-  const B extends CustomBlockConfig,
-  const I extends InlineContentSchema,
-  const S extends StyleSchema,
+  const Name extends string,
+  const Props extends PropSchema,
+  const InlineType extends "inline" | "none",
 >({
   config,
   implementation,
   slashMenu,
   customToolbar,
 }: {
-  config: B;
-  implementation: ReactCustomBlockImplementation<B, I, S>;
+  config: BlockConfig<Name, Props, InlineType>;
+  implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
   slashMenu:
     | false
     | {
@@ -75,7 +78,11 @@ function createCustomBlockSpec<
         aliases?: string[];
         group: string;
         icon: ReactNode;
-        default: () => PartialBlock<Record<B["type"], B>>;
+        default: () => PartialBlockFromConfig<
+          BlockConfig<Name, Props, InlineType>,
+          InlineContentSchema,
+          StyleSchema
+        >;
       };
   customToolbar: (() => ReactNode) | null;
 }) {
@@ -85,7 +92,7 @@ function createCustomBlockSpec<
     slashMenuEntry: !slashMenu
       ? (false as const)
       : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (editor: BlockNoteEditor<any>) => ({
+        (editor: BlockNoteEditor<any, any, any>) => ({
           title: slashMenu.title,
           aliases: slashMenu.aliases,
           group: slashMenu.group,
@@ -269,25 +276,41 @@ function adaptMacroForBlockNote(
         }
       : false;
 
-  // The rendering function
-  const renderMacro = (
+  /**
+   * The rendering function
+   *
+   * @param contentRef - React reference to the WYSIWYG-editable content zone
+   * @param props - The macro's properties
+   * @param content - The macro's content
+   * @param update - An update function for the macro
+   *
+   * @returns The rendered macro, as a JSX element
+   */
+  function renderMacro(
     contentRef: (node: HTMLElement | null) => void,
     props: Props<PropSchema>,
+    content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
+    // TODO: should also allow to replace the macro's body
+    // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-742
     update: (newParams: Props<PropSchema>) => void,
-  ) => {
+  ): JSX.Element {
     const openParamsEditor = () =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctx.openParamsEditor(macro, props, update as any);
 
+    /** The macro's raw body */
+    const rawBody =
+      macro.infos.bodyType === "raw" ? extractMacroRawContent(content) : null;
+
     const renderedJsx =
       macro.renderAs === "block"
-        ? jsxConverter.blocksToReactJSX(macro.render(props), {
+        ? jsxConverter.blocksToReactJSX(macro.render(props, rawBody), {
             type: "block",
-            ref: contentRef,
+            ref: macro.infos.bodyType === "wysiwyg" ? contentRef : null,
           })
-        : jsxConverter.inlineContentsToReactJSX(macro.render(props), {
+        : jsxConverter.inlineContentsToReactJSX(macro.render(props, rawBody), {
             type: "inline",
-            ref: contentRef,
+            ref: macro.infos.bodyType === "wysiwyg" ? contentRef : null,
           });
 
     if (renderedJsx instanceof Error) {
@@ -296,15 +319,11 @@ function adaptMacroForBlockNote(
     }
 
     return macro.renderAs === "block" ? (
-      <div style={{ userSelect: "none" }} onDoubleClick={openParamsEditor}>
-        {renderedJsx}
-      </div>
+      <div onDoubleClick={openParamsEditor}>{renderedJsx}</div>
     ) : (
-      <span style={{ userSelect: "none" }} onDoubleClick={openParamsEditor}>
-        {renderedJsx}
-      </span>
+      <span onDoubleClick={openParamsEditor}>{renderedJsx}</span>
     );
-  };
+  }
 
   // Block and inline macros are defined pretty differently, so a bit of logic was computed ahead of time
   // to share it between the two definitions here.
@@ -315,16 +334,22 @@ function adaptMacroForBlockNote(
           block: createCustomBlockSpec({
             config: {
               type: blockNoteName,
-              // TODO: when BlockNote supports internal content in custom blocks, set this to "inline" if the macro can have children
+              // NOTE: Nesting is not supported
               // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-              content: "none",
+              content: macro.infos.bodyType === "wysiwyg" ? "inline" : "none",
               propSchema,
             },
             implementation: {
               render: ({ contentRef, block, editor }) =>
-                renderMacro(contentRef, block.props, (newProps) => {
-                  editor.updateBlock(block.id, { props: newProps });
-                }),
+                renderMacro(
+                  contentRef,
+                  block.props,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  block.content as any,
+                  (newProps) => {
+                    editor.updateBlock(block.id, { props: newProps });
+                  },
+                ),
             },
             slashMenu: getSlashMenu((getDefaultValue) => ({
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -340,21 +365,25 @@ function adaptMacroForBlockNote(
           inlineContent: createCustomInlineContentSpec({
             config: {
               type: blockNoteName,
-              // TODO: when BlockNote supports internal content in custom inline contents themselves, set this to "styled" if the macro can have children
+              // NOTE: Nesting is not supported
               // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-              content: "none",
+              content: macro.infos.bodyType === "wysiwyg" ? "styled" : "none",
               propSchema,
             },
             implementation: {
               render: ({ contentRef, inlineContent, updateInlineContent }) =>
-                renderMacro(contentRef, inlineContent.props, (newProps) => {
-                  updateInlineContent({
-                    type: inlineContent.type,
-                    props: newProps,
-                    // TODO: make it editable!
-                    content: inlineContent.content,
-                  });
-                }),
+                renderMacro(
+                  contentRef,
+                  inlineContent.props,
+                  inlineContent.content,
+                  (newProps) => {
+                    updateInlineContent({
+                      type: inlineContent.type,
+                      props: newProps,
+                      content: inlineContent.content,
+                    });
+                  },
+                ),
             },
             slashMenu: getSlashMenu((getDefaultValue) => ({
               default: () => [
@@ -371,10 +400,61 @@ function adaptMacroForBlockNote(
   return { macro, bnRendering };
 }
 
+/**
+ * Extract a macro's raw content from its BlockNote AST sub-tree
+ *
+ * Identity function with `buildMacroRawContent`
+ *
+ * @param content - The BlockNote AST to extract the macro's raw content from
+ *
+ * @returns The extracted raw content
+ *
+ * @since 0.24-rc-1
+ * @beta
+ */
+function extractMacroRawContent(
+  content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
+): string {
+  if (content.length !== 1) {
+    throw new Error(
+      "Internal error: raw-body macro does not have precisely 1 inline content",
+    );
+  }
+
+  if (content[0].type !== "text") {
+    throw new Error(
+      "Internal error: raw-body macro's inline content is not a text",
+    );
+  }
+
+  return content[0].text;
+}
+
+/**
+ * Wrap a macro's raw content inside a BlockNote AST
+ *
+ * Identify function with `extractMacroRawContent`
+ *
+ * @param content - The raw content to wrap the macro's raw content in
+ *
+ * @returns A BlockNote wrapper AST
+ *
+ * @since 0.24-rc-1
+ * @beta
+ */
+function buildMacroRawContent(
+  content: string,
+): InlineContent<DefaultInlineContentSchema, DefaultStyleSchema> {
+  return { type: "text", text: content, styles: {} };
+}
+
 export {
   MACRO_NAME_PREFIX,
   adaptMacroForBlockNote,
+  buildMacroRawContent,
   createCustomBlockSpec,
   createCustomInlineContentSpec,
+  extractMacroRawContent,
 };
+
 export type { BlockNoteConcreteMacro, ContextForMacros };

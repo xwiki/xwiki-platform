@@ -73,6 +73,7 @@ export type {
   EditorStyleSchema,
   EditorStyledText,
   EditorType,
+  InlineContentType,
 } from "./blocknote";
 
 export {
@@ -84,4 +85,9 @@ export {
 export type {
   createCustomBlockSpec,
   createCustomInlineContentSpec,
+} from "./blocknote/utils";
+
+export {
+  buildMacroRawContent,
+  extractMacroRawContent,
 } from "./blocknote/utils";

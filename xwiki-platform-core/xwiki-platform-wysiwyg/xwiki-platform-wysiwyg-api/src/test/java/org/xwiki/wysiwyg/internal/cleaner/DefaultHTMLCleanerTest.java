@@ -19,14 +19,14 @@
  */
 package org.xwiki.wysiwyg.internal.cleaner;
 
-import org.junit.runner.RunWith;
+import org.xwiki.test.annotation.AllComponents;
 
 /**
  * Unit tests for {@link DefaultHTMLCleaner}.
  * 
  * @version $Id$
  */
-@RunWith(HTMLCleanerTestSuite.class)
-public class DefaultHTMLCleanerTest
+@AllComponents
+public class DefaultHTMLCleanerTest extends HTMLCleanerTest
 {
 }

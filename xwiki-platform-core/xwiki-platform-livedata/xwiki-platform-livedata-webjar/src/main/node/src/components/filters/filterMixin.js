@@ -70,15 +70,29 @@ export default {
   methods: {
     // This method should be used to apply filter.
     // Since only the newValue has to be specified it is less error prone.
-    applyFilter: function(newValue, filterOperator = undefined) {
+    /**
+     * @param newValue the new filtering value
+     * @param filterOperator the operator to apply, when undefined the default operator is used
+     * @param skipFetch when true, the filter will be applied on the reactive variables, but will not trigger an
+     * fetch. When undefined, the default value is false. This paramter is important in the case of asynchronous
+     * methods where we need to have an instance feedback on the UI (e.g., between the advanced filtering panel and
+     * the top filters in the table layout)
+     */
+    applyFilter: async function (newValue, filterOperator = undefined, skipFetch = false) {
       // Once a filter is applied, the filtering state is switched to true.
       // The filtering state is switched to false only once the filtering is finished.
-      this.$emit("update:isFiltering", true);
-      this.logic.filter(this.propertyId, this.index, { value: newValue }, { filterOperator })
-        .finally(() => {
-          // Whatever the filter promise result, the filtering state is switched to false.
+      // The UI must not give visual clues when the fetching is not actually started.
+      if (!skipFetch) {
+        this.$emit("update:isFiltering", true);
+      }
+      try {
+        this.logic.filter(this.propertyId, this.index, {value: newValue}, {filterOperator, skipFetch});
+      } finally {
+        // Whatever the filter promise result, the filtering state is switched to false.
+        if (!skipFetch) {
           this.$emit("update:isFiltering", false);
-        });
+        }
+      }
     },
 
     removeFilter: function() {
@@ -94,11 +108,14 @@ export default {
     // This can be used when we want to call the applyFilter method inside an input event
     applyFilterWithDelay(newValue) {
       // Clear existing timeout
+      // The filter is applied without delay, but skips updating the rows.
+      // The update is only performed after the configured 250ms.
+      this.applyFilter(newValue, undefined, true);
       clearTimeout(this._applyFilterTimeoutId);
       // Set a 250 milliseconds timeout before calling applyFilter method
       const timeoutDelay = 250;
       this._applyFilterTimeoutId = setTimeout(() => {
-        this.applyFilter(newValue);
+        this.logic.updateEntries();
       }, timeoutDelay);
     },
 

@@ -45,15 +45,12 @@ export default {
 
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
-
-};
+}
 </script>
 
 
-<style>
-
-.livedata-filter .filter-text {
+<style scoped>
+.filter-text {
   width: 100%;
 }
-
 </style>

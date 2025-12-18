@@ -113,15 +113,6 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-image-module</artifactId>
     </dependency>
-    <!-- Add back Bouncy Castle dependencies required by Tika but with the right id -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk18on</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk18on</artifactId>
-    </dependency>
 
     <!-- We need a Log4j 2.x implementation since some Tika parsers use Log4j 2.x -->
     <dependency>

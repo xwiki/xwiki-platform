@@ -41,6 +41,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
@@ -169,16 +171,7 @@ public class XWikiDocumentMockitoTest
         this.document = new XWikiDocument(DOCUMENT_REFERENCE);
         this.document.setSyntax(Syntax.PLAIN_1_0);
         this.attachmentList = this.document.getAttachmentList();
-        this.baseClass = this.document.getXClass();
-        this.baseClass.addTextField("string", "String", 30);
-        this.baseClass.addTextAreaField("area", "Area", 10, 10);
-        this.baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
-        // set the text areas an non interpreted content
-        ((TextAreaClass) this.baseClass.getField("puretextarea")).setContentType("puretext");
-        this.baseClass.addPasswordField("passwd", "Password", 30);
-        this.baseClass.addBooleanField("boolean", "Boolean", "yesno");
-        this.baseClass.addNumberField("int", "Int", 10, "integer");
-        this.baseClass.addStaticListField("stringlist", "StringList", 1, true, "value1, value2");
+        this.baseClass = this.generateFakeClass();
 
         this.baseObject = this.document.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
         this.baseObject.setStringValue("string", "string");
@@ -271,10 +264,10 @@ public class XWikiDocumentMockitoTest
     /**
      * Generate the fake class that is used for the test of {@link #readObjectsFromForm()} and
      * {@link #readObjectsFromFormUpdateOrCreate()}.
-     * 
+     *
      * @return The fake BaseClass
      */
-    private BaseClass generateFakeClass()
+    private BaseClass generateFakeClass() throws XWikiException
     {
         BaseClass baseClass = this.document.getXClass();
         baseClass.addTextField("string", "String", 30);
@@ -285,8 +278,10 @@ public class XWikiDocumentMockitoTest
         baseClass.addPasswordField("passwd", "Password", 30);
         baseClass.addBooleanField("boolean", "Boolean", "yesno");
         baseClass.addNumberField("int", "Int", 10, "integer");
-        baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
+        baseClass.addStaticListField("stringlist", "StringList", 1, true, "value1, value2");
 
+        // Save the xclass since it's used for xobject creation.
+        this.oldcore.getSpyXWiki().saveDocument(this.document, this.oldcore.getXWikiContext());
         return baseClass;
     }
 
@@ -315,55 +310,6 @@ public class XWikiDocumentMockitoTest
         baseObject2.setIntValue("int", 42);
         baseObject3.setStringValue("string", "string3");
         baseObject3.setIntValue("int", 42);
-    }
-
-    /**
-     * Unit test for {@link XWikiDocument#readObjectsFromForm(EditForm, XWikiContext)}.
-     */
-    @Test
-    void readObjectsFromForm() throws Exception
-    {
-        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
-
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        MockitoComponentManager mocker = this.oldcore.getMocker();
-        XWikiContext context = this.oldcore.getXWikiContext();
-        DocumentReferenceResolver<String> documentReferenceResolverString =
-            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        // Entity Reference resolver is used in <BaseObject>.getXClass()
-        DocumentReferenceResolver<EntityReference> documentReferenceResolverEntity =
-            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        EntityReferenceSerializer<String> entityReferenceResolver =
-            mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-
-        Map<String, String[]> parameters = generateFakeRequestMap();
-        BaseClass baseClass = generateFakeClass();
-        generateFakeObjects();
-
-        when(request.getParameterMap()).thenReturn(parameters);
-
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        // This entity resolver with this 'resolve' method is used in
-        // <BaseCollection>.getXClassReference()
-        when(documentReferenceResolverEntity.resolve(any(EntityReference.class), any(DocumentReference.class)))
-            .thenReturn(this.document.getDocumentReference());
-        when(documentReferenceResolverString.resolve("space.page")).thenReturn(documentReference);
-        when(entityReferenceResolver.serialize(any(EntityReference.class))).thenReturn("space.page");
-
-        EditForm eform = new EditForm();
-        eform.setRequest(request);
-        document.readObjectsFromForm(eform, context);
-
-        assertEquals(3, this.document.getXObjectSize(baseClass.getDocumentReference()));
-        assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
-        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
-        assertEquals("string3", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 2).getIntValue("int"));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
     }
 
     /**
@@ -2021,5 +1967,25 @@ public class XWikiDocumentMockitoTest
         document.setHidden(true);
 
         assertFalse(document.isMetaDataDirty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void readFromTemplate(boolean enforceRequiredRights) throws XWikiException
+    {
+        XWikiDocument templateDocument = new XWikiDocument(new DocumentReference("Wiki", "Space", "Template"));
+        String title = "Test Template";
+        templateDocument.setTitle(title);
+        String content = "Test Content";
+        templateDocument.setContent(content);
+        templateDocument.setEnforceRequiredRights(enforceRequiredRights);
+        templateDocument.setSyntax(Syntax.XWIKI_2_0);
+        this.oldcore.getSpyXWiki().saveDocument(templateDocument, "", false, this.oldcore.getXWikiContext());
+
+        this.document.readFromTemplate(templateDocument.getDocumentReference(), this.oldcore.getXWikiContext());
+
+        assertEquals(enforceRequiredRights, this.document.isEnforceRequiredRights());
+        assertEquals(title, this.document.getTitle());
+        assertEquals(content, this.document.getContent());
     }
 }

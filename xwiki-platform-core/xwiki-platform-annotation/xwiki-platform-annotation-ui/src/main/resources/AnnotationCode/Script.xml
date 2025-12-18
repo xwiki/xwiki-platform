@@ -171,7 +171,7 @@ XWiki.Selection = Class.create({
       return;
     }
     this.selectionText = this.range.toString();
-    this.selectionText = this.selectionText.replace(
+    this.selectionText = this.selectionText.replaceAll(
         "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))",'')
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
@@ -964,19 +964,6 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  addAnnotationToggleHint : function(annotations) {
-    annotations.forEach((ann) =&gt; {
-      let toggleButtonDescription = document.createElement('span');
-      toggleButtonDescription.addClassName('hidden');
-      toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
-      toggleButtonDescription.textContent =
-        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
-      let toggleButton = document.getElementById('ID' + ann.annotationId);
-      toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
-      toggleButton.appendChild(toggleButtonDescription);
-    });
-  },
-
   addAnnotationMarkup : function(ann) {
     // Check if the annotation was found.
     var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
@@ -984,7 +971,6 @@ XWiki.Annotation = Class.create({
     if (plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
       return false;
     }
-
     var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset.value, plainTextEndOffset.value);
     // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
     // a new range is created to recalculate the new ends.
@@ -1027,6 +1013,24 @@ XWiki.Annotation = Class.create({
     toggleButton.addEventListener('focusout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
   },
 
+  addAnnotationsToggleHint : function(annotations) {
+    annotations.forEach((ann) =&gt; {
+      var plainTextStartOffset = ann.fields.find(field =&gt; field.name === 'plainTextStartOffset');
+      var plainTextEndOffset = ann.fields.find(field =&gt; field.name === 'plainTextEndOffset');
+      if(plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
+        return false;
+      }
+      let toggleButtonDescription = document.createElement('span');
+      toggleButtonDescription.addClassName('hidden');
+      toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
+      toggleButtonDescription.textContent =
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
+      let toggleButton = document.getElementById('ID' + ann.annotationId);
+      toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
+      toggleButton.appendChild(toggleButtonDescription);
+    });
+  },
+
   /**
    * Surround this node with a span corresponding to its annotation.
    *
@@ -1037,7 +1041,6 @@ XWiki.Annotation = Class.create({
     var wrapper = document.createElement('mark');
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
-
     var parentNode = markedNode.parentElement;
     parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);
@@ -1946,7 +1949,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         this.updateAnnotationsOffsets(annotatedContent);
         this.addAnnotationsMarkup(annotatedContent.annotations);
         // We add the hints afterwards because they shift the ranges in the text.
-        this.addAnnotationToggleHint(annotatedContent.annotations);
+        this.addAnnotationsToggleHint(annotatedContent.annotations);
         // Notify the content change.
         $(document).trigger('xwiki:dom:updated', {'elements': [this.annotatedElement]});
         // Also handle the tab 'downstairs' when the annotations list changes.

@@ -286,6 +286,12 @@
   color: inherit;
 }
 
+mark.annotation:not(.annotation-highlight) {
+  padding: 0;
+  background-color: unset;
+  color: unset;
+}
+
 /* Annotation boxes */
 .annotation-bubble {
   background: $theme.backgroundSecondaryColor;

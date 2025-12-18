@@ -4640,6 +4640,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     // is copied into the new document
                     setSyntax(templatedoc.getSyntax());
 
+                    // Keep the enforce required rights setting from the template
+                    setEnforceRequiredRights(templatedoc.isEnforceRequiredRights());
+
                     // If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
                         setParentReference(templatedoc.getRelativeParentReference());

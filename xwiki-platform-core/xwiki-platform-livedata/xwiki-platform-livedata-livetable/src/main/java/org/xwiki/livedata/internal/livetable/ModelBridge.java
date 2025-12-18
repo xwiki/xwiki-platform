@@ -325,6 +325,10 @@ public class ModelBridge
                 changedValue = document.isHidden();
                 document.setHidden(Boolean.valueOf(String.valueOf(value)));
             }
+            case "enforceRequiredRights" -> {
+                changedValue = document.isEnforceRequiredRights();
+                document.setEnforceRequiredRights(Boolean.parseBoolean(String.valueOf(value)));
+            }
             case "title" -> {
                 changedValue = document.getTitle();
                 document.setTitle(String.valueOf(value));

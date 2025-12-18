@@ -97,6 +97,12 @@
   #error($errorMessageContent)
   #set ($disableModalConfirmation = true)
 #end
+## check if the exception is about missing required rights for the template
+#if("$!exception" != '' && $exception.code == 11019)
+  #error($escapetool.xml($services.localization.render('core.create.template.requiredRightsMissing',
+    [$templateProvider])))
+  #set ($disableModalConfirmation = true)
+#end
 ## check if the exception is about the document which already exists
 #if("$!exception" != '' && $exception.code == 11002)
   <div class='box errormessage'>

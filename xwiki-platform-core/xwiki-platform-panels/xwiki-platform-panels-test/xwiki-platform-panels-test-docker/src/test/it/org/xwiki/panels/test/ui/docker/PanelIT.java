@@ -234,9 +234,7 @@ class PanelIT
         testUtils.setWikiPreference("showLeftPanels", "1");
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
-        String testMethodName = testReference.getLastSpaceReference().getName();
-        String testClassName = testReference.getSpaceReferences().get(0).getName();
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         PageWithPanels panelPage = new PageWithPanels();
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
@@ -244,14 +242,14 @@ class PanelIT
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_SMALL);
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_SMALL);
         // Reload the page with the new preferences taken into account.
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_LARGE);
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_LARGE);
         // Get back to the test page after updating the preferences.
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(300, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(300, panelPage.getPanelWidth(PageWithPanels.RIGHT));
@@ -261,14 +259,14 @@ class PanelIT
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         // Check if the user preferences are kept on page reload.
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         // Check if the user preferences are kept on page reload even when defaults have changed.
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.RIGHT));
@@ -282,7 +280,7 @@ class PanelIT
         panelPage.resizePanel(PageWithPanels.LEFT, -60);
         assertAlmostEqualSize(210, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
-        testUtils.gotoPage(testClassName, testMethodName);
+        testUtils.gotoPage(testReference);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));

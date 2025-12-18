@@ -152,7 +152,8 @@
       ## The column is a document field.
       ##
       ## These document fields need to be ordered as raw values and not as strings.
-      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements', 'minorEdit1', 'hidden'])
+      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements',
+          'minorEdit1', 'hidden', 'enforceRequiredRights'])
       #set($documentField = $stringtool.removeStart($order, 'doc.'))
       #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection},  $rawDocumentFields.contains($documentField))
     #else
@@ -454,6 +455,7 @@
       #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
       #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
       #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
+      #set($discard = $row.put('doc_enforceRequiredRights', $itemDoc.isEnforceRequiredRights()))
       #foreach($colname in $collist)
         #gridresult_buildColumnJSON($colname $row)
       #end

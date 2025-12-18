@@ -64,4 +64,6 @@ type TreeProps<T extends DisplayableTreeNode> = {
   nodeClickAction?: (node: T) => Promise<void>;
 };
 
-export type { DisplayableTreeNode, TreeProps };
+// TreeNode needs to be re-exported because it is required to define
+// DisplayableTreeNode.
+export type { DisplayableTreeNode, TreeNode, TreeProps };

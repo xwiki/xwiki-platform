@@ -190,6 +190,8 @@ export type TextFieldProps = {
     type?: "date" | "datetime-local" | "email" | "number" | "password" | "search" | "tel" | "text" | "time" | "url";
 };
 
+export { TreeNode }
+
 // @beta
 export type TreeProps<T extends DisplayableTreeNode> = {
     rootNode: T;

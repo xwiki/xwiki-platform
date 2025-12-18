@@ -42,7 +42,7 @@ import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
 import type { TextFieldProps } from "./XTextField";
-import type { DisplayableTreeNode, TreeProps } from "./XTree";
+import type { DisplayableTreeNode, TreeNode, TreeProps } from "./XTree";
 import type {
   ButtonHTMLAttributes,
   ComponentOptionsMixin,
@@ -95,6 +95,8 @@ type AbstractElements = {
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
   XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
   XTree: DefineComponent<
+    // We use `DisplayableTreeNode & any` instead of just `any` to keep the
+    // properties of DisplayableTreeNode mandatory.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     TreeProps<DisplayableTreeNode & any> & HTMLAttributes
   >;
@@ -129,6 +131,7 @@ export type {
   TabPanelProps,
   TabProps,
   TextFieldProps,
+  TreeNode,
   TreeProps,
 };
 

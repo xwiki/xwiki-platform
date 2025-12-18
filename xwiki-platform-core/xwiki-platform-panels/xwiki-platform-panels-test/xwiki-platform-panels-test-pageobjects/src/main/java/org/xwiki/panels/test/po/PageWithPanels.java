@@ -54,14 +54,13 @@ public class PageWithPanels extends BasePage
     private WebElement leftPanelsResizeHandle;
 
     /**
-     * Utility string to select the different elements related to the right column of panels.
+     * Utility string to select the different elements related to both columns of panels.
      */
-    public static final String RIGHT = "right";
-
-    /**
-     * Utility string to select the different elements related to the left column of panels.
-     */
-    public static final String LEFT = "left";
+    public enum Column
+    {
+        RIGHT,
+        LEFT
+    }
     
     /**
      * @param panelTitle the panel title
@@ -95,28 +94,32 @@ public class PageWithPanels extends BasePage
             By.xpath("//div[@id = 'leftPanels']/div[contains(@class, '"+panelName+"')]"));
     }
     
-    public boolean panelIsToggled(String panelSide) {
-        WebElement panelToggle = (Objects.equals(panelSide, RIGHT)) ? rightPanelsToggle : leftPanelsToggle;
+    public boolean panelIsToggled(Column panelSide) 
+    {
+        WebElement panelToggle = (Objects.equals(panelSide, Column.RIGHT)) ? rightPanelsToggle : leftPanelsToggle;
         return Objects.equals(panelToggle.getDomAttribute("aria-expanded"), "true") 
             || Objects.equals(panelToggle.getDomAttribute("aria-expanded"), null);
     }
     
-    public void togglePanel(String panelSide) {
-        WebElement panelToggle = Objects.equals(panelSide, RIGHT) ? rightPanelsToggle : leftPanelsToggle;
+    public void togglePanel(Column panelSide) 
+    {
+        WebElement panelToggle = Objects.equals(panelSide, Column.RIGHT) ? rightPanelsToggle : leftPanelsToggle;
         panelToggle.click();
     }
-    public int getPanelWidth(String panelSide) {
-        WebElement panels = Objects.equals(panelSide, RIGHT) ? rightPanels : leftPanels;
+    public int getPanelWidth(Column panelSide) 
+    {
+        WebElement panels = Objects.equals(panelSide, Column.RIGHT) ? rightPanels : leftPanels;
         return panels.getSize().getWidth();
     }
 
-    public void resizePanel(String panelSide, int panelSizeDiff) {
-        WebElement panelResizeHandle = (Objects.equals(panelSide, RIGHT)) ?
+    public void resizePanel(Column panelSide, int panelSizeDiff) 
+    {
+        WebElement panelResizeHandle = (Objects.equals(panelSide, Column.RIGHT)) ?
             rightPanelsResizeHandle : leftPanelsResizeHandle;
         // Define the drag and drop action
         Actions action = new Actions(this.getDriver().getWrappedDriver());
         action.clickAndHold(panelResizeHandle);
-        int panelSideInvert = Objects.equals(panelSide, RIGHT)? -1 : 1;
+        int panelSideInvert = Objects.equals(panelSide, Column.RIGHT)? -1 : 1;
         // We need to correct a bit the shift induced by the exact place where the handled is taken.
         action.moveByOffset((panelSizeDiff + 6) * panelSideInvert, 0);
         action.release();

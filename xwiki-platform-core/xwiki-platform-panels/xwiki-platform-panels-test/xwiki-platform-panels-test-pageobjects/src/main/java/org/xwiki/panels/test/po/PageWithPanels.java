@@ -109,6 +109,7 @@ public class PageWithPanels extends BasePage
         WebElement panels = Objects.equals(panelSide, RIGHT) ? rightPanels : leftPanels;
         return panels.getSize().getWidth();
     }
+
     public void resizePanel(String panelSide, int panelSizeDiff) {
         WebElement panelResizeHandle = (Objects.equals(panelSide, RIGHT)) ?
             rightPanelsResizeHandle : leftPanelsResizeHandle;

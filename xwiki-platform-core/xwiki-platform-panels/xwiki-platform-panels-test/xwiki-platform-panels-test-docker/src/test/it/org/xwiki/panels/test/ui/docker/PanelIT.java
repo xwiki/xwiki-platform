@@ -252,7 +252,7 @@ class PanelIT
         assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_LARGE);
         testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_LARGE);
-        // Reload the page with the new preferences taken into account.
+        // Get back to the test page after updating the preferences.
         testUtils.gotoPage(testClassName, testMethodName);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(300, panelPage.getPanelWidth(PageWithPanels.LEFT));

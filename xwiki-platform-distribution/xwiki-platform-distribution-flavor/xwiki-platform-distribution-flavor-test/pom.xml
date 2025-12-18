@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>17.10.1</version>
+    <version>17.10.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -508,6 +508,6 @@
   </modules>
 
   <scm>
-    <tag>xwiki-platform-17.10.1</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

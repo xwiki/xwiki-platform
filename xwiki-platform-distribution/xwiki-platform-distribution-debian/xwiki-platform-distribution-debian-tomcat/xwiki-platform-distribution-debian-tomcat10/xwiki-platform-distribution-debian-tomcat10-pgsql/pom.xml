@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat10</artifactId>
-    <version>17.10.1</version>
+    <version>17.10.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat10-pgsql</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat ${debian.tomcat.version} - Postgres SQL</name>
@@ -36,6 +36,6 @@
   </properties>
 
   <scm>
-    <tag>xwiki-platform-17.10.1</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

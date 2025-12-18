@@ -22,7 +22,7 @@
   <parent>
     <artifactId>xwiki-platform-security</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>17.10.1</version>
+    <version>17.10.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -46,6 +46,6 @@
   </profiles>
 
   <scm>
-    <tag>xwiki-platform-17.10.1</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

@@ -54,7 +54,7 @@ public class PageWithPanels extends BasePage
     private WebElement leftPanelsResizeHandle;
 
     /**
-     * Utility string to select the different elements related to both columns of panels.
+     * Utility to select the different elements related to both columns of panels.
      */
     public enum Column
     {

@@ -52,8 +52,16 @@ public class PageWithPanels extends BasePage
 
     @FindBy(css = "#leftPanels .ui-resizable-handle")
     private WebElement leftPanelsResizeHandle;
-    public static constant String RIGHT = "right";
-    public static constant String LEFT = "left";
+
+    /**
+     * Utility string to select the different elements related to the right column of panels.
+     */
+    public static final String RIGHT = "right";
+
+    /**
+     * Utility string to select the different elements related to the left column of panels.
+     */
+    public static final String LEFT = "left";
     
     /**
      * @param panelTitle the panel title

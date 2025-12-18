@@ -188,8 +188,6 @@ class PanelIT
         testUtils.setWikiPreference("leftPanels", "Panels.Welcome");
         testUtils.setWikiPreference("showRightPanels", "1");
         testUtils.setWikiPreference("showLeftPanels", "1");
-        String testMethodName = testReference.getLastSpaceReference().getName();
-        String testClassName = testReference.getSpaceReferences().get(0).getName();
         testUtils.gotoPage(testReference);
         PageWithPanels panelPage = new PageWithPanels();
         // Check the initial state
@@ -222,7 +220,7 @@ class PanelIT
         assertFalse(panelPage.panelIsToggled(PageWithPanels.RIGHT));
         panelPage.togglePanel(PageWithPanels.LEFT);
         panelPage.togglePanel(PageWithPanels.RIGHT);
-        testUtils.getDriver().navigate().refresh();
+        testUtils.getDriver().navigate();
         assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
         assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
     }

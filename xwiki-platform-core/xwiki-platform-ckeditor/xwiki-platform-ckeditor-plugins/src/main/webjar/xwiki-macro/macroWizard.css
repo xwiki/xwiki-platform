@@ -179,3 +179,7 @@ ul.macro-list .macro-extension {
 .macro-parameter-group.invisible > ul[role="tablist"] {
   display: none;
 }
+
+.macro-tabs {
+  margin-bottom: 0.5em;
+}

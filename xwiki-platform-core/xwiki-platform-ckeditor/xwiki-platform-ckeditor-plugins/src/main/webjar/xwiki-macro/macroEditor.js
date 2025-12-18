@@ -170,7 +170,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
   macroParameterGroupOptionalsTemplate =
       `<div class="macro-parameter-group-optionals single-choice">
-        <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-tabs macro-tabs" role="tablist">
           <li class="active" role="presentation">
             <a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>
           </li>

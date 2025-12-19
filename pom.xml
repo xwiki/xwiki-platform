@@ -849,13 +849,6 @@
         <groupId>com.github.docker-java</groupId>
         <artifactId>docker-java-core</artifactId>
         <version>${dockerJava.version}</version>
-        <exclusions>
-          <!-- Wrong id -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.github.docker-java</groupId>

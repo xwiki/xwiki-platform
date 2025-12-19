@@ -31,10 +31,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-navigation-tree-api": "workspace:*"
+    "@xwiki/platform-fn-utils": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

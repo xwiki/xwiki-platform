@@ -219,8 +219,10 @@ public class XWikiAttachment implements Cloneable
         return internalClone(false, false, true);
     }
 
-    protected XWikiAttachment cloneWithActualContent()
+    protected XWikiAttachment cloneWithActualContent(XWikiContext context) throws XWikiException
     {
+        // We need to ensure to content is properly loaded if we want to clone it.
+        loadAttachmentContent(context);
         return internalClone(false, false, false);
     }
 
@@ -1547,7 +1549,6 @@ public class XWikiAttachment implements Cloneable
             attachment.setMetaDataDirty(isMetaDataDirty());
             if (!skipContent && getAttachment_content() != null) {
                 attachment.setAttachment_content(getAttachment_content().clone(skipActualContent));
-                attachment.getAttachment_content().setAttachment(attachment);
             }
             if (!skipArchive && getAttachment_archive() != null) {
                 attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());

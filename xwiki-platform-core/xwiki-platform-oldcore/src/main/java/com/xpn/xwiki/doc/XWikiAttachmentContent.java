@@ -167,9 +167,14 @@ public class XWikiAttachmentContent implements Cloneable
         XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
         if (!skipContent) {
             try {
+                // ensure to not have an attachment set to the clone, so that the dirty flag doesn't impact the old
+                // attachment
+                clone.attachment = null;
+                clone.file = null;
                 boolean contentDirty = this.isContentDirty();
                 clone.setContent(getContentInputStream());
                 clone.setContentDirty(contentDirty);
+                clone.setAttachment(attachment);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to clone data to storage.", e);
             }

@@ -4896,7 +4896,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
     {
-        XWikiAttachment newAttachment = attachment.cloneWithActualContent();
+        XWikiAttachment newAttachment = attachment.cloneWithActualContent(getXWikiContext());
 
         if (reset) {
             // Reset the meta data that is specific to the original attachment (version, author, date).
@@ -4906,6 +4906,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Add the attachment copy to the list of attachments of this document.
+        newAttachment.setDirty(true, true);
         setAttachment(newAttachment);
         setMetaDataDirty(true);
     }

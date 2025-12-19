@@ -90,15 +90,18 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
       if (authorization) {
         headers.Authorization = authorization;
       }
-      const response = await fetch(restApiUrl, { headers });
+      const response = await fetch(`${restApiUrl}?prettyNames=true`, {
+        headers,
+      });
       const jsonResponse = await response.json();
       const hierarchy: Array<PageHierarchyItem> = [];
       jsonResponse.hierarchy.items.forEach(
         (hierarchyItem: { label: string; url: string; type: string }) => {
-          // If a document item is not terminal (i.e., WebHome) we exclude it.
+          // Terminal pages and spaces only
           if (
-            hierarchyItem.type != "document" ||
-            !hierarchyItem.url.endsWith("/")
+            (hierarchyItem.type == "document" &&
+              !new URL(hierarchyItem.url).pathname.endsWith("/")) ||
+            hierarchyItem.type == "space"
           ) {
             hierarchy.push({
               label: hierarchyItem.label,
@@ -120,9 +123,19 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
         },
       );
       if (includeHomePage) {
-        hierarchy[0].label = "Home";
-      } else {
-        hierarchy.shift();
+        const wikiItem = jsonResponse.hierarchy.items[0];
+        hierarchy.unshift({
+          label: wikiItem.label,
+          pageId: this.storageProvider.get().getPageFromViewURL(wikiItem.url)!,
+          url: this.cristalApp.getRouter().resolve({
+            name: "view",
+            params: {
+              page: this.referenceSerializer.serialize(
+                this.urlParser.parse(wikiItem.url)! as DocumentReference,
+              ),
+            },
+          }).href,
+        });
       }
       return hierarchy;
     } catch (error) {

@@ -207,6 +207,9 @@ reposition = arrows
 sort-ascending = sort-amount-asc
 sort-descending = sort-amount-desc
 
+## Since 18.0.0RC1
+note = sticky-note
+
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
 anchor = anchor

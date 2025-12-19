@@ -471,7 +471,7 @@ return XWiki;
       <name>Annotation Javascript -- Selection handling code</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>always</use>
@@ -985,18 +985,26 @@ XWiki.Annotation = Class.create({
     // We nest the content of the first one in a button. 
     // All the highlights elements fulfill the same role so there's little point extending every single one.
     // It could be detrimental for the user experience to have to tab through all of the buttons.
-    let firstSpanContent = allSpans[0].textContent;
-    let toggleButton = document.createElement('a');
-    toggleButton.href="#";
+    let toggleButton = document.createElement('button');
     toggleButton.id = 'ID' + ann.annotationId;
-    toggleButton.addClassName('annotation-toggle');
-    toggleButton.addClassName('force-no-underline');
-    toggleButton.textContent = firstSpanContent;
-    allSpans[0].innerHTML = '';
-    allSpans[0].appendChild(toggleButton);
+    toggleButton.classList.add('annotation-toggle');
+    toggleButton.classList.add('sr-only');
+    toggleButton.classList.add('btn');
+    toggleButton.classList.add('btn-xs');
+    toggleButton.classList.add('btn-warning');
+    toggleButton.innerHTML = "$!escapetool.javascript($services.icon.renderHTML('note'))";
+    // Add the button at the end of the last mark for the annotation.
+    allSpans[allSpans.length-1].appendChild(toggleButton);
     // Add the onclick listener on every span of this annotation.
     allSpans.forEach(markNode =&gt; markNode.addEventListener('click', (event) =&gt;
       this.onMarkerClick(event, ann.annotationId)));
+    // Clicking specifically on the toggle blocks any other event, such as a page reload if the parent is an anchor
+    // The other event can still be triggered by clicking on the other text in it.
+    toggleButton.addEventListener('click', (event) =&gt; {
+      this.onMarkerClick(event, ann.annotationId);
+      event.stopPropagation();
+      event.preventDefault();
+    });
     let onMarkerHover = function(event, allSpans) {
       allSpans.forEach((span) =&gt; span.classList.add('hovered'));
     };
@@ -1008,9 +1016,15 @@ XWiki.Annotation = Class.create({
       markNode.addEventListener('mouseover', (event) =&gt; onMarkerHover(event, allSpans));
       markNode.addEventListener('mouseout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
     });
-    // Only the first span button can be focused with the keyboard.
-    toggleButton.addEventListener('focus', (event) =&gt; onMarkerHover(event, allSpans));
-    toggleButton.addEventListener('focusout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
+    // Only the button can be focused with the keyboard.
+    toggleButton.addEventListener('focus', (event) =&gt; {
+      event.target.classList.remove('sr-only');
+      onMarkerHover(event, allSpans);
+    });
+    toggleButton.addEventListener('focusout', (event) =&gt; {
+      event.target.classList.add('sr-only');
+      onMarkerHoverLeft(event, allSpans);
+    });
   },
 
   addAnnotationsToggleHint : function(annotations) {
@@ -1021,12 +1035,11 @@ XWiki.Annotation = Class.create({
         return false;
       }
       let toggleButtonDescription = document.createElement('span');
-      toggleButtonDescription.addClassName('hidden');
+      toggleButtonDescription.addClassName('sr-only');
       toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
       toggleButtonDescription.textContent =
         "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
       let toggleButton = document.getElementById('ID' + ann.annotationId);
-      toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
       toggleButton.appendChild(toggleButtonDescription);
     });
   },
@@ -1200,9 +1213,9 @@ XWiki.Annotation = Class.create({
    * was deleted.
    */
   removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("mark.annotation, a.annotation-toggle, mark.selection-highlight")
+    document.querySelectorAll("mark.annotation, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span[id^='annotation-toggle-description-']").forEach(description =&gt; description.remove());
+    document.querySelectorAll("button.annotation-toggle, span[id^='annotation-toggle-description-']").forEach(description =&gt; description.remove());
     this.fetchedAnnotations = false;
   },
 

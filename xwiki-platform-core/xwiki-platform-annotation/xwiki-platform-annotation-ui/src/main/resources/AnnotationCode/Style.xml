@@ -280,12 +280,6 @@
   }
 }
 
-/* Reset the styles so that the action link doesn't distract from the text. */
-.annotation &gt; a.annotation-toggle {
-  text-decoration: none;
-  color: inherit;
-}
-
 mark.annotation:not(.annotation-highlight) {
   padding: 0;
   background-color: unset;

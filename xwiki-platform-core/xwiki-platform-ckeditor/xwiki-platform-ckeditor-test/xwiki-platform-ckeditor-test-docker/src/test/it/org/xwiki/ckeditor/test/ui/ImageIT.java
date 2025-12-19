@@ -644,6 +644,8 @@ class ImageIT extends AbstractCKEditorIT
         assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
+        // The inserted image should be selected.
+        textArea.waitUntilWidgetSelected();
 
         assertSourceEquals("[[image:image.gif]]");
     }
@@ -725,7 +727,9 @@ class ImageIT extends AbstractCKEditorIT
         assertIterableEquals(List.of("External"), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
-        
+        // The inserted image should be selected.
+        textArea.waitUntilWidgetSelected();
+
         assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
     }
 
@@ -1111,6 +1115,8 @@ class ImageIT extends AbstractCKEditorIT
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
+        // The inserted image should be selected.
+        this.textArea.waitUntilWidgetSelected();
         assertSourceEquals("12 [[image:childPage@otherImage.gif]]3");
 
         // Move the image using cut & paste.

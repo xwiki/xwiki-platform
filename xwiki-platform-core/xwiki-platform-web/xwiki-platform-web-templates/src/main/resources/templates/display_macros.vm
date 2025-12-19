@@ -171,18 +171,31 @@
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
   ## (they are aready available on the target page so there's no need to re-load them).
   #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
-    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $xwiki.get($pluginName).importString))
+    ## Split the import string by line breaks so we can check which lines are always used. Store the result as a set.
+    #set ($macro.alwaysUsedLinesSet = $collectiontool.getSet())
+    #set ($macro.importLines = $stringtool.split($xwiki.get($pluginName).importString, $escapetool.n))
+    ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
+    ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
+    #set ($discard = $macro.alwaysUsedLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))
+    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $macro.alwaysUsedLinesSet))
   #end
 #end
 
 #macro (getRequiredSkinExtensions $return)
   #set ($macro.importStrings = [])
   #foreach ($entry in $requiredSkinExtensionsMap.entrySet())
-    #set ($macro.importString = $xwiki.get($entry.key).importString)
-    ## Remove the always used skin extensions, keep only those that have been requested by the display macros above.
-    #set ($discard = $macro.importStrings.add($!stringtool.removeStart($macro.importString, $entry.value).trim()))
+    ## Store the import strings split by line breaks in an ordered set and then remove the always used skin extensions.
+    ## Note that skin extensions that are on the current page are always last, after the on-demand ones and thus we
+    ## cannot rely on the fact that new skin extensions are added at the end.
+    #set ($macro.importLinesSet = $collectiontool.getOrderedSet())
+    #set ($macro.importLines = $stringtool.split($xwiki.get($entry.key).importString, $escapetool.n))
+    ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
+    ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
+    #set ($discard = $macro.importLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))
+    #set ($discard = $macro.importLinesSet.removeAll($entry.value))
+    #set ($discard = $macro.importStrings.addAll($macro.importLinesSet))
   #end
-  #set ($macro.importStrings = $stringtool.join($macro.importStrings, ''))
+  #set ($macro.importStrings = $stringtool.join($macro.importStrings, $escapetool.n))
   #set ($return = $NULL)
   #setVariable("$return" $macro.importStrings)
 #end

@@ -1279,9 +1279,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Edit the inserted Velocity macro to add some script.
-        firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
+        firstTextArea.waitUntilWidgetSelected();
+        firstTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
         firstTextArea.waitForContentRefresh();
+        firstTextArea.waitUntilWidgetSelected();
         text = firstTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
         String firstRefreshCounter = firstTextArea.getRefreshCounter();

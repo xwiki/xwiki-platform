@@ -43,6 +43,9 @@ catalog:
   "@mantine/hooks": 8.3.10
   "@microsoft/api-extractor": 7.55.1
   "@playwright/experimental-ct-react": 1.56.1
+  "@tiptap/core": 3.13.0
+  "@tiptap/extensions": 3.13.0
+  "@tiptap/pm": 3.13.0
   "@tsconfig/node24": 24.0.3
   "@types/jsdom": 27.0.0
   "@types/lodash-es": 4.17.12
@@ -120,4 +123,4 @@ catalog:
   vue-tsc: 3.1.8
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
-  yjs: 13.6.27
+  yjs: 13.6.28

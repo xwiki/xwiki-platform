@@ -1765,9 +1765,9 @@ class CreateActionTest
         List<?> availableTemplateProviders =
             (List<?>) this.oldcore.getScriptContext().getAttribute("availableTemplateProviders");
         assertEquals(1, availableTemplateProviders.size());
-        assertInstanceOf(Document.class, availableTemplateProviders.getFirst());
+        assertInstanceOf(Document.class, availableTemplateProviders.get(0));
         assertEquals(templateProviderDocumentReference,
-            ((Document) availableTemplateProviders.getFirst()).getDocumentReference());
+            ((Document) availableTemplateProviders.get(0)).getDocumentReference());
     }
 
     private void mockRequiredRights(DocumentReference providerReference, Right right, EntityType scope, boolean enforce)

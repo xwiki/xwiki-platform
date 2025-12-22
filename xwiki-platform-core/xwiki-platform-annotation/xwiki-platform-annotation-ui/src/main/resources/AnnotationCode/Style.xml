@@ -292,7 +292,6 @@ mark.annotation:not(.annotation-highlight) {
   border: 1px dotted $theme.borderColor;
   width: 560px;
   position: absolute;
-  z-index: 2;
   border-radius: 0 10px 10px 10px;
   box-shadow: 0 2px 4px -1px $theme.linkColor;
   margin: 0 10px;

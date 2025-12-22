@@ -47,7 +47,7 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        getDriver().findElement(By.id(annotationId)).click();
+        getDriver().findElement(By.className(annotationId)).click();
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 

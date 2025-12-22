@@ -26,7 +26,8 @@ var XWiki = (function(XWiki) {
     "core.widgets.html5upload.item.cancel" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.item.cancel'))",
     "core.widgets.html5upload.item.canceled" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.item.canceled'))",
     "core.widgets.html5upload.cancelAll" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.cancelAll'))",
-    "core.widgets.html5upload.hideStatus" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.hideStatus'))"
+    "core.widgets.html5upload.hideStatus" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.hideStatus'))",
+    "core.widgets.html5upload.status.fileSize" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.fileSize'))"
   };
   const icons = {
     'check' : "$!escapetool.javascript($services.icon.renderHTML('check'))",
@@ -136,38 +137,28 @@ var XWiki = (function(XWiki) {
       var statusUI = this.statusUI = {};
 
       statusUI.UPLOAD_STATUS = UploadUtils.createDiv('upload-status upload-inprogress');
-
-      // Set up the icons and their text alternatives
-      // The inprogress icon is a special case, we set the content using a GIF background in CSS
-      statusUI.STATUS_ICON_INPROGRESS = UploadUtils.createDiv('status-icon icon-inprogress', '');
-      statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.icon.inprogress']);
-      statusUI.STATUS_ICON_INPROGRESS.insert(statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE);
-      statusUI.STATUS_ICON_DONE = UploadUtils.createDiv('status-icon icon-done', icons['check']);
-      statusUI.STATUS_ICON_DONE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.icon.done']);
-      statusUI.STATUS_ICON_DONE.insert(statusUI.STATUS_ICON_DONE_ALTERNATIVE);
-      statusUI.STATUS_ICON_CANCELED = UploadUtils.createDiv('status-icon icon-canceled', icons['remove']);
-      statusUI.STATUS_ICON_CANCELED_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.icon.canceled']);
-      statusUI.STATUS_ICON_CANCELED.insert(statusUI.STATUS_ICON_CANCELED_ALTERNATIVE);
-      statusUI.STATUS_ICON_ERROR = UploadUtils.createDiv('status-icon icon-error', icons['error']);
-      statusUI.STATUS_ICON_ERROR_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.icon.error']);
-      statusUI.STATUS_ICON_ERROR.insert(statusUI.STATUS_ICON_ERROR_ALTERNATIVE);
-      statusUI.UPLOAD_STATUS.insert(statusUI.STATUS_ICON_INPROGRESS).insert(statusUI.STATUS_ICON_DONE).insert(statusUI.STATUS_ICON_CANCELED).insert(statusUI.STATUS_ICON_ERROR);
+      statusUI.UPLOAD_STATUS_MAIN = new Element('div');
+      statusUI.UPLOAD_STATUS.insert(statusUI.UPLOAD_STATUS_MAIN);
 
       if (this.options.enableFileInfo) {
         statusUI.FILE_INFO   = UploadUtils.createDiv('file-info');
         (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name.escapeHTML())).title = this.file.type;
-        statusUI.FILE_SIZE   = UploadUtils.createSpan('file-size', ' (' + UploadUtils.bytesToSize(this.file.size) + ')');
+        statusUI.FILE_SIZE_CONTAINER = UploadUtils.createSpan('progress-info')
+        statusUI.FILE_SIZE   = UploadUtils.createSpan('file-size', UploadUtils.bytesToSize(this.file.size));
+        statusUI.FILE_SIZE_CONTAINER.insert(statusUI.FILE_SIZE);
+        statusUI.FILE_SIZE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.fileSize']);
+        statusUI.FILE_SIZE.insert(statusUI.FILE_SIZE_ALTERNATIVE);
         statusUI.FILE_CANCEL = UploadUtils.createButton(l10n['core.widgets.html5upload.item.cancel'], this.cancelUpload.bindAsEventListener(this));
-        // TODO MIME type icon?
-
-        statusUI.FILE_INFO.insert(statusUI.FILE_NAME).insert(statusUI.FILE_SIZE).insert(statusUI.FILE_CANCEL);
-        statusUI.UPLOAD_STATUS.insert(statusUI.FILE_INFO);
+        // We want to put the button next to everything else.
+        statusUI.UPLOAD_STATUS.insert(statusUI.FILE_CANCEL);
+        statusUI.FILE_INFO.insert(statusUI.FILE_NAME).insert(statusUI.FILE_SIZE_CONTAINER);
+        statusUI.UPLOAD_STATUS_MAIN.insert(statusUI.FILE_INFO);
       }
 
       if (this.options.enableProgressInfo) {
         statusUI.PROGRESS_INFO       = UploadUtils.createDiv('progress-info');
         statusUI.PROGRESS_CONTAINER  = UploadUtils.createDiv('progress-container');
-        statusUI.PROGRESS            = UploadUtils.createDiv('progress');
+        statusUI.PROGRESS            = new Element('progress', {'class' : 'progress'})
         statusUI.PROGRESS_PERCENTAGE = UploadUtils.createSpan('progress-percentage', '&nbsp;');
         statusUI.PROGRESS_SPEED      = UploadUtils.createSpan('progress-speed', '&nbsp;');
         statusUI.PROGRESS_REMAINING  = UploadUtils.createSpan('progress-remaining', '&nbsp;');
@@ -180,15 +171,30 @@ var XWiki = (function(XWiki) {
                                                                             .insert(statusUI.PROGRESS_REMAINING)
                                                                             .insert(UploadUtils.createDiv('clearfloats'))
         );
-        statusUI.UPLOAD_STATUS.insert(statusUI.PROGRESS_INFO);
+        statusUI.UPLOAD_STATUS_MAIN.insert(statusUI.PROGRESS_INFO);
       }
 
       if (this.options.responseContainer) {
         statusUI.UPLOAD_RESPONSE = this.options.responseContainer;
       } else {
         statusUI.UPLOAD_RESPONSE = UploadUtils.createDiv('upload-response');
-        statusUI.UPLOAD_STATUS.insert(statusUI.UPLOAD_RESPONSE);
+        statusUI.UPLOAD_STATUS_MAIN.insert(statusUI.UPLOAD_RESPONSE);
       }
+
+      // Set up the icons and their text alternatives
+      // The inprogress icon is a special case, we set the content using a GIF background in CSS
+      statusUI.STATUS_UPLOAD_RESULT = UploadUtils.createSpan('upload-result');
+      statusUI.RESULT_DONE = UploadUtils.createDiv('result-done', icons['check']);
+      statusUI.RESULT_DONE_TEXT = UploadUtils.createSpan('', l10n['core.widgets.html5upload.status.icon.done']);
+      statusUI.RESULT_DONE.insert(statusUI.RESULT_DONE_TEXT);
+      statusUI.RESULT_CANCELED = UploadUtils.createDiv('result-canceled', icons['remove']);
+      statusUI.RESULT_CANCELED_TEXT = UploadUtils.createSpan('', l10n['core.widgets.html5upload.status.icon.canceled']);
+      statusUI.RESULT_CANCELED.insert(statusUI.RESULT_CANCELED_TEXT);
+      statusUI.RESULT_ERROR = UploadUtils.createDiv('result-error', icons['error']);
+      statusUI.RESULT_ERROR_TEXT = UploadUtils.createSpan('', l10n['core.widgets.html5upload.status.icon.error']);
+      statusUI.RESULT_ERROR.insert(statusUI.RESULT_ERROR_TEXT);
+      statusUI.STATUS_UPLOAD_RESULT.insert(statusUI.RESULT_DONE).insert(statusUI.RESULT_CANCELED).insert(statusUI.RESULT_ERROR);
+      statusUI.UPLOAD_STATUS_MAIN.insert(statusUI.STATUS_UPLOAD_RESULT);
 
       this.container.insert(statusUI.UPLOAD_STATUS);
 

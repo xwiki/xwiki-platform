@@ -233,7 +233,8 @@
     "list-group-link-hover-color": "var(--list-group-link-color)",
     "navbar-height" : "50px",
     "table-bg-hover": "#f5f5f5",
-    "table-border-color": "#ddd"
+    "table-border-color": "#ddd",
+    "state-danger-text": "#a94442"
 })
 
 ############################################

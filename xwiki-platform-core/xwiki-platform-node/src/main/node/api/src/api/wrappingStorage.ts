@@ -21,7 +21,7 @@
 import type { Storage } from "./storage";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export interface WrappingStorage extends Storage {

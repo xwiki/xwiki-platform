@@ -22,7 +22,7 @@ import type { Storage } from "@xwiki/platform-api";
 
 /**
  * Resolves a {@link Storage} based on the current configuration.
- * @since 0.13
+ * @since 18.0.0RC1
  * @beta
  */
 export interface StorageProvider {

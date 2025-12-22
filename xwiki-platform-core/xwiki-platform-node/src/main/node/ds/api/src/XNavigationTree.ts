@@ -22,7 +22,7 @@ import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { NavigationTreeNode } from "@xwiki/platform-navigation-tree-api";
 
 /**
- * @since 0.15
+ * @since 18.0.0RC1
  * @beta
  */
 type NavigationTreeProps = {
@@ -30,13 +30,13 @@ type NavigationTreeProps = {
   currentPageReference?: DocumentReference;
   /**
    * Whether to include terminal pages in the tree (default: true).
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   includeTerminals?: boolean;
   /**
    * Whether to display a root node (default: false).
-   * @since 0.20
+   * @since 18.0.0RC1
    * @beta
    */
   showRootNode?: boolean;
@@ -44,7 +44,7 @@ type NavigationTreeProps = {
 
 /**
  * Default props values for NavigationTree implementations.
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 const navigationTreePropsDefaults = {

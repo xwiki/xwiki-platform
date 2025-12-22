@@ -24,7 +24,7 @@ import type { LinkSuggestService } from "./linkSuggestService";
 import type { CristalApp } from "@xwiki/platform-api";
 
 /**
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

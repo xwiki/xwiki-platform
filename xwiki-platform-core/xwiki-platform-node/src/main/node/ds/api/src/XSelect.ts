@@ -20,7 +20,7 @@
 
 /**
  * Props of the select component.
- * @since 0.18
+ * @since 18.0.0RC1
  * @beta
  */
 type SelectProps = {

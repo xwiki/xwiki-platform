@@ -21,7 +21,7 @@
 /**
  * Props of the x-tab-panel component.
  *
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 type TabPanelProps = {

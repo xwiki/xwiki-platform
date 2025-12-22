@@ -21,7 +21,7 @@
 /**
  * Props for the btn component.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 type BtnProps = {

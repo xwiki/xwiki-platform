@@ -23,13 +23,13 @@ import type { MacrosService } from "./service/macros-service";
 import type { Container } from "inversify";
 
 /**
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 const macrosServiceName = "MacrosService";
 
 /**
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 class ComponentInit {

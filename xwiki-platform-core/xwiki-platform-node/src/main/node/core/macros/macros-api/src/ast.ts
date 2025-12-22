@@ -21,7 +21,7 @@
 /**
  * Block returned by a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroBlock =
@@ -67,7 +67,7 @@ type MacroBlock =
 /**
  * Styles for a `MacroBlock`
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroBlockStyles = {
@@ -82,7 +82,7 @@ type MacroBlockStyles = {
 /**
  * Alignment for an item
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroAlignment = "left" | "center" | "right" | "justify";
@@ -90,7 +90,7 @@ type MacroAlignment = "left" | "center" | "right" | "justify";
 /**
  * Item that's part of a `MacroBlock` list
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroListItem = {
@@ -102,7 +102,7 @@ type MacroListItem = {
 /**
  * Image returned by a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroImage = {
@@ -115,7 +115,7 @@ type MacroImage = {
 /**
  * Link returned by a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroLink = {
@@ -126,7 +126,7 @@ type MacroLink = {
 /**
  * Column that's part of a `MacroBlock` table
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroTableColumn = {
@@ -140,7 +140,7 @@ type MacroTableColumn = {
 /**
  * Cell that's part of a `MacroBlock` table
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroTableCell = {
@@ -153,7 +153,7 @@ type MacroTableCell = {
 /**
  * Inline content returned by a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroInlineContent =
@@ -170,7 +170,7 @@ type MacroInlineContent =
 /**
  * Text that's part of a `MacroInlineContent`
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroText = {
@@ -181,7 +181,7 @@ type MacroText = {
 /**
  * Styles for a `MacroText`
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroTextStyles = {
@@ -197,7 +197,7 @@ type MacroTextStyles = {
 /**
  * Link target returned by a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroLinkTarget =

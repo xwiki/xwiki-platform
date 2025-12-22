@@ -24,7 +24,7 @@ import type {
 } from "@xwiki/platform-model-api";
 
 /**
- * @since 0.15
+ * @since 18.0.0RC1
  * @beta
  */
 type NavigationTreeSelectProps = {
@@ -34,7 +34,7 @@ type NavigationTreeSelectProps = {
   modelValue?: SpaceReference;
   /**
    * Whether to include terminal pages as select options (default: false).
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   includeTerminals?: boolean;
@@ -42,7 +42,7 @@ type NavigationTreeSelectProps = {
 
 /**
  * Default props values for NavigationTreeSelect implementations.
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 const navigationTreeSelectPropsDefaults = {

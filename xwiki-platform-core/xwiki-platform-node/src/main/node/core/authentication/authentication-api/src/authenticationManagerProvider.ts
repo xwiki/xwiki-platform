@@ -24,7 +24,7 @@ import type { AuthenticationManager } from "./authenticationManager";
  * Help to resolve the right Authentication Manager based on the backend
  * type.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 interface AuthenticationManagerProvider {

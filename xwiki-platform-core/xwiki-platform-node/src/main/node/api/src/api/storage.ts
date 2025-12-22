@@ -24,7 +24,7 @@ import type { AttachmentsData } from "./attachmentsData";
 import type { PageAttachment } from "./pageAttachment";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export interface Storage {
@@ -47,7 +47,7 @@ export interface Storage {
    *  the page content is allowed (default is true)
    * @returns a promise wrapping a page data, or undefined in case of page not
    *  found
-   *  @since 0.8
+   *  @since 18.0.0RC1
    */
   getPageContent(
     page: string,
@@ -61,7 +61,7 @@ export interface Storage {
    * @returns a promise wrapping an array of attachments and an optional count, or undefined if the
    *  requested page is not found
    *
-   * @since 0.9
+   * @since 18.0.0RC1
    * @beta
    */
   getAttachments(page: string): Promise<AttachmentsData | undefined>;
@@ -70,7 +70,7 @@ export interface Storage {
    * @param page - the attachment page name
    * @param name - the attachment name
    * @returns a promise wrapping the attachment data, or undefined if the requested attachment is not found
-   * @since 0.12
+   * @since 18.0.0RC1
    * @beta
    */
   getAttachment(
@@ -97,7 +97,7 @@ export interface Storage {
    * @param syntax - the syntax of the page
    * @returns a promise when the save is done
    *
-   * @since 0.8
+   * @since 18.0.0RC1
    * @beta
    */
   save(
@@ -113,7 +113,7 @@ export interface Storage {
    * @returns (since 0.20) an optional list of resolved attachments URL (in the same order as the provided files). This
    *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
    *   alone.
-   * @since 0.9
+   * @since 18.0.0RC1
    * @beta
    */
   saveAttachments(
@@ -127,7 +127,7 @@ export interface Storage {
    * @param page - the page to delete
    * @returns true if the delete was successful, false with the reason otherwise
    *
-   * @since 0.11
+   * @since 18.0.0RC1
    * @beta
    */
   delete(page: string): Promise<{ success: boolean; error?: string }>;
@@ -140,7 +140,7 @@ export interface Storage {
    * @param preserveChildren - whether to move children
    * @returns true if the move was successful, false with the reason otherwise
    *
-   * @since 0.14
+   * @since 18.0.0RC1
    * @beta
    */
   move(

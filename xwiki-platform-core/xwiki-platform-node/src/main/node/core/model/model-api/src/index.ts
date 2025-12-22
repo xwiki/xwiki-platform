@@ -19,7 +19,7 @@
  */
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 enum EntityType {
@@ -30,7 +30,7 @@ enum EntityType {
 }
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface BaseEntityReference {
@@ -38,7 +38,7 @@ interface BaseEntityReference {
 }
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 class WikiReference implements BaseEntityReference {
@@ -52,7 +52,7 @@ class WikiReference implements BaseEntityReference {
 }
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 class SpaceReference implements BaseEntityReference {
@@ -67,7 +67,7 @@ class SpaceReference implements BaseEntityReference {
 }
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 class DocumentReference implements BaseEntityReference {
@@ -76,7 +76,7 @@ class DocumentReference implements BaseEntityReference {
   name: string;
   /**
    * Indicates whether the current document reference is terminal.
-   * @since 0.13
+   * @since 18.0.0RC1
    * @beta
    */
   terminal: boolean;
@@ -89,7 +89,7 @@ class DocumentReference implements BaseEntityReference {
 }
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 class AttachmentReference implements BaseEntityReference {
@@ -97,7 +97,7 @@ class AttachmentReference implements BaseEntityReference {
   name: string;
   document: DocumentReference;
   /**
-   * @since 0.22
+   * @since 18.0.0RC1
    */
   private readonly _metadata: Record<string, string>;
 
@@ -124,7 +124,7 @@ class AttachmentReference implements BaseEntityReference {
 }
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EntityReference =

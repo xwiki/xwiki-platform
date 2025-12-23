@@ -104,7 +104,7 @@
 ## If the value is the same in both models, there is no need to write it twice.
 #set($xsVariablesValues = {
     "figure-caption-font-size": "90%",
-    "figure-caption-color": {"css": "var(--text-muted)", "less": "@text-muted"},
+    "figure-caption-color": {"css": "\", "less": "@text-muted"},
     "target-size-minimum": "24px",
     "target-size-recommended": "44px",
     "breadcrumb-link-color": {"css": "var(--link-color)", "less": "@link-color"},
@@ -223,6 +223,7 @@
     "font-family-serif": 'Georgia, "Times New Roman", Times, serif',
     "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
     "font-size-base": "1rem",
+    "font-size-small": ".85rem",
     "grid-gutter-width": "30px",
     "input-bg" : "#fff",
     "input-border-focus": "#66afe9",

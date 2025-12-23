@@ -27,12 +27,14 @@ var XWiki = (function(XWiki) {
     "core.widgets.html5upload.item.canceled" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.item.canceled'))",
     "core.widgets.html5upload.cancelAll" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.cancelAll'))",
     "core.widgets.html5upload.hideStatus" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.hideStatus'))",
-    "core.widgets.html5upload.status.fileSize" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.fileSize'))"
+    "core.widgets.html5upload.status.fileSize" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.fileSize'))",
+    "core.widgets.html5upload.remaining" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.remaining'))"
   };
   const icons = {
     'check' : "$!escapetool.javascript($services.icon.renderHTML('check'))",
     'remove' : "$!escapetool.javascript($services.icon.renderHTML('remove'))",
     'error' : "$!escapetool.javascript($services.icon.renderHTML('error'))",
+    'cross': "$!escapetool.javascript($services.icon.renderHTML('cross'))"
   }
   // Only enable this widget if the needed JS APIs are present
   if (typeof (File) === 'undefined' || typeof (FormData) === 'undefined' || typeof (XMLHttpRequest) === 'undefined') {return XWiki;}
@@ -65,13 +67,13 @@ var XWiki = (function(XWiki) {
      * @return a string representing the size in bytes, kilobytes or megabytes, with 1 decimal precision
      */
     bytesToSize : function (bytes) {
-      var sizes = ['b', 'Kb', 'Mb'];
-      if (bytes == 0) return 'n/a';
+      var sizes = ['B', 'KB', 'MB'];
+      if (bytes === 0) return 'n/a';
       var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
       if (i >= sizes.length) {
         i = sizes.length - 1;
       }
-      return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+      return (bytes / Math.pow(1024, i)).toFixed(1) + sizes[i];
     },
 
     /**
@@ -97,15 +99,15 @@ var XWiki = (function(XWiki) {
     },
 
     /**
-     * Create and return a new XWiki button element, an <tt>a.secondary.button</tt> element inside a <tt>span.buttonwrapper</tt>.
+     * Create and return a new button element, an <tt>button.btn.btn-default</tt> element.
      *
      * @param text the text to display on the button
      * @param handler optional event handler to attach to the <tt>click</tt> event
      * @return the newly created element
      */
     createButton : function (text, handler) {
-      return new Element('a', {'class' : 'button secondary', 'href' : '#'})
-        .update(text || '').wrap('span', {'class' : 'buttonwrapper'})
+      return new Element('button', {'class' : 'btn btn-default'})
+        .update(text || '')
         .observe('click', handler || Prototype.emptyFunction);
     }
   }
@@ -148,7 +150,10 @@ var XWiki = (function(XWiki) {
         statusUI.FILE_SIZE_CONTAINER.insert(statusUI.FILE_SIZE);
         statusUI.FILE_SIZE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.status.fileSize']);
         statusUI.FILE_SIZE.insert(statusUI.FILE_SIZE_ALTERNATIVE);
-        statusUI.FILE_CANCEL = UploadUtils.createButton(l10n['core.widgets.html5upload.item.cancel'], this.cancelUpload.bindAsEventListener(this));
+        statusUI.FILE_CANCEL = UploadUtils.createButton(icons['cross'], this.cancelUpload.bindAsEventListener(this));
+        statusUI.FILE_CANCEL.addClassName('upload-cancel');
+        statusUI.FILE_CANCEL_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['core.widgets.html5upload.item.cancel']);
+        statusUI.FILE_CANCEL.insert(statusUI.FILE_CANCEL_ALTERNATIVE);
         // We want to put the button next to everything else.
         statusUI.UPLOAD_STATUS.insert(statusUI.FILE_CANCEL);
         statusUI.FILE_INFO.insert(statusUI.FILE_NAME).insert(statusUI.FILE_SIZE_CONTAINER);
@@ -157,20 +162,22 @@ var XWiki = (function(XWiki) {
 
       if (this.options.enableProgressInfo) {
         statusUI.PROGRESS_INFO       = UploadUtils.createDiv('progress-info');
-        statusUI.PROGRESS_CONTAINER  = UploadUtils.createDiv('progress-container');
-        statusUI.PROGRESS            = new Element('progress', {'class' : 'progress'})
+        statusUI.PROGRESS            = new Element('progress')
         statusUI.PROGRESS_PERCENTAGE = UploadUtils.createSpan('progress-percentage', '&nbsp;');
         statusUI.PROGRESS_SPEED      = UploadUtils.createSpan('progress-speed', '&nbsp;');
         statusUI.PROGRESS_REMAINING  = UploadUtils.createSpan('progress-remaining', '&nbsp;');
+        statusUI.PROGRESS_REMAINING_TEXT = UploadUtils.createSpan('progress-remaining-text', l10n['core.widgets.html5upload.remaining']);
         statusUI.PROGRESS_TRANSFERED = UploadUtils.createSpan('progress-transfered', '&nbsp;');
 
-        statusUI.PROGRESS_INFO.insert(statusUI.PROGRESS_CONTAINER.insert(statusUI.PROGRESS))
-                              .insert(statusUI.PROGRESS_PERCENTAGE)
-                              .insert(statusUI.PROGRESS_TRANSFERED)
-                              .insert(UploadUtils.createDiv('progress-time').insert(statusUI.PROGRESS_SPEED)
-                                                                            .insert(statusUI.PROGRESS_REMAINING)
-                                                                            .insert(UploadUtils.createDiv('clearfloats'))
-        );
+        statusUI.PROGRESS_INFO.insert(statusUI.PROGRESS)
+        // If the file info is displayed, we can put some of this info above the progress bar.
+        if (this.options.enableFileInfo) {
+          statusUI.FILE_SIZE_CONTAINER.insert(statusUI.PROGRESS_TRANSFERED).insert(statusUI.PROGRESS_PERCENTAGE);
+        } else {
+          statusUI.PROGRESS_INFO.insert(statusUI.PROGRESS_TRANSFERED).insert(statusUI.PROGRESS_PERCENTAGE);
+        }
+        statusUI.PROGRESS_INFO.insert(UploadUtils.createDiv('progress-time').insert(statusUI.PROGRESS_REMAINING)
+          .insert(statusUI.PROGRESS_REMAINING_TEXT).insert(statusUI.PROGRESS_SPEED));
         statusUI.UPLOAD_STATUS_MAIN.insert(statusUI.PROGRESS_INFO);
       }
 
@@ -274,7 +281,6 @@ var XWiki = (function(XWiki) {
       this.request && this.request.abort();
       this.canceled = true;
       clearInterval(this.timer);
-      this.statusUI.FILE_CANCEL.addClassName('upload-canceled-label').removeClassName('buttonwrapper').update(l10n['core.widgets.html5upload.item.canceled']);
       this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-canceled');
     },
 
@@ -302,8 +308,8 @@ var XWiki = (function(XWiki) {
       // update speed info
       var speed = UploadUtils.bytesToSize(crtBytesPerSecond) + '/s';
       this.progressData.latestSpeed = speed;
-      this.statusUI.PROGRESS_SPEED.update(speed);
-      this.statusUI.PROGRESS_REMAINING.update(' | ' + UploadUtils.secondsToTime(secondsRemaining));
+      this.statusUI.PROGRESS_SPEED.update(`($${speed})`);
+      this.statusUI.PROGRESS_REMAINING.update(UploadUtils.secondsToTime(secondsRemaining));
     },
 
     /**
@@ -319,7 +325,7 @@ var XWiki = (function(XWiki) {
         var bytesTransfered = UploadUtils.bytesToSize(this.progressData.bytesUploaded);
 
         this.statusUI.PROGRESS_PERCENTAGE.update(percentageCompleted + '%');
-        this.statusUI.PROGRESS.style.width = percentageCompleted + '%';
+        this.statusUI.PROGRESS.setAttribute('value', percentageCompleted/100 );
         this.statusUI.PROGRESS_TRANSFERED.update('(' + bytesTransfered + ')');
       } else {
         this.statusUI.PROGRESS.update('n/a'); //Unable to compute
@@ -333,9 +339,6 @@ var XWiki = (function(XWiki) {
     onUploadFinish : function(event) {
       this.completed = true;
       clearInterval(this.timer);
-      if (this.statusUI.FILE_CANCEL) {
-        this.statusUI.FILE_CANCEL.addClassName('hidden');
-      }
       this.formData.input.fire('xwiki:html5upload:message', {content: 'UPLOAD_FINISHING', type: 'inprogress', source: this,
         parameters : {name : this.file.name.escapeHTML()}
       });
@@ -347,22 +350,18 @@ var XWiki = (function(XWiki) {
      * @param event the ProgressEvent fired by the browser
      */
     onRequestDone : function(event) {
-      if (event && event.target && typeof event.target.status === 'number') {
-        if (event.target.status >= 200 && event.target.status < 300) {
-          this.statusUI.UPLOAD_RESPONSE.update(event.target.responseText);
-        } else {
-          this.onUploadError();
-          return;
-        }
+      if (event && event.target && typeof event.target.status === 'number' &&
+        (event.target.status < 200 || event.target.status >= 300)) {
+        this.onUploadError();
+        return;
       }
 
       if (this.options.enableProgressInfo) {
         this.statusUI.PROGRESS_PERCENTAGE.update('100%');
-        this.statusUI.PROGRESS.style.width = "100%";
-        this.statusUI.PROGRESS_REMAINING.update(' | 00:00:00');
-        this.statusUI.PROGRESS_TRANSFERED.update('(' + UploadUtils.bytesToSize(this.file.size) + ')');
+        this.statusUI.PROGRESS_REMAINING.update('00:00:00');
+        this.statusUI.PROGRESS_TRANSFERED.update(UploadUtils.bytesToSize(this.file.size));
         if (this.progressData.latestSpeed === 0) {
-          this.statusUI.PROGRESS_SPEED.update(UploadUtils.bytesToSize(this.file.size) + "/s");
+          this.statusUI.PROGRESS_SPEED.update('(' + UploadUtils.bytesToSize(this.file.size) + '/s)');
         }
       }
       this.formData.input.fire('xwiki:html5upload:message', {content: 'UPLOAD_FINISHED', type: 'done', source: this,
@@ -377,7 +376,6 @@ var XWiki = (function(XWiki) {
      * Function called by the XHR when the upload finishes unsuccessfully.
      */
     onUploadError : function() {
-      this.statusUI.FILE_CANCEL.remove();
       this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-error');
       this.abnormalUploadFinish('UNKNOWN_ERROR');
     },

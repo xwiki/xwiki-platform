@@ -4,108 +4,126 @@
 }
 .upload-status {
   position: relative;
-  padding: .3em 1em .3em 22px;
-  background-color: var(--nav-link-hover-bg);
-  border-radius: 7px; /* Same value as @border-radius-base from Flamingo. */
-  margin: .5em 0;
-  clear: both;
+  padding: .3em;
+  padding-left: 1em;
+  background-color: var(--xwiki-background-secondary-color);
+  border-radius: var(--border-radius-large);
+  margin: .5em .2em;
   display: flex;
+  gap: 1em;
+  /* We expect the first child to be the main container. The second child should be the (optional) cancel button. */
+  &> *:first-child {
+    flex-grow: 1;
+  }
 }
-
+/* When the upload results in an error, we color code it accordingly.*/
 .upload-status.upload-error {
   background-color: var(--alert-danger-bg);
   color: var(--state-danger-text);
 }
-
 /* We expect the first node child of the .result-<something> node to be its icon. */
+.upload-result > div > span:first-child {
+  margin-right: 1em;
+}
+
+/* Color the icons. */
 .result-canceled > *:first-child {
   color: var(--state-danger-text);
 }
 
-
-/* We expect the first node child of the .result-<something> node to be its icon. */
-.result-done > *:first-child,
-.upload-inprogress .progress-info .progress {
-  color: var(--brand-info);
+.result-done > *:first-child {
+  color: var(--brand-primary);
 }
 
-.upload-status .upload-result > * {
+/* We display extra info only when the upload is in progress.
+ We only display the result blocks when the result is achieved. */
+.upload-status .upload-result > *,
+.progress-info,
+.upload-cancel {
   display: none;
 }
 
 .upload-done .result-done,
 .upload-canceled .result-canceled,
-.upload-error .result-error {
+.upload-error .result-error,
+.upload-inprogress .progress-info,
+.upload-inprogress .upload-cancel {
   display: inherit;
 }
 
-.progress-info {
-  display: none;
+.upload-inprogress .progress-info progress {
+  width: 100%;
+  height: .5em;
+  margin: .25em 0;
+  border: none;
+  border-radius: var(--border-radius-small);
+  
+  /* Firefox progress colors */
+  &::-moz-progress-bar {
+    background-color: var(--brand-primary);
+  }
+  background-color: var(--alert-info-bg);
+  /* Webkit based progress colors */
+  &::-webkit-progress-bar {
+    border-radius: var(--border-radius-small);
+    background-color: var(--alert-info-bg);
+  }
+  &::-webkit-progress-value {
+    border-radius: var(--border-radius-small);
+    background-color: var(--brand-primary);
+  }
 }
 
-.upload-status.upload-inprogress .progress-info {
-  display: block;
+.progress-transfered, .progress-speed {
+  display: none;
+  color: var(--text-muted);
+}
+.advanced-user .progress-transfered,
+.advanced-user .progress-speed {
+  display: unset;
+}
+
+.upload-cancel {
+  align-items: center;
+  background: none;
+  border-color: transparent;
+}
+
+.upload-inprogress .progress-info {
+  display: default;
+}
+
+.upload-inprogress .file-info .progress-info {
+  margin-left: .5em;
+  display: inline-flex;
+  gap: .2em;
+  flex-grow: 1;
+}
+
+.progress-info .file-size {
+  flex-grow: 1;
 }
 
 .file-info {
-  margin: .5em 0;
+  display: inline-flex;
+  width: 100%;
 }
+
 .file-info .file-name {
-  font-weight: bold;
+  font-weight: var(--font-weight-semibold);
 }
 
 .file-info .buttonwrapper, .file-info .upload-canceled-label {
   float: right;
   margin: 0;
 }
-.upload-inprogress .progress-info {
-  opacity: 1;
-}
-.progress-info .progress-time {
-  float: right;
-  text-align: right;
-}
-.progress-info .progress-percentage {
-  margin: 0 0.5em 0 0;
-}
-.progress-info .progress, .progress-info .progress-container {
-  height: 6px;
-  border-radius: 5px;
-}
-.progress-info .progress {
-  background-color: $theme.notificationSuccessColor;
-  box-shadow: inset 0 0 5px rgba(1,1,1,.2);
-  width: 0;
-}
-.progress-info .progress-container {
-  border: 1px solid $theme.notificationSuccessColor;
-  border-radius: 7px;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  box-shadow: 0 0 5px rgba(0,0,0,.2), inset 0 0 5px rgba(0,0,0,.2);
-  height: 8px;
-  margin: 0.3em 0;
-  width: 100%;
+
+.progress-time {
+  display: inline-flex;
+  gap: .2em;
 }
 
 .upload-error .file-info .file-name,
 .upload-error .status-icon.icon-error {
   color: var(--brand-error);
-}
-
-.upload-canceled .progress-info .progress-container {
-  border-color: $theme.notificationWarningColor;
-}
-.upload-canceled .progress-info .progress {
-  background-color: $theme.notificationWarningColor;
-}
-upload-status.upload-error .progress-info .progress {
-  background-color: $theme.notificationErrorColor;
-}
-.upload-error .progress-info .progress-container {
-  border-color: $theme.notificationErrorColor;
-}
-.upload-canceled-label {
-  color: $theme.notificationErrorColor !important;
-  font-weight: bold;
 }

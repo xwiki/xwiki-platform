@@ -55,7 +55,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
           <dd><input type="text" id="xwikiuploadcomment" name="comment" maxlength="1023"></dd>
         </dl>
       #end
-      <label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
+      <label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
     </div>
     <div>
       <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.attachments.upload.submit')" class="button btn btn-primary"/></span>

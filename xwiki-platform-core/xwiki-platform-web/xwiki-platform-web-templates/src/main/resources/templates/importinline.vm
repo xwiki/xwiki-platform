@@ -54,7 +54,7 @@
   $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##
   $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
-  $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/upload.css')##
   <div id="import" class="row">
     <div id="packagelist" class="col-xs-12 col-sm-6 col-md-6">
       <div class="legend">

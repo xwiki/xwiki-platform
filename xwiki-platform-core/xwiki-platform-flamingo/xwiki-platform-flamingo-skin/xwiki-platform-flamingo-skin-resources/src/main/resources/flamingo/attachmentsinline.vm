@@ -21,7 +21,7 @@
 #template('display_macros.vm')
 #initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-$xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
+$xwiki.ssfx.use('uicomponents/widgets/upload.css')
 $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###

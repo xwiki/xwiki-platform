@@ -31,6 +31,7 @@ catalogMode: strict
 cleanupUnusedCatalogs: true
 ignoredBuiltDependencies:
   - esbuild
+  - unrs-resolver
 onlyBuiltDependencies:
   - nx
 catalog:

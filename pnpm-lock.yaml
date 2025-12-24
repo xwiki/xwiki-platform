@@ -61,8 +61,8 @@ catalogs:
       specifier: 19.2.2
       version: 19.2.2
     '@types/react-dom':
-      specifier: 19.2.2
-      version: 19.2.2
+      specifier: 19.2.3
+      version: 19.2.3
     '@vitejs/plugin-react':
       specifier: 5.1.0
       version: 5.1.0
@@ -1425,10 +1425,10 @@ importers:
         version: 0.42.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)
       '@blocknote/mantine':
         specifier: 'catalog:'
-        version: 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@mantine/hooks@8.3.10(react@19.2.0))(@mantine/utils@6.0.22(react@19.2.0))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@mantine/hooks@8.3.10(react@19.2.0))(@mantine/utils@6.0.22(react@19.2.0))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@blocknote/react':
         specifier: 'catalog:'
-        version: 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@mantine/core':
         specifier: 'catalog:'
         version: 8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1437,7 +1437,7 @@ importers:
         version: 8.3.10(react@19.2.0)
       '@types/react-dom':
         specifier: 'catalog:'
-        version: 19.2.2(@types/react@19.2.2)
+        version: 19.2.3(@types/react@19.2.2)
       '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
@@ -2563,8 +2563,8 @@ packages:
   '@types/node@24.10.3':
     resolution: {integrity: sha512-gqkrWUsS8hcm0r44yn7/xZeV1ERva/nLgrLxFRUGb7aoNMIJfZJ3AC261zDQuOAKC7MiXai1WCpYc48jAHoShQ==}
 
-  '@types/react-dom@19.2.2':
-    resolution: {integrity: sha512-9KQPoO6mZCi7jcIStSnlOWn2nEF3mNmyr3rIAsGnAbQKYbRLyqmeSc39EVgtxXVia+LMT8j3knZLAZAh+xLmrw==}
+  '@types/react-dom@19.2.3':
+    resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
 
@@ -6061,10 +6061,10 @@ snapshots:
       - sugar-high
       - supports-color
 
-  '@blocknote/mantine@0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@mantine/hooks@8.3.10(react@19.2.0))(@mantine/utils@6.0.22(react@19.2.0))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@blocknote/mantine@0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@mantine/hooks@8.3.10(react@19.2.0))(@mantine/utils@6.0.22(react@19.2.0))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@blocknote/core': 0.42.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)
-      '@blocknote/react': 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@blocknote/react': 0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@mantine/core': 8.3.10(@mantine/hooks@8.3.10(react@19.2.0))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@mantine/hooks': 8.3.10(react@19.2.0)
       '@mantine/utils': 6.0.22(react@19.2.0)
@@ -6084,14 +6084,14 @@ snapshots:
       - sugar-high
       - supports-color
 
-  '@blocknote/react@0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@blocknote/react@0.42.3(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@blocknote/core': 0.42.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.28))(yjs@13.6.28))(@tiptap/extensions@3.13.0(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@types/hast@3.0.4)
       '@emoji-mart/data': 1.2.1
       '@floating-ui/react': 0.27.16(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tiptap/core': 3.13.0(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
-      '@tiptap/react': 3.13.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@tiptap/react': 3.13.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       emoji-mart: 5.6.0
       lodash.merge: 4.6.2
       react: 19.2.0
@@ -6818,12 +6818,12 @@ snapshots:
       prosemirror-transform: 1.10.5
       prosemirror-view: 1.41.4
 
-  '@tiptap/react@3.13.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@tiptap/react@3.13.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@types/react-dom@19.2.3(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@tiptap/core': 3.13.0(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
       '@types/react': 19.2.2
-      '@types/react-dom': 19.2.2(@types/react@19.2.2)
+      '@types/react-dom': 19.2.3(@types/react@19.2.2)
       '@types/use-sync-external-store': 0.0.6
       fast-equals: 5.4.0
       react: 19.2.0
@@ -6925,7 +6925,7 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/react-dom@19.2.2(@types/react@19.2.2)':
+  '@types/react-dom@19.2.3(@types/react@19.2.2)':
     dependencies:
       '@types/react': 19.2.2
 

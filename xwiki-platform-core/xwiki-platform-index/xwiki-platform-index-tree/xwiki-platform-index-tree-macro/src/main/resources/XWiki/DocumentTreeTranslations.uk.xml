@@ -82,11 +82,28 @@ rendering.macro.documentTree.parameter.limit.name=Межа
 rendering.macro.documentTree.parameter.limit.description=Максимальна кількість дочірніх вузлів для відображення при розгортанні батьківського вузла вперше. Решта дочірніх вузлів доступні за посиланням "більше ...". Цей параметр в основному використовується для розбиття на сторінки дочірніх вузлів і, таким чином, допомагає масштабувати дерево, коли кількість дочірніх вузлів велика.
 rendering.macro.documentTree.parameter.exclusions.name=Виключення
 rendering.macro.documentTree.parameter.exclusions.description=Список вузлів для виключення з дерева. Вузли вказуються за їх id та відокремлені комами.
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Сортувати сторінки за
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=Поле сторінки, за яким сортуються дочірні сторінки, а також порядок сортування.
+rendering.macro.documentTree.parameter.expandToLevel.name=Розгорнути до рівня
+rendering.macro.documentTree.parameter.expandToLevel.description=Визначає глибину дерева для автоматичного розгортання. Значення за умовчання — 0, що означає відображення лише вузлів верхнього рівня. Рівень 1 відкриває їх, рівень 2 також відкриває дочірні вузли під щойно відображеними вузлами й так далі. Зверніть увагу, що велике значення може зробити відображення макроса ресурсомістким для браузера.
 rendering.macro.children.name=Дочірні сторінки
 rendering.macro.children.description=Показує дерево дочірніх сторінок поточної сторінки
+rendering.macro.children.parameter.sort.name=Сортувати за
+rendering.macro.children.parameter.sort.description=Поле сторінки, за яким сортуються дочірні сторінки, а також порядок сортування.
+rendering.macro.children.parameter.root.name=Корінь
+### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=Нічого не знайдено
 index.documentTree.more=ще {0}...
 index.documentTree.addDocument=Нова сторінка...
+index.documentTree.documentSortDisplayer.field=Поле сортування
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Назва
+index.documentTree.documentSortDisplayer.field.date=Дата останньої зміни
+index.documentTree.documentSortDisplayer.field.creationDate=Дата створення
+index.documentTree.documentSortDisplayer.order=Порядок сортування
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=За зростанням
+index.documentTree.documentSortDisplayer.order.desc=За спаданням
 
 ## Deprecated translation keys
 

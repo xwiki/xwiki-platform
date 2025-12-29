@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Приховати пан�
 platform.appwithinminutes.classEditorMoveFieldLabel=Перемістити
 platform.appwithinminutes.classEditorMoveFieldHint=Перетягніть для зміни порядку
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Значення за умовчанням
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Читабельна назва
+platform.appwithinminutes.classEditorFieldHintToolTip=Підказка
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Ідентиф�
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Додати
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Видалити
 appWithinMinutes.templateProviderEditor.hint=Записи додатка є вікі-сторінками зі структурованими даними.
+appWithinMinutes.templateProviderEditor.icon.name=Піктограма
 appWithinMinutes.templateProviderEditor.icon.hint=Значок, пов'язаний з додатком.
+appWithinMinutes.templateProviderEditor.description.name=Опис
 appWithinMinutes.templateProviderEditor.description.hint=Короткий опис додатка.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Створення записів з
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Якщо розташування не вибране, записи можна створювати з будь якої сторінки.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Створен
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Якщо розташування не вибране, записи можна створювати в будь якому місці вікі.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Не застосовувати розташування записів
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Використовувати вказані вище місця лише як пропозиції, що дозволяє користувачеві вибрати інше місце розташування при створенні запису програми.
+appWithinMinutes.templateProviderEditor.terminal.name=Термінальна
 appWithinMinutes.templateProviderEditor.terminal.hint=Чи мають бути записи додатку термінальними сторінками, чи ні.
 
 ### Wizard Step 3: Application Presentation

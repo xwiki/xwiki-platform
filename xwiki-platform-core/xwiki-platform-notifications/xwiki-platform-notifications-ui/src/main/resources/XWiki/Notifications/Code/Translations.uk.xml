@@ -259,6 +259,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Ви ігноруєте цю сторінку та її дочірні сторінки: ви не отримаєте сповіщення про це.
 notifications.watch.modal.title.CUSTOM=Спеціальні налаштування спостереження
 notifications.watch.modal.description.CUSTOM=Ви використовуєте спеціальні налаштування сповіщень для цієї сторінки: ви можете слідкувати або блокувати певні події для сторінки, або ви можете націлити лише певні канали для сповіщень. Ми запрошуємо вас переглянути налаштування сповіщень з вашого профілю.
+notifications.watch.modal.option.hint.toggle=Перемкнути деталі про цей варіант
 notifications.watch.modal.option.watchpage.title=Слідкувати за поточною сторінкою
 notifications.watch.modal.option.watchpage.hint=Ви отримуватимете сповіщення лише про цю сторінку.
 notifications.watch.modal.option.watchspace.title=Слідкувати за поточною сторінкою та її дочірніми сторінками

@@ -150,20 +150,8 @@
             </revapi.differences>
             -->
 
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.extension.script.ScriptExtensionRewriter</old>
-                  <new>class org.xwiki.extension.script.ScriptExtensionRewriter</new>
-                  <superClass>org.xwiki.extension.internal.InstallOnRootNamespaceExtensionRewriter</superClass>
-                  <criticality>allowed</criticality>
-                  <justification>Usage of an abstract class which implements the interface previously
-                    used, so not a breaking change.</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

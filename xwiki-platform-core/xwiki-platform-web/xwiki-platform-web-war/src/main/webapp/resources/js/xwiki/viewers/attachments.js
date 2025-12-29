@@ -42,156 +42,154 @@
 (function(l10n) {
   "use strict";
 
-window.XWiki = window.XWiki || {};
-var viewers = XWiki.viewers = XWiki.viewers || {};
-/**
- * Enhancements for the Attachment upload area: adding and removing file fields, resetting with the Cancel button,
- * preventing submit if no files are selected.
- */
-viewers.Attachments = Class.create({
-  /** Counter for creating distinct upload field names. */
-  counter : 1,
-  /** Constructor. Adds all the JS improvements of the Attachment area. */
-  initialize : function() {
-    // Initialize the event listener to prepare the form when the Attachments tab is loaded or reloaded, or prepare the form straight away.
-    // prepareForm won't be called twice as it is skipped once #attachform exists. 
-    this.addTabLoadListener();
-    this.prepareForm();
-  },
-  /** Enhance the upload form with JS behaviors. */
-  prepareForm : function() {
-    if (!$("attachform")) {
-      return;
-    }
-    this.form = $("attachform").up("form");
-    this.defaultFileDiv = this.form.down("input[type='file']").up("div");
-    this.inputSize = this.form.down("input[type='file']").size;
-
-    var html5Uploader = this.attachHTML5Uploader(this.form.down("input[type='file']"));
-    if (html5Uploader) {
-      html5Uploader.hideFormButtons();
-    } else {
-      this.addInitialRemoveButton();
-      this.addAddButton();
-      this.resetOnCancel();
-    }
-    this.blockEmptySubmit();
-  },
-  /** If available in the current browser, enable HTML5 upload for a given file input */
-  attachHTML5Uploader : function(input) {
-    if (typeof(XWiki.FileUploader) != 'undefined') {
-      input.multiple = true;
-      // Since the attachments liveData is refreshed on file upload, we skip updating the attachments container.
-      return new XWiki.FileUploader(input, {
-        'responseContainer' : document.createElement('div'),
-        'responseURL' : '',
-        'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
-      });
-    }
-    return false;
-  },
-  /** By default the form contains one upload field. Add a "remove" button for this one, too. */
-  addInitialRemoveButton : function() {
-    this.defaultFileDiv.appendChild(this.createRemoveButton());
-  },
-  /** Add an "Add another file" button below the file fields. */
-  addAddButton : function() {
-    var addButton = new Element("input", {
-      type: "button",
-      value: l10n['core.viewers.attachments.upload.addFileInput'],
-      className: "attachmentActionButton add-file-input"
-    });
-    this.addDiv = new Element("div");
-    this.addDiv.appendChild(addButton);
-    Event.observe(addButton, 'click', this.addField.bindAsEventListener(this));
-    this.defaultFileDiv.up().insertBefore(this.addDiv, this.defaultFileDiv.next());
-  },
-  /** Add a submit listener that prevents submitting the form if no file was specified. */
-  blockEmptySubmit : function() {
-    Event.observe(this.form, 'submit', this.onSubmit.bindAsEventListener(this));
-  },
-  /** Add a reset listener that resets the number of file fields to 1. */
-  resetOnCancel : function() {
-    Event.observe(this.form, 'reset', this.onReset.bindAsEventListener(this));
-    Event.observe(this.form.down('.cancel'), 'click', this.onReset.bindAsEventListener(this));
-  },
-  /** Creates and inserts a new file input field. */
-  addField : function(event) {
-    var fileInput = new Element("input", {
-      type: "file",
-      name: "filepath_" + this.counter,
-      size: this.inputSize,
-      className: "uploadFileInput"
-    });
-    // For the moment, specifying a different name is not used anymore.
-    var filenameInput = new Element("input", {type: "hidden", name : "filename_" + this.counter});
-    var removeButton = this.createRemoveButton();
-    var containerDiv = new Element("div", {'class' : 'fileupload-field'});
-    containerDiv.insert(filenameInput).insert(fileInput).insert(removeButton);
-    this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
-    // Remove the focus border from the button
-    event.element().blur();
-    this.counter++;
-  },
-  /** Remove a file field when pressing the corresponding "Remove" button. */
-  removeField : function(event) {
-    event.element().up("div").remove();
-  },
-  /** Create a remove button that triggers {@link #removeField} when clicked. */
-  createRemoveButton : function() {
-    var removeButton = new Element("input", {
-      type: "button",
-      value: l10n['core.viewers.attachments.upload.removeFileInput'],
-      title: l10n['core.viewers.attachments.upload.removeFileInput.title'],
-      className: "attachmentActionButton remove-file-input"
-    });
-    Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
-    return removeButton;
-  },
-  /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */
-  onSubmit : function(event) {
-    var hasFiles = false;
-    this.form.getInputs("file").each(function(item) {
-      if(item.value != '') {
-        hasFiles = true;
-      }
-    });
-    if(!hasFiles) {
-      event.stop();
-    }
-  },
-  /** Form reset listener. It resets the number of file fields to just one. */
-  onReset : function(event) {
-    if (event) {
-      event.stop();
-    }
-    this.form.getInputs("file").each(function(item) {
-      item.up().remove();
-    });
-    this.counter = 1;
-    this.addField(event);
-  },
+require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploader) {
+  window.XWiki = window.XWiki || {};
+  var viewers = XWiki.viewers = XWiki.viewers || {};
   /**
-   * Registers a listener that watches for the insertion of the Attachments tab and triggers the form enhancement.
+   * Enhancements for the Attachment upload area: adding and removing file fields, resetting with the Cancel button,
+   * preventing submit if no files are selected.
    */
-  addTabLoadListener : function(event) {
-    var listener = function(event) {
-      if (event.memo.id == 'Attachments') {
-        this.prepareForm();
+  
+  viewers.Attachments = class {
+    /** Counter for creating distinct upload field names. */
+    static counter = 1;
+    /** Constructor. Adds all the JS improvements of the Attachment area. */
+    constructor() {
+      // Initialize the event listener to prepare the form when the Attachments tab is loaded or reloaded, or prepare the form straight away.
+      // prepareForm won't be called twice as it is skipped once #attachform exists. 
+      this.addTabLoadListener();
+      this.prepareForm();
+    }
+    /** Enhance the upload form with JS behaviors. */
+    prepareForm() {
+      if (!$("attachform")) return;
+      this.form = $("#attachform").parents("form");
+      let fileInput = this.form.find("input[type='file']");
+      this.defaultFileDiv = fileInput.parent("div");
+      this.inputSize = fileInput.size;
+  
+      let html5Uploader = this.attachHTML5Uploader(fileInput);
+      if (html5Uploader) {
+        html5Uploader.hideFormButtons();
+      } else {
+        this.addInitialRemoveButton();
+        this.addAddButton();
+        this.resetOnCancel();
       }
-    }.bindAsEventListener(this);
-    document.observe("xwiki:docextra:loaded", listener);
-  }
-});
-
-// When the document is loaded, trigger the attachment form enhancements.
-(XWiki.domIsLoaded && new viewers.Attachments())
-|| document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
-
+      this.blockEmptySubmit();
+    }
+    /** If available in the current browser, enable HTML5 upload for a given file input */
+    attachHTML5Uploader(input) {
+      if (typeof(FileUploader) != 'undefined') {
+        input.multiple = true;
+        // Since the attachments liveData is refreshed on file upload, we skip updating the attachments container.
+        return new FileUploader(input[0], {
+          'responseContainer' : document.createElement('div'),
+          'responseURL' : '',
+          'maxFilesize' : parseInt(input.attr('data-max-file-size'))
+        });
+      }
+      return false;
+    }
+    /** By default the form contains one upload field. Add a "remove" button for this one, too. */
+    addInitialRemoveButton() {
+      this.defaultFileDiv.appendChild(this.createRemoveButton());
+    }
+    /** Add an "Add another file" button below the file fields. */
+    addAddButton() {
+      let addButton = $(document.createElement("input"));
+      addButton.attr('type', 'button');
+      addButton.attr('value', l10n['core.viewers.attachments.upload.addFileInput']);
+      addButton.attr('class', "attachmentActionButton add-file-input");
+      this.addDiv = document.createElement("div");
+      this.addDiv.append(addButton);
+      addButton.observe('click', this.addField.bindAsEventListener(this));
+      this.defaultFileDiv.up().insertBefore(this.addDiv, this.defaultFileDiv.next());
+    }
+    /** Add a submit listener that prevents submitting the form if no file was specified. */
+    blockEmptySubmit() {
+      this.form[0].observe('submit', this.onSubmit.bindAsEventListener(this));
+    }
+    /** Add a reset listener that resets the number of file fields to 1. */
+    resetOnCancel() {
+      this.form[0].observe('reset', this.onReset.bindAsEventListener(this));
+      this.form.down('.cancel')[0].observe('click', this.onReset.bindAsEventListener(this));
+    }
+    /** Creates and inserts a new file input field. */
+    addField(event) {
+      let fileInput = document.createElement("input", {
+        type: "file",
+        name: "filepath_" + this.counter,
+        size: this.inputSize,
+        className: "uploadFileInput"
+      });
+      // For the moment, specifying a different name is not used anymore.
+      var filenameInput = document.createElement("input", {type: "hidden", name : "filename_" + this.counter});
+      var removeButton = this.createRemoveButton();
+      var containerDiv = document.createElement("div", {'class' : 'fileupload-field'});
+      containerDiv.append(filenameInput, fileInput, removeButton);
+      this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
+      // Remove the focus border from the button
+      event.target.blur();
+      this.counter++;
+    }
+    /** Remove a file field when pressing the corresponding "Remove" button. */
+    removeField(event) {
+      event.target.up("div").remove();
+    }
+    /** Create a remove button that triggers {@link #removeField} when clicked. */
+    createRemoveButton() {
+      var removeButton = new Element("input", {
+        type: "button",
+        value: l10n['core.viewers.attachments.upload.removeFileInput'],
+        title: l10n['core.viewers.attachments.upload.removeFileInput.title'],
+        className: "attachmentActionButton remove-file-input"
+      });
+      Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
+      return removeButton;
+    }
+    /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */
+    onSubmit(event) {
+      let hasFiles = false;
+      this.form.getInputs("file").each(function(item) {
+        if(item.value !== '') {
+          hasFiles = true;
+        }
+      });
+      if(!hasFiles) {
+        event.stop();
+      }
+    }
+    /** Form reset listener. It resets the number of file fields to just one. */
+    onReset(event) {
+      if (event) {
+        event.stop();
+      }
+      this.form.getInputs("file").each(function(item) {
+        item.up().remove();
+      });
+      this.counter = 1;
+      this.addField(event);
+    }
+    /**
+     * Registers a listener that watches for the insertion of the Attachments tab and triggers the form enhancement.
+     */
+    addTabLoadListener() {
+      let listener = function(event) {
+        if (event.memo.id === 'Attachments') {
+          this.prepareForm();
+        }
+      }.bindAsEventListener(this);
+      document.observe("xwiki:docextra:loaded", listener);
+    }
+  };
+  
+  // When the document is loaded, trigger the attachment form enhancements.
+  (XWiki.domIsLoaded && new viewers.Attachments())
+  || document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
 /**
  * Delete attachments from AttachmentsTab.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
    * Event on deleteAttachment button.
    */
@@ -262,7 +260,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var itemCount = $('#Attachmentstab').find('.itemCount');
     if (itemCount) {
       itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
-    };
+    }
     var tmAttachments = $('#tmAttachments');
     if (tmAttachments.length) {
       // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.

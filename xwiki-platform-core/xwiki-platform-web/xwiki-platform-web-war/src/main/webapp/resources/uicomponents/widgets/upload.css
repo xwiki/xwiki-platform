@@ -10,6 +10,7 @@
   margin: .5em .2em;
   display: flex;
   gap: 1em;
+  align-items: center;
   /* We expect the first child to be the main container. The second child should be the (optional) cancel button. */
   &> *:first-child {
     flex-grow: 1;
@@ -86,6 +87,8 @@
   align-items: center;
   background: none;
   border-color: transparent;
+  aspect-ratio: 1;
+  height: fit-content;
 }
 
 .upload-inprogress .progress-info {

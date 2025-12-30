@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker</artifactId>
-    <version>17.10.2-SNAPSHOT</version>
+    <version>17.10.2</version>
   </parent>
   <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
   <name>XWiki Platform - Attachment - Picker - UI</name>
@@ -66,6 +66,6 @@
   </dependencies>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.2</tag>
   </scm>
 </project>

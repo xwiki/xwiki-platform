@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-crypto-store</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>17.10.2-SNAPSHOT</version>
+    <version>17.10.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-crypto-store-api</artifactId>
@@ -61,6 +61,6 @@
   </dependencies>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.2</tag>
   </scm>
 </project>

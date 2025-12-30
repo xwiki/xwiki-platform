@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-office</artifactId>
-    <version>17.10.2-SNAPSHOT</version>
+    <version>17.10.2</version>
   </parent>
   <artifactId>xwiki-platform-legacy-office-importer</artifactId>
   <name>XWiki Platform - Legacy - Office Importer</name>
@@ -165,6 +165,6 @@
   </build>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.2</tag>
   </scm>
 </project>

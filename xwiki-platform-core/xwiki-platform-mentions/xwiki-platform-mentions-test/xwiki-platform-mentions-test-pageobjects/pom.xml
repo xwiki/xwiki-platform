@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-mentions-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>17.10.2-SNAPSHOT</version>
+    <version>17.10.2</version>
   </parent>
   <artifactId>xwiki-platform-mentions-test-pageobjects</artifactId>
   <name>XWiki Platform - Mentions - Tests - Page Objects</name>
@@ -48,6 +48,6 @@
 
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.2</tag>
   </scm>
 </project>

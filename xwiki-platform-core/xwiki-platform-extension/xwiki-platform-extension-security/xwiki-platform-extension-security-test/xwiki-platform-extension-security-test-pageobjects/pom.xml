@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-security-test</artifactId>
-    <version>17.10.2-SNAPSHOT</version>
+    <version>17.10.2</version>
   </parent>
   <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
   <name>XWiki Platform - Extension - Security - Tests - Page Objects</name>
@@ -43,6 +43,6 @@
   </dependencies>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.2</tag>
   </scm>
 </project>

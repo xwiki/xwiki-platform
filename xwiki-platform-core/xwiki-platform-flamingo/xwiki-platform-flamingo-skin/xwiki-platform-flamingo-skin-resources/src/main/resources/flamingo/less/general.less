@@ -219,6 +219,16 @@ body {
       & a:has(span.fa) { // With an icon from the Font Awesome iconTheme
         .not-inline-link();
       }
+      
+      // Repeat the force-underline rule here to make sure it has enough specificity.
+      // The :has with FA icons adds a lot of specificity...
+      .force-underline a,
+      a.force-underline {
+        &:has(img),
+        &:has(span.fa) {
+          .inline-link();
+        }
+      }
     }
 
     // Helper classes for easier content customization. Note that those only work for this preference.

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>17.10.2</version>
+    <version>17.10.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-bridge</artifactId>
   <name>XWiki Platform - Legacy - Bridge</name>
@@ -95,6 +95,6 @@
   </build>
 
   <scm>
-    <tag>xwiki-platform-17.10.2</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

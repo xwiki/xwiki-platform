@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tag-test</artifactId>
-    <version>17.10.2</version>
+    <version>17.10.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-test-docker</artifactId>
   <name>XWiki Platform - Tag - Test - Functional Docker Tests</name>
@@ -100,6 +100,6 @@
   </profiles>
 
   <scm>
-    <tag>xwiki-platform-17.10.2</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

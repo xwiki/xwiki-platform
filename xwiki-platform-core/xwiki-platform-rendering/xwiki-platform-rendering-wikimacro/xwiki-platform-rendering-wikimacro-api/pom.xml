@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>17.10.2</version>
+    <version>17.10.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
@@ -85,6 +85,6 @@
   </dependencies>
 
   <scm>
-    <tag>xwiki-platform-17.10.2</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

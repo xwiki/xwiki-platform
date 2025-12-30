@@ -258,9 +258,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
    */
   var updateAttachmentsNumber = function(attachmentsNumber) {
     var itemCount = $('#Attachmentstab').find('.itemCount');
-    if (itemCount) {
-      itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
-    }
+    itemCount?.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
     var tmAttachments = $('#tmAttachments');
     if (tmAttachments.length) {
       // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.

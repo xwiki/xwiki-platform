@@ -20,8 +20,11 @@
 #if ("$!request.get('uix')" != "")
   #set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'select' : $request.get('uix')}))
   #if (!$docExtraExtensions.isEmpty())
-    #skinExtensionHooks()
+    #template('display_macros.vm')
+    #initRequiredSkinExtensions()
     #set ($content = $services.rendering.render($docExtraExtensions.get(0).execute(), 'html/5.0'))
     $content
+    #getRequiredSkinExtensions($requiredSkinExtensions)
+    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
   #end
 #end

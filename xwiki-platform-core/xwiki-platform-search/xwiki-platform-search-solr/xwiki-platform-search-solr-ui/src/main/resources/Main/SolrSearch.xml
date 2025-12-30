@@ -181,6 +181,11 @@
     $(this).before(checkBox)
   };
 
+  var addFacetTitle = function() {
+    let facetPrettyNameText = $(this).text();
+    $(this).attr('title', facetPrettyNameText);
+  }
+
   var enhanceSearchFacets = function() {
     var facetsContainer = $(this);
 
@@ -203,7 +208,8 @@
     // Add a check box before each facet value. We do this from JavaScript because the behaviour of a check box inside
     // a link is not consistent across different browsers (some follow the link when the check box is clicked, others
     // don't) and having the check box outside the facet value link requires JavaScript to synchronize them.
-    facetsContainer.find('.search-facet-body a.itemName').each(addFacetValueCheckbox);
+    // Add a title on the facet. We do this from JS because the pretty name can contain custom HTML.
+    facetsContainer.find('.search-facet-body a.itemName').each(addFacetValueCheckbox).each(addFacetTitle);
   };
 
   var getQueryString = function(url) {

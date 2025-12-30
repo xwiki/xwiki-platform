@@ -178,18 +178,16 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
       if (this.options.enableFileInfo) {
         statusUI.FILE_INFO = UploadUtils.createDiv('file-info');
-        statusUI.FILE_NAME = UploadUtils.createSpan('file-name', this.file.name.escapeHTML())
+        statusUI.FILE_NAME = UploadUtils.createSpan('file-name', this.file.name.escapeHTML());
         statusUI.FILE_NAME.title = this.file.type;
-        statusUI.FILE_SIZE_CONTAINER = UploadUtils.createSpan('progress-info')
+        statusUI.FILE_SIZE_CONTAINER = UploadUtils.createSpan('progress-info');
         statusUI.FILE_SIZE = UploadUtils.createSpan('file-size', UploadUtils.bytesToSize(this.file.size));
         statusUI.FILE_SIZE_CONTAINER.append(statusUI.FILE_SIZE);
-        statusUI.FILE_SIZE_ALTERNATIVE =
-            UploadUtils.createSpan('sr-only', l10n['status.fileSize']);
+        statusUI.FILE_SIZE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['status.fileSize']);
         statusUI.FILE_SIZE.append(statusUI.FILE_SIZE_ALTERNATIVE);
         statusUI.FILE_CANCEL = UploadUtils.createButton(icons['cross'], this.cancelUpload.bindAsEventListener(this));
         statusUI.FILE_CANCEL.addClassName('upload-cancel');
-        statusUI.FILE_CANCEL_ALTERNATIVE =
-            UploadUtils.createSpan('sr-only', l10n['item.cancel']);
+        statusUI.FILE_CANCEL_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['item.cancel']);
         statusUI.FILE_CANCEL.append(statusUI.FILE_CANCEL_ALTERNATIVE);
         // We want to put the button next to everything else.
         statusUI.UPLOAD_STATUS.append(statusUI.FILE_CANCEL);
@@ -199,21 +197,21 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
       if (this.options.enableProgressInfo) {
         statusUI.PROGRESS_INFO = UploadUtils.createDiv('progress-info');
-        statusUI.PROGRESS = document.createElement('progress')
+        statusUI.PROGRESS = document.createElement('progress');
         statusUI.PROGRESS_PERCENTAGE = UploadUtils.createSpan('progress-percentage', '&nbsp;');
         statusUI.PROGRESS_SPEED = UploadUtils.createSpan('progress-speed', '&nbsp;');
         statusUI.PROGRESS_REMAINING = UploadUtils.createSpan('progress-remaining', '&nbsp;');
         statusUI.PROGRESS_REMAINING_TEXT = UploadUtils.createSpan('progress-remaining-text', l10n['remaining']);
         statusUI.PROGRESS_TRANSFERED = UploadUtils.createSpan('progress-transfered', '&nbsp;');
 
-        statusUI.PROGRESS_INFO.append(statusUI.PROGRESS)
+        statusUI.PROGRESS_INFO.append(statusUI.PROGRESS);
         // If the file info is displayed, we can put some of this info above the progress bar.
         if (this.options.enableFileInfo) {
           statusUI.FILE_SIZE_CONTAINER.append(statusUI.PROGRESS_TRANSFERED, statusUI.PROGRESS_PERCENTAGE);
         } else {
           statusUI.PROGRESS_INFO.append(statusUI.PROGRESS_TRANSFERED, statusUI.PROGRESS_PERCENTAGE);
         }
-        statusUI.PROGRESS_TIME = UploadUtils.createDiv('progress-time')
+        statusUI.PROGRESS_TIME = UploadUtils.createDiv('progress-time');
         statusUI.PROGRESS_TIME.append(statusUI.PROGRESS_REMAINING, statusUI.PROGRESS_REMAINING_TEXT, 
           statusUI.PROGRESS_SPEED);
         statusUI.PROGRESS_INFO.append(statusUI.PROGRESS_TIME);

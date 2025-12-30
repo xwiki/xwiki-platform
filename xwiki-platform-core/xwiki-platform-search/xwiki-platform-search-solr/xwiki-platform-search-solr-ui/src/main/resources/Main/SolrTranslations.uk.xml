@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Вікі, для всіх документів я�
 solr.admin.indexing.wiki.select_farm=Глобально
 solr.admin.indexing.query.label=Користувацький запит
 solr.admin.indexing.query.hint=Додатковий запит для обмежених документів, на які вплине вибрана дія в індексі.
+solr.admin.indexing.query.language.label=Мова користувацького запиту
 solr.admin.info.affectedDocuments=Викликані документи в індексі:
-solr.sortBy=Сортувати за:
-solr.sortBy.score=Відповідність
-solr.sortBy.title_sort=Заголовком
-solr.sortBy.date=Дата останньої зміни
-solr.sortBy.author_display_sort=Останній автор
-solr.sortBy.filename_sort=Ім'я файлу
-solr.sortBy.attsize_sort=Розмір файлу
-solr.sortBy.attdate_sort=Дата завантаження
-solr.sortBy.attauthor_display_sort=Завантажено
-solr.sortOrder.asc=За зростанням
-solr.sortOrder.desc=За спаданням
-solr.options=Показати:
-solr.options.highlight=Виділення
+search.solr.sortBy.hint=Правило порядку сортування
+search.solr.sortBy.field.score=Сортувати за релевантністю
+search.solr.sortBy.field.titleSort=Сортувати за назвою
+search.solr.sortBy.field.date=Сортувати за датою останнього редагування
+search.solr.sortBy.field.authorDisplaySort=Сортувати за ім'ям останнього автора
+search.solr.sortBy.field.filenameSort=Сортувати за назвою файлу
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Відображення точного збігу у результаті
-solr.options.facet=Аспекти
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Дозволити додаткову фільтрацію результату
 solr.result.language=Мова
 solr.result.locatedIn=Розташований в
@@ -172,6 +172,18 @@ solr.result.location=Розташований у {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Розташування
+solr.sortBy=Сортувати за:
+solr.sortBy.score=Відповідність
+solr.sortBy.title_sort=Заголовком
+solr.sortBy.date=Дата останньої зміни
+solr.sortBy.author_display_sort=Останній автор
+solr.sortBy.filename_sort=Ім'я файлу
+solr.sortBy.attsize_sort=Розмір файлу
+solr.sortBy.attdate_sort=Дата завантаження
+solr.sortBy.attauthor_display_sort=Завантажено
+solr.options=Показати:
+solr.options.highlight=Виділення
+solr.options.facet=Аспекти
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

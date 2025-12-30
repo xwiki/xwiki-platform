@@ -63,6 +63,7 @@ public interface MentionsConfiguration
      * that is meant to have enough contrast on the saturated red of the background.
      * @return the foreground color for the mentions to the current user.
      * @since 18.0.0RC1
+     * @since 17.10.3
      */
     @Unstable
     default String getSelfMentionsForeground()

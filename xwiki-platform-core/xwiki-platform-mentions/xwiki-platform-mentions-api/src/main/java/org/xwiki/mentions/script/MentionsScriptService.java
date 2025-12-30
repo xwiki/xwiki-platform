@@ -80,6 +80,7 @@ public class MentionsScriptService implements ScriptService
      * @see MentionsConfiguration#getSelfMentionsForeground()
      * @return the mentions foreground color configuration value for the current user.
      * @since 18.0.0RC1
+     * @since 17.10.3
      */
     @Unstable
     public String getSelfMentionsForeground()

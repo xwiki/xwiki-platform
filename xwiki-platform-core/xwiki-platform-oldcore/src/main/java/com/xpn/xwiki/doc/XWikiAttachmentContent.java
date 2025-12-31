@@ -158,7 +158,7 @@ public class XWikiAttachmentContent implements Cloneable
      * Note that {@link #clone()} never copy the actual content of the instance.
      * @param skipContent {@code false} to also copy the content while performing the clone.
      * @return a clone with the copied content or not depending on the parameter.
-     * @since 17.10.2
+     * @since 17.10.3
      * @since 18.0.0RC1
      */
     @Unstable
@@ -174,7 +174,7 @@ public class XWikiAttachmentContent implements Cloneable
      *
      * @param clone the cloned instance
      * @param skipContent {@code false} to also copy the content while performing the clone.
-     * @since 17.10.2
+     * @since 17.10.3
      * @since 18.0.0RC1
      */
     @Unstable
@@ -394,7 +394,7 @@ public class XWikiAttachmentContent implements Cloneable
      * @deprecated This method doesn't perform any action anymore. Call {@link #getAttachment()} and
      * {@link XWikiAttachment#setDoc(XWikiDocument)} instead.
      */
-    @Deprecated(since = "18.0.0RC1,17.10.2")
+    @Deprecated(since = "18.0.0RC1,17.10.3")
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
     }

@@ -148,7 +148,7 @@
           'forceSkinAction': true,
           'language': $xcontext.locale
         }))
-        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css', true))
+        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css'))
         <form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"
             class="extension-history-source-upload">
           <div class="hidden">

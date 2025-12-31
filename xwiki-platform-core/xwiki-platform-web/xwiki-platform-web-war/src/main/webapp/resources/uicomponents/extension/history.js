@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
+require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploader) {
   //
   // Extension History Sources
   //
@@ -105,10 +105,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  if (typeof(XWiki.FileUploader) != 'undefined') {
+  if (typeof(FileUploader) != 'undefined') {
     $('.extension-history-source-upload input[type="file"]').each(function() {
       $(this).on('xwiki:html5upload:message', onUploadMessage);
-      new XWiki.FileUploader(this, {
+      new FileUploader(this, {
         'maxFilesize': 1000000,
         'fileFilter': /application\/xml|text\/xml/i,
         'progressAutohide': true,

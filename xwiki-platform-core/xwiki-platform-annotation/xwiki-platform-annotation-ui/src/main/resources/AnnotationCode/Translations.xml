@@ -51,6 +51,7 @@ annotations.annotated.loaderror=Failed:
 annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
 annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
 annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+annotations.annotated.highlight.toggle.hint=Open the annotation about this text.
 
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit annotation

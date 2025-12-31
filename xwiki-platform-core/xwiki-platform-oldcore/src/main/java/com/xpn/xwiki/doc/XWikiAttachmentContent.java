@@ -165,6 +165,21 @@ public class XWikiAttachmentContent implements Cloneable
     public XWikiAttachmentContent clone(boolean skipContent)
     {
         XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
+        this.handleSkipContentInClone(clone, skipContent);
+        return clone;
+    }
+
+    /**
+     * Helper to properly handle setting the property content when performing a clone.
+     *
+     * @param clone the cloned instance
+     * @param skipContent {@code false} to also copy the content while performing the clone.
+     * @since 17.10.2
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    protected void handleSkipContentInClone(XWikiAttachmentContent clone, boolean skipContent)
+    {
         if (!skipContent) {
             try {
                 // ensure to not have an attachment set to the clone, so that the dirty flag doesn't impact the old
@@ -179,7 +194,6 @@ public class XWikiAttachmentContent implements Cloneable
                 throw new RuntimeException("Failed to clone data to storage.", e);
             }
         }
-        return clone;
     }
 
     /**

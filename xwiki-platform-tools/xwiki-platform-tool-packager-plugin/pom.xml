@@ -157,6 +157,12 @@
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Required by the blog store -->
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Make sure artifacts included in the built Jetty package are built before the plugin -->
     <dependency>

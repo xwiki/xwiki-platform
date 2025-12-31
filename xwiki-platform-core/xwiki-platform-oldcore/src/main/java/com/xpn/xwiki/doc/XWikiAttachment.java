@@ -219,6 +219,15 @@ public class XWikiAttachment implements Cloneable
         return internalClone(false, false, true);
     }
 
+    /**
+     * Perform a deep clone with both the archive and current content.
+     * @param context the context for loading the content before cloning
+     * @return a cloned instance
+     * @throws XWikiException in case of problem for loading the content
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
     protected XWikiAttachment cloneWithActualContent(XWikiContext context) throws XWikiException
     {
         // We need to ensure to content is properly loaded if we want to clone it.
@@ -1528,7 +1537,7 @@ public class XWikiAttachment implements Cloneable
      * @param skipContent {@code true} to skip content metadata
      * @param skipActualContent {@code false} will also include {@link XWikiAttachmentContent} content, but this
      * flag is only used if {@code skipContent} is {@code false}.
-     * @return
+     * @return a clone of current instance.
      */
     private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent, boolean skipActualContent)
     {

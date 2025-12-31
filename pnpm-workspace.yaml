@@ -82,7 +82,7 @@ catalog:
   jiti: 2.6.1
   jquery: 3.7.1
   jsdom: 27.3.0
-  lodash-es: 4.17.21
+  lodash-es: 4.17.22
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.0
   mdast-util-gfm-table: 2.0.0

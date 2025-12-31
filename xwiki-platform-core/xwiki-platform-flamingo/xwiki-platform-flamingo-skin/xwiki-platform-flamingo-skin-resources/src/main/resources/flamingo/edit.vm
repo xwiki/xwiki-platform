@@ -150,9 +150,13 @@
         #template("menus_content.vm")
       </div>
     #end
-    #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+    #if (($editor == 'wiki' || $editor == 'wysiwyg'))
       <h1 class="sr-only">
-        $services.localization.render('core.editors.content.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #if ($request.section)
+          $services.localization.render('core.editors.section.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #else
+          $services.localization.render('core.editors.content.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #end
       </h1>
       <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
         #template('editmeta.vm')

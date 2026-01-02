@@ -32,6 +32,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.web.Utils;
@@ -57,9 +58,6 @@ public class XWikiAttachmentContent implements Cloneable
     // TODO: use TemporaryDeferredFileRepository instead (see DeletedAttachment)
     private FileItem file;
 
-    /** The owner document. */
-    private XWikiDocument ownerDocument;
-
     /**
      * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
      *
@@ -71,7 +69,6 @@ public class XWikiAttachmentContent implements Cloneable
         this.file = original.file;
         this.attachment = original.attachment;
         this.isContentDirty = original.isContentDirty;
-        this.ownerDocument = original.ownerDocument;
     }
 
     /**
@@ -153,7 +150,50 @@ public class XWikiAttachmentContent implements Cloneable
     @Override
     public Object clone()
     {
-        return new XWikiAttachmentContent(this);
+        return clone(true);
+    }
+
+    /**
+     * Clone current instance and possibly copy the content.
+     * Note that {@link #clone()} never copy the actual content of the instance.
+     * @param skipContent {@code false} to also copy the content while performing the clone.
+     * @return a clone with the copied content or not depending on the parameter.
+     * @since 17.10.3
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    public XWikiAttachmentContent clone(boolean skipContent)
+    {
+        XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
+        this.handleSkipContentInClone(clone, skipContent);
+        return clone;
+    }
+
+    /**
+     * Helper to properly handle setting the property content when performing a clone.
+     *
+     * @param clone the cloned instance
+     * @param skipContent {@code false} to also copy the content while performing the clone.
+     * @since 17.10.3
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    protected void handleSkipContentInClone(XWikiAttachmentContent clone, boolean skipContent)
+    {
+        if (!skipContent) {
+            try {
+                // ensure to not have an attachment set to the clone, so that the dirty flag doesn't impact the old
+                // attachment
+                clone.attachment = null;
+                clone.file = null;
+                boolean contentDirty = this.isContentDirty();
+                clone.setContent(getContentInputStream());
+                clone.setContentDirty(contentDirty);
+                clone.setAttachment(attachment);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to clone data to storage.", e);
+            }
+        }
     }
 
     /**
@@ -204,10 +244,6 @@ public class XWikiAttachmentContent implements Cloneable
     public void setAttachment(XWikiAttachment attachment)
     {
         this.attachment = attachment;
-
-        if (this.attachment != null) {
-            setOwnerDocument(this.attachment.getDoc());
-        }
     }
 
     /**
@@ -229,8 +265,8 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
-        if (contentDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(contentDirty);
+        if (contentDirty && this.attachment != null) {
+            this.attachment.setMetaDataDirty(contentDirty);
         }
     }
 
@@ -325,7 +361,6 @@ public class XWikiAttachmentContent implements Cloneable
         } finally {
             fios.close();
         }
-
         // Indicate the content has been modified
         setContentDirty(true);
     }
@@ -356,15 +391,12 @@ public class XWikiAttachmentContent implements Cloneable
      * Set the owner document in order to propagate the content dirty flag.
      *
      * @param ownerDocument the owner document.
+     * @deprecated This method doesn't perform any action anymore. Call {@link #getAttachment()} and
+     * {@link XWikiAttachment#setDoc(XWikiDocument)} instead.
      */
+    @Deprecated(since = "18.0.0RC1,17.10.3")
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        if (this.ownerDocument != ownerDocument) {
-            this.ownerDocument = ownerDocument;
-            if (this.isContentDirty && ownerDocument != null) {
-                ownerDocument.setMetaDataDirty(true);
-            }
-        }
     }
 
     /**

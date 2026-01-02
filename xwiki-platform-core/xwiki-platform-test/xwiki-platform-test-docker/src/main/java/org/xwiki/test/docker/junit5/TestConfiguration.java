@@ -99,6 +99,8 @@ public class TestConfiguration
 
     private String blobStoreTag;
 
+    private XWikiInstances xwikiInstances;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -132,6 +134,7 @@ public class TestConfiguration
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.getBlobStore());
         mergeBlobStoreTag(testConfiguration.getBlobStoreTag());
+        mergeXWikiInstances(testConfiguration.getXWikiInstances());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -389,6 +392,15 @@ public class TestConfiguration
             }
         } else {
             this.blobStoreTag = blobStoreTag;
+        }
+    }
+
+    private void mergeXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        // Select the configuration with the biggest number of instances.
+        if (getXWikiInstances() == null
+            || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
+            setXWikiInstances(xwikiInstances);
         }
     }
 
@@ -900,5 +912,25 @@ public class TestConfiguration
     public void setBlobStoreTag(String blobStoreTag)
     {
         this.blobStoreTag = blobStoreTag;
+    }
+
+    /**
+     * @return the XWiki instances configuration
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    public XWikiInstances getXWikiInstances()
+    {
+        return this.xwikiInstances;
+    }
+
+    /**
+     * @param xwikiInstances see {@link #getXWikiInstances()}
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    public void setXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        this.xwikiInstances = xwikiInstances;
     }
 }

@@ -34,10 +34,8 @@ import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
@@ -229,8 +227,7 @@ class NotificationsIT
 
     @Test
     @Order(2)
-    void compositeNotifications(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void compositeNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
@@ -312,10 +309,7 @@ class NotificationsIT
         assertEquals(22, groupedNotificationsPage.getNumberOfElements(1));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        notificationsRSS.loadEntries(
-            String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
-            String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
+        notificationsRSS.loadEntries(setup);
         assertEquals(2, notificationsRSS.getEntries().size());
 
         // FIXME: This needs to be enabled back once XWIKI-21059 is fixed.

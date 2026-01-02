@@ -149,14 +149,12 @@ public class PDFExportOptionsModal extends BaseModal
     /**
      * Click on the export button and wait for the PDF document to be generated.
      * 
-     * @param hostURL the URL that can be used to access the XWiki instance from the test code; this may be different
-     *            than the URL used by the browser (e.g. in case the browser is running inside a Docker container)
      * @param userName the user name used to access the generated PDF document
      * @param password the password used to access the generated PDF document
      * @return the generated PDF document
      * @throws IOException if the PDF export fails
      */
-    public PDFDocument export(URL hostURL, String userName, String password) throws IOException
+    public PDFDocument export(String userName, String password) throws IOException
     {
         // The user is redirected to the generated PDF when ready, so we need to detect when the current URL changes.
         String currentURL = getDriver().getCurrentUrl();
@@ -177,7 +175,8 @@ public class PDFExportOptionsModal extends BaseModal
 
         // The browser used for running the test might be on a different machine than the one running XWiki and the test
         // code itself so we can't always use the same URL as the browser to download the PDF file.
-        URL pdfURL = new URL(hostURL, new URL(getDriver().getCurrentUrl()).getFile());
+        URL pdfURL = new URL(new URL(getUtil().getCurrentExecutor().getHttpClientBaseURL(false)),
+            new URL(getDriver().getCurrentUrl()).getFile());
         return new PDFDocument(pdfURL, userName, password);
     }
 

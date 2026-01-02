@@ -25,8 +25,8 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.test.po.PDFDocument;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,14 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(vnc = false)
 class PDFExportIT
 {
-    private String prefix;
+    private String baseURL;
 
     @BeforeEach
-    void beforeEach(TestConfiguration testConfiguration)
+    void beforeEach(TestUtils setup)
     {
-        String host = testConfiguration.getServletEngine().getIP();
-        int port = testConfiguration.getServletEngine().getPort();
-        this.prefix = String.format("http://%s:%s/", host, port);
+        this.baseURL = setup.getCurrentExecutor().getHttpClientBaseURL();
     }
 
     /**
@@ -66,7 +64,7 @@ class PDFExportIT
         // property which was mistaken with the title property of XWiki.PDFClass before XWIKI-7048 was fixed. The gadget
         // title contains Velocity code that isn't wrapped in a Velocity macro so it is printed as is if not rendered in
         // the right context.
-        URL pdfURL = new URL(createURL("xwiki/bin/export/Dashboard/WebHome?format=pdf"));
+        URL pdfURL = new URL(createURL("bin/export/Dashboard/WebHome?format=pdf"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             String text = document.getText();
             // Note: This is the title of the Pages gadget when it's working
@@ -84,11 +82,11 @@ class PDFExportIT
     @Test
     void exportContentWithAttachmentLink() throws Exception
     {
-        URL pdfURL = new URL(createURL("xwiki/bin/export/Sandbox/WebHome?format=pdf"));
+        URL pdfURL = new URL(createURL("bin/export/Sandbox/WebHome?format=pdf"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             Map<String, String> links = document.getLinks();
             assertTrue(links.containsKey("XWikiLogo.png"));
-            assertEquals(String.format("%sxwiki/bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1", this.prefix),
+            assertEquals(createURL("bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1"),
                 links.get("XWikiLogo.png"));
 
             // The PDF document should contain the XWikiLogo.png image embedded in the Sandbox home page.
@@ -106,7 +104,7 @@ class PDFExportIT
     void exportTableOfContents() throws Exception
     {
         URL pdfURL =
-            new URL(createURL("xwiki/bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0"));
+            new URL(createURL("bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
             Map<String, String> links = document.getLinksFromPage(0, false);
             // Make sure we have a Table of Contents.
@@ -120,6 +118,6 @@ class PDFExportIT
 
     private String createURL(String suffix)
     {
-        return String.format("%s%s", this.prefix, suffix);
+        return String.format("%s%s", this.baseURL, suffix);
     }
 }

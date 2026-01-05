@@ -40,15 +40,6 @@
   </properties>
   <build>
     <plugins>
-      <!-- We're skipping the license check because we put the actual original license in bootstrap file and not the
-      XWiki license -->
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
@@ -71,7 +62,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <!-- Copy the fonts. -->
             <id>copy-font-resources</id>
             <phase>validate</phase>
             <goals>
@@ -89,6 +80,15 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <!-- We're skipping the license check because we put the actual original license in bootstrap file and not the
+      XWiki license -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -96,7 +96,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -1296,7 +1295,12 @@ public class XWikiDocumentMockitoTest
         bobAttachment.setAuthorReference(templateAuthor);
         template.setAttachment(bobAttachment);
 
+        // Verify that the attachment content is loaded before being copied.
+        XWikiAttachmentStoreInterface attachmentContentStore = mock(XWikiAttachmentStoreInterface.class);
+        xcontext.getWiki().setDefaultAttachmentContentStore(attachmentContentStore);
+
         this.oldcore.getSpyXWiki().saveDocument(template, xcontext);
+        assertFalse(template.isMetaDataDirty());
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
 
@@ -1331,6 +1335,7 @@ public class XWikiDocumentMockitoTest
         assertAttachment("bob content", "1.1", targetAuthor, null, target.getAttachment("bob.png"));
         assertAttachment("carol content", "3.1", targetAuthor, simpleDateFormat.parse("13/11/2020"),
             target.getAttachment("carol.png"));
+        assertFalse(template.isMetaDataDirty());
     }
 
     private void assertAttachment(String expectedContent, String expectedVersion,

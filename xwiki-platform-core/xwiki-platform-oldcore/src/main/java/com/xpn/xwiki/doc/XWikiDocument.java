@@ -9418,7 +9418,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         if (reference instanceof DocumentReference classReference) {
             DocumentReference relativeXClassReference = classReference;
             // The class reference is always relative to the current wiki of the document.
-            if (classReference.getWikiReference() != getDocumentReference().getWikiReference()) {
+            if (!classReference.getWikiReference().equals(getDocumentReference().getWikiReference())) {
                 relativeXClassReference = classReference.replaceParent(classReference.getWikiReference(),
                     getDocumentReference().getWikiReference());
             }

@@ -7668,8 +7668,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private String getDefaultEditModeInternal(XWikiContext context) throws XWikiException
     {
         String editModeProperty = "defaultEditMode";
-        DocumentReference editModeClass =
-            getCurrentReferenceDocumentReferenceResolver().resolve(XWikiConstant.EDIT_MODE_CLASS);
+        LocalDocumentReference editModeClass = new LocalDocumentReference(XWikiConstant.EDIT_MODE_CLASS);
         // check if the current document has any edit mode class object attached to it, and read the edit mode from it
         BaseObject editModeObject = this.getXObject(editModeClass);
         if (editModeObject != null) {
@@ -9413,6 +9412,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             if (!classReference.getWikiReference().equals(getDocumentReference().getWikiReference())) {
                 relativeXClassReference = classReference.replaceParent(classReference.getWikiReference(),
                     getDocumentReference().getWikiReference());
+                LOGGER.warn("Calling xclass [{}] on document [{}]: the wiki part of the xclass reference is wrong, "
+                    + "replacing it.", classReference, getDocumentReference());
             }
             return relativeXClassReference;
         } else if (reference instanceof LocalDocumentReference) {

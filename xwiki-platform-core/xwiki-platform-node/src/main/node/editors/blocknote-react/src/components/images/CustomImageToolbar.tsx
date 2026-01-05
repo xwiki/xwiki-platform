@@ -51,7 +51,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   const { t } = useTranslation();
   const editor = useBlockNoteEditor();
 
-  const [showLinkEditor, setShowLinkEditor] = useState(false);
+  const [showImageEditor, setShowImageEditor] = useState(false);
 
   const updateImageProps = useCallback(
     (newProps: Partial<BlockOfType<"image">["props"]>) => {
@@ -64,13 +64,13 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
     if (imageEditionOverrideFn) {
       imageEditionOverrideFn(currentBlock, updateImageProps);
     } else {
-      setShowLinkEditor(true);
+      setShowImageEditor(true);
     }
   }, [imageEditionOverrideFn, currentBlock, editor]);
 
   return (
     <>
-      <Components.Generic.Popover.Root opened={showLinkEditor}>
+      <Components.Generic.Popover.Root opened={showImageEditor}>
         <Components.Generic.Popover.Trigger>
           {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}

@@ -3056,7 +3056,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         List<BaseObject> xobjects = null;
 
         if (classReference != null) {
-            xobjects = getXObjects().get(classReference);
+            xobjects = getXObjects().get(resolveClassReference(classReference));
         }
 
         return xobjects != null ? xobjects : Collections.emptyList();
@@ -3076,8 +3076,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
-            return getXObjects(
-                getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()));
+            return getXObjects(resolveClassReference(reference));
         }
 
         return Collections.emptyList();
@@ -3319,15 +3318,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference reference, String key, String value, boolean failover)
     {
-        if (reference instanceof DocumentReference) {
-            return getXObject((DocumentReference) reference, key, value, failover);
-        } else if (reference.getType() == EntityType.DOCUMENT) {
-            // class reference
-            return getXObject(getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()),
-                key, value, failover);
-        }
-
-        return null;
+        return getXObject(resolveClassReference(reference), key, value, failover);
     }
 
     /**
@@ -3335,17 +3326,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(DocumentReference classReference, String key, String value, boolean failover)
     {
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
         try {
             if (value == null) {
                 if (failover) {
-                    return getXObject(classReference);
+                    return getXObject(resolvedClassReference);
                 } else {
                     return null;
                 }
             }
 
-            List<BaseObject> objects = getXObjects().get(classReference);
-            if ((objects == null) || (objects.size() == 0)) {
+            List<BaseObject> objects = getXObjects().get(resolvedClassReference);
+            if ((objects == null) || (objects.isEmpty())) {
                 return null;
             }
             for (BaseObject obj : objects) {
@@ -3357,13 +3349,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             }
 
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             } else {
                 return null;
             }
         } catch (Exception e) {
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             }
 
             LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(),

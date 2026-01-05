@@ -23,7 +23,7 @@
  *
  * @param value - the error value printed when this method is reached
  *
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  */
 function assertUnreachable(value: never): never {
@@ -34,7 +34,7 @@ function assertUnreachable(value: never): never {
 /**
  * Assert that a value is in an array, and fix its type
  *
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  *
  * @param array - the array to check
@@ -58,7 +58,7 @@ function assertInArray<T, U extends T>(
 /**
  * Get a function's output or `null` if it thrown an error
  *
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  *
  * @param func - The function to try
@@ -77,7 +77,7 @@ function tryFallible<T>(func: () => T): T | null {
  * Get a function's output or the thrown error
  * Will construct a new Error object if the thrown value is not an instance of the Error class
  *
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  *
  * @param func - The function to try
@@ -118,7 +118,7 @@ function tryFallibleOrError<T>(func: () => T): T | Error {
  * Get a funcion's promise's output or the thrown error
  * Will construct a new Error object if the thrown value is not an instance of the Error class
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  *
  * @param func - The function to try
@@ -162,7 +162,7 @@ async function tryFalliblePromiseOrError<T>(
  *
  * This is actually an identity function - the provided value is returned as is, with no other operation.
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  *
  * @param value - The value to return
@@ -180,7 +180,7 @@ function provideTypeInference<T>(value: T): T {
  *
  * Combines both `.filter` and `.map` with the additional benefit of conditional type predicates
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  *
  * @example `filterMap([1, 2, 3], value => value >= 2 ? value.toString() : null) // ['2', '3']`
@@ -208,7 +208,7 @@ function filterMap<T, U>(
  *
  * @returns - The correctly-typed object's entries
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 function objectEntries<O extends Record<string, unknown>>(
@@ -226,7 +226,7 @@ function objectEntries<O extends Record<string, unknown>>(
  *
  * @returns - The string representation of the HTML element
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 function produceHtmlEl(
@@ -256,7 +256,7 @@ function produceHtmlEl(
  *
  * @returns - The HTML-safe string
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 function escapeHtml(str: string): string {
@@ -266,7 +266,7 @@ function escapeHtml(str: string): string {
 
 /**
  * Generic tree structure type.
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type TreeNode<T> = T & {

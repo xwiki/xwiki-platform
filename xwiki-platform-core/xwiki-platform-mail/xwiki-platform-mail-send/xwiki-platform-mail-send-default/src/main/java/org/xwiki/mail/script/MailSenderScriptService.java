@@ -214,7 +214,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
     }
 
     /**
-     * Send the list of mails synchronously, using a Memory {@link }MailListener} to store the results.
+     * Send the list of mails synchronously, using a Memory {@link MailListener} to store the results.
      *
      * @param messages the list of messages to send
      * @return the result and status of the send batch

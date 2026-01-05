@@ -23,7 +23,7 @@ import type { AuthenticationManager } from "@xwiki/platform-authentication-api";
 
 /**
  * Realtime user
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 export type User = {
@@ -34,7 +34,7 @@ export type User = {
 /**
  *
  * @param authentication - an authentication manager components
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 export async function computeCurrentUser(

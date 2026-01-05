@@ -44,6 +44,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -65,7 +66,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
  * Unit tests for {@link WebJarsResourceReferenceHandler}.
@@ -106,7 +106,7 @@ class WebJarsResourceReferenceHandlerTest
     private NamespaceURLClassLoader classLoader;
 
     @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
     void setUp() throws Exception
@@ -158,7 +158,7 @@ class WebJarsResourceReferenceHandlerTest
         // Verify that the resource content has been copied to the Response output stream.
         assertEquals("content", this.response.getOutputStream().toString());
         // Verify that the correct Content Type has been set.
-        verify(this.response).setContentType("application/javascript");
+        verify(this.response).setContentType("text/javascript");
 
         // Verify that the static resource is cached permanently.
         verify(this.response.getResponse()).setHeader("Cache-Control", "public");
@@ -211,7 +211,7 @@ class WebJarsResourceReferenceHandlerTest
         assertEquals("evaluated content", this.response.getOutputStream().toString());
 
         // Verify that the correct Content Type has been set.
-        verify(this.response).setContentType("application/javascript");
+        verify(this.response).setContentType("text/javascript");
 
         // Verify that the dynamic resource is not cached.
         verify(this.response.getResponse(), never()).setHeader(any(), any());

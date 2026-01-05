@@ -85,10 +85,10 @@
 }
 
 img + .lightbox-toggle {
-  min-width: @target-size-minimum;
-  min-height: @target-size-minimum;
+  min-width: var(--target-size-minimum);
+  min-height: var(--target-size-minimum);
   vertical-align: top;
-  margin: 0 0 0 -@target-size-minimum;
+  margin: 0 0 0 calc(-1 * var(--target-size-minimum));
 }
 
 #imageToolbarTemplate {
@@ -113,8 +113,8 @@ img + .lightbox-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: @target-size-recommended;
-      min-height: @target-size-recommended;
+      min-width: var(--target-size-recommended);
+      min-height: var(--target-size-recommended);
     }
 
     .tooltip-inner {

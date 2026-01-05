@@ -19,13 +19,13 @@
  */
 
 /**
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type MenuItemProps = {
   value: string;
   /**
-   * @since 0.23
+   * @since 18.0.0RC1
    * @beta
    */
   disabled?: boolean;

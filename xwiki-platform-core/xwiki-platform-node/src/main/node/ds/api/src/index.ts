@@ -63,7 +63,7 @@ import type {
  * {@link HTMLAttributes} must be a type for all components. Possibly a sub-type of the abstract component is expected
  * to mick an existing HTML element (e.g., {@link ButtonHTMLAttributes} from {@link AbstractElements.XBtn}).
  *
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type AbstractElements = {

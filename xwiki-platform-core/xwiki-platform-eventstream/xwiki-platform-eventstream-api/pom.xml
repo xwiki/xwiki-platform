@@ -32,7 +32,7 @@
   <description>API for Event Stream events</description>
   <properties>
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-eventstream</xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Event Stream API</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->

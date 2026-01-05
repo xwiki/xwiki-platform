@@ -21,7 +21,7 @@
 import type { RemoteURLParser } from "./remoteURLParser";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface RemoteURLParserProvider {

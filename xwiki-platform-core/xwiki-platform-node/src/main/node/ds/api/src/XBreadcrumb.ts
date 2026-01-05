@@ -19,20 +19,20 @@
  */
 
 /**
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 type BreadcrumbItem = { label: string; url?: string };
 
 /**
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 type BreadcrumbItems = BreadcrumbItem[];
 
 /**
  * Shared types for the x-breadcrumb component implementations.
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 type BreadcrumbProps = {

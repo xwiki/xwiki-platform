@@ -20,11 +20,12 @@
 package org.xwiki.livedata.internal.livetable;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.IntStream;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +33,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
@@ -46,9 +48,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import static java.util.Collections.singletonMap;
 
 /**
  * Used by the live table source to update the live data entries that are mapped to XWiki documents (i.e., when entry
@@ -139,21 +140,23 @@ public class ModelBridge
 
     /**
      * Update multiple properties of a document. The properties can either be from the document itself, if prefixed with
-     * {@code doc.}, or from the first xobject instance of the specified type (class reference) found on the document;
-     * to update another XObject, see {@link #updateAll(Map, DocumentReference, DocumentReference, int)}
+     * {@code doc.}, or from the first XObject instance of the specified type. Custom property mappings are honored
+     * while still targeting the first object instance.
      *
      * @param properties the properties to update
      * @param documentReference the document to update
-     * @param classReference the type of XObject to update
+     * @param classReference the default type of XObject to update
+     * @param propertyClassReferences optional mapping that specifies the XClass for each property
      * @throws AccessDeniedException in case the current user is not allow to edit the document
      * @throws XWikiException in case of error when loading or saving the updated document
      * @throws LiveDataException in case of error when validating the document
-     * @see #updateAll(Map, DocumentReference, DocumentReference, int)
+     * @see #updateAll(Map, DocumentReference, DocumentReference, Map, int)
      */
     public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
-        DocumentReference classReference) throws AccessDeniedException, XWikiException, LiveDataException
+        DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences)
+        throws AccessDeniedException, XWikiException, LiveDataException
     {
-        updateAll(properties, documentReference, classReference, 0);
+        updateAll(properties, documentReference, classReference, propertyClassReferences, 0);
     }
 
     /**
@@ -163,15 +166,16 @@ public class ModelBridge
      *
      * @param properties the properties to update
      * @param documentReference the document to update
-     * @param classReference the type of XObject to update
+     * @param classReference the default type of XObject to update
+     * @param propertyClassReferences optional mapping that specifies the XClass for each property
      * @param objectNumber the index of the XObject to update
      * @throws AccessDeniedException in case the current user is not allow to edit the document
      * @throws XWikiException in case of error when loading or saving the updated document
      * @throws LiveDataException in case of error when validating the document
-     * @see #updateAll(Map, DocumentReference, DocumentReference)
+     * @see #updateAll(Map, DocumentReference, DocumentReference, Map, int)
      */
     public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
-        DocumentReference classReference, int objectNumber)
+        DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences, int objectNumber)
         throws AccessDeniedException, XWikiException, LiveDataException
     {
         this.authorization.checkAccess(Right.EDIT, documentReference);
@@ -185,35 +189,74 @@ public class ModelBridge
         // Avoid modifying the cache document
         document = document.clone();
 
-        convertPropertiesFromHtml(properties, this.localSerializer.serialize(classReference), objectNumber);
+        convertPropertiesFromHtml(properties, classReference, propertyClassReferences, objectNumber);
 
         for (Map.Entry<String, Object> property : properties.entrySet()) {
-            this.updateProperty(property.getKey(), property.getValue(), classReference, objectNumber, document);
+            DocumentReference propertyClassReference = propertyClassReferences.get(property.getKey());
+            DocumentReference targetClassReference = propertyClassReference != null ? propertyClassReference
+                : classReference;
+            this.updateProperty(property.getKey(), property.getValue(), targetClassReference, objectNumber, document);
         }
 
         saveDocument(document);
     }
 
-    private void convertPropertiesFromHtml(Map<String, Object> properties, String className, int objectNumber)
+    private void convertPropertiesFromHtml(Map<String, Object> properties, DocumentReference defaultClassReference,
+        Map<String, DocumentReference> propertyClassReferences, int objectNumber)
     {
         if (properties.containsKey(REQUIRES_HTML_CONVERSION)) {
-            String requiresHTMLConversion = (String) properties.get(REQUIRES_HTML_CONVERSION);
-            properties.remove(REQUIRES_HTML_CONVERSION);
-            for (String requiresHTMLConversionProperty : requiresHTMLConversion.split(",")) {
-                // Removes the class name and object index from the conversion property.
-                String propertyName = requiresHTMLConversionProperty.replace(className, "")
-                    .replaceFirst(String.format("_%d_", objectNumber), "");
+            String requiresHTMLConversion = (String) properties.remove(REQUIRES_HTML_CONVERSION);
+            Set<String> propertiesRequiringHTMLConversion = getPropertiesRequiringHTMLConversion(
+                requiresHTMLConversion, defaultClassReference, propertyClassReferences, objectNumber);
+            for (String propertyName : propertiesRequiringHTMLConversion) {
                 String syntaxKey = propertyName + "_syntax";
                 String cacheKey = propertyName + "_cache";
-                if (properties.containsKey(propertyName)) {
-                    String property = (String) properties.get(propertyName);
-                    properties
-                        .put(propertyName, this.htmlConverter.fromHTML(property, (String) properties.get(syntaxKey)));
-                }
+                properties.computeIfPresent(propertyName, (k, v) ->
+                    this.htmlConverter.fromHTML((String) v, (String) properties.get(syntaxKey)));
                 properties.remove(syntaxKey);
                 properties.remove(cacheKey);
             }
         }
+    }
+
+    /**
+     * Extract the set of plain property names that require HTML conversion based on the provided parameters.
+     *
+     * @param requiresHTMLConversion the comma separated list of properties requiring HTML conversion
+     * @param defaultClassReference the default class reference
+     * @param propertyClassReferences the map of property to class references for custom classes per property
+     * @param objectNumber the object number
+     * @return the set of property names requiring HTML conversion
+     */
+    public Set<String> getPropertiesRequiringHTMLConversion(String requiresHTMLConversion,
+        DocumentReference defaultClassReference, Map<String, DocumentReference> propertyClassReferences,
+        int objectNumber)
+    {
+        // Use a LinkedHashSet to make the iteration order consistent.
+        Set<String> result = new LinkedHashSet<>();
+        String defaultClassName = this.localSerializer.serialize(defaultClassReference);
+        Set<String> requiresHTMLConversionSet = new LinkedHashSet<>(Arrays.asList(requiresHTMLConversion.split(",")));
+        // First, check for every custom class reference in the provided map if it matches any of the
+        // requiresHTMLConversion properties.
+        for (Map.Entry<String, DocumentReference> entry : propertyClassReferences.entrySet()) {
+            String className = this.localSerializer.serialize(entry.getValue());
+            String htmlConversionProperty = getPrefix(className, objectNumber) + entry.getKey();
+            if (requiresHTMLConversionSet.remove(htmlConversionProperty)) {
+                result.add(entry.getKey());
+            }
+        }
+
+        // For the remaining properties, add them to the result after removing the default prefix.
+        for (String requiresHTMLConversionProperty : requiresHTMLConversionSet) {
+            String defaultPrefix = getPrefix(defaultClassName, objectNumber);
+            result.add(Strings.CS.removeStart(requiresHTMLConversionProperty, defaultPrefix));
+        }
+        return result;
+    }
+
+    private static String getPrefix(String className, int objectNumber)
+    {
+        return String.format("%s_%d_", className, objectNumber);
     }
 
     private void saveDocument(XWikiDocument document) throws XWikiException, LiveDataException
@@ -245,9 +288,13 @@ public class ModelBridge
     private Object updateXObject(String property, Object value, XWikiDocument document,
         DocumentReference classReference, int objectNumber) throws XWikiException, LiveDataException
     {
-        Object changedValue = null;
         XWikiContext xcontext = this.xcontextProvider.get();
         BaseObject baseObject = document.getXObject(classReference, objectNumber);
+
+        if (baseObject == null && objectNumber == document.getXObjectSize(classReference)) {
+            // If the object number corresponds to the next free index, we create a new one.
+            baseObject = document.newXObject(classReference, xcontext);
+        }
 
         if (baseObject == null) {
             throw new LiveDataException(
@@ -256,21 +303,17 @@ public class ModelBridge
 
         BaseClass xClass = baseObject.getXClass(xcontext);
 
-        List<String> properties = Arrays.asList(baseObject.getPropertyNames());
-        if (properties.contains(property)) {
-            changedValue = baseObject.get(property).toFormString();
+        PropertyInterface propertyInterface = baseObject.get(property);
+        Object changedValue = propertyInterface != null ? propertyInterface.toFormString() : null;
 
-            Object newValue;
-            if (value instanceof List) {
-                List list = (List) value;
-                newValue = IntStream.range(0, list.size())
-                    .mapToObj(i -> String.valueOf(list.get(i)))
-                    .toArray(String[]::new);
-            } else {
-                newValue = value;
-            }
-            xClass.fromMap(singletonMap(property, newValue), baseObject);
+        Object newValue;
+        if (value instanceof List<?> list) {
+            newValue = list.stream().map(String::valueOf).toArray(String[]::new);
+        } else {
+            newValue = value;
         }
+        xClass.fromMap(Map.of(property, newValue), baseObject);
+
         return changedValue;
     }
 
@@ -281,6 +324,10 @@ public class ModelBridge
             case "hidden" -> {
                 changedValue = document.isHidden();
                 document.setHidden(Boolean.valueOf(String.valueOf(value)));
+            }
+            case "enforceRequiredRights" -> {
+                changedValue = document.isEnforceRequiredRights();
+                document.setEnforceRequiredRights(Boolean.parseBoolean(String.valueOf(value)));
             }
             case "title" -> {
                 changedValue = document.getTitle();

@@ -25,7 +25,7 @@ import type { CollaborationManagerProvider } from "./collaborationManagerProvide
 import type { CristalApp } from "@xwiki/platform-api";
 
 /**
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

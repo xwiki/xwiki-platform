@@ -48,7 +48,7 @@ import type {
 /**
  * Converts the Universal AS to the internal format of Blocknote.
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 // TODO: convert to an actual inversify component

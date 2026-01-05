@@ -23,7 +23,7 @@ import type { Attachment } from "./attachment";
 import type { Ref } from "vue";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface AttachmentPreview {

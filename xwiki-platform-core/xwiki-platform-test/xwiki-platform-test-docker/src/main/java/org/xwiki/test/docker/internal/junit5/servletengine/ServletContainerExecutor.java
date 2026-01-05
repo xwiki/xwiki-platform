@@ -280,10 +280,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
         // "localhost" as the JVM host to connect to.
         if (this.testConfiguration.isDebug()) {
-            options.add("-Xdebug");
-            options.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
-            options.add("-Xnoagent");
-            options.add("-Djava.compiler=NONE");
+            options.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005");
         }
     }
 
@@ -415,7 +412,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
             String imageVersion = String.format("LO-%S", officeVersion);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
-                .withImageNameFilter(imageName)
+                .withReferenceFilter(imageName)
                 .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
                 .exec();
 

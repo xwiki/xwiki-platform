@@ -22,7 +22,7 @@ import type { TreeNode } from "@xwiki/platform-fn-utils";
 
 /**
  * Represents a TreeNode that can be displayed in a Tree component.
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type DisplayableTreeNode = TreeNode<{
@@ -34,7 +34,7 @@ type DisplayableTreeNode = TreeNode<{
 
 /**
  * Props of the Tree component.
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type TreeProps = {

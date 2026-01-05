@@ -21,7 +21,7 @@ import { LinkType } from "./linkType";
 
 /**
  * Minimal data required to describe a link.
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 type Link = {

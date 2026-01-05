@@ -20,7 +20,7 @@
 
 /**
  * Props of the text-field component.
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 type TextFieldProps = {
@@ -29,26 +29,26 @@ type TextFieldProps = {
   required?: boolean;
   /**
    * Whether the field should be focused on load or not (default: false).
-   * @since 0.13
+   * @since 18.0.0RC1
    * @beta
    */
   autofocus?: boolean;
   modelValue?: string;
   /**
    * Help message.
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   help?: string;
   /**
    * Whether the field should be readonly (default: false).
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   readonly?: boolean;
   /**
    * Type of content.
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   type?:

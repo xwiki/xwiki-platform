@@ -22,7 +22,7 @@ import { Container } from "inversify";
 import type { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 
 /**
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 class ComponentInit {

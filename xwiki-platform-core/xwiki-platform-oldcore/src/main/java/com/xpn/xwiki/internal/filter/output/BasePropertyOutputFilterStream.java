@@ -91,4 +91,11 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
             // TODO: Log something ?
         }
     }
+
+    @Override
+    public void disable()
+    {
+        super.disable();
+        this.currentXClass = null;
+    }
 }

@@ -125,6 +125,7 @@ public class BaseObjectOutputFilterStream extends AbstractElementOutputFilterStr
                 }
 
                 setCurrentXClass(xclass);
+                this.entity.setSourceXClass(xclass);
                 getBaseClassOutputFilterStream().setEntity(null);
             }
         }
@@ -174,17 +175,19 @@ public class BaseObjectOutputFilterStream extends AbstractElementOutputFilterStr
 
     private void checkDatabaseClass()
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        if (xcontext != null && xcontext.getWiki() != null) {
-            try {
-                this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
-                if (!this.databaseXClass.getOwnerDocument().isNew()) {
-                    setCurrentXClass(this.databaseXClass);
-                } else {
-                    this.databaseXClass = null;
+        if (this.entity.getSourceXClass() == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null && xcontext.getWiki() != null) {
+                try {
+                    this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
+                    if (!this.databaseXClass.getOwnerDocument().isNew()) {
+                        setCurrentXClass(this.databaseXClass);
+                    } else {
+                        this.databaseXClass = null;
+                    }
+                } catch (XWikiException e) {
+                    // TODO: log something ?
                 }
-            } catch (XWikiException e) {
-                // TODO: log something ?
             }
         }
     }
@@ -206,7 +209,7 @@ public class BaseObjectOutputFilterStream extends AbstractElementOutputFilterStr
         super.endWikiObject(name, parameters);
 
         getBaseClassOutputFilterStream().disable();
-        getBaseClassOutputFilterStream().disable();
+        getBasePropertyOutputFilterStream().disable();
     }
 
     private void addMissingProperties(BaseClass xclass)

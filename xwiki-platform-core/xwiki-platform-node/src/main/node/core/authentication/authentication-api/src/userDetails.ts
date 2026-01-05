@@ -21,7 +21,7 @@
 /**
  * Holds the user details, for now the profile link and the name of the user.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 export interface UserDetails {
@@ -30,13 +30,13 @@ export interface UserDetails {
   /**
    * URL of the user avatar. Must be publicly accessible.
    *
-   * @since 0.14
+   * @since 18.0.0RC1
    * @beta
    */
   avatar?: string;
   /**
    * Username of the user.
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   username?: string;

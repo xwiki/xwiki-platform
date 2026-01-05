@@ -27,7 +27,7 @@
  *
  * @returns The generated color, in hexadecimal (e.g. `#789ABC`)
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 function stringToColor(str: string, prc?: number): string {

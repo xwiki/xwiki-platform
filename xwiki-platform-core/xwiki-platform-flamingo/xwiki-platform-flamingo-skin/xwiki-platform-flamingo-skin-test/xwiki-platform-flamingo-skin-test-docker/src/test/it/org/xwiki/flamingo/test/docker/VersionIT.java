@@ -36,6 +36,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -44,6 +46,7 @@ import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.SourceViewer;
@@ -52,6 +55,7 @@ import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
 import org.xwiki.test.ui.po.diff.EntityDiff;
 import org.xwiki.test.ui.po.diff.RawChanges;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -1097,5 +1101,251 @@ class VersionIT
         assertTrue(changesPane.hasNextFromVersion());
         assertTrue(changesPane.hasPreviousToVersion());
         assertFalse(changesPane.hasNextToVersion());
+    }
+
+    @Test
+    @Order(12)
+    void diffAfterXClassChange(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        String className = "XClassTest";
+        DocumentReference xclassReference = new DocumentReference(className, testReference.getLastSpaceReference());
+        ViewPage classPage = testUtils.createPage(xclassReference, "");
+        ClassEditPage classEditPage = classPage.editClass();
+        classEditPage.addProperty("stringTest", "String");
+        ClassPropertyEditPane classPropertyEditPane = classEditPage.addProperty("mypass", "Password");
+        classPropertyEditPane.setMetaProperty("storageType", "Clear");
+        classEditPage.clickSaveAndView();
+
+        // v1.1
+        testUtils.rest().savePage(testReference, "Some content", "Test title");
+        // v2.1
+        testUtils.rest().addObject(testReference, xclassReference.toString(), "stringTest", "myvalue", "mypass", "foo");
+        // v3.1
+        testUtils.rest().savePage(testReference, "Some content 2", "Test title");
+
+        // v4.1
+        Object object = testUtils.rest().object(testReference, xclassReference.toString(), 0);
+        object.withProperties(TestUtils.RestTestUtils.property("stringTest", "anothervalue"));
+        object.withProperties(TestUtils.RestTestUtils.property("mypass", "foobar"));
+        Page page = testUtils.rest().page(testReference);
+        page.setObjects(new Objects());
+        page.getObjects().withObjectSummaries(object);
+        testUtils.rest().save(page, 202);
+
+        // v5.1
+        testUtils.rest().savePage(testReference, "Some content 3", "Test title");
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(5, historyPane.getNumberOfVersions());
+        assertEquals("5.1", historyPane.getCurrentVersion());
+
+        String objectIdInDiff = String.format("%s[0]", xclassReference.toString().substring("xwiki:".length()));
+
+        // diff 1.1 -> 5.1
+        ComparePage comparePage = historyPane.compare("1.1", "5.1");
+        ChangesPane changesPane = comparePage.getChangesPane();
+        RawChanges rawChanges = changesPane.getRawChanges();
+        List<String> contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 3</ins>", contentDiff.get(2));
+
+        EntityDiff objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        List<String> stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 4.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 3.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+myvalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 2.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+myvalue", stringTestDiff.get(1));
+
+        // diff 2.1 -> 2.1
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertTrue(changesPane.getRawChanges().hasNoChanges());
+
+        // diff 2.1 -> 3.1
+        changesPane.clickNextToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        assertTrue(rawChanges.getDiffSummary().getModifiedObjects().isEmpty());
+
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        // diff 3.1 -> 3.1
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertTrue(changesPane.getRawChanges().hasNoChanges());
+
+        // diff 3.1 -> 4.1
+        changesPane.clickNextToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(3, stringTestDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("-<del>my</del>value", stringTestDiff.get(1));
+        assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
+
+        // modify the xclass
+        classPage = testUtils.gotoPage(xclassReference);
+        classEditPage = classPage.editClass();
+        classEditPage.deleteProperty("mypass");
+        classEditPage.clickSaveAndView();
+
+        viewPage = testUtils.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(5, historyPane.getNumberOfVersions());
+        assertEquals("5.1", historyPane.getCurrentVersion());
+
+        // diff 1.1 -> 5.1
+        comparePage = historyPane.compare("1.1", "5.1");
+        changesPane = comparePage.getChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 3</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        // FIXME
+        //assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 4.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 3.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+myvalue", stringTestDiff.get(1));
+
+        // diff 1.1 -> 2.1
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+myvalue", stringTestDiff.get(1));
+
+        // diff 2.1 -> 2.1
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertTrue(changesPane.getRawChanges().hasNoChanges());
+
+        // diff 2.1 -> 3.1
+        changesPane.clickNextToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        assertTrue(rawChanges.getDiffSummary().getModifiedObjects().isEmpty());
+
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 2</ins>", contentDiff.get(2));
+
+        // diff 3.1 -> 3.1
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertTrue(changesPane.getRawChanges().hasNoChanges());
+
+        // diff 3.1 -> 4.1
+        changesPane.clickNextToVersion();
+        changesPane = new ChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(3, stringTestDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("-<del>my</del>value", stringTestDiff.get(1));
+        assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
     }
 }

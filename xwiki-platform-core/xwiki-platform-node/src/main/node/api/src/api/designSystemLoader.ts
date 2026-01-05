@@ -28,7 +28,7 @@ import type {
 } from "vue";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export interface DesignSystemLoader {
@@ -43,7 +43,7 @@ export interface DesignSystemLoader {
  * @param source - the source loaded (i.e., a call to import). The import must be
  * in the package where the component is as otherwise the import is made
  * relative to this package and the dependency is not found
- * @since 0.7
+ * @since 18.0.0RC1
  * @beta
  */
 export function registerAsyncComponent<

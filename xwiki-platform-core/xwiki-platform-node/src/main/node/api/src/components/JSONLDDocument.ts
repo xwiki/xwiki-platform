@@ -21,7 +21,7 @@
 import type { Document } from "../api/document";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export class JSONLDDocument implements Document {

@@ -57,7 +57,7 @@ public class HTML5ValidatorTest
         validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         List<ValidationError> errors = validator.validate();
         assertEquals(errors, validator.getErrors());
-        assertEquals(5, errors.size());
+        assertEquals(6, errors.size());
         validator.clear();
         assertTrue(validator.getErrors().isEmpty());
     }

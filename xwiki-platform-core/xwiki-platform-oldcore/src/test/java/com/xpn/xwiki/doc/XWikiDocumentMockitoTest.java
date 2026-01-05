@@ -43,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
@@ -290,9 +291,15 @@ public class XWikiDocumentMockitoTest
      * 
      * @return Return the reference of the first clone
      */
-    private void generateFakeObjects()
+    private void generateFakeObjects() throws ComponentLookupException
     {
         BaseObject baseObject = null, baseObject2 = null, baseObject3 = null;
+
+        // The resolver is used by BaseCollection#getXClassReference.
+        DocumentReferenceResolver<EntityReference> currentDocumentReferenceResolver =
+            this.oldcore.getMocker().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        when(currentDocumentReferenceResolver.resolve(any(EntityReference.class),
+            eq(this.document.getDocumentReference()))).thenReturn(this.document.getDocumentReference());
         try {
             baseObject = this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
             baseObject2 =
@@ -1987,5 +1994,25 @@ public class XWikiDocumentMockitoTest
         assertEquals(enforceRequiredRights, this.document.isEnforceRequiredRights());
         assertEquals(title, this.document.getTitle());
         assertEquals(content, this.document.getContent());
+    }
+
+    @Test
+    void cloneWithXObject() throws XWikiException
+    {
+        XWikiDocument myDoc = new XWikiDocument(new DocumentReference("wiki1", "Space", "Page"));
+
+        DocumentReference xclassReference = new DocumentReference("xwiki", "XWiki", "Users");
+        DocumentReference xclassWikiReference = new DocumentReference("wiki1", "XWiki", "Users");
+        EntityReference xclassRelativeReference = xclassReference.removeParent(new WikiReference("xwiki"));
+        BaseObject obj = myDoc.newXObject(xclassReference, this.oldcore.getXWikiContext());
+        assertEquals(xclassRelativeReference, obj.getRelativeXClassReference());
+
+        assertSame(obj, myDoc.getXObject(xclassReference));
+        assertSame(obj, myDoc.getXObject(xclassWikiReference));
+
+        XWikiDocument cloneDoc = myDoc.clone();
+        BaseObject cloneObj = cloneDoc.getXObject(xclassWikiReference);
+        assertEquals(xclassRelativeReference, cloneObj.getRelativeXClassReference());
+        assertSame(cloneObj, cloneDoc.getXObject(xclassReference));
     }
 }

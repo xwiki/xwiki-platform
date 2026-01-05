@@ -22,14 +22,13 @@ import {defineConfig} from "vite";
 
 export default defineConfig({
     build: {
-        sourcemap: false,
-        minify: false,
+        sourcemap: true,
         outDir: '../../../target/node-dist',
         lib: {
             entry: 'js/main.js',
             name: 'xwiki-bootstrap',
             formats: ['umd'],
-            fileName: () => `js/xwiki-bootstrap.js`
+            fileName: () => `js/xwiki-bootstrap.min.js`
         },
         rollupOptions: {
             external: ['jQuery'],

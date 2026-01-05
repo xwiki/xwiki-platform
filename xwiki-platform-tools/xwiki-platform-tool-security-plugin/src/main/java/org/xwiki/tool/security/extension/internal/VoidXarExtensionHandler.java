@@ -33,7 +33,7 @@ import org.xwiki.job.Request;
 /**
  * @version $Id$
  * @since 18.0.0RC1
- * @since 17.10.2
+ * @since 17.10.3
  */
 @Component
 @Singleton

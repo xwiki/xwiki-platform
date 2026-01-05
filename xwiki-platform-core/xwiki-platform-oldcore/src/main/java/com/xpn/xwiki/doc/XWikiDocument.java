@@ -2995,17 +2995,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setOwnerDocument(this);
-        object.setXClassReference(classReference);
-        BaseObjects objects = this.xObjects.get(absoluteClassReference);
-        if (objects == null) {
-            objects = new BaseObjects();
-            this.xObjects.put(absoluteClassReference, objects);
-        }
-        objects.add(object);
-        int nb = objects.size() - 1;
-        object.setNumber(nb);
-        setMetaDataDirty(true);
-        return nb;
+        this.addXObject(object);
+        return object.getNumber();
     }
 
     /**
@@ -3065,7 +3056,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         List<BaseObject> xobjects = null;
 
         if (classReference != null) {
-            xobjects = getXObjects().get(classReference);
+            xobjects = getXObjects().get(resolveClassReference(classReference));
         }
 
         return xobjects != null ? xobjects : Collections.emptyList();
@@ -3085,8 +3076,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
-            return getXObjects(
-                getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()));
+            return getXObjects(resolveClassReference(reference));
         }
 
         return Collections.emptyList();
@@ -3107,8 +3097,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public void setXObjects(DocumentReference classReference, List<BaseObject> objects)
     {
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
         // Remove existing objects
-        List<BaseObject> existingbjects = this.xObjects.get(classReference);
+        List<BaseObject> existingbjects = this.xObjects.get(resolvedClassReference);
         if (existingbjects != null) {
             existingbjects.clear();
         }
@@ -3118,7 +3109,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Add new objects
-        this.xObjects.put(classReference, new BaseObjects(objects));
+        this.xObjects.put(resolvedClassReference, new BaseObjects(objects));
 
         setMetaDataDirty(true);
     }
@@ -3148,7 +3139,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public BaseObject getXObject(DocumentReference classReference)
     {
         BaseObject result = null;
-        List<BaseObject> objects = getXObjects().get(classReference);
+
+        List<BaseObject> objects = getXObjects().get(resolveClassReference(classReference));
         if (objects != null) {
             for (BaseObject object : objects) {
                 if (object != null) {
@@ -3246,7 +3238,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(DocumentReference classReference, int nb)
     {
-        List<BaseObject> objects = getXObjects().get(classReference);
+        List<BaseObject> objects = getXObjects().get(resolveClassReference(classReference));
 
         if (objects != null && objects.size() > nb) {
             return objects.get(nb);
@@ -3292,8 +3284,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference classReference, int nb)
     {
-        return getXObject(
-            getCurrentReferenceDocumentReferenceResolver().resolve(classReference, getDocumentReference()), nb);
+        return getXObject(resolveClassReference(classReference), nb);
     }
 
     /**
@@ -3327,15 +3318,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference reference, String key, String value, boolean failover)
     {
-        if (reference instanceof DocumentReference) {
-            return getXObject((DocumentReference) reference, key, value, failover);
-        } else if (reference.getType() == EntityType.DOCUMENT) {
-            // class reference
-            return getXObject(getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()),
-                key, value, failover);
-        }
-
-        return null;
+        return getXObject(resolveClassReference(reference), key, value, failover);
     }
 
     /**
@@ -3343,17 +3326,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(DocumentReference classReference, String key, String value, boolean failover)
     {
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
         try {
             if (value == null) {
                 if (failover) {
-                    return getXObject(classReference);
+                    return getXObject(resolvedClassReference);
                 } else {
                     return null;
                 }
             }
 
-            List<BaseObject> objects = getXObjects().get(classReference);
-            if ((objects == null) || (objects.size() == 0)) {
+            List<BaseObject> objects = getXObjects().get(resolvedClassReference);
+            if ((objects == null) || (objects.isEmpty())) {
                 return null;
             }
             for (BaseObject obj : objects) {
@@ -3365,13 +3349,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             }
 
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             } else {
                 return null;
             }
         } catch (Exception e) {
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             }
 
             LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(),
@@ -7684,8 +7668,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private String getDefaultEditModeInternal(XWikiContext context) throws XWikiException
     {
         String editModeProperty = "defaultEditMode";
-        DocumentReference editModeClass =
-            getCurrentReferenceDocumentReferenceResolver().resolve(XWikiConstant.EDIT_MODE_CLASS);
+        LocalDocumentReference editModeClass = new LocalDocumentReference(XWikiConstant.EDIT_MODE_CLASS);
         // check if the current document has any edit mode class object attached to it, and read the edit mode from it
         BaseObject editModeObject = this.getXObject(editModeClass);
         if (editModeObject != null) {
@@ -9419,12 +9402,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Transforms a XClass reference relative to this document into an absolute reference.
+     * Transforms an XClass reference to an absolute reference relative to the current document wiki.
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        if (reference instanceof DocumentReference) {
-            return (DocumentReference) reference;
+        if (reference instanceof DocumentReference classReference) {
+            DocumentReference relativeXClassReference = classReference;
+            // The class reference is always relative to the current wiki of the document.
+            if (!classReference.getWikiReference().equals(getDocumentReference().getWikiReference())) {
+                relativeXClassReference = classReference.replaceParent(classReference.getWikiReference(),
+                    getDocumentReference().getWikiReference());
+                LOGGER.warn("Calling xclass [{}] on document [{}]: the wiki part of the xclass reference is wrong, "
+                    + "replacing it.", classReference, getDocumentReference());
+            }
+            return relativeXClassReference;
         } else if (reference instanceof LocalDocumentReference) {
             return new DocumentReference((LocalDocumentReference) reference, getDocumentReference().getWikiReference());
         } else {
@@ -9451,8 +9442,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private BaseObject prepareXObject(EntityReference classReference)
     {
-        DocumentReference absoluteClassReference = resolveClassReference(classReference);
-        BaseObject bobject = getXObject(absoluteClassReference);
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
+        BaseObject bobject = getXObject(resolvedClassReference);
         if (bobject == null) {
             bobject = new BaseObject();
             bobject.setXClassReference(classReference);

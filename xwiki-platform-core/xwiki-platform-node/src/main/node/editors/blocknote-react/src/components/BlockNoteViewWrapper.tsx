@@ -67,7 +67,7 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 
 /**
  * Properties for the BlockNote editor component.
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type BlockNoteViewWrapperProps = {
@@ -97,7 +97,7 @@ type BlockNoteViewWrapperProps = {
   /**
    * Macros to show in the editor
    *
-   * @since 0.21
+   * @since 18.0.0RC1
    * @beta
    */
   macros:
@@ -105,7 +105,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * List of buildable macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         list: MacroWithUnknownParamsType[];
@@ -113,7 +113,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * Context for macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         ctx: ContextForMacros;

@@ -41,7 +41,7 @@ import type {
 } from "react";
 
 /**
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 export type MacroEditableZoneRef =
@@ -51,7 +51,7 @@ export type MacroEditableZoneRef =
 /**
  * Converter that transforms a macro's returned AST to React JSX
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 export class MacrosAstToReactJsxConverter {

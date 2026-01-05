@@ -32,7 +32,7 @@ import type { LinkEditionContext } from "./misc/linkSuggest";
  *
  * @returns - An unmount function to properly dispose of the editor
  *
- * @since 0.19
+ * @since 18.0.0RC1
  * @beta
  */
 function mountBlockNote(

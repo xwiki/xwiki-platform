@@ -99,7 +99,7 @@
       <dl>
         #foreach ($prop in $deprecatedProperties)
           <dt class="disabled property-name"><label>${escapetool.xml($prop.name)}:</label></dt>
-          #if ($objecttool.instanceOf($prop.property, 'com.xpn.xwiki.objects.PasswordProperty'))
+          #if ($prop.sensitive)
             <dd class="disabled obfuscated property-value" data-property-name="$escapetool.xml($prop.name)">
               <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
                 $services.icon.renderHTML('info')

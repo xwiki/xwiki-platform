@@ -26,6 +26,7 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
@@ -437,5 +438,17 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         }
 
         return null;
+    }
+
+    /**
+     * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
+     * @return {@code false} if the property is never sensitive (default), some property might override to always
+     * return {@code true}.
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    public boolean isSensitive()
+    {
+        return false;
     }
 }

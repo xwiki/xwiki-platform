@@ -353,4 +353,14 @@ public class PasswordClass extends StringClass
         property.setName(getName());
         return property;
     }
+
+    /**
+     * {@inheritDoc}
+     * @return {@code true} as this property is always sensitive.
+     */
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        return true;
+    }
 }

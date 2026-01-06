@@ -124,9 +124,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected SolrLinkSerializer linkSerializer;
 
-    @Inject
-    protected GeneralMailConfiguration generalMailConfiguration;
-
     private int shortTextLimit = -1;
 
     /**
@@ -440,17 +437,10 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // Boolean properties are stored as integers (0 is false and 1 is true).
             Boolean booleanValue = ((Integer) propertyValue) != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
-        } else if (!isPropertyTooSensitiveToBeIndexed(property, propertyClass))
-        {
+        } else if (!property.isSensitive(xcontextProvider.get())) {
             // Avoid indexing passwords and, when obfuscation is enabled, emails.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
         }
-    }
-
-    private boolean isPropertyTooSensitiveToBeIndexed(BaseProperty<?> property, PropertyClass propertyClass)
-    {
-        return property.isSensitive()
-            || (propertyClass instanceof EmailClass) && this.generalMailConfiguration.shouldObfuscate();
     }
 
     /**

@@ -440,15 +440,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return null;
     }
 
-    /**
-     * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
-     * @return {@code false} if the property is never sensitive (default), some property might override to always
-     * return {@code true}.
-     * @since 18.0.0RC1
-     */
-    @Unstable
-    public boolean isSensitive()
+    @Override
+    public boolean isSensitive(XWikiContext context)
     {
-        return false;
+        PropertyClass propertyClass = getPropertyClass(context);
+        boolean result = false;
+        if (propertyClass != null) {
+            result = propertyClass.isSensitive(context);
+        }
+        return result;
     }
 }

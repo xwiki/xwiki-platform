@@ -104,6 +104,6 @@ public class Property extends Element
      */
     public boolean isSensitive()
     {
-        return getBaseProperty().isSensitive();
+        return getBaseProperty().isSensitive(getXWikiContext());
     }
 }

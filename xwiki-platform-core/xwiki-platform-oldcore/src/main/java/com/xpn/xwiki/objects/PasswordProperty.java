@@ -21,6 +21,8 @@ package com.xpn.xwiki.objects;
 
 import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Property for containing a password value.
  * @version $Id$
@@ -38,7 +40,7 @@ public class PasswordProperty extends StringProperty
      * @return {@code true} as this property is always sensitive.
      */
     @Override
-    public boolean isSensitive()
+    public boolean isSensitive(XWikiContext context)
     {
         return true;
     }

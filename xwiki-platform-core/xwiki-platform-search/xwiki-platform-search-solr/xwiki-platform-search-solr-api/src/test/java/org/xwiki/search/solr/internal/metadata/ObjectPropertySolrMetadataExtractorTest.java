@@ -156,7 +156,7 @@ class ObjectPropertySolrMetadataExtractorTest
         when(property.getName()).thenReturn(propertyName);
         when(property.getValue()).thenReturn(value);
         when(property.getObject()).thenReturn(object);
-        when(property.isSensitive()).thenReturn(isSensitive);
+        when(property.isSensitive(this.xcontext)).thenReturn(isSensitive);
 
         // Mock the class reference
         DocumentReference classReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class");

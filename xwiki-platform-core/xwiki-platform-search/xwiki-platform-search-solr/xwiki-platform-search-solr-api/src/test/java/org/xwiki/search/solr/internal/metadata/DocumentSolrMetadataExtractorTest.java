@@ -395,7 +395,7 @@ class DocumentSolrMetadataExtractorTest
         BaseProperty<EntityReference> passwordField = mock(BaseProperty.class);
         when(passwordField.getName()).thenReturn("password");
         when(passwordField.getValue()).thenReturn(commentPassword);
-        when(passwordField.isSensitive()).thenReturn(true);
+        when(passwordField.isSensitive(this.xcontext)).thenReturn(true);
         commentFields.add(passwordField);
 
         List<String> commentList = Arrays.asList("a", "list");

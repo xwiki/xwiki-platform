@@ -97,7 +97,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -1297,6 +1296,7 @@ public class XWikiDocumentMockitoTest
         template.setAttachment(aliceAttachment);
 
         XWikiAttachment bobAttachment = new XWikiAttachment(template, "bob.png");
+        bobAttachment.setContent(new ByteArrayInputStream("bob content".getBytes()));
         bobAttachment.setVersion("5.3");
         bobAttachment.setDate(simpleDateFormat.parse("25/5/2019"));
         bobAttachment.setAuthorReference(templateAuthor);
@@ -1305,17 +1305,9 @@ public class XWikiDocumentMockitoTest
         // Verify that the attachment content is loaded before being copied.
         XWikiAttachmentStoreInterface attachmentContentStore = mock(XWikiAttachmentStoreInterface.class);
         xcontext.getWiki().setDefaultAttachmentContentStore(attachmentContentStore);
-        doAnswer(invocation -> {
-            XWikiAttachment attachment = invocation.getArgument(0);
-            if ("bob.png".equals(attachment.getFilename())) {
-                XWikiAttachmentContent attachmentContent = new XWikiAttachmentContent(attachment);
-                attachmentContent.setContent(new ByteArrayInputStream("bob content".getBytes()));
-                attachment.setAttachment_content(attachmentContent);
-            }
-            return null;
-        }).when(attachmentContentStore).loadAttachmentContent(any(XWikiAttachment.class), eq(xcontext), eq(true));
 
         this.oldcore.getSpyXWiki().saveDocument(template, xcontext);
+        assertFalse(template.isMetaDataDirty());
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
 
@@ -1350,6 +1342,7 @@ public class XWikiDocumentMockitoTest
         assertAttachment("bob content", "1.1", targetAuthor, null, target.getAttachment("bob.png"));
         assertAttachment("carol content", "3.1", targetAuthor, simpleDateFormat.parse("13/11/2020"),
             target.getAttachment("carol.png"));
+        assertFalse(template.isMetaDataDirty());
     }
 
     private void assertAttachment(String expectedContent, String expectedVersion,

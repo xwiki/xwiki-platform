@@ -674,9 +674,11 @@ public class MockitoOldcore
                     document.setSyntax(Syntax.PLAIN_1_0);
                     document.setOriginalDocument(document.clone());
                 } else {
-                    // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
-                    // by modifying the XWikiDocument instance and always return a new instance)
-                    document = document.clone();
+                    if (document.isMetaDataDirty()) {
+                        // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
+                        // by modifying the XWikiDocument instance and always return a new instance)
+                        document = document.clone();
+                    }
                 }
 
                 return document;
@@ -1272,7 +1274,7 @@ public class MockitoOldcore
         // Make sure the document is not restricted.
         document.setRestricted(false);
 
-        XWikiDocument savedDocument = document.clone();
+        XWikiDocument savedDocument = document;
 
         this.documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 

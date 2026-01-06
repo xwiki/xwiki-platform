@@ -142,7 +142,8 @@ class ObjectPropertySolrMetadataExtractorTest
 
     @ParameterizedTest
     @MethodSource("getDocumentWithPropertyParameters")
-    void getDocumentWithProperty(PropertyClass propertyClass, Object value, boolean obfuscate, boolean visible)
+    void getDocumentWithProperty(PropertyClass propertyClass, Object value, boolean obfuscate, boolean visible,
+        boolean isSensitive)
         throws Exception
     {
         when(this.mailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
@@ -155,6 +156,7 @@ class ObjectPropertySolrMetadataExtractorTest
         when(property.getName()).thenReturn(propertyName);
         when(property.getValue()).thenReturn(value);
         when(property.getObject()).thenReturn(object);
+        when(property.isSensitive()).thenReturn(isSensitive);
 
         // Mock the class reference
         DocumentReference classReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class");
@@ -207,11 +209,11 @@ class ObjectPropertySolrMetadataExtractorTest
     static Stream<Arguments> getDocumentWithPropertyParameters()
     {
         return Stream.of(
-            arguments(mock(StringClass.class), "value", false, true),
-            arguments(mock(EmailClass.class), "email@example.com", false, true),
-            arguments(mock(EmailClass.class), "hidden@example.com", true, false),
-            arguments(mock(PasswordClass.class), "passw0rd", false, false),
-            arguments(mock(StaticListClass.class), List.of("red", "green"), false, true)
+            arguments(mock(StringClass.class), "value", false, true, false),
+            arguments(mock(EmailClass.class), "email@example.com", false, true, false),
+            arguments(mock(EmailClass.class), "hidden@example.com", true, false, false),
+            arguments(mock(PasswordClass.class), "passw0rd", false, false, true),
+            arguments(mock(StaticListClass.class), List.of("red", "green"), false, true, false)
         );
     }
 

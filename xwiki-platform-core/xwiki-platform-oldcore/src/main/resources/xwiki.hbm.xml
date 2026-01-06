@@ -301,7 +301,7 @@
         <joined-subclass name="com.xpn.xwiki.objects.PasswordProperty" table="xwikipasswords">
             <key>
                 <column name="XWP_ID" />
-                <column name="XWP_NAME" />
+                <column name="XWP_NAME" index="XWPASSWORD_NAME" />
             </key>
             <property name="value" type="string" column="XWP_VALUE" length="768" />
         </joined-subclass>

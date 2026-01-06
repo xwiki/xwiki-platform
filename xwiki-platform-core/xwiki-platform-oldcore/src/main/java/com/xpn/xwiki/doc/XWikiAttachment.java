@@ -216,7 +216,23 @@ public class XWikiAttachment implements Cloneable
     @Override
     public XWikiAttachment clone()
     {
-        return internalClone(false, false);
+        return internalClone(false, false, true);
+    }
+
+    /**
+     * Perform a deep clone with both the archive and current content.
+     * @param context the context for loading the content before cloning
+     * @return a cloned instance
+     * @throws XWikiException in case of problem for loading the content
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
+    protected XWikiAttachment cloneWithActualContent(XWikiContext context) throws XWikiException
+    {
+        // We need to ensure to content is properly loaded if we want to clone it.
+        loadAttachmentContent(context);
+        return internalClone(false, false, false);
     }
 
     /**
@@ -232,7 +248,7 @@ public class XWikiAttachment implements Cloneable
     public XWikiAttachment clone(String name, XWikiContext context)
         throws XWikiException, IOException
     {
-        XWikiAttachment clone = internalClone(true, true);
+        XWikiAttachment clone = internalClone(true, true, true);
         if (clone == null) {
             // According to #internalClone, this should never happen.
             throw new XWikiException("Failed to clone the attachment", null);
@@ -492,9 +508,6 @@ public class XWikiAttachment implements Cloneable
             if (updateDirty) {
                 if (isMetaDataDirty() && doc != null) {
                     doc.setMetaDataDirty(true);
-                }
-                if (getAttachment_content() != null) {
-                    getAttachment_content().setOwnerDocument(doc);
                 }
             }
         }
@@ -1518,7 +1531,15 @@ public class XWikiAttachment implements Cloneable
         }
     }
 
-    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent)
+    /**
+     *
+     * @param skipArchive {@code true} to skip the attachment archive when cloning
+     * @param skipContent {@code true} to skip content metadata
+     * @param skipActualContent {@code false} will also include {@link XWikiAttachmentContent} content, but this
+     * flag is only used if {@code skipContent} is {@code false}.
+     * @return a clone of current instance.
+     */
+    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent, boolean skipActualContent)
     {
         XWikiAttachment attachment = null;
 
@@ -1536,8 +1557,7 @@ public class XWikiAttachment implements Cloneable
             attachment.setRCSVersion(getRCSVersion());
             attachment.setMetaDataDirty(isMetaDataDirty());
             if (!skipContent && getAttachment_content() != null) {
-                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
-                attachment.getAttachment_content().setAttachment(attachment);
+                attachment.setAttachment_content(getAttachment_content().clone(skipActualContent));
             }
             if (!skipArchive && getAttachment_archive() != null) {
                 attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());

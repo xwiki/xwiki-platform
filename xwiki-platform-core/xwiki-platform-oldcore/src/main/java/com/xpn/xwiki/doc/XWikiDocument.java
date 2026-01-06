@@ -34,6 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -2455,16 +2456,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (metaDataDirty && !this.isMetaDataDirty && isCached()) {
             // Warn about abusive modification of cached document
-            LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
-            String logMessage = "Abusive modification of the cached document [{}]";
-            IllegalStateException exception = new IllegalStateException("Abusive modification of the cached document");
-            if (loggerConfiguration.isDeprecatedLogEnabled()) {
-                // We generally don't print a stack trace in case of warning log, but in this specific case the warning
-                // is almost useless without a way to know what code is responsible for this call
-                LOGGER.warn(logMessage, getDocumentReferenceWithLocale(), exception);
-            } else {
-                LOGGER.debug(logMessage, getDocumentReferenceWithLocale(), exception);
-            }
+            warnWithStackTrace("Abusive modification of the cached document",
+                "Abusive modification of the cached document [{}]", getDocumentReferenceWithLocale());
         }
 
         this.isMetaDataDirty = metaDataDirty;
@@ -9402,8 +9395,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             if (!classReference.getWikiReference().equals(getDocumentReference().getWikiReference())) {
                 relativeXClassReference = classReference.replaceParent(classReference.getWikiReference(),
                     getDocumentReference().getWikiReference());
-                LOGGER.warn("Calling xclass [{}] on document [{}]: the wiki part of the xclass reference is wrong, "
-                    + "replacing it.", classReference, getDocumentReference());
+                warnWithStackTrace("Wiki part of XClass reference is wrong",
+                    "Calling xclass [{}] on document [{}]: the wiki part of the xclass reference is wrong, "
+                        + "replacing it.", classReference, getDocumentReference());
             }
             return relativeXClassReference;
         } else if (reference instanceof LocalDocumentReference) {
@@ -9413,6 +9407,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
                     getDocumentReference().getName());
             return getExplicitReferenceDocumentReferenceResolver().resolve(reference, defaultReference);
+        }
+    }
+
+    private void warnWithStackTrace(String exceptionMessage, String logMessage, Object... parameters)
+    {
+        // Warn about abusive modification of cached document
+        LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
+        IllegalStateException exception = new IllegalStateException(exceptionMessage);
+        List<Object> paramList = new ArrayList<>(Arrays.stream(parameters).toList());
+        paramList.add(exception);
+        if (loggerConfiguration.isDeprecatedLogEnabled()) {
+            // We generally don't print a stack trace in case of warning log, but in this specific case the warning
+            // is almost useless without a way to know what code is responsible for this call
+            LOGGER.warn(logMessage, paramList.toArray());
+        } else {
+            LOGGER.debug(logMessage, paramList.toArray());
         }
     }
 

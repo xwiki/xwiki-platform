@@ -9412,7 +9412,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private void warnWithStackTrace(String exceptionMessage, String logMessage, Object... parameters)
     {
-        // Warn about abusive modification of cached document
         LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
         IllegalStateException exception = new IllegalStateException(exceptionMessage);
         if (loggerConfiguration.isDeprecatedLogEnabled()) {

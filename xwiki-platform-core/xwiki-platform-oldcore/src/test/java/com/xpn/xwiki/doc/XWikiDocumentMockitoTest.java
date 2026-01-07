@@ -576,8 +576,13 @@ public class XWikiDocumentMockitoTest
             this.oldcore.getXWikiContext());
         BaseClass dirtyClass = cleanDocument.getXClass();
         dirtyClass.addTextField("string", "String", 30);
+        dirtyClass.addTextField("key", "String", 30);
+        dirtyClass.addTextField("prefixKey", "String", 30);
         BaseObject dirtyObject = cleanDocument.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
         dirtyObject.setStringValue("string", "string");
+        dirtyObject.setStringValue("key", "foo");
+        dirtyObject.setStringValue("prefixKey", "bar");
+        ArrayList<String> expectedListOfProperties = new ArrayList<>(List.of("string", "key", "prefixKey"));
 
         // Make sure the document is not considered dirty
         cleanDocument.setDirty(false, true);
@@ -595,13 +600,14 @@ public class XWikiDocumentMockitoTest
         assertEquals(cleanDocument.getDocumentReference(), cleanDocument.getXClass().getDocumentReference());
         assertFalse(((PropertyClass) cleanDocument.getXClass().getField("string")).isDirty());
         assertSame(cleanDocument, ((PropertyClass) cleanDocument.getXClass().getField("string")).getOwnerDocument());
-        assertFalse(cleanDocument.getXObject(CLASS_REFERENCE).isDirty());
-        assertSame(cleanDocument, cleanDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
-        assertEquals(cleanDocument.getDocumentReference(),
-            cleanDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
-        assertFalse(((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+        BaseObject cleanObject = cleanDocument.getXObject(CLASS_REFERENCE);
+        assertFalse(cleanObject.isDirty());
+        assertSame(cleanDocument, cleanObject.getOwnerDocument());
+        assertEquals(cleanDocument.getDocumentReference(), cleanObject.getDocumentReference());
+        assertFalse(((BaseProperty) cleanObject.getField("string")).isDirty());
         assertSame(cleanDocument,
-            ((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
+            ((BaseProperty) cleanObject.getField("string")).getOwnerDocument());
+        assertEquals(expectedListOfProperties, new ArrayList<>(cleanObject.getPropertyList()));
 
         XWikiDocument clonedDocument = cleanDocument.clone();
 
@@ -615,13 +621,14 @@ public class XWikiDocumentMockitoTest
         assertEquals(cleanDocument.getDocumentReference(), cleanDocument.getXClass().getDocumentReference());
         assertFalse(((PropertyClass) cleanDocument.getXClass().getField("string")).isDirty());
         assertSame(cleanDocument, ((PropertyClass) cleanDocument.getXClass().getField("string")).getOwnerDocument());
-        assertFalse(cleanDocument.getXObject(CLASS_REFERENCE).isDirty());
-        assertSame(cleanDocument, cleanDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
+        assertFalse(cleanObject.isDirty());
+        assertSame(cleanDocument, cleanObject.getOwnerDocument());
         assertEquals(cleanDocument.getDocumentReference(),
-            cleanDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
-        assertFalse(((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+            cleanObject.getDocumentReference());
+        assertFalse(((BaseProperty) cleanObject.getField("string")).isDirty());
         assertSame(cleanDocument,
-            ((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
+            ((BaseProperty) cleanObject.getField("string")).getOwnerDocument());
+        assertEquals(expectedListOfProperties, new ArrayList<>(cleanObject.getPropertyList()));
 
         assertFalse(clonedDocument.isCached());
         assertTrue(clonedDocument.isChangeTracked());
@@ -633,13 +640,15 @@ public class XWikiDocumentMockitoTest
         assertEquals(clonedDocument.getDocumentReference(), clonedDocument.getXClass().getDocumentReference());
         assertFalse(((PropertyClass) clonedDocument.getXClass().getField("string")).isDirty());
         assertSame(clonedDocument, ((PropertyClass) clonedDocument.getXClass().getField("string")).getOwnerDocument());
-        assertFalse(clonedDocument.getXObject(CLASS_REFERENCE).isDirty());
-        assertSame(clonedDocument, clonedDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
+        BaseObject cloneObject = clonedDocument.getXObject(CLASS_REFERENCE);
+        assertFalse(cloneObject.isDirty());
+        assertSame(clonedDocument, cloneObject.getOwnerDocument());
         assertEquals(clonedDocument.getDocumentReference(),
-            clonedDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
-        assertFalse(((BaseProperty) clonedDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+            cloneObject.getDocumentReference());
+        assertFalse(((BaseProperty) cloneObject.getField("string")).isDirty());
         assertSame(clonedDocument,
-            ((BaseProperty) clonedDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
+            ((BaseProperty) cloneObject.getField("string")).getOwnerDocument());
+        assertEquals(expectedListOfProperties, new ArrayList<>(cloneObject.getPropertyList()));
     }
 
     @Test

@@ -34,7 +34,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -62,6 +61,7 @@ import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -9420,14 +9420,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // Warn about abusive modification of cached document
         LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
         IllegalStateException exception = new IllegalStateException(exceptionMessage);
-        List<Object> paramList = new ArrayList<>(Arrays.stream(parameters).toList());
-        paramList.add(exception);
         if (loggerConfiguration.isDeprecatedLogEnabled()) {
             // We generally don't print a stack trace in case of warning log, but in this specific case the warning
             // is almost useless without a way to know what code is responsible for this call
-            LOGGER.warn(logMessage, paramList.toArray());
+            LOGGER.warn(logMessage, ArrayUtils.add(parameters, exception));
         } else {
-            LOGGER.debug(logMessage, paramList.toArray());
+            LOGGER.debug(logMessage, ArrayUtils.add(parameters, exception));
         }
     }
 

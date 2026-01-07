@@ -25,12 +25,13 @@ import org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration;
  * Makes {@link DefaultGeneralMailConfiguration} more easily testable.
  *
  * @version $Id$
+ * @since 18.0.0RC1
  */
-public class TestMailSenderConfiguration extends DefaultGeneralMailConfiguration
+public class TestGeneralMailSenderConfiguration extends DefaultGeneralMailConfiguration
 {
     private boolean shouldObfuscate;
 
-    public TestMailSenderConfiguration(boolean shouldObfuscate)
+    public TestGeneralMailSenderConfiguration(boolean shouldObfuscate)
     {
         this.shouldObfuscate = shouldObfuscate;
     }

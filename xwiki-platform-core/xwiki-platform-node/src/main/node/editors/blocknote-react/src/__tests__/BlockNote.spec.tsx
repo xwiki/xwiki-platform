@@ -19,7 +19,7 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { expect, test } from "@playwright/experimental-ct-react";
-import type { BlockOfType, BlockType, EditorType } from "../blocknote";
+import type { BlockOfType, BlockType } from "../blocknote";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(

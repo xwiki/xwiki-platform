@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -30,7 +30,6 @@
     :data-livedata-entry-index="entryIdx"
     :data-livedata-entry-id="logic.getEntryId(entry)"
   >
-
     <!-- Card title-->
     <div class="card-title">
       <!-- Entry selector -->
@@ -41,10 +40,7 @@
       />
       <!-- Title property -->
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
-        <LivedataDisplayer
-          :property-id="titlePropertyId"
-          :entry="entry"
-        />
+        <LivedataDisplayer :property-id="titlePropertyId" :entry="entry" />
       </h2>
     </div>
 
@@ -59,7 +55,7 @@
       @change="reorderProperty"
       tag="div"
     >
-      <template #item="{element: property}">
+      <template #item="{ element: property }">
         <!--
           Card Properties
           Uses the XWikiDraggableItem component that goes along the
@@ -67,39 +63,36 @@
         -->
         <XWikiDraggableItem
           class="card-property"
-          v-show="logic.isPropertyVisible(property.id) && property.id !== titlePropertyId"
+          v-show="
+            logic.isPropertyVisible(property.id) &&
+            property.id !== titlePropertyId
+          "
         >
           <!-- Specify the handle to drag properties -->
           <template #handle>
-            <XWikiIcon :icon-descriptor="{name: 'more-vertical'}" />
+            <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
           </template>
 
           <!-- Property Name -->
           <strong class="property-name">{{ property.name }}:</strong>
           <!-- Property Value -->
           <span class="value">
-          <LivedataDisplayer
-            :property-id="property.id"
-            :entry="entry"
-          />
-        </span>
+            <LivedataDisplayer :property-id="property.id" :entry="entry" />
+          </span>
         </XWikiDraggableItem>
       </template>
     </draggable>
-
   </div>
 </template>
-
 
 <script>
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
-import draggable from "vuedraggable/src/vuedraggable";
 import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
 import XWikiIcon from "../../utilities/XWikiIcon.vue";
+import draggable from "vuedraggable/src/vuedraggable";
 
 export default {
-
   name: "LayoutCardsCard",
 
   components: {
@@ -148,7 +141,6 @@ export default {
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
-
   },
 
   methods: {
@@ -156,13 +148,10 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex, e.moved.newIndex);
     },
   },
-
 };
 </script>
 
-
 <style>
-
 .layout-cards .card {
   display: inline-block;
   margin: 1rem;
@@ -218,7 +207,6 @@ export default {
   font-size: 20px;
 }
 
-
 .layout-cards .property-name {
   margin-right: 0.5em;
 }
@@ -230,11 +218,8 @@ export default {
 
 /* for not IE11 */
 @supports (display: grid) {
-
   .layout-cards .card {
     margin: 0;
   }
-
 }
-
 </style>

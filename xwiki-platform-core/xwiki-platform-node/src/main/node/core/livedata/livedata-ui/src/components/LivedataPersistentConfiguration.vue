@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -31,21 +31,16 @@
   So we are using v-show instead, that will just set `display: none` as css.
 -->
 <template>
-  <div
-    v-if="data.id"
-    v-show="false"
-  ></div>
+  <div v-if="data.id" v-show="false"></div>
 </template>
-
 
 <script>
 // u-node is used to encode and decode the config
+import LZString from "lz-string";
 import { decode, encode, fromJson } from "u-node";
 // lz-string is used to compress / decrompress the encoded config
-import LZString from "lz-string";
 
 export default {
-
   name: "LivedataPersistentConfiguration",
 
   inject: ["logic"],
@@ -135,15 +130,20 @@ export default {
         // Return an array of hidden properties
         // We use hidden properties because they are more likely to be
         // less numerous than visible ones
-        return this.data.query.properties
-          .reduce((hiddenProperties, propertyId) => this.logic.isPropertyVisible(propertyId)
+        return this.data.query.properties.reduce(
+          (hiddenProperties, propertyId) =>
+            this.logic.isPropertyVisible(propertyId)
               ? hiddenProperties
               : hiddenProperties.concat(propertyId),
-            []);
+          [],
+        );
       },
       set(value) {
-        this.data.query.properties.forEach(propertyId => {
-          this.logic.setPropertyVisible(propertyId, !value.includes(propertyId));
+        this.data.query.properties.forEach((propertyId) => {
+          this.logic.setPropertyVisible(
+            propertyId,
+            !value.includes(propertyId),
+          );
         });
       },
     },
@@ -159,8 +159,8 @@ export default {
     encodingSpecsFilterOperators() {
       // The whole list of operators ids
       const operatorIds = [];
-      this.data.meta.filters.forEach(filterDescriptor => {
-        (filterDescriptor.operators || []).forEach(operator => {
+      this.data.meta.filters.forEach((filterDescriptor) => {
+        (filterDescriptor.operators || []).forEach((operator) => {
           if (!operatorIds.includes(operator.id)) {
             operatorIds.push(operator.id);
           }
@@ -182,18 +182,27 @@ export default {
     // the values during encoding and decoding
     encodingSpecsV1() {
       return {
-        $_filters: ["array", {
-          property: this.encodingSpecsProperties,
-          matchAll: ["boolean"],
-          constraints: ["array", {
-            operator: this.encodingSpecsFilterOperators,
-            value: ["varchar"],
-          }],
-        }],
-        $_sort: ["array", {
-          property: this.encodingSpecsProperties,
-          descending: ["boolean"],
-        }],
+        $_filters: [
+          "array",
+          {
+            property: this.encodingSpecsProperties,
+            matchAll: ["boolean"],
+            constraints: [
+              "array",
+              {
+                operator: this.encodingSpecsFilterOperators,
+                value: ["varchar"],
+              },
+            ],
+          },
+        ],
+        $_sort: [
+          "array",
+          {
+            property: this.encodingSpecsProperties,
+            descending: ["boolean"],
+          },
+        ],
         $_offset: ["integer"],
         $_limit: ["integer"],
         $_currentLayoutId: this.encodingSpecsCurrentLayoutId,
@@ -234,7 +243,6 @@ export default {
     saveKey() {
       return "livedata-config-" + this.data.id;
     },
-
   },
 
   watch: {
@@ -254,7 +262,6 @@ export default {
   },
 
   methods: {
-
     // Fully encode the provided config
     // - First: encode it using u-node encode function, so that it takes
     //   much less space
@@ -280,7 +287,8 @@ export default {
       if (!encodedConfig) {
         return;
       }
-      const uncompressed = LZString.decompressFromEncodedURIComponent(encodedConfig);
+      const uncompressed =
+        LZString.decompressFromEncodedURIComponent(encodedConfig);
       if (!uncompressed) {
         return;
       }
@@ -311,7 +319,7 @@ export default {
       let config = "";
       // url search param
       if (this.urlSearchParam) {
-        config = (new URLSearchParams(window.location.search)).get(saveKey);
+        config = new URLSearchParams(window.location.search).get(saveKey);
       }
       // local storage
       if (!config && this.localStorage) {
@@ -326,7 +334,10 @@ export default {
     // or if the saveKey is already used for something else
     hasConfig(saveKey) {
       // url search param
-      if (this.urlSearchParam && new URLSearchParams(window.location.search).has(saveKey)) {
+      if (
+        this.urlSearchParam &&
+        new URLSearchParams(window.location.search).has(saveKey)
+      ) {
         return true;
       }
       // local storage
@@ -340,7 +351,7 @@ export default {
     // Update the Livedata config using the computed value setters
     // defined for the properties to save
     loadConfig(config) {
-      Object.keys(this.dataToSave).forEach(key => {
+      Object.keys(this.dataToSave).forEach((key) => {
         this[key] = config[key];
       });
     },
@@ -370,16 +381,14 @@ export default {
     const config = this.decodeConfig(this.getConfig(this.saveKey));
     if (!config) {
       this.deleteConfig(config);
-      new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");
+      new XWiki.widgets.Notification(
+        "Bad LiveData config given, fall back to default",
+      );
       return;
     }
     this.loadConfig(config);
   },
-
 };
 </script>
 
-
-<style>
-
-</style>
+<style></style>

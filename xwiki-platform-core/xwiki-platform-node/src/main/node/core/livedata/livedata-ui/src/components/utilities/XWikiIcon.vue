@@ -1,39 +1,28 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <template>
-  <img
-    v-if="isImage"
-    :src="url"
-    alt=""
-  />
-  <span
-    v-else-if="isFont"
-    :class="cssClass"
-  ></span>
-  <span
-    v-else
-    class="icon-placeholder"
-  ></span>
+  <img v-if="isImage" :src="url" alt="" />
+  <span v-else-if="isFont" :class="cssClass"></span>
+  <span v-else class="icon-placeholder"></span>
 </template>
-
 
 <script>
 // This cache stores the metadata of the already resolved icons as well as the Promises for the icons currently being
@@ -42,7 +31,6 @@
 const iconCache = {};
 
 export default {
-
   name: "XWikiIcon",
 
   props: {
@@ -86,11 +74,12 @@ export default {
     async fetchRemoteIconDescriptor(iconName) {
       try {
         const parameters = `name=${encodeURIComponent(iconName)}`;
-        const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}` +
+        const iconURL =
+          `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}` +
           `/iconThemes/icons?${parameters}`;
         const response = await window.fetch(iconURL, {
           headers: {
-            "Accept": "application/json",
+            Accept: "application/json",
           },
         });
         const jsonResponse = await response.json();
@@ -135,7 +124,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .icon-placeholder {

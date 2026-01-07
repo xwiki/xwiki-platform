@@ -1,23 +1,22 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
 
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   DisplayerDate is a custom displayer that displays the entry value as dates
@@ -36,7 +35,6 @@
     @saveEdit="genericSave"
     v-if="moment !== null"
   >
-
     <!-- Provide the Date Viewer widget to the `viewer` slot -->
     <template #viewer>
       <div class="displayed-date">{{ valueFormatted }}</div>
@@ -56,19 +54,16 @@
         v-if="daterangepicker"
       />
     </template>
-
   </BaseDisplayer>
 </template>
 
-
 <script>
+import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
-import BaseDisplayer from "./BaseDisplayer.vue";
 import { loadById } from "@/services/require.js";
 
 export default {
-
   name: "displayer-date",
 
   inject: ["jQuery"],
@@ -134,9 +129,7 @@ export default {
       const editorDate = this.$refs.editorDate;
       // Create the date range picker associated to the single date input
       const $ = this.jQuery;
-      $(editorDate).daterangepicker(
-        this.editorConfig,
-      );
+      $(editorDate).daterangepicker(this.editorConfig);
       $(editorDate).on("apply.daterangepicker", () => {
         this.applyDate();
       });
@@ -152,7 +145,7 @@ export default {
         // This removes the 'hide' function only for the event target.
         editorDate.hide = undefined;
         // Restore the 'hide' function after the event is handled (i.e. after all the listeners have been called).
-        setTimeout(function() {
+        setTimeout(function () {
           // This deletes the local 'hide' key from the instance, making the 'hide' inherited from the prototype
           // visible again (the next calls to 'hide' won't find the key on the instance and thus it will go up
           // the prototype chain).
@@ -179,9 +172,7 @@ export default {
 };
 </script>
 
-
 <style>
-
 .livedata-displayer .editor-date {
   width: 100%;
 }
@@ -190,5 +181,4 @@ export default {
   min-width: 100%;
   min-height: 100%;
 }
-
 </style>

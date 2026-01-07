@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -28,14 +28,16 @@
     all the Advanced Panels default behavior
   -->
   <LivedataBaseAdvancedPanel
-    :class="['livedata-advanced-panel-extension', `livedata-advanced-panel-${panel.id}`]"
+    :class="[
+      'livedata-advanced-panel-extension',
+      `livedata-advanced-panel-${panel.id}`,
+    ]"
     :panel-id="panel.id"
     ref="basePanel"
   >
-
     <!-- Provide the panel title and icon to the `header` slot -->
     <template #header>
-      <XWikiIcon :icon-descriptor="{name: panel.icon}" />
+      <XWikiIcon :icon-descriptor="{ name: panel.icon }" />
       {{ panel.title }}
     </template>
 
@@ -44,7 +46,6 @@
       <div ref="bodyContainer" class="extension-body"></div>
     </template>
   </LivedataBaseAdvancedPanel>
-
 </template>
 
 <script>
@@ -61,7 +62,7 @@ export default {
 
   inject: ["logic"],
 
-  props: { "panel": Object },
+  props: { panel: Object },
 
   methods: {
     attachContainer() {
@@ -78,7 +79,7 @@ export default {
   },
 
   watch: {
-    "panel.container": function() {
+    "panel.container": function () {
       this.attachContainer();
     },
   },
@@ -86,7 +87,7 @@ export default {
   mounted() {
     this.attachContainer();
     // Watch the child's collapsed property to re-attach the body element when the body is rendered again.
-    this.$watch("$refs.basePanel.collapsed", function(newValue) {
+    this.$watch("$refs.basePanel.collapsed", function (newValue) {
       if (!newValue) {
         // Wait for the next tick such that the change has been applied in the DOM.
         this.$nextTick(this.attachContainer);

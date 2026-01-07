@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <script>
@@ -24,7 +24,6 @@ import XWikiLoader from "../utilities/XWikiLoader.vue";
 import { loadById } from "@/services/require.js";
 
 export default {
-
   name: "filter-list",
   components: { XWikiLoader },
   // Add the filterMixin to get access to all the generic filter methods and computed properties inside this component.
@@ -67,9 +66,12 @@ export default {
       // If the current filter has the empty operator and no existing option has an empty value, the default
       // empty option is added.
       // The empty option is not displayed in the advanced filtering panel nor when the empty operator is not available.
-      if (!this.isAdvanced && this.hasEmptyOperator && this.filterEntry?.operator === "empty" &&
-        !options.some(((value) => value.value === "")))
-      {
+      if (
+        !this.isAdvanced &&
+        this.hasEmptyOperator &&
+        this.filterEntry?.operator === "empty" &&
+        !options.some((value) => value.value === "")
+      ) {
         options.push(this.getDefaultEmptyOption());
       }
       const settings = {
@@ -85,7 +87,7 @@ export default {
         //   data or in the live data macro parameters
         // * the user can still add more values by adding more constraints from the advanced filtering panel
         maxItems: 1,
-        onChange: value => {
+        onChange: (value) => {
           if (this.$refs.input.selectize.items.length === 0) {
             // When no values are selected, simply remove the filter.
             this.removeFilter();
@@ -103,8 +105,8 @@ export default {
       };
       if (this.config.searchURL) {
         Object.assign(settings, {
-          load: this.getLoader({ "limit": 10 }),
-          loadSelected: this.getLoader({ "exactMatch": true }),
+          load: this.getLoader({ limit: 10 }),
+          loadSelected: this.getLoader({ exactMatch: true }),
         });
       }
       return settings;
@@ -115,7 +117,7 @@ export default {
       return this.filterEntry.operator !== "empty" || !this.isAdvanced;
     },
     hasEmptyOperator() {
-      return this.config.operators.some(it => it.id === "empty");
+      return this.config.operators.some((it) => it.id === "empty");
     },
   },
 
@@ -124,9 +126,13 @@ export default {
     getLoader(searchParams) {
       return (text, callback) => {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
-        const searchURL = this.config.searchURL.replace("{encodedQuery}", encodeURIComponent(text));
-        this.jQuery.getJSON(searchURL, searchParams)
-          .then(results => callback(this.getResultsAdapter(results)))
+        const searchURL = this.config.searchURL.replace(
+          "{encodedQuery}",
+          encodeURIComponent(text),
+        );
+        this.jQuery
+          .getJSON(searchURL, searchParams)
+          .then((results) => callback(this.getResultsAdapter(results)))
           .catch(() => callback(this.getResultsAdapter()));
       };
     },
@@ -141,9 +147,11 @@ export default {
 
       // An empty option is automatically added to the results only when hasEmptyOperator is true, no empty
       // option is already found, and we are not in an advanced filter panel.
-      if (!this.isAdvanced && this.hasEmptyOperator &&
-        !adaptedResults.some((value) => value.value === ""))
-      {
+      if (
+        !this.isAdvanced &&
+        this.hasEmptyOperator &&
+        !adaptedResults.some((value) => value.value === "")
+      ) {
         adaptedResults.unshift(this.getDefaultEmptyOption());
       }
 
@@ -187,7 +195,6 @@ export default {
           // take it into account.
           $(this.$refs.input).val(",").trigger("change");
         }
-
       }
     },
   },
@@ -212,8 +219,11 @@ export default {
 <template>
   <!-- A simple text input that will be enhanced by the selectize widget. -->
   <span v-if="isReady && selectizeLoaded" v-show="isVisible">
-    <input :value="value" class="filter-list livedata-filter" ref="input"
-           :aria-label="this.$t('livedata.filter.list.label')"
+    <input
+      :value="value"
+      class="filter-list livedata-filter"
+      ref="input"
+      :aria-label="this.$t('livedata.filter.list.label')"
     />
   </span>
   <XWikiLoader v-else />

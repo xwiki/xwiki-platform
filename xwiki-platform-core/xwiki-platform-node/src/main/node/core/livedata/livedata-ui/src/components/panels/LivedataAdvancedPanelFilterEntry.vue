@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -33,7 +33,9 @@
     -->
     <select
       class="operator-select"
-      @change="logic.filter(propertyId, filterIndex, { operator: $event.target.value })"
+      @change="
+        logic.filter(propertyId, filterIndex, { operator: $event.target.value })
+      "
     >
       <option
         v-for="operator in logic.getFilterDescriptor(propertyId).operators"
@@ -61,19 +63,16 @@
       @click.prevent="logic.removeFilter(propertyId, filterIndex)"
       :title="$t('livedata.panel.filter.delete')"
     >
-      <XWikiIcon :icon-descriptor="{name: 'trash'}" />
+      <XWikiIcon :icon-descriptor="{ name: 'trash' }" />
     </a>
-
   </div>
 </template>
-
 
 <script>
 import LivedataFilter from "../filters/LivedataFilter.vue";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
 
 export default {
-
   name: "LivedataAdvancedPanelFilterEntry",
 
   components: {
@@ -91,16 +90,15 @@ export default {
   computed: {
     // The filter entry corresponding to the props
     filterEntry() {
-      return this.logic.getQueryFilterGroup(this.propertyId).constraints[this.filterIndex];
+      return this.logic.getQueryFilterGroup(this.propertyId).constraints[
+        this.filterIndex
+      ];
     },
   },
-
 };
 </script>
 
-
 <style>
-
 .livedata-filter-container {
   display: flex;
   flex-direction: row;

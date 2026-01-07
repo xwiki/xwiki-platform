@@ -386,7 +386,7 @@ importers:
         version: 10.1.8(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-vue:
         specifier: 'catalog:'
-        version: 10.5.1(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.1(jiti@2.6.1)))
+        version: 10.5.1(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.1(jiti@2.6.1)))
       globals:
         specifier: 'catalog:'
         version: 16.5.0
@@ -423,15 +423,9 @@ importers:
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.1
-      lz-string:
-        specifier: 'catalog:'
-        version: 1.5.0
       tippy.js:
         specifier: 'catalog:'
         version: 6.3.7
-      u-node:
-        specifier: 'catalog:'
-        version: 0.0.2
       vue-i18n:
         specifier: 'catalog:'
         version: 11.1.12(vue@3.5.26(typescript@5.9.3))
@@ -441,9 +435,6 @@ importers:
       vue3-touch-events:
         specifier: 'catalog:'
         version: 5.0.15(vue@3.5.26(typescript@5.9.3))
-      vuedraggable:
-        specifier: 'catalog:'
-        version: 4.1.0(vue@3.5.26(typescript@5.9.3))
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
@@ -540,7 +531,7 @@ importers:
         version: 1.3.3(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-import:
         specifier: 'catalog:'
-        version: 2.32.0(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-prettier:
         specifier: 'catalog:'
         version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
@@ -552,7 +543,7 @@ importers:
         version: 0.4.0
       eslint-plugin-vue:
         specifier: 'catalog:'
-        version: 10.5.1(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.1(jiti@2.6.1)))
+        version: 10.5.1(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.1(jiti@2.6.1)))
       globals:
         specifier: 'catalog:'
         version: 16.5.0
@@ -975,6 +966,25 @@ importers:
         version: 4.0.15(@types/node@24.10.3)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-ui:
+    dependencies:
+      dompurify:
+        specifier: 'catalog:'
+        version: 3.3.0
+      lz-string:
+        specifier: 'catalog:'
+        version: 1.5.0
+      tippy.js:
+        specifier: 'catalog:'
+        version: 6.3.7
+      u-node:
+        specifier: 'catalog:'
+        version: 0.0.2
+      vue-tippy:
+        specifier: 'catalog:'
+        version: 6.7.1(vue@3.5.26(typescript@5.9.3))
+      vuedraggable:
+        specifier: 'catalog:'
+        version: 4.1.0(vue@3.5.26(typescript@5.9.3))
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -988,6 +998,18 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)
+      flush-promises:
+        specifier: 'catalog:'
+        version: 1.0.2
+      jquery:
+        specifier: 'catalog:'
+        version: 3.7.1
+      lodash-es:
+        specifier: 'catalog:'
+        version: 4.17.21
+      sinon:
+        specifier: 'catalog:'
+        version: 21.0.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -5816,6 +5838,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -7077,8 +7100,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.49.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.49.0(typescript@5.9.3)
-      '@typescript-eslint/types': 8.49.0
+      '@typescript-eslint/tsconfig-utils': 8.50.0(typescript@5.9.3)
+      '@typescript-eslint/types': 8.50.0
       debug: 4.4.3
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -8079,15 +8102,15 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
@@ -8098,7 +8121,7 @@ snapshots:
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -8109,7 +8132,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -8121,7 +8144,7 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack

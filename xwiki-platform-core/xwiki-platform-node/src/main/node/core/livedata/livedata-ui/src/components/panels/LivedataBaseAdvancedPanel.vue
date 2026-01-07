@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -33,10 +33,7 @@
     The Livedata Advanced panel base
     Uses the Bootstrap 3 panel syntax.
   -->
-  <div
-    class="livedata-advanced-panel panel panel-default"
-    v-show="panelOpened"
-  >
+  <div class="livedata-advanced-panel panel panel-default" v-show="panelOpened">
     <!--
       Panel Header
       Contains the panel title on the left
@@ -54,44 +51,37 @@
       <!-- Panel header buttons -->
       <div class="actions">
         <!-- Collapse panel button -->
-        <span
-          class="action collapse-button"
-          @click="collapsed = !collapsed"
-        >
-          <XWikiIcon v-if="!collapsed" :icon-descriptor="{name: 'arrow_in'}" />
-          <XWikiIcon v-else :icon-descriptor="{name: 'arrow_out'}" />
+        <span class="action collapse-button" @click="collapsed = !collapsed">
+          <XWikiIcon
+            v-if="!collapsed"
+            :icon-descriptor="{ name: 'arrow_in' }"
+          />
+          <XWikiIcon v-else :icon-descriptor="{ name: 'arrow_out' }" />
         </span>
         <!-- Close panel button -->
         <span
           class="action close-button"
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
-          <XWikiIcon :icon-descriptor="{name: 'cross'}" />
+          <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
         </span>
-
       </div>
     </div>
 
     <!--
       Panel Body
     -->
-    <div
-      class="panel-body"
-      v-if="!collapsed"
-    >
+    <div class="panel-body" v-if="!collapsed">
       <!-- The slot containing the panel body content -->
       <slot name="body"></slot>
     </div>
-
   </div>
 </template>
-
 
 <script>
 import XWikiIcon from "../utilities/XWikiIcon.vue";
 
 export default {
-
   name: "LivedataBaseAdvancedPanel",
 
   components: { XWikiIcon },
@@ -131,13 +121,10 @@ export default {
       }
     },
   },
-
 };
 </script>
 
-
 <style>
-
 .livedata-advanced-panel .panel-heading {
   position: relative;
   display: flex;
@@ -165,5 +152,4 @@ export default {
   padding: 0 15px;
   cursor: pointer;
 }
-
 </style>

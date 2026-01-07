@@ -16,13 +16,10 @@
   "dependencies": {
     "dompurify": "catalog:",
     "eventemitter3": "catalog:",
-    "lz-string": "catalog:",
     "tippy.js": "catalog:",
-    "u-node": "catalog:",
     "vue-i18n": "catalog:",
     "vue-tippy": "catalog:",
-    "vue3-touch-events": "catalog:",
-    "vuedraggable": "catalog:"
+    "vue3-touch-events": "catalog:"
   },
   "peerDependencies": {
     "vue": "3.x"

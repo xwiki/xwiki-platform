@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -39,10 +39,7 @@
   >
     <!-- Entry Select All -->
     <template #header>
-      <th
-        v-if="isSelectionEnabled"
-        class="entry-selector"
-      >
+      <th v-if="isSelectionEnabled" class="entry-selector">
         <LivedataEntrySelectorAll />
       </th>
     </template>
@@ -53,7 +50,7 @@
       a div element, that would be invalid inside the table structure.
       So we need to implement the XWikiDraggableItem structure from scratch
     -->
-    <template #item="{element: property}">
+    <template #item="{ element: property }">
       <th
         class="draggable-item"
         :title="property.description"
@@ -62,13 +59,17 @@
         <!-- Wrapper for the column header -->
         <div class="column-name">
           <!-- Property Name -->
-          <button type="button" class="handle"
-                  @click="sort(property)"
-                  @keydown.left="keyboardDragNDrop($event, -1)"
-                  @keydown.right="keyboardDragNDrop($event, 1)"
-                  :title="logic.isPropertySortable(property.id) ?
-            $t('livedata.action.columnName.sortable.hint') :
-            $t('livedata.action.columnName.default.hint')"
+          <button
+            type="button"
+            class="handle"
+            @click="sort(property)"
+            @keydown.left="keyboardDragNDrop($event, -1)"
+            @keydown.right="keyboardDragNDrop($event, 1)"
+            :title="
+              logic.isPropertySortable(property.id)
+                ? $t('livedata.action.columnName.sortable.hint')
+                : $t('livedata.action.columnName.default.hint')
+            "
           >
             <span class="property-name">{{ property.name }}</span>
             <!--
@@ -77,37 +78,42 @@
             -->
             <XWikiIcon
               v-if="logic.isPropertySortable(property.id)"
-              :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
-              :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']" />
+              :icon-descriptor="{
+                name:
+                  isFirstSortLevel(property) && firstSortLevel.descending
+                    ? 'caret-down'
+                    : 'caret-up',
+              }"
+              :class="['sort-icon', isFirstSortLevel(property) ? 'sorted' : '']"
+            />
           </button>
         </div>
         <!--
             Specify the handle to resize properties
           -->
-        <button type="button" class="resize-handle btn btn-xs btn-default"
-                :title="$t('livedata.action.resizeColumn.hint')"
-                v-mousedownmove="mouseResizeColumnInit"
-                @mousedownmove="mouseResizeColumn"
-                @keydown.left="keyboardResizeColumn($event, -10)"
-                @keydown.right="keyboardResizeColumn($event, 10)"
-                @dblclick="resetColumnSize"
-                @keydown.esc="resetColumnSize"
-        >
-        </button>
+        <button
+          type="button"
+          class="resize-handle btn btn-xs btn-default"
+          :title="$t('livedata.action.resizeColumn.hint')"
+          v-mousedownmove="mouseResizeColumnInit"
+          @mousedownmove="mouseResizeColumn"
+          @keydown.left="keyboardResizeColumn($event, -10)"
+          @keydown.right="keyboardResizeColumn($event, 10)"
+          @dblclick="resetColumnSize"
+          @keydown.esc="resetColumnSize"
+        ></button>
       </th>
     </template>
   </draggable>
 </template>
 
-
 <script>
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
-import draggable from "vuedraggable/src/vuedraggable";
 import { mousedownmove } from "../../directives.js";
 import XWikiIcon from "../../utilities/XWikiIcon.vue";
+import draggable from "vuedraggable/src/vuedraggable";
 
 export default {
-
   name: "LayoutTableHeaderNames",
 
   components: {
@@ -139,11 +145,9 @@ export default {
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();
     },
-
   },
 
   methods: {
-
     /**
      * Return whether the given property the one of `this.firstSortLevel`
      * @param {property} Object A property descriptor
@@ -154,7 +158,7 @@ export default {
     },
 
     sort(property) {
-      this.logic.sort(property.id, 0).catch(err => {
+      this.logic.sort(property.id, 0).catch((err) => {
         console.warn(err);
       });
     },
@@ -191,9 +195,12 @@ export default {
     mouseResizeColumnInit(e) {
       const th = e.currentTarget.closest("th");
       e.data.leftColumn = th.querySelector(".column-name");
-      e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
-      e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
-      e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
+      e.data.leftColumnBaseWidth =
+        e.data.leftColumn.getBoundingClientRect()?.width;
+      e.data.rightColumn =
+        this.getNextVisibleProperty(th)?.querySelector(".column-name");
+      e.data.rightColumnBaseWidth =
+        e.data.rightColumn?.getBoundingClientRect()?.width;
       this.resizeColumnInit(th);
     },
 
@@ -205,7 +212,9 @@ export default {
       const widths = [];
       let columns = th.closest("tr").querySelectorAll(".column-name");
       // Filter columns that aren't visible to avoid setting a width of zero on them.
-      columns = Array.from(columns).filter(column => column.closest("th").style.display !== "none");
+      columns = Array.from(columns).filter(
+        (column) => column.closest("th").style.display !== "none",
+      );
       for (const column of columns) {
         widths.push(column.getBoundingClientRect().width);
       }
@@ -214,7 +223,13 @@ export default {
       }
     },
 
-    resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth) {
+    resizeColumn(
+      offsetX,
+      leftColumn,
+      rightColumn,
+      leftColumnBaseWidth,
+      rightColumnBaseWidth,
+    ) {
       // Resize left column
       let leftColumnWidth = leftColumnBaseWidth + offsetX;
       leftColumn.style.width = `${leftColumnWidth}px`;
@@ -231,8 +246,13 @@ export default {
       let rightColumn = e.data.rightColumn;
       let leftColumnBaseWidth = e.data.leftColumnBaseWidth;
       let rightColumnBaseWidth = e.data.rightColumnBaseWidth;
-      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth,
-        rightColumnBaseWidth);
+      this.resizeColumn(
+        offsetX,
+        leftColumn,
+        rightColumn,
+        leftColumnBaseWidth,
+        rightColumnBaseWidth,
+      );
     },
 
     keyboardResizeColumn(e, offsetX) {
@@ -241,27 +261,31 @@ export default {
 
       let leftColumn = th.querySelector(".column-name");
       let leftColumnBaseWidth = leftColumn.getBoundingClientRect()?.width;
-      let rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
+      let rightColumn =
+        this.getNextVisibleProperty(th)?.querySelector(".column-name");
       let rightColumnBaseWidth = rightColumn?.getBoundingClientRect()?.width;
-      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth,
-        rightColumnBaseWidth);
+      this.resizeColumn(
+        offsetX,
+        leftColumn,
+        rightColumn,
+        leftColumnBaseWidth,
+        rightColumnBaseWidth,
+      );
     },
 
     resetColumnSize(e) {
       // Reset all column sizes as resizing a single column sets sizes for all columns.
-      for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {
+      for (const column of e.currentTarget
+        .closest("tr")
+        .querySelectorAll(".column-name")) {
         column.style.removeProperty("width");
       }
     },
-
   },
-
 };
 </script>
 
-
 <style>
-
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;

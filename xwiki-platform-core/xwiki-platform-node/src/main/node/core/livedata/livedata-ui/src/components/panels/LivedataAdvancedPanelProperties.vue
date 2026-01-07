@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -36,7 +36,7 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <XWikiIcon :icon-descriptor="{name: panel.icon}" />
+      <XWikiIcon :icon-descriptor="{ name: panel.icon }" />
       {{ panel.title }}
     </template>
 
@@ -59,7 +59,7 @@
             Uses the XWikiDraggableItem component that goes along the
             XWikiDraggable one
           -->
-        <template #item="{element: property}">
+        <template #item="{ element: property }">
           <XWikiDraggableItem class="property">
             <!--
               Property visibility checkbox
@@ -72,7 +72,9 @@
               <input
                 type="checkbox"
                 :checked="logic.isPropertyVisible(property.id)"
-                @change="logic.setPropertyVisible(property.id, $event.target.checked)"
+                @change="
+                  logic.setPropertyVisible(property.id, $event.target.checked)
+                "
               />
             </div>
 
@@ -85,15 +87,13 @@
   </LivedataBaseAdvancedPanel>
 </template>
 
-
 <script>
 import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
-import draggable from "vuedraggable/src/vuedraggable";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
+import draggable from "vuedraggable/src/vuedraggable";
 
 export default {
-
   name: "LivedataAdvancedPanelProperties",
 
   components: {
@@ -105,7 +105,7 @@ export default {
 
   inject: ["logic"],
 
-  props: { "panel": Object },
+  props: { panel: Object },
 
   computed: {
     data() {
@@ -123,14 +123,10 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex, e.moved.newIndex);
     },
   },
-
 };
 </script>
 
-
 <style>
-
-
 .livedata-advanced-panel-properties .property {
   display: flex;
   flex-direction: row;

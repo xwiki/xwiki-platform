@@ -1,23 +1,22 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
 
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   DisplayerXObjectProperty is a custom displayer that displays an XObject property.
@@ -31,32 +30,30 @@
     :entry="entry"
     v-model:is-view="isView"
     :is-loading="isLoading"
-    @saveEdit="applyEdit">
-
+    @saveEdit="applyEdit"
+  >
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <div :class="['html-wrapper', isLoading ? 'disabled' : '']"
-           v-html="sanitizeHtml(value)"
-           ref="xObjectPropertyView" />
+      <div
+        :class="['html-wrapper', isLoading ? 'disabled' : '']"
+        v-html="sanitizeHtml(value)"
+        ref="xObjectPropertyView"
+      />
     </template>
 
     <!-- Provide the Html Editor widget to the `editor` slot -->
     <template #editor>
-      <div v-html="sanitizeHtml(editField)"
-           ref="xObjectPropertyEdit" />
+      <div v-html="sanitizeHtml(editField)" ref="xObjectPropertyEdit" />
     </template>
   </BaseDisplayer>
 </template>
 
-
 <script>
-
-import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
+import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
 export default {
-
   name: "displayer-xobject-property",
 
   inject: ["logic", "jQuery"],
@@ -82,16 +79,21 @@ export default {
       const documentName = this.logic.getEntryId(this.entry);
       if (!documentName) {
         new XWiki.widgets.Notification(
-          this.$t("livedata.displayer.xObjectProperty.missingDocumentName.errorMessage"),
-          "error");
+          this.$t(
+            "livedata.displayer.xObjectProperty.missingDocumentName.errorMessage",
+          ),
+          "error",
+        );
       } else {
         const $ = this.jQuery;
         $(document).trigger("xwiki:actions:beforeSave");
-        const fields = $(this.$refs.xObjectPropertyEdit).find(":input").serializeArray();
+        const fields = $(this.$refs.xObjectPropertyEdit)
+          .find(":input")
+          .serializeArray();
         const className = this.getClassName();
 
         const data = {};
-        fields.forEach(field => {
+        fields.forEach((field) => {
           var newName = field.name;
 
           if (newName.startsWith(className)) {
@@ -107,7 +109,6 @@ export default {
             }
 
             data[newName].push(field.value);
-
           } else {
             data[newName] = field.value;
           }
@@ -118,7 +119,7 @@ export default {
     },
 
     getClassName() {
-      const classNameProperty = this.propertyId + '_class';
+      const classNameProperty = this.propertyId + "_class";
       if (classNameProperty in this.data.query.source) {
         return this.data.query.source[classNameProperty];
       } else {
@@ -156,10 +157,14 @@ export default {
           this.$nextTick().then(() => {
             const $ = this.jQuery;
             if (this.$refs.xObjectPropertyEdit) {
-              $(document).trigger("xwiki:dom:updated",
-                { "elements": [this.$refs.xObjectPropertyEdit] });
+              $(document).trigger("xwiki:dom:updated", {
+                elements: [this.$refs.xObjectPropertyEdit],
+              });
               // Focuses on the first visible field of the loaded form.
-              $(this.$refs.xObjectPropertyEdit).find(":input").filter(":visible").focus();
+              $(this.$refs.xObjectPropertyEdit)
+                .find(":input")
+                .filter(":visible")
+                .focus();
             }
           });
         })
@@ -173,17 +178,13 @@ export default {
 
   watch: {
     // Refreshes the edit field when the view mode switched to edit.
-    isView: function(isView) {
+    isView: function (isView) {
       if (!isView) {
         this.updateEdit();
       }
     },
   },
 };
-
 </script>
 
-
-<style>
-
-</style>
+<style></style>

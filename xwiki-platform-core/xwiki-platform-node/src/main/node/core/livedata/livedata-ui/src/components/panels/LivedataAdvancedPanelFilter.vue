@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -39,13 +39,12 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <XWikiIcon :icon-descriptor="{name: panel.icon}" />
+      <XWikiIcon :icon-descriptor="{ name: panel.icon }" />
       {{ panel.title }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
     <template #body>
-
       <!-- Explain why the panel might be empty. -->
       <div v-show="!logic.getFilterableProperties().length" class="text-muted">
         {{ $t("livedata.panel.filter.noneFilterable") }}
@@ -77,7 +76,7 @@
             @click.prevent="logic.removeAllFilters(filterGroup.property)"
             :title="$t('livedata.panel.filter.deleteAll')"
           >
-            <XWikiIcon :icon-descriptor="{name: 'trash'}" />
+            <XWikiIcon :icon-descriptor="{ name: 'trash' }" />
           </a>
         </div>
 
@@ -104,7 +103,7 @@
             tag="div"
             handle=".handle"
           >
-            <template #item="{index: filterIdx}">
+            <template #item="{ index: filterIdx }">
               <!--
                 Draggable wrapper for the filter entry
                 Uses the XWikiDraggableItem component that goes along the
@@ -129,9 +128,8 @@
             + {{ $t("livedata.panel.filter.addConstraint") }}
           </a>
         </div>
-
-      </div> <!-- end of Filter Group -->
-
+      </div>
+      <!-- end of Filter Group -->
 
       <!--
         Add Filter
@@ -150,11 +148,7 @@
           it adds the filter group corresponging to the option
           then falls back to this default option
         -->
-        <option
-          value="none"
-          ref="selectFilterPropertiesNone"
-          selected disabled
-        >
+        <option value="none" ref="selectFilterPropertiesNone" selected disabled>
           {{ $t("livedata.panel.filter.addProperty") }}
         </option>
         <!--
@@ -168,22 +162,18 @@
           v-text="property.name"
         ></option>
       </select>
-
     </template>
-
   </LivedataBaseAdvancedPanel>
 </template>
 
-
 <script>
-import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
 import LivedataAdvancedPanelFilterEntry from "./LivedataAdvancedPanelFilterEntry.vue";
-import draggable from "vuedraggable/src/vuedraggable";
+import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
+import draggable from "vuedraggable/src/vuedraggable";
 
 export default {
-
   name: "LivedataAdvancedPanelFilter",
 
   components: {
@@ -196,20 +186,19 @@ export default {
 
   inject: ["logic"],
 
-  props: { "panel": Object },
+  props: { panel: Object },
 
   computed: {
-
     data() {
       return this.logic.data;
     },
 
     // The filterable properties that don't have a filter group in the live data query.
     unfilteredProperties() {
-      return this.logic.getUnfilteredProperties().map(
-        property => this.logic.getPropertyDescriptor(property));
+      return this.logic
+        .getUnfilteredProperties()
+        .map((property) => this.logic.getPropertyDescriptor(property));
     },
-
   },
 
   methods: {
@@ -230,32 +219,35 @@ export default {
     reorderFilter(e, filterGroup) {
       // Filter entry reordered in the same property
       if (e.moved) {
-        this.logic.filter(filterGroup.property, e.moved.oldIndex, {
-          index: e.moved.newIndex,
-        })
-          .catch(err => void console.warn(err));
+        this.logic
+          .filter(filterGroup.property, e.moved.oldIndex, {
+            index: e.moved.newIndex,
+          })
+          .catch((err) => void console.warn(err));
       }
       // Filter entry moved to another property (add handler)
       else if (e.added) {
-        this.logic.addFilter(filterGroup.property, e.added.element.operator, e.added.element.value,
-          e.added.newIndex)
-          .catch(err => void console.warn(err));
+        this.logic
+          .addFilter(
+            filterGroup.property,
+            e.added.element.operator,
+            e.added.element.value,
+            e.added.newIndex,
+          )
+          .catch((err) => void console.warn(err));
       }
       // Filter entry moved to another property (remove handler)
       else if (e.removed) {
-        this.logic.removeFilter(filterGroup.property, e.removed.oldIndex)
-          .catch(err => void console.warn(err));
+        this.logic
+          .removeFilter(filterGroup.property, e.removed.oldIndex)
+          .catch((err) => void console.warn(err));
       }
     },
   },
-
 };
 </script>
 
-
 <style>
-
-
 .livedata-advanced-panel-filter .property-name {
   display: inline-block;
   margin-right: 0.5rem;
@@ -274,7 +266,7 @@ export default {
 }
 
 .livedata-advanced-panel-filter .draggable-item {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 .livedata-advanced-panel-filter .draggable-item .handle {

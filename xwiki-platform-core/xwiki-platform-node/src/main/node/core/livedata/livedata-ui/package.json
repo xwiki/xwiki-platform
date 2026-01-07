@@ -31,6 +31,12 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "dompurify": "catalog:",
+    "lz-string": "catalog:",
+    "tippy.js": "catalog:",
+    "u-node": "catalog:",
+    "vue-tippy": "catalog:",
+    "vuedraggable": "catalog:"
   },
   "peerDependencies": {
     "vue": "3.x"
@@ -40,6 +46,10 @@
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
+    "flush-promises": "catalog:",
+    "jquery": "catalog:",
+    "lodash-es": "catalog:",
+    "sinon": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -42,11 +42,12 @@
     It uses the Bootstrap 3 dropdown syntax.
   -->
   <div class="livedata-entry-selector-all dropdown">
-
     <button
       class="btn dropdown-toggle"
       type="button"
-      data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="true"
     >
       <!--
         Property selection checkbox
@@ -57,14 +58,14 @@
         class="livedata-entry-selector-all-checkbox"
         @click.stop.self="$refs.checkbox.click()"
       >
-          <input
-            ref="checkbox"
-            type="checkbox"
-            :checked="checked"
-            @click.stop
-            @change="toggle"
-          />
-        </span>
+        <input
+          ref="checkbox"
+          type="checkbox"
+          :checked="checked"
+          @click.stop
+          @change="toggle"
+        />
+      </span>
       <!--
         The caret used to expand the dropdown
         (Actually the dropdown is extended when the user clicks
@@ -82,14 +83,11 @@
         </a>
       </li>
     </ul>
-
   </div>
 </template>
 
-
 <script>
 export default {
-
   name: "LivedataEntrySelectorAll",
 
   inject: ["logic"],
@@ -106,11 +104,16 @@ export default {
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked() {
-      const selectablePageEntries = this.data.data.entries
-        .filter(entry => this.logic.isSelectionEnabled({ entry }));
-      const allPageEntriesSeleted = selectablePageEntries
-        .every(entry => this.logic.entrySelection.selected.includes(this.logic.getEntryId(entry)));
-      const allEntriesSelected = this.entrySelection.isGlobal &&
+      const selectablePageEntries = this.data.data.entries.filter((entry) =>
+        this.logic.isSelectionEnabled({ entry }),
+      );
+      const allPageEntriesSeleted = selectablePageEntries.every((entry) =>
+        this.logic.entrySelection.selected.includes(
+          this.logic.getEntryId(entry),
+        ),
+      );
+      const allEntriesSelected =
+        this.entrySelection.isGlobal &&
         this.entrySelection.deselected.length === 0;
       return allPageEntriesSeleted || allEntriesSelected;
     },
@@ -123,7 +126,6 @@ export default {
       const someSelected = this.logic.entrySelection.selected.length > 0;
       return someDeselected || (someSelected && !this.checked);
     },
-
   },
 
   watch: {
@@ -160,13 +162,10 @@ export default {
       }
     },
   },
-
 };
 </script>
 
-
 <style>
-
 .livedata-entry-selector-all .btn {
   display: flex;
   align-items: center;
@@ -188,6 +187,4 @@ export default {
 .livedata-entry-selector-all .caret {
   margin-left: 5px;
 }
-
-
 </style>

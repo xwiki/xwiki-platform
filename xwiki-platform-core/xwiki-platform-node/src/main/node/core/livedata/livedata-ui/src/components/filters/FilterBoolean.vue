@@ -1,37 +1,42 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
 
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!-- BooleanFilter is a custom filter that allow to filter boolean values. -->
 <template>
   <span v-if="isReady">
-    <select :value="filterEntry.value"
-            class="xwiki-selectize livedata-selectize filter-boolean livedata-filter"
-            ref="input" :aria-label="$t('livedata.filter.boolean.label')">
+    <select
+      :value="filterEntry.value"
+      class="xwiki-selectize livedata-selectize filter-boolean livedata-filter"
+      ref="input"
+      :aria-label="$t('livedata.filter.boolean.label')"
+    >
       <option value=""></option>
-      <option :value="trueValue">{{ $t("livedata.displayer.boolean.true") }}</option>
-      <option :value="falseValue">{{ $t("livedata.displayer.boolean.false") }}</option>
+      <option :value="trueValue">
+        {{ $t("livedata.displayer.boolean.true") }}
+      </option>
+      <option :value="falseValue">
+        {{ $t("livedata.displayer.boolean.false") }}
+      </option>
     </select>
   </span>
 </template>
-
 
 <script>
 import filterMixin from "./filterMixin.js";
@@ -57,12 +62,14 @@ export default {
       return this.filterEntry.value;
     },
     trueValue() {
-      return Object.prototype.hasOwnProperty.call(this.config, "trueValue") ?
-        this.config.trueValue : "true";
+      return Object.prototype.hasOwnProperty.call(this.config, "trueValue")
+        ? this.config.trueValue
+        : "true";
     },
     falseValue() {
-      return Object.prototype.hasOwnProperty.call(this.config, "falseValue") ?
-        this.config.falseValue : "false";
+      return Object.prototype.hasOwnProperty.call(this.config, "falseValue")
+        ? this.config.falseValue
+        : "false";
     },
     // Settings used when creating the selectize widget.
     selectizeSettings() {
@@ -80,7 +87,7 @@ export default {
         //   data or in the live data macro parameters
         // * the user can still add more values by adding more constraints from the advanced filtering panel
         maxItems: 1,
-        onChange: value => {
+        onChange: (value) => {
           if (this.$refs.input.selectize.items.length === 0) {
             // When no values are selected, simply remove the filter.
             this.removeFilter();
@@ -115,7 +122,6 @@ export default {
   beforeDestroyed() {
     this.$refs.input.selectize?.destroy();
   },
-
 };
 </script>
 

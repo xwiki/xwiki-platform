@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -26,7 +26,6 @@
 -->
 <template>
   <div class="layout-cards">
-
     <!--
       The layout Topbar
       Add common layout utilities, like the dropdown menu, the refresh button,
@@ -50,10 +49,8 @@
     <!-- Loading bar -->
     <LayoutLoader />
 
-
     <!-- Cards layout root -->
     <div class="layout-table-root">
-
       <!--
         The cards (= the entries)
         Implement property reorder
@@ -71,7 +68,6 @@
 
       <!-- Component to create a new entry -->
       <LayoutCardsNewCard v-if="canAddEntry" />
-
     </div>
     <LivedataBottombar>
       <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
@@ -79,25 +75,21 @@
       </div>
       <LivedataPagination />
     </LivedataBottombar>
-
   </div>
 </template>
 
-
 <script>
-
-import LivedataTopbar from "../../LivedataTopbar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataPagination from "../../LivedataPagination.vue";
-import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
-import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
-import LayoutLoader from "../LayoutLoader.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
+import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
+import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
+import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
+import LivedataPagination from "../../LivedataPagination.vue";
+import LivedataTopbar from "../../LivedataTopbar.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
-
   name: "layout-cards",
 
   components: {
@@ -138,13 +130,10 @@ export default {
       this.entriesFetched = true;
     });
   },
-
 };
 </script>
 
-
 <style>
-
 /*
   The Cards Layout uses css grid to display its cards in a nice grid pattern
   However, IE11 does not support a lot grid layouts, but does not support either
@@ -152,7 +141,6 @@ export default {
   and display grid will use the following styles
 */
 @supports (display: grid) {
-
   /* Make the cards 30rem large, and display as many of them on one row */
   .layout-cards .layout-table-root {
     display: grid;
@@ -161,7 +149,6 @@ export default {
     gap: 1.5rem;
     grid-gap: 1.5rem; /* safari */
   }
-
 }
 
 .layout-cards .layout-loader {

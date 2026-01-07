@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -26,7 +26,6 @@
 -->
 <template>
   <div class="layout-table">
-
     <!--
       The layout Topbar
       Add common layout utilities, like the dropdown menu, the refresh button,
@@ -51,44 +50,43 @@
     <!-- Table layout root -->
     <div class="layout-table-wrapper">
       <table class="layout-table-root responsive-table">
-
         <!--
           Table Header
           Implement quick sort, filter, and property reorder
         -->
         <thead>
-        <!-- Table property names -->
-        <LayoutTableHeaderNames />
+          <!-- Table property names -->
+          <LayoutTableHeaderNames />
 
-        <!-- Table filters -->
-        <LayoutTableHeaderFilters />
+          <!-- Table filters -->
+          <LayoutTableHeaderFilters />
         </thead>
-
 
         <!-- Table Body -->
         <tbody>
-        <!-- The rows (= the entries) -->
-        <!--
+          <!-- The rows (= the entries) -->
+          <!--
         We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
         That way even if two entries have the same id, the keys will not be equals.
         -->
-        <LayoutTableRow
-          v-for="(entry, idx) in entries"
-          :key="`table-${logic.getEntryId(entry)}-${idx}`"
-          :entry="entry"
-          :entry-idx="idx"
-        />
+          <LayoutTableRow
+            v-for="(entry, idx) in entries"
+            :key="`table-${logic.getEntryId(entry)}-${idx}`"
+            :entry="entry"
+            :entry-idx="idx"
+          />
 
-        <!-- Component to create a new entry -->
-        <LayoutTableNewRow v-if="canAddEntry" />
-
+          <!-- Component to create a new entry -->
+          <LayoutTableNewRow v-if="canAddEntry" />
         </tbody>
-
       </table>
     </div>
 
     <LivedataBottombar>
-      <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
+      <div
+        v-if="entriesFetched && entries.length === 0"
+        class="noentries-table"
+      >
         {{ $t("livedata.bottombar.noEntries") }}
       </div>
       <LivedataPagination />
@@ -96,21 +94,19 @@
   </div>
 </template>
 
-
 <script>
-import LivedataTopbar from "../../LivedataTopbar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataPagination from "../../LivedataPagination.vue";
-import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
-import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
-import LayoutTableRow from "./LayoutTableRow.vue";
+import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
-import LayoutLoader from "../LayoutLoader.vue";
+import LayoutTableRow from "./LayoutTableRow.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
+import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
+import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
+import LivedataPagination from "../../LivedataPagination.vue";
+import LivedataTopbar from "../../LivedataTopbar.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
-
   name: "layout-table",
 
   components: {
@@ -149,19 +145,15 @@ export default {
       this.entriesFetched = true;
     });
   },
-
 };
 </script>
 
-
 <style>
-
 .layout-table-wrapper {
   overflow: auto;
 }
 
 .layout-table {
-
   table {
     height: 100%;
   }

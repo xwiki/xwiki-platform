@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -38,7 +38,9 @@
   <tippy
     class="displayer-actions-popover"
     :interactive="true"
-    :trigger="isEditable && !duringEditing ? 'mouseenter focus manual': 'manual'"
+    :trigger="
+      isEditable && !duringEditing ? 'mouseenter focus manual' : 'manual'
+    "
     theme="light-border"
     follow-cursor="horizontal"
     :arrow="true"
@@ -46,7 +48,7 @@
     :ignore-attributes="true"
     :z-index="99999"
     tabindex="0"
-    :aria="{expanded: false}"
+    :aria="{ expanded: false }"
     tag="div"
   >
     <div
@@ -79,10 +81,11 @@
       </div>
 
       <!-- The slot containing the displayer Editor widget -->
-      <div @keydown.enter="applyEdit"
-           @keydown.esc.capture="cancelEdit"
-           v-if="!isView && !isLoading"
-           ref="editBlock"
+      <div
+        @keydown.enter="applyEdit"
+        @keydown.esc.capture="cancelEdit"
+        v-if="!isView && !isLoading"
+        ref="editBlock"
       >
         <slot name="editor">
           <!--
@@ -110,7 +113,11 @@
       <div class="displayer-action-list">
         <ActionEdit
           v-if="isEditable"
-          :displayer="{ setEdit: () => { setEdit() } }"
+          :displayer="{
+            setEdit: () => {
+              setEdit();
+            },
+          }"
           :close-popover="closePopover"
         />
         <ActionFollowLink
@@ -123,18 +130,16 @@
   </tippy>
 </template>
 
-
 <script>
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light-border.css";
-import displayerMixin from "./displayerMixin.js";
-import XWikiLoader from "../utilities/XWikiLoader.vue";
 import ActionEdit from "./actions/ActionEdit.vue";
 import ActionFollowLink from "./actions/ActionFollowLink.vue";
+import displayerMixin from "./displayerMixin.js";
+import XWikiLoader from "../utilities/XWikiLoader.vue";
 import { Tippy } from "vue-tippy";
 
 export default {
-
   name: "BaseDisplayer",
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
@@ -183,7 +188,8 @@ export default {
       if (empty === undefined) {
         empty = !this.value;
       }
-      const isViewable = this.logic.isActionAllowed("view", this.entry) || !empty;
+      const isViewable =
+        this.logic.isActionAllowed("view", this.entry) || !empty;
       if (!isViewable) {
         this.logic.footnotes.put("*", "livedata.footnotes.propertyNotViewable");
       }
@@ -242,7 +248,7 @@ export default {
         if (this.isEditable && targetsLink) {
           e.preventDefault();
         }
-        if(this.isEditable) {
+        if (this.isEditable) {
           this.$refs.tippy.tippy.hide();
           this.$refs.tippy.tippy.show();
         }
@@ -289,12 +295,9 @@ export default {
     });
   },
 };
-
 </script>
 
-
 <style>
-
 .livedata-displayer {
   display: inline-block;
   width: 100%;

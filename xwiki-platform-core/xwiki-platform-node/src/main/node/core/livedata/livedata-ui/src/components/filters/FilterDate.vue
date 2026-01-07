@@ -1,23 +1,22 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
 
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   DateFilter is a custom filter that allow to filter dates
@@ -52,13 +51,11 @@
   </div>
 </template>
 
-
 <script>
 import filterMixin from "./filterMixin.js";
 import { loadById } from "@/services/require.js";
 
 export default {
-
   name: "filter-date",
 
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
@@ -96,7 +93,9 @@ export default {
           from: "between",
           to: "after",
           getValue: ({ oldValue }) => {
-            return typeof oldValue === "string" ? oldValue.split("/")[0] : oldValue;
+            return typeof oldValue === "string"
+              ? oldValue.split("/")[0]
+              : oldValue;
           },
         },
         {
@@ -104,7 +103,7 @@ export default {
           to: "between",
           getValue: ({ oldValue }) => {
             const date = this.moment(oldValue + "");
-            return date.isValid() ? (oldValue + "/" + oldValue) : oldValue;
+            return date.isValid() ? oldValue + "/" + oldValue : oldValue;
           },
         },
       ],
@@ -114,15 +113,19 @@ export default {
   },
 
   computed: {
-
     valueFormatted() {
-      if (typeof this.filterEntry.value === "string" && this.filterEntry.value.length) {
+      if (
+        typeof this.filterEntry.value === "string" &&
+        this.filterEntry.value.length
+      ) {
         const range = this.filterEntry.value.split("/");
         if (range.length <= 2) {
-          return range.map(dateString => {
-            const date = this.moment(dateString);
-            return date.isValid() ? date.format(this.format) : dateString;
-          }).join(" - ");
+          return range
+            .map((dateString) => {
+              const date = this.moment(dateString);
+              return date.isValid() ? date.format(this.format) : dateString;
+            })
+            .join(" - ");
         }
       }
       return this.filterEntry.value;
@@ -134,26 +137,34 @@ export default {
 
     format() {
       const javaDateFormat = this.config.dateFormat;
-      return javaDateFormat ? this.moment().toMomentFormatString(javaDateFormat) :
-        "YYYY/MM/DD HH:mm";
+      return javaDateFormat
+        ? this.moment().toMomentFormatString(javaDateFormat)
+        : "YYYY/MM/DD HH:mm";
     },
 
     ranges() {
       return {
-        "Today":
-          [this.moment().startOf("day"), this.moment().endOf("day")],
-        "Yesterday":
-          [this.moment().subtract(1, "days").startOf("day"),
-            this.moment().subtract(1, "days").endOf("day")],
-        "Last 7 days":
-          [this.moment().subtract(6, "days").startOf("day"), this.moment().endOf("day")],
-        "Last 30 days":
-          [this.moment().subtract(29, "days").startOf("day"), this.moment().endOf("day")],
-        "This month":
-          [this.moment().startOf("month"), this.moment().endOf("month")],
-        "Last month":
-          [this.moment().subtract(1, "month").startOf("month"),
-            this.moment().subtract(1, "month").endOf("month")],
+        Today: [this.moment().startOf("day"), this.moment().endOf("day")],
+        Yesterday: [
+          this.moment().subtract(1, "days").startOf("day"),
+          this.moment().subtract(1, "days").endOf("day"),
+        ],
+        "Last 7 days": [
+          this.moment().subtract(6, "days").startOf("day"),
+          this.moment().endOf("day"),
+        ],
+        "Last 30 days": [
+          this.moment().subtract(29, "days").startOf("day"),
+          this.moment().endOf("day"),
+        ],
+        "This month": [
+          this.moment().startOf("month"),
+          this.moment().endOf("month"),
+        ],
+        "Last month": [
+          this.moment().subtract(1, "month").startOf("month"),
+          this.moment().subtract(1, "month").endOf("month"),
+        ],
       };
     },
 
@@ -178,25 +189,28 @@ export default {
     filterConfig() {
       if (this.operator === "between") {
         return {
-          ...this.defaultFilterConfig, singleDatePicker: false,
+          ...this.defaultFilterConfig,
+          singleDatePicker: false,
           ranges: this.ranges,
         };
       } else {
         return { ...this.defaultFilterConfig };
       }
     },
-
   },
 
   methods: {
     // Get date filter value from input element
     getDateValue() {
-      const daterangepicker = this.jQuery(this.$refs.filterDate).data("daterangepicker");
+      const daterangepicker = this.jQuery(this.$refs.filterDate).data(
+        "daterangepicker",
+      );
       if (this.operator === "between") {
         // Serialize the date range as a ISO 8601 time interval, without fractional seconds.
         // See https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
-        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.add(59,
-          "seconds").format()}`;
+        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate
+          .add(59, "seconds")
+          .format()}`;
       } else if (this.operator === "before" || this.operator === "after") {
         // Use the ISO 8601 representation, without fractional seconds.
         return daterangepicker.startDate.format();
@@ -222,7 +236,8 @@ export default {
     await loadById("daterangepicker");
     await loadById("moment-jdateformatparser");
     this.dependenciesloaded = true;
-    this.$watch(() => {
+    this.$watch(
+      () => {
         return {
           filterConfig: this.filterConfig,
           loaded: this.dependenciesloaded,
@@ -237,9 +252,7 @@ export default {
         const filterDate = this.$refs.filterDate;
         // Create the date range picker associated to the single date input
         const $ = this.jQuery;
-        $(filterDate).daterangepicker(
-          this.filterConfig,
-        );
+        $(filterDate).daterangepicker(this.filterConfig);
         $(filterDate).on("apply.daterangepicker", () => {
           this.applyFilterFromDate();
         });
@@ -252,7 +265,7 @@ export default {
           // This removes the 'hide' function only for the event target.
           filterDate.hide = undefined;
           // Restore the 'hide' function after the event is handled (i.e. after all the listeners have been called).
-          setTimeout(function() {
+          setTimeout(function () {
             // This deletes the local 'hide' key from the instance, making the 'hide' inherited from the prototype
             // visible again (the next calls to 'hide' won't find the key on the instance and thus it will go up
             // the prototype chain).
@@ -263,16 +276,12 @@ export default {
       { immediate: true },
     );
   },
-
 };
 </script>
 
-
 <style>
-
 .livedata-filter .filter-date {
   width: 100%;
   height: 100%;
 }
-
 </style>

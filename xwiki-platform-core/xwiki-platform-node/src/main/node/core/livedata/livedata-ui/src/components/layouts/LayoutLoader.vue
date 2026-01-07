@@ -1,35 +1,31 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <template>
-  <div
-    :class="[{ 'layout-loader': true, waiting: loading, visible: visible }]"
-  >
+  <div :class="[{ 'layout-loader': true, waiting: loading, visible: visible }]">
     <div class="loader-fill"></div>
   </div>
 </template>
 
-
 <script>
 export default {
-
   name: "layout-loader",
 
   inject: ["logic"],
@@ -45,7 +41,11 @@ export default {
 
   computed: {
     loading() {
-      return this.loadingData || this.logic.firstEntriesLoading.value || this.loadingLayout;
+      return (
+        this.loadingData ||
+        this.logic.firstEntriesLoading.value ||
+        this.loadingLayout
+      );
     },
   },
 
@@ -67,7 +67,6 @@ export default {
         this[propertyName] = false;
         this.visible = this.loading;
       });
-
     },
   },
 
@@ -75,13 +74,10 @@ export default {
     this.watchLoading("loadingData", "beforeEntryFetch", "afterEntryFetch");
     this.watchLoading("loadingLayout", "layoutChange", "layoutLoaded");
   },
-
 };
 </script>
 
-
 <style>
-
 @keyframes waiting {
   0% {
     left: 0;
@@ -130,5 +126,4 @@ export default {
   -webkit-animation: waiting 2s linear infinite;
   animation: waiting 2s linear infinite;
 }
-
 </style>

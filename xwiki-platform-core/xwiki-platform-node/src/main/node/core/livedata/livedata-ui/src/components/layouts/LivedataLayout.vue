@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -34,7 +34,11 @@
 -->
 <template>
   <div class="livedata-layout">
-    <p class="livedata-layout-description" :id="descriptionId" v-if="hasDescription">
+    <p
+      class="livedata-layout-description"
+      :id="descriptionId"
+      v-if="hasDescription"
+    >
       {{ description }}
     </p>
 
@@ -54,18 +58,15 @@
         ></component>
       </div>
     </keep-alive>
-
   </div>
 </template>
 
-
 <script>
 // We import explicitly the most used layout to avoid having to load it dynamically during the component rendering.
-import { componentStore } from "@/components/store.js";
 import { markRaw } from "vue";
+import { componentStore } from "@/components/store.js";
 
 export default {
-
   name: "LivedataLayout",
 
   inject: ["logic"],
@@ -107,7 +108,7 @@ export default {
       handler(layoutId, previousLayoutId) {
         // Try to load layout
         this.loadLayout(this.layoutId)
-          .then(layoutComponent => {
+          .then((layoutComponent) => {
             // dispatch events
             this.logic.triggerEvent("layoutLoaded", {
               layoutId,
@@ -115,9 +116,12 @@ export default {
               component: layoutComponent,
             });
           })
-          .catch(err => {
+          .catch((err) => {
             // If the layout was not the default one, try to load default layout
-            if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
+            if (
+              this.layoutId &&
+              this.layoutId !== this.data.meta.defaultLayout
+            ) {
               console.warn(err);
               this.logic.changeLayout(this.data.meta.defaultLayout);
             } else {
@@ -147,6 +151,5 @@ export default {
       return component;
     },
   },
-
 };
 </script>

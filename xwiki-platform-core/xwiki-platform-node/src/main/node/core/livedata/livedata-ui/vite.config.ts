@@ -19,5 +19,17 @@
  */
 
 import { generateConfigVue } from "../../../vite.config";
+import { mergeConfig } from "vite";
+import { URL, fileURLToPath } from "node:url";
 
-export default generateConfigVue(import.meta.url);
+const conf: Record<string, unknown> = mergeConfig(
+  generateConfigVue(import.meta.url),
+  {
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    },
+  },
+);
+export default conf;

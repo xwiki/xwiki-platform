@@ -174,6 +174,10 @@
     ## Split the import string by line breaks so we can check which lines are always used. Store the result as a set.
     #set ($macro.alwaysUsedLinesSet = $collectiontool.getSet())
     #set ($macro.importLines = $stringtool.split($xwiki.get($pluginName).importString, $escapetool.n))
+    ## Improve compatibility with tests that don't mock the skin extensions.
+    #if ($macro.importLines == $NULL)
+      #set ($macro.importLines = [])
+    #end
     ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
     ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
     #set ($discard = $macro.alwaysUsedLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))
@@ -189,6 +193,10 @@
     ## cannot rely on the fact that new skin extensions are added at the end.
     #set ($macro.importLinesSet = $collectiontool.getOrderedSet())
     #set ($macro.importLines = $stringtool.split($xwiki.get($entry.key).importString, $escapetool.n))
+    ## Improve compatibility with tests that don't mock the skin extensions.
+    #if ($macro.importLines == $NULL)
+      #set ($macro.importLines = [])
+    #end
     ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
     ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
     #set ($discard = $macro.importLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))

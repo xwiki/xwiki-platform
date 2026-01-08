@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "xwiki-bootstrap",
+  "version": "3.4.1.1-xwiki",
+  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+  "scripts": {
+    "build": "vite build; vite build -c vite.config.min.ts",
+    "lint": "echo skipping linting",
+    "test:unit": "vitest --run --passWithNoTests"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

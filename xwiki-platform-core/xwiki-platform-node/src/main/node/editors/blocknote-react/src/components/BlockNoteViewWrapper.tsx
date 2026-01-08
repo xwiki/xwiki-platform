@@ -310,6 +310,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   return (
     <BlockNoteView
       editor={editor}
+      title={"HELLO WORLD"}
       theme={theme}
       // Override some builtin components
       formattingToolbar={false}

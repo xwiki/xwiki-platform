@@ -126,7 +126,7 @@
 {{/velocity}}
 
 (% id='HImageStyles' %)
-=== {{translation key="image.style.administration.imageStyleList.heading"/}} ===
+== {{translation key="image.style.administration.imageStyleList.heading"/}} ==
 
 {{liveData
   id='imageStyles'

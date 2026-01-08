@@ -74,7 +74,7 @@ class RenamePageIT
 
     @Order(1)
     @Test
-    void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void convertNestedPageToTerminalPage(TestUtils setup) throws Exception
     {
         // Note: we use a 3-level-deep nested page since 2 levels wouldn't show problems such as the regression
         // we've had with https://jira.xwiki.org/browse/XWIKI-16170
@@ -88,7 +88,7 @@ class RenamePageIT
         ViewPage vp = setup.createPage(reference, "", "");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -126,7 +126,7 @@ class RenamePageIT
         ViewPage vp = new ViewPage();
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -399,7 +399,7 @@ class RenamePageIT
             "testPage");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -416,7 +416,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
@@ -433,7 +433,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -450,7 +450,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
@@ -467,7 +467,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -489,8 +489,7 @@ class RenamePageIT
      */
     @Order(5)
     @Test
-    void renamePageRelativeLinkPageAndTranslation(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void renamePageRelativeLinkPageAndTranslation(TestUtils setup, TestReference testReference) throws Exception
     {
         String parent = "RenamePageIT";
         String name = "renamePageRefactorOutgoingLinksInPageAndTranslation";
@@ -503,7 +502,7 @@ class RenamePageIT
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);
@@ -610,8 +609,7 @@ class RenamePageIT
     @ParameterizedTest
     @ValueSource(strings = { "true", "false" })
     @NullSource
-    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference) throws Exception
     {
         // Create two pages that link to each other.
         SpaceReference spaceReference = testReference.getLastSpaceReference();
@@ -629,7 +627,7 @@ class RenamePageIT
 
         // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
         // won't be updated just because the page is still in the index.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Make the other page slow to index by sleeping when we're in Solr.
         String slowTitle = "$services.sleep.sleepInSolr(20) Slow Title";
@@ -680,7 +678,7 @@ class RenamePageIT
 
     @Order(9)
     @Test
-    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
@@ -699,7 +697,7 @@ class RenamePageIT
 
         // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
         // won't be updated just because the page is still in the index.
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
         RenamePage rename = viewPage.rename();
@@ -742,7 +740,7 @@ class RenamePageIT
 
     @Order(10)
     @Test
-    void renameLinkContainingWiki(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void renameLinkContainingWiki(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "TestLinkWithWiki", "WebHome");
@@ -750,7 +748,7 @@ class RenamePageIT
         testUtils.rest().savePage(documentReference, "Some content", "TestLinkWithWiki");
         testUtils.rest().savePage(testReference, "[[MyPage>>xwiki:TestLinkWithWiki.WebHome]]",
             "renameLinkContainingWiki");
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
         RenamePage renamePage = testUtils.gotoPage(documentReference).rename();
         renamePage.getDocumentPicker().setName("TestLinkWithWikiNew");
         CopyOrRenameOrDeleteStatusPage statusPage =
@@ -808,7 +806,7 @@ class RenamePageIT
             p3Content);
 
         testUtils.loginAsSuperAdmin();
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
         RenamePage renamePage = testUtils.gotoPage(p1).rename();
         renamePage.getDocumentPicker().setName("P43");
         CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();

@@ -219,8 +219,7 @@ class MailIT
             new UsernamePasswordCredentials("superadmin", "pass"));
 
         String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort());
+            setup.getCurrentExecutor().getInternalHost(), setup.getCurrentExecutor().getInternalPort());
 
         // Step 5: Send a template email (with an attachment) to a single email address
         sendTemplateMailToEmail(setup, requestURLPrefix);

@@ -299,7 +299,7 @@ class ClassEditorIT
 
         // Save the page and expect the error.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, "The class has two fields with the same name: alice");
+        waitForPageSourceContains(setup, "The class has two fields with the same name: bob");
     }
 
     /**

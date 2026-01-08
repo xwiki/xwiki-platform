@@ -89,8 +89,7 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
 
   #if ($xcontext.action == 'get')
-    #getRequiredSkinExtensions($requiredSkinExtensions)
-    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+    #sendRequiredSkinExtensions()
   #end
 
   #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
@@ -188,12 +187,14 @@
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
-  #ckeditor_initRequiredSkinExtensions()
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
   #set ($macroDescriptor = $services.wysiwyg.getMacroDescriptorUI($macroIdAsString))
   #if ($macroDescriptor)
+    #getRequiredSkinExtensions($requiredSkinExtensions)
     #set ($data = {
       'descriptor': $macroDescriptor,
-      'requiredSkinExtensions': "#ckeditor_getRequiredSkinExtensions()"
+      'requiredSkinExtensions': $requiredSkinExtensions
     })
   #end
 #end

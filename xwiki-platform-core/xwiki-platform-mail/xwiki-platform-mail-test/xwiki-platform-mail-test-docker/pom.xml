@@ -93,6 +93,11 @@
       <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
          systems go through SLF4J -->
     <dependency>

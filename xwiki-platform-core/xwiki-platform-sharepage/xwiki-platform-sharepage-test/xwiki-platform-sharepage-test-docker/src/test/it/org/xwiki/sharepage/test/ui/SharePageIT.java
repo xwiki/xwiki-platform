@@ -19,7 +19,7 @@
  */
 package org.xwiki.sharepage.test.ui;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;

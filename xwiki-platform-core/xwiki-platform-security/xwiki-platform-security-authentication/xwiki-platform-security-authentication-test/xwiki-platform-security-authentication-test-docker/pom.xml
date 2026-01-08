@@ -85,13 +85,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>jakarta.mail</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>javax.activation</artifactId>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

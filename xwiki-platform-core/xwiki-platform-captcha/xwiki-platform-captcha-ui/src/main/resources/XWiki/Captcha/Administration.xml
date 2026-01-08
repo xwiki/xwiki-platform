@@ -69,12 +69,12 @@
 (% class='col-xs-12 col-lg-7' %)(((
 #set ($captchaImplementationAdministrations = $services.uix.getExtensions('org.xwiki.captcha', {'select' : "$!{services.captcha.defaultCaptchaName}"}))
 #if ($captchaImplementationAdministrations.size() &gt; 0)
-  === $services.localization.render('captcha.admin.configure.title', $services.rendering.resolveSyntax('xwiki/2.1'), [$services.localization.render("captcha.${services.captcha.defaultCaptchaName}")]) ===
+  == $services.localization.render('captcha.admin.configure.title', $services.rendering.resolveSyntax('xwiki/2.1'), [$services.localization.render("captcha.${services.captcha.defaultCaptchaName}")]) ==
   $services.rendering.render($captchaImplementationAdministrations[0].execute(), $doc.syntax)
 #end
 )))
 (% class='col-xs-12 col-lg-5 well' %)(((
-=== $services.localization.render('captcha.admin.sample.title', $services.rendering.resolveSyntax('xwiki/2.1')) ===
+== $services.localization.render('captcha.admin.sample.title', $services.rendering.resolveSyntax('xwiki/2.1')) ==
 
 $services.localization.render('captcha.admin.sample.description', $services.rendering.resolveSyntax('xwiki/2.1'))
 

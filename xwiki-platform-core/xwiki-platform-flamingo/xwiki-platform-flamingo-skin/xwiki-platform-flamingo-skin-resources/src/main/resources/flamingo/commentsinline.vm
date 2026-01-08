@@ -468,5 +468,4 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #showDeleteModal
 </div> ## commentscontent
 #end ## comment == ''
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()

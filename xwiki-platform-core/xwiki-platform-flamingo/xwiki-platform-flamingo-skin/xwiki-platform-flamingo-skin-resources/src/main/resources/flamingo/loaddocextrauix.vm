@@ -24,7 +24,6 @@
     #initRequiredSkinExtensions()
     #set ($content = $services.rendering.render($docExtraExtensions.get(0).execute(), 'html/5.0'))
     $content
-    #getRequiredSkinExtensions($requiredSkinExtensions)
-    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+    #sendRequiredSkinExtensions()
   #end
 #end

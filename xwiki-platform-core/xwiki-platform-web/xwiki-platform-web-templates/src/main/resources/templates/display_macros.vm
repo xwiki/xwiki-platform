@@ -208,6 +208,17 @@
   #setVariable("$return" $macro.importStrings)
 #end
 
+#**
+ * Sends the required skin extensions as a response header. #initRequiredSkinExtensions() must be called before.
+ *
+ * @since 18.0.0RC1
+ * @since 17.10.3
+ *#
+#macro (sendRequiredSkinExtensions)
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#end
+
 #macro (createObjectAndPropertyIfMissing $propertyReference)
   #set ($propertyReferenceObject = $services.model.resolveObjectProperty($propertyReference))
   #set ($object = $doc.getObject($propertyReferenceObject.parent, true))

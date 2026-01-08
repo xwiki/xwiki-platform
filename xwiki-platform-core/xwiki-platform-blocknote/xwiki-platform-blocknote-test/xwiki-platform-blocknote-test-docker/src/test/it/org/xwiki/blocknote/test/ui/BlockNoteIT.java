@@ -74,7 +74,7 @@ class BlockNoteIT
         // Move cursor to end using keyboard shortcuts, then insert the content.
         Actions actions = new Actions(driver.getWrappedDriver());
         actions.keyDown(CONTROL).sendKeys(END).keyUp(CONTROL).sendKeys(addedContent).perform();
-        ViewPage postSavePage = ((Callable<ViewPage>) () -> new WYSIWYGEditPage().clickSaveAndView()).call();
+        ViewPage postSavePage = new WYSIWYGEditPage().clickSaveAndView();
         assertEquals("""
             %s
             %s""".formatted(textContent, addedContent), postSavePage.getContent());

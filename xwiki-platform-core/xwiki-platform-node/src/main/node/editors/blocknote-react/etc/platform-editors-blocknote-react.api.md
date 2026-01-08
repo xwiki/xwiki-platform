@@ -64,6 +64,7 @@ export type BlockNoteViewWrapperProps = {
     blockNoteOptions?: Partial<Omit<DefaultEditorOptionsType, "schema" | "collaboration">>;
     theme?: "light" | "dark";
     lang: EditorLanguage;
+    label: string;
     content: BlockType[];
     macros: {
         list: MacroWithUnknownParamsType[];

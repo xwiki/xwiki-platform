@@ -37,13 +37,15 @@
 ## List of versions where variables were introduced:
 ## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
 ## * 17.9.0RC1: login-form-max-width
+## * 18.0.0RC1: mark-bg
 #set($newVariables = {
 "100vw": "100vw",
 "int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
 "login-form-max-width": "450px",
 "font-weight-regular": 400,
 "font-weight-semibold": 700,
-"font-weight-bold": "900"
+"font-weight-bold": "900",
+"mark-bg": "color-mix(in srgb, var(--btn-warning-bg), white)"
 })
 
 ## Retrieve the lists of variables

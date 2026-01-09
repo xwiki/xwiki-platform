@@ -14,6 +14,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@xwiki/platform-livedata-ui": "workspace:*",
     "dompurify": "catalog:",
     "eventemitter3": "catalog:",
     "tippy.js": "catalog:",

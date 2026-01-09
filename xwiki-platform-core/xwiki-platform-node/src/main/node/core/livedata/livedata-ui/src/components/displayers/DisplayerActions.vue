@@ -66,6 +66,7 @@
 <script>
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
+import { XWiki } from "../../services/xwiki.js";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
 
 export default {
@@ -91,6 +92,7 @@ export default {
     },
   },
   methods: {
+    // eslint-disable-next-line max-statements
     async handleClick(event, action) {
       const { async } = action;
       if (async) {

@@ -18,7 +18,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfigVue } from "../../../vite.config";
+import { require } from "./requirejs.js";
 
-const conf: Record<string, unknown> = generateConfigVue(import.meta.url);
-export default conf;
+/**
+ * Load requirejs modules using an asynchronous call instead of a callback.
+ *
+ * @param ids an array of ids to load using require js
+ * @return {Promise<unknown>} return the array of resolved requested modules
+ * @since 17.4.0RC1
+ */
+export function loadById(...ids) {
+  let resolveP;
+  const promise = new Promise((resolve) => {
+    resolveP = resolve;
+  });
+  require([...ids], function (...response) {
+    if (ids.length === 1 && response.length > 0) {
+      resolveP(response[0]);
+    } else {
+      resolveP(response);
+    }
+  });
+  return promise;
+}

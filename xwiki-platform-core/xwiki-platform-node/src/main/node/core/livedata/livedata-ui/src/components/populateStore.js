@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,57 +17,58 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { componentStore } from "@/components/store.js";
+import { componentStore } from "./store.js";
 
+// eslint-disable-next-line max-statements
 (function populateStore() {
   componentStore.register("filter", "boolean", async () => {
-    return (await import("@/components/filters/FilterBoolean.vue")).default;
+    return (await import("./filters/FilterBoolean.vue")).default;
   });
   componentStore.register("filter", "date", async () => {
-    return (await import("@/components/filters/FilterDate.vue")).default;
+    return (await import("./filters/FilterDate.vue")).default;
   });
   componentStore.register("filter", "list", async () => {
-    return (await import("@/components/filters/FilterList.vue")).default;
+    return (await import("./filters/FilterList.vue")).default;
   });
   componentStore.register("filter", "number", async () => {
-    return (await import("@/components/filters/FilterNumber.vue")).default;
+    return (await import("./filters/FilterNumber.vue")).default;
   });
   componentStore.register("filter", "text", async () => {
-    return (await import("@/components/filters/FilterText.vue")).default;
+    return (await import("./filters/FilterText.vue")).default;
   });
 
   componentStore.register("layout", "table", async () => {
-    return (await import("@/components/layouts/table/LayoutTable.vue")).default;
+    return (await import("./layouts/table/LayoutTable.vue")).default;
   });
   componentStore.register("layout", "cards", async () => {
-    return (await import("@/components/layouts/cards/LayoutCards.vue")).default;
+    return (await import("./layouts/cards/LayoutCards.vue")).default;
   });
 
   componentStore.register("displayer", "actions", async () => {
-    return (await import("@/components/displayers/DisplayerActions.vue")).default;
+    return (await import("./displayers/DisplayerActions.vue")).default;
   });
   componentStore.register("displayer", "boolean", async () => {
-    return (await import("@/components/displayers/DisplayerBoolean.vue")).default;
+    return (await import("./displayers/DisplayerBoolean.vue")).default;
   });
   componentStore.register("displayer", "date", async () => {
-    return (await import("@/components/displayers/DisplayerDate.vue")).default;
+    return (await import("./displayers/DisplayerDate.vue")).default;
   });
   componentStore.register("displayer", "docTitle", async () => {
-    return (await import("@/components/displayers/DisplayerDocTitle.vue")).default;
+    return (await import("./displayers/DisplayerDocTitle.vue")).default;
   });
   componentStore.register("displayer", "html", async () => {
-    return (await import("@/components/displayers/DisplayerHtml.vue")).default;
+    return (await import("./displayers/DisplayerHtml.vue")).default;
   });
   componentStore.register("displayer", "link", async () => {
-    return (await import("@/components/displayers/DisplayerLink.vue")).default;
+    return (await import("./displayers/DisplayerLink.vue")).default;
   });
   componentStore.register("displayer", "number", async () => {
-    return (await import("@/components/displayers/DisplayerNumber.vue")).default;
+    return (await import("./displayers/DisplayerNumber.vue")).default;
   });
   componentStore.register("displayer", "text", async () => {
-    return (await import("@/components/displayers/DisplayerText.vue")).default;
+    return (await import("./displayers/DisplayerText.vue")).default;
   });
   componentStore.register("displayer", "xObjectProperty", async () => {
-    return (await import("@/components/displayers/DisplayerXObjectProperty.vue")).default;
+    return (await import("./displayers/DisplayerXObjectProperty.vue")).default;
   });
 })();

@@ -96,6 +96,9 @@ catalogs:
     eslint-config-prettier:
       specifier: 10.1.8
       version: 10.1.8
+    eslint-import-resolver-alias:
+      specifier: 1.1.2
+      version: 1.1.2
     eslint-import-resolver-typescript:
       specifier: 4.4.4
       version: 4.4.4
@@ -417,6 +420,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node:
     dependencies:
+      '@xwiki/platform-livedata-ui':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/livedata/livedata-ui
       dompurify:
         specifier: 'catalog:'
         version: 3.3.0
@@ -523,6 +529,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)
+      eslint-import-resolver-alias:
+        specifier: 'catalog:'
+        version: 1.1.2(eslint-plugin-import@2.32.0)
       eslint-import-resolver-typescript:
         specifier: 'catalog:'
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
@@ -3580,6 +3589,12 @@ packages:
       unrs-resolver:
         optional: true
 
+  eslint-import-resolver-alias@1.1.2:
+    resolution: {integrity: sha512-WdviM1Eu834zsfjHtcGHtGfcu+F30Od3V7I9Fi57uhBEwPkjDcii7/yW8jAT+gOhn4P/vOxxNAXbFAKsrrc15w==}
+    engines: {node: '>= 4'}
+    peerDependencies:
+      eslint-plugin-import: '>=1.4.0'
+
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
 
@@ -5781,6 +5796,7 @@ packages:
   vue-i18n@11.1.12:
     resolution: {integrity: sha512-BnstPj3KLHLrsqbVU2UOrPmr0+Mv11bsUZG0PyCOzsawCivk8W00GMXHeVUWIDOgNaScCuZah47CZFE+Wnl8mw==}
     engines: {node: '>= 16'}
+    deprecated: This version is NOT deprecated. Previous deprecation was a mistake.
     peerDependencies:
       vue: ^3.0.0
 
@@ -8082,6 +8098,10 @@ snapshots:
       stable-hash-x: 0.2.0
     optionalDependencies:
       unrs-resolver: 1.11.1
+
+  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.32.0):
+    dependencies:
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.1(jiti@2.6.1))
 
   eslint-import-resolver-node@0.3.9:
     dependencies:

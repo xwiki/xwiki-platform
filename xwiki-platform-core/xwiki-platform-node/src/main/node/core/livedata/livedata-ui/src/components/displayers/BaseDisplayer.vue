@@ -130,7 +130,7 @@
   </tippy>
 </template>
 
-<script>
+<script lang="js">
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light-border.css";
 import ActionEdit from "./actions/ActionEdit.vue";
@@ -139,6 +139,7 @@ import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
 import { Tippy } from "vue-tippy";
 
+// @ts-expect-error TODO
 export default {
   name: "BaseDisplayer",
 
@@ -258,6 +259,7 @@ export default {
   mounted() {
     // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of
     // the current cell.
+    // eslint-disable-next-line max-statements
     const listener = (evt) => {
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];

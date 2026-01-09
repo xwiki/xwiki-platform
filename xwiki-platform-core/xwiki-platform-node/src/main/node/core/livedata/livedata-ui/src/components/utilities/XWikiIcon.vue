@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { XWiki } from "../../services/xwiki.js";
+
 // This cache stores the metadata of the already resolved icons as well as the Promises for the icons currently being
 // asynchronously resolved.
 // The goal of this cache is to only request for the resolution of an icon once per live data rendering.
@@ -75,6 +77,7 @@ export default {
       try {
         const parameters = `name=${encodeURIComponent(iconName)}`;
         const iconURL =
+          // XWiki is expected to be available globally
           `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}` +
           `/iconThemes/icons?${parameters}`;
         const response = await window.fetch(iconURL, {
@@ -93,6 +96,7 @@ export default {
 
   watch: {
     iconDescriptor: {
+      // eslint-disable-next-line max-statements
       async handler(iconDescriptor) {
         // If the new icon descriptor already has an icon type, we consider it is not needed to fetch its metadata
         // remotely. The remote icon descriptor is set to undefined and the iconDescriptor prop value are directly used

@@ -81,6 +81,7 @@ export default {
     this.logic.onEvent("layoutLoaded", () => {
       this.layoutLoaded = true;
     });
+    // eslint-disable-next-line promise/catch-or-return
     this.logic.translationsLoaded().finally(() => {
       this.translationsLoaded = true;
     });

@@ -150,8 +150,8 @@ export default {
   methods: {
     /**
      * Return whether the given property the one of `this.firstSortLevel`
-     * @param {property} Object A property descriptor
-     * @returns {Boolean}
+     * @param property - Object A property descriptor
+     * @returns true if the property is from the first sort level
      */
     isFirstSortLevel(property) {
       return this.firstSortLevel.property === property.id;

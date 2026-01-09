@@ -53,7 +53,7 @@
 
 <script>
 import filterMixin from "./filterMixin.js";
-import { loadById } from "@/services/require.js";
+import { loadById } from "../../services/require.js";
 
 export default {
   name: "filter-date",

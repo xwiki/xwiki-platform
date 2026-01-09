@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,15 +19,19 @@
  */
 import FilterList from "./FilterList.vue";
 import { mount } from "@vue/test-utils";
-import _ from "lodash-es";
-import $ from "jquery";
 import flushPromises from "flush-promises";
+import $ from "jquery";
+import _ from "lodash-es";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/services/requirejs.js", () => {
+vi.mock("../../services/require.js", () => {
   return {
-    require(ids, callback) {
-      callback();
+    loadById() {
+      return {
+        require(ids, callback) {
+          callback();
+        },
+      };
     },
   };
 });
@@ -59,35 +63,40 @@ vi.mock("@/services/requirejs.js", () => {
  */
 function initWrapper(mountConfiguration = {}) {
   // Define an empty xwikiSelectize to prevent the component mount to fail.
-  $.fn.xwikiSelectize = () => {
-  };
+  $.fn.xwikiSelectize = () => {};
 
-  return mount(FilterList, _.merge({
-    global: {
-      provide: {
-        jQuery: $,
-        logic: {
-          getQueryFilterGroup() {
-            return {};
+  return mount(
+    FilterList,
+    _.merge(
+      {
+        attachTo: document.body,
+        global: {
+          provide: {
+            jQuery: $,
+            logic: {
+              getQueryFilterGroup() {
+                return {};
+              },
+              onEventWhere() {},
+              getFilterDescriptor() {
+                return {
+                  options: "",
+                  operators: [],
+                };
+              },
+              translationsLoaded() {
+                return Promise.resolve(true);
+              },
+            },
           },
-          onEventWhere() {
-          },
-          getFilterDescriptor() {
-            return {
-              options: "",
-              operators: [],
-            };
-          },
-          translationsLoaded() {
-            return Promise.resolve(true);
+          mocks: {
+            $t: (key) => key,
           },
         },
       },
-      mocks: {
-        $t: (key) => key,
-      },
-    },
-  }, mountConfiguration));
+      mountConfiguration,
+    ),
+  );
 }
 
 describe("FilterList.vue", () => {
@@ -97,7 +106,8 @@ describe("FilterList.vue", () => {
     expect(wrapper.find("div").classes()).toStrictEqual(["xwiki-loader"]);
     await flushPromises();
     expect(wrapper.find("span").html()).toBe(
-      "<span><input class=\"filter-list livedata-filter\" aria-label=\"livedata.filter.list.label\"></span>");
+      '<span><input class="filter-list livedata-filter" aria-label="livedata.filter.list.label"></span>',
+    );
   });
 
   it("Render the filter list when Empty filter and advanced", async () => {
@@ -121,6 +131,7 @@ describe("FilterList.vue", () => {
     const span = wrapper.find("span");
     expect(span.isVisible()).toBe(false);
     expect(span.find("input").html()).toBe(
-      "<input class=\"filter-list livedata-filter\" aria-label=\"livedata.filter.list.label\">");
+      '<input class="filter-list livedata-filter" aria-label="livedata.filter.list.label">',
+    );
   });
 });

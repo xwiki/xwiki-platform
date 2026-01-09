@@ -20,8 +20,8 @@
 
 <script>
 import filterMixin from "./filterMixin.js";
+import { loadById } from "../../services/require.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
-import { loadById } from "@/services/require.js";
 
 export default {
   name: "filter-list",
@@ -132,7 +132,9 @@ export default {
         );
         this.jQuery
           .getJSON(searchURL, searchParams)
+          // eslint-disable-next-line promise/no-callback-in-promise
           .then((results) => callback(this.getResultsAdapter(results)))
+          // eslint-disable-next-line promise/no-callback-in-promise
           .catch(() => callback(this.getResultsAdapter()));
       };
     },

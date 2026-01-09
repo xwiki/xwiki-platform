@@ -52,7 +52,9 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
+import { XWiki } from "../../services/xwiki.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
+
 export default {
   name: "displayer-xobject-property",
 
@@ -130,9 +132,9 @@ export default {
     /**
      * Takes an update method and retrieves its content.
      *
-     * @param {method} updateMethod the method dedicate to the update of a given aspect of the displayer. For instance,
-     *  the view or edit html content
-     * @returns {*} a `Promise` with the content of the updated view
+     * @param updateMethod - the method dedicate to the update of a given aspect of the displayer. For instance,the view
+     * or edit html content
+     * @returns a `Promise` with the content of the updated view
      */
     update(updateMethod) {
       this.isLoading = true;
@@ -147,6 +149,7 @@ export default {
      */
     updateEdit() {
       this.update(edit)
+        // eslint-disable-next-line promise/always-return
         .then((html) => {
           this.isLoading = false;
 
@@ -154,8 +157,10 @@ export default {
 
           // Wait for the rendering to be finished after editField is updated, to have access to  xObjectPropertyEdit
           // and be able to send the trigger event.
+          // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
           this.$nextTick().then(() => {
             const $ = this.jQuery;
+            // eslint-disable-next-line promise/always-return
             if (this.$refs.xObjectPropertyEdit) {
               $(document).trigger("xwiki:dom:updated", {
                 elements: [this.$refs.xObjectPropertyEdit],

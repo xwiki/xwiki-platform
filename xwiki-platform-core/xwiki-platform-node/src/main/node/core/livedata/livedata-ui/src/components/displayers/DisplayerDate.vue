@@ -61,7 +61,7 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
-import { loadById } from "@/services/require.js";
+import { loadById } from "../../services/require.js";
 
 export default {
   name: "displayer-date",
@@ -120,6 +120,7 @@ export default {
   },
 
   methods: {
+    // eslint-disable-next-line max-statements
     async upgradeDatePicker() {
       // Create the date picker in edit mode
       if (this.$refs.baseDisplayer.isView) {

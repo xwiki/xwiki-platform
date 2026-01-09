@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,11 +20,11 @@
 
 import DisplayerDate from "./DisplayerDate.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import { afterEach, describe, expect, it, vi } from "vitest";
 import flushPromises from "flush-promises";
 import sinon from "sinon";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/services/require.js", function() {
+vi.mock("../../services/require.js", function () {
   return {
     async loadById() {
       return () => {
@@ -39,7 +39,7 @@ vi.mock("@/services/require.js", function() {
 });
 
 describe("DisplayerDate.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
     sinon.restore();
   });
@@ -57,6 +57,6 @@ describe("DisplayerDate.vue", () => {
 
     const input = wrapper.find(".editor-date");
     expect(input.attributes("value")).toBe("formatted date");
-    expect(input.element).toBe(document.activeElement)
+    expect(input.element).toBe(document.activeElement);
   });
 });

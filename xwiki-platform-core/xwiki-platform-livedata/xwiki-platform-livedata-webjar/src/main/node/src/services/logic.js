@@ -19,7 +19,7 @@
  */
 
 import { createApp, reactive, ref } from "vue";
-import XWikiLivedata from "@/components/XWikiLivedata.vue";
+import { XWikiLivedata, componentStore } from "@xwiki/platform-livedata-ui";
 import { init as liveDataSourceModuleInit } from "@/services/liveDataSource.js";
 import { FootnotesService } from "@/services/footnote.js";
 import { init as editBusInit } from "@/services/editBus.js";
@@ -27,7 +27,6 @@ import { createI18n } from "vue-i18n";
 import { jsonMerge } from "@/services/jsonMerge.js";
 import { i18nResolver } from "@/services/i18nResolver.js";
 import Vue3TouchEvents from "vue3-touch-events";
-import { componentStore } from "@/components/store.js";
 
 export class Logic {
   constructor(element, $) {

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { loadById } from "@/services/require.js";
+import { loadById } from "../services/require.js";
 
 /**
  * Resolve the url of the document reference in the given mode.
@@ -28,17 +28,27 @@ import { loadById } from "@/services/require.js";
  */
 function computeTargetURL(documentReference, mode) {
   return new XWiki.Document(
-    XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT)).getURL(mode);
+    XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT),
+  ).getURL(mode);
 }
 
 function getPropertyReference(propertyName, className) {
   let entityReference;
   if (propertyName.startsWith("doc.")) {
-    entityReference =
-      new XWiki.EntityReference(propertyName.substring("doc.".length), XWiki.EntityType.OBJECT_PROPERTY);
+    entityReference = new XWiki.EntityReference(
+      propertyName.substring("doc.".length),
+      XWiki.EntityType.OBJECT_PROPERTY,
+    );
   } else {
-    let objectReference = new XWiki.EntityReference(className + "[0]", XWiki.EntityType.OBJECT);
-    entityReference = new XWiki.EntityReference(propertyName, XWiki.EntityType.OBJECT_PROPERTY, objectReference);
+    let objectReference = new XWiki.EntityReference(
+      className + "[0]",
+      XWiki.EntityType.OBJECT,
+    );
+    entityReference = new XWiki.EntityReference(
+      propertyName,
+      XWiki.EntityType.OBJECT_PROPERTY,
+      objectReference,
+    );
   }
   return XWiki.Model.serialize(entityReference);
 }
@@ -53,11 +63,15 @@ async function load(mode, documentReference, property, className) {
     property: getPropertyReference(property, className),
     type: property.startsWith("doc.") ? "document" : "object",
     language: xcontext.locale,
-    objectPolicy: 'updateOrCreate',
+    objectPolicy: "updateOrCreate",
   }).catch((error) => {
     new XWiki.widgets.Notification(
-      this.$t("livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage", [mode]),
-      "error");
+      this.$t(
+        "livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        [mode],
+      ),
+      "error",
+    );
     throw error;
   });
 }

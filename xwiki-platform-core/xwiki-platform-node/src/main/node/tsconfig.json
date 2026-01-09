@@ -27,7 +27,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "noImplicitOverride": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
   },
   "vueCompilerOptions": {
     "strictTemplates": true

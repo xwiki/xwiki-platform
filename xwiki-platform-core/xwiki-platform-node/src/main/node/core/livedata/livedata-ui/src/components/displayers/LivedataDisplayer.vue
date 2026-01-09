@@ -61,8 +61,8 @@
 </template>
 
 <script>
+import { componentStore } from "../store.js";
 import { markRaw } from "vue";
-import { componentStore } from "@/components/store.js";
 
 export default {
   name: "LivedataDisplayer",

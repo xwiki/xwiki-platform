@@ -30,7 +30,7 @@ global.XWiki = { contextPath: "http://localhost/" };
 
 describe("liveDataSource.js", () => {
 
-  vi.mock("@/services/require.js", () => {
+  vi.mock("@xwiki/platform-livedata-ui", () => {
     return {
       loadById(id) {
         if (id === "jquery") {

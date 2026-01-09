@@ -35,10 +35,11 @@
 </template>
 
 <script>
-// u-node is used to encode and decode the config
+import { XWiki } from "../services/xwiki.js";
+// lz-string is used to compress / decompress the encoded config
 import LZString from "lz-string";
+// u-node is used to encode and decode the config
 import { decode, encode, fromJson } from "u-node";
-// lz-string is used to compress / decrompress the encoded config
 
 export default {
   name: "LivedataPersistentConfiguration",

@@ -63,8 +63,8 @@
 
 <script>
 // We import explicitly the most used layout to avoid having to load it dynamically during the component rendering.
+import { componentStore } from "../store.js";
 import { markRaw } from "vue";
-import { componentStore } from "@/components/store.js";
 
 export default {
   name: "LivedataLayout",
@@ -108,6 +108,7 @@ export default {
       handler(layoutId, previousLayoutId) {
         // Try to load layout
         this.loadLayout(this.layoutId)
+          // eslint-disable-next-line promise/always-return
           .then((layoutComponent) => {
             // dispatch events
             this.logic.triggerEvent("layoutLoaded", {

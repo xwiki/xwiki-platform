@@ -18,6 +18,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "eslint": "catalog:",
+    "eslint-import-resolver-alias": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-headers": "catalog:",
     "eslint-plugin-import": "catalog:",

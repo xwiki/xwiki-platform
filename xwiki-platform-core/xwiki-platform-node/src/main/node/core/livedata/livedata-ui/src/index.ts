@@ -19,5 +19,22 @@
  */
 // @ts-expect-error this is a JavaScript Vue component, it is expected to not have types.
 import XWikiLivedata from "./components/XWikiLivedata.vue";
+// @ts-expect-error this is a JavaScript Vue component, it is expected to not have types.
+import BaseDisplayer from "./components/displayers/BaseDisplayer.vue";
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import displayerMixin from "./components/displayers/displayerMixin";
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import { componentStore } from "./components/store";
+// @ts-expect-error this is a JavaScript Vue component, it is expected to not have types.
+import XWikiIcon from "./components/utilities/XWikiIcon.vue";
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import { loadById } from "./services/require.js";
 
-export { XWikiLivedata };
+export {
+  BaseDisplayer,
+  XWikiIcon,
+  XWikiLivedata,
+  componentStore,
+  displayerMixin,
+  loadById,
+};

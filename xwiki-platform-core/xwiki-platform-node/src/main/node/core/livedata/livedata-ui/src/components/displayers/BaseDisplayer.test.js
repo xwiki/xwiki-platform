@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,11 +19,11 @@
  */
 import BaseDisplayer from "./BaseDisplayer.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import { afterEach, describe, expect, it } from "vitest";
 import sinon from "sinon";
+import { afterEach, describe, expect, it } from "vitest";
 
 describe("BaseDisplayer.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
     sinon.restore();
   });
@@ -53,7 +53,7 @@ describe("BaseDisplayer.vue", () => {
 
     const inputElement = wrapper.find("input").element;
     expect(inputElement.value).toMatch("red");
-    expect(inputElement).toBe(document.activeElement)
+    expect(inputElement).toBe(document.activeElement);
   });
 
   it("Send an event on save", async () => {
@@ -88,7 +88,9 @@ describe("BaseDisplayer.vue", () => {
       },
     });
 
-    expect(wrapper.find("div.view > div").text()).toBe("livedata.displayer.emptyValue*");
+    expect(wrapper.find("div.view > div").text()).toBe(
+      "livedata.displayer.emptyValue*",
+    );
   });
 
   it("Renders a viewable entry with an empty content", () => {
@@ -118,5 +120,4 @@ describe("BaseDisplayer.vue", () => {
     // way to present empty values, such as the link displayer.
     expect(wrapper.find("div.view > div").text()).toBe("");
   });
-
 });

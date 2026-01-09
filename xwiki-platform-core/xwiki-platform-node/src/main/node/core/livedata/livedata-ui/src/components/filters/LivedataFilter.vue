@@ -59,9 +59,9 @@
 </template>
 
 <script>
+import { componentStore } from "../store.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
 import { markRaw } from "vue";
-import { componentStore } from "@/components/store.js";
 
 export default {
   name: "LivedataFilter",
@@ -132,6 +132,7 @@ export default {
     this.loadFilter().catch((err) => {
       // Try to load default Filter
       console.warn(err);
+      // eslint-disable-next-line promise/no-nesting
       this.loadFilter(this.data.meta.defaultFilter).catch((err) => {
         console.error(err);
       });

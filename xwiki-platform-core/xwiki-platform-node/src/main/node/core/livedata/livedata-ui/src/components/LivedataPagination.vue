@@ -246,6 +246,7 @@ export default {
     //   - first page index
     //   - last page index
     //   - page indexes around current page index, alternating before and after it
+    // eslint-disable-next-line max-statements
     paginationIndexes() {
       // Total count of pages
       const pageCount = this.logic.getPageCount();
@@ -314,7 +315,7 @@ export default {
 
     /**
      * Merges and sort the pages sizes from the pagination as well as the configured limit.
-     * @returns {number[]} the list of page sizes
+     * @returns the list of page sizes
      */
     pageSizes() {
       const pageSizesSet = new Set();

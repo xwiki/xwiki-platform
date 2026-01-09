@@ -171,17 +171,13 @@
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
   ## (they are aready available on the target page so there's no need to re-load them).
   #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
-    ## Split the import string by line breaks so we can check which lines are always used. Store the result as a set.
-    #set ($macro.alwaysUsedLinesSet = $collectiontool.getSet())
+    ## Split the import string by line breaks so we can check which lines are always used.
     #set ($macro.importLines = $stringtool.split($xwiki.get($pluginName).importString, $escapetool.n))
     ## Improve compatibility with tests that don't mock the skin extensions.
     #if ($macro.importLines == $NULL)
       #set ($macro.importLines = [])
     #end
-    ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
-    ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
-    #set ($discard = $macro.alwaysUsedLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))
-    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $macro.alwaysUsedLinesSet))
+    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $macro.importLines))
   #end
 #end
 
@@ -197,9 +193,7 @@
     #if ($macro.importLines == $NULL)
       #set ($macro.importLines = [])
     #end
-    ## Use subList to explicitly convert the array to a list to work around a bug in the automatic argument conversion.
-    ## This can be removed when https://jira.xwiki.org/browse/XCOMMONS-3520 is fixed.
-    #set ($discard = $macro.importLinesSet.addAll($macro.importLines.subList(0, $macro.importLines.size())))
+    #set ($discard = $macro.importLinesSet.addAll($macro.importLines))
     #set ($discard = $macro.importLinesSet.removeAll($entry.value))
     #set ($discard = $macro.importStrings.addAll($macro.importLinesSet))
   #end

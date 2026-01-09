@@ -443,8 +443,9 @@ class PageTemplatesIT
         // Verify that the page has the required rights
         InformationPane informationPane = templateInstanceView.openInformationDocExtraPane();
         assertThat(informationPane.getRequiredRightsStatusMessage(),
-            containsString("This page is enforcing required rights"));
-        assertEquals(List.of("Script right"), informationPane.getRequiredRights());
+            containsString("The content of this page runs with the following right"));
+        assertEquals(List.of("Scripting: Allows running scripts (macros, Velocity, JavaScript, CSS, etc.)"),
+            informationPane.getRequiredRights());
     }
 
     /**

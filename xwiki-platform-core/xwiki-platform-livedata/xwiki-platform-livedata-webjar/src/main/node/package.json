@@ -15,11 +15,8 @@
   },
   "dependencies": {
     "@xwiki/platform-livedata-ui": "workspace:*",
-    "dompurify": "catalog:",
     "eventemitter3": "catalog:",
-    "tippy.js": "catalog:",
     "vue-i18n": "catalog:",
-    "vue-tippy": "catalog:",
     "vue3-touch-events": "catalog:"
   },
   "peerDependencies": {

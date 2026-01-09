@@ -24,13 +24,12 @@ import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import dts from "vite-plugin-dts";
 import { copyFileSync, existsSync, readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
-import { URL, fileURLToPath } from "node:url";
+import { fileURLToPath } from "node:url";
 import type { UserConfig } from "vite";
 
 function pathsComputation(path: string) {
   const dir = dirname(fileURLToPath(path));
   const packageDirName = basename(dir);
-
   const pkg = JSON.parse(
     readFileSync(resolve(dir, "package.json"), { encoding: "utf-8" }),
   );

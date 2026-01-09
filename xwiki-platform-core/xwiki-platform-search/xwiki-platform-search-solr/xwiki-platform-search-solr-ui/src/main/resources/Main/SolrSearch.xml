@@ -465,9 +465,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-/* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
+      <code>/* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
 .xdocLastModification, #xdocFooter {
   display: none;
 }
@@ -613,7 +611,7 @@ When the box is not checked, we want to hide the second icon. */
 .search-result-language,
 .search-result-uploader,
 .search-result-mediaType {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 
 .search-result-location,
@@ -659,7 +657,7 @@ blockquote.search-result-highlight {
 }
 
 .search-text-highlight {
-  background-color: $theme.highlightColor;
+  background-color: var(--nav-link-hover-bg);
   font-weight: bold;
 }
 
@@ -730,7 +728,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 }
 
 .search-facet-header label {
-  color: $theme.titleColor;
+  color: var(--headings-color);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -810,7 +808,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 }
 
 .search-facet-body ul, .search-facet-body ul.users {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   list-style: none;
   display: block;
   padding: 0;
@@ -845,13 +843,13 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 .search-facet-body .facet-value-toggle,
 .search-facet-body .more {
   /* Remove link styling */
-  color: $theme.textColor;
+  color: var(--text-color);
   text-decoration: none;
 }
 
 .search-facet-body .itemName.empty,
 .search-facet-body .more {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 
 /* In case the JavaScript is disabled. */
@@ -860,6 +858,8 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemCount {
+  /* The YUI CSS compressor removes spaces incorrectly in this operator. We use a workaround to still make it work. */
+  max-height: calc(1lh - -.2em);
   padding: .1em .5em;
   margin-left: auto;
   background-color: var(--nav-link-hover-bg);
@@ -888,7 +888,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
  */
 
 .search-results-left .paginationFilter {
-  border-top: 1px solid $theme.borderColor;
+  border-top: 1px solid var(--xwiki-border-color);
   padding-left: 0;
 }
 </code>
@@ -900,7 +900,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

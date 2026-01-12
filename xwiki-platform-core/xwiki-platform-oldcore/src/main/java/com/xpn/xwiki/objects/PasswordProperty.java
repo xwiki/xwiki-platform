@@ -33,8 +33,6 @@ public class PasswordProperty extends StringProperty
 {
     private static final long serialVersionUID = 1L;
 
-    // No different from BaseStringProperty, only exists for Hibernate mapping.
-
     /**
      * {@inheritDoc}
      * @return {@code true} as this property is always sensitive.

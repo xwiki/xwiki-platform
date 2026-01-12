@@ -106,7 +106,8 @@ class R180100000XWIKI23827DataMigrationTest
         String passwordXClassQuery = "select doc.fullName, obj.id "
             + "from XWikiDocument doc, BaseObject as obj "
             + "where obj.className = doc.fullName and doc.xWikiClassXML like "
-            + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%'";
+            + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%' "
+            + "order by doc.fullName";
         XWikiStoreInterface storeInterface = mock(XWikiStoreInterface.class);
         when(wiki.getStore()).thenReturn(storeInterface);
         QueryManager queryManager = mock(QueryManager.class);
@@ -677,19 +678,19 @@ class R180100000XWIKI23827DataMigrationTest
         assertEquals(14, logCapture.size());
         assertEquals("[235] xobjects containing password properties related to [4] different xclass to migrate found.",
             logCapture.getMessage(0));
-        assertEquals("Sarting migration of [108] objects containing [1] password properties from xclass "
+        assertEquals("Starting migration of [108] objects containing [1] password properties from xclass "
                 + "[XWiki.XWikiUser].",
             logCapture.getMessage(1));
         assertEquals("[100] objects migrated on [108] for xclass [XWiki.XWikiUser].",
             logCapture.getMessage(2));
         assertEquals("[108] objects migrated on [108] for xclass [XWiki.XWikiUser].",
             logCapture.getMessage(3));
-        assertEquals("Sarting migration of [13] objects containing [1] password properties from xclass "
+        assertEquals("Starting migration of [13] objects containing [1] password properties from xclass "
                 + "[XWiki.ResetPassword].",
             logCapture.getMessage(4));
         assertEquals("[13] objects migrated on [13] for xclass [XWiki.ResetPassword].",
             logCapture.getMessage(5));
-        assertEquals("Sarting migration of [111] objects containing [2] password properties from xclass "
+        assertEquals("Starting migration of [111] objects containing [2] password properties from xclass "
                 + "[MyApp.CustomClass].",
             logCapture.getMessage(6));
         assertEquals("[50] objects migrated on [111] for xclass [MyApp.CustomClass].",
@@ -698,7 +699,7 @@ class R180100000XWIKI23827DataMigrationTest
             logCapture.getMessage(8));
         assertEquals("[111] objects migrated on [111] for xclass [MyApp.CustomClass].",
             logCapture.getMessage(9));
-        assertEquals("Sarting migration of [3] objects containing [113] password properties from xclass "
+        assertEquals("Starting migration of [3] objects containing [113] password properties from xclass "
                 + "[AnotherApp.LotsOfFields].",
             logCapture.getMessage(10));
         assertEquals("[1] objects migrated on [3] for xclass [AnotherApp.LotsOfFields].",

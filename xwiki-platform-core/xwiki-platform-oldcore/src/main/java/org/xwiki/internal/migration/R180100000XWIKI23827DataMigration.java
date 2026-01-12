@@ -153,12 +153,13 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     private List<PasswordPropertyValues> getPasswordPropertiesValues() throws XWikiException, DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
-        // Get XClass containing a Password Field
+        // Get XClass containing a Password Field and all objects of that xclass
         // TODO: should we limit? What if there's a very big number of objects?
         String passwordXClassQuery = "select doc.fullName, obj.id "
             + "from XWikiDocument doc, BaseObject as obj "
             + "where obj.className = doc.fullName and doc.xWikiClassXML like "
-            + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%'";
+            + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%' "
+            + "order by doc.fullName";
         List<Object[]> results;
         try {
             results = wiki.getStore().getQueryManager()
@@ -169,14 +170,19 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
                 e);
         }
 
+        // this list will contain one occurence of PasswordPropertyValues per xclass
         List<PasswordPropertyValues> passwordPropertyValuesList = new ArrayList<>();
         PasswordPropertyValues passwordPropertyValues = null;
         for (Object[] result : results) {
+            // it's an xclass we haven't visited yet so we're looking for the password properties
+            // TODO: right now it only works because we don't paginate results
             if (passwordPropertyValues == null || !passwordPropertyValues.getClassName().equals(result[0])) {
                 passwordPropertyValues = new PasswordPropertyValues(String.valueOf(result[0]));
                 passwordPropertyValuesList.add(passwordPropertyValues);
                 DocumentReference xclassDocReference =
                     this.documentReferenceResolver.resolve(passwordPropertyValues.getClassName());
+
+                // we load the doc, get its xclass, iterate over the fields and memorize the names of password fields
                 XWikiDocument document = wiki.getDocument(xclassDocReference, getXWikiContext());
                 for (Object field : document.getXClass().getFieldList()) {
                     if (field instanceof PasswordClass passwordField) {
@@ -184,6 +190,7 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
                     }
                 }
             }
+            // we then memorize the xobjects ids for that xclass
             passwordPropertyValues.addObjectId((Long) result[1]);
         }
         this.logger.info("[{}] xobjects containing password properties related to [{}] different xclass "
@@ -197,7 +204,7 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         int objectNumbers = passwordPropertyValues.getObjectIds().size();
         int propertyNumbers = passwordPropertyValues.getProperties().size();
 
-        logger.info("Sarting migration of [{}] objects containing [{}] password properties from xclass [{}].",
+        logger.info("Starting migration of [{}] objects containing [{}] password properties from xclass [{}].",
             objectNumbers,
             propertyNumbers,
             passwordPropertyValues.getClassName());
@@ -221,6 +228,11 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
 
         String propertyStatement = propertyStatementBuilder.toString();
 
+        // The size of the number of xobject we deal with is defined by the total batch size we have and the number of
+        // properties we want to deal with, to avoid having a too longer where statement.
+        // So if the xclass contains a single password property the number of xobjects we deal with in a single update
+        // is BATCH_SIZE.
+        // For 2 properties, it's BATCH_SIZE / 2, etc.
         int objectBatchSize = Math.max(BATCH_SIZE / propertyNumbers, 1);
         int objectIndex = 0;
 

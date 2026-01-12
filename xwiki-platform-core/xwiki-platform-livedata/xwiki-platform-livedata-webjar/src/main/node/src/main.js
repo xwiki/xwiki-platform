@@ -32,7 +32,8 @@ require(["jquery"], ($) => {
   };
 
   const init = function(event, data) {
-    import("@xwiki/platform-livedata-ui").then(() => {
+    import("@xwiki/platform-livedata-ui").then(({populateStore}) => {
+      populateStore()
       const container = $((data && data.elements) || document);
       container.find(".liveData").liveData();
     });

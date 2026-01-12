@@ -20,7 +20,7 @@
 import { componentStore } from "./store.js";
 
 // eslint-disable-next-line max-statements
-(function populateStore() {
+export function populateStore() {
   componentStore.register("filter", "boolean", async () => {
     return (await import("./filters/FilterBoolean.vue")).default;
   });
@@ -71,4 +71,4 @@ import { componentStore } from "./store.js";
   componentStore.register("displayer", "xObjectProperty", async () => {
     return (await import("./displayers/DisplayerXObjectProperty.vue")).default;
   });
-})();
+}

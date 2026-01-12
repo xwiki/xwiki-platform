@@ -24,6 +24,8 @@ import BaseDisplayer from "./components/displayers/BaseDisplayer.vue";
 // @ts-expect-error this is a JavaScript file, it is expected to not have types.
 import displayerMixin from "./components/displayers/displayerMixin";
 // @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import { populateStore } from "./components/populateStore.js";
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
 import { componentStore } from "./components/store";
 // @ts-expect-error this is a JavaScript Vue component, it is expected to not have types.
 import XWikiIcon from "./components/utilities/XWikiIcon.vue";
@@ -37,4 +39,5 @@ export {
   componentStore,
   displayerMixin,
   loadById,
+  populateStore,
 };

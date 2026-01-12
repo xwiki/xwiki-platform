@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -39,6 +39,7 @@ const componentStore = {
 
     // If the component was requested before registation, it is resolved and registered directly.
     if (awaiting?.[kind]?.[key]) {
+      // eslint-disable-next-line promise/catch-or-return,promise/always-return
       componentProvider().then((resolved) => {
         store[kind][key] = resolved;
         awaiting[kind][key].resolve(resolved);
@@ -47,6 +48,7 @@ const componentStore = {
     }
   },
 
+  // eslint-disable-next-line max-statements
   async load(kind, key) {
     if (!store[kind] || !store[kind][key]) {
       // If the component was already awaited for, we return the same promise again.

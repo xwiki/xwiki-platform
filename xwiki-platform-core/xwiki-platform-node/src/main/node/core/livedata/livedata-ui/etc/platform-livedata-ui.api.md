@@ -8,6 +8,7 @@ import { default as BaseDisplayer } from './components/displayers/BaseDisplayer.
 import { componentStore } from './components/store';
 import { default as displayerMixin } from './components/displayers/displayerMixin';
 import { loadById } from './services/require.js';
+import { populateStore } from './components/populateStore.js';
 import { default as XWikiIcon } from './components/utilities/XWikiIcon.vue';
 import { default as XWikiLivedata } from './components/XWikiLivedata.vue';
 
@@ -18,6 +19,8 @@ export { componentStore }
 export { displayerMixin }
 
 export { loadById }
+
+export { populateStore }
 
 export { XWikiIcon }
 

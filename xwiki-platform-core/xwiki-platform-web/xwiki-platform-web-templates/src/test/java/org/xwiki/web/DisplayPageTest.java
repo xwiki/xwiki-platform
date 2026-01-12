@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.properties.internal.converter.CollectionConverter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
@@ -56,7 +57,8 @@ import static org.mockito.Mockito.when;
 @SecurityScriptServiceComponentList
 @ComponentList({
     ModelScriptService.class,
-    TemplateScriptService.class
+    TemplateScriptService.class,
+    CollectionConverter.class
 })
 @SuppressWarnings("multipleStringLiterals")
 class DisplayPageTest extends PageTest

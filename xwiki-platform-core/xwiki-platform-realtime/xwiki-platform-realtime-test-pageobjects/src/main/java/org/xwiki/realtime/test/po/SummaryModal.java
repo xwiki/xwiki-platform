@@ -22,6 +22,7 @@ package org.xwiki.realtime.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Modal displayed when clicking on "Summarize and Done" button in realtime edition.
@@ -69,9 +70,37 @@ public class SummaryModal extends BaseModal
      */
     public void clickSave(boolean waitSuccess)
     {
+        boolean continueEditing = isContinueEditing();
+        boolean editingInplace = isEditingInplace();
+        if (waitSuccess && !continueEditing && !editingInplace) {
+            getDriver().addPageNotYetReloadedMarker();
+        }
         getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".btn-primary")).click();
         if (waitSuccess) {
-            waitForNotificationSuccessMessage("Saved");
+            if (continueEditing) {
+                waitForNotificationSuccessMessage("Saved");
+            } else if (editingInplace) {
+                new RealtimeInplaceEditablePage().waitForView();
+            } else {
+                getDriver().waitUntilPageIsReloaded();
+                new ViewPage();
+            }
         }
+    }
+
+    /**
+     * @return whether the user continues editing after submitting the summary
+     */
+    public boolean isContinueEditing()
+    {
+        return "true".equals(this.container.getDomAttribute("data-continue"));
+    }
+
+    /**
+     * @return whether this modal was opened from the inplace editing mode or standalone editing mode
+     */
+    public boolean isEditingInplace()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector(".xcontent.form")).isEmpty();
     }
 }

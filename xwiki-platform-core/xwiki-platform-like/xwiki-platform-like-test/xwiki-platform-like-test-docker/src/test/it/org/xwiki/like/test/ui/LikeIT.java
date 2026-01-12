@@ -22,7 +22,6 @@ package org.xwiki.like.test.ui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.like.test.po.LikeButton;
 import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
@@ -32,7 +31,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.EditRightsPane;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -180,45 +178,28 @@ class LikeIT
     @Order(3)
     void likeRight(TestReference testReference, TestUtils testUtils) throws Exception
     {
-        try {
-            testUtils.loginAsSuperAdmin();
-            // Create a page for the test.
-            testUtils.rest().savePage(testReference, "some content", "Title");
-            // Make sure that user 1 has the right to like while user 2 doesn't have it.
-            AdministrationPage administrationPage = AdministrationPage.gotoPage();
-            administrationPage.clickSection("Users & Rights", "Extension Rights");
-            EditRightsPane editRightsPane = new EditRightsPane();
-            editRightsPane.switchToUsers();
-            editRightsPane.clickRight(USER1, "Like");
-            assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(USER1, "Like"));
+        testUtils.loginAsSuperAdmin();
+        // Create a page for the test.
+        testUtils.rest().savePage(testReference, "some content", "Title");
+        // Make sure that user 1 has the right to like while user 2 doesn't have it.
+        testUtils.setRights(testReference, null, "XWiki." + USER1, "like", true);
 
-            // Verify that user 1 can like the page.
-            testUtils.login(USER1, USER1);
-            testUtils.gotoPage(testReference);
-            LikeButton likeButton = new LikeButton();
-            assertTrue(likeButton.isDisplayed());
-            assertTrue(likeButton.canBeClicked());
-            assertEquals(0, likeButton.getLikeNumber());
-            likeButton.clickToLike();
-            assertEquals(1, likeButton.getLikeNumber());
+        // Verify that user 1 can like the page.
+        testUtils.login(USER1, USER1);
+        testUtils.gotoPage(testReference);
+        LikeButton likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+        assertTrue(likeButton.canBeClicked());
+        assertEquals(0, likeButton.getLikeNumber());
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
 
-            // Verify that user 2 can't like the page.
-            testUtils.login(USER2, USER2);
-            testUtils.gotoPage(testReference);
-            likeButton = new LikeButton();
-            assertTrue(likeButton.isDisplayed());
-            assertFalse(likeButton.canBeClicked());
-            assertEquals(1, likeButton.getLikeNumber());
-        } finally {
-            // Revert the rights modification to avoid impacting other tests.
-            testUtils.loginAsSuperAdmin();
-            AdministrationPage administrationPage = AdministrationPage.gotoPage();
-            administrationPage.clickSection("Users & Rights", "Extension Rights");
-            EditRightsPane editRightsPane = new EditRightsPane();
-            editRightsPane.switchToUsers();
-            // Click twice to get back to neutral.
-            editRightsPane.clickRight(USER1, "Like");
-            editRightsPane.clickRight(USER1, "Like");
-        }
+        // Verify that user 2 can't like the page.
+        testUtils.login(USER2, USER2);
+        testUtils.gotoPage(testReference);
+        likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+        assertFalse(likeButton.canBeClicked());
+        assertEquals(1, likeButton.getLikeNumber());
     }
 }

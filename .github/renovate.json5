@@ -69,12 +69,11 @@
       "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
     },
-
-    // Group all cristal releases in the same PR.
+    // Group React dependencies together
     {
       "matchDatasources": ["npm"],
-      "groupName": "cristal",
-      "matchDepPatterns": "@xwiki/cristal-.+"
+      "groupName": "react",
+      "matchDepPatterns": "^react(-dom)?"
     }
   ]
 }

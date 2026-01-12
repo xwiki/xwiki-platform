@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,8 +35,9 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-import org.xwiki.text.StringUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -98,7 +100,7 @@ class RequiredRightsIT
 
         // Wait for the required rights information to reload.
         setup.getDriver()
-            .waitUntilCondition(driver -> StringUtils.contains(informationPane.getRequiredRightsStatusMessage(),
+            .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
                 "This page is enforcing required rights but no rights"));
         assertEquals(List.of(), informationPane.getRequiredRights());
         assertFalse(informationPane.getRequiredRightsModificationMessage().isPresent());
@@ -375,6 +377,48 @@ class RequiredRightsIT
         assertTrue(viewPage.hasRenderingError());
     }
 
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
+    @Order(7)
+    void testWithXClassWithCustomDisplay(WikiReference wiki, TestLocalReference testLocalReference, TestUtils setup)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        DocumentReference testReference = new DocumentReference(testLocalReference, wiki);
+
+        setup.rest().delete(testReference);
+
+        ViewPage viewPage = setup.createPage(testReference, "Content");
+        enabledRequiredRights(viewPage, setup);
+
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("custom", "String");
+        ClassPropertyEditPane customPropertyEditPane = classEditPage.getPropertyEditPane("custom");
+        customPropertyEditPane.expand();
+        customPropertyEditPane.setMetaProperty("customDisplay", "{{velocity}}Custom{{/velocity}}");
+        viewPage = classEditPage.clickSaveAndView();
+
+        // There should be a warning now that the custom property might be missing a required right.
+        assertTrue(viewPage.hasRequiredRightsWarning(true));
+        RequiredRightsModal requiredRightsModal = viewPage.openRequiredRightsModal();
+        assertTrue(requiredRightsModal.isDisplayed());
+        assertTrue(requiredRightsModal.isEnforceRequiredRights());
+        List<RequiredRightsModal.RequiredRight> requiredRights = requiredRightsModal.getRequiredRights();
+        // Ensure that script right is marked as required.
+        RequiredRightsModal.RequiredRight scriptRight = requiredRights.stream()
+            .filter(requiredRight -> "script".equals(requiredRight.name()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals("required", scriptRight.suggestionClass());
+
+        // Assert that there are analysis details.
+        assertTrue(requiredRightsModal.hasAnalysisDetails());
+        assertFalse(requiredRightsModal.isAnalysisDetailsDisplayed());
+        requiredRightsModal.toggleAnalysisDetails();
+        assertTrue(requiredRightsModal.isAnalysisDetailsDisplayed());
+    }
+
     private static void assertAvailableRights(RequiredRightsModal requiredRightsModal, List<String> expectedRights)
     {
         List<String> availableRights = requiredRightsModal.getRequiredRights().stream()
@@ -392,7 +436,7 @@ class RequiredRightsIT
         requiredRightsModal.setEnforcedRequiredRight("");
         requiredRightsModal.clickSave(true);
         setup.getDriver()
-            .waitUntilCondition(driver -> StringUtils.contains(informationPane.getRequiredRightsStatusMessage(),
+            .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
                 "This page is enforcing required rights but no rights"));
     }
 }

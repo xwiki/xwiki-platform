@@ -19,15 +19,12 @@
  */
 package org.xwiki.eventstream;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Type of the events used for standard notifications related to documents.
  *
  * @version $Id$
  * @since 16.0.0RC1
  */
-@Unstable
 public interface DocumentEventType
 {
     /**

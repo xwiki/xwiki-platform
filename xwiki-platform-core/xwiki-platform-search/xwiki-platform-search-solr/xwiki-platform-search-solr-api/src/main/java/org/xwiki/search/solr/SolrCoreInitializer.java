@@ -22,7 +22,6 @@ package org.xwiki.search.solr;
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
-import org.xwiki.stability.Unstable;
 
 /**
  * An extension point used to inject mandatory Solr cores.
@@ -82,7 +81,6 @@ public interface SolrCoreInitializer
      * @throws SolrException when failing to migrate the core
      * @since 16.2.0RC1
      */
-    @Unstable
     default void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
         // Do nothing by default

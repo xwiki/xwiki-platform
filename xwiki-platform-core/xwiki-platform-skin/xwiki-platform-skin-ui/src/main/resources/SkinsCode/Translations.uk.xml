@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=Скін
 skin.sheet.properties=Властивості скіна
+skin.sheet.properties.logo.warning=Цей логотип зазвичай замінюється тим, що визначений у кольоровій темі. Якщо ви бажаєте змінити логотип вікі, розгляньте можливість редагування поточної кольорової теми.
 skin.sheet.deprecatedProperties=Застарілі властивості
 skin.sheet.overriddenTemplates=Перевизначені шаблони
 skin.sheet.addTemplate=Додати новий шаблон перевизначення

@@ -1,6 +1,7 @@
 {
   "name": "xwiki-bootstrap",
   "version": "3.4.1.1-xwiki",
+  "private": true,
   "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
   "license": "MIT",
   "main": "./dist/js/npm",

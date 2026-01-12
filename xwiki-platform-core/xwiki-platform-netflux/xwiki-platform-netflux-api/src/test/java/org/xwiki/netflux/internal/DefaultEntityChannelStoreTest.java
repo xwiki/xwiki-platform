@@ -24,9 +24,10 @@ import java.util.List;
 import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.netflux.EntityChannel;
+import org.xwiki.observation.internal.DefaultObservationManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -34,6 +35,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({InternalEntityChannelStore.class, EntityChannels.class, DefaultObservationManager.class})
 class DefaultEntityChannelStoreTest
 {
     @InjectMockComponents
@@ -50,10 +53,18 @@ class DefaultEntityChannelStoreTest
     @MockComponent
     private ChannelStore channelStore;
 
-    @Mock
-    private Session session;
+    @MockComponent
+    private IdGenerator idGenerator;
 
     private final WikiReference entityReference = new WikiReference("test");
+
+    private Channel mockChannel(String key)
+    {
+        Channel channel = new Channel(key);
+        when(this.idGenerator.generateChannelId()).thenReturn(channel.getKey());
+        when(this.channelStore.create(channel.getKey())).thenReturn(channel);
+        return channel;
+    }
 
     @Test
     void createAndGetChannel()
@@ -63,8 +74,7 @@ class DefaultEntityChannelStoreTest
         assertFalse(this.entityChannelStore.getChannel(this.entityReference, path).isPresent());
 
         // Create the channel.
-        Channel channel = new Channel("test");
-        when(this.channelStore.create()).thenReturn(channel);
+        Channel channel = mockChannel("test");
         EntityChannel entityChannel = this.entityChannelStore.createChannel(this.entityReference, path);
 
         assertEquals(this.entityReference, entityChannel.getEntityReference());
@@ -77,17 +87,13 @@ class DefaultEntityChannelStoreTest
         assertSame(entityChannel, this.entityChannelStore.createChannel(this.entityReference, path));
 
         // Add an user to the channel.
-        User me = new User(this.session, "mflorea");
+        User me = new LocalUser(mock(Session.class), "mflorea");
         channel.getUsers().put(me.getName(), me);
 
         // Get should return the existing channel.
         assertSame(entityChannel, this.entityChannelStore.getChannel(this.entityReference, path).get());
         assertSame(entityChannel, this.entityChannelStore.getChannel(channel.getKey()).get());
         assertEquals(1, entityChannel.getUserCount());
-
-        // Disconnect the user and check again the user count.
-        me.setConnected(false);
-        assertEquals(0, this.entityChannelStore.getChannel(this.entityReference, path).get().getUserCount());
 
         // Disconnect the raw channel and check the entity channel.
         when(this.channelStore.get(channel.getKey())).thenReturn(null);
@@ -98,18 +104,15 @@ class DefaultEntityChannelStoreTest
     @Test
     void getChannels()
     {
-        Channel channelOne = new Channel("one");
-        when(this.channelStore.create()).thenReturn(channelOne);
+        Channel channelOne = mockChannel("one");
         EntityChannel entityChannelOne = this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b"));
         when(this.channelStore.get(channelOne.getKey())).thenReturn(channelOne);
 
-        Channel channelTwo = new Channel("two");
-        when(this.channelStore.create()).thenReturn(channelTwo);
+        Channel channelTwo = mockChannel("two");
         EntityChannel entityChannelTwo = this.entityChannelStore.createChannel(this.entityReference, List.of("x"));
         when(this.channelStore.get(channelTwo.getKey())).thenReturn(channelTwo);
 
-        Channel channelThree = new Channel("three");
-        when(this.channelStore.create()).thenReturn(channelThree);
+        Channel channelThree = mockChannel("three");
         EntityChannel entityChannelThree =
             this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b", "c"));
         when(this.channelStore.get(channelThree.getKey())).thenReturn(channelThree);

@@ -70,9 +70,8 @@ define('macroParameterEnhancer', ['jquery'], function($) {
     // if the group doesn't contain any children anymore we can just hide it
     if (displayedChildren.length === 0) {
       group.hidden = true;
-    // if the group contains a single parameter then we don't consider it's a feature only.
     } else if (displayedChildren.length === 1) {
-      group.featureOnly = false;
+      group.singleParam = true;
       // if the single children is a group, we actually remove it to display directly the parameters
       let uniqueChildKey = displayedChildren[0];
       if (isNodeAGroup(uniqueChildKey)) {
@@ -171,7 +170,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
   macroParameterGroupOptionalsTemplate =
       `<div class="macro-parameter-group-optionals single-choice">
-        <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-tabs macro-tabs" role="tablist">
           <li class="active" role="presentation">
             <a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>
           </li>
@@ -223,9 +222,13 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       output.find('.mandatory').text('(' + translations.get('required') + ')');
       output.addClass('mandatory');
     }
+    if (isFeature) {
+      output.addClass('feature-only');
+    }
+    let useRadioButtons = isFeature && !groupNode.singleParam;
     output.find('.panel-body').append(
         groupNode.children.map(nodeKey =>
-            createGroupNodeValue(parametersMap, nodeKey, groupNode.id, isFeature, groupNode.mandatory)
+            createGroupNodeValue(parametersMap, nodeKey, groupNode.id, useRadioButtons, groupNode.mandatory)
     ));
     return output;
   },
@@ -553,7 +556,7 @@ define(
 
         let emptyMandatoryParams = [];
         // Include the mandatory features for which no option is checked.
-        macroEditor.find('.feature-container.mandatory').filter(function () {
+        macroEditor.find('.feature-only.mandatory').filter(function () {
           if ($(this).find('.feature-radio').length > 0) {
             return $(this).find('.feature-radio:checked').length === 0;
           } else {

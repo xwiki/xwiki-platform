@@ -33,6 +33,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.internal.web.PageTemplateRequiredRightsChecker;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -46,7 +47,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -444,9 +444,10 @@ public class CreateActionRequestHandler
                 XWikiDocument templateDoc = context.getWiki().getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
 
-                // Check the template provider's visibility restrictions.
+                // Check the template provider's visibility restrictions and required rights.
                 if (isTemplateProviderAllowedInSpace(templateObject, spaceReference,
-                    TP_VISIBILITY_RESTRICTIONS_PROPERTY)) {
+                    TP_VISIBILITY_RESTRICTIONS_PROPERTY)
+                    && hasRequiredRightsForTargetReference(templateObject, spaceReference)) {
 
                     List<String> creationRestrictions =
                         getTemplateProviderRestrictions(templateObject, TP_CREATION_RESTRICTIONS_PROPERTY);
@@ -532,6 +533,28 @@ public class CreateActionRequestHandler
         return true;
     }
 
+    /**
+     * Verifies if the current user has the required rights for the given document or space reference if the template
+     * exists and enforces them.
+     *
+     * @param templateObject the template provider object
+     * @param documentOrSpaceReference the document or space reference
+     * @return {@code true} if the user has the required rights, {@code false} otherwise
+     */
+    private boolean hasRequiredRightsForTargetReference(BaseObject templateObject,
+        EntityReference documentOrSpaceReference)
+    {
+        String templateDocumentReferenceString = templateObject.getStringValue(TEMPLATE);
+        if (StringUtils.isBlank(templateDocumentReferenceString)) {
+            return true;
+        }
+        DocumentReference templateDocumentReference =
+            getCurrentMixedResolver().resolve(templateDocumentReferenceString);
+
+        return Utils.getComponent(PageTemplateRequiredRightsChecker.class)
+            .hasRequiredRights(templateDocumentReference, documentOrSpaceReference);
+    }
+
     private boolean matchesRestriction(String spaceStringReferenceToTest, String allowedSpaceRestriction)
     {
         return allowedSpaceRestriction.equals(spaceStringReferenceToTest)
@@ -556,7 +579,6 @@ public class CreateActionRequestHandler
      * @since 16.4.2
      * @since 15.10.12
      */
-    @Unstable
     public DocumentReference getDocumentReference()
     {
         if (StringUtils.isEmpty(name)) {
@@ -611,7 +633,6 @@ public class CreateActionRequestHandler
      * @since 16.4.1
      * @since 15.10.12
      */
-    @Unstable
     public boolean isTemplateInfoProvided()
     {
         return hasTemplate() || availableTemplateProviders.isEmpty();
@@ -655,6 +676,27 @@ public class CreateActionRequestHandler
                 scontext.setAttribute("createAllowedSpaces",
                     getTemplateProviderRestrictions(templateProvider, TP_CREATION_RESTRICTIONS_PROPERTY),
                     ScriptContext.ENGINE_SCOPE);
+
+                return false;
+            }
+
+            // Check required rights.
+            DocumentReference documentReference = getDocumentReference();
+            // The document reference shouldn't be null, check it anyway to avoid surprises.
+            // This is not a security checkpoint, we just want to avoid surprises when actually saving the document,
+            // so skipping the check if the reference is null is okay.
+            if (documentReference != null
+                && !hasRequiredRightsForTargetReference(this.templateProvider, documentReference)) {
+                // put an exception on the context, for create.vm to know to display an error.
+                String documentReferenceString = getLocalEntityReferenceSerializer().serialize(documentReference);
+                Object[] args = { templateProvider.getStringValue(TEMPLATE), documentReferenceString };
+                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_REQUIRED_RIGHTS_MISSING,
+                    "Template {0} cannot be used for creating page {1} due to missing rights", null,
+                    args);
+
+                ScriptContext scontext = getCurrentScriptContext();
+                scontext.setAttribute(EXCEPTION, exception, ScriptContext.ENGINE_SCOPE);
 
                 return false;
             }

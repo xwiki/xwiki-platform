@@ -718,13 +718,13 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (!response.statusText) {
-        $('ajaxRequestFailureReason').update('Server not responding');
-      } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
         // Regard the body of plain text responses as custom status messages.
         $('ajaxRequestFailureReason').update(response.responseText);
-      } else {
+      } else if (response.statusText) {
         $('ajaxRequestFailureReason').update(response.statusText);
+      } else {
+        $('ajaxRequestFailureReason').update('Server not responding');
       }
       // Announce that a document save attempt has failed
       state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});

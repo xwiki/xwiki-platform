@@ -52,7 +52,7 @@ ul.macro-list .macro-extension {
 .macro-parameter-name::first-letter,
 .macro-parameter-description::first-letter,
 .macro-parameter-group-name::first-letter,
-.feature-title::first-letter,
+.feature-title,
 .feature-choice-name::first-letter {
   text-transform: capitalize;
 }
@@ -92,8 +92,6 @@ ul.macro-list .macro-extension {
 
 .feature-container {
   margin-top: 1em;
-  margin-left: 10px;
-  margin-right: 10px;
 }
 
 .feature-container.has-error {
@@ -106,8 +104,6 @@ ul.macro-list .macro-extension {
 
 .macro-parameter {
   margin-top: 0.5em;
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 .macro-parameter:first-of-type {
@@ -178,4 +174,8 @@ ul.macro-list .macro-extension {
 
 .macro-parameter-group.invisible > ul[role="tablist"] {
   display: none;
+}
+
+.macro-tabs {
+  margin-bottom: 0.5em;
 }

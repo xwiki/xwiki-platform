@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-docker</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Docker Tests</name>
@@ -95,8 +95,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>jakarta.mail</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -124,11 +134,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- A wrapper to javax.mail much easier to use -->
+    <!-- A wrapper to jakarta.mail much easier to use -->
     <dependency>
       <groupId>org.simplejavamail</groupId>
       <artifactId>simple-java-mail</artifactId>
-      <version>6.7.6</version>
+      <version>8.12.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

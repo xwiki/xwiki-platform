@@ -126,6 +126,10 @@ public class MultiUserTestUtils
         // Switch back to the first tab.
         this.setup.getDriver().switchTo().window(this.firstTabHandle);
         afterTabSwitch();
+
+        // Clean up the state associated with the first tab.
+        this.baseURLByTab.remove(this.firstTabHandle);
+        this.secretTokenByTab.remove(this.firstTabHandle);
     }
 
     private void beforeTabSwitch()

@@ -56,11 +56,14 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryClass
     public static final LocalDocumentReference XWIKI_JOB_CLASSREFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "SchedulerJobClass");
 
+    /**
+     * Field containing the class name of the job.
+     */
+    public static final String FIELD_JOBCLASS = "jobClass";
+
     private static final String FIELD_JOBNAME = "jobName";
 
     private static final String FIELD_JOBDESCRIPTION = "jobDescription";
-
-    private static final String FIELD_JOBCLASS = "jobClass";
 
     private static final String FIELD_STATUS = "status";
 

@@ -116,7 +116,7 @@ define('xwiki-realtime-userData', [
     userData[myId] = getMyUserData(configData, oldCursor);
 
     let intervalId;
-    if (cursor !== 'undefined') {
+    if (cursor) {
       intervalId = setInterval(function() {
         if (!online) {
           return;

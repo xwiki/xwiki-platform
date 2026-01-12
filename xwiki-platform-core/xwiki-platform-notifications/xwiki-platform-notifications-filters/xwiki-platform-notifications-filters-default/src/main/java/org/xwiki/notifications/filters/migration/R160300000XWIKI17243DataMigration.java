@@ -48,7 +48,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,7 +74,6 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 @Component
 @Named("R160300000XWIKI17243")
 @Singleton
-@Unstable
 public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigration
 {
     private static final String WATCHLIST_CLASSNAME = "WatchListClass";

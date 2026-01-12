@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Provider;
-import javax.mail.BodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.mail.BodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;

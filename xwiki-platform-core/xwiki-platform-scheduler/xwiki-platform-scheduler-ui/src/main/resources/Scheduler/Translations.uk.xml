@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>scheduler.applicationsPanelEntryLabel=Планувальник
+  <content>scheduler.disabled=Планувальник вимкнено в цьому інстансі. Жодне завдання не буде виконуватися.
+scheduler.applicationsPanelEntryLabel=Планувальник
 </content>
 </xwikidoc>

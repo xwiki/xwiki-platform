@@ -47,9 +47,13 @@ like.newlike.error=Помилка під час спроби уподобати 
 like.unlike.success=Уподобання сторінки було скасоване.
 like.unlike.error=Помилка під час спроби скасовувати уподобання сторінки.
 like.userprofile.menu=Сторінки, які сподобалися
-like.button.title=Кількість уподобань на цій сторінці: {0}
-like.button.title.like=Натисніть, щоб уподобати поточну сторінку. Кількість уподобань на цій сторінці: {0}.
-like.button.title.unlike=Натисніть, щоб скасувати уподобання поточної сторінки. Кількість уподобань на цій сторінці: {0}.
+### Missing: like.toggle.hint.like=Like this page.
+### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
+like.toggle.hint.like.noright=Ви не можете взаємодіяти з вподобаннями на цій сторінці.
+### Missing: like.likers.link.zero={0} Likes
+### Missing: like.likers.link.one={0} Like
+### Missing: like.likers.link.many={0} Likes
+### Missing: like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=Ця сторінка ще нікому не сподобалась.
 like.likers.number={0} особі(ам) подобається ця сторінка:
 like.likers.title=Користувачі, яким подобається {0}
@@ -63,5 +67,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Ємність кешу
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Кількість уподобань, які зберігаються в кеші. Зауважте, що вам потрібно перезапустити XWiki, щоб ця зміна опції була врахована.
 XWiki.Like.LikeConfigurationClass_enabled=Увімкнути функцію Уподобання
 XWiki.Like.LikeConfigurationClass_enabled.hint=Якщо не обрано, функція Уподобання буде вимкнена, а інформація, пов'язана з цим, буде прихована.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Кількість уподобань на цій сторінці: {0}
+like.button.title.like=Натисніть, щоб уподобати поточну сторінку. Кількість уподобань на цій сторінці: {0}.
+like.button.title.unlike=Натисніть, щоб скасувати уподобання поточної сторінки. Кількість уподобань на цій сторінці: {0}.
+
+#@deprecatedend
 </content>
 </xwikidoc>

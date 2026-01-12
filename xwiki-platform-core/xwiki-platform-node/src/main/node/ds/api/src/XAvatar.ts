@@ -21,7 +21,7 @@
 /**
  * Props for the avatar component.
  *
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type AvatarProps = {

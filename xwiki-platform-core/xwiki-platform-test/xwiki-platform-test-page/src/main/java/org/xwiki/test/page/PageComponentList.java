@@ -89,6 +89,7 @@ import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.script.internal.service.DefaultScriptServiceManager;
 import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
+import org.xwiki.security.internal.DefaultSecurityConfiguration;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.template.script.TemplateScriptService;
@@ -284,7 +285,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultCacheControl.class,
 
     // Required rights (needed for Document/Object API)
-    DocumentRequiredRightsReader.class
+    DocumentRequiredRightsReader.class,
+
+    // Security configuration, needed for query limits, e.g., in DBListClass
+    DefaultSecurityConfiguration.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList

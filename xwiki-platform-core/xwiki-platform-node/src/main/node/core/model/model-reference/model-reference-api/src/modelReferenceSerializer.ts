@@ -21,7 +21,7 @@
 import type { EntityReference } from "@xwiki/platform-model-api";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface ModelReferenceSerializer {

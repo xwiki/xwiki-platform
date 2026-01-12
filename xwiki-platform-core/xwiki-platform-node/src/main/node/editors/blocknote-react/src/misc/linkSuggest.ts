@@ -41,7 +41,7 @@ import type {
 } from "@xwiki/platform-model-remote-url-api";
 
 /**
- * @since 0.19
+ * @since 18.0.0RC1
  * @beta
  */
 type LinkEditionContext = {
@@ -58,7 +58,7 @@ type LinkEditionContext = {
 /**
  * Describe a link suggestion action (i.e., a search result entry).
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type LinkSuggestion = {
@@ -72,7 +72,7 @@ type LinkSuggestion = {
 /**
  * Shape of a function providing a list of link suggestions for a given query
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
@@ -82,7 +82,7 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  *
  * @returns `null` if the context does not contain a link suggestion service
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 function createLinkSuggestor({

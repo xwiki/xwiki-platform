@@ -112,19 +112,6 @@ public class FilesystemStoreTools implements Initializable
     private BlobStore store;
 
     /**
-     * Testing Constructor.
-     *
-     * @param blobStore the blob store to use
-     * @param lockProvider the lock provider to use
-     * @since 17.10.0RC1
-     */
-    public FilesystemStoreTools(BlobStore blobStore, LockProvider lockProvider)
-    {
-        this.store = blobStore;
-        this.lockProvider = lockProvider;
-    }
-
-    /**
      * Constructor for component manager.
      */
     public FilesystemStoreTools()

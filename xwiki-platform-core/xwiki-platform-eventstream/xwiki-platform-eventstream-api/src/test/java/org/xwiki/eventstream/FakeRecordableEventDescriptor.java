@@ -19,6 +19,11 @@
  */
 package org.xwiki.eventstream;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 /**
  * Fake descriptor used to test the {@link AbstractRecordableEventDescriptor}.
  *
@@ -27,6 +32,9 @@ package org.xwiki.eventstream;
  * @since 10.5
  * @since 9.11.6
  */
+@Component
+@Named("FakeRecordableEventDescriptor")
+@Singleton
 public class FakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor
 {
     public FakeRecordableEventDescriptor()

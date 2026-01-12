@@ -25,7 +25,7 @@ import type {
 
 /**
  * Description of a navigation tree node.
- * @since 0.10
+ * @since 18.0.0RC1
  * @beta
  */
 type NavigationTreeNode = {
@@ -34,7 +34,7 @@ type NavigationTreeNode = {
   label: string;
   /**
    * The location of the corresponding page on Cristal.
-   * @since 0.25
+   * @since 18.0.0RC1
    * @beta
    */
   location: SpaceReference;
@@ -42,7 +42,7 @@ type NavigationTreeNode = {
   has_children: boolean;
   /**
    * Whether this node corresponds to a terminal page.
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   is_terminal: boolean;
@@ -51,7 +51,7 @@ type NavigationTreeNode = {
 /**
  * A NavigationTreeSource computes and returns a wiki's navigation tree.
  *
- * @since 0.10
+ * @since 18.0.0RC1
  * @beta
  **/
 interface NavigationTreeSource {
@@ -71,7 +71,7 @@ interface NavigationTreeSource {
    * @param includeTerminal - whether to include the final terminal page (default: true)
    * @param includeRootNode - whether to include a root node with empty id (default: false)
    * @returns the parents nodes ids
-   * @since 0.20
+   * @since 18.0.0RC1
    * @beta
    **/
   getParentNodesId(
@@ -85,7 +85,7 @@ interface NavigationTreeSource {
  * A NavigationTreeSourceProvider returns the instance of NavigationTreeSource
  * matching the current wiki configuration.
  *
- * @since 0.10
+ * @since 18.0.0RC1
  * @beta
  **/
 interface NavigationTreeSourceProvider {
@@ -100,7 +100,7 @@ interface NavigationTreeSourceProvider {
 
 /**
  * The component id of NavigationTreeSource.
- * @since 0.10
+ * @since 18.0.0RC1
  * @beta
  */
 const name = "NavigationTreeSource";

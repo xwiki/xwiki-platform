@@ -29,7 +29,7 @@ import type { CristalApp } from "@xwiki/platform-api";
  * {@link ./defaultModelReferenceHandler#DefaultModelReferenceHandler} as a
  * fallback if no better fit was registered.
  *
- * @since 0.13
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

@@ -56,7 +56,7 @@ import type { JSX, ReactNode } from "react";
  *
  * @returns A block definition
  *
- * @since 0.18
+ * @since 18.0.0RC1
  * @internal
  */
 function createCustomBlockSpec<
@@ -113,12 +113,12 @@ function createCustomBlockSpec<
  *
  * @returns An inline content definition
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 
 /**
- * @since 0.23
+ * @since 18.0.0RC1
  * @internal
  */
 function createCustomInlineContentSpec<
@@ -169,7 +169,7 @@ function createCustomInlineContentSpec<
 /**
  * Name prefix for macro blocks and inline contents in BlockNote
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 const MACRO_NAME_PREFIX = "Macro_";
@@ -177,7 +177,7 @@ const MACRO_NAME_PREFIX = "Macro_";
 /**
  * Description of a macro adapted by `adaptMacroForBlockNote`
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @internal
  */
 type BlockNoteConcreteMacro = {
@@ -200,7 +200,7 @@ type BlockNoteConcreteMacro = {
 /**
  * Internal context required for macros execution
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type ContextForMacros = {
@@ -227,7 +227,7 @@ type ContextForMacros = {
  *
  * @returns - The BlockNote-compatible macro
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 function adaptMacroForBlockNote(
@@ -409,7 +409,7 @@ function adaptMacroForBlockNote(
  *
  * @returns The extracted raw content
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 function extractMacroRawContent(
@@ -439,7 +439,7 @@ function extractMacroRawContent(
  *
  * @returns A BlockNote wrapper AST
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 function buildMacroRawContent(

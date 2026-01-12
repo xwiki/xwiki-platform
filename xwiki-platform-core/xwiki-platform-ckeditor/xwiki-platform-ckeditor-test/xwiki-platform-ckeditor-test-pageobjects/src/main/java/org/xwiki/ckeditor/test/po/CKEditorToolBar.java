@@ -38,6 +38,12 @@ public class CKEditorToolBar extends BaseElement
 {
     private static final String SOURCE = "source";
 
+    private static final String UNDO = "undo";
+
+    private static final String REDO = "redo";
+
+    private static final String CLASS = "class";
+
     protected final WebElement container;
 
     /**
@@ -152,8 +158,7 @@ public class CKEditorToolBar extends BaseElement
      */
     public boolean isInSourceMode()
     {
-        return hasButton(SOURCE,
-            sourceButton -> sourceButton.isDisplayed() && sourceButton.getAttribute("class").contains("cke_button_on"));
+        return isButtonToggledOn(SOURCE);
     }
 
     /**
@@ -188,5 +193,95 @@ public class CKEditorToolBar extends BaseElement
     protected WebElement getContainer()
     {
         return this.container;
+    }
+
+    /**
+     * @return {@code true} if the Undo button is present on the toolbar and is enabled, {@code false} otherwise
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public boolean canUndo()
+    {
+        return isButtonToggledOff(UNDO);
+    }
+
+    /**
+     * @return {@code true} if the Undo button is present on the toolbar and is disabled, {@code false} otherwise
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public boolean isUndoDisabled()
+    {
+        return isButtonDisabled(UNDO);
+    }
+
+    /**
+     * Clicks the Undo button.
+     *
+     * @return this toolbar instance
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public CKEditorToolBar undo()
+    {
+        clickButton(UNDO);
+        return this;
+    }
+
+    /**
+     * @return {@code true} if the Redo button is present on the toolbar and is enabled, {@code false} otherwise
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public boolean canRedo()
+    {
+        return isButtonToggledOff(REDO);
+    }
+
+    /**
+     * @return {@code true} if the Redo button is present on the toolbar and is disabled, {@code false} otherwise
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public boolean isRedoDisabled()
+    {
+        return isButtonDisabled(REDO);
+    }
+
+    /**
+     * Clicks the Redo button.
+     *
+     * @return this toolbar instance
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public CKEditorToolBar redo()
+    {
+        clickButton(REDO);
+        return this;
+    }
+
+    private boolean isButtonDisabled(String feature)
+    {
+        return hasButton(feature,
+            button -> button.isDisplayed() && button.getAttribute(CLASS).contains("cke_button_disabled"));
+    }
+
+    private boolean isButtonToggledOn(String feature)
+    {
+        return hasButton(feature,
+            button -> button.isDisplayed() && button.getAttribute(CLASS).contains("cke_button_on"));
+    }
+
+    private boolean isButtonToggledOff(String feature)
+    {
+        return hasButton(feature,
+            button -> button.isDisplayed() && button.getAttribute(CLASS).contains("cke_button_off"));
     }
 }

@@ -152,7 +152,8 @@
       ## The column is a document field.
       ##
       ## These document fields need to be ordered as raw values and not as strings.
-      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements', 'minorEdit1', 'hidden'])
+      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements',
+          'minorEdit1', 'hidden', 'enforceRequiredRights'])
       #set($documentField = $stringtool.removeStart($order, 'doc.'))
       #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection},  $rawDocumentFields.contains($documentField))
     #else
@@ -454,6 +455,7 @@
       #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
       #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
       #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
+      #set($discard = $row.put('doc_enforceRequiredRights', $itemDoc.isEnforceRequiredRights()))
       #foreach($colname in $collist)
         #gridresult_buildColumnJSON($colname $row)
       #end
@@ -597,14 +599,18 @@
   #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
     #set($tableName = 'LargeStringProperty')
   #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass' || $propType == 'PageClass')
+    ## The following logic is mirrored from ListClass and might need to be updated when the logic in ListClass changes.
     #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
     #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
+    #set($largeStorage = $propClass.get($colname).getProperty('largeStorage').getValue())
     #if($multiSelect == 1)
       #if($relationalStorage == 1)
         #set($tableName = 'DBStringListProperty')
       #else
         #set($tableName = 'StringListProperty')
       #end
+    #elseif($largeStorage == 1)
+      #set($tableName = 'LargeStringProperty')
     #else
       #set($tableName = 'StringProperty')
     #end

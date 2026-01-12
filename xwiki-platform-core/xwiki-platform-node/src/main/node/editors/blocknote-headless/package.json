@@ -32,6 +32,9 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@blocknote/core": "catalog:",
+    "@tiptap/core": "catalog:",
+    "@tiptap/extensions": "catalog:",
+    "@tiptap/pm": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",

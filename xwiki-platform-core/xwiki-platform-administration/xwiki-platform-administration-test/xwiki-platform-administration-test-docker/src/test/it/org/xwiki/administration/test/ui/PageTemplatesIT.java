@@ -34,15 +34,20 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentDoesNotExistPage;
+import org.xwiki.test.ui.po.InformationPane;
+import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,6 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-notifications-filters-default"
     }
 )
+@SuppressWarnings({ "checkstyle:MultipleStringLiterals", "checkstyle:ClassFanOutComplexity" })
 class PageTemplatesIT
 {
     /**
@@ -80,6 +86,7 @@ class PageTemplatesIT
     /**
      * Tests if a new page can be created from a template.
      */
+    @SuppressWarnings({ "checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS" })
     @Test
     @Order(1)
     void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
@@ -190,7 +197,7 @@ class PageTemplatesIT
         templateProviderView = setup.gotoPage(templateProviderReference);
         templateProviderView.editInline();
         TemplateProviderInlinePage templateProviderInline = new TemplateProviderInlinePage();
-        List<String> allowedSpaces = new ArrayList<String>();
+        List<String> allowedSpaces = new ArrayList<>();
         allowedSpaces.add(testSpace);
         templateProviderInline.setVisibilityRestrictions(allowedSpaces);
         templateProviderInline.setCreationRestrictions(allowedSpaces);
@@ -224,6 +231,7 @@ class PageTemplatesIT
     /**
      * Tests that creating a page or a space that already exists displays an error.
      */
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
     @Test
     @Order(2)
     void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
@@ -365,7 +373,7 @@ class PageTemplatesIT
         ViewPage viewPage = setup.gotoPage(templateReference);
         assertTrue(viewPage.isForbidden());
 
-        setup.gotoPage(newDoc, "edit", "template=" + templateReference.toString());
+        setup.gotoPage(newDoc, "edit", "template=" + templateReference);
         WikiEditPage wikiEditPage = new WikiEditPage();
 
         assertTrue(wikiEditPage.getContent().isEmpty());
@@ -399,6 +407,135 @@ class PageTemplatesIT
     }
 
     /**
+     * The goal of this test is to check that if the template enforces required rights, then the created page also
+     * enforces the same rights.
+     */
+    @Test
+    @Order(6)
+    void createPageFromTemplateWithRequiredRights(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        String templateContent = "Templates are fun";
+        String providerName = "RequiredRightsTemplateProvider";
+        LocalDocumentReference templateProviderReference = new LocalDocumentReference(providerName,
+            testReference.getLocalDocumentReference().getParent());
+        createTemplateAndTemplateProvider(setup, templateProviderReference,
+            templateContent, "Required Rights Template", true);
+
+        // Edit the template to enforce required rights.
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference("TestTemplate", templateProviderReference.getParent());
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        RequiredRightsModal requiredRightsModal = viewPage.openInformationDocExtraPane().openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+
+        // Create the page from template
+        CreatePagePage createPagePage = setup.gotoPage(templateProviderReference).createPage();
+        EditPage templateInstanceEditWysiwyg =
+            createPagePage.createPageFromTemplate("Test Page With Required Rights From Template",
+                testReference.getLastSpaceReference().getName(),
+                TEMPLATE_NAME + "Instance", setup.serializeReference(templateProviderReference));
+        ViewPage templateInstanceView = templateInstanceEditWysiwyg.clickSaveAndView();
+
+        // Verify that the page has the required rights
+        InformationPane informationPane = templateInstanceView.openInformationDocExtraPane();
+        assertThat(informationPane.getRequiredRightsStatusMessage(),
+            containsString("This page is enforcing required rights"));
+        assertEquals(List.of("Script right"), informationPane.getRequiredRights());
+    }
+
+    /**
+     * Consider the following scenario:
+     * <ul>
+     *  <li>A template requires script right.</li>
+     *  <li>The test user has script right, but only in space "Scripting" and not in space "NoScripting".</li>
+     * </ul>
+     * Verify the following:
+     * <ul>
+     *  <li>The template is listed in space "Scripting" but not in space "NoScripting"</li>
+     *  <li>When opening the create page dialog in "Scripting" but selecting the space "NoScripting", an error is
+     *  displayed.</li>
+     * </ul>
+     */
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
+    @Test
+    @Order(7)
+    void templateWithRequiredRightsVisibilityAndEnforcement(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        SpaceReference scriptingSpaceReference = new SpaceReference("Scripting", testSpaceReference);
+        SpaceReference noScriptingSpaceReference = new SpaceReference("NoScripting", testSpaceReference);
+
+        DocumentReference scriptingSpaceHome = new DocumentReference("WebHome", scriptingSpaceReference);
+        DocumentReference noScriptingSpaceHome = new DocumentReference("WebHome", noScriptingSpaceReference);
+
+        setup.rest().savePage(scriptingSpaceHome, "Content", "Scripting");
+        setup.rest().savePage(noScriptingSpaceHome, "Content", "NoScripting");
+
+        LocalDocumentReference templateProviderReference =
+            new LocalDocumentReference(TEMPLATE_NAME + "Provider",
+                testReference.getLocalDocumentReference().getParent());
+
+        createTemplateAndTemplateProvider(setup, templateProviderReference,
+            "{{velocity}}Script{{/velocity}}", "Script Template", true);
+
+        // Edit the template to enforce required rights.
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference("TestTemplate", templateProviderReference.getParent());
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        RequiredRightsModal requiredRightsModal = viewPage.openInformationDocExtraPane().openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+
+        String userName = "PageTemplateITScriptUser";
+        setup.createUser(userName, userName, "", "usertype", "Advanced");
+
+        String userFullName = String.format("%s:XWiki.%s", testReference.getWikiReference().getName(), userName);
+        setup.setRightsOnSpace(scriptingSpaceReference, null, userFullName, "script", true);
+        setup.setRightsOnSpace(noScriptingSpaceReference, null, userFullName, "script", false);
+
+        setup.login(userName, userName);
+
+        // The template should be available when creating a page in the Scripting space.
+        ViewPage scriptingSpaceView = setup.gotoPage(scriptingSpaceHome);
+        CreatePagePage scriptingCreatePage = scriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        String templateProviderFullName = setup.serializeReference(templateProviderReference);
+        assertTrue(scriptingCreatePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // The template should not be available when creating a page in the NoScripting space.
+        ViewPage noScriptingSpaceView = setup.gotoPage(noScriptingSpaceHome);
+        CreatePagePage noScriptingCreatePage = noScriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertFalse(noScriptingCreatePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // When creating a page from the Scripting space but selecting the NoScripting space as target, the creation
+        // should fail with an error.
+        scriptingSpaceView = setup.gotoPage(scriptingSpaceHome);
+        scriptingCreatePage = scriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        scriptingCreatePage.setTemplate(templateProviderFullName);
+        scriptingCreatePage.getDocumentPicker().toggleLocationAdvancedEdit();
+        scriptingCreatePage.getDocumentPicker().setParent(setup.serializeReference(noScriptingSpaceReference));
+        scriptingCreatePage.getDocumentPicker().setName("Target");
+
+        scriptingCreatePage.clickCreate();
+        scriptingCreatePage.waitForErrorMessage();
+
+        assertThat(scriptingCreatePage.getErrorMessage(),
+            containsString("You don't have the required rights to create pages from the template ["
+                + templateProviderFullName + "]."));
+    }
+
+    /**
      * Helper function to Create both a Template and a Template Provider for the tests in this class.
      */
     private ViewPage createTemplateAndTemplateProvider(TestUtils setup,
@@ -417,7 +554,7 @@ class PageTemplatesIT
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
         TemplateProviderInlinePage templateProviderInline =
             sectionPage.createTemplateProvider(templateProviderReference);
-        templateProviderInline.setTemplateName("Test Template");
+        templateProviderInline.setTemplateName(templateTitle);
         templateProviderInline.setTemplate(setup.serializeReference(templateReference));
         if (saveAndEdit) {
             templateProviderInline.setActionOnCreate(TemplateProviderInlinePage.ACTION_SAVEANDEDIT);

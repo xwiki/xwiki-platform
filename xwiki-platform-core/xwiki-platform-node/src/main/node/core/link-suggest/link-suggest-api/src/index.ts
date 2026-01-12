@@ -26,7 +26,7 @@ import type { LinkSuggestService } from "./linkSuggestService";
 
 /**
  * The component id of LinkSuggestService.
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 const name = "LinkSuggestService";

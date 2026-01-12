@@ -36,7 +36,7 @@ import type {
  *  - `ignore` item to indicate the macro invocation is invalid
  *  - `break` item to tell the transformer to stop right there (used for nesting handling)
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroHandler = (
@@ -69,7 +69,7 @@ type MacroHandler = (
  *
  * @returns The provided input, with transformed macros ; along with the character offset where the handler requested to break at
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 // eslint-disable-next-line max-statements
@@ -478,7 +478,7 @@ const eatMacro: MacroHandler = async (
  *
  * @returns The macro invocation encoded in the provided inline code
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 function reparseCodifiedMacro(code: string): MacroInvocation {
@@ -497,7 +497,7 @@ function reparseCodifiedMacro(code: string): MacroInvocation {
 /**
  * A prefix used in codified macros, allowing to identify them
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 const CODIFIED_MACRO_PREFIX = "###cristalMacro:###";

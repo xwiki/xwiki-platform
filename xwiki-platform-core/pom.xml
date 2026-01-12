@@ -150,8 +150,20 @@
               </differences>
             </revapi.differences>
             -->
+            <revapi.differences>
+              <justification>This is not a breakage</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.extension.script.ScriptExtensionRewriter</old>
+                  <new>class org.xwiki.extension.script.ScriptExtensionRewriter</new>
+                  <superClass>org.xwiki.extension.InstallOnRootNamespaceExtensionRewriter</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
 
-            
             
           </analysisConfiguration>
         </configuration>

@@ -28,6 +28,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
+import { useTimeoutCheck } from "../hooks";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -67,7 +68,7 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 
 /**
  * Properties for the BlockNote editor component.
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type BlockNoteViewWrapperProps = {
@@ -97,7 +98,7 @@ type BlockNoteViewWrapperProps = {
   /**
    * Macros to show in the editor
    *
-   * @since 0.21
+   * @since 18.0.0RC1
    * @beta
    */
   macros:
@@ -105,7 +106,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * List of buildable macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         list: MacroWithUnknownParamsType[];
@@ -113,7 +114,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * Context for macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         ctx: ContextForMacros;
@@ -187,6 +188,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Prevent changes in the editor until the provider has synced with other clients
   const [ready, setReady] = useState(!initializer);
+
+  // Check if the syncing is happing for too long, in order to display an information message
+  const longLoading = useTimeoutCheck(1000);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
@@ -291,9 +295,13 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   }, []);
 
   if (!ready) {
+    // Only display the loading message after a given amount of time,
+    // otherwise we end up with a flashing pending message
+    //
+    // We still show the <h3> + <em> structure with an insecable space in order to keep the same height at all times
     return (
       <h3>
-        <em>{t("blocknote.realtime.pendingSync")}</em>
+        <em>{longLoading ? t("blocknote.realtime.pendingSync") : "\u00A0"}</em>
       </h3>
     );
   }

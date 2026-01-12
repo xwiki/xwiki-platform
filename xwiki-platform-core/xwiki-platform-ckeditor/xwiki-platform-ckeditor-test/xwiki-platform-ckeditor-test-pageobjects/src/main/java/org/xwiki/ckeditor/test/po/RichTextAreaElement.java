@@ -290,6 +290,32 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * Waits until the rich text area has the specified plain text.
+     *
+     * @param text the text to wait for
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public void waitUntilTextIs(String text)
+    {
+        waitUntilTextIs(text, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextIs(String text, int timeout)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return Objects.equals(getText(), text);
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        }, timeout);
+    }
+
+    /**
      * @return the HTML element that has the focus in the Rich editor
      */
     private WebElement getActiveElement()

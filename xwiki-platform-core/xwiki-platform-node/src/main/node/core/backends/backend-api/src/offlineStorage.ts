@@ -21,7 +21,7 @@
 import type { PageData } from "@xwiki/platform-api";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export default interface OfflineStorage {

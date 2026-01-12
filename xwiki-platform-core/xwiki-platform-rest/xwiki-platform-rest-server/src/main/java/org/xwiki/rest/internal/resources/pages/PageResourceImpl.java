@@ -50,11 +50,8 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
 
             URI baseUri = uriInfo.getBaseUri();
 
-            Page page =
-                this.factory.toRestPage(baseUri, uriInfo.getAbsolutePath(), doc, false, withPrettyNames, withObjects,
-                    withXClass, withAttachments);
-
-            return page;
+            return this.factory.toRestPage(baseUri, uriInfo.getAbsolutePath(), doc, false, withPrettyNames, withObjects,
+                withXClass, withAttachments);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

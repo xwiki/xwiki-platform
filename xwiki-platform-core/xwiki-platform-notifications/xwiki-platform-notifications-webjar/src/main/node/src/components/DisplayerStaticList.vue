@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin } from "xwiki-livedata";
+import { BaseDisplayer, displayerMixin } from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-staticList",

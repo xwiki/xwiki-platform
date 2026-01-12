@@ -16,6 +16,9 @@
   "peerDependencies": {
     "vue": "3.x"
   },
+  "dependencies": {
+    "@xwiki/platform-livedata-ui": "workspace:*"
+  },
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
     "@types/jsdom": "catalog:",

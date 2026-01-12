@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin, XWikiIcon } from "xwiki-livedata";
+import { BaseDisplayer, displayerMixin, XWikiIcon } from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-toggle",

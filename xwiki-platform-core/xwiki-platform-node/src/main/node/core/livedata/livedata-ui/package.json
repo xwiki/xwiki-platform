@@ -13,13 +13,6 @@
     "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts"
-    }
-  },
-  "main": "./src/index.ts",
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
@@ -28,7 +21,6 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "dompurify": "catalog:",
     "lz-string": "catalog:",
@@ -55,20 +47,18 @@
     "vue": "catalog:",
     "vue-tsc": "catalog:"
   },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/index.es.js"
-        },
-        "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.umd.js"
-        }
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.umd.js"
       }
-    },
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts"
-  }
+    }
+  },
+  "main": "./dist/index.es.js",
+  "types": "./dist/index.d.ts"
 }

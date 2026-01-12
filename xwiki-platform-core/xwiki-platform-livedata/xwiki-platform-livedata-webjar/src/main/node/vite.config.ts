@@ -37,7 +37,7 @@ export default defineConfig({
     },
     sourcemap: true,
     rollupOptions: {
-      external: ['jquery', 'vue', 'vue-i18n'],
+      external: ['jquery', 'vue', 'vue-i18n', '@xwiki/platform-livedata-ui'],
       output: {
         globals: {
           vue: 'Vue'

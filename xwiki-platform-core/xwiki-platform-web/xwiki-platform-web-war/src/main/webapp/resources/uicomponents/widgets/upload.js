@@ -374,8 +374,6 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
     /**
      * Function called by the XHR when the upload finishes successfully (just sending the file).
-     *
-     * @param event the ProgressEvent fired by the browser
      */
     onUploadFinish()
     {

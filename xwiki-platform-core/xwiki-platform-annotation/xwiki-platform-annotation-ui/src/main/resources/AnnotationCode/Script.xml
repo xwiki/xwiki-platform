@@ -982,9 +982,7 @@ XWiki.Annotation = Class.create({
     if (!allSpans.length) {
       return;
     }
-    // We nest the content of the first one in a button. 
-    // All the highlights elements fulfill the same role so there's little point extending every single one.
-    // It could be detrimental for the user experience to have to tab through all of the buttons.
+    // We generate the keyboard interactive button.
     let toggleButton = document.createElement('button');
     toggleButton.id = 'ID' + ann.annotationId;
     toggleButton.classList.add('annotation-toggle');

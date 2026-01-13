@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>## General settings
 xwiki.iconset.type = font
-xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/all.css'),$services.webjars.url('org.webjars:font-awesome', 'css/v4-shims.css')
+xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/all.min.css'),$services.webjars.url('org.webjars:font-awesome', 'css/v4-shims.min.css')
 xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;{{/html}}
 xwiki.iconset.render.html = &lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;
 xwiki.iconset.icon.cssClass = fa fa-$icon

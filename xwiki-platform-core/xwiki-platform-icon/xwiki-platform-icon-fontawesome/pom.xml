@@ -59,7 +59,6 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>font-awesome</artifactId>
-      <version>7.0.1</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

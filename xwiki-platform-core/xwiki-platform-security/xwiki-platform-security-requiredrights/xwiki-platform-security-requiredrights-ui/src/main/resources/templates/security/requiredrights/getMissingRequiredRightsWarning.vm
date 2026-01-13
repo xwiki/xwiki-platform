@@ -26,6 +26,5 @@
 {{uiextension id="org.xwiki.platform.security.requiredrights.ui.MissingRequiredRightWarningUIExtension"/}}
 
 {{velocity output="false"}}
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()
 {{/velocity}}

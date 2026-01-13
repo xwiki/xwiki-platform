@@ -47,8 +47,7 @@
 ## resources (besides the form HTML).
 #initRequiredSkinExtensions()
 #displayEditBoxFromReference("$!{request.id}", $annotationReference)
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()
 {{/html}}
 {{/velocity}}</content>
   <object>

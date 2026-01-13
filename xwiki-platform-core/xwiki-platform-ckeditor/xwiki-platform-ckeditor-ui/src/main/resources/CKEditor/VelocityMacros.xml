@@ -61,9 +61,10 @@
       ## directly in the current page, e.g. when CKEditor is used in-line (no iframe). We still need to send back the
       ## required style sheets and JavaScript files because some of them might not be available in the target page, e.g.
       ## when a macro is inserted and it needs resource files not available on every page.
-      #ckeditor_initRequiredSkinExtensions()
+      #template('display_macros.vm')
+      #initRequiredSkinExtensions()
       #set ($output = "#ckeditor_getRenderedContent($source)$!html")
-      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#ckeditor_getRequiredSkinExtensions()"))
+      #sendRequiredSkinExtensions()
     #else
       ## Returns a full HTML page, including the HEAD tag with the style sheets and possibly the JavaScript includes.
       ## This is needed when the edited content is loaded in an iframe, which is the case when CKEditor replaces a text
@@ -235,6 +236,9 @@
   &lt;/dl&gt;
 #end
 
+#**
+ * Deprecated. Use #initRequiredSkinExtensions() from display_macros.vm instead.
+*#
 #macro (ckeditor_initRequiredSkinExtensions)
   #set ($requiredSkinExtensions = $collectiontool.orderedMap)
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
@@ -244,6 +248,9 @@
   #end
 #end
 
+#**
+ * Deprecated. Use #getRequiredSkinExtensions() from display_macros.vm instead.
+*#
 #macro (ckeditor_getRequiredSkinExtensions)
   #foreach ($entry in $requiredSkinExtensions.entrySet())
     #set ($importString = $xwiki.get($entry.key).importString)

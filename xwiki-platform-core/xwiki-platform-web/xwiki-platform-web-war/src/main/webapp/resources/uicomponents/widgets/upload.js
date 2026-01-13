@@ -23,14 +23,6 @@
 #foreach ($name in $iconNames)
 #set ($discard = $icons.put($name, $services.icon.renderHTML($name)))
 #end
-#set($l10nwithParams = {
-  'unknown' :  "$services.localization.render('core.widgets.html5upload.error.unknown', ['#{name}'])",
-  'invalidType': "$services.localization.render('core.widgets.html5upload.error.invalidType', ['#{name}'])",
-  'invalidSize': "$services.localization.render('core.widgets.html5upload.error.invalidSize', ['#{name}', '#{size}'])",
-  'aborted': "$services.localization.render('core.widgets.html5upload.error.aborted', ['#{name}'])",
-  'finishing': "$services.localization.render('core.widgets.html5upload.status.finishing', ['#{name}'])",
-  'finished': "$services.localization.render('core.widgets.html5upload.status.finished', ['#{name}', '#{size}'])"
-})
 #set($maxAttachmentSize = "$!escapetool.javascript($xwiki.getSpacePreference('upload_maxsize'))")
 #[[*/
 // Start JavaScript-only code.
@@ -48,7 +40,13 @@ define('upload-translations', {
     'cancelAll',
     'hideStatus',
     'status.fileSize',
-    'remaining'
+    'remaining',
+    'error.unknown',
+    'error.invalidType',
+    'error.invalidSize',
+    'error.aborted',
+    'status.finishing',
+    'status.finished'
   ]
 });
 define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
@@ -487,12 +485,12 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
     /** Templates for feedback messages displayed to the user. */
     messages = {
-      UNKNOWN_ERROR: new Template(l10nwithParams['unknown']),
-      INVALID_FILE_TYPE: new Template(l10nwithParams['invalidType']),
-      UPLOAD_LIMIT_EXCEEDED: new Template(l10nwithParams['invalidSize']),
-      UPLOAD_ABORTED: new Template(l10nwithParams['aborted']),
-      UPLOAD_FINISHING: new Template(l10nwithParams['finishing']),
-      UPLOAD_FINISHED: new Template(l10nwithParams['finished'])
+      UNKNOWN_ERROR: new Template(l10n.get('error.unknown', '#{name}')),
+      INVALID_FILE_TYPE: new Template(l10n.get('error.invalidType', '#{name}')),
+      UPLOAD_LIMIT_EXCEEDED: new Template(l10n.get('error.invalidSize', '#{name}', '#{size}')),
+      UPLOAD_ABORTED: new Template(l10n.get('error.aborted', '#{name}')),
+      UPLOAD_FINISHING: new Template(l10n.get('status.finishing', '#{name}')),
+      UPLOAD_FINISHED: new Template(l10n.get('status.finished', '#{name}', '#{size}'))
     }
 
     /**

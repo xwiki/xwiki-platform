@@ -264,6 +264,7 @@
 
 /* Annotations displayed in the text */
 .annotation-highlight, .selection-highlight {
+  position: relative;
   background-color: var(--mark-bg);
   /* Remove the default mark padding added in bootstrap. 
      The highlights can happen in the middle of words, and it would look odd. */
@@ -277,6 +278,15 @@
        marks across text blocks. */
     /* We repeat the selector because of nested annotation marks. */
     background-color: var(--mark-highlighted-bg);
+  }
+  .annotation-toggle {
+    /* We don't want the annotation toggle to disturb the text layout. */
+    position: absolute;
+    margin: 0;
+    z-index: 1;
+    /* But we still need to center it relative to its parent. */
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
 

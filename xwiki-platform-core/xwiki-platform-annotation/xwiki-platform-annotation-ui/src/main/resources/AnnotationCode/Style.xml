@@ -279,6 +279,7 @@
     /* We repeat the selector because of nested annotation marks. */
     background-color: var(--mark-highlighted-bg);
   }
+  
   .annotation-toggle {
     /* We don't want the annotation toggle to disturb the text layout. */
     position: absolute;
@@ -287,6 +288,11 @@
     /* But we still need to center it relative to its parent. */
     top: 50%;
     transform: translateY(-50%);
+    transition:opacity .5s ease;
+  }
+
+  .annotation-toggle.sr-only {
+    opacity: 0;
   }
 }
 

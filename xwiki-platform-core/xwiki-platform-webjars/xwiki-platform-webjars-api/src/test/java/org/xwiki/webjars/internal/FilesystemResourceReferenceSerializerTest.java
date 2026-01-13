@@ -136,9 +136,9 @@ public class FilesystemResourceReferenceSerializerTest
         Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "css/font-awesome.min.css"));
+            "font-awesome", "7.0.1", "css/all.min.css"));
 
-        assertEquals("webjars/font-awesome/7.0.1/css/font-awesome.min.css",
+        assertEquals("webjars/font-awesome/7.0.1/css/all.min.css",
             this.mocker.getComponentUnderTest().serialize(reference).serialize());
 
         // Also verify that the resources haves been copied!

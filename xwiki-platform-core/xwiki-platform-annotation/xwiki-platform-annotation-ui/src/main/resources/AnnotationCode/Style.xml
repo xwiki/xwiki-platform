@@ -288,7 +288,7 @@
     /* But we still need to center it relative to its parent. */
     top: 50%;
     transform: translateY(-50%);
-    transition:opacity .5s ease;
+    transition: opacity .5s ease;
   }
 
   .annotation-toggle.sr-only {

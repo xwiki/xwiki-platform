@@ -1,6 +1,7 @@
 .upload-status-container {
   position: relative;
 }
+
 .upload-status {
   position: relative;
   padding: .3em;
@@ -16,11 +17,13 @@
     flex-grow: 1;
   }
 }
+
 /* When the upload results in an error, we color code it accordingly.*/
 .upload-status.upload-error {
   background-color: var(--alert-danger-bg);
   color: var(--state-danger-text);
 }
+
 /* We expect the first node child of the .result-<something> node to be its icon. */
 .upload-result > div > span:first-child {
   margin-right: 1em;
@@ -62,12 +65,15 @@
   &::-moz-progress-bar {
     background-color: var(--brand-primary);
   }
+  
   background-color: var(--alert-info-bg);
+  
   /* Webkit based progress colors */
   &::-webkit-progress-bar {
     border-radius: var(--border-radius-small);
     background-color: var(--alert-info-bg);
   }
+  
   &::-webkit-progress-value {
     border-radius: var(--border-radius-small);
     background-color: var(--brand-primary);
@@ -78,6 +84,7 @@
   display: none;
   color: var(--text-muted);
 }
+
 .advanced-user .progress-transfered,
 .advanced-user .progress-speed {
   display: unset;

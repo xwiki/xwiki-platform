@@ -52,6 +52,7 @@ org.xwiki.mentions.DisplayStyle.LOGIN=Ім'я користувача
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Колір згадок
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Колір згадок для поточного користувача (примітка: використовується як значення атрибута CSS кольору фону).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Колір само згадування
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsForeground=Тло згадок про себе
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Активувати цитування
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Визначає, чи включено цитату тексту навколо згадки до сповіщень про згадку користувача.
 mentions.tip=Під час редагування у WYSIWYG введіть @, а потім почніть вводити літери, щоб отримати пропозиції щодо згадування користувача.

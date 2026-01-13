@@ -26,11 +26,13 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.validation.AbstractEntityNameValidation;
 
 /**
- * A name strategy that will remove all accents and replace special characters (including spaces) with "-".
+ * A kebab-style name strategy that will remove all accents and replace special characters (including spaces) with
+ * the {@code -} character.
  *
  * @version $Id$
  * @since 12.0RC1
@@ -47,15 +49,15 @@ public class SlugEntityNameValidation extends AbstractEntityNameValidation
     @Override
     public String transform(String name)
     {
-        String strippedAccents = StringUtils.stripAccents(name);
-        String result = RegExUtils.replaceAll(strippedAccents, "[\\W]", REPLACEMENT_CHARACTER);
-        result = RegExUtils.replaceAll(result, "[-]+", REPLACEMENT_CHARACTER);
-        if (result.endsWith(REPLACEMENT_CHARACTER)) {
-            result = result.substring(0, result.length() - 1);
-        }
-        if (result.startsWith(REPLACEMENT_CHARACTER)) {
-            result = result.substring(1);
-        }
+        // Remove accents.
+        String result = StringUtils.stripAccents(name);
+        // Replace non-word characters by a REPLACEMENT_CHARACTER.
+        result = RegExUtils.replaceAll(result, "[\\W]", REPLACEMENT_CHARACTER);
+        // Replace several REPLACEMENT_CHARACTER characters with a single one.
+        result = RegExUtils.replaceAll(result, "-+", REPLACEMENT_CHARACTER);
+        // Remove leading and trailing REPLACEMENT_CHARACTER characters.
+        result = Strings.CS.removeEnd(result, REPLACEMENT_CHARACTER);
+        result = Strings.CS.removeStart(result, REPLACEMENT_CHARACTER);
         return result;
     }
 

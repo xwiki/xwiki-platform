@@ -730,6 +730,19 @@
         #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
           #livetable_getTableAlias($colName)
           #livetable_filterDateProperty()
+        #elseif ($colName == 'doc.hidden' || $colName == 'doc.minorEdit1' || $colName == 'doc.enforceRequiredRights')
+          ## Boolean document fields need special handling to work across all databases
+          ## (HSQLDB/PostgreSQL use true/false, MySQL/MariaDB/Oracle use 1/0).
+          ## Support both true/false and 1/0 as Live Data uses the former while LiveTable uses the latter.
+          #set ($booleanValue = ($filterValue.toLowerCase() == 'true' || $filterValue == '1'))
+          ## No need to clean the column name since it's only one of the given values.
+          #if ($whereParams.entrySet())
+            #set ($whereSql = "${whereSql} and $colName = :${colName.replace('.', '_')}_filter")
+            #set ($discard = $whereParams.put("${colName.replace('.', '_')}_filter", $booleanValue))
+          #else
+            #set ($whereSql = "${whereSql} and $colName = ?")
+            #set ($discard = $whereParams.add($booleanValue))
+          #end
         #else
           #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
           #if ($whereParams.entrySet())

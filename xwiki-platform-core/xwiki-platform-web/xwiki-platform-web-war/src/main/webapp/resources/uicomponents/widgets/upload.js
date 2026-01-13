@@ -720,7 +720,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
   // This is a global scope variable set for backwards compatibility only.
   // Using XWiki.FileUploader is deprecated.
   // Use requireJS with 'xwiki-upload' instead. For example see history.js .
-  // This can be removed once all uses of XWiki.FileUploader have been removed from XS.
+  // This can be moved to legacy once all uses of XWiki.FileUploader have been removed from XS.
   XWiki.FileUploader = FileUploader;
   return FileUploader;
 });

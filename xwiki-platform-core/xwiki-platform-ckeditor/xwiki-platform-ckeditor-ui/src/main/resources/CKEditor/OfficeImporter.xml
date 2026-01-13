@@ -45,7 +45,8 @@
     'filterStyles': $request.filterStyles,
     'useOfficeViewer': $request.useOfficeViewer
   })
-  #ckeditor_initRequiredSkinExtensions()
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
   #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters))
   #if ($output != '' &amp;&amp; "$!output" == '')
     ## Null output means an error has occured.
@@ -53,7 +54,7 @@
   #else
     ## When importing presentations using the Office Viewer macro the slides are displayed using the gallery widget for
     ## which we need to load the required CSS and JavaScript resources.
-    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#ckeditor_getRequiredSkinExtensions()"))
+    #sendRequiredSkinExtensions()
     $output
   #end
 #end

@@ -67,5 +67,4 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #end
 </div> ## attw
 </div> ## attachmentscontent
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()

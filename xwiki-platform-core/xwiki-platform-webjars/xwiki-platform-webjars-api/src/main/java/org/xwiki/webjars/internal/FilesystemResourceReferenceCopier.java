@@ -53,9 +53,12 @@ public class FilesystemResourceReferenceCopier
     private static final Logger LOGGER  = LoggerFactory.getLogger(FilesystemResourceReferenceCopier.class);
 
     /**
-     * Matches {@code url("whatever")} or {@code ur('whatever')}.
+     * Matches {@code url("whatever")} or {@code url('whatever')} or {@code url(whatever)} with optional spaces.
+     * We intentionally don't support escaped quotes inside URLs as they aren't valid in regular URLs.
      */
-    private static final Pattern URL_PATTERN = Pattern.compile("url\\(['\"](.*?)['\"]\\)");
+    private static final Pattern URL_PATTERN = Pattern.compile(
+        "(?i)\\burl\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|([^)]*))\\s*\\)"
+    );
 
     private static final String CONCAT_PATH_FORMAT = "%s/%s";
 
@@ -97,8 +100,7 @@ public class FilesystemResourceReferenceCopier
             // Ignore errors
             return;
         }
-        JarFile jar = new JarFile(jarFile);
-        try {
+        try (JarFile jar = new JarFile(jarFile)) {
             for (Enumeration<JarEntry> enumeration = jar.entries(); enumeration.hasMoreElements();) {
                 JarEntry entry = enumeration.nextElement();
                 if (entry.getName().startsWith(resourcePath) && !entry.isDirectory()) {
@@ -109,16 +111,13 @@ public class FilesystemResourceReferenceCopier
                     File targetLocation = new File(exportContext.getExportDir(), targetPath);
                     if (!targetLocation.exists()) {
                         targetLocation.getParentFile().mkdirs();
-                        InputStream is = jar.getInputStream(entry);
-                        try (FileOutputStream fos = new FileOutputStream(targetLocation)) {
+                        try (InputStream is = jar.getInputStream(entry);
+                             FileOutputStream fos = new FileOutputStream(targetLocation)) {
                             IOUtils.copy(is, fos);
                         }
-                        is.close();
                     }
                 }
             }
-        } finally {
-            jar.close();
         }
     }
 
@@ -131,8 +130,7 @@ public class FilesystemResourceReferenceCopier
             // Ignore errors
             return;
         }
-        JarFile jar = new JarFile(jarFile);
-        try {
+        try (JarFile jar = new JarFile(jarFile)) {
             for (Enumeration<JarEntry> enumeration = jar.entries(); enumeration.hasMoreElements();) {
                 JarEntry entry = enumeration.nextElement();
                 if (entry.getName().equals(resourcePath)) {
@@ -141,8 +139,6 @@ public class FilesystemResourceReferenceCopier
                     break;
                 }
             }
-        } finally {
-            jar.close();
         }
     }
 
@@ -155,7 +151,15 @@ public class FilesystemResourceReferenceCopier
             while ((line = br.readLine()) != null) {
                 Matcher matcher = URL_PATTERN.matcher(line);
                 while (matcher.find()) {
-                    String url = matcher.group(1);
+                    // Find the first non-null group
+                    String url = null;
+                    for (int i : new int[] { 1, 2, 3 }) {
+                        String group = matcher.group(i);
+                        if (group != null) {
+                            url = group.trim();
+                            break;
+                        }
+                    }
                     // Determine if URL is relative
                     if (isRelativeURL(url)) {
                         // Remove any query string part and any fragment part too

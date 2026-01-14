@@ -48,6 +48,7 @@ annotations.annotated.loaderror=실패함:
 annotations.annotated.loaderror.wrongresponse=잘못된 형식의 서버 응답
 annotations.annotated.error.noannotatedelement=컨텐츠를 사용할 수 없기 때문에 주석을 로드할 수 없습니다.
 annotations.annotated.error.wrongsyntax=XWiki/1.0 구문으로 작성된 페이지에는 주석을 사용할 수 없습니다.
+annotations.annotated.highlight.toggle.hint=이 텍스트에 대한 주석을 열다.
 annotations.action.edit.text=[편집]
 annotations.action.edit.tooltip=주석 편집
 annotations.action.edit.submit.text=업데이트

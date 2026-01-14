@@ -20,7 +20,10 @@
 package org.xwiki.webjars.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 
 import javax.inject.Provider;
 
@@ -48,9 +51,7 @@ class FilesystemResourceReferenceSerializerTest
 {
     private static final File BASEDIR = new File(System.getProperty("java.io.tmpdir"), "xwikitest");
 
-    // The fallback version is primarily needed for running the test in an IDE like IntelliJ without Maven.
-    // It might get outdated, so if you face issues while running the test in an IDE, you might need to update it.
-    private static final String FONTAWESOME_VERSION = System.getProperty("fontawesome.version", "7.0.1");
+    private static final String FONTAWESOME_VERSION = loadFontAwesomeVersion();
 
     private static final String WEBJAR_PREFIX = "webjars/font-awesome/" + FONTAWESOME_VERSION;
 
@@ -61,6 +62,30 @@ class FilesystemResourceReferenceSerializerTest
     private FilesystemResourceReferenceSerializer serializer;
 
     private ClassLoader originalThreadContextClassLoader;
+
+    /**
+     * Load the Font Awesome version from the WebJar's pom.properties file.
+     *
+     * @return the Font Awesome version
+     */
+    private static String loadFontAwesomeVersion()
+    {
+        // Try to load from the WebJar's pom.properties file
+        String propertiesPath = "META-INF/maven/org.webjars/font-awesome/pom.properties";
+        try (InputStream is = Thread.currentThread().getContextClassLoader()
+            .getResourceAsStream(propertiesPath))
+        {
+            if (is == null) {
+                throw new RuntimeException("Could not find Font Awesome pom.properties at " + propertiesPath);
+            }
+
+            Properties properties = new Properties();
+            properties.load(is);
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load Font Awesome version from " + propertiesPath, e);
+        }
+    }
 
     @BeforeEach
     void setUp() throws Exception

@@ -109,6 +109,7 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
   },
   theme: "light",
   lang: getLanguage(),
+  label: "Editor"
 });
 
 //

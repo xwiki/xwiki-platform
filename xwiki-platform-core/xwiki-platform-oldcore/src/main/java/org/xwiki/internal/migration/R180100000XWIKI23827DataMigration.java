@@ -37,7 +37,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
@@ -155,8 +157,13 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         throws XWikiException, DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
-        String passwordXClassQuery = "select doc.fullName"
-            + "from XWikiDocument doc"
+        XWikiStoreInterface store = wiki.getStore();
+        XWikiCacheStore cacheStore = null;
+        if (store instanceof XWikiCacheStore wikiCacheStore) {
+            cacheStore = wikiCacheStore;
+        }
+        String passwordXClassQuery = "select doc.fullName "
+            + "from XWikiDocument doc "
             + "where doc.xWikiClassXML like "
             + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%' "
             + "order by doc.fullName";
@@ -176,12 +183,15 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
             DocumentReference xclassDocReference = this.documentReferenceResolver.resolve(className);
 
             // we load the doc, get its xclass, iterate over the fields and memorize the names of password fields
-            // FIXME: ensure to invalidate the doc in cache
             XWikiDocument document = wiki.getDocument(xclassDocReference, getXWikiContext());
             for (Object field : document.getXClass().getFieldList()) {
                 if (field instanceof PasswordClass passwordField) {
                     xClassWithPasswordProperties.addProperty(passwordField.getName());
                 }
+            }
+            // ensure to invalidate the doc in cache to avoid any problems if it contains also objects.
+            if (cacheStore != null) {
+                cacheStore.invalidate(document);
             }
             // ensure to avoid false positives
             if (!xClassWithPasswordProperties.getProperties().isEmpty()) {

@@ -52,8 +52,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
@@ -103,12 +103,12 @@ class R180100000XWIKI23827DataMigrationTest
     @Test
     void migrate() throws QueryException, XWikiException, DataMigrationException
     {
-        String passwordXClassQuery = "select doc.fullName"
-            + "from XWikiDocument doc"
+        String passwordXClassQuery = "select doc.fullName "
+            + "from XWikiDocument doc "
             + "where doc.xWikiClassXML like "
             + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%' "
             + "order by doc.fullName";
-        XWikiStoreInterface storeInterface = mock(XWikiStoreInterface.class);
+        XWikiCacheStore storeInterface = mock(XWikiCacheStore.class);
         when(wiki.getStore()).thenReturn(storeInterface);
         QueryManager queryManager = mock(QueryManager.class);
         when(storeInterface.getQueryManager()).thenReturn(queryManager);
@@ -174,12 +174,14 @@ class R180100000XWIKI23827DataMigrationTest
         OngoingStubbing<Query> queryOngoingStubbing =
             when(queryManager.createQuery(objectIdsQuery, Query.HQL)).thenReturn(classObjectIdQuery);
 
+        List<XWikiDocument> xclassDocs = new ArrayList<>();
         for (int i = 0; i < passwordClassReferenceString.size(); i++) {
             String className = passwordClassReferenceString.get(i);
             DocumentReference documentReference = mock(DocumentReference.class, "docRef_" + i);
             when(this.documentReferenceResolver.resolve(className))
                 .thenReturn(documentReference);
             XWikiDocument doc = mock(XWikiDocument.class, "doc_" + i);
+            xclassDocs.add(doc);
             BaseClass xclass = mock(BaseClass.class, "class_" + i);
             when(doc.getXClass()).thenReturn(xclass);
             when(wiki.getDocument(documentReference, context)).thenReturn(doc);
@@ -567,6 +569,9 @@ class R180100000XWIKI23827DataMigrationTest
         }
         verify(hibernateStore, times(9)).beginTransaction(context);
         verify(hibernateStore, times(9)).endTransaction(context, true);
+        for (XWikiDocument xclassDoc : xclassDocs) {
+            verify(storeInterface).invalidate(xclassDoc);
+        }
         assertEquals(18, logCapture.size());
         assertEquals("[4] different xclass found containing password properties values to migrate found.",
             logCapture.getMessage(0));

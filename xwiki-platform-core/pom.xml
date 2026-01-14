@@ -192,7 +192,7 @@
             <configuration>
               <skip>${xwiki.enforcer.valid-importmap.skip}</skip>
               <rules>
-                <javascriptImportMapCheck/>
+                <javascriptImportMapCheck />
               </rules>
             </configuration>
           </execution>

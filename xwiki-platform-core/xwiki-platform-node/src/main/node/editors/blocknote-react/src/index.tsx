@@ -94,4 +94,7 @@ export {
 
 export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
 
-export type { ImageEditionOverrideFn } from "./components/images/CustomImageToolbar";
+export type {
+  ImageEditionOverrideFn,
+  ImageUpdateResult,
+} from "./components/images/CustomImageToolbar";

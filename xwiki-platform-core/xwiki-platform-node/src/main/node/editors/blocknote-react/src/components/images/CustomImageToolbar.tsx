@@ -125,4 +125,8 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   );
 };
 
-export type { CustomImageToolbarProps, ImageEditionOverrideFn };
+export type {
+  CustomImageToolbarProps,
+  ImageEditionOverrideFn,
+  ImageUpdateResult,
+};

@@ -29,7 +29,7 @@ import type {
   ListItem,
   MacroInvocation,
   TableCell,
-  Text,
+  TextStyles,
   UniAst,
 } from "@xwiki/platform-uniast-api";
 
@@ -189,13 +189,22 @@ export class DefaultUniAstToMarkdownConverter
   async convertInlineContent(inlineContent: InlineContent): Promise<string> {
     switch (inlineContent.type) {
       case "text":
-        return this.convertText(inlineContent);
+        return this.convertText(inlineContent.content, inlineContent.styles);
+
       case "image":
         return this.convertImage(inlineContent);
+
       case "link":
         return this.convertLink(inlineContent);
+
       case "inlineMacro":
         return this.convertMacro(inlineContent.call);
+
+      case "subscript":
+        return `<sub>${this.convertText(inlineContent.content, inlineContent.styles)}</sub>`;
+
+      case "superscript":
+        return `<sup>${this.convertText(inlineContent.content, inlineContent.styles)}</sup>`;
     }
   }
 
@@ -250,9 +259,7 @@ export class DefaultUniAstToMarkdownConverter
   }
 
   // eslint-disable-next-line max-statements
-  private convertText(text: Text): string {
-    const { content, styles } = text;
-
+  private convertText(content: string, styles: TextStyles): string {
     const { bold, italic, strikethrough, code } = styles;
 
     const surroundings = [];

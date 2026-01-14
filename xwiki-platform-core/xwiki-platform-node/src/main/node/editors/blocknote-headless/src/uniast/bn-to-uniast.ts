@@ -28,13 +28,12 @@ import {
   tryFallible,
   tryFallibleOrError,
 } from "@xwiki/platform-fn-utils";
-import type { Link, TableCell as BlockNoteTableCell } from "@blocknote/core";
+import type { Styles, TableCell as BlockNoteTableCell } from "@blocknote/core";
 import type {
   BlockType,
   EditorInlineContentSchema,
-  EditorLink,
   EditorStyleSchema,
-  EditorStyledText,
+  InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
@@ -46,6 +45,7 @@ import type {
   LinkTarget,
   ListItem,
   TableCell,
+  TextStyles,
   UniAst,
 } from "@xwiki/platform-uniast-api";
 
@@ -152,7 +152,7 @@ export class BlockNoteToUniAstConverter {
         );
       }
 
-      const content = block.content ?? [];
+      const content: InlineContentType[] = block.content ?? [];
 
       return {
         type: "macroBlock",
@@ -374,7 +374,7 @@ export class BlockNoteToUniAstConverter {
 
   private convertTableCell(
     cell:
-      | Array<EditorStyledText | EditorLink>
+      | Array<InlineContentType>
       | BlockNoteTableCell<EditorInlineContentSchema, EditorStyleSchema>,
   ): TableCell {
     return Array.isArray(cell)
@@ -390,8 +390,9 @@ export class BlockNoteToUniAstConverter {
         };
   }
 
+  // eslint-disable-next-line max-statements
   private convertInlineContent(
-    inlineContent: EditorStyledText | Link<EditorStyleSchema>,
+    inlineContent: InlineContentType,
   ): InlineContent {
     // Handle macros
     if (inlineContent.type.startsWith(MACRO_NAME_PREFIX)) {
@@ -434,28 +435,10 @@ export class BlockNoteToUniAstConverter {
 
     switch (inlineContent.type) {
       case "text": {
-        const {
-          bold,
-          italic,
-          underline,
-          strike,
-          code,
-          backgroundColor,
-          textColor,
-        } = inlineContent.styles;
-
         return {
           type: "text",
           content: inlineContent.text,
-          styles: {
-            bold: bold ?? false,
-            italic: italic ?? false,
-            underline: underline ?? false,
-            strikethrough: strike ?? false,
-            code: code ?? false,
-            backgroundColor,
-            textColor,
-          },
+          styles: this.convertTextStyles(inlineContent.styles),
         };
       }
 
@@ -475,7 +458,57 @@ export class BlockNoteToUniAstConverter {
           }),
           target: this.parseTarget(inlineContent.href),
         };
+
+      case "subscript": {
+        if (inlineContent.content.length !== 1) {
+          throw new Error(
+            "Expected exactly one inline content in BlockNote subscript",
+          );
+        }
+
+        return {
+          type: "subscript",
+          content: inlineContent.content[0].text,
+          styles: this.convertTextStyles(inlineContent.content[0].styles),
+        };
+      }
+
+      case "superscript": {
+        if (inlineContent.content.length !== 1) {
+          throw new Error(
+            "Expected exactly one inline content in BlockNote superscript",
+          );
+        }
+
+        return {
+          type: "superscript",
+          content: inlineContent.content[0].text,
+          styles: this.convertTextStyles(inlineContent.content[0].styles),
+        };
+      }
     }
+  }
+
+  private convertTextStyles(styles: Styles<EditorStyleSchema>): TextStyles {
+    const {
+      bold,
+      italic,
+      underline,
+      strike,
+      code,
+      backgroundColor,
+      textColor,
+    } = styles;
+
+    return {
+      bold: bold ?? false,
+      italic: italic ?? false,
+      underline: underline ?? false,
+      strikethrough: strike ?? false,
+      code: code ?? false,
+      backgroundColor,
+      textColor,
+    };
   }
 
   private parseTarget(url: string): LinkTarget {

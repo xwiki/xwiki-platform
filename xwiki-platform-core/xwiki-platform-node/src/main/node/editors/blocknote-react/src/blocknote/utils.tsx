@@ -24,6 +24,7 @@ import {
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import type { InlineContentType } from ".";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -139,7 +140,11 @@ function createCustomInlineContentSpec<
         aliases?: string[];
         group: string;
         icon: ReactNode;
-        default: () => PartialInlineContent<Record<I["type"], I>, S>;
+        // TODO: change to `PartialInlineContentElement` instead of that `Exclude` mess once https://github.com/TypeCellOS/BlockNote/issues/2352 is resolved
+        default: () => Exclude<
+          PartialInlineContent<Record<I["type"], I>, S>,
+          string
+        >[number];
       };
   customToolbar: (() => ReactNode) | null;
 }) {
@@ -386,10 +391,9 @@ function adaptMacroForBlockNote(
                 ),
             },
             slashMenu: getSlashMenu((getDefaultValue) => ({
-              default: () => [
+              default: () =>
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 getDefaultValue() as any,
-              ],
             })),
             // TODO: allow macros to define their own toolbar, using a set of provided UI components (buttons, ...)
             // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-708
@@ -412,9 +416,7 @@ function adaptMacroForBlockNote(
  * @since 18.0.0RC1
  * @beta
  */
-function extractMacroRawContent(
-  content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
-): string {
+function extractMacroRawContent(content: InlineContentType[]): string {
   if (content.length !== 1) {
     throw new Error(
       "Internal error: raw-body macro does not have precisely 1 inline content",

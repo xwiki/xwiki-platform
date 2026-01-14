@@ -72,9 +72,30 @@ export type InlineContent = ({
     type: "image";
 } & Image_2) | ({
     type: "link";
-} & Link) | {
+} & Link)
+/**
+* @since 18.0.0RC1
+* @beta
+*/
+| {
     type: "inlineMacro";
     call: MacroInvocation;
+}
+/**
+* @since 18.0.0RC1
+* @beta
+*/
+| {
+    type: "subscript";
+    content: string;
+}
+/**
+* @since 18.0.0RC1
+* @beta
+*/
+| {
+    type: "superscript";
+    content: string;
 };
 
 // @beta (undocumented)

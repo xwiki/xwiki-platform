@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { SubScript } from "./inlineContents/SubScript";
+import { SuperScript } from "./inlineContents/SuperScript";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
@@ -50,13 +52,9 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
     defaultBlockSpecs;
 
-  macros = [
-    ...macros.sort((a, b) =>
-      a.macro.infos.name.localeCompare(b.macro.infos.name),
-    ),
-  ];
+  macros.sort((a, b) => a.macro.infos.name.localeCompare(b.macro.infos.name));
 
-  const blockNoteSchema = BlockNoteSchema.create({
+  return BlockNoteSchema.create({
     blockSpecs: {
       ...remainingBlockSpecs,
 
@@ -76,6 +74,10 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
 
+      // Custom inline contents
+      subscript: SubScript.inlineContent,
+      superscript: SuperScript.inlineContent,
+
       // Macros
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
@@ -89,8 +91,6 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
       ),
     },
   });
-
-  return blockNoteSchema;
 }
 
 /**
@@ -131,6 +131,17 @@ function querySuggestionsMenuItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
+      // Custom inline contents
+      filterMap([SubScript, SuperScript], (item) =>
+        item.slashMenuEntry
+          ? item.slashMenuEntry(
+              // NOTE: this is required as `slashMenuEntry` is returned by `createCustomInlineContentSpec` which can't be generic over the editor type
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              editor as BlockNoteEditor<any>,
+            )
+          : null,
+      ),
+
       // Block macros
       filterMap(macros, ({ bnRendering }) =>
         bnRendering.type === "block" && bnRendering.block.slashMenuEntry
@@ -142,7 +153,11 @@ function querySuggestionsMenuItems(
       filterMap(macros, ({ bnRendering }) =>
         bnRendering.type === "inline" &&
         bnRendering.inlineContent.slashMenuEntry
-          ? bnRendering.inlineContent.slashMenuEntry(editor)
+          ? bnRendering.inlineContent.slashMenuEntry(
+              // NOTE: this is required as `slashMenuEntry` is returned by `createCustomInlineContentSpec` which can't be generic over the editor type
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              editor as BlockNoteEditor<any>,
+            )
           : null,
       ),
     ),

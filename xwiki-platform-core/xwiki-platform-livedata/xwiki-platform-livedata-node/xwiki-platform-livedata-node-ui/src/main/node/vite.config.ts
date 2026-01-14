@@ -37,12 +37,21 @@ export default defineConfig({
         sourcemap: true,
         rollupOptions: {
             external: (id, parentId, isResolved) => {
-                console.log('extension', id, parentId, isResolved)
                 // Keep the specific dependency internal
-                const bundle = ['@xwiki/platform-livedata-ui', "lz-string", "u-node", "lodash", "dompurify",
-                    "vue-tippy"];
+                // TODO: This list can actually be derived from the package.json dependencies, meaning that we can
+                //  make this vite configuration generic and reusable.
+                // The rest of the dependencies are peer or dev dependencies.
+                const bundle = [
+                    '@xwiki/platform-livedata-ui',
+                    "dompurify",
+                    "lz-string",
+                    "tippy.js",
+                    "u-node",
+                    "vue-tippy",
+                    "vuedraggable",
+                ];
+
                 if (bundle.find(s => id === s || id.startsWith(`${s}/`)) !== undefined) {
-                    console.log('keeping', id)
                     return false;
                 }
 

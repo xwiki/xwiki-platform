@@ -30,6 +30,7 @@
     "vuedraggable": "catalog:"
   },
   "peerDependencies": {
+    "jquery": "3.x",
     "vue": "3.x"
   },
   "devDependencies": {

@@ -43,9 +43,16 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 class FilesystemResourceReferenceSerializerTest
 {
     private static final File BASEDIR = new File(System.getProperty("java.io.tmpdir"), "xwikitest");
+
+    // The fallback version is primarily needed for running the test in an IDE like IntelliJ without Maven.
+    // It might get outdated, so if you face issues while running the test in an IDE, you might need to update it.
+    private static final String FONTAWESOME_VERSION = System.getProperty("fontawesome.version", "7.0.1");
+
+    private static final String WEBJAR_PREFIX = "webjars/font-awesome/" + FONTAWESOME_VERSION;
 
     @MockComponent
     private Provider<FilesystemExportContext> exportContextProvider;
@@ -78,14 +85,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals(WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -98,14 +105,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../../webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals("../../../" + WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -118,14 +125,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals("../../" + WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -137,16 +144,15 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "css/all.min.css"));
+            "font-awesome", FONTAWESOME_VERSION, "css/all.min.css"));
 
-        assertEquals("webjars/font-awesome/7.0.1/css/all.min.css",
-            this.serializer.serialize(reference).serialize());
+        assertEquals(WEBJAR_PREFIX + "/css/all.min.css", this.serializer.serialize(reference).serialize());
 
         // Also verify that the resources haves been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/css/all.min.css").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-solid-900.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-brands-400.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-v4compatibility.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/css/all.min.css").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-solid-900.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-brands-400.woff2").exists());
+        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-v4compatibility.woff2").exists());
     }
 }

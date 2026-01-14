@@ -739,6 +739,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 
 .search-facet-body {
   opacity: 0;
+  height: 0;
+  width: 0;
   visibility: hidden; /* This makes sure the element is removed from the accessibility tree. */
 
   position: absolute;
@@ -803,6 +805,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   }
   &amp; .search-facet-body {
     opacity: 1;
+    height: auto;
+    width: auto;
     position: unset; /* This element should be positioned normally when shown. */
     visibility: visible;
     transform: translateY(0);
@@ -838,6 +842,11 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
   &amp;:hover, &amp;:focus {
     text-decoration: underline;
   }
+}
+
+/* Avoid displaying scroll bars when filters are too large. */
+#xwikicontent {
+  overflow: unset;
 }
 
 .search-facet-body .itemName,

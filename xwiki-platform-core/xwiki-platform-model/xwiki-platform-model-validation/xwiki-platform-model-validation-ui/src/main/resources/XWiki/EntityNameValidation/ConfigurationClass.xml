@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.EntityNameValidation.ConfigurationClass" locale="">
+<xwikidoc version="1.6" reference="XWiki.EntityNameValidation.ConfigurationClass" locale="">
   <web>XWiki.EntityNameValidation</web>
   <name>ConfigurationClass</name>
   <language/>
@@ -110,6 +110,54 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </replaceCharacters.replacementCharacters>
+    <slug.dotsBetweenDigits>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>slug.dotsBetweenDigits</name>
+      <number>7</number>
+      <prettyName>slug.dotsBetweenDigits</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </slug.dotsBetweenDigits>
+    <slug.forbiddenWords>
+      <contenttype>---</contenttype>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
+      <name>slug.forbiddenWords</name>
+      <number>8</number>
+      <picker>1</picker>
+      <prettyName>slug.forbiddenWords</prettyName>
+      <restricted>0</restricted>
+      <rows>5</rows>
+      <size>50</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </slug.forbiddenWords>
+    <slug.lowercase>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>slug.lowercase</name>
+      <number>6</number>
+      <prettyName>slug.lowercase</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </slug.lowercase>
     <useTransformation>
       <customDisplay/>
       <defaultValue/>

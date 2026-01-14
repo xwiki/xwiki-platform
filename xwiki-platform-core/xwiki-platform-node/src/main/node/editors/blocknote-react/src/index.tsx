@@ -91,3 +91,10 @@ export {
   buildMacroRawContent,
   extractMacroRawContent,
 } from "./blocknote/utils";
+
+export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
+
+export type {
+  ImageEditionOverrideFn,
+  ImageUpdateResult,
+} from "./components/images/CustomImageToolbar";

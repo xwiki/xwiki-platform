@@ -69,7 +69,7 @@ test("Image insertion UI can be overriden", async ({ mount }) => {
       overrides={{
         // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
         imageEdition: (image) => {
-          overrideFnCalledWithUrl = image.props.url;
+          overrideFnCalledWithUrl = image.url;
         },
       }}
     />,

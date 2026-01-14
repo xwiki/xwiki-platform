@@ -19,6 +19,7 @@
  */
 import { ImageFilePanel } from "./ImageFilePanel";
 import { useBlockNoteEditor, useComponentsContext } from "@blocknote/react";
+import { assertUnreachable } from "@xwiki/platform-fn-utils";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
@@ -38,9 +39,19 @@ type CustomImageToolbarProps = {
  * @beta
  */
 type ImageEditionOverrideFn = (
-  image: BlockOfType<"image">,
-  update: (newProps: Partial<BlockOfType<"image">["props"]>) => void,
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
 ) => void;
+
+/**
+ * Result of an image update process, from `ImageEditionOverrideFn`
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type ImageUpdateResult =
+  | { type: "update"; updatedProps: Partial<BlockOfType<"image">["props"]> }
+  | { type: "aborted" };
 
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
@@ -54,15 +65,27 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   const [showImageEditor, setShowImageEditor] = useState(false);
 
   const updateImageProps = useCallback(
-    (newProps: Partial<BlockOfType<"image">["props"]>) => {
-      editor.updateBlock(currentBlock, { props: newProps });
+    (updateResult: ImageUpdateResult) => {
+      switch (updateResult.type) {
+        case "update":
+          editor.updateBlock(currentBlock, {
+            props: updateResult.updatedProps,
+          });
+          break;
+
+        case "aborted":
+          break;
+
+        default:
+          assertUnreachable(updateResult);
+      }
     },
     [currentBlock, editor],
   );
 
   const openEditor = useCallback(() => {
     if (imageEditionOverrideFn) {
-      imageEditionOverrideFn(currentBlock, updateImageProps);
+      imageEditionOverrideFn(currentBlock.props, updateImageProps);
     } else {
       setShowImageEditor(true);
     }

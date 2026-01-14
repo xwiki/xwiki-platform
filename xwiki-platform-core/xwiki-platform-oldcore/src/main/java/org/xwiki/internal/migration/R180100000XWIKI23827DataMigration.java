@@ -20,9 +20,7 @@
 package org.xwiki.internal.migration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -80,8 +78,8 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     // (prop.id.id = :objectId_0 and prop.id.name = :property_0)
     private static final int BATCH_SIZE = 100;
 
-    private static final String OR_STATEMENT = " or ";
-    private static final String SELECT_PROPERTIES_STATEMENT = "select prop from StringProperty as prop where %s";
+    private static final String SELECT_PROPERTIES_STATEMENT = "select prop from StringProperty as prop "
+        + "where prop.id.name in :propNames and prop.id.id in :objectIds";
 
     @Inject
     @Named("current")
@@ -102,13 +100,13 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         return new XWikiDBVersion(180100000);
     }
     
-    private static class PasswordPropertyValues
+    private static class XClassWithPasswordProperties
     {
         private final String className;
         private final List<String> properties;
         private final List<Long> objectIds;
 
-        PasswordPropertyValues(String className)
+        XClassWithPasswordProperties(String className)
         {
             this.className = className;
             this.properties = new ArrayList<>();
@@ -125,9 +123,9 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
             this.properties.add(property);
         }
 
-        void addObjectId(Long objectId)
+        void addObjectIds(List<Long> objectIds)
         {
-            this.objectIds.add(objectId);
+            this.objectIds.addAll(objectIds);
         }
 
         public List<String> getProperties()
@@ -144,23 +142,25 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        List<PasswordPropertyValues> passwordPropertyValuesList = getPasswordPropertiesValues();
-        for (PasswordPropertyValues passwordPropertyValues : passwordPropertyValuesList) {
-            handlePasswordPropertiesValues(passwordPropertyValues);
+        List<XClassWithPasswordProperties> xClassWithPasswordPropertiesList = getXClassWithPasswordProperties();
+        for (XClassWithPasswordProperties xclass : xClassWithPasswordPropertiesList) {
+            retrieveXObjectsIds(xclass);
+            if (!xclass.getObjectIds().isEmpty()) {
+                handlePasswordPropertiesValues(xclass);
+            }
         }
     }
 
-    private List<PasswordPropertyValues> getPasswordPropertiesValues() throws XWikiException, DataMigrationException
+    private List<XClassWithPasswordProperties> getXClassWithPasswordProperties()
+        throws XWikiException, DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
-        // Get XClass containing a Password Field and all objects of that xclass
-        // TODO: should we limit? What if there's a very big number of objects?
-        String passwordXClassQuery = "select doc.fullName, obj.id "
-            + "from XWikiDocument doc, BaseObject as obj "
-            + "where obj.className = doc.fullName and doc.xWikiClassXML like "
+        String passwordXClassQuery = "select doc.fullName"
+            + "from XWikiDocument doc"
+            + "where doc.xWikiClassXML like "
             + "'%<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>%' "
             + "order by doc.fullName";
-        List<Object[]> results;
+        List<String> results;
         try {
             results = wiki.getStore().getQueryManager()
                 .createQuery(passwordXClassQuery, Query.HQL)
@@ -170,63 +170,63 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
                 e);
         }
 
-        // this list will contain one occurence of PasswordPropertyValues per xclass
-        List<PasswordPropertyValues> passwordPropertyValuesList = new ArrayList<>();
-        PasswordPropertyValues passwordPropertyValues = null;
-        for (Object[] result : results) {
-            // it's an xclass we haven't visited yet so we're looking for the password properties
-            // TODO: right now it only works because we don't paginate results
-            if (passwordPropertyValues == null || !passwordPropertyValues.getClassName().equals(result[0])) {
-                passwordPropertyValues = new PasswordPropertyValues(String.valueOf(result[0]));
-                passwordPropertyValuesList.add(passwordPropertyValues);
-                DocumentReference xclassDocReference =
-                    this.documentReferenceResolver.resolve(passwordPropertyValues.getClassName());
+        List<XClassWithPasswordProperties> xClassWithPasswordPropertiesList = new ArrayList<>();
+        for (String className : results) {
+            XClassWithPasswordProperties xClassWithPasswordProperties = new XClassWithPasswordProperties(className);
+            DocumentReference xclassDocReference = this.documentReferenceResolver.resolve(className);
 
-                // we load the doc, get its xclass, iterate over the fields and memorize the names of password fields
-                XWikiDocument document = wiki.getDocument(xclassDocReference, getXWikiContext());
-                for (Object field : document.getXClass().getFieldList()) {
-                    if (field instanceof PasswordClass passwordField) {
-                        passwordPropertyValues.addProperty(passwordField.getName());
-                    }
+            // we load the doc, get its xclass, iterate over the fields and memorize the names of password fields
+            // FIXME: ensure to invalidate the doc in cache
+            XWikiDocument document = wiki.getDocument(xclassDocReference, getXWikiContext());
+            for (Object field : document.getXClass().getFieldList()) {
+                if (field instanceof PasswordClass passwordField) {
+                    xClassWithPasswordProperties.addProperty(passwordField.getName());
                 }
             }
-            // we then memorize the xobjects ids for that xclass
-            passwordPropertyValues.addObjectId((Long) result[1]);
+            // ensure to avoid false positives
+            if (!xClassWithPasswordProperties.getProperties().isEmpty()) {
+                xClassWithPasswordPropertiesList.add(xClassWithPasswordProperties);
+            }
         }
-        this.logger.info("[{}] xobjects containing password properties related to [{}] different xclass "
-            + "to migrate found.", results.size(), passwordPropertyValuesList.size());
-        return passwordPropertyValuesList;
+        this.logger.info("[{}] different xclass found containing password properties values to migrate found.",
+            xClassWithPasswordPropertiesList.size());
+        return xClassWithPasswordPropertiesList;
     }
 
-    private void handlePasswordPropertiesValues(PasswordPropertyValues passwordPropertyValues)
+    private void retrieveXObjectsIds(XClassWithPasswordProperties xClassWithPasswordProperties)
+        throws DataMigrationException
+    {
+        XWiki wiki = getXWikiContext().getWiki();
+        String className = xClassWithPasswordProperties.getClassName();
+        String objectIdsQuery =  "select obj.id "
+            + "from BaseObject as obj "
+            + "where obj.className = :className "
+            + "order by obj.id";
+        List<Long> results;
+        try {
+            results = wiki.getStore().getQueryManager()
+                .createQuery(objectIdsQuery, Query.HQL)
+                .bindValue("className", className)
+                .execute();
+        } catch (QueryException e) {
+            throw new DataMigrationException(
+                String.format("Error while trying to get xobject ids for xclass [%s]", className),
+                e);
+        }
+        xClassWithPasswordProperties.addObjectIds(results);
+        logger.info("[{}] objects to migrate found for xclass [{}].", results.size(), className);
+    }
+
+    private void handlePasswordPropertiesValues(XClassWithPasswordProperties xClassWithPasswordProperties)
         throws XWikiException
     {
-        int objectNumbers = passwordPropertyValues.getObjectIds().size();
-        int propertyNumbers = passwordPropertyValues.getProperties().size();
+        int objectNumbers = xClassWithPasswordProperties.getObjectIds().size();
+        int propertyNumbers = xClassWithPasswordProperties.getProperties().size();
 
         logger.info("Starting migration of [{}] objects containing [{}] password properties from xclass [{}].",
             objectNumbers,
             propertyNumbers,
-            passwordPropertyValues.getClassName());
-
-        // We build once for all the where statement parts with properties, that we will reuse for all objects.
-        int loop = 0;
-        StringBuilder propertyStatementBuilder = new StringBuilder();
-        Map<String, Object> propertyBindings = new HashMap<>();
-        for (String property : passwordPropertyValues.getProperties()) {
-            String propertyBindingName = String.format("property_%s", loop);
-            propertyBindings.put(propertyBindingName, property);
-            propertyStatementBuilder.append("(prop.id.id = :%1$s and prop.id.name = :");
-            propertyStatementBuilder.append(propertyBindingName);
-            propertyStatementBuilder.append(")");
-            loop++;
-
-            if (loop < propertyNumbers) {
-                propertyStatementBuilder.append(OR_STATEMENT);
-            }
-        }
-
-        String propertyStatement = propertyStatementBuilder.toString();
+            xClassWithPasswordProperties.getClassName());
 
         // The size of the number of xobject we deal with is defined by the total batch size we have and the number of
         // properties we want to deal with, to avoid having a too longer where statement.
@@ -237,40 +237,27 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         int objectIndex = 0;
 
         do {
-            objectIndex = migrateProperties(passwordPropertyValues, propertyStatement, propertyBindings, objectIndex,
-                objectBatchSize);
+            objectIndex = migrateProperties(xClassWithPasswordProperties, objectIndex, objectBatchSize);
         } while (objectIndex < objectNumbers);
     }
 
-    private int migrateProperties(PasswordPropertyValues passwordPropertyValues, String propertyStatement,
-        Map<String, Object> propertyBindings, int originalObjectIndex, int objectBatchSize) throws XWikiException
+    private int migrateProperties(XClassWithPasswordProperties xclassWithPasswordProperties, int originalObjectIndex,
+        int objectBatchSize) throws XWikiException
     {
-        int objectIndex = originalObjectIndex;
+
         XWikiContext context = getXWikiContext();
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
         hibernateStore.beginTransaction(context);
         Session session = hibernateStore.getSession(context);
-        int objectNumbers = passwordPropertyValues.getObjectIds().size();
-
-        Map<String, Object> queryBindings = new HashMap<>(propertyBindings);
-        StringBuilder whereStatement = new StringBuilder();
-        for (int loopIndex = 0; objectIndex < objectNumbers && loopIndex < objectBatchSize; loopIndex++) {
-            Long objectId = passwordPropertyValues.getObjectIds().get(objectIndex);
-            String objectIdBindingName = String.format("objectId_%s", objectIndex);
-            queryBindings.put(objectIdBindingName, objectId);
-            whereStatement.append(String.format(propertyStatement, objectIdBindingName));
-
-            if (objectIndex < objectNumbers - 1 && loopIndex < objectBatchSize - 1) {
-                whereStatement.append(OR_STATEMENT);
-            }
-            objectIndex++;
-        }
+        int objectNumbers = xclassWithPasswordProperties.getObjectIds().size();
+        int objectEndIndex = Math.min(originalObjectIndex + objectBatchSize, objectNumbers);
+        List<Long> objectsIdsToMigrate = new ArrayList<>(xclassWithPasswordProperties.getObjectIds()
+            .subList(originalObjectIndex, objectEndIndex));
 
         org.hibernate.query.Query<StringProperty> query =
-            session.createQuery(String.format(SELECT_PROPERTIES_STATEMENT, whereStatement), StringProperty.class);
-        for (Map.Entry<String, Object> bindingEntry : queryBindings.entrySet()) {
-            query.setParameter(bindingEntry.getKey(), bindingEntry.getValue());
-        }
+            session.createQuery(SELECT_PROPERTIES_STATEMENT, StringProperty.class);
+        query.setParameter("propNames", xclassWithPasswordProperties.getProperties());
+        query.setParameter("objectIds", objectsIdsToMigrate);
 
         for (StringProperty stringProperty : query.getResultList()) {
             PasswordProperty passwordProperty = new PasswordProperty();
@@ -282,8 +269,8 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         }
 
         hibernateStore.endTransaction(context, true);
-        logger.info("[{}] objects migrated on [{}] for xclass [{}].", objectIndex, objectNumbers,
-            passwordPropertyValues.getClassName());
-        return objectIndex;
+        logger.info("[{}] objects migrated on [{}] for xclass [{}].", objectEndIndex, objectNumbers,
+            xclassWithPasswordProperties.getClassName());
+        return objectEndIndex;
     }
 }

@@ -306,7 +306,8 @@
                 <column name="XWP_ID" />
                 <column name="XWP_NAME" index="XWPASSWORD_NAME" />
             </key>
-            <property name="value" type="string" column="XWP_VALUE" length="768" />
+            <!-- Using a text size to ensure large tokens can be stored. -->
+            <property name="value" type="materialized_clob" column="XWP_VALUE" length="60000" />
         </joined-subclass>
     </class>
 

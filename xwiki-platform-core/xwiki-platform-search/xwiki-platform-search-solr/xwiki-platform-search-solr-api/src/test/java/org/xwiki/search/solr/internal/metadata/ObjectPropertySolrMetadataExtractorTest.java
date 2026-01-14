@@ -169,6 +169,9 @@ class ObjectPropertySolrMetadataExtractorTest
         when(object.getRelativeXClassReference())
             .thenReturn(classReference.removeParent(classReference.getWikiReference()));
         when(xclass.get(propertyName)).thenReturn(propertyClass);
+        if (obfuscate) {
+            when(property.isSensitive(xcontext)).thenReturn(true);
+        }
 
         BaseObjectReference objectReference = new BaseObjectReference(classReference, 0, this.documentReference);
         ObjectPropertyReference propertyReference = new ObjectPropertyReference(propertyName, objectReference);

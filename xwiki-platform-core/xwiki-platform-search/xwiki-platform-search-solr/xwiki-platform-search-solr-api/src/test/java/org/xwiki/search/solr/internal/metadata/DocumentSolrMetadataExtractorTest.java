@@ -507,6 +507,9 @@ class DocumentSolrMetadataExtractorTest
         when(emailField.getName()).thenReturn("email");
         when(emailField.getValue()).thenReturn(email);
         when(emailField.getObject()).thenReturn(userObject);
+        if (obfuscate) {
+            when(emailField.isSensitive(xcontext)).thenReturn(true);
+        }
 
         // Mock the class reference
         DocumentReference userClassRef = new DocumentReference("wiki", "space", "userClass");

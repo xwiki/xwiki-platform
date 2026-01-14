@@ -209,6 +209,16 @@
       <artifactId>ecs</artifactId>
       <version>1.4.2</version>
     </dependency>
+    <!--
+		Used to workaround a regression in Java that breaks FOP.
+		See https://issues.apache.org/jira/browse/FOP-3275 and https://bugs.openjdk.org/browse/JDK-8368356.
+    -->
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>12.9</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- HTML Export/PDF Export -->
     <dependency>

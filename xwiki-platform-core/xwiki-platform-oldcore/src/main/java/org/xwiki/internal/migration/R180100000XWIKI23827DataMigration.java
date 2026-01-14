@@ -69,7 +69,7 @@ import jakarta.inject.Singleton;
  * </ol>
  *
  * @version $Id$
- * @since 18.0.0RC1
+ * @since 18.1.0RC1
  */
 @Component
 @Singleton
@@ -105,8 +105,8 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     private static class XClassWithPasswordProperties
     {
         private final String className;
-        private final List<String> properties;
-        private final List<Long> objectIds;
+        private List<String> properties;
+        private List<Long> objectIds;
 
         XClassWithPasswordProperties(String className)
         {
@@ -139,6 +139,12 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         {
             return objectIds;
         }
+
+        public void emptyLists()
+        {
+            this.objectIds = null;
+            this.properties = null;
+        }
     }
 
     @Override
@@ -150,6 +156,8 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
             if (!xclass.getObjectIds().isEmpty()) {
                 handlePasswordPropertiesValues(xclass);
             }
+            // unbound the lists to allow GC free the memory
+            xclass.emptyLists();
         }
     }
 

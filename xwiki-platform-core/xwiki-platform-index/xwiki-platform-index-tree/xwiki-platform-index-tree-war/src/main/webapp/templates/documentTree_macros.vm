@@ -106,7 +106,7 @@
   ##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
   ##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
   ##   configuration becomes complex.
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css'), {
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.webjars:font-awesome', 'css/all.min.css'), {
     'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($_options = $macro.options)
   #tree($_options)

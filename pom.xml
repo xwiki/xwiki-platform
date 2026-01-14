@@ -1218,6 +1218,11 @@
         <artifactId>vue-i18n</artifactId>
         <version>11.1.12</version>
       </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>font-awesome</artifactId>
+        <version>7.0.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

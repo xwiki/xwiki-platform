@@ -48,6 +48,7 @@ annotations.annotated.loaderror=Fehlgeschlagen:
 annotations.annotated.loaderror.wrongresponse=Falsch formatierte Serverantwort
 annotations.annotated.error.noannotatedelement=Anmerkungen konnten nicht geladen werden, da der Inhalt nicht verfügbar ist.
 annotations.annotated.error.wrongsyntax=Anmerkungen werden auf Seiten mit XWiki/1.0 Syntax nicht unterstützt.
+annotations.annotated.highlight.toggle.hint=Öffne die Anmerkung zu diesem Text.
 annotations.action.edit.text=[Bearbeiten]
 annotations.action.edit.tooltip=Anmerkung bearbeiten
 annotations.action.edit.submit.text=Aktualisieren

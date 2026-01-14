@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -933,6 +934,52 @@ class LiveTableResultsTest extends PageTest
             "prop_dbList_item_1", "Ba%"
         );
         verify(this.query).bindValues(values);
+    }
+
+    private static Stream<Arguments> provideBooleanColumnFilters()
+    {
+        // Outer stream: for each boolean column to test.
+        return Stream.of("hidden", "minorEdit1", "enforceRequiredRights")
+            .flatMap(column -> {
+                String fullColumnName = "doc." + column;
+                String filterName = "doc_" + column + "_filter";
+                String whereString = "  where 1=1  and %s = :%s ".formatted(fullColumnName, filterName);
+                // Inner stream: for each possible boolean filter value.
+                return Stream.of(
+                        new ImmutablePair<>("true", true),
+                        new ImmutablePair<>("1", true),
+                        new ImmutablePair<>("false", false),
+                        new ImmutablePair<>("0", false),
+                        // Other values should be treated as false.
+                        new ImmutablePair<>("other", false)
+                    )
+                    .map(pair -> Arguments.of(
+                        fullColumnName,
+                        pair.getLeft(),
+                        whereString,
+                        Map.of(filterName, pair.getRight())
+                    ));
+            });
+    }
+
+    @ParameterizedTest(name = "{0} filtered by ''{1}''")
+    @MethodSource("provideBooleanColumnFilters")
+    void filterBooleanColumns(String columnName, String filterValue, String expectedHql,
+        Map<String, Object> expectedBindValues) throws Exception
+    {
+        setColumns(columnName);
+        setFilter(columnName, filterValue);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(expectedHql);
+        verify(this.query).bindValues(expectedBindValues);
     }
 
     //

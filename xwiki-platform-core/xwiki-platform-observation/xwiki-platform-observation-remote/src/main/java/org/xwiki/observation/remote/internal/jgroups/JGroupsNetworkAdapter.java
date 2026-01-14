@@ -24,12 +24,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import javax.inject.Provider;
-
+import org.jgroups.BytesMessage;
 import org.jgroups.Message;
-import org.jgroups.ObjectMessage;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -67,7 +66,9 @@ public class JGroupsNetworkAdapter implements NetworkAdapter, Disposable
         this.logger.debug("Send JGroups remote event [{}]", remoteEvent.toString());
 
         // Send the message to the whole group
-        Message message = new ObjectMessage(null, remoteEvent);
+        // Using BytesMessage and not ObjectMessage (which would have been much better for the memory) here because it's
+        // not possible to provide a custom classloader to unserialize objects
+        Message message = new BytesMessage(null, remoteEvent);
 
         // Send message to JGroups channels
         for (Map.Entry<String, JGroupsNetworkChannel> entry : this.channels.getChannels().entrySet()) {

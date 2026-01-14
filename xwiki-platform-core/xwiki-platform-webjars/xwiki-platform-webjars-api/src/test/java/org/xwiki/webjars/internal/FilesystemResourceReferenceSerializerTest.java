@@ -143,5 +143,9 @@ public class FilesystemResourceReferenceSerializerTest
 
         // Also verify that the resources haves been copied!
         assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/css/all.min.css").exists());
+        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-solid-900.woff2").exists());
+        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-brands-400.woff2").exists());
+        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-v4compatibility.woff2").exists());
     }
 }

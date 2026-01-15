@@ -40,7 +40,7 @@
 Help.Applications.Movies.Code.MoviesClass_title1=제목
 Help.Applications.Movies.Code.MoviesClass_longText1=포스터
 Help.Applications.Movies.Code.MoviesClass_staticList1=장르
-Help.Applications.Movies.Code.MoviesClass_staticList1_action=행동
+Help.Applications.Movies.Code.MoviesClass_staticList1_action=Action
 Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=코메디
 Help.Applications.Movies.Code.MoviesClass_staticList1_drama=드라마
 Help.Applications.Movies.Code.MoviesClass_staticList1_horror=공포
@@ -69,7 +69,7 @@ movies.livetable.doc.creationDate=생산 일
 movies.livetable._avatar=화신
 movies.livetable._images=이미지
 movies.livetable._attachments=첨부파일
-movies.livetable._actions=행위
+movies.livetable._actions=Actions
 movies.livetable._actions.edit=편집하다
 movies.livetable._actions.delete=삭제
 movies.livetable.emptyvalue=-

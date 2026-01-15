@@ -54,11 +54,11 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     protected ComponentManager componentManager;
 
     @Inject
-    private ComponentDescriptor<HibernateDataMigration> componentDescriptor;
-
-    @Inject
     @Named(XWikiHibernateBaseStore.HINT)
     protected Provider<DataMigrationManager> manager;
+
+    @Inject
+    private ComponentDescriptor<HibernateDataMigration> componentDescriptor;
 
     /**
      * Execution context used to access XWikiContext.

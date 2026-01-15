@@ -32,13 +32,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -63,6 +68,9 @@ class FilesystemResourceReferenceCopierTest
     private FilesystemExportContext exportContext;
 
     private ClassLoader originalClassLoader;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp()
@@ -110,6 +118,20 @@ class FilesystemResourceReferenceCopierTest
 
         assertTrue(new File(this.exportDir, "webjars/testlib/1.0.0/assets/file1.txt").exists());
         assertTrue(new File(this.exportDir, "webjars/testlib/1.0.0/assets/file1.txt.gz").exists());
+    }
+
+    @Test
+    void copyResourceFromJARWithPathTraversalAttack() throws Exception
+    {
+        // Create a JAR with a malicious resource
+        String resourcePath = "../../../../file.txt";
+        createTestJarWithResources(resourcePath);
+
+        FilesystemResourceReferenceCopier copier = new FilesystemResourceReferenceCopier();
+        copier.copyResourceFromJAR(RESOURCE_PREFIX, "../../../../file.txt", "webjars/testlib/1.0.0",
+            this.exportContext);
+
+        assertThat(this.logCapture.getMessage(0), containsString("Skipping copying of resource"));
     }
 
     @ParameterizedTest
@@ -172,6 +194,19 @@ class FilesystemResourceReferenceCopierTest
 
         File webjarDir = new File(this.exportDir, "webjars/testlib/1.0.0");
         assertFalse(webjarDir.exists());
+    }
+
+    @Test
+    void processCSSWithPathTraversalAttack() throws Exception
+    {
+        // Create a JAR with a malicious CSS file
+        String cssContent = ".icon { background: url(\"../../../../file.png\"); }";
+        createTestJarWithCSS(cssContent, "css/style.css", "../../../../file.png");
+
+        FilesystemResourceReferenceCopier copier = new FilesystemResourceReferenceCopier();
+        copier.processCSS(RESOURCE_PREFIX, "css/style.css", "webjars/testlib/1.0.0", this.exportContext);
+
+        assertThat(this.logCapture.getMessage(0), containsString("Skipping copying of resource"));
     }
 
     /**

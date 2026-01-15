@@ -104,6 +104,6 @@ platform.xclass.classes.livetable.doc.location=위치
 platform.xclass.classes.livetable.doc.date=날짜
 platform.xclass.classes.livetable.doc.author=마지막 저자
 platform.xclass.classes.livetable.pageCount=페이지 수
-platform.xclass.classes.livetable._actions=행위
+platform.xclass.classes.livetable._actions=Actions
 </content>
   </xwikidoc>

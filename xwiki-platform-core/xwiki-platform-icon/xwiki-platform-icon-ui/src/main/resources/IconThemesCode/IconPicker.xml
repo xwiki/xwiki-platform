@@ -685,6 +685,11 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   clear: left;
   height: 60px;
 }
+
+/* Define the select width explicitly because unexpected width definitions can break the icon picker layout. */
+.xwikiIconPickerIconThemeSelector select {
+  width: auto;
+}
 </code>
     </property>
     <property>

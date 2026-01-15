@@ -71,7 +71,7 @@
 ###############################################################################
 
 ## Menus
-platform.wiki.menu.wikiindex=위키 색인
+platform.wiki.menu.wikiindex=위키 인덱스
 platform.wiki.menu.deletewiki=위키 삭제
 platform.wiki.menu.userwikis=위키
 

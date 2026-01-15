@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>entitynamevalidation.currentStrategy.label=현재 명명 전략
+  <content>entitynamevalidation.currentStrategy.label=현재 명명 정책
 entitynamevalidation.currentStrategy.hint=이름 전략은 문서를 생성하거나 이름을 바꾸거나 저장할 때 사용됩니다.
 entitynamevalidation.useTransformation.label=자동으로 이름 변환
 entitynamevalidation.useTransformation.hint=활성화하면 가능한 경우 이름 전략을 사용하여 이름을 자동으로 조정합니다.

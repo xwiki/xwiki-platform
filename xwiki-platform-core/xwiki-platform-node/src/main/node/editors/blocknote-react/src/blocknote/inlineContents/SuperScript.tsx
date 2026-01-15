@@ -32,7 +32,12 @@ export const SuperScript = createCustomInlineContentSpec({
   },
   customToolbar: null,
   slashMenu: {
-    default: () => ({ type: "superscript" as const }),
+    default: () => ({
+      type: "superscript" as const,
+      // TODO: Currently required as the element would be invisible and un-editable if it was empty
+      // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/2359
+      content: [{ type: "text" as const, text: "superscript", styles: {} }],
+    }),
     group: "Others",
     title: "SuperScript",
     icon: "S",

@@ -460,9 +460,11 @@ export class BlockNoteToUniAstConverter {
         };
 
       case "subscript": {
-        if (inlineContent.content.length !== 1) {
+        if (inlineContent.content.length === 0) {
+          return { type: "subscript", content: "", styles: {} };
+        } else if (inlineContent.content.length !== 1) {
           throw new Error(
-            "Expected exactly one inline content in BlockNote subscript",
+            "Expected at most one inline content in BlockNote subscript",
           );
         }
 
@@ -474,9 +476,11 @@ export class BlockNoteToUniAstConverter {
       }
 
       case "superscript": {
-        if (inlineContent.content.length !== 1) {
+        if (inlineContent.content.length === 0) {
+          return { type: "subscript", content: "", styles: {} };
+        } else if (inlineContent.content.length > 1) {
           throw new Error(
-            "Expected exactly one inline content in BlockNote superscript",
+            "Expected at most one inline content in BlockNote superscript",
           );
         }
 

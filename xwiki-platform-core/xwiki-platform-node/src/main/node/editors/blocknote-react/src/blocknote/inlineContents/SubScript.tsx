@@ -32,7 +32,12 @@ export const SubScript = createCustomInlineContentSpec({
   },
   customToolbar: null,
   slashMenu: {
-    default: () => ({ type: "subscript" as const }),
+    default: () => ({
+      type: "subscript" as const,
+      // TODO: Currently required as the element would be invisible and un-editable if it was empty
+      // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/2359
+      content: [{ type: "text" as const, text: "subscript", styles: {} }],
+    }),
     group: "Others",
     title: "SubScript",
     icon: "S",

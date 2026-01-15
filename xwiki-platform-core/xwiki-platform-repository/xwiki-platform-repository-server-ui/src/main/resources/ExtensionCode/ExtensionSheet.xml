@@ -167,7 +167,7 @@
         ##------- Website button --------------
         #set($website = $extension.getProperty("website").value)
         #if ("$!website" != '')
-          [[$services.icon.render('book') Documentation>>$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
+          [[$services.icon.render('book') Documentation&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))

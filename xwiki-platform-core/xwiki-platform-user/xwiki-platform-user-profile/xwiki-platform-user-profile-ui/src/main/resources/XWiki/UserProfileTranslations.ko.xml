@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=위키에는 기본적으로 표시되지 않는 문서가 포함되어 있습니다. 이러한 숨겨진 문서는 애플리케이션 클래스, 환경설정 페이지, 매크로, 스타일, 스크립트 등과 같은 기술 콘텐츠를 나타냅니다.
-XWiki.XWikiUsers_accessibility.hint=추가 접근성은 더 큰 폰트, 밑줄 링크 등과 같은 다양한 시각적 개선을 가능하게 합니다.
+XWiki.XWikiUsers_underline.hint=링크에 밑줄 표시 여부를 선택하라.
 XWiki.XWikiUsers_timezone.hint=날짜가 현재 위치를 반영하도록 특정 타임존을 사용하십시오.
 XWiki.XWikiUsers_editor.hint=어떤 편집기가 기본 편집기가 될지 선택하고, 전역으로 설정된 기본 편집기를 무시하십시오. 정의되지 않은 경우, 편집중인 내용에 따라 기본 편집기가 선택됩니다.
 XWiki.XWikiUsers_usertype.hint=어떤 유형의 사용자가 기본 사용자가 될지 선택하십시오. 고급 사용자는 여러 편집 기능, 페이지 생성 등을 사용할 수 있습니다.
@@ -61,5 +61,13 @@ user.profile.network.error=알림 설정을 저장하는 중 오류가 발생했
 user.profile.status.done=완료
 user.profile.status.saving=저장중...
 user.profile.status.error=사용자 상태 저장 중 에러
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=추가 접근성은 더 큰 폰트, 밑줄 링크 등과 같은 다양한 시각적 개선을 가능하게 합니다.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rightsmanager.like=좋다
-like.unlike.modal.title=확인과 달리
+  <content>rightsmanager.like=좋아요
+like.unlike.modal.title=싫어요 확인
 like.unlike.modal.body={0} 페이지에 대한 좋아요를 삭제하시겠습니까?
 like.unlike.modal.closeButton=닫다
-like.unlike.modal.unlikeButton=페이지 좋아요
+like.unlike.modal.unlikeButton=페이지 싫어요
 like.unlike.modal.viewLikersButton=좋아요
 like.newlike.success=페이지가 좋아요를 받았습니다.
 like.newlike.error=페이지에 좋아요를 누르는 중에 오류가 발생했습니다.

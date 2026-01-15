@@ -29,6 +29,7 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -61,6 +62,8 @@ public class FilesystemResourceReferenceCopier
     );
 
     private static final String CONCAT_PATH_FORMAT = "%s/%s";
+
+    private static final String PATH_SEPARATOR = "/";
 
     private File getJARFile(String resourceName) throws IOException
     {
@@ -108,13 +111,23 @@ public class FilesystemResourceReferenceCopier
                     // TODO: Won't this cause collisions if the same resource is available on several subwikis
                     // for example?
                     String targetPath = targetPrefix + entry.getName().substring(resourcePrefix.length());
-                    File targetLocation = new File(exportContext.getExportDir(), targetPath);
-                    if (!targetLocation.exists()) {
-                        targetLocation.getParentFile().mkdirs();
-                        try (InputStream is = jar.getInputStream(entry);
-                             FileOutputStream fos = new FileOutputStream(targetLocation)) {
-                            IOUtils.copy(is, fos);
+                    File exportDirectory = exportContext.getExportDir();
+                    File targetLocation = new File(exportDirectory, targetPath);
+                    // Check if the canonical file is within the export directory to avoid path traversal issues
+                    String canonicalTargetPath = targetLocation.getCanonicalPath();
+                    String canonicalExportPath = exportDirectory.getCanonicalPath();
+                    if (canonicalTargetPath.startsWith(canonicalExportPath)) {
+                        if (!targetLocation.exists()) {
+                            targetLocation.getParentFile().mkdirs();
+                            try (InputStream is = jar.getInputStream(entry);
+                                 FileOutputStream fos = new FileOutputStream(targetLocation)) {
+                                IOUtils.copy(is, fos);
+                            }
                         }
+                    } else {
+                        LOGGER.warn("Skipping copying of resource [{}] to target location [{}] since it is outside "
+                            + "of the export directory [{}]. Possible path traversal attempt.", entry.getName(),
+                            canonicalTargetPath, canonicalExportPath);
                     }
                 }
             }
@@ -146,20 +159,13 @@ public class FilesystemResourceReferenceCopier
         FilesystemExportContext exportContext) throws Exception
     {
         // Limitation: we only support url() constructs located on a single line
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(jar.getInputStream(entry), "UTF-8"))) {
+        try (BufferedReader br =
+                 new BufferedReader(new InputStreamReader(jar.getInputStream(entry), StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 Matcher matcher = URL_PATTERN.matcher(line);
                 while (matcher.find()) {
-                    // Find the first non-null group
-                    String url = null;
-                    for (int i : new int[] { 1, 2, 3 }) {
-                        String group = matcher.group(i);
-                        if (group != null) {
-                            url = group.trim();
-                            break;
-                        }
-                    }
+                    String url = resolveUrlFromMatcher(matcher);
                     // Determine if URL is relative
                     if (isRelativeURL(url)) {
                         // Remove any query string part and any fragment part too
@@ -167,15 +173,33 @@ public class FilesystemResourceReferenceCopier
                         url = StringUtils.substringBefore(url, "#");
                         // Normalize paths
                         String resourceName = String.format(CONCAT_PATH_FORMAT,
-                            StringUtils.substringBeforeLast(entry.getName(), "/"), url);
+                            StringUtils.substringBeforeLast(entry.getName(), PATH_SEPARATOR), url);
                         resourceName = new URI(resourceName).normalize().getPath();
-                        resourceName = resourceName.substring(resourcePrefix.length() + 1);
-                        // Copy to filesystem
-                        copyResourceFromJAR(resourcePrefix, resourceName, targetPrefix, exportContext);
+                        if (resourceName.startsWith(resourcePrefix + PATH_SEPARATOR)) {
+                            resourceName = resourceName.substring(resourcePrefix.length() + 1);
+                            // Copy to filesystem
+                            copyResourceFromJAR(resourcePrefix, resourceName, targetPrefix, exportContext);
+                        } else {
+                            LOGGER.warn("Skipping copying of resource [{}] since it is outside of the expected "
+                                + "prefix [{}]. Possible path traversal attempt.", resourceName, resourcePrefix);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private static String resolveUrlFromMatcher(Matcher matcher)
+    {
+        // Find the first non-null group
+        for (int i : new int[] { 1, 2, 3 }) {
+            String group = matcher.group(i);
+            if (group != null) {
+                return group.trim();
+            }
+        }
+
+        return null;
     }
 
     private boolean isRelativeURL(String url)

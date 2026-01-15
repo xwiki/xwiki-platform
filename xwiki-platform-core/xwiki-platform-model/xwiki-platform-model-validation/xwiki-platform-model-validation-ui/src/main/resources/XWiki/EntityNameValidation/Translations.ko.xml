@@ -36,18 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>entitynamevalidation.currentStrategy.label=현재 명명 전략
+  <content>entitynamevalidation.currentStrategy.label=현재 명명 정책
 entitynamevalidation.currentStrategy.hint=이름 전략은 문서를 생성하거나 이름을 바꾸거나 저장할 때 사용됩니다.
 entitynamevalidation.useTransformation.label=자동으로 이름 변환
 entitynamevalidation.useTransformation.hint=활성화하면 가능한 경우 이름 전략을 사용하여 이름을 자동으로 조정합니다.
 entitynamevalidation.useValidation.label=저장하기 전에 이름을 확인하세요
 entitynamevalidation.useValidation.hint=활성화된 경우 이름 전략은 저장하기 전에 이름의 유효성을 검사합니다. 이 기능을 사용하면 일부 기존 문서가 저장되지 않을 수 있으므로 주의해서 사용하세요.
+### Missing: entitynamevalidation.slug.configuration=Kebab-case Strategy Configuration
 entitynamevalidation.replacementCharacter.configuration=캐릭터 교체 전략 구성
 entitynamevalidation.testStrategy.label=선택한 전략을 테스트해 보세요
 entitynamevalidation.testStrategy.hint=선택한 이름 전략의 동작을 확인할 수 있습니다
 entitynamevalidation.testStrategy.placeholder=테스트할 페이지 이름을 여기에 입력하세요
 entitynamevalidation.testStrategy.validName=선택한 전략에 이 이름이 유효합니까?
 entitynamevalidation.testStrategy.transformedName=선택한 전략에 따른 변환 후의 이름:
+### Missing: entitynamevalidation.slug.lowercase.label=Conversion to Lowercase
+### Missing: entitynamevalidation.slug.lowercase.hint=If enabled, convert page names to lowercase.
+### Missing: entitynamevalidation.slug.dotsBetweenDigits.label=Allow Dots
+### Missing: entitynamevalidation.slug.dotsBetweenDigits.hint=If enabled, allow dots to be used, when located between digits (e.g. to represent versions)
+### Missing: entitynamevalidation.slug.forbiddenWords.label=Forbidden Words
+### Missing: entitynamevalidation.slug.forbiddenWords.hint=Comma-separated list of words that are forbidden in page names. Only use alpha-numerical values.
 entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=금지된 문자
 entitynamevalidation.replacementCharacter.livetable.replacementCharacter=대체 문자
 entitynamevalidation.replacementCharacter.livetable._actions=행위

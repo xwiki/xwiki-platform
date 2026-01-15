@@ -15,7 +15,7 @@ export { name_2 as name }
 export type NavigationTreeNode = {
     id: string;
     label: string;
-    location: SpaceReference | DocumentReference;
+    location: SpaceReference;
     url: string;
     has_children: boolean;
     is_terminal: boolean;

@@ -37,33 +37,33 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># App name
-tour.app.name=관광
+tour.app.name=툴러보기
 
 # Class fields
 TourCode.TourClass_description=설명
-TourCode.TourClass_isActive=활동적인
+TourCode.TourClass_isActive=활성화
 TourCode.TourClass_targetPage=대상 페이지
 
 # Live table generic keys
-tour.livetable.doc.title=투어명
-tour.livetable._actions=행위
-tour.livetable._actions.edit=편집하다
+tour.livetable.doc.title=툴러보기 이름
+tour.livetable._actions=Actions
+tour.livetable._actions.edit=편집
 tour.livetable._actions.delete=삭제
-tour.livetable._actions.launch=시작하다
+tour.livetable._actions.launch=시작
 tour.livetable.emptyvalue=-
 
 # Live table specific keys
 tour.livetable.description=설명
-tour.livetable.isActive=활동적인
+tour.livetable.isActive=활성화
 tour.livetable.targetPage=대상 페이지
 tour.livetable.targetClass=대상 클래스
 
 # Tour popover
 tour.popover.previous=« 이전
 tour.popover.next=다음 "
-tour.popover.end=투어 종료
+tour.popover.end=둘러보기 종료
 tour.popover.quit=둘러보기 종료
-tour.popover.show=쇼 투어
+tour.popover.show=툴러보기 보기
 tour.popover.show.hint=언제든지 이 버튼을 클릭하여 둘러보기를 다시 시작할 수 있습니다
 
 # Steps

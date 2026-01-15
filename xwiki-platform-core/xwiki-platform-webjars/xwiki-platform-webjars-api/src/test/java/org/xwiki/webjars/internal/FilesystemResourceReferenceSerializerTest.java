@@ -20,7 +20,10 @@
 package org.xwiki.webjars.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 
 import javax.inject.Provider;
 
@@ -43,6 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 class FilesystemResourceReferenceSerializerTest
 {
     private static final File BASEDIR = new File(System.getProperty("java.io.tmpdir"), "xwikitest");
@@ -55,12 +59,19 @@ class FilesystemResourceReferenceSerializerTest
 
     private ClassLoader originalThreadContextClassLoader;
 
+    private String fontAwesomeVersion;
+
+    private String webjarPrefix;
+
     @BeforeEach
     void setUp() throws Exception
     {
         this.originalThreadContextClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         FileUtils.deleteDirectory(BASEDIR);
+
+        this.fontAwesomeVersion = loadFontAwesomeVersion();
+        this.webjarPrefix = "webjars/font-awesome/" + this.fontAwesomeVersion;
     }
 
     @AfterEach
@@ -78,14 +89,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals(this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -98,14 +109,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../../webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals("../../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -118,14 +129,14 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "webfonts/fa-regular-400.woff2"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+        assertEquals("../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
             this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
@@ -137,16 +148,39 @@ class FilesystemResourceReferenceSerializerTest
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "7.0.1", "css/all.min.css"));
+            "font-awesome", this.fontAwesomeVersion, "css/all.min.css"));
 
-        assertEquals("webjars/font-awesome/7.0.1/css/all.min.css",
-            this.serializer.serialize(reference).serialize());
+        assertEquals(this.webjarPrefix + "/css/all.min.css", this.serializer.serialize(reference).serialize());
 
         // Also verify that the resources haves been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/css/all.min.css").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-regular-400.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-solid-900.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-brands-400.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/7.0.1/webfonts/fa-v4compatibility.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/css/all.min.css").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-solid-900.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-brands-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-v4compatibility.woff2").exists());
+    }
+
+    /**
+     * Load the Font Awesome version from the WebJar's pom.properties file.
+     *
+     * @return the Font Awesome version
+     */
+    private static String loadFontAwesomeVersion()
+    {
+        // Try to load from the WebJar's pom.properties file
+        String propertiesPath = "META-INF/maven/org.webjars/font-awesome/pom.properties";
+        try (InputStream is = Thread.currentThread().getContextClassLoader()
+            .getResourceAsStream(propertiesPath))
+        {
+            if (is == null) {
+                throw new RuntimeException("Could not find Font Awesome pom.properties at " + propertiesPath);
+            }
+
+            Properties properties = new Properties();
+            properties.load(is);
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load Font Awesome version from " + propertiesPath, e);
+        }
     }
 }

@@ -65,9 +65,9 @@
 #end
 #set($class = $vobj.xWikiClass)
 #if ($isNewStep)
-  &lt;h2&gt;$services.localization.render('tour.steps.new_step')&lt;/h2&gt;
+  &lt;h2&gt;$escapetool.xml($services.localization.render('tour.steps.new_step'))&lt;/h2&gt;
 #else
-  &lt;h2&gt;$services.localization.render('tour.steps.edit_step')&lt;/h2&gt;
+  &lt;h2&gt;$escapetool.xml($services.localization.render('tour.steps.edit_step'))&lt;/h2&gt;
 #end
 &lt;div id="stepForm" class="xform"&gt;
   #foreach($prop in $class.properties)

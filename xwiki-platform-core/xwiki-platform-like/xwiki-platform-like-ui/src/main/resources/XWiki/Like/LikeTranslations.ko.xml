@@ -36,22 +36,23 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rightsmanager.like=좋다
-like.unlike.modal.title=확인과 달리
+  <content>rightsmanager.like=좋아요
+like.unlike.modal.title=싫어요 확인
 like.unlike.modal.body={0} 페이지에 대한 좋아요를 삭제하시겠습니까?
 like.unlike.modal.closeButton=닫다
-like.unlike.modal.unlikeButton=페이지 좋아요
+like.unlike.modal.unlikeButton=페이지 싫어요
 like.unlike.modal.viewLikersButton=좋아요
 like.newlike.success=페이지가 좋아요를 받았습니다.
 like.newlike.error=페이지에 좋아요를 누르는 중에 오류가 발생했습니다.
 like.unlike.success=페이지에 좋아요 표시가 취소되었습니다.
 like.unlike.error=페이지 좋아요 취소를 시도하는 중에 오류가 발생했습니다.
 like.userprofile.menu=좋아요를 누른 페이지
-### Missing: like.toggle.hint.like=Like this page.
-### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
-### Missing: like.likers.link.zero={0} Likes
-### Missing: like.likers.link.one={0} Like
-### Missing: like.likers.link.many={0} Likes
+like.toggle.hint.like=페이지 좋아요.
+like.toggle.hint.unlike=이 페이지를 싫어요. 현재 이 페이지를 좋아합니다.
+like.toggle.hint.like.noright=이 페이지에서는 '좋아요'를 설정할 수 없습니다.
+like.likers.link.zero={0} 좋아요
+like.likers.link.one={0} 좋아요
+like.likers.link.many={0} 좋아요
 ### Missing: like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=아직 이 페이지를 좋아하는 사람이 없습니다.
 like.likers.number={0}명이 이 페이지를 좋아합니다:

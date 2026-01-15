@@ -57,7 +57,7 @@ public class FilesystemResourceReferenceCopier
      * We intentionally don't support escaped quotes inside URLs as they aren't valid in regular URLs.
      */
     private static final Pattern URL_PATTERN = Pattern.compile(
-        "(?i)\\burl\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|([^)]*))\\s*\\)"
+        "(?i)\\burl\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|([^)\"'\\s]+))\\s*\\)"
     );
 
     private static final String CONCAT_PATH_FORMAT = "%s/%s";

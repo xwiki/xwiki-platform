@@ -77,7 +77,7 @@ widgets.FullScreen = Class.create({
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
-    if (!this.isNotMaximizable(item)) {
+    if (!this.isNotMaximizable(item) && !this.isAlreadyAugmented(item)) {
       if (this.isWikiContent(item)) {
         this.addWikiContentButton(item);
       } else if (this.isWikiField(item)) {
@@ -87,6 +87,9 @@ widgets.FullScreen = Class.create({
         this.addElementButton(item);
       }
     }
+  },
+  isAlreadyAugmented: function(item) {
+    return typeof item._x_fullScreenActivator !== 'undefined';
   },
   isNotMaximizable: function (item) {
     return item.hasClassName('not-maximizable');

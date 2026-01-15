@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=이름
 extension.repository.summary=요약
 extension.repository.type=유형
@@ -49,5 +49,34 @@ extension.repository.rating=평가
 extension.repository.installedCount=설치
 
 ## Administration UI
-admin.repository=확장 기능 저장소</content>
+admin.repository=확장 기능 저장소
+
+## Support
+### Missing: repository.support.createsupporter=Register
+
+## Supporters
+### Missing: repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
+### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+repository.supporter.sheet.createplan=추가
+### Missing: repository.supporter.sheet.plans=Plans
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
+### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
+### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
+### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
+### Missing: ExtensionCode.ExtensionSupporterClass_content=Details
+ExtensionCode.ExtensionSupporterClass_active=활성화
+
+## Support plans
+### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
+### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
+### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
+ExtensionCode.ExtensionSupportPlanClass_active=활성화
+### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+</content>
 </xwikidoc>

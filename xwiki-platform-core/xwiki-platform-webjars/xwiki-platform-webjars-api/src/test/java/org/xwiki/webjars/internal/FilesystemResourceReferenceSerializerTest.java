@@ -51,10 +51,6 @@ class FilesystemResourceReferenceSerializerTest
 {
     private static final File BASEDIR = new File(System.getProperty("java.io.tmpdir"), "xwikitest");
 
-    private static final String FONTAWESOME_VERSION = loadFontAwesomeVersion();
-
-    private static final String WEBJAR_PREFIX = "webjars/font-awesome/" + FONTAWESOME_VERSION;
-
     @MockComponent
     private Provider<FilesystemExportContext> exportContextProvider;
 
@@ -62,6 +58,107 @@ class FilesystemResourceReferenceSerializerTest
     private FilesystemResourceReferenceSerializer serializer;
 
     private ClassLoader originalThreadContextClassLoader;
+
+    private String fontAwesomeVersion;
+
+    private String webjarPrefix;
+
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        this.originalThreadContextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        FileUtils.deleteDirectory(BASEDIR);
+
+        this.fontAwesomeVersion = loadFontAwesomeVersion();
+        this.webjarPrefix = "webjars/font-awesome/" + this.fontAwesomeVersion;
+    }
+
+    @AfterEach
+    void tearDown()
+    {
+        Thread.currentThread().setContextClassLoader(this.originalThreadContextClassLoader);
+    }
+
+    @Test
+    void serialize() throws Exception
+    {
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(BASEDIR);
+
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
+
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
+
+        // Verify that the returned URL is ok
+        assertEquals(this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
+
+        // Also verify that the resource has been copied!
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+    }
+
+    @Test
+    void serializeWithCSSPathAdjustments() throws Exception
+    {
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(BASEDIR);
+        exportContext.pushCSSParentLevels(3);
+
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
+
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
+
+        // Verify that the returned URL is ok
+        assertEquals("../../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
+
+        // Also verify that the resource has been copied!
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+    }
+
+    @Test
+    void serializeWithCSSPathAdjustmentsWithDocParentLevels() throws Exception
+    {
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(BASEDIR);
+        exportContext.setDocParentLevels(2);
+
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
+
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
+
+        // Verify that the returned URL is ok
+        assertEquals("../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
+
+        // Also verify that the resource has been copied!
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+    }
+
+    @Test
+    void serializeCSSResourceWithURLsInIt() throws Exception
+    {
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(BASEDIR);
+
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
+
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+            "font-awesome", this.fontAwesomeVersion, "css/all.min.css"));
+
+        assertEquals(this.webjarPrefix + "/css/all.min.css", this.serializer.serialize(reference).serialize());
+
+        // Also verify that the resources haves been copied!
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/css/all.min.css").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-solid-900.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-brands-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-v4compatibility.woff2").exists());
+    }
 
     /**
      * Load the Font Awesome version from the WebJar's pom.properties file.
@@ -85,99 +182,5 @@ class FilesystemResourceReferenceSerializerTest
         } catch (IOException e) {
             throw new RuntimeException("Failed to load Font Awesome version from " + propertiesPath, e);
         }
-    }
-
-    @BeforeEach
-    void setUp() throws Exception
-    {
-        this.originalThreadContextClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        FileUtils.deleteDirectory(BASEDIR);
-    }
-
-    @AfterEach
-    void tearDown()
-    {
-        Thread.currentThread().setContextClassLoader(this.originalThreadContextClassLoader);
-    }
-
-    @Test
-    void serialize() throws Exception
-    {
-        FilesystemExportContext exportContext = new FilesystemExportContext();
-        exportContext.setExportDir(BASEDIR);
-
-        when(this.exportContextProvider.get()).thenReturn(exportContext);
-
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
-
-        // Verify that the returned URL is ok
-        assertEquals(WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
-            this.serializer.serialize(reference).serialize());
-
-        // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
-    }
-
-    @Test
-    void serializeWithCSSPathAdjustments() throws Exception
-    {
-        FilesystemExportContext exportContext = new FilesystemExportContext();
-        exportContext.setExportDir(BASEDIR);
-        exportContext.pushCSSParentLevels(3);
-
-        when(this.exportContextProvider.get()).thenReturn(exportContext);
-
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
-
-        // Verify that the returned URL is ok
-        assertEquals("../../../" + WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
-            this.serializer.serialize(reference).serialize());
-
-        // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
-    }
-
-    @Test
-    void serializeWithCSSPathAdjustmentsWithDocParentLevels() throws Exception
-    {
-        FilesystemExportContext exportContext = new FilesystemExportContext();
-        exportContext.setExportDir(BASEDIR);
-        exportContext.setDocParentLevels(2);
-
-        when(this.exportContextProvider.get()).thenReturn(exportContext);
-
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", FONTAWESOME_VERSION, "webfonts/fa-regular-400.woff2"));
-
-        // Verify that the returned URL is ok
-        assertEquals("../../" + WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2",
-            this.serializer.serialize(reference).serialize());
-
-        // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
-    }
-
-    @Test
-    void serializeCSSResourceWithURLsInIt() throws Exception
-    {
-        FilesystemExportContext exportContext = new FilesystemExportContext();
-        exportContext.setExportDir(BASEDIR);
-
-        when(this.exportContextProvider.get()).thenReturn(exportContext);
-
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", FONTAWESOME_VERSION, "css/all.min.css"));
-
-        assertEquals(WEBJAR_PREFIX + "/css/all.min.css", this.serializer.serialize(reference).serialize());
-
-        // Also verify that the resources haves been copied!
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/css/all.min.css").exists());
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-regular-400.woff2").exists());
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-solid-900.woff2").exists());
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-brands-400.woff2").exists());
-        assertTrue(new File(BASEDIR, WEBJAR_PREFIX + "/webfonts/fa-v4compatibility.woff2").exists());
     }
 }

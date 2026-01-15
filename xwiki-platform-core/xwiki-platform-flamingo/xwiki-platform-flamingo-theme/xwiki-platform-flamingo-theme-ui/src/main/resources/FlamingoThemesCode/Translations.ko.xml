@@ -68,11 +68,11 @@ platform.flamingo.themes.category.navbar=네비게이션 바
 platform.flamingo.themes.category.dropdowns=드롭다운
 platform.flamingo.themes.category.panels=패널
 platform.flamingo.themes.category.breadcrumb=탐색경로
-platform.flamingo.themes.category.advanced=고급의
+platform.flamingo.themes.category.advanced=고급
 platform.flamingo.themes.defaultvalue=기본
 platform.flamingo.themes.lessCode.description=이 필드에서는 스킨에 추가될 LESS 코드를 직접 작성할 수 있습니다.
 platform.flamingo.themes.local=현지의
-platform.flamingo.themes.global=글로벌
+platform.flamingo.themes.global=전역
 
 ###############################################################################
 ## Deprecated

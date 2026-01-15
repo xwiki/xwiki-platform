@@ -17,6 +17,12 @@ export function escapeHtml(str: string): string;
 export function filterMap<T, U>(array: T[], filterMap: (value: T, index: number) => U | null | undefined): U[];
 
 // @beta
+export function findWithIndex<T>(array: T[], predicate: (value: T) => boolean): [T, number] | null;
+
+// @beta
+export function findWithIndexTypePredicate<T, U extends T>(array: T[], predicate: (value: T) => value is U): [U, number] | null;
+
+// @beta
 export function objectEntries<O extends Record<string, unknown>>(obj: O): Array<[keyof O & string, O[keyof O]]>;
 
 // @beta

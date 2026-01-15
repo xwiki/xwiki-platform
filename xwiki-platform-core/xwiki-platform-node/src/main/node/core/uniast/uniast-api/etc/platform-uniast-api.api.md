@@ -88,6 +88,7 @@ export type InlineContent = ({
 | {
     type: "subscript";
     content: string;
+    styles: TextStyles;
 }
 /**
 * @since 18.0.0RC1
@@ -96,6 +97,7 @@ export type InlineContent = ({
 | {
     type: "superscript";
     content: string;
+    styles: TextStyles;
 };
 
 // @beta (undocumented)

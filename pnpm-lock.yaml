@@ -1280,18 +1280,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api:
     dependencies:
-      '@xwiki/platform-api':
-        specifier: workspace:*
-        version: link:../../api
       '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/platform-model-api':
-        specifier: workspace:*
-        version: link:../../core/model/model-api
-      '@xwiki/platform-navigation-tree-api':
-        specifier: workspace:*
-        version: link:../../core/navigation-tree/navigation-tree-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2

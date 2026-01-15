@@ -40,7 +40,7 @@
 # Default Class Sheet
 #
 
-platform.xclass.defaultClassSheet.title=기본 수업 시트
+platform.xclass.defaultClassSheet.title=기본 클래스 시트
 platform.xclass.defaultClassSheet.description=이 페이지를 편집하여 수업의 기본 표시를 변경하거나 복사하여 하나 또는 여러 수업에 대한 사용자 정의 보기를 만들 수 있습니다.
 platform.xclass.defaultClassSheet.properties.heading=클래스 속성
 platform.xclass.defaultClassSheet.properties.empty=이 클래스에는 아직 속성이 없습니다. {0}클래스 편집기{1}를 사용하여 정의할 수 있습니다.
@@ -51,7 +51,7 @@ platform.xclass.defaultClassSheet.createPage.denied=해당 페이지를 만들 �
 platform.xclass.defaultClassSheet.createPage.label=이 페이지 만들기
 platform.xclass.defaultClassSheet.pages.heading=기존 페이지
 platform.xclass.defaultClassSheet.pages.description=다음 페이지에는 이 클래스에서 설명하는 개체가 있습니다.
-platform.xclass.defaultClassSheet.sheets.heading=수업 시트
+platform.xclass.defaultClassSheet.sheets.heading=클래스 시트
 platform.xclass.defaultClassSheet.sheets.missing=이 클래스를 사용하기 전에 먼저 시트와 템플릿을 만들어야 합니다. 이를 수행하려면 아래 지침을 따르십시오.
 platform.xclass.defaultClassSheet.sheets.description={0}시트{1}를 사용하면 이러한 유형의 페이지 표시를 제어할 수 있습니다. 사용 가능한 모든 필드를 열거하는 기본 프레젠테이션을 사용하거나 자신만의 프레젠테이션을 디자인할 수 있습니다. 보기 모드와 편집 모드에 대해 서로 다른 프레젠테이션을 선택할 수도 있습니다.
 platform.xclass.defaultClassSheet.sheets.create=시트 만들기

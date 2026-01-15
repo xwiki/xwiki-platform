@@ -44,7 +44,7 @@ platform.appwithinminutes.appsLiveTableHeading=응용
 platform.appwithinminutes.appsLiveTable.doc.title=애플리케이션
 platform.appwithinminutes.appsLiveTable.doc.author=마지막 저자
 platform.appwithinminutes.appsLiveTable.doc.date=업데이트 날짜
-platform.appwithinminutes.appsLiveTable._actions=행위
+platform.appwithinminutes.appsLiveTable._actions=Actions
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=공간 관리 권한을 부여합니다.
 
 ### AWM Applications panel entry
@@ -109,7 +109,7 @@ platform.appwithinminutes.classEditorTranslationsSaveComment=번역 업데이트
 platform.appwithinminutes.classEditorStandardCategoryName=기준
 platform.appwithinminutes.classEditorPickersCategoryName=피커
 platform.appwithinminutes.classEditorDocumentCategoryName=페이지
-platform.appwithinminutes.classEditorAdvancedCategoryName=고급의
+platform.appwithinminutes.classEditorAdvancedCategoryName=고급
 platform.appwithinminutes.classEditorDBListFieldName=데이터베이스 목록
 platform.appwithinminutes.classEditorGroupsFieldName=그룹
 platform.appwithinminutes.classEditorUsersFieldName=사용자
@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 �
 platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
 platform.appwithinminutes.classEditorMoveFieldHint=드래그 앤 드롭하여 순서를 변경하세요
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Pretty Name
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=Hint
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
@@ -139,10 +141,12 @@ platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=오늘
 ### Static List Editor
 platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=값
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=추가하다
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=추가
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=삭제
 appWithinMinutes.templateProviderEditor.hint=애플리케이션 항목은 구조화된 데이터가 포함된 위키 페이지입니다.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=Icon
 appWithinMinutes.templateProviderEditor.icon.hint=애플리케이션 항목 과 연관된 아이콘입니다 .
+### Missing: appWithinMinutes.templateProviderEditor.description.name=Description
 appWithinMinutes.templateProviderEditor.description.hint=애플리케이션 항목 에 대한 간단한 설명입니다 .
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=항목을 생성 할 위치
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=위치를 선택하지 않으면 모든 페이지에서 항목을 생성할 수 있습니다.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=항목을 생�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=위치를 선택하지 않으면 Wiki의 어느 위치에나 항목을 만들 수 있습니다.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=진입 위치를 강요하지 마세요
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=위에 지정된 위치는 제안용으로만 사용하여 사용자가 애플리케이션 항목을 생성할 때 다른 위치를 선택할 수 있도록 합니다 .
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=애플리케이션 항목이 터미널 페이지여야 하는지 여부입니다.
 
 ### Wizard Step 3: Application Presentation
@@ -171,7 +176,7 @@ platform.appwithinminutes.liveTableEditorDocDateColumnName=날짜
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=애플리케이션 데이터가 마지막으로 편집된 날짜
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=생산 일
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=애플리케이션 데이터가 생성된 날짜
-platform.appwithinminutes.liveTableEditorActionsColumnName=행위
+platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=편집, 삭제 등 애플리케이션 데이터에 대해 수행할 수 있는 작업 목록
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=첨부파일
 platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=데이터 페이지의 첨부 파일에 대한 링크를 표시하는 특수 열
@@ -194,8 +199,8 @@ platform.appwithinminutes.liveTableEditorIconHintWithPicker=애플리케이션 �
 platform.appwithinminutes.appLiveTableHeading=항목
 platform.appwithinminutes.appLiveTableEditEntryActionName=편집하다
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=삭제
-platform.appwithinminutes.appHomePageActionsHeading=행위
-platform.appwithinminutes.appHomePageAddEntryLabel=추가하다
+platform.appwithinminutes.appHomePageActionsHeading=Actions
+platform.appwithinminutes.appHomePageAddEntryLabel=추가
 platform.appwithinminutes.appHomePageAddEntryHint=새 항목 추가
 platform.appwithinminutes.appHomePageEntryNameLabel=항목 이름:
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=모든 항목 삭제

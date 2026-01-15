@@ -39,6 +39,7 @@ import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.EditConfirmationScriptService;
 import org.xwiki.model.validation.edit.internal.DefaultEditConfirmationCheckersManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.block.GroupBlock;
@@ -84,6 +85,9 @@ class EditMacrosPageTest extends PageTest
 {
     @MockComponent
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
+    @MockComponent
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
 
     @MockComponent(classToMock = IconManagerScriptService.class)
     @Named("icon")

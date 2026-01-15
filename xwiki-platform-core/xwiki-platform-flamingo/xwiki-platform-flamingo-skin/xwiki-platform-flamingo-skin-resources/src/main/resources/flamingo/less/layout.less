@@ -344,7 +344,6 @@ body#body #leftPanelsToggle {
   padding: @padding-large-vertical @padding-large-horizontal;
   .text-smaller;
   text-align: center;
-  position: relative;
 
   a {
     color: @navbar-default-link-color;
@@ -390,8 +389,7 @@ already take care of padding and shadow. */
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;
   margin-top: -1px;
-  /* Makes the bottom border hidden below the footer on pages with a long content (longer than the viewport height). */
-  margin-bottom: -1px;
+  border-bottom: 0;
 }
 
 #xdocFooter {

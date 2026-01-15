@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>office.createForm.type.name=사무실의 페이지
+  <content>office.createForm.type.name=Office의 페이지
 office.createForm.type.description=Office 문서를 Wiki 페이지로 가져오기
 office.form.error.noDocument=Office 문서를 가져오려면 {0}작업 만들기{1}를 사용해야 합니다.
 office.import.document.hint=가져올 Office 문서를 선택합니다.

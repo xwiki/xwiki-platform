@@ -71,7 +71,7 @@
 ###############################################################################
 
 ## Menus
-platform.wiki.menu.wikiindex=위키 색인
+platform.wiki.menu.wikiindex=위키 인덱스
 platform.wiki.menu.deletewiki=위키 삭제
 platform.wiki.menu.userwikis=위키
 
@@ -172,7 +172,7 @@ platform.wiki.browse.description=설명
 platform.wiki.browse.owner=소유자
 platform.wiki.browse.membershipType=회원 유형
 platform.wiki.browse.doc.creationDate=생산 일
-platform.wiki.browse._actions=행위
+platform.wiki.browse._actions=Actions
 platform.wiki.browse._actions.join=가입하다
 platform.wiki.browse._actions.requestJoin=가입 요청
 platform.wiki.browse._actions.viewInvitation=초대장 보기
@@ -182,10 +182,10 @@ platform.wiki.browse._actions.delete=삭제
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=모든 사용자가 참여할 수 있도록 개방
-WikiManager.WikiUserClass_membershipType_request=모든 글로벌 사용자가 가입을 요청할 수 있지만 관리자가 수락해야 합니다
+WikiManager.WikiUserClass_membershipType_request=모든 전역 사용자가 가입을 요청할 수 있지만 관리자가 수락해야 합니다
 WikiManager.WikiUserClass_membershipType_invite=관리자만이 이 위키에 가입하기 위한 초대장을 보낼 수 있습니다
 WikiManager.WikiUserClass_userScope_local_only=위키에서는 로컬 사용자만 사용할 수 있습니다
-WikiManager.WikiUserClass_userScope_global_only=위키에서는 글로벌 사용자만 사용할 수 있습니다
+WikiManager.WikiUserClass_userScope_global_only=위키에서는 전역 사용자만 사용할 수 있습니다
 WikiManager.WikiUserClass_userScope_local_and_global=×번
 platform.wiki.prop.wikiname=위키 식별자
 platform.wiki.prop.wikiprettyname=예쁜 이름

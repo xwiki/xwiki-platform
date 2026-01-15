@@ -8,14 +8,11 @@ import { ButtonHTMLAttributes } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComputedOptions } from 'vue';
 import { DefineComponent } from 'vue';
-import { DocumentReference } from '@xwiki/platform-model-api';
 import { FormHTMLAttributes } from 'vue';
 import { HTMLAttributes } from 'vue';
 import { ImgHTMLAttributes } from 'vue';
 import { InputHTMLAttributes } from 'vue';
 import { MethodOptions } from 'vue';
-import { NavigationTreeNode } from '@xwiki/platform-navigation-tree-api';
-import { SpaceReference } from '@xwiki/platform-model-api';
 import { TreeNode } from '@xwiki/platform-fn-utils';
 
 // @beta
@@ -37,14 +34,12 @@ export type AbstractElements = {
     XMenu: DefineComponent<MenuProps & HTMLAttributes>;
     XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
     XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
-    XNavigationTree: DefineComponent<NavigationTreeProps & HTMLAttributes>;
-    XNavigationTreeSelect: DefineComponent<NavigationTreeSelectProps & HTMLAttributes>;
     XSelect: DefineComponent<SelectProps & HTMLAttributes>;
     XTab: DefineComponent<TabProps & HTMLAttributes>;
     XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
     XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
     XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
-    XTree: DefineComponent<TreeProps & HTMLAttributes>;
+    XTree: DefineComponent<TreeProps<DisplayableTreeNode & any> & HTMLAttributes>;
 };
 
 // @beta (undocumented)
@@ -159,33 +154,6 @@ export type MenuProps = {
     disabled?: boolean;
 };
 
-// @beta (undocumented)
-export type NavigationTreeProps = {
-    clickAction?: (node: NavigationTreeNode) => void;
-    currentPageReference?: DocumentReference;
-    includeTerminals?: boolean;
-    showRootNode?: boolean;
-};
-
-// @beta
-export const navigationTreePropsDefaults: {
-    includeTerminals: boolean;
-};
-
-// @beta (undocumented)
-export type NavigationTreeSelectProps = {
-    label: string;
-    help?: string;
-    currentPageReference?: DocumentReference;
-    modelValue?: SpaceReference;
-    includeTerminals?: boolean;
-};
-
-// @beta
-export const navigationTreeSelectPropsDefaults: {
-    includeTerminals: boolean;
-};
-
 // @beta
 export type SelectProps = {
     label: string;
@@ -222,12 +190,16 @@ export type TextFieldProps = {
     type?: "date" | "datetime-local" | "email" | "number" | "password" | "search" | "tel" | "text" | "time" | "url";
 };
 
+export { TreeNode }
+
 // @beta
-export type TreeProps = {
-    rootNode: DisplayableTreeNode;
+export type TreeProps<T extends DisplayableTreeNode> = {
+    rootNode: T;
     showRootNode?: boolean;
     activated?: string;
     opened?: string[];
+    lazyLoadChildren?: (node: T) => Promise<void>;
+    nodeClickAction?: (node: T) => Promise<void>;
 };
 
 // (No @packageDocumentation comment for this package)

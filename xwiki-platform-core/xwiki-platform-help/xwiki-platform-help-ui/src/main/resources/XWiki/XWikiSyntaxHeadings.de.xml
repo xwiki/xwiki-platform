@@ -63,7 +63,7 @@
 (% style="color:blue" %)
 = Überschrift =
 )))
-|Überschrift mit XWiki Syntax|1.1.1 Überschrift mit *fett*|(((=== Überschrift mit **fett** ===)))
+|Überschrift mit XWiki Syntax|1.1 Überschrift mit *fett*|(((== Überschrift mit **fett** ==)))
 
 === 2.0 Headings ===
 
@@ -87,5 +87,5 @@
 (% style="color:blue" %)
 = Überschrift =
 )))
-|Überschrift mit XWiki Syntax|{{{=== Überschrift mit **fett** ===}}}|(((=== Überschrift mit **fett** ===)))</content>
+|Überschrift mit XWiki Syntax|{{{== Überschrift mit **fett** ==}}}|(((== Überschrift mit **fett** ==)))</content>
 </xwikidoc>

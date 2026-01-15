@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>rendering.macro.notifications.name=알림
 rendering.macro.notifications.description=위키에서 발생한 이벤트에 대한 알림을 표시합니다.
-rendering.macro.notifications.parameter.count.name=세다
+rendering.macro.notifications.parameter.count.name=수
 rendering.macro.notifications.parameter.count.description=기본적으로 표시할 최대 이벤트 수
 rendering.macro.notifications.parameter.useUserPreferences.name=사용자의 선호도를 활용하세요
 rendering.macro.notifications.parameter.useUserPreferences.description=true인 경우 알림에 대한 사용자 기본 설정이 사용됩니다

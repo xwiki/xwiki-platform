@@ -41,10 +41,11 @@ panels.name=이름
 panels.description=설명
 panels.type=유형
 panels.category=범주
-panels._actions=행위
+panels._actions=Actions
 ### Missing: panels.emptyvalue=
 panels.children.title=하위 페이지
 panels.siblings.title=형제 페이지
+### Missing: panels.customize=You can customize the side column(s) using the {0}
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

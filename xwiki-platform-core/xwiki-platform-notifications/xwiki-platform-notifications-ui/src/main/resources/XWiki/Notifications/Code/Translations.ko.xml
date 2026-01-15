@@ -70,7 +70,8 @@ notifications.filters.description.minorEventEmailNotificationFilter=페이지의
 notifications.filters.preferences.scopeNotificationFilter.name=범위 알림 필터
 notifications.filters.preferences.scopeNotificationFilter.page=페이지만
 notifications.filters.preferences.scopeNotificationFilter.space=페이지와 아이들
-notifications.filters.preferences.scopeNotificationFilter.wiki=일주일
+notifications.filters.preferences.scopeNotificationFilter.wiki=위키(Wiki)
+### Missing: notifications.filters.preferences.scopeNotificationFilter.user=User
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=이 위치를 보려면 설정에서 알림을 활성화해야 합니다
@@ -93,6 +94,7 @@ notifications.settings.filters.preferences.system.title=시스템 필터
 notifications.settings.filters.preferences.system.hint=수신하려는 알림을 보다 세밀하게 제어하기 위해 전환할 수 있는 시스템 필터입니다.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=이름
+### Missing: notifications.settings.filters.preferences.system.table.filterDescription=Description
 notifications.settings.filters.preferences.system.table.filterType=설명
 notifications.settings.filters.preferences.system.table.notificationFormats=형식
 notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
@@ -101,12 +103,14 @@ notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
 notifications.settings.filters.preferences.custom.title=맞춤 필터
 notifications.settings.filters.preferences.custom.hint=받고 싶은 알림을 제어하려면 필터를 만드세요.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=위치
+### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+### Missing: notifications.settings.filters.preferences.custom.table.scope=Scope
+### Missing: notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.filterType=필터 동작
 notifications.settings.filters.preferences.custom.table.eventTypes=이벤트
 notifications.settings.filters.preferences.custom.table.notificationFormats=형식
 notifications.settings.filters.preferences.custom.table.isEnabled=사용 가능?
-notifications.settings.filters.preferences.custom.table._actions=행위
+notifications.settings.filters.preferences.custom.table._actions=Actions
 notifications.filters.type.custom.inclusive=이벤트를 알려드립니다
 notifications.filters.type.custom.exclusive=이벤트를 무시하세요
 
@@ -116,7 +120,7 @@ notifications.settings.addFilter=필터 추가
 notifications.settings.addFilter.hint=특정 위치에서 발생하는 이벤트에 대한 필터를 만듭니다. 필터는 이벤트 및 알림 채널에 따라 알림 전송을 트리거하거나 알림 전송을 방지할 수 있습니다.
 notifications.filters.preferences.custom.addFilter.location.label=위치
 notifications.filters.preferences.custom.addFilter.location.hint=이 필터는 여기에서 선택한 위치에서 발생하는 이벤트에 적용됩니다. 하나 이상의 위치를 선택하세요.
-notifications.filters.preferences.custom.addFilter.type.label=행동
+notifications.filters.preferences.custom.addFilter.type.label=Action
 notifications.filters.preferences.custom.addFilter.type.hint=이 필터는 선택한 위치에서 발생하는 이벤트를 알리거나 무시할 수 있습니다. 이벤트에 대해 수행할 작업을 선택합니다.
 notifications.filters.preferences.custom.addFilter.filterType.inclusive=이벤트를 알려드립니다
 notifications.filters.preferences.custom.addFilter.filterType.exclusive=이벤트를 무시하세요
@@ -165,7 +169,7 @@ notifications.events.lastComment=마지막 댓글: {0}.
 notifications.preferences.scope.table.scope=범위
 notifications.preferences.scope.table.location=위치
 notifications.preferences.scope.table.scopeFilterType=필터 유형
-notifications.preferences.scope.table._actions=행위
+notifications.preferences.scope.table._actions=Actions
 notifications.email.title=위키의 이벤트:
 notifications.email.subject=위키의 이벤트 {0}개
 notifications.email.seeChanges=변경사항: {0}
@@ -229,9 +233,57 @@ notifications.switches.tooltip.space=상위 페이지와 해당 하위 페이지
 notifications.switches.tooltip.wiki=이 위키 보기
 notifications.switches.changeStatusError=알림 상태를 변경하지 못했습니다.
 
-## Used to indicate where deprecated keys start
-#@deprecatedstart
+## Watch button and modal
 
+### Missing: notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
+### Missing: notifications.watch.button.status.notset=Not set
+### Missing: notifications.watch.button.status.followed=Followed
+### Missing: notifications.watch.button.status.blocked=Blocked
+### Missing: notifications.watch.button.status.custom=Custom
+### Missing: notifications.watch.modal.title=Notification settings for this page
+### Missing: notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
+### Missing: notifications.watch.modal.description.ancestoroption=You can either go to {0} and modify the notification settings there or directly apply settings on the current page with the following options: 
+### Missing: notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Followed page watch settings
+### Missing: notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=You are following this page: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Followed page by parent watch settings
+### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Followed page and children watch settings
+### Missing: notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are following this page and its children: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.NOT_SET=Not set watch settings
+### Missing: notifications.watch.modal.description.NOT_SET=You haven't configured any settings for watching this page yet and so you are not following this page: you won't receive notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Blocked page watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Blocked page by parent watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Blocked page and children watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
+### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
+### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children
+### Missing: notifications.watch.modal.option.watchspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.watchwiki.title=Follow entire wiki
+### Missing: notifications.watch.modal.option.watchwiki.hint=This option doesn't only impact current page or space: you will receive notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.blockpage.title=Block current page
+### Missing: notifications.watch.modal.option.blockpage.hint=You will block any notifications for that page only.
+### Missing: notifications.watch.modal.option.blockspace.title=Block current page and its children
+### Missing: notifications.watch.modal.option.blockspace.hint=You will block any notifications for that page and all of its children.
+### Missing: notifications.watch.modal.option.unwatchpage.title=Unfollow current page
+### Missing: notifications.watch.modal.option.unwatchpage.hint=You will stop receiving notifications for that page only.
+### Missing: notifications.watch.modal.option.unwatchspace.title=Unfollow current page and its children
+### Missing: notifications.watch.modal.option.unwatchspace.hint=You will stop receiving notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unwatchwiki.title=Unfollow entire wiki
+### Missing: notifications.watch.modal.option.unwatchwiki.hint=This option doesn't only impact current page or space: you will stop receiving notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.unblockpage.title=Unblock current page
+### Missing: notifications.watch.modal.option.unblockpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.unblockspace.title=Unblock current page and its children
+### Missing: notifications.watch.modal.option.unblockspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unblockwiki.title=Unblock entire wiki
+### Missing: notifications.watch.modal.option.unblockwiki.hint=This option doesn't only impact current page or space: you will stop ignoring notifications for any page in the wiki.
+### Missing: notifications.watch.modal.close=Close without saving
+### Missing: notifications.watch.modal.savechanges=Save changes
+### Missing: notifications.watch.modal.gotosettings=Manage all notifications settings
 ## until 13.2RC1
 notifications.settings.filters.preferences.title=필터
 notifications.settings.filters.preferences.hint=활성 이벤트가 알림을 트리거해야 하는 시기를 보다 정확하게 제어하려면 필터를 만드세요.
@@ -242,7 +294,7 @@ notifications.settings.filters.preferences.table.filterType=필터 유형
 notifications.settings.filters.preferences.table.eventTypes=이벤트
 notifications.settings.filters.preferences.table.notificationFormats=형식
 notifications.settings.filters.preferences.table.isEnabled=사용 가능?
-notifications.settings.filters.preferences.table._actions=행위
+notifications.settings.filters.preferences.table._actions=Actions
 notifications.filters.preferences.addPreference.filterType.inclusive=포함한
 notifications.filters.preferences.addPreference.filterType.exclusive=독점적인
 notifications.filters.preferences.addPreference.notificationFormat.label=알림 형식
@@ -256,6 +308,12 @@ notifications.filters.preferences.addPreference.location.hint=필터는 어떤 �
 ## Filter Types
 notifications.filters.type.inclusive=포함한
 notifications.filters.type.exclusive=독점적인
+
+## until 16.2.0RC1
+### Missing: notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
+### Missing: notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=위치
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

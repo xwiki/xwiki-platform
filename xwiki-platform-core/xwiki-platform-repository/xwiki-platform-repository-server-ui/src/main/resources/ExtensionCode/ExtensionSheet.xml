@@ -306,7 +306,7 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($doc.getValue('versionPage') == 1)
+    #if ($doc.getValue('versionPage') == 1 &amp;&amp; $proxyExtensionObject.getValue('proxyLevel') != 'history')
       #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
       = Versions =
 

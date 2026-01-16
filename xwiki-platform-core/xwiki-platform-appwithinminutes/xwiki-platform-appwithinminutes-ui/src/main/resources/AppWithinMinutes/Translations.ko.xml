@@ -48,7 +48,7 @@ platform.appwithinminutes.appsLiveTable._actions=Actions
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=공간 관리 권한을 부여합니다.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=스스로 만드시 오!
+platform.appwithinminutes.appPanelCreateEntry=직접 만들어보세요!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=단계 {0} - {1}
@@ -79,7 +79,7 @@ appWithinMinutes.createApp.location.hint=애플리케이션이 생성될 페이�
 appWithinMinutes.createApp.parent.label=부모의
 appWithinMinutes.createApp.parent.hint=새 애플리케이션의 상위입니다. 최상위 애플리케이션을 생성하려면 이 필드를 비워 두세요.
 appWithinMinutes.createApp.parent.placeholder=경로.대상.부모
-appWithinMinutes.codeSpace.title=암호
+appWithinMinutes.codeSpace.title=코드(Code)
 appWithinMinutes.codeSpace.description=애플리케이션 코드가 있는 곳입니다.
 appWithinMinutes.codeSpace.hiddenPagesInfo=현재 사용자 프로필 설정이 이를 금지하더라도 숨겨진 페이지도 나열됩니다. 그렇지 않으면 기본적으로 모두 숨겨져 있기 때문에 응용 프로그램 코드 페이지가 표시되지 않습니다.
 platform.appwithinminutes.appNamePageTitle=애플리케이션 생성
@@ -119,11 +119,11 @@ platform.appwithinminutes.classEditorBooleanFieldName=부울(참/거짓)
 platform.appwithinminutes.classEditorNumberFieldName=숫자
 platform.appwithinminutes.classEditorTextAreaFieldName=긴 텍스트
 platform.appwithinminutes.classEditorStringFieldName=짧은 텍스트
-platform.appwithinminutes.classEditorContentFieldName=콘텐츠
+platform.appwithinminutes.classEditorContentFieldName=내용
 platform.appwithinminutes.classEditorTitleFieldName=제목
 platform.appwithinminutes.classEditorPageFieldName=페이지
 platform.appwithinminutes.classEditorDeleteFieldLabel=삭제
-platform.appwithinminutes.classEditorConfigureFieldLabel=구성
+platform.appwithinminutes.classEditorConfigureFieldLabel=설정
 platform.appwithinminutes.classEditorPreviewFieldLabel=시사
 platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 및 변경 사항 적용
 platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
@@ -132,7 +132,7 @@ platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=분명한
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=지우기
 platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=지금
 platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=오늘
 
@@ -168,11 +168,11 @@ platform.appwithinminutes.liveTableEditorDocLocationColumnName=위치
 platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=애플리케이션 데이터가 포함된 페이지의 위치
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=마지막 저자
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=애플리케이션 데이터를 마지막으로 편집한 사용자
-platform.appwithinminutes.liveTableEditorDocCreatorColumnName=창조자
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=생성자
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=애플리케이션 데이터를 생성한 사용자
 platform.appwithinminutes.liveTableEditorDocDateColumnName=날짜
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=애플리케이션 데이터가 마지막으로 편집된 날짜
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=생산 일
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=생성일
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=애플리케이션 데이터가 생성된 날짜
 platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=편집, 삭제 등 애플리케이션 데이터에 대해 수행할 수 있는 작업 목록

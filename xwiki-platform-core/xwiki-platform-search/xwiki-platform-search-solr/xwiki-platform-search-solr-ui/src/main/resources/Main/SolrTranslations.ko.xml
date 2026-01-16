@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>solr.admin.title=Solr 검색 관리
-solr.admin.submit=적용하다
+solr.admin.submit=적용
 solr.admin.error.action={0} 실패:
 solr.admin.error.notallowed=이 작업을 수행할 권한이 없습니다.
 solr.admin.error.norights=이 섹션에 액세스하려면 관리 권한이 필요합니다.
@@ -116,7 +116,7 @@ solr.facet.date.olderThan30Days=30일 이상
 solr.facet.date.customInterval=맞춤 날짜 및 시간 간격
 solr.facet.date.start=시작 날짜 및 시간
 solr.facet.date.end=종료 날짜 및 시간
-solr.facet.date.applyCustomInterval=적용하다
+solr.facet.date.applyCustomInterval=적용
 solr.facet.date.between=0}부터 {1}까지
 solr.facet.date.after={0} 이후
 solr.facet.date.before=0} 이전

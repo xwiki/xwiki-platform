@@ -138,7 +138,7 @@ platform.wiki.users.invitation.reject.label=거부하다
 platform.wiki.users.invitation.postpone.label=나중에
 platform.wiki.users.join.request.message.label=메시지
 platform.wiki.users.join.request.send.label=요청 보내기
-platform.wiki.users.join.request.cancel.label=뒤쪽에
+platform.wiki.users.join.request.cancel.label=돌아가기
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=가입한 위키

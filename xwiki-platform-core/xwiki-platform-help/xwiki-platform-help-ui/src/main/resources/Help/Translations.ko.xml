@@ -44,6 +44,7 @@ help.tipsPanel.improveXWikiTip=XWiki를 개선할 수 있다는 것을 알고 �
 help.tipsPanel.breadcrumbsTip=탐색경로 요소 옆에 있는 화살표를 클릭하면 형제 및 하위 페이지로 빠르게 이동할 수 있습니다.
 help.tipsPanel.advancedHiddenShortcutTip=x+x+x+a 키 콤보를 눌러 [[고급 모드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ Documentation /UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] 및 x+x+x+h를 사용하여 [[숨겨진 페이지&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=WYSIWYG에서 편집할 때 ##[##을 입력한 다음 문자를 입력하기 시작하면 링크 생성에 대한 제안이 표시됩니다.
+### Missing: help.tipsPanel.WYSIWYGEditorTip=When editing in WYSIWYG mode, the {0}Alt + 0{1} shortcut ({0}⌥0{1} on macOS) opens a help modal with information about using the keyboard to navigate the editor.
 help.macroList.title=사용 가능한 매크로
 help.macroList.id=ID
 help.macroList.name=이름
@@ -59,7 +60,7 @@ help.macroList.visibility=시계
 #@deprecatedstart
 
 ## until 14.6RC1
-help.macroList.category=범주
+help.macroList.category=카테고리
 
 #@deprecatedend
 </content>

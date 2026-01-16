@@ -62,7 +62,7 @@ platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=귀하는 이 위키�
 platform.wiki.currentwiki.joinRequestAcceptedNotification=''{0}'' 위키 가입 요청이 승인되었습니다.
 platform.wiki.currentwiki.joinRequestRejectedNotification=''{0}'' Wiki 가입 요청이 거부되었습니다.
 platform.wiki.currentwiki.candidateHandledSaveComment=처리된 후보 {0}({1})
-platform.wiki.currentwiki.candidateHandledComment=논평:
+platform.wiki.currentwiki.candidateHandledComment=댓글:
 platform.wiki.currentwiki.candidateAcceptedSuccess=요청이 승인되었습니다.
 platform.wiki.currentwiki.candidateRejectedSuccess=요청이 거부되었습니다.
 platform.wiki.currentwiki.inviteUserAlreadyMember={0}은(는) 이미 위키 회원입니다.
@@ -128,7 +128,7 @@ platform.wiki.currentwiki.candidates.empty=위키에 가입하도록 요청하�
 # ADMIN
 admin.xwiki.manageworkspace.description=위키 이름, 설명, 소유자, 회원 유형 등의 설정을 관리합니다.
 admin.xwiki.workspaceusers.description=위키 회원 관리: 위키 회원을 추가, 제거, 초대, 수락 또는 거부합니다.
-admin.xwiki.usersconfiguration.title=구성
+admin.xwiki.usersconfiguration.title=설정
 admin.xwiki.members.title=현재 회원
 admin.xwiki.users.title=모든 사용자들
 

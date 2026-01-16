@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-platform.appwithinminutes.homePageTitle=몇 분 안에 앱
+platform.appwithinminutes.homePageTitle=몇 분 만에 만드는 앱
 platform.appwithinminutes.description=XWiki 의 강력한 구조화된 데이터 관리 시스템을 기반으로 몇 분 안에 협업 웹 애플리케이션을 생성하세요 .
 platform.appwithinminutes.createAppButtonLabel=애플리케이션 생성
 platform.appwithinminutes.appsLiveTableHeading=어플리케이션

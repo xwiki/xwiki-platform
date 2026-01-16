@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=페이지 트리
-rendering.macro.documentTree.description=XWiki 페이지 의 트리를 표시합니다 .
+rendering.macro.documentTree.description=위키 페이지의 트리를 표시합니다 .
 rendering.macro.documentTree.parameter.readOnly.name=읽기 전용
 rendering.macro.documentTree.parameter.readOnly.description=사용자에게 필요한 권한이 있는 경우 트리 구조를 수정할 수 있어야 합니까?
 rendering.macro.documentTree.parameter.showWikis.name=위키 표시
@@ -85,9 +85,9 @@ rendering.macro.documentTree.parameter.exclusions.description=트리에서 제�
 ### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
 ### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
 ### Missing: rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
-### Missing: rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
+rendering.macro.documentTree.parameter.expandToLevel.description=자동으로 펼칠 트리의 깊이를 설정합니다. 기본값은 0(최상위 노드만 표시)입니다. 1로 설정하면 하위 1단계까지, 2로 설정하면 그 아래 단계까지 펼쳐집니다. 값이 너무 크면 브라우저 로딩 속도가 느려질 수 있으니 주의하세요.
 rendering.macro.children.name=하위
-### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+rendering.macro.children.description=현재 페이지의 하위 페이지 트리를 표시합니다
 ### Missing: rendering.macro.children.parameter.sort.name=Sort by
 ### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
 ### Missing: rendering.macro.children.parameter.root.name=Root
@@ -103,7 +103,7 @@ index.documentTree.documentSortDisplayer.field.creationDate=생성일
 ### Missing: index.documentTree.documentSortDisplayer.order=Sort order
 ### Missing: index.documentTree.documentSortDisplayer.order.default=---
 index.documentTree.documentSortDisplayer.order.asc=오름차순
-### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
+index.documentTree.documentSortDisplayer.order.desc=내림차순
 
 ## Deprecated translation keys
 

@@ -60,6 +60,6 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=�
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=철자
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=단순 목록
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=간단한 수학
-captcha.jcaptcha.engine.custom=관습:
+captcha.jcaptcha.engine.custom=사용자 정의:
 </content>
   </xwikidoc>

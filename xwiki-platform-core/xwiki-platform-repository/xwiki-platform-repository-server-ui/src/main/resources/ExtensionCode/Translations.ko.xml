@@ -64,7 +64,7 @@ repository.supporter.sheet.createplan=추가
 ### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
 ### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
 ### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
-### Missing: ExtensionCode.ExtensionSupporterClass_content=Details
+ExtensionCode.ExtensionSupporterClass_content=세부사항
 ExtensionCode.ExtensionSupporterClass_active=활성화
 
 ## Support plans
@@ -76,7 +76,7 @@ ExtensionCode.ExtensionSupporterClass_active=활성화
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
-### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
+ExtensionCode.ExtensionSupportPlanClass_content=세부사항
 ExtensionCode.ExtensionSupportPlanClass_active=활성화
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
 </content>

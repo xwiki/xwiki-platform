@@ -50,7 +50,7 @@ index.spacesMacro.spaceIndex.title=스페이스 목록 보기
 index.spacesMacro.spaceIndex.alt=스페이스 목록
 index.spacesMacro.spaceAdministration.title=스페이스 관리자 보기
 index.spacesMacro.spaceAdministration.alt=스페이스 관리
-index.spacesMacro.createSpace.link=스페이스 생성
+index.spacesMacro.createSpace.link=새 스페이스 만들기
 index.spacesMacro.createSpace.defaultSpaceName=스페이스 이름
 index.spacesMacro.createSpace.submit=글쓰기
 </content>

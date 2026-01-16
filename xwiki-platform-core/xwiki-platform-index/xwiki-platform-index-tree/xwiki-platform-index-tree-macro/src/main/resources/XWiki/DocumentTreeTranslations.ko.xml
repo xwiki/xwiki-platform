@@ -105,7 +105,7 @@ index.documentTree.more={0}개 더 ...
 ### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
 ### Missing: index.documentTree.documentSortDisplayer.order=Sort order
 ### Missing: index.documentTree.documentSortDisplayer.order.default=---
-### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
+index.documentTree.documentSortDisplayer.order.asc=오름차순
 ### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys

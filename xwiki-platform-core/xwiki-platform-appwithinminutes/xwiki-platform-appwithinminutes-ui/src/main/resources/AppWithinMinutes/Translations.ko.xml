@@ -37,10 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-platform.appwithinminutes.homePageTitle=몇 분 안에 앱
+platform.appwithinminutes.homePageTitle=몇 분 만에 만드는 앱
 platform.appwithinminutes.description=XWiki 의 강력한 구조화된 데이터 관리 시스템을 기반으로 몇 분 안에 협업 웹 애플리케이션을 생성하세요 .
 platform.appwithinminutes.createAppButtonLabel=애플리케이션 생성
-platform.appwithinminutes.appsLiveTableHeading=응용
+platform.appwithinminutes.appsLiveTableHeading=어플리케이션
 platform.appwithinminutes.appsLiveTable.doc.title=애플리케이션
 platform.appwithinminutes.appsLiveTable.doc.author=마지막 저자
 platform.appwithinminutes.appsLiveTable.doc.date=업데이트 날짜
@@ -115,7 +115,7 @@ platform.appwithinminutes.classEditorGroupsFieldName=그룹
 platform.appwithinminutes.classEditorUsersFieldName=사용자
 platform.appwithinminutes.classEditorDateFieldName=날짜
 platform.appwithinminutes.classEditorStaticListFieldName=정적 목록
-platform.appwithinminutes.classEditorBooleanFieldName=부울
+platform.appwithinminutes.classEditorBooleanFieldName=부울(참/거짓)
 platform.appwithinminutes.classEditorNumberFieldName=숫자
 platform.appwithinminutes.classEditorTextAreaFieldName=긴 텍스트
 platform.appwithinminutes.classEditorStringFieldName=짧은 텍스트
@@ -158,7 +158,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=
 appWithinMinutes.templateProviderEditor.terminal.hint=애플리케이션 항목이 터미널 페이지여야 하는지 여부입니다.
 
 ### Wizard Step 3: Application Presentation
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=응용 분야
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=어플리케이션 필드
 platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=일반 열
 platform.appwithinminutes.liveTableEditorHelpTitle=팁
 platform.appwithinminutes.liveTableEditorHelpDescription=일반 라이브 테이블 열은 애플리케이션 구조와 독립적입니다. 이는 애플리케이션 데이터를 보유하는 페이지에 대한 정보를 제공합니다.
@@ -182,7 +182,7 @@ platform.appwithinminutes.liveTableEditorAttachmentsColumnName=첨부파일
 platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=데이터 페이지의 첨부 파일에 대한 링크를 표시하는 특수 열
 platform.appwithinminutes.liveTableEditorImagesColumnName=이미지
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=데이터 페이지에 첨부된 이미지를 표시하는 특수 열
-platform.appwithinminutes.liveTableEditorAvatarColumnName=화신
+platform.appwithinminutes.liveTableEditorAvatarColumnName=아바타
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=사용자 아바타를 표시하는 특수 열입니다. XWiki .XWikiUsers 클래스 에 바인딩된 테이블에 대해서만 작동합니다
 platform.appwithinminutes.liveTableEditorTitleHint=애플리케이션 홈 페이지, 애플리케이션 패널 및 라이브 테이블, 이동 경로 등에 표시되는 애플리케이션 제목입니다.
 platform.appwithinminutes.liveTableEditorDescriptionHint=애플리케이션 데이터와 함께 라이브 테이블 위에 홈페이지에 표시될 콘텐츠입니다. 이를 사용하여 응용 프로그램을 설명합니다.
@@ -237,7 +237,7 @@ appWithinMinutes.renameApp.failed=애플리케이션 이름을 바꾸지 못했�
 
 ### Deprecated keys
 ### Since 8.4
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=응용클래스
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=어플리케이션 클래스
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=애플리케이션 데이터 위치
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=공간
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=애플리케이션 항목이 포함된 공간의 이름

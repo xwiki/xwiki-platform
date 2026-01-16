@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.attachmentsrestriction=첨부 파일 제한
+  <content>admin.attachmentsrestriction=첨부파일 제한
 attachment.validation.filesize.errorMessage=파일 {0}이(가) 너무 큽니다({1}). 최대 파일 크기: {2}.
 attachment.validation.mimetype.errorMessage=파일 {0}에 잘못된 MIME 유형 {1}이(가) 있습니다.
 attachment.validation.mimetype.allowedMimetypes=허용된 MIME 유형: {0}

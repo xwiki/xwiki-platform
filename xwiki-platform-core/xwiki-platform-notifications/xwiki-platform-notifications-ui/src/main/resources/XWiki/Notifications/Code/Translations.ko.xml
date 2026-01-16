@@ -50,7 +50,7 @@ notifications.filters.advanced.toggles.hint=이러한 필터는 기본적으로 
 notifications.filters.advanced.toggles.table.name=필터 이름
 notifications.filters.advanced.toggles.table.description=설명
 notifications.filters.advanced.toggles.table.toggle=비녀장
-notifications.filters.advanced.modal.close=닫다
+notifications.filters.advanced.modal.close=닫기
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=시스템 필터
@@ -282,7 +282,7 @@ notifications.watch.modal.option.blockspace.title=현재 및 하위 페이지 �
 ### Missing: notifications.watch.modal.option.unblockspace.hint=You will receive notifications for that page and its children.
 ### Missing: notifications.watch.modal.option.unblockwiki.title=Unblock entire wiki
 ### Missing: notifications.watch.modal.option.unblockwiki.hint=This option doesn't only impact current page or space: you will stop ignoring notifications for any page in the wiki.
-### Missing: notifications.watch.modal.close=Close without saving
+notifications.watch.modal.close=저장없이 닫기
 ### Missing: notifications.watch.modal.savechanges=Save changes
 ### Missing: notifications.watch.modal.gotosettings=Manage all notifications settings
 ## until 13.2RC1

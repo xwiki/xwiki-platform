@@ -62,8 +62,8 @@ appWithinMinutes.wizardStep.entries.name=항목
 appWithinMinutes.wizardStep.entries.title=데이터 찾기
 appWithinMinutes.wizardStep.entries.description=데이터를 저장할 위치를 선택하세요
 appWithinMinutes.wizardStep.presentation.name=프레젠테이션
-appWithinMinutes.wizardStep.presentation.title=애플리케이션 홈 페이지 사용자 정의
-appWithinMinutes.wizardStep.presentation.description=애플리케이션 홈 페이지 사용자 정의
+appWithinMinutes.wizardStep.presentation.title=당신의 애플리케이션 홈페이지 사용자 정의
+appWithinMinutes.wizardStep.presentation.description=애플리케이션 홈페이지 사용자 정의
 platform.appwithinminutes.wizardStepNextButtonLabel=다음 단계
 platform.appwithinminutes.wizardStepNextButtonTip=다음 단계로 이동
 platform.appwithinminutes.wizardStepFinishButtonLabel=마치다
@@ -144,7 +144,7 @@ platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=삭제
 appWithinMinutes.templateProviderEditor.hint=애플리케이션 항목은 구조화된 데이터가 포함된 위키 페이지입니다.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.name=Icon
 appWithinMinutes.templateProviderEditor.icon.hint=애플리케이션 항목 과 연관된 아이콘입니다 .
-### Missing: appWithinMinutes.templateProviderEditor.description.name=Description
+appWithinMinutes.templateProviderEditor.description.name=설명
 appWithinMinutes.templateProviderEditor.description.hint=애플리케이션 항목 에 대한 간단한 설명입니다 .
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=항목을 생성 할 위치
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=위치를 선택하지 않으면 모든 페이지에서 항목을 생성할 수 있습니다.
@@ -257,7 +257,7 @@ platform.appwithinminutes.wizardStep2Description=애플리케이션 데이터 �
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=프레젠테이션
 #@deprecated appWithinMinutes.wizardStep.presentation.title
-platform.appwithinminutes.wizardStep3Title=애플리케이션 홈페이지 맞춤설정
+platform.appwithinminutes.wizardStep3Title=당신의 애플리케이션 홈페이지 사용자 정의
 #@deprecated appWithinMinutes.wizardStep.presentation.description
 platform.appwithinminutes.wizardStep3Description=애플리케이션 홈페이지 사용자 정의
 

@@ -40,7 +40,7 @@
 platform.appwithinminutes.homePageTitle=몇 분 안에 앱
 platform.appwithinminutes.description=XWiki 의 강력한 구조화된 데이터 관리 시스템을 기반으로 몇 분 안에 협업 웹 애플리케이션을 생성하세요 .
 platform.appwithinminutes.createAppButtonLabel=애플리케이션 생성
-platform.appwithinminutes.appsLiveTableHeading=응용
+platform.appwithinminutes.appsLiveTableHeading=어플리케이션
 platform.appwithinminutes.appsLiveTable.doc.title=애플리케이션
 platform.appwithinminutes.appsLiveTable.doc.author=마지막 저자
 platform.appwithinminutes.appsLiveTable.doc.date=업데이트 날짜
@@ -158,7 +158,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=
 appWithinMinutes.templateProviderEditor.terminal.hint=애플리케이션 항목이 터미널 페이지여야 하는지 여부입니다.
 
 ### Wizard Step 3: Application Presentation
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=응용 분야
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=어플리케이션 필드
 platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=일반 열
 platform.appwithinminutes.liveTableEditorHelpTitle=팁
 platform.appwithinminutes.liveTableEditorHelpDescription=일반 라이브 테이블 열은 애플리케이션 구조와 독립적입니다. 이는 애플리케이션 데이터를 보유하는 페이지에 대한 정보를 제공합니다.
@@ -237,7 +237,7 @@ appWithinMinutes.renameApp.failed=애플리케이션 이름을 바꾸지 못했�
 
 ### Deprecated keys
 ### Since 8.4
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=응용클래스
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=어플리케이션 클래스
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=애플리케이션 데이터 위치
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=공간
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=애플리케이션 항목이 포함된 공간의 이름

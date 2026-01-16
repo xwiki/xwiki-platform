@@ -79,7 +79,7 @@ appWithinMinutes.createApp.location.hint=애플리케이션이 생성될 페이�
 appWithinMinutes.createApp.parent.label=부모의
 appWithinMinutes.createApp.parent.hint=새 애플리케이션의 상위입니다. 최상위 애플리케이션을 생성하려면 이 필드를 비워 두세요.
 appWithinMinutes.createApp.parent.placeholder=경로.대상.부모
-appWithinMinutes.codeSpace.title=암호
+appWithinMinutes.codeSpace.title=코드(Code)
 appWithinMinutes.codeSpace.description=애플리케이션 코드가 있는 곳입니다.
 appWithinMinutes.codeSpace.hiddenPagesInfo=현재 사용자 프로필 설정이 이를 금지하더라도 숨겨진 페이지도 나열됩니다. 그렇지 않으면 기본적으로 모두 숨겨져 있기 때문에 응용 프로그램 코드 페이지가 표시되지 않습니다.
 platform.appwithinminutes.appNamePageTitle=애플리케이션 생성
@@ -123,7 +123,7 @@ platform.appwithinminutes.classEditorContentFieldName=콘텐츠
 platform.appwithinminutes.classEditorTitleFieldName=제목
 platform.appwithinminutes.classEditorPageFieldName=페이지
 platform.appwithinminutes.classEditorDeleteFieldLabel=삭제
-platform.appwithinminutes.classEditorConfigureFieldLabel=구성
+platform.appwithinminutes.classEditorConfigureFieldLabel=설정
 platform.appwithinminutes.classEditorPreviewFieldLabel=시사
 platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 및 변경 사항 적용
 platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
@@ -134,7 +134,7 @@ platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
-platform.appwithinminutes.classEditorDatePickerClearSelectedDate=분명한
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=지우기
 platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=지금
 platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=오늘
 

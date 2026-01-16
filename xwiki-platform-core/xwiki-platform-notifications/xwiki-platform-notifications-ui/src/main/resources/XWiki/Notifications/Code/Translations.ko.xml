@@ -94,7 +94,7 @@ notifications.settings.filters.preferences.system.title=시스템 필터
 notifications.settings.filters.preferences.system.hint=수신하려는 알림을 보다 세밀하게 제어하기 위해 전환할 수 있는 시스템 필터입니다.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=이름
-### Missing: notifications.settings.filters.preferences.system.table.filterDescription=Description
+notifications.settings.filters.preferences.system.table.filterDescription=설명
 notifications.settings.filters.preferences.system.table.filterType=설명
 notifications.settings.filters.preferences.system.table.notificationFormats=형식
 notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
@@ -186,7 +186,7 @@ XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=매일
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=시간별
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=주간
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=살다
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=변경사항 세부정보
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=변경 세부정보
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=아무것도 아님
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=기준
 XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=포함한

@@ -196,6 +196,9 @@ public class UIExtensionTest extends AbstractTest
         Assert.assertEquals("Doc extra content", docExtra.getText());
         // Verify that the page content is not modified by the "on this page" JavaScript extension but is modified by
         // the JavaScript extension loaded by the DocExtra UI extension.
-        Assert.assertEquals(expectedPageContent + "OnDemandJS", page.getContent().trim());
+        String expectedContent = expectedPageContent + "OnDemandJS";
+        // Wait for the expected content to be added by the JavaScript extension loaded by the DocExtra UI extension.
+        page.waitUntilContent(expectedContent);
+        Assert.assertEquals(expectedContent, page.getContent().trim());
     }
 }

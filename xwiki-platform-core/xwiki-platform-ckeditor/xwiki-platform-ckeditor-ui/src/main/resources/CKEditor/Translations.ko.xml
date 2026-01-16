@@ -215,7 +215,7 @@ ckeditor.plugin.slash.action.table_cell_delete.hint=현재 테이블 셀을 제�
 ckeditor.plugin.slash.action.table_delete.hint=콘텐츠에서 현재 테이블을 제거합니다.
 ckeditor.plugin.slash.placeholder=빠른 작업을 위해 /를 입력하세요...
 ckeditor.plugin.slash.dropdown.hint=자동완성할 항목을 선택하세요.
-ckeditor.plugin.focusedplaceholder.placeholder.body=몸
+ckeditor.plugin.focusedplaceholder.placeholder.body=Body
 ckeditor.plugin.focusedplaceholder.placeholder.address=주소
 ckeditor.plugin.focusedplaceholder.placeholder.aside=곁에
 ckeditor.plugin.focusedplaceholder.placeholder.footer=보행인
@@ -330,7 +330,7 @@ imageSelector.modal.initialization.fail=이미지 선택 양식을 검색하지 
 #@deprecatedstart
 
 ## Deprecated since 14.10
-imageEditor.modal.backToEditor.button=뒤쪽에
+imageEditor.modal.backToEditor.button=돌아가기
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=문서 트리
 ckeditor.plugin.link.uploadProgress={0} 업로드 중...
 ckeditor.plugin.link.uploadSuccess={0}을(를) 업로드했습니다

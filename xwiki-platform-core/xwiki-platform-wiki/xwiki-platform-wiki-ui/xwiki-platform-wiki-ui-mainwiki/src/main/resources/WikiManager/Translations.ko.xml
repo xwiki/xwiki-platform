@@ -241,7 +241,7 @@ admin.wikis.templates.hint=템플릿은 새 위키를 생성하기 위한 모델
 admin.wikis.rights=생성 권한
 
 ## XWikiServer Sheet
-platform.wiki.sheet.title=위키 "{0}"의 설명자
+platform.wiki.sheet.title=위키 "{0}"의 서술자
 platform.wiki.sheet.erroraliasalreadynotexists=Wiki 별칭 "{0}"이(가) 이미 존재합니다.
 platform.wiki.sheet.erroraliasdoesnotexists=Wiki 별칭 "{0}"이(가) 존재하지 않습니다.
 platform.wiki.sheet.title.settings=위키 속성

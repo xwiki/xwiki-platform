@@ -65,7 +65,7 @@ contributors.livetable._avatar=아바타
 contributors.livetable._images=이미지
 contributors.livetable._attachments=첨부파일
 contributors.livetable._actions=Actions
-contributors.livetable._actions.edit=편집하다
+contributors.livetable._actions.edit=편집
 contributors.livetable._actions.delete=삭제
 contributors.livetable.emptyvalue=-
 

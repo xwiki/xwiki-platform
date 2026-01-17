@@ -70,7 +70,7 @@ movies.livetable._avatar=아바타
 movies.livetable._images=이미지
 movies.livetable._attachments=첨부파일
 movies.livetable._actions=Actions
-movies.livetable._actions.edit=편집하다
+movies.livetable._actions.edit=편집
 movies.livetable._actions.delete=삭제
 movies.livetable.emptyvalue=-
 

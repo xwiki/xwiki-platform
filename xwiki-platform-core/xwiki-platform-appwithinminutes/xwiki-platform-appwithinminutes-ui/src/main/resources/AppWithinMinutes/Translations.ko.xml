@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorIconHintWithPicker=애플리케이션 �
 
 ### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=항목
-platform.appwithinminutes.appLiveTableEditEntryActionName=편집하다
+platform.appwithinminutes.appLiveTableEditEntryActionName=편집
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=삭제
 platform.appwithinminutes.appHomePageActionsHeading=Actions
 platform.appwithinminutes.appHomePageAddEntryLabel=추가

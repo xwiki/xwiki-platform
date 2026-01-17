@@ -86,7 +86,7 @@ tour.steps.delete_done=삭제 단계가 완료되었습니다!
 tour.steps.deleting=단계 삭제 중...
 tour.steps.yes=예
 tour.steps.no=아니요
-tour.steps.edit=편집하다
+tour.steps.edit=편집
 tour.steps.delete=삭제
 
 # Upgrade

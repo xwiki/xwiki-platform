@@ -85,7 +85,7 @@ XWiki.XWikiPreferences_iconTheme.hint=기본적으로 사용할 아이콘 테마
 XWiki.XWikiPreferences_colorTheme.hint=기본적으로 사용할 색상 테마를 지정합니다.
 
 # Editing Sections
-admin.edit=편집
+admin.edit=편집 중
 admin.edit.description=편집 모드, WYSIWYG 편집기 및 사용 가능한 구문을 구성합니다.
 admin.title=제목
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=사용자가 제목이 비어 있는 위키 페이지를 생성하는 것을 방지합니다.

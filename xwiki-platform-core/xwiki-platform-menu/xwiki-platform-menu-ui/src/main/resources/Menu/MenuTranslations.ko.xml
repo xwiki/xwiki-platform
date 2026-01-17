@@ -53,7 +53,7 @@ menu.livetable._avatar=아바타
 menu.livetable._images=이미지
 menu.livetable._attachments=첨부파일
 menu.livetable._actions=Actions
-menu.livetable._actions.edit=편집하다
+menu.livetable._actions.edit=편집
 menu.livetable._actions.delete=삭제
 menu.livetable.emptyvalue=-
 

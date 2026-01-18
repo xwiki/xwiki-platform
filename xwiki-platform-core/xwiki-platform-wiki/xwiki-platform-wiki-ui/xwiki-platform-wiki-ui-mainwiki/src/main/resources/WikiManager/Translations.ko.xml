@@ -231,7 +231,7 @@ platform.wiki.create.wizard.step.creation.wait=위키가 생성될 때까지 기
 platform.wiki.create.wizard.step.creation.complete=Wiki {0}이(가) 성공적으로 생성되었습니다. 이제 액세스할 수 있습니다.
 platform.wiki.create.wizard.step.creation.errorlog=그러나 해당 프로세스 중에 오류가 발생했으며 이를 검토하는 것이 좋습니다.
 platform.wiki.create.wizard.step.creation.error=Wiki {0} 생성에 실패했습니다. 삭제하는 것이 좋습니다.
-platform.wiki.create.wizard.step.creation.go=위키로 이동
+platform.wiki.create.wizard.step.creation.go=위키(Wiki)로 이동
 
 ## Admin
 admin.wikis.description=위키 관리.

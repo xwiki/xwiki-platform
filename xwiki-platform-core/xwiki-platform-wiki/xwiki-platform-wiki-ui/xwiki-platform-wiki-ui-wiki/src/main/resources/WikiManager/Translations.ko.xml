@@ -133,6 +133,6 @@ admin.xwiki.members.title=현재 회원
 admin.xwiki.users.title=모든 사용자들
 
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=집
+platform.wiki.drawer.homeWiki=홈
 </content>
 </xwikidoc>

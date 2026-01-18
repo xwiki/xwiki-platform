@@ -62,6 +62,6 @@ tour.homepageTour.header.contentA=콘텐츠를 검색하거나 , 페이지 변�
 tour.homepageTour.header.contentB={0} 버튼을 누르면 관리 및 색인과 같은 Wiki 관련 작업이 포함된 서랍이 열립니다.
 tour.homepageTour.tourComplete.title=투어 완료
 tour.homepageTour.tourComplete.contentA=이것으로 XWiki 의 인터페이스와 기본 기능 에 대한 둘러보기를 마칩니다 .
-tour.homepageTour.tourComplete.contentB=각 기능에 대한 자세한 내용을 보려면 {0} 문서 {1}에 액세스하세요.
+tour.homepageTour.tourComplete.contentB=각 기능에 대한 자세한 내용을 보려면 {0}문서 {1}에 액세스하세요.
 </content>
 </xwikidoc>

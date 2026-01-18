@@ -63,7 +63,7 @@ repository.supporter.sheet.createplan=추가
 ### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
 ### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
 ### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
-### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
+ExtensionCode.ExtensionSupporterClass_email=이메일
 ExtensionCode.ExtensionSupporterClass_content=세부사항
 ExtensionCode.ExtensionSupporterClass_active=활성화
 

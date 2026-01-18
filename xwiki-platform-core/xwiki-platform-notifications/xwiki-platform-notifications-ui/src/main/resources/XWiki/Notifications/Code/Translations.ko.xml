@@ -190,7 +190,7 @@ XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=변경 세부
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=아무것도 아님
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=기준
 XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=포함한
-XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=독점적인
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=제외
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=절대
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=수정을 할 때마다
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=큰 수정을 할 때마다
@@ -209,7 +209,7 @@ notifications.userprofile.follow=팔로우 시작
 notifications.userprofile.unfollow=팔로우 중지
 notifications.userprofile.done=완료
 notifications.userprofile.saving=절약...
-notifications.userprofile.error=알림 설정을 저장하는 중에 오류가 발생했습니다
+notifications.userprofile.error=알림 설정을 저장하는 중 오류가 발생했습니다
 
 ## Macros description
 rendering.macro.notificationsApplicationsPreferences.name=알림 애플리케이션 기본 설정
@@ -297,7 +297,7 @@ notifications.settings.filters.preferences.table.notificationFormats=형식
 notifications.settings.filters.preferences.table.isEnabled=사용 가능?
 notifications.settings.filters.preferences.table._actions=Actions
 notifications.filters.preferences.addPreference.filterType.inclusive=포함한
-notifications.filters.preferences.addPreference.filterType.exclusive=독점적인
+notifications.filters.preferences.addPreference.filterType.exclusive=제외
 notifications.filters.preferences.addPreference.notificationFormat.label=알림 형식
 notifications.filters.preferences.addPreference.notificationFormat.hint=필터는 어떤 형식의 알림에 적용되어야 합니까?
 notifications.filters.preferences.addPreference.eventType.label=이벤트 유형
@@ -308,7 +308,7 @@ notifications.filters.preferences.addPreference.location.hint=필터는 어떤 �
 
 ## Filter Types
 notifications.filters.type.inclusive=포함한
-notifications.filters.type.exclusive=독점적인
+notifications.filters.type.exclusive=제외
 
 ## until 16.2.0RC1
 ### Missing: notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.

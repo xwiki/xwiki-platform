@@ -78,7 +78,7 @@ menu.uix.scope.hint=메뉴가 표시되는 컨텍스트를 지정합니다.
 # Menu Macro
 rendering.macro.menu.name=메뉴
 rendering.macro.menu.description=간단한 위키 구문(중첩 목록 및 링크)을 사용하여 생성된 메뉴를 표시합니다.
-rendering.macro.menu.parameter.id.name=ID
+rendering.macro.menu.parameter.id.name=식별자
 rendering.macro.menu.parameter.id.description=메뉴를 래핑하는 HTML 요소 에 설정될 선택적 메뉴 식별자입니다 . JavaScript 코드에서 이 식별자를 사용하여 메뉴 DOM에 액세스하거나 기능 테스트에서 메뉴 항목을 어설션할 수 있습니다.
 rendering.macro.menu.parameter.label.name=상표
 rendering.macro.menu.parameter.label.description=메뉴 내용을 설명하는 데 사용되는 선택적 메뉴 레이블입니다. 보조 기술과 메뉴 접근성이 특히 중요합니다.

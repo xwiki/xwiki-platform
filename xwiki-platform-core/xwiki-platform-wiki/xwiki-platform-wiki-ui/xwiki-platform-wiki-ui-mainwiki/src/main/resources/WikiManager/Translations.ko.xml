@@ -215,9 +215,9 @@ platform.wiki.create.wizard.template.noTemplate=템플릿 없음(기본값)
 platform.wiki.create.wizard.userScope.label=사용자 범위
 platform.wiki.create.wizard.userScope.hint=위키에 액세스할 수 있는 사용자 유형을 선택하세요
 platform.wiki.create.wizard.template.label=주형
-platform.wiki.create.wizard.flavortemplate.label=기호 / 템플릿
-platform.wiki.create.wizard.flavortemplate.hint=새 위키의 초기 콘텐츠로 사용할 플레이버 또는 템플릿
-platform.wiki.create.wizard.flavortemplate.flavorTab=기호
+platform.wiki.create.wizard.flavortemplate.label=기본 패키지 / 템플릿
+platform.wiki.create.wizard.flavortemplate.hint=새 위키의 초기 콘텐츠로 사용할 기본 패키지 또는 템플릿
+platform.wiki.create.wizard.flavortemplate.flavorTab=기본 패키지
 platform.wiki.create.wizard.flavortemplate.templateTab=주형
 platform.wiki.create.wizard.step.dw="만들기" 버튼을 클릭하면 위키가 생성되고 위키 초기화를 돕기 위해 배포 마법사가 시작됩니다 . 마법사를 건너뛰면 위키가 비어 있게 됩니다.
 platform.wiki.create.wizard.step.previous=이전 단계
@@ -290,7 +290,7 @@ platform.wiki.create.wizard.step.provisioning=시스템이 위키를 프로비�
 platform.wiki.create.wizard.step.provisioning.wait=시스템이 Wiki를 제공하는 동안 잠시 기다려 주십시오.
 platform.wiki.create.wizard.step.provisioning.complete=위키가 거의 준비되었습니다. 마지막 작업을 수행하려면 "완료"를 클릭하세요.
 platform.wiki.create.wizard.step.provisioning.error=Wiki {0}이(가) 생성되었지만 템플릿에 포함된 일부 페이지가 복사되지 않았습니다. 아마도 삭제해야 할 것입니다.
-platform.wiki.create.wizard.step.provisioning.finalize=마무리
+platform.wiki.create.wizard.step.provisioning.finalize=완료
 
 #######################################
 ## until 9.5-rc-1

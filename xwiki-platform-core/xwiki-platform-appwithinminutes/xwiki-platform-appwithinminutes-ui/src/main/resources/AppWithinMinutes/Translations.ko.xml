@@ -130,7 +130,7 @@ platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
 platform.appwithinminutes.classEditorMoveFieldHint=드래그 앤 드롭하여 순서를 변경하세요
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
 ### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Pretty Name
-### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=Hint
+platform.appwithinminutes.classEditorFieldHintToolTip=힌트
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
@@ -140,11 +140,11 @@ platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=오늘
 
 ### Static List Editor
 platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=값
-platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=식별자
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=추가
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=삭제
 appWithinMinutes.templateProviderEditor.hint=애플리케이션 항목은 구조화된 데이터가 포함된 위키 페이지입니다.
-### Missing: appWithinMinutes.templateProviderEditor.icon.name=Icon
+appWithinMinutes.templateProviderEditor.icon.name=아이콘
 appWithinMinutes.templateProviderEditor.icon.hint=애플리케이션 항목 과 연관된 아이콘입니다 .
 appWithinMinutes.templateProviderEditor.description.name=설명
 appWithinMinutes.templateProviderEditor.description.hint=애플리케이션 항목 에 대한 간단한 설명입니다 .
@@ -192,7 +192,7 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=드래그 앤 드롭하�
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=삭제
 platform.appwithinminutes.liveTableEditorAddColumnHint=선택한 열 추가
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?&lt;a href=""&gt;예&lt;/a&gt; / &lt;a href=""&gt;아니요&lt;/a&gt;
-platform.appwithinminutes.liveTableEditorIcon=상
+platform.appwithinminutes.liveTableEditorIcon=아이콘
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=애플리케이션 아이콘입니다. 아이콘 선택기에서 아이콘을 선택하거나 첨부된 이미지를 참조할 수 있습니다.
 
 ### Wizard Step 4: Application home page

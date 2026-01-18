@@ -91,7 +91,7 @@ platform.appwithinminutes.appNameIsUsedWarning=이 애플리케이션은 이미 
 platform.appwithinminutes.appNameEmptyError=애플리케이션 이름을 입력해 주세요.
 
 ### Wizard Step 2: Application Structure
-platform.appwithinminutes.classEditorPaletteTitle=필드 팔레트
+platform.appwithinminutes.classEditorPaletteTitle=필드 도구 모음
 platform.appwithinminutes.classEditorPaletteHint=팔레트에서 필드를 끌어다 놓아 데이터를 입력하는 데 사용할 양식을 만듭니다.
 platform.appwithinminutes.classEditorCanvasHint=팔레트에서 필드를 끌어서 이 영역에 놓습니다.
 platform.appwithinminutes.classEditorUpdateTemplateLabel=템플릿 업데이트

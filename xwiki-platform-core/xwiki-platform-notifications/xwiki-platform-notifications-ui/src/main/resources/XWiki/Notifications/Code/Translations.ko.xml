@@ -209,7 +209,7 @@ notifications.userprofile.follow=팔로우 시작
 notifications.userprofile.unfollow=팔로우 중지
 notifications.userprofile.done=완료
 notifications.userprofile.saving=절약...
-notifications.userprofile.error=알림 설정을 저장하는 중에 오류가 발생했습니다
+notifications.userprofile.error=알림 설정을 저장하는 중 오류가 발생했습니다
 
 ## Macros description
 rendering.macro.notificationsApplicationsPreferences.name=알림 애플리케이션 기본 설정

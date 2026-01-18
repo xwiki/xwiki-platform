@@ -45,7 +45,7 @@ platform.appwithinminutes.appsLiveTable.doc.title=애플리케이션
 platform.appwithinminutes.appsLiveTable.doc.author=마지막 저자
 platform.appwithinminutes.appsLiveTable.doc.date=업데이트 날짜
 platform.appwithinminutes.appsLiveTable._actions=Actions
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=공간 관리 권한을 부여합니다.
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=스페이스 관리 권한을 부여합니다.
 
 ### AWM Applications panel entry
 platform.appwithinminutes.appPanelCreateEntry=직접 만들어보세요!

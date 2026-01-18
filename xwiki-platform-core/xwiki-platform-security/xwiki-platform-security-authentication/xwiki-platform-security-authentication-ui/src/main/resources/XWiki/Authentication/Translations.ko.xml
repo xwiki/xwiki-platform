@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>authentication.admin.failureStrategy.label=실패 전략
+  <content>authentication.admin.failureStrategy.label=인증 실패 정책
 authentication.admin.failureStrategy.hint=다중 인증 실패 시 사용할 전략입니다. 여러 전략을 선택할 수 있습니다.
 authentication.admin.failureStrategy.disableAccount.name=계정 비활성화
 authentication.admin.failureStrategy.captcha.name=보안 문자

@@ -60,7 +60,7 @@ user.profile.network.saving=저장중...
 user.profile.network.error=알림 설정을 저장하는 중 오류가 발생했습니다
 user.profile.status.done=완료
 user.profile.status.saving=저장중...
-user.profile.status.error=사용자 상태 저장 중 에러
+user.profile.status.error=사용자 상태 저장 중 오류가 발생했습니다
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

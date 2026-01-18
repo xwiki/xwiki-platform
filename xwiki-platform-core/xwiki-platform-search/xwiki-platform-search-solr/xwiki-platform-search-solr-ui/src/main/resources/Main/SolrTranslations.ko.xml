@@ -79,7 +79,7 @@ solr.result.author={1}에 {0}이(가) 수정함
 solr.result.mediaType={0} 유형의 파일
 solr.result.uploadedBy={1}({2})에 {0}이(가) 업로드함
 solr.result.highlightAll=모든 일치 항목 강조 표시
-solr.facets.title=검색 세분화
+solr.facets.title=검색 필터링
 solr.facets.hint=카테고리를 선택하고 현재 결과에 대한 필터를 활성화하세요
 solr.facets.resetAll=모두 초기화
 solr.facets.expandAll=모두 펼치기
@@ -183,7 +183,7 @@ solr.sortBy.attdate_sort=업로드 날짜
 solr.sortBy.attauthor_display_sort=업로드한 사람
 solr.options=보여주다:
 solr.options.highlight=강조
-solr.options.facet=패싯
+solr.options.facet=검색 필터
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

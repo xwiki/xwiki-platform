@@ -103,7 +103,7 @@ notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
 notifications.settings.filters.preferences.custom.title=사용자 정의 필터
 notifications.settings.filters.preferences.custom.hint=받고 싶은 알림을 제어하려면 필터를 만드세요.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=식별자
 ### Missing: notifications.settings.filters.preferences.custom.table.scope=Scope
 ### Missing: notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.filterType=필터 동작

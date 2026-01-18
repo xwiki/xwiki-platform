@@ -45,7 +45,7 @@ XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=라이트박스
 # Gallery template
 image.lightbox.autoPlay.title=슬라이드쇼
 image.lightbox.caption.label=표제
-image.lightbox.imageId.title=이미지 ID
+image.lightbox.imageId.title=이미지 식별자
 image.lightbox.imageId.copy.title=이미지 ID 복사
 image.lightbox.imageId.copy.copied=클립보드에 복사됨
 image.lightbox.imageId.permalink=고유링크

@@ -103,7 +103,7 @@ notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
 notifications.settings.filters.preferences.custom.title=사용자 정의 필터
 notifications.settings.filters.preferences.custom.hint=받고 싶은 알림을 제어하려면 필터를 만드세요.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=식별자
 ### Missing: notifications.settings.filters.preferences.custom.table.scope=Scope
 ### Missing: notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.filterType=필터 동작
@@ -203,7 +203,7 @@ notifications.settings.error.badCSRF=CSRF 토큰이 잘못되었습니다.
 notifications.settings.badParameters=요청 매개변수가 잘못되었습니다.
 
 ## User profile
-notifications.userprofile.following=수행원
+notifications.userprofile.following=팔로잉
 notifications.userprofile.notfollowing=팔로우하지 않음
 notifications.userprofile.follow=팔로우 시작
 notifications.userprofile.unfollow=팔로우 중지
@@ -263,7 +263,7 @@ notifications.watch.modal.option.watchpage.title=현재 페이지 팔로우
 ### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
 notifications.watch.modal.option.watchspace.title=현재 및 하위 페이지 팔로우
 ### Missing: notifications.watch.modal.option.watchspace.hint=You will receive notifications for that page and its children.
-### Missing: notifications.watch.modal.option.watchwiki.title=Follow entire wiki
+notifications.watch.modal.option.watchwiki.title=위키 전체 지켜보기
 ### Missing: notifications.watch.modal.option.watchwiki.hint=This option doesn't only impact current page or space: you will receive notifications for any page in the wiki.
 notifications.watch.modal.option.blockpage.title=현재 페이지 차단
 ### Missing: notifications.watch.modal.option.blockpage.hint=You will block any notifications for that page only.

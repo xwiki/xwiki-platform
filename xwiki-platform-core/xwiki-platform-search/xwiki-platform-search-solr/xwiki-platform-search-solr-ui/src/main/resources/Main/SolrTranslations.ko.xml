@@ -105,7 +105,7 @@ solr.facet.fileType.text.plain=일반 텍스트
 solr.facet.fileType.text.javascript=자바스크립트
 solr.facet.fileType.text.java-source=자바 소스
 solr.facet.fileType.text.sh=쉘 스크립트
-solr.facet.fileType.image.icon=상
+solr.facet.fileType.image.icon=아이콘
 solr.facet.fileType.archive.java-archive=항아리
 solr.facet.fileType.archive.xara=자르
 solr.facet.fileType.other.octet-stream=바이너리 데이터
@@ -182,7 +182,7 @@ solr.sortBy.attsize_sort=파일 크기
 solr.sortBy.attdate_sort=업로드 날짜
 solr.sortBy.attauthor_display_sort=업로드한 사람
 solr.options=보여주다:
-solr.options.highlight=강조
+solr.options.highlight=강조 중
 solr.options.facet=검색 필터
 
 ## Used to indicate where deprecated keys end

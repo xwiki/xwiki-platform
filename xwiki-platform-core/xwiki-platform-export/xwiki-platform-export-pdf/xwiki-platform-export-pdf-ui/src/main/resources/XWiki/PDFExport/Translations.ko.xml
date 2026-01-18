@@ -39,9 +39,9 @@
   <content>export.pdf.options.template=템플릿
 export.pdf.options.template.hint=PDF 템플릿 은 표지, 목차, 각 페이지의 머리글과 바닥글에 표시되는 정보를 제어합니다.
 export.pdf.options.loadFailure=PDF 내보내기 옵션을 로드하지 못했습니다 .
-export.pdf.hint=웹 브라우저를 사용하여 PDF (Portable Document Format)로 내보내기
+export.pdf.hint=웹 브라우저를 사용하여 PDF로 내보내기
 export.pdf.modal.close=닫기
-export.pdf.inProgress=PDF 로 내보내는 중 ...
+export.pdf.inProgress=PDF로 내보내는 중...
 export.pdf.failed=PDF 로 내보내지 못했습니다
 export.pdf.lastError=PDF 내보내기 로그 에 오류가 있습니다: {0}
 export.pdf.canceling=PDF 내보내기 취소 중 ...

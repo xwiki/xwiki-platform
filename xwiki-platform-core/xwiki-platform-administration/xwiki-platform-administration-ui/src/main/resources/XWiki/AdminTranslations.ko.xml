@@ -56,7 +56,7 @@ XWiki.XWikiPreferences_invitation_email_content.hint=등록하도록 초대된 �
 XWiki.Registration_heading.hint=이것은 등록하는 사람들과 방금 등록한 사람들에게 표시되는 페이지 상단의 줄입니다. Velocity 및 wiki 구문을 사용할 수 있습니다.
 XWiki.Registration_welcomeMessage.hint=이는 사람들이 양식을 작성할 때만 표시됩니다. Velocity 및 wiki 구문 코드를 사용할 수 있습니다.
 XWiki.Registration_loginButton_enabled.hint=사용자가 등록하면 사용자 이름과 비밀번호를 로그인 작업에 게시하고 즉시 로그인할 수 있는 버튼을 제공합니다. 그러나 이로 인해 사용자 이름과 비밀번호가 HTML 로 다시 전달되며 이는 보안 요구 사항에 따라 허용되지 않을 수 있습니다.
-XWiki.Registration_loginButton_autoLogin_enabled.hint=로그인 버튼이 활성화된 경우 JavaScript가 사용자의 로그인 버튼을 누르도록 할 수 있습니다.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=자동 로그인을 활성화하면, 스크립트가 자동으로 로그인 버튼을 클릭하여 로그인을 처리합니다.
 XWiki.Registration_defaultRedirect.hint=xredirect 매개변수가 지정되지 않은 경우 로그인 버튼을 누른 후 사용자가 리디렉션되는 URL 입니다 . 속도 코드를 사용할 수 있습니다.
 XWiki.Registration_requireCaptcha.hint=사용자가 등록하기 위해 CAPTCHA를 해결하도록 요구하려면 이를 true로 설정하십시오.
 XWiki.Registration_registrationSuccessMessage.hint=이는 성공적으로 등록되면 사용자에게 표시됩니다. Velocity 및 Wiki 구문 코드를 사용할 수 있습니다.
@@ -157,7 +157,7 @@ admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=섹션에 표시
-XWiki.ConfigurableClass_heading=표제
+XWiki.ConfigurableClass_heading=제목
 XWiki.ConfigurableClass_configurationClass=구성 클래스
 XWiki.ConfigurableClass_linkPrefix=링크 접두어
 XWiki.ConfigurableClass_propertiesToShow=표시할 속성

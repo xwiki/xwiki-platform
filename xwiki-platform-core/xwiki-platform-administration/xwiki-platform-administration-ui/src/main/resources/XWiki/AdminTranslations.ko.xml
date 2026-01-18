@@ -161,7 +161,7 @@ admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=섹션에 표시
-XWiki.ConfigurableClass_heading=표제
+XWiki.ConfigurableClass_heading=제목
 XWiki.ConfigurableClass_configurationClass=구성 클래스
 XWiki.ConfigurableClass_linkPrefix=링크 접두어
 XWiki.ConfigurableClass_propertiesToShow=표시할 속성

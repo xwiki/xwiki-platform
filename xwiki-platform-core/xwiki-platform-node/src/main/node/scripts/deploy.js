@@ -173,7 +173,7 @@ try {
     );
   } else {
     execSync(
-      `pnpm -r publish --registry ${releaseRegistry} --access public`,
+      `pnpm -r publish --registry ${releaseRegistry} --access public --no-git-checks`,
       { stdio: 'inherit', cwd: baseDirectory }
     );
   }

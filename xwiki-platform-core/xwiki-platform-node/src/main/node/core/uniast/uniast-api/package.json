@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

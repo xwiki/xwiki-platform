@@ -42,6 +42,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/react": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "react": "catalog:",

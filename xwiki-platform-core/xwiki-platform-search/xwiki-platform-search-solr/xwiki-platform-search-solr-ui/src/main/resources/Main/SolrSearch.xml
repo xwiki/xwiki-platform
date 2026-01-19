@@ -136,20 +136,20 @@
 
   var collapseAllFacets = function(event) {
     event.preventDefault();
-    $(event.target).closest('.search-facets').find('.search-facet .facet-toggle').collapse('hide');
+    $(event.target).closest('.search-facets').find('.search-facet .search-facet-body').collapse('hide');
     $(event.target).hide().parent().children('.search-facets-action-expandAll').show();
   };
 
   var expandAllFacets = function(event) {
     event.preventDefault();
-    $(event.target).closest('.search-facets').find('.search-facet .facet-toggle').collapse('show');
+    $(event.target).closest('.search-facets').find('.search-facet .search-facet-body').collapse('show');
     $(event.target).hide().parent().children('.search-facets-action-collapseAll').show();
   };
 
   var updateExpandCollapseAllFacetsState = function(facetsContainer) {
     let facetCount = facetsContainer.find('.search-facet').length;
-    let expandedFacetCount = facetsContainer.find('.search-facet.collapsed').length;
-    if (expandedFacetCount &lt;= facetCount / 2) {
+    let expandedFacetCount = facetsContainer.find('.search-facet-body.collapse.in').length;
+    if (expandedFacetCount &gt; facetCount / 2) {
       facetsContainer.find('.search-facets-action-collapseAll').show()
         .parent().children('.search-facets-action-expandAll').hide();
     } else {
@@ -195,7 +195,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.facet-toggle').on('click', function(event) {
+    facetsContainer.find('.search-facet-body').on('hidden.bs.collapse shown.bs.collapse', function(event) {
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
 

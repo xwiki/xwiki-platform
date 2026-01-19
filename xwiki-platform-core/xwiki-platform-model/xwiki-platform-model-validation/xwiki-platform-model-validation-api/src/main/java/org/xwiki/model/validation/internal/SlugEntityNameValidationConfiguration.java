@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,37 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.model.validation.internal;
 
-import type {
-  DocumentReference,
-  SpaceReference,
-} from "@xwiki/platform-model-api";
+import java.util.Set;
 
-/**
- * @since 18.0.0RC1
- * @beta
- */
-type NavigationTreeSelectProps = {
-  label: string;
-  help?: string;
-  currentPageReference?: DocumentReference;
-  modelValue?: SpaceReference;
-  /**
-   * Whether to include terminal pages as select options (default: false).
-   * @since 18.0.0RC1
-   * @beta
-   */
-  includeTerminals?: boolean;
-};
+import org.xwiki.component.annotation.Role;
 
 /**
- * Default props values for NavigationTreeSelect implementations.
- * @since 18.0.0RC1
- * @beta
+ * Configuration component for the kebab-case entity name validation.
+ *
+ * @version $Id$
+ * @since 18.1.0RC1
  */
-const navigationTreeSelectPropsDefaults = {
-  includeTerminals: false,
-};
+@Role
+public interface SlugEntityNameValidationConfiguration
+{
+    /**
+     * @return true if uppercase characters should be transformed to lowercase, false otherwise.
+     */
+    boolean convertToLowercase();
 
-export type { NavigationTreeSelectProps };
-export { navigationTreeSelectPropsDefaults };
+    /**
+     * @return true if dots are allowed between digits, false otherwise.
+     */
+    boolean isDotAllowedBetweenDigits();
+
+    /**
+     * @return the set of forbidden words that should be removed.
+     */
+    Set<String> getForbiddenWords();
+}

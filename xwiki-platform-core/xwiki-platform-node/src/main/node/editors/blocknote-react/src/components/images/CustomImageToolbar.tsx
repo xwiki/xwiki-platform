@@ -18,30 +18,82 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { useComponentsContext } from "@blocknote/react";
-import { useState } from "react";
+import { useBlockNoteEditor, useComponentsContext } from "@blocknote/react";
+import { assertUnreachable } from "@xwiki/platform-fn-utils";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
 import type { LinkEditionContext } from "../../misc/linkSuggest";
 
-export type CustomImageToolbarProps = {
+type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;
   linkEditionCtx: LinkEditionContext;
+  imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
+
+/**
+ * Interceptor for the image edition mechanism
+ *
+ * @since 0.26
+ * @beta
+ */
+type ImageEditionOverrideFn = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => void;
+
+/**
+ * Result of an image update process, from `ImageEditionOverrideFn`
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type ImageUpdateResult =
+  | { type: "update"; updatedProps: Partial<BlockOfType<"image">["props"]> }
+  | { type: "aborted" };
 
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
   linkEditionCtx,
+  imageEditionOverrideFn,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
+  const editor = useBlockNoteEditor();
 
-  const [showLinkEditor, setShowLinkEditor] = useState(false);
+  const [showImageEditor, setShowImageEditor] = useState(false);
+
+  const updateImageProps = useCallback(
+    (updateResult: ImageUpdateResult) => {
+      switch (updateResult.type) {
+        case "update":
+          editor.updateBlock(currentBlock, {
+            props: updateResult.updatedProps,
+          });
+          break;
+
+        case "aborted":
+          break;
+
+        default:
+          assertUnreachable(updateResult);
+      }
+    },
+    [currentBlock, editor],
+  );
+
+  const openEditor = useCallback(() => {
+    if (imageEditionOverrideFn) {
+      imageEditionOverrideFn(currentBlock.props, updateImageProps);
+    } else {
+      setShowImageEditor(true);
+    }
+  }, [imageEditionOverrideFn, currentBlock, editor]);
 
   return (
     <>
-      <Components.Generic.Popover.Root opened={showLinkEditor}>
+      <Components.Generic.Popover.Root opened={showImageEditor}>
         <Components.Generic.Popover.Trigger>
           {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}
@@ -49,7 +101,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
             className="bn-button"
             label={t("blocknote.imageToolbar.buttons.edit")}
             icon={<RiPencilLine />}
-            onClick={() => setShowLinkEditor(true)}
+            onClick={openEditor}
           />
         </Components.Generic.Popover.Trigger>
         <Components.Generic.Popover.Content
@@ -71,4 +123,10 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
       />
     </>
   );
+};
+
+export type {
+  CustomImageToolbarProps,
+  ImageEditionOverrideFn,
+  ImageUpdateResult,
 };

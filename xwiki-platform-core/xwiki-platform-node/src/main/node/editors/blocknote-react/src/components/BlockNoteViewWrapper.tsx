@@ -56,11 +56,18 @@ import type {
   ContextForMacros,
 } from "../blocknote/utils";
 import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
-type DefaultEditorOptionsType = BlockNoteEditorOptions<
+/**
+ * Default options for the BlockNote editor
+ *
+ * @since 0.16
+ * @beta
+ */
+type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<
   EditorBlockSchema,
   EditorInlineContentSchema,
   EditorStyleSchema
@@ -68,7 +75,8 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 
 /**
  * Properties for the BlockNote editor component.
- * @since 18.0.0RC1
+ *
+ * @since 0.16
  * @beta
  */
 type BlockNoteViewWrapperProps = {
@@ -76,7 +84,7 @@ type BlockNoteViewWrapperProps = {
    * Options to forward to the BlockNote editor
    */
   blockNoteOptions?: Partial<
-    Omit<DefaultEditorOptionsType, "schema" | "collaboration">
+    Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">
   >;
 
   /**
@@ -141,6 +149,18 @@ type BlockNoteViewWrapperProps = {
   linkEditionCtx: LinkEditionContext;
 
   /**
+   * Overrides for default behavior
+   *
+   * @since 0.26
+   */
+  overrides?: {
+    /**
+     * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
+     */
+    imageEdition?: ImageEditionOverrideFn;
+  };
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
@@ -161,6 +181,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   onChange,
   lang,
   linkEditionCtx,
+  overrides,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
@@ -332,6 +353,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           <CustomFormattingToolbar
             formattingToolbarProps={props}
             linkEditionCtx={linkEditionCtx}
+            imageEditionOverrideFn={overrides?.imageEdition}
           />
         )}
       />
@@ -365,5 +387,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   );
 };
 
-export type { BlockNoteViewWrapperProps, EditorSchema };
+export type {
+  BlockNoteViewWrapperProps,
+  DefaultBlockNoteEditorOptions,
+  EditorSchema,
+};
+
 export { BlockNoteViewWrapper };

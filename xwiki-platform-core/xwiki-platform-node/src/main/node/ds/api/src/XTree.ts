@@ -37,11 +37,11 @@ type DisplayableTreeNode = TreeNode<{
  * @since 18.0.0RC1
  * @beta
  */
-type TreeProps = {
+type TreeProps<T extends DisplayableTreeNode> = {
   /**
    * Node that contains the nodes to display.
    */
-  rootNode: DisplayableTreeNode;
+  rootNode: T;
   /**
    * Whether to display the root node itself (default: false).
    */
@@ -54,6 +54,16 @@ type TreeProps = {
    * Model value that contains the ids of the current opened nodes.
    */
   opened?: string[];
+  /**
+   * Optional method to call when opening a node with empty children.
+   */
+  lazyLoadChildren?: (node: T) => Promise<void>;
+  /**
+   * Optional method to call when clicking on nodes, replaces the URL click.
+   */
+  nodeClickAction?: (node: T) => Promise<void>;
 };
 
-export type { DisplayableTreeNode, TreeProps };
+// TreeNode needs to be re-exported because it is required to define
+// DisplayableTreeNode.
+export type { DisplayableTreeNode, TreeNode, TreeProps };

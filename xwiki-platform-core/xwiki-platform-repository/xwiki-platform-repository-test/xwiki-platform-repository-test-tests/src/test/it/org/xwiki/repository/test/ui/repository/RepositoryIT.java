@@ -410,6 +410,9 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // Make sure to clean the extension if it's already there
         getUtil().rest().delete(new LocalDocumentReference(List.of("Extension", "name"), "WebHome"));
 
+        // Use an account without script right
+        getUtil().login(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword());
+
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
         ExtensionImportPage importPage = extensionsPage.clickImport();

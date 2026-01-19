@@ -75,6 +75,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -85,8 +86,8 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
+import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -107,6 +108,9 @@ import com.xpn.xwiki.objects.StringProperty;
 public class RepositoryManager
 {
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
+
+    private static final LocalDocumentReference VERSIONSHOME_REFERENCE =
+        new LocalDocumentReference("ExtensionCode", "WebVersionsHome");
 
     /**
      * Get the reference of the class in the current wiki.
@@ -159,6 +163,10 @@ public class RepositoryManager
 
     @Inject
     private ExtensionStore extensionStore;
+
+    @Inject
+    @Named("document")
+    private SheetBinder documentSheetBinder;
 
     @Inject
     private Logger logger;
@@ -1409,11 +1417,9 @@ public class RepositoryManager
     {
         PageReference versionsReference = new PageReference("Versions", extensiondocument.getPageReference());
 
-        if (!xcontext.getWiki().exists(versionsReference, xcontext)) {
-            XWikiDocument versionsDocument = xcontext.getWiki().getDocument(versionsReference, xcontext);
+        XWikiDocument versionsDocument = xcontext.getWiki().getDocument(versionsReference, xcontext);
 
-            versionsDocument.setContent("{{include reference=\"ExtensionCode.VersionsHome\"/}}", Syntax.XWIKI_2_1);
-
+        if (this.documentSheetBinder.bind(extensiondocument, VERSIONSHOME_REFERENCE)) {
             saveDocument(versionsDocument, "", xcontext);
         }
     }

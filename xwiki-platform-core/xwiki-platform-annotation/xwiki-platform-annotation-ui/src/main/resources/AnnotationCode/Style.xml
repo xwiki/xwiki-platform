@@ -311,6 +311,7 @@ mark.annotation:not(.annotation-highlight) {
   border-radius: 0 10px 10px 10px;
   box-shadow: 0 2px 4px -1px $theme.linkColor;
   margin: 0 10px;
+  z-index: 2;
 }
 
 .annotation-bubble:before, .annotation-bubble:after {

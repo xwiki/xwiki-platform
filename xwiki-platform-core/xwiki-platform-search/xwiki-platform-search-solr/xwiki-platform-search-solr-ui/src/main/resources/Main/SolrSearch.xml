@@ -695,6 +695,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 
 .search-facet {
   padding: .2em 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-facets-header &gt; p,
@@ -737,8 +739,6 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 }
 
 .search-facet-body {
-  padding-top: .5em;
-  
   border-top-width: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -781,14 +781,14 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   }
 }
 
-.search-facet:has(btn.facet-toggle:not(.collapsed)) {
+.search-facet:has(.search-facet-body.collapse.in) {
   &amp; .search-facet-header {
     border-bottom-width: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     
     &amp; label {
-    font-weight: var(--font-weight-semibold);
+      font-weight: var(--font-weight-semibold);
     }
   }
 }

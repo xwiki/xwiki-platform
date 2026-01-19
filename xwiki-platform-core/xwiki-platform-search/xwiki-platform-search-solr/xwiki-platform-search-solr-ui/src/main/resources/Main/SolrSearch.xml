@@ -764,19 +764,19 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggle.collapsed > span, button.facet-value-toggle > span,
-.search-facet .search-facet-header .facet-toggle.collapsed > img, button.facet-value-toggle > img {
+.search-facet .search-facet-header .facet-toggle.collapsed &gt; span, button.facet-value-toggle &gt; span,
+.search-facet .search-facet-header .facet-toggle.collapsed &gt; img, button.facet-value-toggle &gt; img {
   transform: rotate(90deg);
 }
 
-.search-facet .search-facet-header .facet-toggle > span, .expanded > button.facet-value-toggle > span,
-.search-facet .search-facet-header .facet-toggle > img, .expanded > button.facet-value-toggle > img {
+.search-facet .search-facet-header .facet-toggle &gt; span, .expanded &gt; button.facet-value-toggle &gt; span,
+.search-facet .search-facet-header .facet-toggle &gt; img, .expanded &gt; button.facet-value-toggle &gt; img {
   transform: rotate(0deg);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
-  .search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
+  .search-facet .search-facet-header .facet-toggle &gt; span, button.facet-value-toggle &gt; span,
+  .search-facet .search-facet-header .facet-toggle &gt; img, button.facet-value-toggle &gt; img {
     transition: transform 0.2s ease;
   }
 }

@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiContext;
  * @since 18.0.0RC1
  */
 @Unstable
-public class PasswordProperty extends StringProperty
+public class PasswordProperty extends BaseStringProperty
 {
     private static final long serialVersionUID = 1L;
 

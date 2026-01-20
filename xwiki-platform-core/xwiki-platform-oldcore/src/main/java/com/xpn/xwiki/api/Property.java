@@ -96,4 +96,14 @@ public class Property extends Element
 
         return getBaseProperty().getValue();
     }
+
+    /**
+     * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
+     * @return {@code false} if the property is never sensitive, {@code true} otherwise.
+     * @since 18.0.0RC1
+     */
+    public boolean isSensitive()
+    {
+        return getBaseProperty().isSensitive(getXWikiContext());
+    }
 }

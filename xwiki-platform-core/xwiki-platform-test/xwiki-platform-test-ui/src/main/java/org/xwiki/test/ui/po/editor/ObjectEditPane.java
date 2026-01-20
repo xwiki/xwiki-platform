@@ -19,10 +19,12 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -35,6 +37,8 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class ObjectEditPane extends FormContainerElement
 {
+    private static final By DEPRECATED_PROPERTIES_SELECTOR = By.className("deprecatedProperties");
+
     /**
      * The object type.
      */
@@ -207,5 +211,40 @@ public class ObjectEditPane extends FormContainerElement
     public int getObjectNumber()
     {
         return objectNumber;
+    }
+
+    /**
+     * Retrieve the displayed value of a deprecated property.
+     * @param propertyName the name of the property for which to retrieve the value.
+     * @return a displayed value.
+     * @since 18.0.0RC1
+     */
+    public String getDeprecatedPropertyValue(String propertyName)
+    {
+        WebElement deprecatedPropertiesContainer =
+            getDriver().findElementWithoutWaiting(this.getXobjectContainer(), DEPRECATED_PROPERTIES_SELECTOR);
+        return getDriver().findElementWithoutWaiting(deprecatedPropertiesContainer,
+            By.cssSelector(String.format(".disabled.property-value[data-property-name=\"%s\"]", propertyName)))
+            .getText();
+    }
+
+    /**
+     * Check if a given deprecated property value is obfuscated. Note that this method throws a
+     * {@link NotFoundException} if the property is not among the list of deprecated properties.
+     * @param propertyName the name of the property for which to check whether its value is obfuscated or not
+     * @return {@code true} if the value of the property is obfuscated, {@code false} if a value is displayed.
+     * @since 18.0.0RC1
+     */
+    public boolean isDeprecatedPropertyObfuscated(String propertyName)
+    {
+        WebElement deprecatedPropertiesContainer =
+            getDriver().findElementWithoutWaiting(this.getXobjectContainer(), DEPRECATED_PROPERTIES_SELECTOR);
+        if (!getDriver().hasElementWithoutWaiting(deprecatedPropertiesContainer,
+            By.cssSelector(String.format(".disabled.property-value[data-property-name=\"%s\"]", propertyName)))) {
+            throw new NotFoundException(String.format("Cannot find deprecated property [%s]", propertyName));
+        }
+        return getDriver().hasElementWithoutWaiting(deprecatedPropertiesContainer,
+                By.cssSelector(String.format(".disabled.obfuscated.property-value[data-property-name=\"%s\"]",
+                    propertyName)));
     }
 }

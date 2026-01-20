@@ -26,6 +26,7 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
@@ -437,5 +438,16 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         }
 
         return null;
+    }
+
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        PropertyClass propertyClass = getPropertyClass(context);
+        boolean result = false;
+        if (propertyClass != null) {
+            result = propertyClass.isSensitive(context);
+        }
+        return result;
     }
 }

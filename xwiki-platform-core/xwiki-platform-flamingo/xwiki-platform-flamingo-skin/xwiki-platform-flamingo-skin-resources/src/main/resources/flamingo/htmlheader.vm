@@ -60,6 +60,7 @@
 #if ("$!xcontext.userReference" != '')
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
+#addMetaAttribute($metaAttributes, 'user-advanced', $isAdvancedUser)
 #addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
@@ -164,7 +165,6 @@
   #if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
   #if($showLeftPanels == "0") hideleft#end#if($showRightPanels == "0")hideright#end##Take care not to add any space between these two classes, they should combine in only one class if both are present.
   #if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
-  #if($isAdvancedUser) advanced-user#end##
   #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

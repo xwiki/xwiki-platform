@@ -55,6 +55,7 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
         } else {
           this.userReference = null;
         }
+        this.userAdvanced = html.dataset.xwikiUserAdvanced;
         // Since 11.2RC1
         this.isNew = html.dataset.xwikiIsnew === 'true';
         // Since 12.3RC1

@@ -85,8 +85,8 @@
   color: var(--text-muted);
 }
 
-.advanced-user .progress-transfered,
-.advanced-user .progress-speed {
+[data-xwiki-user-advanced=true] .progress-transfered,
+[data-xwiki-user-advanced=true] .progress-speed {
   display: unset;
 }
 

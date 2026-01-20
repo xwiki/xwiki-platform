@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.openqa.selenium.By;

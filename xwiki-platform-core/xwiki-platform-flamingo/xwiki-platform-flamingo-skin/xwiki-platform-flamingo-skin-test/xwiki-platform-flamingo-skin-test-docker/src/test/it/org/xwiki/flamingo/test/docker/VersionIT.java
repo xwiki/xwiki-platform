@@ -1140,7 +1140,7 @@ class VersionIT
         assertEquals(5, historyPane.getNumberOfVersions());
         assertEquals("5.1", historyPane.getCurrentVersion());
 
-        String objectIdInDiff = String.format("%s[0]", xclassReference.toString().substring("xwiki:".length()));
+        String objectIdInDiff = String.format("%s[0]", testUtils.serializeLocalReference(xclassReference));
 
         // diff 1.1 -> 5.1
         ComparePage comparePage = historyPane.compare("1.1", "5.1");

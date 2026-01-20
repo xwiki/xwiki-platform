@@ -101,9 +101,17 @@
       <dl>
         #foreach ($prop in $deprecatedProperties)
           <dt class="disabled property-name"><label>${escapetool.xml($prop.name)}:</label></dt>
-          <dd class="disabled property-value" data-property-name="$escapetool.xml($prop.name)">
-            ${escapetool.xml($prop.value)}
-          </dd>
+          #if ($prop.sensitive)
+            <dd class="disabled obfuscated property-value" data-property-name="$escapetool.xml($prop.name)">
+              <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+                $services.icon.renderHTML('info')
+              </span>
+            </dd>
+          #else
+            <dd class="disabled property-value" data-property-name="$escapetool.xml($prop.name)">
+              ${escapetool.xml($prop.value)}
+            </dd>
+          #end
         #end
       </dl>
       <div>

@@ -21,7 +21,7 @@
 import type { ModelReferenceParser } from "./modelReferenceParser";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface ModelReferenceParserProvider {

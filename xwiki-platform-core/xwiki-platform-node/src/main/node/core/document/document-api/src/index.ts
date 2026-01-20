@@ -23,7 +23,7 @@ import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { Ref } from "vue";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 type DocumentChange = "update" | "delete";
@@ -31,7 +31,7 @@ type DocumentChange = "update" | "delete";
 /**
  * Provide the operation to access a document.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 interface DocumentService {
@@ -43,7 +43,7 @@ interface DocumentService {
   /**
    * Returns a reference the document reference for the current document.
    *
-   * @since 0.13
+   * @since 18.0.0RC1
    * @beta
    */
   getCurrentDocumentReference(): Ref<DocumentReference | undefined>;
@@ -51,21 +51,21 @@ interface DocumentService {
   /**
    * Returns a serialized string of {@link getCurrentDocumentReference}.
    *
-   * @since 0.13
+   * @since 18.0.0RC1
    * @beta
    */
   getCurrentDocumentReferenceString(): Ref<string | undefined>;
 
   /**
    * @returns the revision of the current document, or undefined if it's the last one
-   * @since 0.12
+   * @since 18.0.0RC1
    * @beta
    */
   getCurrentDocumentRevision(): Ref<string | undefined>;
 
   /**
    * @returns the current document action
-   * @since 0.23
+   * @since 18.0.0RC1
    */
   getCurrentDocumentAction(): Ref<string | undefined>;
 
@@ -73,7 +73,7 @@ interface DocumentService {
    * Return the document title, either with the defined title (from {@link getTitle}), or by using the name of the
    * document reference.
    *
-   * @since 0.14
+   * @since 18.0.0RC1
    * @beta
    */
   getDisplayTitle(): Ref<string>;
@@ -82,7 +82,7 @@ interface DocumentService {
    * Return the defined document title, or undefined if no title is defined. To get a never empty title to display,
    * see {@link getDisplayTitle}.
    *
-   * @since 0.14
+   * @since 18.0.0RC1
    * @beta
    */
   getTitle(): Ref<string | undefined>;
@@ -103,7 +103,7 @@ interface DocumentService {
    * @param action - the current document action (default: "view")
    * @param revision - the revision of the document, undefined for latest
    *
-   * @since 0.23
+   * @since 18.0.0RC1
    * @beta
    */
   setCurrentDocument(
@@ -115,7 +115,7 @@ interface DocumentService {
   /**
    * Force reloading the content of the document without changing the current document reference
    *
-   * @since 0.18
+   * @since 18.0.0RC1
    * @beta
    */
   refreshCurrentDocument(): Promise<void>;
@@ -125,7 +125,7 @@ interface DocumentService {
    * made on the whole Cristal instance.
    * @param change - the kind of change
    * @param listener - the listener to register
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   registerDocumentChangeListener(
@@ -138,7 +138,7 @@ interface DocumentService {
    * listeners for the given kind of change.
    * @param change - the kind of change
    * @param page - the reference to the changed document
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   notifyDocumentChange(

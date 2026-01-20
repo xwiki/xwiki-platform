@@ -28,9 +28,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import org.apache.hc.core5.net.PercentCodec;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +42,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Page;
@@ -126,6 +129,12 @@ class LiveDataIT
             + "pages.";
 
     public static final String ACTIONS_COLUMN = "_actions";
+
+    private static final String ENFORCE_REQUIRED_RIGHTS_COLUMN = "doc.enforceRequiredRights";
+
+    private static final String FALSE = "False";
+
+    private static final String TRUE = "True";
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
@@ -434,7 +443,7 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "My Class");
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
         ClassEditPage classEditPage = viewPage.editClass();
         classEditPage.addProperty("myList", "DBList");
         DatabaseListClassEditElement dbListClassEditElement =
@@ -480,6 +489,322 @@ class LiveDataIT
             Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
+    }
+
+    /**
+     * Test filtering with a StaticList property that has multiple selection enabled but doesn't use relational
+     * storage. This uses StringListProperty which stores values in a CLOB column on Oracle.
+     */
+    @Test
+    @Order(5)
+    void filterWithNonRelationalStaticList(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "StaticList");
+        StaticListClassEditElement staticListClassEditElement =
+            classEditPage.getStaticListClassEditElement("myList");
+        staticListClassEditElement.setMultiSelect(true);
+
+        staticListClassEditElement.setMetaProperty("displayType", "input");
+        // Don't configure any static values to explicitly test the used values fetching.
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with multiple selections and no selections.
+        // First, the first two options are selected.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
+        // Second, third option selected.
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
+        // Third, no option selected.
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
+        // Third, many options selected to test large CLOB value filtering.
+        DocumentReference doc4Ref = new DocumentReference("Doc4", testReference.getLastSpaceReference());
+        StringJoiner manyOptions = new StringJoiner("|");
+        for (int i = 1; i <= 1000; i++) {
+            manyOptions.add("Option" + i);
+        }
+        testUtils.rest().addObject(doc4Ref, testUtils.serializeReference(testReference), "myList",
+            manyOptions.toString());
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(4);
+
+        // Filter by Option1 should return Doc1 and Doc4.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow("myList", "Option1 Option2");
+        tableLayout.assertRow("doc.name", "Doc4");
+
+        // Filter by Option3 should return Doc2 and Doc4.
+        tableLayout.filterColumn("myList", "Option3", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow("myList", "Option3");
+        tableLayout.assertRow("doc.name", "Doc4");
+
+        // Filter by (empty) should return only Doc3.
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
+
+        // Filter by Option100 should return only Doc4.
+        tableLayout.filterColumn("myList", "Option100", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc4");
+    }
+
+    /**
+     * Test filtering with a single-select StringProperty. This is stored in a VARCHAR column for small values or CLOB
+     * for large values (on Oracle).
+     */
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @Order(6)
+    void filterWithSingleSelectStringProperty(boolean largeStorage, TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "StaticList");
+        StaticListClassEditElement staticListClassEditElement =
+            classEditPage.getStaticListClassEditElement("myList");
+        // Single select - this will use StringProperty.
+        staticListClassEditElement.setMultiSelect(false);
+        staticListClassEditElement.setMetaProperty("displayType", "input");
+        // Using large storage will make the property use CLOB storage on databases that differentiate between
+        // VARCHAR and CLOB (like Oracle).
+        staticListClassEditElement.setMetaProperty("largeStorage", Boolean.toString(largeStorage));
+        // Don't configure any static values to explicitly test the used values fetching.
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with different selections.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1");
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        String option2 = "Option2";
+        if (largeStorage) {
+            // Use a large value to test that it actually works with a very large value with more than 4k characters.
+            option2 += StringUtils.repeat("A", 5000);
+        }
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", option2);
+
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        String option3 = "Option3";
+        if (largeStorage) {
+            // Use a large value that has less than 4k characters but more than 4k bytes.
+            // We don't just append Unicode characters because this would make the URI too large when filtering the Live
+            // Data as the filters are passed in the URL (should be fixed in the future). So we append a mix of 3.6k
+            // ASCII and 200 Unicode characters.
+            option3 += StringUtils.repeat("B", 3600) + StringUtils.repeat("⟷", 200);
+            // Sanity check to ensure we have more than 4k bytes.
+            assertTrue(option3.getBytes().length > 4000);
+        }
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference), "myList", option3);
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter by Option1 should return only Doc1.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc1");
+
+        // For the long values, we only use a part of the value to filter.
+        // Users won't type such long values in a real filter - the long value support is mostly for storing several
+        // values in the multiselect scenario, not really for single select.
+        String option2Filter = largeStorage ? option2.substring(0, 20) : option2;
+        // We can't filter directly using filterColumn as it expects an exact match. So we use the SuggestInputElement
+        // directly.
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter("myList"));
+        suggestInputElement.clearSelectedSuggestions().sendKeys(option2Filter).waitForNonTypedSuggestions();
+        suggestInputElement.selectByVisibleText(option2);
+        // Filter by Option2 should return only Doc2.
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc2");
+
+        String option3Filter = largeStorage ? option3.substring(0, 20) : option3;
+        // Filter by Option3 should return only Doc3.
+        suggestInputElement.clearSelectedSuggestions().sendKeys(option3Filter).waitForNonTypedSuggestions();
+        suggestInputElement.selectByVisibleText(option3);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
+    }
+
+    @Test
+    @Order(7)
+    void livedataLivetableTableLayoutWithCustomClass(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // Custom page content that sets the class on the individual properties. We filter the documents based on the
+        // space.
+        List<String> properties = List.of(DOC_TITLE_COLUMN, NAME_COLUMN, CHOICE_COLUMN);
+        String encodedReference =
+            PercentCodec.RFC3986.encode(testUtils.serializeReference(testReference.getLocalDocumentReference()));
+        EntityReference localSpaceReference = testReference.getLocalDocumentReference().getParent();
+        String content =
+            """
+                {{liveData
+                    id="test"
+                    properties="%s"
+                    limit="5"
+                    source="liveTable"
+                    sourceParameters="translationPrefix=&location=%s&%s_class=%s&%s_class=%s"
+                /}}
+                """.formatted(
+                String.join(",", properties),
+                PercentCodec.RFC3986.encode(testUtils.serializeReference(localSpaceReference)),
+                NAME_COLUMN,
+                encodedReference,
+                CHOICE_COLUMN,
+                encodedReference
+                );
+        testUtils.rest().savePage(testReference, content, "Custom Class");
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+        // Create another page without XObject so we can test adding an object.
+        DocumentReference noXObjectPage = new DocumentReference("NoXObject", testReference.getLastSpaceReference());
+        testUtils.rest().savePage(noXObjectPage, "", "No XObject");
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        // Test the Live Data content. We should have 5 rows: 3 XObjects + 1 No XObject + the result page.
+        assertEquals(5, tableLayout.countRows());
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_A);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
+
+        // Make sure that we have a selectized filter for the choice column.
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
+        suggestInputElement.click().waitForNonTypedSuggestions();
+        assertTrue(suggestInputElement.getSuggestions().stream().anyMatch(s -> s.getLabel().equals(CHOICE_A)));
+        // Filter by Choice A should return only Lynda.
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Clear the filter again.
+        suggestInputElement.clearSelectedSuggestions();
+        // Wait for all rows to be back.
+        tableLayout.waitUntilRowCountEqualsTo(5);
+
+        // Edit the choice column of Lynda.
+        // Filter the table to Lynda.
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, "O1", true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_C);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Edit the choice column of the "No XObject" page.
+        // Filter the table to "No XObject".
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, "No XObject", true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_D);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+        // The name should still be empty.
+        tableLayout.assertRow(NAME_COLUMN, "");
+
+        // Edit the name column of the "No XObject" page.
+        String newName = "New Name";
+        tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, newName);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, newName);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+    }
+
+    @Test
+    @Order(8)
+    void enforceRequiredRights(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // Create a test page.
+        DocumentReference testPageDocumentReference =
+            new DocumentReference("TestPage", testReference.getLastSpaceReference());
+        String testPageTitle = "Test Page";
+        testUtils.rest().savePage(testPageDocumentReference, "", testPageTitle);
+        String content = """
+            {{liveData
+                id="test"
+                properties="doc.title,doc.enforceRequiredRights"
+                source="liveTable"
+                sourceParameters="translationPrefix=&space=%s"
+            }}{{/liveData}}
+            """.formatted(
+                testUtils.serializeReference(testReference.getLocalDocumentReference().getParent()));
+        String liveDataTitle = "enforceRequiredRights LiveData";
+        testUtils.createPage(testReference, content, liveDataTitle);
+
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, liveDataTitle);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
+
+        // Test sorting on the enforceRequiredRights column.
+        tableLayout.sortBy(ENFORCE_REQUIRED_RIGHTS_COLUMN);
+        // Ensure that both rows are still present.
+        tableLayout.waitUntilRowCountEqualsTo(2);
+
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, testPageTitle);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
+
+        // Test the filter on the enforceRequiredRights column.
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true);
+        tableLayout.waitUntilRowCountEqualsTo(0);
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE, true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
+
+        // Remove the required rights filter to edit the value (the edit action of the page object doesn't like when
+        // the row disappears after an edit).
+        new SuggestInputElement(tableLayout.getFilter(ENFORCE_REQUIRED_RIGHTS_COLUMN)).clear().hideSuggestions();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+
+        // Edit the enforceRequiredRights column.
+        tableLayout.editCell(ENFORCE_REQUIRED_RIGHTS_COLUMN, 1, ENFORCE_REQUIRED_RIGHTS_COLUMN,
+            Boolean.TRUE.toString());
+
+        // Change the filter to check that setting the filter to TRUE now returns the page.
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

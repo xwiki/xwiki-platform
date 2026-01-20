@@ -19,18 +19,21 @@
  */
 package org.xwiki.model.validation.internal;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.validation.AbstractEntityNameValidation;
 
 /**
- * A name strategy that will remove all accents and replace special characters (including spaces) with "-".
+ * A kebab-style name strategy that will remove all accents and replace special characters (including spaces) with
+ * the {@code -} character.
  *
  * @version $Id$
  * @since 12.0RC1
@@ -41,27 +44,53 @@ import org.xwiki.model.validation.AbstractEntityNameValidation;
 public class SlugEntityNameValidation extends AbstractEntityNameValidation
 {
     protected static final String COMPONENT_NAME = "SlugEntityNameValidation";
-    private static final Pattern VALIDATION_PATTERN = Pattern.compile("^\\w+(-\\w+)*$");
+
     private static final String REPLACEMENT_CHARACTER = "-";
+    private static final Pattern DASH_PATTERN = Pattern.compile("-+");
+    private static final Pattern NONWORDCHARACTERS_PATTERN = Pattern.compile("[\\W]");
+    private static final Pattern DOTSBETWEENDIGITS = Pattern.compile("(?<=\\d)\\.(?=\\d)");
+    private static final Pattern NONWORD_PATTERN = Pattern.compile("\\W");
+    private static final String PROTECTED_DOT = "__DOT__";
+
+    @Inject
+    private SlugEntityNameValidationConfiguration configuration;
 
     @Override
     public String transform(String name)
     {
-        String strippedAccents = StringUtils.stripAccents(name);
-        String result = RegExUtils.replaceAll(strippedAccents, "[\\W]", REPLACEMENT_CHARACTER);
-        result = RegExUtils.replaceAll(result, "[-]+", REPLACEMENT_CHARACTER);
-        if (result.endsWith(REPLACEMENT_CHARACTER)) {
-            result = result.substring(0, result.length() - 1);
+        // Remove accents.
+        String result = StringUtils.stripAccents(name);
+        // Replace non-word characters by a REPLACEMENT_CHARACTER.
+        if (this.configuration.isDotAllowedBetweenDigits()) {
+            // 1) Protect dots between digits
+            result = DOTSBETWEENDIGITS.matcher(result).replaceAll(PROTECTED_DOT);
+            // 2) Replace all non-word characters
+            result = NONWORD_PATTERN.matcher(result).replaceAll(REPLACEMENT_CHARACTER);
+            // 3) Restore protected dots
+            result = result.replace(PROTECTED_DOT, ".");
+        } else {
+            result = NONWORDCHARACTERS_PATTERN.matcher(result).replaceAll(REPLACEMENT_CHARACTER);
         }
-        if (result.startsWith(REPLACEMENT_CHARACTER)) {
-            result = result.substring(1);
+        if (this.configuration.convertToLowercase()) {
+            result = result.toLowerCase(Locale.ROOT);
         }
+        // Remove forbidden words.
+        for (String forbiddenWord : this.configuration.getForbiddenWords()) {
+            // Note: the replacement is case-insensitive.
+            result = result.replaceAll(String.format("(?i)(?:(?<=^)|(?<=-))\\Q%s\\E(?:(?=$)|(?=-))",
+                forbiddenWord), "");
+        }
+        // Replace several REPLACEMENT_CHARACTER characters with a single one.
+        result = DASH_PATTERN.matcher(result).replaceAll(REPLACEMENT_CHARACTER);
+        // Remove leading and trailing REPLACEMENT_CHARACTER characters.
+        result = Strings.CS.removeEnd(result, REPLACEMENT_CHARACTER);
+        result = Strings.CS.removeStart(result, REPLACEMENT_CHARACTER);
         return result;
     }
 
     @Override
     public boolean isValid(String name)
     {
-        return VALIDATION_PATTERN.matcher(name).matches();
+        return transform(name).equals(name);
     }
 }

@@ -24,7 +24,7 @@ import type { ModelReferenceSerializerProvider } from "./modelReferenceSerialize
 import type { CristalApp } from "@xwiki/platform-api";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

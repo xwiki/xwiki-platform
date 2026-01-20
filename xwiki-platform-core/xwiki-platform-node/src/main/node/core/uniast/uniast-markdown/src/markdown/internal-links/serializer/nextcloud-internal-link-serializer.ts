@@ -28,7 +28,7 @@ import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-u
 import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  */
 @injectable()
 export class NextcloudInternalLinkSerializer

@@ -17,27 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.integration;
+package org.xwiki.model.validation.internal;
 
-import org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration;
+import java.util.Set;
+
+import org.xwiki.component.annotation.Role;
 
 /**
- * Makes {@link DefaultGeneralMailConfiguration} more easily testable.
+ * Configuration component for the kebab-case entity name validation.
  *
  * @version $Id$
+ * @since 18.1.0RC1
  */
-public class TestMailSenderConfiguration extends DefaultGeneralMailConfiguration
+@Role
+public interface SlugEntityNameValidationConfiguration
 {
-    private boolean shouldObfuscate;
+    /**
+     * @return true if uppercase characters should be transformed to lowercase, false otherwise.
+     */
+    boolean convertToLowercase();
 
-    public TestMailSenderConfiguration(boolean shouldObfuscate)
-    {
-        this.shouldObfuscate = shouldObfuscate;
-    }
+    /**
+     * @return true if dots are allowed between digits, false otherwise.
+     */
+    boolean isDotAllowedBetweenDigits();
 
-    @Override
-    public boolean shouldObfuscate()
-    {
-        return this.shouldObfuscate;
-    }
+    /**
+     * @return the set of forbidden words that should be removed.
+     */
+    Set<String> getForbiddenWords();
 }

@@ -201,4 +201,9 @@ public class AllIT
     class NestedDocExtraTabsIT extends DocExtraTabsIT
     {
     }
+
+    @Nested
+    class NestedWebJarsIT extends WebJarsIT
+    {
+    }
 }

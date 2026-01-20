@@ -362,8 +362,11 @@ class DocumentTest
         xdoc.setCreatorReference(new DocumentReference("wiki1", "XWiki", "initialcreator"));
 
         xdoc.getXClass().addTextField("key", "Key", 30);
-        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
+        xdoc.setContentDirty(false);
+        // perform a fake save to ensure the xclass is set when creating the new xobject.
+        this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
+        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
         xdoc.setContentDirty(false);
         this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 

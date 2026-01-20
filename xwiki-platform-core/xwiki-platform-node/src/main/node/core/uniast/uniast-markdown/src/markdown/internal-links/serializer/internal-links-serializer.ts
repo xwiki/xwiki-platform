@@ -23,7 +23,7 @@ import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 /**
  * Serialize internal link and image for a specific backend.
  *
- * @since 0.22
+ * @since 18.0.0RC1
  */
 export interface InternalLinksSerializer {
   serialize(

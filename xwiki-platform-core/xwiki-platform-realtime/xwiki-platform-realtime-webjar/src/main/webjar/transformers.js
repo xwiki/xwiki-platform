@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
+define('xwiki-realtime-transformers', ['chainpad'], function(ChainPad) {
   'use strict';
 
   /**
@@ -31,48 +31,16 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
    * @param {Array<Operation>} localOperations your own local operations
    * @param {Array<Operation>} remoteOperations the incoming remote operations (performed by other users)
    * @param {string} text the mutual common ancestor (the text before the local and remote operations were performed)
+   * @param {boolean} [allowEmptyOperations=false] whether to allow empty operations in the result
    * @returns {Array<Operation>} the transformed (rebased) local operations
    */
-  function RebaseNaiveJSONTransformer(localOperations, remoteOperations, text) {
-    // We follow the implementation of NaiveJSONTransformer which doesn't throw an exception when the outcome is not a
-    // valid JSON, but instead it logs the error and saves it in a global variable for debugging purposes. We use the
-    // same global variable and the same error keys to be consistent.
-    const DEBUG = ChainPad.Common.global.REALTIME_DEBUG = ChainPad.Common.global.REALTIME_DEBUG || {};
-
-    let rebasedLocalOperations, textAfterRemoteOperations, textAfterRebase, error, errorType;
-    try {
-      rebasedLocalOperations = RebaseTextTransformer(localOperations, remoteOperations, text);
-      textAfterRemoteOperations = ChainPad.Operation.applyMulti(remoteOperations, text);
-      textAfterRebase = ChainPad.Operation.applyMulti(rebasedLocalOperations, textAfterRemoteOperations);
-
-      try {
-        JSON.parse(textAfterRebase);
-        return rebasedLocalOperations;
-      } catch (e) {
-        error = e;
-        errorType = 'ot_parseError';
-      }
-    } catch (e) {
-      error = e;
-      errorType = 'ot_applyError';
-    }
-
-    DEBUG[errorType] = {
-      error,
-
-      remoteOperations,
-      localOperations,
-      rebasedLocalOperations,
-
-      text,
-      textAfterRemoteOperations,
-      textAfterRebase
-    };
-    console.error(error);
-    console.debug('Debugging info available at `window.REALTIME_DEBUG.' + errorType + '`');
-
-    // Return an empty patch in case we can't do anything else.
-    return [];
+  function RebaseNaiveJSONTransformer(localOperations, remoteOperations, text, allowEmptyOperations = false) {
+    const rebasedLocalOperations = RebaseTextTransformer(localOperations, remoteOperations, text, allowEmptyOperations);
+    const textAfterRemoteOperations = ChainPad.Operation.applyMulti(remoteOperations, text);
+    const textAfterRebase = ChainPad.Operation.applyMulti(rebasedLocalOperations, textAfterRemoteOperations);
+    // Verify that the rebased local operations produce valid JSON, otherwise we fail the rebase.
+    JSON.parse(textAfterRebase);
+    return rebasedLocalOperations;
   }
 
   /**
@@ -86,9 +54,10 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
    * @param {Array<Operation>} localOperations your own local operations
    * @param {Array<Operation>} remoteOperations the incoming remote operations (performed by other users)
    * @param {string} text the mutual common ancestor (the text before the local and remote operations were performed)
+   * @param {boolean} [allowEmptyOperations=false] whether to allow empty operations in the result
    * @returns {Array<Operation>} the transformed (rebased) local operations
    */
-  function RebaseTextTransformer(localOperations, remoteOperations, text) {
+  function RebaseTextTransformer(localOperations, remoteOperations, text, allowEmptyOperations = false) {
     let textAfterRemoteOperations = ChainPad.Operation.applyMulti(remoteOperations, text);
 
     let rebasedLocalOperations = [];
@@ -96,7 +65,8 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
         let rebasedLocalOperation = localOperations[i];
         for (let j = remoteOperations.length - 1; j >= 0; j--) {
             try {
-              rebasedLocalOperation = rebaseOperationSafely(rebasedLocalOperation, remoteOperations[j]);
+              rebasedLocalOperation = rebaseOperationSafely(rebasedLocalOperation, remoteOperations[j],
+                allowEmptyOperations);
             } catch (e) {
                 console.error("The pluggable transform function threw an error, " +
                   "failing operational transformation", e);
@@ -122,16 +92,17 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
    *
    * @param {Operation} localOperation your own local operation
    * @param {Operation} remoteOperation the incoming remote operation (performed by another user)
+   * @param {boolean} [allowEmptyOperations=false] whether to allow empty operations in the result
    * @returns {Operation} the transformed (rebased) local operation, or {@code null} if the local operation should be
    *   ignored
    */
-  function rebaseOperationSafely(localOperation, remoteOperation) {
+  function rebaseOperationSafely(localOperation, remoteOperation, allowEmptyOperations = false) {
     if (ChainPad.Common.PARANOIA) {
       ChainPad.Operation.check(localOperation);
       ChainPad.Operation.check(remoteOperation);
     }
     let rebasedLocalOperation = rebaseOperation(localOperation, remoteOperation);
-    if (!rebasedLocalOperation?.toRemove && !rebasedLocalOperation?.toInsert?.length) {
+    if (!allowEmptyOperations && !rebasedLocalOperation?.toRemove && !rebasedLocalOperation?.toInsert?.length) {
       // Discard the rebased local operation because it doesn't do anything.
       rebasedLocalOperation = null;
     } else if (ChainPad.Common.PARANOIA) {

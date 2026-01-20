@@ -21,7 +21,7 @@
 /**
  * Set of allowed provider states.
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 export enum Status {

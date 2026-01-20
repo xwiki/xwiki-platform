@@ -28,19 +28,19 @@ import type { UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-c
 import type { Container, Factory, Newable, ResolutionContext } from "inversify";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  * @beta
  */
 const markdownToUniAstConverterName = "MarkdownToUniAstConverter";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  * @beta
  */
 const uniAstToMarkdownConverterName = "UniAstToMarkdownConverter";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  * @beta
  */
 class ComponentInit {

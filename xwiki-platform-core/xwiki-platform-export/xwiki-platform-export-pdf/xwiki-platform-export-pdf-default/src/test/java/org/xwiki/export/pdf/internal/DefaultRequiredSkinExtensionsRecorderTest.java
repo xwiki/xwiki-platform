@@ -21,7 +21,8 @@ package org.xwiki.export.pdf.internal;
 
 import javax.inject.Provider;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -48,8 +49,13 @@ class DefaultRequiredSkinExtensionsRecorderTest
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
-    @Test
-    void startStop()
+    @ParameterizedTest
+    @CsvSource({
+        "before, after, after",
+        "'before', 'before\nafter', after",
+        "'first\nthird', 'first\nsecond\nthird', second"
+    })
+    void startStop(String before, String after, String expected)
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(xcontext);
@@ -59,10 +65,10 @@ class DefaultRequiredSkinExtensionsRecorderTest
 
         SkinExtensionPluginApi jsx = mock(SkinExtensionPluginApi.class, "jsx");
         when(xwiki.getPluginApi("jsx", xcontext)).thenReturn(jsx);
-        when(jsx.getImportString()).thenReturn("before", "before after");
+        when(jsx.getImportString()).thenReturn(before, after);
 
         this.recorder.start();
 
-        assertEquals("after", this.recorder.stop());
+        assertEquals(expected, this.recorder.stop());
     }
 }

@@ -29,10 +29,12 @@ import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service for name strategies.
@@ -58,6 +60,9 @@ public class ModelValidationScriptService implements ScriptService
 
     @Inject
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
+    @Inject
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
@@ -100,6 +105,20 @@ public class ModelValidationScriptService implements ScriptService
     {
         if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
             return this.replaceCharacterEntityNameValidationConfiguration;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return the slug entity name configuration
+     * @since 18.1.0RC1
+     */
+    @Unstable
+    public SlugEntityNameValidationConfiguration getSlugEntityNameValidationConfiguration()
+    {
+        if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
+            return this.slugEntityNameValidationConfiguration;
         } else {
             return null;
         }

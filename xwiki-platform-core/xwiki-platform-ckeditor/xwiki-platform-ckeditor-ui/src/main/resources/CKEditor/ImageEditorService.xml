@@ -213,8 +213,7 @@
 
 {{velocity output='false'}}
 #if ($xcontext.action == 'get')
-  #getRequiredSkinExtensions($requiredSkinExtensions)
-  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #sendRequiredSkinExtensions()
 #end
 {{/velocity}}</content>
   <object>

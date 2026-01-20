@@ -607,6 +607,18 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   right: 5px;
 }
 
+/* Prevent the user from interacting with the highlighted UI elements. */
+#contentcontainer:has(.popover[class*="tour-"])::before {
+  background: transparent;
+  z-index: 1101;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  content: "";
+}
+
 .popover[class*="tour-"] .popover-navigation:not(.row) {
   padding-right: 0;
   padding-left: 0;

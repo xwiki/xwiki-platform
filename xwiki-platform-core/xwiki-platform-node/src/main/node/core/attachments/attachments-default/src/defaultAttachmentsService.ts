@@ -111,7 +111,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore<
 });
 
 /**
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

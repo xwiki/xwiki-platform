@@ -53,6 +53,7 @@ async function load(mode, documentReference, property, className) {
     property: getPropertyReference(property, className),
     type: property.startsWith("doc.") ? "document" : "object",
     language: xcontext.locale,
+    objectPolicy: 'updateOrCreate',
   }).catch((error) => {
     new XWiki.widgets.Notification(
       this.$t("livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage", [mode]),

@@ -69,13 +69,13 @@ export abstract class AbstractStorage implements Storage {
   /**
    * Returns the list of attachments of a given page.
    * TODO: this API is missing pagination.
-   * @since 0.9
+   * @since 18.0.0RC1
    * @beta
    */
   abstract getAttachments(page: string): Promise<AttachmentsData | undefined>;
 
   /**
-   * @since 0.12
+   * @since 18.0.0RC1
    * @beta
    */
   abstract getAttachment(
@@ -107,7 +107,7 @@ export abstract class AbstractStorage implements Storage {
    * @param content - the content of the page
    * @param syntax - the syntax of the content
    *
-   * @since 0.8
+   * @since 18.0.0RC1
    * @beta
    */
   abstract save(
@@ -123,7 +123,7 @@ export abstract class AbstractStorage implements Storage {
    * @returns (since 0.20) an optional list of resolved attachments URL (in the same order as the provided files). This
    *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
    *   alone.
-   * @since 0.9
+   * @since 18.0.0RC1
    * @beta
    */
   abstract saveAttachments(
@@ -137,7 +137,7 @@ export abstract class AbstractStorage implements Storage {
    * @param page - the page to delete
    * @returns true if the delete was successful, false with the reason otherwise
    *
-   * @since 0.11
+   * @since 18.0.0RC1
    * @beta
    */
   abstract delete(page: string): Promise<{ success: boolean; error?: string }>;
@@ -150,7 +150,7 @@ export abstract class AbstractStorage implements Storage {
    * @param preserveChildren - whether to move children
    * @returns true if the move was successful, false with the reason otherwise
    *
-   * @since 0.14
+   * @since 18.0.0RC1
    * @beta
    */
   abstract move(

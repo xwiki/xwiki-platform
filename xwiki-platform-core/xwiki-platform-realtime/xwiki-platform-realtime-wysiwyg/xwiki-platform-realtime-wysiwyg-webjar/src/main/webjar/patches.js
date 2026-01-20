@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wysiwyg-patches', [
-  'xwiki-realtime-wysiwyg-transformers',
+  'xwiki-realtime-transformers',
   'hyper-json',
   'diff-dom',
   'json.sortify',

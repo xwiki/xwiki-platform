@@ -22,7 +22,7 @@ import type { InlineContent, UniAst } from "@xwiki/platform-uniast-api";
 /**
  * Converts Universal AST trees to markdown.
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 export interface UniAstToMarkdownConverter {
@@ -42,7 +42,7 @@ export interface UniAstToMarkdownConverter {
    *
    * @returns The converted blocks
    *
-   * @since 0.24-rc-1
+   * @since 18.0.0RC1
    * @beta
    */
   toMarkdown(uniAst: UniAst): Promise<string | Error>;
@@ -54,7 +54,7 @@ export interface UniAstToMarkdownConverter {
    *
    * @returns the markdown representation of the inline content
    *
-   * @since 0.24-rc-1
+   * @since 18.0.0RC1
    * @beta
    */
   convertInlineContents(

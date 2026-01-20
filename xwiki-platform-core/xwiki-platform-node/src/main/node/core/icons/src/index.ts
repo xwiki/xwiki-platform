@@ -22,7 +22,7 @@ import { Size } from "./size";
 import CIcon from "./vue/c-icon.vue";
 
 /**
- * @since 0.7
+ * @since 18.0.0RC1
  * @beta
  */
 const CIconAnnotated = CIcon;

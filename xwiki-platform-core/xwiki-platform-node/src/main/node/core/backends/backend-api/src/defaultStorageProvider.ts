@@ -24,7 +24,7 @@ import type { CristalApp, Storage } from "@xwiki/platform-api";
 
 /**
  * Provide the current storage.
- * @since 0.13
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

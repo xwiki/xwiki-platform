@@ -31,7 +31,7 @@
         // selection when the Source mode is active. In that case we take the selection directly from the plain text
         // area used for editing the source. We'll have to update this code when and if we'll add support for syntax
         // highlighting to the Source area.
-        const selection = editor.getSelection();
+        const selection = this._getSelection(editor);
         const domRanges = selection?.getRanges().map(range => {
           const domRange = range.startContainer.$.ownerDocument.createRange();
           domRange.setStart(range.startContainer.$, range.startOffset);
@@ -49,6 +49,17 @@
         }
         return domRanges;
       }
+    },
+
+    _getSelection: function(editor) {
+      let selection = editor.getSelection();
+      if (selection && !selection.isFake) {
+        // CKEditor's selection is not always up to date, which can cause us problems when we convert it to a native
+        // selection (e.g. by setting the offset of a native range outside the valid bounds). For this reason we have to
+        // get the real selection, unless it's a fake one.
+        selection = editor.getSelection(/* force real selection */ true);
+      }
+      return selection;
     },
 
     saveSelection: function(editor) {

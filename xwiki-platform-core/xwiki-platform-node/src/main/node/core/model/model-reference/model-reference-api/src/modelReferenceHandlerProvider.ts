@@ -24,7 +24,7 @@ import type { ModelReferenceHandler } from "./modelReferenceHandler";
  * A ModelReferenceHandlerProvider returns the expected instance of
  * {@link ModelReferenceHandler}.
  *
- * @since 0.13
+ * @since 18.0.0RC1
  * @beta
  */
 interface ModelReferenceHandlerProvider {

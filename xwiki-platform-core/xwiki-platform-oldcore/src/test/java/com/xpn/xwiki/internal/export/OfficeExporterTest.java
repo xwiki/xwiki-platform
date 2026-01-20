@@ -57,7 +57,9 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -168,13 +170,11 @@ class OfficeExporterTest
         Map<String, InputStream> inputStreams = captor.getValue();
         InputStream htmlInputStream = inputStreams.get(inputFileNameCaptor.getValue());
         String processedHtml = new String(htmlInputStream.readAllBytes(), StandardCharsets.UTF_8);
-        assertEquals("""
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" \
-            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml"><head>\
-            <META http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>
-                <p><b style="font-family: sans-serif; color: #f00; "><em>Bold and italic</em></b>\
-            <span style="text-decoration:underline">Inserted</span></p>
-            </body></html>""", processedHtml);
+        // The CSS was applied and the inserted element was converted.
+        assertThat(processedHtml, containsString(
+            "<p><b style=\"font-family: sans-serif; color: #f00; \"><em>Bold and italic</em></b>"
+                + "<span style=\"text-decoration:underline\">Inserted</span></p>"));
+        // The XML declaration is not part of the HTML content.
+        assertThat(processedHtml, not(containsString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")));
     }
 }

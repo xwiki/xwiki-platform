@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,39 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.mail.integration;
 
-import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { NavigationTreeNode } from "@xwiki/platform-navigation-tree-api";
-
-/**
- * @since 0.15
- * @beta
- */
-type NavigationTreeProps = {
-  clickAction?: (node: NavigationTreeNode) => void;
-  currentPageReference?: DocumentReference;
-  /**
-   * Whether to include terminal pages in the tree (default: true).
-   * @since 0.16
-   * @beta
-   */
-  includeTerminals?: boolean;
-  /**
-   * Whether to display a root node (default: false).
-   * @since 0.20
-   * @beta
-   */
-  showRootNode?: boolean;
-};
+import org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration;
 
 /**
- * Default props values for NavigationTree implementations.
- * @since 0.16
- * @beta
+ * Makes {@link DefaultGeneralMailConfiguration} more easily testable.
+ *
+ * @version $Id$
+ * @since 18.0.0RC1
  */
-const navigationTreePropsDefaults = {
-  includeTerminals: true,
-};
+public class TestGeneralMailSenderConfiguration extends DefaultGeneralMailConfiguration
+{
+    private boolean shouldObfuscate;
 
-export type { NavigationTreeProps };
-export { navigationTreePropsDefaults };
+    public TestGeneralMailSenderConfiguration(boolean shouldObfuscate)
+    {
+        this.shouldObfuscate = shouldObfuscate;
+    }
+
+    @Override
+    public boolean shouldObfuscate()
+    {
+        return this.shouldObfuscate;
+    }
+}

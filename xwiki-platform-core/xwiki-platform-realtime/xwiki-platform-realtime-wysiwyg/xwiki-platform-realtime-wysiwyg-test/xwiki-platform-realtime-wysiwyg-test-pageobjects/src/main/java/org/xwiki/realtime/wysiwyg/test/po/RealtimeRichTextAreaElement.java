@@ -157,6 +157,12 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     }
 
     @Override
+    public void waitUntilTextIs(String text)
+    {
+        repeatedWait(timeout -> waitUntilTextIs(text, timeout));
+    }
+
+    @Override
     public void waitUntilContentContains(String html)
     {
         repeatedWait(timeout -> waitUntilContentContains(html, timeout));

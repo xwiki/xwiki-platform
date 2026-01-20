@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=페이지 트리
-rendering.macro.documentTree.description=XWiki 페이지 의 트리를 표시합니다 .
+rendering.macro.documentTree.description=위키 페이지의 트리를 표시합니다 .
 rendering.macro.documentTree.parameter.readOnly.name=읽기 전용
 rendering.macro.documentTree.parameter.readOnly.description=사용자에게 필요한 권한이 있는 경우 트리 구조를 수정할 수 있어야 합니까?
 rendering.macro.documentTree.parameter.showWikis.name=위키 표시
@@ -72,7 +72,7 @@ rendering.macro.documentTree.parameter.showOnlyViewable.name=볼 수 있는 것�
 rendering.macro.documentTree.parameter.showOnlyViewable.description=현재 사용자에게 보기 권한이 있는 Wiki, 공간 및 페이지 노드만 표시합니다. 이것이 false로 설정되면 현재 사용자가 볼 수 없는 위키, 공간 및 페이지 노드가 해당 이름을 사용하여 트리에 나열됩니다. 하지만 사용자는 해당 링크를 따라가면서 자신의 콘텐츠를 볼 수 없습니다(사용자는 해당 링크의 존재만 인식하게 됩니다).
 rendering.macro.documentTree.parameter.filterByClass.name=클래스별로 필터링
 rendering.macro.documentTree.parameter.filterByClass.description=지정된 유형의 개체가 있는 페이지만 표시합니다. 이 매개변수의 값은 클래스 정의를 보유하는 XWiki 페이지 의 전체 이름입니다 . 예를 들어 'Blog.CategoryClass'를 사용하면 블로그 카테고리를 나타내는 페이지만 표시할 수 있습니다. 트리에 표시되는 페이지 유형을 제한하지 않으려면 이 매개변수를 비워 두세요.
-rendering.macro.documentTree.parameter.finder.name=파인더
+rendering.macro.documentTree.parameter.finder.name=찾기
 rendering.macro.documentTree.parameter.finder.description=트리 노드를 찾는 데 사용할 수 있는 텍스트 입력을 표시합니다. 입력 내용은 트리 위에 표시되며 입력할 때 트리의 내용을 기반으로 제안 사항을 제공합니다. 제안을 선택하면 트리가 해당 노드까지 확장됩니다.
 rendering.macro.documentTree.parameter.hierarchyMode.name=페이지 계층 모드
 rendering.macro.documentTree.parameter.hierarchyMode.description=페이지 간에 사용할 계층 구조를 지정합니다. 가능한 값은 "참조"(기본값) 및 "상위 하위"입니다. "참조"가 사용되면 페이지 계층 구조는 페이지 참조, 특히 페이지 참조의 중첩된 공백 구성 요소만 사용하여 정의됩니다. "상위 하위"가 사용되는 경우 계층 구조는 데이터베이스의 "상위" 페이지 필드에 의해 정의된 상위/하위 관계를 기반으로 합니다.
@@ -84,17 +84,17 @@ rendering.macro.documentTree.parameter.exclusions.name=제외
 rendering.macro.documentTree.parameter.exclusions.description=트리에서 제외할 노드 목록입니다. 노드는 해당 ID로 지정되며 쉼표로 구분됩니다.
 ### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
 ### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
-### Missing: rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
-### Missing: rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
-### Missing: rendering.macro.children.name=Children
-### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+rendering.macro.documentTree.parameter.expandToLevel.name=펼칠 단계
+rendering.macro.documentTree.parameter.expandToLevel.description=자동으로 펼칠 트리의 깊이를 설정합니다. 기본값은 0(최상위 노드만 표시)입니다. 1로 설정하면 하위 1단계까지, 2로 설정하면 그 아래 단계까지 펼쳐집니다. 값이 너무 크면 브라우저 로딩 속도가 느려질 수 있으니 주의하세요.
+rendering.macro.children.name=하위
+rendering.macro.children.description=현재 페이지의 하위 페이지 트리를 표시합니다
 ### Missing: rendering.macro.children.parameter.sort.name=Sort by
 ### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
 ### Missing: rendering.macro.children.parameter.root.name=Root
 ### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
-### Missing: rendering.macro.documentTree.group.show.name=Elements to show
-### Missing: rendering.macro.documentTree.group.filters.name=Filters
-### Missing: rendering.macro.documentTree.group.style.name=Display options
+rendering.macro.documentTree.group.show.name=표시할 항목
+rendering.macro.documentTree.group.filters.name=필터
+rendering.macro.documentTree.group.style.name=옵션 출력
 index.documentTree.empty=페이지를 찾을 수 없습니다
 index.documentTree.more={0}개 더 ...
 ### Missing: index.documentTree.addDocument=New page...
@@ -102,11 +102,11 @@ index.documentTree.more={0}개 더 ...
 ### Missing: index.documentTree.documentSortDisplayer.field.default=---
 ### Missing: index.documentTree.documentSortDisplayer.field.title=Title
 ### Missing: index.documentTree.documentSortDisplayer.field.date=Last modification date
-### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+index.documentTree.documentSortDisplayer.field.creationDate=생성일
 ### Missing: index.documentTree.documentSortDisplayer.order=Sort order
 ### Missing: index.documentTree.documentSortDisplayer.order.default=---
-### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
-### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
+index.documentTree.documentSortDisplayer.order.asc=오름차순
+index.documentTree.documentSortDisplayer.order.desc=내림차순
 
 ## Deprecated translation keys
 

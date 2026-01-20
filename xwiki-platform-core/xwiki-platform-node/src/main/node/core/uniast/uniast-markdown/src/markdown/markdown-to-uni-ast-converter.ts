@@ -22,7 +22,7 @@ import type { UniAst } from "@xwiki/platform-uniast-api";
 /**
  * Convert Markdown string to a Universal AST.
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 export interface MarkdownToUniAstConverter {

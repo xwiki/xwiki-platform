@@ -22,7 +22,7 @@ import type { ModelReferenceParserOptions } from "./modelReferenceParserOptions"
 import type { EntityReference } from "@xwiki/platform-model-api";
 
 /**
- * @since 0.12
+ * @since 18.0.0RC1
  * @beta
  */
 interface ModelReferenceParser {
@@ -39,7 +39,7 @@ interface ModelReferenceParser {
    * Parse a reference with additional analysis that can only be performed asynchronously
    * @param reference - an entity reference
    * @param options - an optional configuration object
-   * @since 0.22
+   * @since 18.0.0RC1
    * @beta
    */
   parseAsync(

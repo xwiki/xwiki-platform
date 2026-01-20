@@ -28,6 +28,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
+import { useTimeoutCheck } from "../hooks";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -55,11 +56,18 @@ import type {
   ContextForMacros,
 } from "../blocknote/utils";
 import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
-type DefaultEditorOptionsType = BlockNoteEditorOptions<
+/**
+ * Default options for the BlockNote editor
+ *
+ * @since 0.16
+ * @beta
+ */
+type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<
   EditorBlockSchema,
   EditorInlineContentSchema,
   EditorStyleSchema
@@ -67,6 +75,7 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 
 /**
  * Properties for the BlockNote editor component.
+ *
  * @since 0.16
  * @beta
  */
@@ -75,7 +84,7 @@ type BlockNoteViewWrapperProps = {
    * Options to forward to the BlockNote editor
    */
   blockNoteOptions?: Partial<
-    Omit<DefaultEditorOptionsType, "schema" | "collaboration">
+    Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">
   >;
 
   /**
@@ -97,7 +106,7 @@ type BlockNoteViewWrapperProps = {
   /**
    * Macros to show in the editor
    *
-   * @since 0.21
+   * @since 18.0.0RC1
    * @beta
    */
   macros:
@@ -105,7 +114,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * List of buildable macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         list: MacroWithUnknownParamsType[];
@@ -113,7 +122,7 @@ type BlockNoteViewWrapperProps = {
         /**
          * Context for macros
          *
-         * @since 0.23
+         * @since 18.0.0RC1
          * @beta
          */
         ctx: ContextForMacros;
@@ -140,6 +149,18 @@ type BlockNoteViewWrapperProps = {
   linkEditionCtx: LinkEditionContext;
 
   /**
+   * Overrides for default behavior
+   *
+   * @since 0.26
+   */
+  overrides?: {
+    /**
+     * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
+     */
+    imageEdition?: ImageEditionOverrideFn;
+  };
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
@@ -160,6 +181,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   onChange,
   lang,
   linkEditionCtx,
+  overrides,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
@@ -187,6 +209,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Prevent changes in the editor until the provider has synced with other clients
   const [ready, setReady] = useState(!initializer);
+
+  // Check if the syncing is happing for too long, in order to display an information message
+  const longLoading = useTimeoutCheck(1000);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
@@ -291,9 +316,13 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   }, []);
 
   if (!ready) {
+    // Only display the loading message after a given amount of time,
+    // otherwise we end up with a flashing pending message
+    //
+    // We still show the <h3> + <em> structure with an insecable space in order to keep the same height at all times
     return (
       <h3>
-        <em>{t("blocknote.realtime.pendingSync")}</em>
+        <em>{longLoading ? t("blocknote.realtime.pendingSync") : "\u00A0"}</em>
       </h3>
     );
   }
@@ -324,6 +353,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           <CustomFormattingToolbar
             formattingToolbarProps={props}
             linkEditionCtx={linkEditionCtx}
+            imageEditionOverrideFn={overrides?.imageEdition}
           />
         )}
       />
@@ -357,5 +387,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   );
 };
 
-export type { BlockNoteViewWrapperProps, EditorSchema };
+export type {
+  BlockNoteViewWrapperProps,
+  DefaultBlockNoteEditorOptions,
+  EditorSchema,
+};
+
 export { BlockNoteViewWrapper };

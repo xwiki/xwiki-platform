@@ -39,7 +39,7 @@ export type SearchBoxProps = {
   /**
    * Link edition context, required for validate raw entity references on submit
    *
-   * @since 0.22
+   * @since 18.0.0RC1
    */
   linkEditionCtx: LinkEditionContext | null;
 

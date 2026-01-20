@@ -20,7 +20,7 @@
 /**
  * Variation points used by the markdown parser.
  *
- * @since 0.22
+ * @since 18.0.0RC1
  */
 export type MarkdownParserConfiguration = {
   /**

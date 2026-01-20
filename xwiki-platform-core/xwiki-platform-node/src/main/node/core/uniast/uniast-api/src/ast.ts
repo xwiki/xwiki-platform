@@ -21,13 +21,13 @@
 import type { EntityReference } from "@xwiki/platform-model-api";
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type UniAst = { blocks: Block[] };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type Block =
@@ -57,20 +57,20 @@ type Block =
   | { type: "break" }
   | {
       /**
-       * @since 0.20
+       * @since 18.0.0RC1
        * @beta
        */
       type: "macroBlock";
 
       /**
-       * @since 0.24-rc-1
+       * @since 18.0.0RC1
        * @beta
        */
       call: MacroInvocation;
     };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type BlockStyles = {
@@ -80,13 +80,13 @@ type BlockStyles = {
 };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type Alignment = "left" | "center" | "right" | "justify";
 
 /**
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  */
 type ListItem = {
@@ -97,7 +97,7 @@ type ListItem = {
 };
 
 /**
- * @since 0.17
+ * @since 18.0.0RC1
  * @beta
  */
 type Image = {
@@ -110,26 +110,26 @@ type Image = {
 };
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  * @beta
  */
 type Link = {
   target: LinkTarget;
   /**
-   * @since 0.23
+   * @since 18.0.0RC1
    * @beta
    */
   content: Exclude<InlineContent, { type: "link" }>[];
 };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type TableColumn = { headerCell?: TableCell; widthPx?: number };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type TableCell = {
@@ -140,7 +140,7 @@ type TableCell = {
 };
 
 /**
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroInvocation = {
@@ -158,7 +158,7 @@ type MacroInvocation = {
 };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type InlineContent =
@@ -167,20 +167,20 @@ type InlineContent =
   | ({ type: "link" } & Link)
   | {
       /**
-       * @since 0.20
+       * @since 18.0.0RC1
        * @beta
        */
       type: "inlineMacro";
 
       /**
-       * @since 0.24-rc-1
+       * @since 18.0.0RC1
        * @beta
        */
       call: MacroInvocation;
     };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type Text = {
@@ -189,7 +189,7 @@ type Text = {
 };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type TextStyles = {
@@ -203,7 +203,7 @@ type TextStyles = {
 };
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type LinkTarget =
@@ -211,7 +211,7 @@ type LinkTarget =
       type: "internal";
 
       /**
-       * @since 0.20
+       * @since 18.0.0RC1
        * @beta
        */
 
@@ -220,7 +220,7 @@ type LinkTarget =
       /**
        * Will be `null` if the raw reference is invalid and can't be parsed
        *
-       * @since 0.20
+       * @since 18.0.0RC1
        * @beta
        */
       parsedReference: EntityReference | null;

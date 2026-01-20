@@ -57,6 +57,12 @@ public class DefaultMentionsConfiguration implements MentionsConfiguration
     }
 
     @Override
+    public String getSelfMentionsForeground()
+    {
+        return this.configuration.getProperty("selfMentionsForeground", "#ffffff");
+    }
+
+    @Override
     public boolean isQuoteActivated()
     {
         return this.configuration.getProperty("quoteActivated", false);

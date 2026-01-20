@@ -23,7 +23,7 @@ import type { Link } from "./link";
 
 /**
  * Provide the operation to get links suggestions.
- * @since 0.8
+ * @since 18.0.0RC1
  * @beta
  */
 interface LinkSuggestService {

@@ -26,7 +26,7 @@ import type { Storage } from "../api/storage";
 import type { WrappingStorage } from "../api/wrappingStorage";
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 export type ConfigObjectType = {
@@ -45,7 +45,7 @@ export type ConfigObjectType = {
 };
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()
@@ -62,14 +62,14 @@ export class DefaultWikiConfig implements WikiConfig {
 
   /**
    * Realtime endpoint URL.
-   * @since 0.11
+   * @since 18.0.0RC1
    * @beta
    */
   public realtimeURL?: string;
 
   /**
    * Authentication server base URL.
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   authenticationBaseURL?: string;
@@ -77,7 +77,7 @@ export class DefaultWikiConfig implements WikiConfig {
   /**
    * Authentication Manager component to use.
    * By default, resolves to configuration type.
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   authenticationManager?: string;
@@ -104,7 +104,7 @@ export class DefaultWikiConfig implements WikiConfig {
 
   /**
    * Root location to store pages.
-   * @since 0.16
+   * @since 18.0.0RC1
    * @beta
    */
   storageRoot?: string;

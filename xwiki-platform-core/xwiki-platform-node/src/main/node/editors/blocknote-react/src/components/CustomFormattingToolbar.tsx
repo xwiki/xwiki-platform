@@ -39,6 +39,7 @@ import {
   UnnestBlockButton,
   useComponentsContext,
 } from "@blocknote/react";
+import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type {
   BlockTypeSelectItem,
@@ -46,14 +47,15 @@ import type {
 } from "@blocknote/react";
 import type { JSX } from "react";
 
-export type CustomFormattingToolbarProps = {
+type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   linkEditionCtx: LinkEditionContext;
+  imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({ formattingToolbarProps, linkEditionCtx }) => {
+> = ({ formattingToolbarProps, linkEditionCtx, imageEditionOverrideFn }) => {
   const Components = useComponentsContext()!;
 
   const editor = useEditor();
@@ -70,6 +72,7 @@ export const CustomFormattingToolbar: React.FC<
         <CustomImageToolbar
           currentBlock={currentBlock}
           linkEditionCtx={linkEditionCtx}
+          imageEditionOverrideFn={imageEditionOverrideFn}
         />
       ) : (
         // For others, simply show the "normal", default toolbar
@@ -125,3 +128,5 @@ const getDefaultFormattingToolbarItems = (
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
   ];
+
+export type { CustomFormattingToolbarProps };

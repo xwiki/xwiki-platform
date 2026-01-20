@@ -23,7 +23,7 @@ import type { Logger } from "../api/logger";
 import type { LoggerConfig } from "../api/loggerConfig";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 @injectable()

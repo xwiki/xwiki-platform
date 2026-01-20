@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>scheduler.applicationsPanelEntryLabel=스케줄러
+  <content>scheduler.disabled=스케줄러가 비활성화됩니다. 작업이 실행되지 않습니다.
+scheduler.applicationsPanelEntryLabel=스케줄러
 </content>
   </xwikidoc>

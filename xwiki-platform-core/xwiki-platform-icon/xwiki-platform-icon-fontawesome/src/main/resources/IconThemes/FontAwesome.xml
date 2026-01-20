@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>## General settings
 xwiki.iconset.type = font
-xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css')
+xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/all.min.css'),$services.webjars.url('org.webjars:font-awesome', 'css/v4-shims.min.css')
 xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;{{/html}}
 xwiki.iconset.render.html = &lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;
 xwiki.iconset.icon.cssClass = fa fa-$icon
@@ -206,6 +206,9 @@ reposition = arrows
 ## Since 17.10.0RC1
 sort-ascending = sort-amount-asc
 sort-descending = sort-amount-desc
+
+## Since 18.0.0RC1
+note = sticky-note
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check

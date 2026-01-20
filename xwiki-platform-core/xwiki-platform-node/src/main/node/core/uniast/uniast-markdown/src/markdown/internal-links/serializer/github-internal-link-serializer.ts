@@ -26,7 +26,7 @@ import type { EntityReference } from "@xwiki/platform-model-api";
 import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  */
 @injectable()
 export class GitHubInternalLinkSerializer implements InternalLinksSerializer {

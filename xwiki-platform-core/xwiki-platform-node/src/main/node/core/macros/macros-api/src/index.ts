@@ -22,7 +22,7 @@ import type { MacroBlock, MacroInlineContent } from "./ast";
 /**
  * Information about a macro.
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
@@ -61,7 +61,7 @@ interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
    * `wysiwyg`: the macro has a body that is user-editable in a WYSIWYG fashion
    * `raw`: the macro has a body that is user-editable but not in a WYSIWYG fashion
    *
-   * @since 0.24-rc-1
+   * @since 18.0.0RC1
    * @beta
    */
   bodyType: "none" | "wysiwyg" | "raw";
@@ -70,7 +70,7 @@ interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
 /**
  * Description of a block macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
@@ -97,7 +97,7 @@ interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
 /**
  * Description of an inline macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
@@ -124,7 +124,7 @@ interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
 /**
  * Description of a macro
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type Macro<Parameters extends Record<string, MacroParameterType>> =
@@ -134,7 +134,7 @@ type Macro<Parameters extends Record<string, MacroParameterType>> =
 /**
  * Description of a macro with an unknown parameters shape
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroWithUnknownParamsType = Macro<Record<string, MacroParameterType>>;
@@ -142,7 +142,7 @@ type MacroWithUnknownParamsType = Macro<Record<string, MacroParameterType>>;
 /**
  * Description of an instanciable macro with an unknown parameters shape
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 
@@ -156,7 +156,7 @@ type MacroClassWithUnknownParamsType = new (
  *
  * The final TypeScript type will be derived through `GetConcreteMacroParameterType`
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type MacroParameterType = (
@@ -172,7 +172,7 @@ type MacroParameterType = (
 /**
  * Internal utility type to remove values that may be assigned `undefined` from a record
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type FilterUndefined<T> = {
@@ -182,7 +182,7 @@ type FilterUndefined<T> = {
 /**
  * Utility type to get the concrete TypeScript type from a macro parameter's definition
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type GetConcreteMacroParameterType<T extends MacroParameterType> =
@@ -198,7 +198,7 @@ type GetConcreteMacroParameterType<T extends MacroParameterType> =
 /**
  * Internal utility type making all properties that may be assigned `undefined` optional in a record
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type UndefinableToOptional<T> = {
@@ -213,7 +213,7 @@ type UndefinableToOptional<T> = {
  *
  * Parameters defined as optional are both optional in the output record and can be assigned `undefined`
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type GetConcreteMacroParametersType<
@@ -225,7 +225,7 @@ type GetConcreteMacroParametersType<
 /**
  * Generic type for a macro's unshaped parameters
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 type UnknownMacroParamsType = Record<string, boolean | number | string>;
@@ -237,7 +237,7 @@ type UnknownMacroParamsType = Record<string, boolean | number | string>;
  *
  * @returns - The same macro class, without its parameters shape
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 export function eraseParamsTypeForMacroClass<

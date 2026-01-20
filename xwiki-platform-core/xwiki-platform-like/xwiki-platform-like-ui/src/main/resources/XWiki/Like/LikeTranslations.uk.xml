@@ -49,6 +49,7 @@ like.unlike.error=Помилка під час спроби скасовуват
 like.userprofile.menu=Сторінки, які сподобалися
 ### Missing: like.toggle.hint.like=Like this page.
 ### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
+like.toggle.hint.like.noright=Ви не можете взаємодіяти з вподобаннями на цій сторінці.
 ### Missing: like.likers.link.zero={0} Likes
 ### Missing: like.likers.link.one={0} Like
 ### Missing: like.likers.link.many={0} Likes

@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -55,6 +56,9 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     @Inject
     @Named(XWikiHibernateBaseStore.HINT)
     protected Provider<DataMigrationManager> manager;
+
+    @Inject
+    private ComponentDescriptor<HibernateDataMigration> componentDescriptor;
 
     /**
      * Execution context used to access XWikiContext.
@@ -89,12 +93,7 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     @Override
     public String getName()
     {
-        String hint = null;
-        Named named = this.getClass().getAnnotation(Named.class);
-        if (named != null) {
-            hint = named.value();
-        }
-        return hint;
+        return componentDescriptor.getRoleHint();
     }
 
     @Override

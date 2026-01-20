@@ -68,6 +68,12 @@
       "matchDatasources": ["maven"],
       "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
+    },
+    // Group React dependencies together
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "react",
+      "matchDepPatterns": "^react(-dom)?"
     }
   ]
 }

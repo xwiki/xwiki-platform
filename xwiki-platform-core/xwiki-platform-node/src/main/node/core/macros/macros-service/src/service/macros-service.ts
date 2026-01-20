@@ -23,7 +23,7 @@ import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 /**
  * Service handling the registration and delivery of macros
  *
- * @since 0.23
+ * @since 18.0.0RC1
  * @beta
  */
 export interface MacrosService {

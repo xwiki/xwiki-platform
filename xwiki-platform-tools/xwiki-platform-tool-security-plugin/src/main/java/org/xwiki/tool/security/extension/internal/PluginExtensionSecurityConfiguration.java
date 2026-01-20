@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,37 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.tool.security.extension.internal;
 
-import type {
-  DocumentReference,
-  SpaceReference,
-} from "@xwiki/platform-model-api";
+import jakarta.inject.Singleton;
 
-/**
- * @since 0.15
- * @beta
- */
-type NavigationTreeSelectProps = {
-  label: string;
-  help?: string;
-  currentPageReference?: DocumentReference;
-  modelValue?: SpaceReference;
-  /**
-   * Whether to include terminal pages as select options (default: false).
-   * @since 0.16
-   * @beta
-   */
-  includeTerminals?: boolean;
-};
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 
 /**
- * Default props values for NavigationTreeSelect implementations.
- * @since 0.16
- * @beta
+ * Replace the default {@link ExtensionSecurityConfiguration}.
+ * 
+ * @version $Id$
+ * @since 18.0.0RC1
+ * @since 17.10.3
  */
-const navigationTreeSelectPropsDefaults = {
-  includeTerminals: false,
-};
+@Component
+@Singleton
+public class PluginExtensionSecurityConfiguration implements ExtensionSecurityConfiguration
+{
+    @Override
+    public boolean isSecurityScanEnabled()
+    {
+        return false;
+    }
 
-export type { NavigationTreeSelectProps };
-export { navigationTreeSelectPropsDefaults };
+    @Override
+    public int getScanDelay()
+    {
+        return 0;
+    }
+
+    @Override
+    public String getScanURL()
+    {
+        return "https://api.osv.dev/v1/query";
+    }
+
+    @Override
+    public String getReviewsURL()
+    {
+        return "https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews";
+    }
+
+}

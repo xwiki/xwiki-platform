@@ -19,15 +19,18 @@
  */
 package org.xwiki.export.pdf.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -67,12 +70,22 @@ public class DefaultRequiredSkinExtensionsRecorder implements RequiredSkinExtens
     @Override
     public String stop()
     {
-        StringBuilder requiredSkinExtensions = new StringBuilder();
+        List<String> requiredSkinExtensions = new ArrayList<>();
         for (Map.Entry<String, String> entry : this.requiredSkinExtensionsMap.entrySet()) {
-            requiredSkinExtensions
-                .append(Strings.CS.removeStart(getImportString(entry.getKey()), entry.getValue()).trim());
+            // Remove the always-used lines from the import string.
+            // Note that the import string is split by line breaks, so we can remove the always used lines one by one.
+            // We cannot expect that the always-used lines are at the beginning of the import string.
+            // Skin extensions that are on the current page are always last, after the on-demand ones, so on-demand
+            // extensions are not always at the end of the import string.
+            String[] alwaysUsed = StringUtils.split(entry.getValue(), '\n');
+            String[] allAfter = StringUtils.split(getImportString(entry.getKey()), '\n');
+            Set<String> allAfterSet = new LinkedHashSet<>(Arrays.asList(allAfter));
+            for (String always : alwaysUsed) {
+                allAfterSet.remove(always);
+            }
+            requiredSkinExtensions.addAll(allAfterSet);
         }
-        return requiredSkinExtensions.toString();
+        return String.join("\n", requiredSkinExtensions);
     }
 
     @SuppressWarnings("deprecation")

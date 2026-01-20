@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -63,6 +64,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 12.10
  */
+@SuppressWarnings({ "checkstyle:MultipleStringLiterals", "checkstyle:ClassFanOutComplexity" })
 @ComponentTest
 class LiveTableLiveDataEntryStoreTest
 {
@@ -104,6 +106,12 @@ class LiveTableLiveDataEntryStoreTest
         when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);
         when(this.liveDataMeta.getEntryDescriptor()).thenReturn(this.entryDescriptor);
         when(this.entryDescriptor.getIdProperty()).thenReturn("doc.fullName");
+    }
+
+    @Test
+    void getWithObject()
+    {
+        assertThrows(UnsupportedOperationException.class, () -> this.entryStore.get("testEntry"));
     }
 
     @Test
@@ -221,6 +229,26 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
+    void updateWithCustomClassName() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "propName";
+        Object value = "theValue";
+        String defaultClass = "MyApp.DefaultClass";
+        String customClass = "MyApp.CustomClass";
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "testEntry");
+        DocumentReference customClassReference = new DocumentReference("xwiki", "MyApp", "CustomClass");
+
+        this.entryStore.getParameters().put("className", defaultClass);
+        this.entryStore.getParameters().put(property + "_class", customClass);
+        when(this.currentDocumentReferenceResolver.resolve(entryId)).thenReturn(documentReference);
+        when(this.currentDocumentReferenceResolver.resolve(customClass)).thenReturn(customClassReference);
+
+        this.entryStore.update(entryId, property, value);
+        verify(this.modelBridge).update(property, value, documentReference, customClassReference);
+    }
+
+    @Test
     void saveXClassUndefined()
     {
         Map<String, Object> entry = new HashMap<>();
@@ -261,7 +289,63 @@ class LiveTableLiveDataEntryStoreTest
         this.entryStore.getParameters().put("className", "MyTest.MyClass");
         Optional<Object> save = this.entryStore.save(entry);
 
-        assertEquals(Optional.of("MyTest.MyObject"), save);
-        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference);
+        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of());
+    }
+
+    @Test
+    void saveWithCustomPropertyClass() throws Exception
+    {
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.hidden", "true");
+        entry.put("customProperty", "value");
+        entry.put("doc.fullName", "MyTest.MyObject");
+        DocumentReference objectDocumentReference = new DocumentReference("xwiki", "MyTest", "MyObject");
+        DocumentReference customClassReference = new DocumentReference("xwiki", "MyTest", "CustomClass");
+
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyObject"))
+            .thenReturn(objectDocumentReference);
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.CustomClass"))
+            .thenReturn(customClassReference);
+
+        this.entryStore.getParameters().put("className", "MyTest.MyClass");
+        this.entryStore.getParameters().put("customProperty_class", "MyTest.CustomClass");
+
+        this.entryStore.save(entry);
+
+        verify(this.modelBridge).updateAll(entry, objectDocumentReference, null,
+            Map.of("customProperty", customClassReference));
+    }
+
+    @Test
+    void saveWithPropertiesRequiringHTMLConversion() throws Exception
+    {
+        String htmlConversionProperties = "MyTest.CustomClass_0_customHTMLProperty";
+        Map<String, Object> entry = Map.of(
+            "doc.hidden", "true",
+            "RequiresHTMLConversion", htmlConversionProperties,
+            "customHTMLProperty_syntax", "xwiki/2.1",
+            "customHTMLProperty_cache", "cacheValue",
+            "customHTMLProperty", "<p>value</p>",
+            "doc.fullName", "MyTest.MyObject"
+        );
+
+        DocumentReference objectDocumentReference = new DocumentReference("xwiki", "MyTest", "MyObject");
+        DocumentReference customClassReference = new DocumentReference("xwiki", "MyTest", "CustomClass");
+
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyObject"))
+            .thenReturn(objectDocumentReference);
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.CustomClass"))
+            .thenReturn(customClassReference);
+
+        this.entryStore.getParameters().put("customHTMLProperty_class", "MyTest.CustomClass");
+
+        when(this.modelBridge.getPropertiesRequiringHTMLConversion(htmlConversionProperties, null,
+            Map.of("customHTMLProperty", customClassReference), 0))
+            .thenReturn(Set.of("customHTMLProperty"));
+
+        this.entryStore.save(entry);
+
+        verify(this.modelBridge).updateAll(eq(entry), eq(objectDocumentReference), any(),
+            eq(Map.of("customHTMLProperty", customClassReference)));
     }
 }

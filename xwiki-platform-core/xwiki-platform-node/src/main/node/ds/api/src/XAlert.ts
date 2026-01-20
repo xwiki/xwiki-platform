@@ -19,13 +19,13 @@
  */
 
 /**
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type AlterAction = { name: string; callback: () => void };
 
 /**
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type AlertActions = AlterAction[];
@@ -33,7 +33,7 @@ type AlertActions = AlterAction[];
 /**
  * Props for the alert component.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 type AlertProps = {
@@ -44,13 +44,13 @@ type AlertProps = {
   closable?: boolean;
   /**
    * Other (less important) data to show in the alert.
-   * @since 0.13
+   * @since 18.0.0RC1
    * @beta
    */
   details?: string;
   /**
    * Render with flat corners to use as, e.g., a banner.
-   * @since 0.24-rc-1
+   * @since 18.0.0RC1
    * @beta
    */
   flatCorners?: boolean;

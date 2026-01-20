@@ -24,7 +24,7 @@ export type {
 } from "@xwiki/platform-editors-blocknote-react";
 
 /**
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 const BlocknoteEditorAnnotated = BlocknoteEditor;

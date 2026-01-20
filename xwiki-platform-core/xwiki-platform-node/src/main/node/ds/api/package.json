@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-dsapi",
-  "version": "18.0.0-SNAPSHOT",
+  "version": "18.1.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -31,10 +31,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-navigation-tree-api": "workspace:*"
+    "@xwiki/platform-fn-utils": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

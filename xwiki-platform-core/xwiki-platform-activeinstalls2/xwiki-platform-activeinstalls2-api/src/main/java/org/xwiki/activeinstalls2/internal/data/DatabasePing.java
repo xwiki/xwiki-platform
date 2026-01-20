@@ -56,7 +56,7 @@ public class DatabasePing
     }
 
     /**
-     * @param version see {@link @getVersion()}
+     * @param version see {@link #getVersion()}
      */
     public void setVersion(String version)
     {

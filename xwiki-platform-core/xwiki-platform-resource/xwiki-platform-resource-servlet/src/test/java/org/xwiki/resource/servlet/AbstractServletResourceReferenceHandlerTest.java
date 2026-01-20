@@ -33,6 +33,7 @@ import org.xwiki.container.Response;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -45,7 +46,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
  * Test of {@link AbstractServletResourceReferenceHandler}.
@@ -75,7 +75,7 @@ class AbstractServletResourceReferenceHandlerTest
     private OutputStream outputStream;
 
     @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     /**
      * Local component to test AbstractServletResourceReferenceHandler even though it is an abstract class.

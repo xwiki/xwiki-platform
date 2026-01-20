@@ -69,6 +69,11 @@ public class HTML5Validator implements Validator
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        // Filter out outline hierarchy errors.
+        // When all the known hierarchy errors have been solved, this filter must be removed.
+        // See https://jira.xwiki.org/browse/XWIKI-23868
+        errorHandler.getErrors()
+            .removeIf(error -> error.getMessage().contains("The heading “h3” (with computed level 3) follows"));
         return this.errorHandler.getErrors();
     }
 

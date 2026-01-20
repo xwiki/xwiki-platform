@@ -28,7 +28,7 @@ import type {
  * A ModelReferenceHandler can do backend-specific operations involving
  * {@link @xwiki/platform-model-api#EntityReference | EntityReferences}.
  *
- * @since 0.13
+ * @since 18.0.0RC1
  * @beta
  */
 interface ModelReferenceHandler {

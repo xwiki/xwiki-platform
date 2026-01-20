@@ -167,7 +167,7 @@
         ##------- Website button --------------
         #set($website = $extension.getProperty("website").value)
         #if ("$!website" != '')
-          [[$services.icon.render('book') Documentation>>$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
+          [[$services.icon.render('book') Documentation&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
@@ -306,7 +306,7 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($doc.getValue('versionPage') == 1)
+    #if ($doc.getValue('versionPage') == 1 &amp;&amp; $proxyExtensionObject.getValue('proxyLevel') != 'history')
       #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
       = Versions =
 

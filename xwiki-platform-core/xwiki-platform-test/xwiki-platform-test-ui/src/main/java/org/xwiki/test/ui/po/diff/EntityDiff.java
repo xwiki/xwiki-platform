@@ -104,4 +104,19 @@ public class EntityDiff extends BaseElement
         }
         return conflictList;
     }
+
+    /**
+     * Check if the given diff property is obfuscated.
+     * @param propertyName a property
+     * @return {@code true} if the diff is obfuscated for that property.
+     * @since 17.10.2
+     * @since 18.0.0RC1
+     */
+    public boolean isDiffObfuscated(String propertyName)
+    {
+        WebElement element = getDriver().findElementWithoutWaiting(this.container,
+            By.cssSelector(String.format(".diff-header[data-property-name=\"%s\"]", propertyName)));
+        return getDriver().hasElementWithoutWaiting(element,
+            By.cssSelector(".diff-info-icon[title=\"Private information\"]"));
+    }
 }

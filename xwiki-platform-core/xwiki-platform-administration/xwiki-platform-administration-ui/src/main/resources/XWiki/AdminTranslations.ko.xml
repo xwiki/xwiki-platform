@@ -39,11 +39,11 @@
   <content>administration.title=관리
 administration.title.page=페이지 관리
 administration.title.wiki=위키 관리
-administration.title.global=글로벌 관리
+administration.title.global=전역 관리
 administration.sectionTitle=관리: {0}
 administration.sectionTitle.page=페이지 관리: {0}
 administration.sectionTitle.wiki=위키 관리: {0}
-administration.sectionTitle.global=글로벌 관리: {0}
+administration.sectionTitle.global=전역 관리: {0}
 administration.menu.label=관리 섹션.
 administration.menu.search.hint=검색 ...
 administration.menu.search.noResults=결과가 없습니다.
@@ -56,7 +56,7 @@ XWiki.XWikiPreferences_invitation_email_content.hint=등록하도록 초대된 �
 XWiki.Registration_heading.hint=이것은 등록하는 사람들과 방금 등록한 사람들에게 표시되는 페이지 상단의 줄입니다. Velocity 및 wiki 구문을 사용할 수 있습니다.
 XWiki.Registration_welcomeMessage.hint=이는 사람들이 양식을 작성할 때만 표시됩니다. Velocity 및 wiki 구문 코드를 사용할 수 있습니다.
 XWiki.Registration_loginButton_enabled.hint=사용자가 등록하면 사용자 이름과 비밀번호를 로그인 작업에 게시하고 즉시 로그인할 수 있는 버튼을 제공합니다. 그러나 이로 인해 사용자 이름과 비밀번호가 HTML 로 다시 전달되며 이는 보안 요구 사항에 따라 허용되지 않을 수 있습니다.
-XWiki.Registration_loginButton_autoLogin_enabled.hint=로그인 버튼이 활성화된 경우 JavaScript가 사용자의 로그인 버튼을 누르도록 할 수 있습니다.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=자동 로그인을 활성화하면, 스크립트가 자동으로 로그인 버튼을 클릭하여 로그인을 처리합니다.
 XWiki.Registration_defaultRedirect.hint=xredirect 매개변수가 지정되지 않은 경우 로그인 버튼을 누른 후 사용자가 리디렉션되는 URL 입니다 . 속도 코드를 사용할 수 있습니다.
 XWiki.Registration_requireCaptcha.hint=사용자가 등록하기 위해 CAPTCHA를 해결하도록 요구하려면 이를 true로 설정하십시오.
 XWiki.Registration_registrationSuccessMessage.hint=이는 성공적으로 등록되면 사용자에게 표시됩니다. Velocity 및 Wiki 구문 코드를 사용할 수 있습니다.
@@ -70,7 +70,7 @@ XWiki.Registration_passwordRuleOneSymbolEnabled.hint=선택하면 사용자가 �
 admin.themes=테마
 admin.themes.description=색상과 아이콘 테마, 스킨, 로고를 사용자 정의하세요.
 admin.colorthemes.local=현지의
-admin.colorthemes.global=글로벌
+admin.colorthemes.global=전역
 XWiki.XWikiPreferences_showannotations.hint=페이지 레이아웃에 주석 섹션을 표시합니다.
 XWiki.XWikiPreferences_showcomments.hint=페이지 레이아웃에 댓글 섹션을 표시합니다.
 XWiki.XWikiPreferences_showattachments.hint=페이지 레이아웃에 첨부 파일 섹션을 표시합니다.
@@ -85,7 +85,7 @@ XWiki.XWikiPreferences_iconTheme.hint=기본적으로 사용할 아이콘 테마
 XWiki.XWikiPreferences_colorTheme.hint=기본적으로 사용할 색상 테마를 지정합니다.
 
 # Editing Sections
-admin.edit=편집
+admin.edit=편집 중
 admin.edit.description=편집 모드, WYSIWYG 편집기 및 사용 가능한 구문을 구성합니다.
 admin.title=제목
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=사용자가 제목이 비어 있는 위키 페이지를 생성하는 것을 방지합니다.
@@ -143,7 +143,7 @@ admin.usersgroups.extensionrights=확장 권한
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
 ### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
-### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+administration.section.groups.deleteUserFromGroup.failure=그룹에서 멤버를 제거하지 못했습니다
 
 # Other Category
 admin.other=다른
@@ -155,9 +155,13 @@ administration.section.analytics.status.hint=Google Analytics™의 추적이 �
 admin.social=소셜
 admin.social.description=소셜 기능에 대한 구성입니다.
 
+# Network category
+### Missing: admin.network=Network
+### Missing: admin.network.description=Network related features.
+
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=섹션에 표시
-XWiki.ConfigurableClass_heading=표제
+XWiki.ConfigurableClass_heading=제목
 XWiki.ConfigurableClass_configurationClass=구성 클래스
 XWiki.ConfigurableClass_linkPrefix=링크 접두어
 XWiki.ConfigurableClass_propertiesToShow=표시할 속성
@@ -167,9 +171,9 @@ XWiki.ConfigurableClass_displayInCategory=카테고리에 표시
 XWiki.ConfigurableClass_displayBeforeCategory=카테고리 앞에 표시
 XWiki.ConfigurableClass_categoryIcon=카테고리 아이콘
 XWiki.ConfigurableClass_scope=범위
-XWiki.ConfigurableClass_scope_WIKI=일주일
-XWiki.ConfigurableClass_scope_SPACE=현재 공간
-XWiki.ConfigurableClass_scope_ALL_SPACES=모든 공간
+XWiki.ConfigurableClass_scope_WIKI=위키(Wiki)
+XWiki.ConfigurableClass_scope_SPACE=현재 스페이스
+XWiki.ConfigurableClass_scope_ALL_SPACES=모든 스페이스
 XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki 및 모든 공간
 XWiki.ConfigurableClass_sectionOrder=섹션 순서
 

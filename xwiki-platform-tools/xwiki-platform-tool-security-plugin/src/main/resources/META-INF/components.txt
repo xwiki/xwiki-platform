@@ -1,0 +1,3 @@
+500:org.xwiki.tool.security.extension.internal.PluginExtensionSecurityConfiguration
+500:org.xwiki.tool.security.extension.internal.VoidObservationManager
+org.xwiki.tool.security.extension.internal.VoidXarExtensionHandler

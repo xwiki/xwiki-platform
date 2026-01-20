@@ -168,5 +168,19 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </hidden>
+    <enforceRequiredRights>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>enforceRequiredRights</name>
+      <number>8</number>
+      <prettyName>Enforce Required Rights</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </enforceRequiredRights>
   </class>
 </xwikidoc>

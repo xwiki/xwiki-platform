@@ -166,11 +166,13 @@ XWiki.Selection = Class.create({
       return;
     }
     this.range = window.getSelection().getRangeAt(0);
-    // ignore if the selection is in the passed container
+    // ignore if the selection is not in the passed container
     if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
       return;
     }
     this.selectionText = this.range.toString();
+    this.selectionText = this.selectionText.replaceAll(
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))",'')
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
     }
@@ -190,13 +192,15 @@ XWiki.Selection = Class.create({
 
   // these functions are here because they depend on selection
 
-  highlightSelection : function(color) {
+  highlightSelection : function() {
     if (!this.range) {
       // there should be some selection at this point
       return;
     }
     // create an annotation highlight span around this content
-    var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
+    var highlightWrapperTemplate = new Element('mark', {
+      'class': 'selection-highlight'
+    });
     // get all the text nodes of this range
     var rangeTextNodes = this.getRangeTextNodes();
     // and remove all the ranges in this selection, otherwise so messed up things will happen
@@ -467,7 +471,7 @@ return XWiki;
       <name>Annotation Javascript -- Selection handling code</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>always</use>
@@ -630,7 +634,7 @@ XWiki.Annotation = Class.create({
     require(['jquery'], ($) =&gt; {
       $(document).on('click', 'blockquote.annotatedText', (event) =&gt; {
         if(this.fetchedAnnotations) {
-          // In this case the annotations are just made visible (if need be). This is synchrnous and
+          // In this case the annotations are just made visible (if need be). This is synchronous and
           // we can just let the click event bubble up.
           this.setAnnotationVisibility(true);
           this.toggleAnnotations(this.displayingAnnotations);
@@ -810,8 +814,6 @@ XWiki.Annotation = Class.create({
     if (this.displayHighlight) {
       this.annotatedElement.select('.annotation').invoke('toggleClassName', 'annotation-highlight', !!visible);
     }
-    // Toggle all annotation markers.
-    this.annotatedElement.select('.annotation-marker').invoke('toggleClassName', 'hidden', !visible);
     this.setAnnotationVisibility(visible);
     if (!visible) {
       // Close all open bubbles.
@@ -908,7 +910,7 @@ XWiki.Annotation = Class.create({
           }
           // hide message at page bottom
           this._x_notification.hide();
-          // Load the received annotations, along with annotations markers.
+          // Load the received annotations, along with annotations highlights.
           this.loadAnnotations(response.responseJSON.annotatedContent, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
@@ -969,39 +971,87 @@ XWiki.Annotation = Class.create({
     if (plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
       return false;
     }
-
     var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset.value, plainTextEndOffset.value);
     // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
     // a new range is created to recalculate the new ends.
     var strictRange = this.fixRangeEndPoints(annDOMRange);
 
-    // Wrap each text node from this range inside an annotation markup SPAN.
+    // Wrap each text node from this range inside an annotation markup node.
     this.getTextNodesInRange(strictRange).forEach(textNode =&gt; this.markAnnotation(textNode, ann));
-
-    // Add the marker span after the last span of this annotation.
     var allSpans = this.annotatedElement.select('[class~=ID' + ann.annotationId + ']');
     if (!allSpans.length) {
       return;
     }
-    var lastSpan = allSpans[allSpans.length - 1];
-    // Create the annotation markers hidden by default, since annotations are added on the document hidden by default.
-    var markerSpan = new Element('span', {'id': 'ID' + ann.annotationId, 'class' : 'hidden annotation-marker ' + ann.state});
-    lastSpan.insert({after: markerSpan});
-    // Annotations are displayed on mouseover.
-    markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, ann.annotationId));
+    // We generate the keyboard interactive button.
+    let toggleButton = document.createElement('button');
+    toggleButton.id = 'ID' + ann.annotationId;
+    toggleButton.classList.add('annotation-toggle');
+    toggleButton.classList.add('sr-only');
+    toggleButton.classList.add('btn');
+    toggleButton.classList.add('btn-xs');
+    toggleButton.classList.add('btn-warning');
+    toggleButton.innerHTML = "$!escapetool.javascript($services.icon.renderHTML('note'))";
+    // Add the button at the end of the last mark for the annotation.
+    allSpans[allSpans.length-1].appendChild(toggleButton);
+    // Add the onclick listener on every span of this annotation.
+    allSpans.forEach(markNode =&gt; markNode.addEventListener('click', (event) =&gt;
+      this.onMarkerClick(event, ann.annotationId)));
+    // Clicking specifically on the toggle blocks any other event, such as a page reload if the parent is an anchor
+    // The other event can still be triggered by clicking on the other text in it.
+    toggleButton.addEventListener('click', (event) =&gt; {
+      this.onMarkerClick(event, ann.annotationId);
+      event.stopPropagation();
+      event.preventDefault();
+    });
+    let onMarkerHover = function(event, allSpans) {
+      allSpans.forEach((span) =&gt; span.classList.add('hovered'));
+    };
+    let onMarkerHoverLeft = function(event, allSpans) {
+      allSpans.forEach((span) =&gt; span.classList.remove('hovered'));
+    };
+    // Add the hover listener on every span to highlight every part of its annotation
+    allSpans.forEach(function(markNode){
+      markNode.addEventListener('mouseover', (event) =&gt; onMarkerHover(event, allSpans));
+      markNode.addEventListener('mouseout', (event) =&gt; onMarkerHoverLeft(event, allSpans));
+    });
+    // Only the button can be focused with the keyboard.
+    toggleButton.addEventListener('focus', (event) =&gt; {
+      event.target.classList.remove('sr-only');
+      onMarkerHover(event, allSpans);
+    });
+    toggleButton.addEventListener('focusout', (event) =&gt; {
+      event.target.classList.add('sr-only');
+      onMarkerHoverLeft(event, allSpans);
+    });
+  },
+
+  addAnnotationsToggleHint : function(annotations) {
+    annotations.forEach((ann) =&gt; {
+      var plainTextStartOffset = ann.fields.find(field =&gt; field.name === 'plainTextStartOffset');
+      var plainTextEndOffset = ann.fields.find(field =&gt; field.name === 'plainTextEndOffset');
+      if(plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
+        return false;
+      }
+      let toggleButtonDescription = document.createElement('span');
+      toggleButtonDescription.addClassName('sr-only');
+      toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
+      toggleButtonDescription.textContent =
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
+      let toggleButton = document.getElementById('ID' + ann.annotationId);
+      toggleButton.appendChild(toggleButtonDescription);
+    });
   },
 
   /**
-   * Surround this node with a span corresponding to it's annotation.
+   * Surround this node with a span corresponding to its annotation.
    *
    * @param markedNode the node that corresponds to the current annotation
    * @param ann object holding information about the annotation
    */
   markAnnotation: function(markedNode, ann) {
-    var wrapper = document.createElement('span');
+    var wrapper = document.createElement('mark');
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
-
     var parentNode = markedNode.parentElement;
     parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);
@@ -1157,13 +1207,13 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
+   * Remove the wrappers for annotations. The selection highlight is also removed in case the new annotation
    * was deleted.
    */
   removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("span.annotation, span.selection-highlight")
+    document.querySelectorAll("mark.annotation, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span.annotation-marker").forEach(marker =&gt; marker.remove());
+    document.querySelectorAll("button.annotation-toggle, span[id^='annotation-toggle-description-']").forEach(description =&gt; description.remove());
     this.fetchedAnnotations = false;
   },
 
@@ -1315,8 +1365,7 @@ XWiki.Annotation = Class.create({
       }
     }.bindAsEventListener(this));
   },
-
-  // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
+  
   onMarkerClick : function(event, id) {
     var bubbleId = 'annotation-bubble-' + id;
     var bubble = $(bubbleId);
@@ -1328,9 +1377,23 @@ XWiki.Annotation = Class.create({
       this.hideBubble(bubble);
     } else {
       // Show the bubble and fetch the annotation display in it.
-      var bubble = this.displayLoadingBubble(event.element().cumulativeOffset().top,
-        event.element().cumulativeOffset().left, true);
+      // If the event is triggered via keyboard, we use the annotation highlight position instead of the event position
+      let bubbleCoordX,bubbleCoordY ;
+      if (event.pageX === 0 &amp;&amp; event.pageY === 0) {
+        let highlight = event.target;
+        let rect = highlight.getBoundingClientRect();
+        bubbleCoordX = rect.left + window.scrollX + highlight.offsetWidth / 2;
+        bubbleCoordY = rect.top + window.scrollY + highlight.offsetHeight / 2;
+      }
+      else {
+        bubbleCoordX = event.pageX;
+        bubbleCoordY = event.pageY;
+      }
+      var bubble = this.displayLoadingBubble(bubbleCoordX, bubbleCoordY, true);
       bubble.writeAttribute('id', bubbleId);
+      // Link semantically the clicked mark to the generated bubble
+      // Adding this info earlier is useless since the element is not even loaded before the click.
+      event.target.writeAttribute('aria-details', bubbleId);
       this.fetchAndShowAnnotationDetails(id, bubble);
     }
   },
@@ -1362,7 +1425,7 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate, hasMarker) {
+  displayLoadingBubble : function(horizontalCoordinate, verticalCoordinate) {
     // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
     // Add a nice loading panel inside
@@ -1378,25 +1441,19 @@ XWiki.Annotation = Class.create({
     // By default, we position it to the right and under the coordinates
     // Position it horizontally.
     let bubbleStyles = getComputedStyle(bubble);
-    // The width in pixels of the annotation marker added in the text.
-    const markerWidth = 10;
-    let markerOffset = hasMarker ? -markerWidth : 0;
-    let bubbleWidth = bubble.offsetWidth 
+    let bubbleWidth = bubble.offsetWidth
       + parseInt(bubbleStyles.marginLeft)
       + parseInt(bubbleStyles.marginRight);
     if (horizontalCoordinate &lt; bubbleWidth 
-      || horizontalCoordinate + markerOffset + bubbleWidth &lt; window.innerWidth) {
+      || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
       bubble.style.left = horizontalCoordinate + 'px';
     } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
-      bubble.style.left = (horizontalCoordinate + markerOffset - bubbleWidth) + 'px';
+      bubble.style.left = (horizontalCoordinate - bubbleWidth) + 'px';
       bubble.toggleClassName('annotation-bubble-position-left');
     }
 
     return bubble;
-  },
-
-  displayAnnotationViewBubble : function(marker) {
   },
 
   /**
@@ -1591,6 +1648,11 @@ XWiki.Annotation = Class.create({
     // Cancel the edit otherwise the user will be asked for confirmation when leaving the page.
     document.fire('xwiki:actions:cancel');
 
+    // Remove all the places where the bubble id is used as an attribute on other elements.
+    document.querySelectorAll('[aria-details="' + bubble.id + '"]').forEach((mark) =&gt; {
+      mark.removeAttribute('aria-details');
+    });
+
     bubble.remove();
     var bubbleIndex = this.bubbles.indexOf(bubble);
     if (bubbleIndex &gt;= 0) {
@@ -1711,11 +1773,10 @@ XWiki.Annotation = Class.create({
   },
 
   displayAnnotationCreationForm : function() {
-    // TODO: get this color from the color theme
-    this.selectionService.highlightSelection('#FFEE99');
+    this.selectionService.highlightSelection();
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
-    this.createPanel = this.displayLoadingBubble(position.top, position.left, false);
+    this.createPanel = this.displayLoadingBubble(position.left, position.top, false);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();
   },
@@ -1898,6 +1959,8 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         this.removeAnnotationsAndSelectionMarkups();
         this.updateAnnotationsOffsets(annotatedContent);
         this.addAnnotationsMarkup(annotatedContent.annotations);
+        // We add the hints afterwards because they shift the ranges in the text.
+        this.addAnnotationsToggleHint(annotatedContent.annotations);
         // Notify the content change.
         $(document).trigger('xwiki:dom:updated', {'elements': [this.annotatedElement]});
         // Also handle the tab 'downstairs' when the annotations list changes.

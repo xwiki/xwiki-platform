@@ -85,12 +85,6 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     }
 
     @Override
-    public FilesystemAttachmentContent clone()
-    {
-        return new FilesystemAttachmentContent(this);
-    }
-
-    @Override
     public boolean exists()
     {
         try {
@@ -144,5 +138,13 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         } catch (Exception e) {
             throw new UnexpectedException("Failed to get size", e);
         }
+    }
+
+    @Override
+    public XWikiAttachmentContent clone(boolean skipContent)
+    {
+        XWikiAttachmentContent clone = new FilesystemAttachmentContent(this);
+        this.handleSkipContentInClone(clone, skipContent);
+        return clone;
     }
 }

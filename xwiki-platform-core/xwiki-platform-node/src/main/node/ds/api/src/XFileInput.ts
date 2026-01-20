@@ -19,7 +19,7 @@
  */
 
 /**
- * @since 0.14
+ * @since 18.0.0RC1
  * @beta
  */
 type FileInputModel = File | File[] | null | undefined;
@@ -27,7 +27,7 @@ type FileInputModel = File | File[] | null | undefined;
 /**
  * Props for the btn component.
  *
- * @since 0.11
+ * @since 18.0.0RC1
  * @beta
  */
 type FileInputProps = {

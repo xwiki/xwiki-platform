@@ -23,7 +23,7 @@ import type { PageAttachment } from "./pageAttachment";
 /**
  * Return the list of attachments and an optional count if the results are
  * paginated.
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 export type AttachmentsData = { attachments: PageAttachment[]; count?: number };

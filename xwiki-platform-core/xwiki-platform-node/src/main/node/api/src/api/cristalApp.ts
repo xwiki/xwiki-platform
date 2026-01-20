@@ -29,7 +29,7 @@ import type { App, Component, Ref } from "vue";
 import type { Router } from "vue-router";
 
 /**
- * @since 0.1
+ * @since 18.0.0RC1
  * @beta
  */
 export interface CristalApp {
@@ -57,7 +57,7 @@ export interface CristalApp {
    * Delete a configuration from the set of available configurations.
    *
    * @param configName - the name of the configuration to delete
-   * @since 0.18
+   * @since 18.0.0RC1
    * @beta
    */
   deleteAvailableConfiguration(configName: string): void;
@@ -71,7 +71,7 @@ export interface CristalApp {
    * extension point to be actually required first.
    *
    * @param extensionPoint - id of the extension point to resolve
-   * @since 0.15
+   * @since 18.0.0RC1
    * @beta
    */
   getUIXTemplates(extensionPoint: string): Promise<Array<Component>>;
@@ -86,12 +86,12 @@ export interface CristalApp {
 
   /**
    * Return the syntax of the current page.
-   * @since 0.7
+   * @since 18.0.0RC1
    * @beta
    */
   getCurrentSyntax(): string;
 
-  /** @since 0.18
+  /** @since 18.0.0RC1
    * @beta
    */
   setCurrentPage(page: string, mode?: string): Promise<void>;
@@ -116,7 +116,7 @@ export interface CristalApp {
    * @param revision - the revision requested, undefined will default to latest
    * @returns the page data, or undefined if the page is not found
    *
-   * @since 0.7
+   * @since 18.0.0RC1
    * @beta
    */
   getPage(

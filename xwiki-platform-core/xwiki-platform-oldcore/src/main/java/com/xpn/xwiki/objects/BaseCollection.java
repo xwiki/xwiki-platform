@@ -659,13 +659,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
-        Map fields = getFields();
-        Map cfields = new HashMap();
-        for (Object objEntry : fields.entrySet()) {
-            Map.Entry entry = (Map.Entry) objEntry;
-            PropertyInterface prop = (PropertyInterface) ((BaseElement) entry.getValue()).clone(true);
+        Map<String, Object> fields = getFields();
+        Map<String, Object> cfields = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> objEntry : fields.entrySet()) {
+            PropertyInterface prop = (PropertyInterface) ((BaseElement) objEntry.getValue()).clone(true);
             prop.setObject(collection);
-            cfields.put(entry.getKey(), prop);
+            cfields.put(objEntry.getKey(), prop);
         }
         collection.setFields(cfields);
     }

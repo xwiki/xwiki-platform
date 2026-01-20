@@ -19,7 +19,7 @@
  */
 
 /**
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 export interface PageAttachment {

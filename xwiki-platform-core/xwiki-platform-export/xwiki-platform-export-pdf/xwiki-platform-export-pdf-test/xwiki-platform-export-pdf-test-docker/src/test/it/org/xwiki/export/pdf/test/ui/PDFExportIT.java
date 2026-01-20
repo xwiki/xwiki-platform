@@ -1322,20 +1322,27 @@ class PDFExportIT
                 OfficeMacro
                 3 / 3
                 This is a word with image
+                < >
+                1 / 1
                 """, pdf.getTextFromPage(2));
 
             // Verify that the images are present.
             List<PDFImage> images = pdf.getImagesFromPage(2);
-            // The first image is the presentation (ppt) slide. The second image is from the word document.
-            assertEquals(2, images.size());
-
-            // The presentation slide.
-            assertEquals(1920, images.get(0).getRawWidth());
-            assertEquals(1080, images.get(0).getRawHeight());
+            // The first image is from the word document. The second image is the presentation (ppt) slide. The third
+            // image is the maximize icon for the gallery macro used to display the slides.
+            assertEquals(3, images.size());
 
             // The image from the word document.
-            assertEquals(81, images.get(1).getRawWidth());
-            assertEquals(81, images.get(1).getRawHeight());
+            assertEquals(81, images.get(0).getRawWidth());
+            assertEquals(81, images.get(0).getRawHeight());
+
+            // The presentation slide.
+            assertEquals(1920, images.get(1).getRawWidth());
+            assertEquals(1080, images.get(1).getRawHeight());
+
+            // The maximize icon for the gallery macro used to display the slides.
+            assertEquals(16, images.get(2).getRawWidth());
+            assertEquals(16, images.get(2).getRawHeight());
         }
     }
 

@@ -21,7 +21,7 @@
 import type { UserDetails } from "@xwiki/platform-authentication-api";
 
 /**
- * @since 0.9
+ * @since 18.0.0RC1
  * @beta
  */
 interface Attachment {

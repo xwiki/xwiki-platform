@@ -125,11 +125,16 @@ private def getCustomJobProperties()
   //   be used and be available for standard builds during the working days.
   return [
     parameters([string(defaultValue: 'none', description: 'Docker Job type', name: 'type')]),
+    // FIXME: disable other builds as they bring more noise (mixing very different things in the same place is always a bad idea) than value, we never really take them into account right now.
+    //        If we ever enable them back, it should be done in a different place.
+    /*
     pipelineTriggers([
       parameterizedCron('''H 22 * * * %type=docker-latest
 H 0 * * 6 %type=docker-all
 @monthly %type=docker-unsupported'''),
       cron("@monthly")
     ])
+    */
+    pipelineTriggers([parameterizedCron('H 22 * * * %type=docker-latest')])
   ]
 }

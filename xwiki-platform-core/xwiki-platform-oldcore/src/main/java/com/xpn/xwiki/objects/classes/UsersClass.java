@@ -148,6 +148,8 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty newProperty()
     {
+        // If the property type should ever change, the logic in UsedValuesListQueryBuilder and LiveTableResultsMacros
+        // might need to be updated.
         BaseProperty property = new LargeStringProperty();
         property.setName(getName());
         return property;

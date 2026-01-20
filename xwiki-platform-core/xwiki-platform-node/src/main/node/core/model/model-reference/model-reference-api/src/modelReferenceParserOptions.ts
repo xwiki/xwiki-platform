@@ -20,7 +20,7 @@
 import { EntityType } from "@xwiki/platform-model-api";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  * @beta
  */
 export type ModelReferenceParserOptions = {

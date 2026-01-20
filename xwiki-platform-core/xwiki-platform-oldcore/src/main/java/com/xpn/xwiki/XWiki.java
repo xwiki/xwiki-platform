@@ -74,7 +74,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
@@ -106,6 +105,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
+import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.CoreExtensionRepository;
@@ -1641,7 +1641,11 @@ public class XWiki implements EventListener
 
             if (this.version == null) {
                 // Fallback on the version of the environment extension
-                this.version = getCoreExtensionRepository().getEnvironmentExtension().getId().getVersion().getValue();
+                CoreExtension environmentExtension = getCoreExtensionRepository().getEnvironmentExtension();
+
+                if (environmentExtension != null) {
+                    this.version = environmentExtension.getId().getVersion().getValue();
+                }
             }
         }
 
@@ -6686,13 +6690,7 @@ public class XWiki implements EventListener
     public String getURLContent(String surl, int timeout, String userAgent) throws IOException
     {
         try (XWikiHTTPClient client = new XWikiHTTPClient(userAgent, timeout)) {
-            return client.executeGet(surl, (response, context) -> {
-                if (response.getCode() != HttpStatus.SC_OK) {
-                    throw new IOException("Failed to get URL content: " + response.getReasonPhrase());
-                }
-
-                return EntityUtils.toString(response.getEntity());
-            });
+            return client.executeGet(surl, (response, context) -> EntityUtils.toString(response.getEntity()));
         }
     }
 
@@ -6722,9 +6720,7 @@ public class XWiki implements EventListener
     public byte[] getURLContentAsBytes(String surl, int timeout, String userAgent) throws IOException
     {
         try (XWikiHTTPClient client = new XWikiHTTPClient(userAgent, timeout)) {
-            return client.executeGet(surl, (response, context) -> {
-                return EntityUtils.toByteArray(response.getEntity());
-            });
+            return client.executeGet(surl, (response, context) -> EntityUtils.toByteArray(response.getEntity()));
         }
     }
 

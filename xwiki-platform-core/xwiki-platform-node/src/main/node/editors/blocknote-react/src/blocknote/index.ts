@@ -41,7 +41,7 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * Contains all the blocks usable inside the editor
  *
  * @returns The created schema
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
@@ -99,7 +99,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
  * @param lang - The dictionary's language
  *
  * @returns The dictionary in the requested language
- * @since 0.19
+ * @since 18.0.0RC1
  * @beta
  */
 function createDictionary(lang: EditorLanguage) {
@@ -108,7 +108,7 @@ function createDictionary(lang: EditorLanguage) {
 }
 
 /**
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorLanguage = keyof typeof locales & keyof typeof translations;
@@ -119,7 +119,7 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
  * @param editor - the editor type
  * @param query - the query to filter the suggestions by
  * @param macros - the available macros
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 function querySuggestionsMenuItems(
@@ -153,7 +153,7 @@ function querySuggestionsMenuItems(
 /**
  * Schema of the BlockNote editor
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
@@ -161,7 +161,7 @@ type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
 /**
  * Block schema for BlockNote
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorBlockSchema =
@@ -178,7 +178,7 @@ type EditorBlockSchema =
 /**
  * Inline content schema for BlockNote
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorInlineContentSchema =
@@ -195,7 +195,7 @@ type EditorInlineContentSchema =
 /**
  * Style schema for BlockNote
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorStyleSchema =
@@ -212,7 +212,7 @@ type EditorStyleSchema =
 /**
  * Type of a BlockNote editor instance
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorType = BlockNoteEditor<
@@ -224,7 +224,7 @@ type EditorType = BlockNoteEditor<
 /**
  * Typesafe BlockNote type
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type BlockType = Block<
@@ -236,7 +236,7 @@ type BlockType = Block<
 /**
  * Typesafe BlockNote type of the a given kind
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
@@ -244,7 +244,7 @@ type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
 /**
  * Typesafe BlockNote inline content
  *
- * @since 0.24-rc-1
+ * @since 18.0.0RC1
  * @beta
  */
 type InlineContentType = InlineContent<
@@ -255,7 +255,7 @@ type InlineContentType = InlineContent<
 /**
  * Typesafe BlockNote styled text
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorStyledText = StyledText<EditorStyleSchema>;
@@ -263,7 +263,7 @@ type EditorStyledText = StyledText<EditorStyleSchema>;
 /**
  * Typesafe BlockNote link
  *
- * @since 0.16
+ * @since 18.0.0RC1
  * @beta
  */
 type EditorLink = Link<EditorStyleSchema>;

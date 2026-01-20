@@ -355,12 +355,12 @@ export default {
 
 .livedata-pagination .page-nav.current {
   font-weight: bold;
-  background-color: @btn-primary-bg;
-  color: @btn-primary-color;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-color);
 }
 
 .livedata-pagination .page-nav:hover {
-  border-color: darken(@dropdown-divider-bg, 10%);
+  border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.10));
 }
 
 /* We make sure that the icons to navigate through the pages are big enough. */

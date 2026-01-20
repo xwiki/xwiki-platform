@@ -22,7 +22,7 @@ import type { InternalLinksSerializer } from "./internal-links-serializer";
 import type { CristalApp } from "@xwiki/platform-api";
 
 /**
- * @since 0.22
+ * @since 18.0.0RC1
  */
 @injectable()
 export class InternalLinksSerializerResolver {

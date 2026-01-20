@@ -20,7 +20,7 @@
 package org.xwiki.wiki.user.script;
 
 /**
- * Encapsulate any exception related to {@link }WikiUserManagerScriptService}.
+ * Encapsulate any exception related to {@link WikiUserManagerScriptService}.
  *
  * @version $Id$
  * @since 5.4RC1

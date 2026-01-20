@@ -21,7 +21,7 @@
 /**
  * Mandatory information for a user connected to a realtime session.
  *
- * @since 0.20
+ * @since 18.0.0RC1
  * @beta
  */
 export type User = {

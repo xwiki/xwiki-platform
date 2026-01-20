@@ -34,6 +34,8 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.PasswordProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
@@ -342,5 +344,23 @@ public class PasswordClass extends StringClass
             salt.append(s);
         }
         return salt.toString();
+    }
+
+    @Override
+    public BaseProperty newProperty()
+    {
+        BaseProperty property = new PasswordProperty();
+        property.setName(getName());
+        return property;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return {@code true} as this property is always sensitive.
+     */
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        return true;
     }
 }

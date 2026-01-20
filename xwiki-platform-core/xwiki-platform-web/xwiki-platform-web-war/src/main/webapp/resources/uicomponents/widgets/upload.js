@@ -40,7 +40,7 @@ define('upload-translations', {
     'cancelAll',
     'hideStatus',
     'status.fileSize',
-    'remaining',
+    'status.remaining',
     'error.unknown',
     'error.invalidType',
     'error.invalidSize',
@@ -199,7 +199,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         statusUI.PROGRESS_PERCENTAGE = UploadUtils.createSpan('progress-percentage', '&nbsp;');
         statusUI.PROGRESS_SPEED = UploadUtils.createSpan('progress-speed', '&nbsp;');
         statusUI.PROGRESS_REMAINING = UploadUtils.createSpan('progress-remaining', '&nbsp;');
-        statusUI.PROGRESS_REMAINING_TEXT = UploadUtils.createSpan('progress-remaining-text', l10n['remaining']);
+        statusUI.PROGRESS_REMAINING_TEXT = UploadUtils.createSpan('progress-remaining-text', '');
         statusUI.PROGRESS_TRANSFERED = UploadUtils.createSpan('progress-transfered', '&nbsp;');
 
         statusUI.PROGRESS_INFO.append(statusUI.PROGRESS);
@@ -210,7 +210,11 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
           statusUI.PROGRESS_INFO.append(statusUI.PROGRESS_TRANSFERED, statusUI.PROGRESS_PERCENTAGE);
         }
         statusUI.PROGRESS_TIME = UploadUtils.createDiv('progress-time');
-        statusUI.PROGRESS_TIME.append(statusUI.PROGRESS_REMAINING, statusUI.PROGRESS_REMAINING_TEXT, 
+        let remainingText = l10n.get('status.remaining', '__timer__').split('__timer__');
+        statusUI.PROGRESS_REMAINING_TEXT.append(remainingText[0]);
+        statusUI.PROGRESS_REMAINING_TEXT.append(statusUI.PROGRESS_REMAINING);
+        statusUI.PROGRESS_REMAINING_TEXT.append(remainingText[1]);
+        statusUI.PROGRESS_TIME.append(statusUI.PROGRESS_REMAINING_TEXT, 
           statusUI.PROGRESS_SPEED);
         statusUI.PROGRESS_INFO.append(statusUI.PROGRESS_TIME);
         statusUI.UPLOAD_STATUS_MAIN.append(statusUI.PROGRESS_INFO);

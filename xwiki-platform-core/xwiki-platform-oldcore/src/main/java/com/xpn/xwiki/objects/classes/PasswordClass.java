@@ -35,7 +35,6 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.PasswordProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 

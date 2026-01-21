@@ -43,6 +43,12 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      * The select input to set the color theme.
      */
     @FindBy(id = "XWiki.XWikiPreferences_0_colorTheme")
+    private WebElement colorThemeInput;
+
+    /**
+     * The select input to set the icon theme.
+     */
+    @FindBy(id = "XWiki.XWikiPreferences_0_iconTheme")
     private WebElement iconThemeInput;
 
     @FindBy(xpath = "//label[@class='colorTheme']//a[contains(text(), 'Customize')]")
@@ -65,18 +71,42 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         super("Themes");
     }
 
+    private List<WebElement> getThemeOptions(WebElement themeInput)
+    {
+        return themeInput.findElements(By.tagName("option"));
+    }
+
     private List<WebElement> getColorThemeOptions()
     {
-        return iconThemeInput.findElements(By.tagName("option"));
+        return getThemeOptions(colorThemeInput);
+    }
+
+    private List<WebElement> getIconThemeOptions()
+    {
+        return getThemeOptions(iconThemeInput);
     }
 
     private List<WebElement> getColibriThemeOptions()
     {
-        return iconThemeInput.findElements(By.xpath("//optgroup[@label='Colibri Themes']//option"));
+        return colorThemeInput.findElements(By.xpath("//optgroup[@label='Colibri Themes']//option"));
     }
+
     private List<WebElement> getFlamingoThemeOptions()
     {
-        return iconThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
+        return colorThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
+    }
+    
+    /**
+    * @param themeInput is the input from which to retrieve themes.
+    * @return a list of the name of all the themes proposed by the themeInput.
+     */
+    private List<String> getThemes(WebElement themeInput)
+    {
+        List<String> results = new ArrayList<>();
+        for (WebElement option : getThemeOptions(themeInput)) {
+            results.add(option.getText());
+        }
+        return results;
     }
 
     /**
@@ -84,44 +114,64 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      */
     public List<String> getColorThemes()
     {
-        List<String> results = new ArrayList<>();
-        for (WebElement option : getColorThemeOptions()) {
-            results.add(option.getText());
-        }
-        return results;
+        return getThemes(this.colorThemeInput);
     }
 
     /**
-     * Select the specified color theme.
-     * @param colorThemeName name of the color theme to select
+     * @return the list of available icon themes
      */
-    public void setColorTheme(String colorThemeName)
+    public List<String> getIconThemes()
     {
-        // Make sure the color theme that we want to set is available from the list first
+        return getThemes(this.iconThemeInput);
+    }
+
+    private void setTheme(String themeName, WebElement themeInput)
+    {
+        // Make sure the theme that we want to set is available from the list first
         try {
-            getDriver().waitUntilCondition(driver -> getColorThemeOptionElement(colorThemeName) != null);
+            getDriver().waitUntilCondition(driver -> getThemeOptionElement(themeName, themeInput) != null);
         } catch (TimeoutException e) {
             // Collect all available options to display a nice message
             List<String> options = new ArrayList<>();
-            for (WebElement option : getColorThemeOptions()) {
+            for (WebElement option : getThemeOptions(themeInput)) {
                 options.add(option.getText());
             }
-            throw new TimeoutException(String.format("Color theme [%s] wasn't found among [%s]", colorThemeName,
+            throw new TimeoutException(String.format("Theme [%s] wasn't found among [%s]", themeName,
                 StringUtils.join(options, ',')), e);
         }
 
         // Click on it to set the theme
-        getColorThemeOptionElement(colorThemeName).click();
+        getThemeOptionElement(themeName, themeInput).click();
 
         // Waiting to be sure the change is effective
-        getDriver().waitUntilCondition(driver -> Strings.CS.equals(getCurrentColorTheme(), colorThemeName));
+        getDriver().waitUntilCondition(driver -> Strings.CS.equals(getCurrentTheme(themeInput), themeName));
     }
 
-    private WebElement getColorThemeOptionElement(String colorThemeName)
+    /**
+     * Select the specified color theme.
+     *
+     * @param colorThemeName name of the color theme to select
+     */
+    public void setColorTheme(String colorThemeName)
+    {
+        setTheme(colorThemeName, colorThemeInput);
+    }
+
+    /**
+     * Select the specified icon theme.
+     *
+     * @param iconThemeName name of the icon theme to select
+     */
+    public void setIconTheme(String iconThemeName)
+    {
+        setTheme(iconThemeName, iconThemeInput);
+    }
+
+    private WebElement getThemeOptionElement(String themeName, WebElement themeInput)
     {
         WebElement element = null;
-        for (WebElement option : getColorThemeOptions()) {
-            if (colorThemeName.equals(option.getText())) {
+        for (WebElement option : getThemeOptions(themeInput)) {
+            if (themeName.equals(option.getText())) {
                 element = option;
                 break;
             }
@@ -129,17 +179,40 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         return element;
     }
 
-    /**
-     * @return the current color theme
-     */
-    public String getCurrentColorTheme()
+    private WebElement getColorThemeOptionElement(String colorThemeName)
     {
-        for (WebElement option : getColorThemeOptions()) {
+        return getThemeOptionElement(colorThemeName, colorThemeInput);
+    }
+
+    private WebElement getIconThemeOptionElement(String iconThemeName)
+    {
+        return getThemeOptionElement(iconThemeName, iconThemeInput);
+    }
+
+    private String getCurrentTheme(WebElement themeInput)
+    {
+        for (WebElement option : getThemeOptions(themeInput)) {
             if (option.isSelected()) {
                 return option.getText();
             }
         }
         return null;
+    }
+
+    /**
+     * @return the current color theme
+     */
+    public String getCurrentColorTheme()
+    {
+        return getCurrentTheme(colorThemeInput);
+    }
+
+    /**
+     * @return the current icon theme
+     */
+    public String getCurrentIconTheme()
+    {
+        return getCurrentTheme(iconThemeInput);
     }
 
     /**
@@ -172,7 +245,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public void clickOnCustomizeColorTheme()
     {
         getDriver().waitUntilElementIsVisible(
-                By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
+            By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
         customizeColorThemeButton.click();
     }
 

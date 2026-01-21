@@ -781,7 +781,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   }
 }
 
-.search-facet:has(.search-facet-body.collapse.in) {
+.search-facet:has(.search-facet-body.collapse.in),
+.search-facet:has(.search-facet-body.collapsing) {
   &amp; .search-facet-header {
     border-bottom-width: 0;
     border-bottom-left-radius: 0;

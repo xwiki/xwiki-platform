@@ -111,8 +111,8 @@ public class ClassesResourceIT extends AbstractHttpIT
                 String tagName = value.getKey();
                 DocumentReference reference = value.getValue();
 
-                this.testUtils.rest().delete(reference);
-                this.testUtils.rest().savePage(reference, "content", "Title " + reference.getName());
+                getUtil().rest().delete(reference);
+                getUtil().rest().savePage(reference, "content", "Title " + reference.getName());
 
                 // Add the tag to the page
                 Object tagObject = this.objectFactory.createObject().withClassName(className);
@@ -167,8 +167,8 @@ public class ClassesResourceIT extends AbstractHttpIT
             Assert.assertEquals(400, getMethod.getStatusCode());
             Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
         } finally {
-            this.testUtils.rest().delete(reference1);
-            this.testUtils.rest().delete(reference2);
+            getUtil().rest().delete(reference1);
+            getUtil().rest().delete(reference2);
         }
     }
 }

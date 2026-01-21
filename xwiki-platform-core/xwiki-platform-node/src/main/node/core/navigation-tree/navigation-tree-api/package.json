@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/navigation-tree/navigation-tree-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/authentication/authentication-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

@@ -7,7 +7,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/icons",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

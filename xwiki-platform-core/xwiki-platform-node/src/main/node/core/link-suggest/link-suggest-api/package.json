@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/link-suggest/link-suggest-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

@@ -13,85 +13,106 @@
 .skin-colibri .xwiki-livetable-pagination .xwiki-livetable-limits {
   float: left;
 }
-.xwiki-livetable-pagination .xwiki-livetable-limits {
-  line-height: 22px;
-}
-.xwiki-livetable-pagination .xwiki-livetable-limits strong {
-  font-weight: normal;
-}
-.xwiki-livetable-pagination .xwiki-livetable-pagesize {
-  line-height: 22px;
-  margin-left: 5px;
-}
-.xwiki-livetable-pagination .xwiki-livetable-pagesize .pagesizeselect {
-  padding: 0;
-}
-.xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
-  display: inline;
-}
-.xwiki-livetable-pagination a.pagenumber {
-  color: $theme.textPrimaryColor;
-  cursor: pointer;
-}
-.xwiki-livetable-pagination a.pagenumber:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-.xwiki-livetable-pagination a.selected {
-  color: $theme.textColor;
-  font-weight: bold;
-}
-.xwiki-livetable-pagination a.pagenumber:focus {
-  outline: 1px dotted $theme.linkColor;
-}
-/* <Pagination>*/
-.pagination {
-  float: right;
-  margin-right: 10px;
-  line-height: 22px;
-}
-.controlPagination {
-  position: relative;
-  width: 42px;
-  height: 22px;
-  overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
-  float: right;
-}
-.controlPagination a {
-  position: absolute;
-  top: 0;
-  left: 0;
-  line-height: 25px;
-  outline: none;
-  overflow: hidden;
-  border: none;
-}
-.controlPagination .prevPagination , .controlPagination .noPrevPagination, .controlPagination .nextPagination, .controlPagination .noNextPagination {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
-  width: 21px;
-  height: 22px;
-}
-.controlPagination .prevPagination:hover, .controlPagination .nextPagination:hover {
-  cursor: pointer;
-}
-.controlPagination .noPrevPagination:hover, .controlPagination .noNextPagination:hover {
-  cursor: default;
-}
-.controlPagination .prevPagination {
-  background-position: left top;
-}
-.controlPagination .noPrevPagination {
-  background-position: left bottom;
-}
-.controlPagination .nextPagination {
-  background-position: right top;
-  left: 21px;
-}
-.controlPagination .noNextPagination {
-  background-position: right bottom;
-  left: 21px;
+.xwiki-livetable-pagination {
+  .xwiki-livetable-limits {
+    line-height: 22px;
+  }
+
+  .xwiki-livetable-limits strong {
+    font-weight: normal;
+  }
+
+  .xwiki-livetable-pagesize {
+    line-height: 22px;
+    margin-left: 5px;
+  }
+
+  .xwiki-livetable-pagesize .pagesizeselect {
+    padding: 0;
+  }
+
+  .xwiki-livetable-pagination-content, .xwiki-livetable-pagination-text {
+    display: inline;
+  }
+
+  a.pagenumber {
+    color: $theme.textPrimaryColor;
+    cursor: pointer;
+  }
+
+  a.pagenumber:hover {
+    color: $theme.linkColor;
+    text-decoration: underline;
+  }
+
+  a.selected {
+    color: $theme.textColor;
+    font-weight: bold;
+  }
+
+  a.pagenumber:focus {
+    outline: 1px dotted $theme.linkColor;
+  }
+
+  /* <Pagination>*/
+
+  .pagination {
+    float: right;
+    margin-right: 10px;
+    line-height: 22px;
+  }
+
+  .controlPagination {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: right;
+  }
+
+  .controlPagination a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 25px;
+    outline: none;
+    overflow: hidden;
+    border: none;
+  }
+
+  .controlPagination .prevPagination, .controlPagination .noPrevPagination, .controlPagination .nextPagination, .controlPagination .noNextPagination {
+    background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
+    width: 21px;
+    height: 22px;
+  }
+
+  .controlPagination .prevPagination:hover, .controlPagination .nextPagination:hover {
+    cursor: pointer;
+  }
+
+  .controlPagination .noPrevPagination:hover, .controlPagination .noNextPagination:hover {
+    cursor: default;
+  }
+
+  .controlPagination .prevPagination {
+    background-position: left top;
+  }
+
+  .controlPagination .noPrevPagination {
+    background-position: left bottom;
+  }
+
+  .controlPagination .nextPagination {
+    background-position: right top;
+    left: 21px;
+  }
+
+  .controlPagination .noNextPagination {
+    background-position: right bottom;
+    left: 21px;
+  }
 }
 /* </ Pagination>*/
 /* </ Live Table Pagination> */

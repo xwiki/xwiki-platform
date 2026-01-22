@@ -26,7 +26,6 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
-  filterSuggestionItems,
 } from "@blocknote/core";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
@@ -34,6 +33,7 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import { filterSuggestionItems } from "@blocknote/core/extensions";
 
 /**
  * Create the BlockNote editor's schema

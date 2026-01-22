@@ -91,7 +91,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
         {{ $t("livedata.bottombar.noEntries") }}
       </div>
-      <LivedataPagination />
+      <LivedataPagination/>
     </LivedataBottombar>
   </div>
 </template>

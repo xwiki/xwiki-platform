@@ -19,126 +19,91 @@
  */
 package org.xwiki.uiextension;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.uiextension.internal.filter.ExcludeFilter;
+import org.xwiki.uiextension.internal.filter.SelectFilter;
 import org.xwiki.uiextension.internal.filter.SortByCustomOrderFilter;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 import org.xwiki.uiextension.internal.filter.SortByParameterFilter;
-import org.xwiki.uiextension.internal.filter.SelectFilter;
 
-public class UIExtensionPointFiltersTest
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Named.named;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.xwiki.uiextension.UIExtensions.TestUix1valueZ;
+import static org.xwiki.uiextension.UIExtensions.TestUix2valueY;
+import static org.xwiki.uiextension.UIExtensions.TestUix3valueX;
+import static org.xwiki.uiextension.UIExtensions.TestUix4valueW;
+import static org.xwiki.uiextension.UIExtensions.TestUix5value1;
+import static org.xwiki.uiextension.UIExtensions.TestUix6value11;
+import static org.xwiki.uiextension.UIExtensions.TestUix7value2;
+
+class UIExtensionPointFiltersTest
 {
-    private UIExtension testUix1valueZ = new UIExtensions.TestUix1valueZ();
-    private UIExtension testUix2valueY = new UIExtensions.TestUix2valueY();
-    private UIExtension testUix3valueX = new UIExtensions.TestUix3valueX();
-    private UIExtension testUix4valueW = new UIExtensions.TestUix4valueW();
-    private UIExtension testUix5value1 = new UIExtensions.TestUix5value1();
-    private UIExtension testUix6value11 = new UIExtensions.TestUix6value11();
-    private UIExtension testUix7value2 = new UIExtensions.TestUix7value2();
-    private List<UIExtension> extensions = new ArrayList<UIExtension>();
+    private final static UIExtension TEST_UIX_1_VALUE_Z = new TestUix1valueZ();
 
-    @Before
-    public void configure()
+    private final static UIExtension TEST_UIX_2_VALUE_Y = new TestUix2valueY();
+
+    private final static UIExtension TEST_UIX_3_VALUE_X = new TestUix3valueX();
+
+    private final static UIExtension TEST_UIX_4_VALUE_W = new TestUix4valueW();
+
+    private final static UIExtension TEST_UIX_5_VALUE_1 = new TestUix5value1();
+
+    private final static UIExtension TEST_UIX_6_VALUE_11 = new TestUix6value11();
+
+    private final static UIExtension TEST_UIX_7_VALUE_2 = new TestUix7value2();
+
+    public static Stream<Arguments> filterSource()
     {
-        extensions.add(testUix3valueX);
-        extensions.add(testUix6value11);
-        extensions.add(testUix1valueZ);
-        extensions.add(testUix5value1);
-        extensions.add(testUix4valueW);
-        extensions.add(testUix7value2);
-        extensions.add(testUix2valueY);
+        return Stream.of(
+            arguments(
+                named("ExcludeFilter", new ExcludeFilter()),
+                new String[] { "platform.testuix2", "platform.testuix3" },
+                List.of(TEST_UIX_6_VALUE_11, TEST_UIX_1_VALUE_Z, TEST_UIX_5_VALUE_1, TEST_UIX_4_VALUE_W,
+                    TEST_UIX_7_VALUE_2)
+            ),
+            arguments(
+                named("SelectFilter", new SelectFilter()),
+                new String[] { "platform.testuix2", "platform.testuix3", "platform.testuix4" },
+                // The extensions must be ordered as in the select clause above.
+                List.of(TEST_UIX_2_VALUE_Y, TEST_UIX_3_VALUE_X, TEST_UIX_4_VALUE_W)
+            ),
+            arguments(
+                named("SortByCustomOrderFilter", new SortByCustomOrderFilter()),
+                new String[] { "platform.testuix2", "platform.testuix3" },
+                List.of(
+                    // The first 2 are placed at the beginning, in the correct order
+                    TEST_UIX_2_VALUE_Y, TEST_UIX_3_VALUE_X,
+                    // The order of the others is preserved
+                    TEST_UIX_6_VALUE_11, TEST_UIX_1_VALUE_Z, TEST_UIX_5_VALUE_1, TEST_UIX_4_VALUE_W, TEST_UIX_7_VALUE_2)
+            ),
+            arguments(
+                named("SortByIdFilter", new SortByIdFilter()),
+                new String[] {},
+                List.of(TEST_UIX_1_VALUE_Z, TEST_UIX_2_VALUE_Y, TEST_UIX_3_VALUE_X, TEST_UIX_4_VALUE_W,
+                    TEST_UIX_5_VALUE_1, TEST_UIX_6_VALUE_11, TEST_UIX_7_VALUE_2)
+            ),
+            arguments(
+                named("SortByParameterFilter", new SortByParameterFilter()),
+                new String[] { "key" },
+                List.of(TEST_UIX_5_VALUE_1, TEST_UIX_7_VALUE_2, TEST_UIX_6_VALUE_11, TEST_UIX_4_VALUE_W,
+                    TEST_UIX_3_VALUE_X, TEST_UIX_2_VALUE_Y, TEST_UIX_1_VALUE_Z)
+            )
+        );
     }
 
-    @Test
-    public void excludeFilter()
+    @ParameterizedTest(name = "{0} - {1}")
+    @MethodSource("filterSource")
+    void filter(UIExtensionFilter filter, String[] parameters, List<UIExtension> expected)
     {
-        String[] list = new String[] {"platform.testuix2", "platform.testuix3"};
-        List<UIExtension> expected = new ArrayList<UIExtension>();
-        expected.add(testUix6value11);
-        expected.add(testUix1valueZ);
-        expected.add(testUix5value1);
-        expected.add(testUix4valueW);
-        expected.add(testUix7value2);
-
-        UIExtensionFilter filter = new ExcludeFilter();
-
-        Assert.assertEquals(expected, filter.filter(extensions, list));
+        var extensions =
+            List.of(TEST_UIX_3_VALUE_X, TEST_UIX_6_VALUE_11, TEST_UIX_1_VALUE_Z, TEST_UIX_5_VALUE_1, TEST_UIX_4_VALUE_W,
+                TEST_UIX_7_VALUE_2, TEST_UIX_2_VALUE_Y);
+        assertEquals(expected, filter.filter(extensions, parameters));
     }
-
-    @Test
-    public void selectFilter()
-    {
-        String[] list = new String[] {"platform.testuix2", "platform.testuix3", "platform.testuix4"};
-        List<UIExtension> expected = new ArrayList<UIExtension>();
-        // The extensions must be ordered as in the select clause above
-        expected.add(testUix2valueY);
-        expected.add(testUix3valueX);
-        expected.add(testUix4valueW);
-
-        UIExtensionFilter filter = new SelectFilter();
-
-        Assert.assertEquals(expected, filter.filter(extensions, list));
-    }
-
-    @Test
-    public void sortByListFilter()
-    {
-        String[] list = new String[] {"platform.testuix2", "platform.testuix3"};
-
-        List<UIExtension> expected = new ArrayList<UIExtension>();
-        // The first 2 are placed at the beginning, in the correct order
-        expected.add(testUix2valueY);
-        expected.add(testUix3valueX);
-        // The order of the others is preserved
-        expected.add(testUix6value11);
-        expected.add(testUix1valueZ);
-        expected.add(testUix5value1);
-        expected.add(testUix4valueW);
-        expected.add(testUix7value2);
-
-        UIExtensionFilter filter = new SortByCustomOrderFilter();
-
-        Assert.assertEquals(expected, filter.filter(extensions, list));
-    }
-
-    @Test
-    public void sortByNameFilter()
-    {
-        List<UIExtension> expected = new ArrayList<UIExtension>();
-        expected.add(testUix1valueZ);
-        expected.add(testUix2valueY);
-        expected.add(testUix3valueX);
-        expected.add(testUix4valueW);
-        expected.add(testUix5value1);
-        expected.add(testUix6value11);
-        expected.add(testUix7value2);
-
-
-        UIExtensionFilter filter = new SortByIdFilter();
-
-        Assert.assertEquals(expected, filter.filter(extensions));
-    }
-
-    @Test
-    public void sortByParameterFilter()
-    {
-        List<UIExtension> expected = new ArrayList<UIExtension>();
-        expected.add(testUix5value1);
-        expected.add(testUix7value2);
-        expected.add(testUix6value11);
-        expected.add(testUix4valueW);
-        expected.add(testUix3valueX);
-        expected.add(testUix2valueY);
-        expected.add(testUix1valueZ);
-
-        UIExtensionFilter filter = new SortByParameterFilter();
-
-        Assert.assertEquals(expected, filter.filter(extensions, "key"));
-    }
-
 }

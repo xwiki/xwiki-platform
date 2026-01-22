@@ -274,6 +274,9 @@ export default {
 .layout-table .column-name {
   display: flex;
   justify-content: space-between;
+  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
+ when the column has been resized to a smaller width that is prevented by some table cell. */
+  min-width: 100%;
 }
 
 .layout-table .draggable-item .resize-handle {

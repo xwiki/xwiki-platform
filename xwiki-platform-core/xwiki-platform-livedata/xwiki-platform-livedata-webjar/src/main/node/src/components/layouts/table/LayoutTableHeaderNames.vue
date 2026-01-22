@@ -36,6 +36,7 @@
     item-key="id"
     @change="reorderProperty"
     tag="tr"
+    handle=".column-name"
   >
     <!-- Entry Select All -->
     <template #header>

@@ -136,19 +136,19 @@
 
   var collapseAllFacets = function(event) {
     event.preventDefault();
-    $(event.target).closest('.search-facets').find('.search-facet').removeClass('expanded');
+    $(event.target).closest('.search-facets').find('.search-facet .search-facet-body').collapse('hide');
     $(event.target).hide().parent().children('.search-facets-action-expandAll').show();
   };
 
   var expandAllFacets = function(event) {
     event.preventDefault();
-    $(event.target).closest('.search-facets').find('.search-facet').addClass('expanded');
+    $(event.target).closest('.search-facets').find('.search-facet .search-facet-body').collapse('show');
     $(event.target).hide().parent().children('.search-facets-action-collapseAll').show();
   };
 
   var updateExpandCollapseAllFacetsState = function(facetsContainer) {
-    var facetCount = facetsContainer.find('.search-facet').length;
-    var expandedFacetCount = facetsContainer.find('.search-facet.expanded').length;
+    let facetCount = facetsContainer.find('.search-facet').length;
+    let expandedFacetCount = facetsContainer.find('.search-facet-body.collapse.in').length;
     if (expandedFacetCount &gt; facetCount / 2) {
       facetsContainer.find('.search-facets-action-collapseAll').show()
         .parent().children('.search-facets-action-expandAll').hide();
@@ -195,8 +195,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.facet-toggle').on('click', function(event) {
-      $(event.target).parents('.search-facet').toggleClass('expanded');
+    facetsContainer.find('.search-facet-body').on('hidden.bs.collapse shown.bs.collapse', function(event) {
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
 
@@ -218,7 +217,7 @@
 
   var getSearchUIState = function() {
     var expandedFacets = [];
-    $('.search-facet.expanded').each(function() {
+    $('.search-facet:has(btn.facet-toggle:not(.collapsed))').each(function() {
       expandedFacets.push($(this).attr('data-name'));
     });
     return {
@@ -229,7 +228,7 @@
   var setSearchUIState = function(state) {
     state = state || {};
     var expandedFacets = state.expandedFacets || [];
-    $('.search-facet').not('.expanded').each(function() {
+    $('.search-facet:has(btn.facet-toggle.collapsed)').each(function() {
       if (expandedFacets.indexOf($(this).attr('data-name')) &gt;= 0) {
         $(this).addClass('expanded');
       }
@@ -696,6 +695,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 
 .search-facet {
   padding: .2em 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-facets-header &gt; p,
@@ -738,13 +739,6 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 }
 
 .search-facet-body {
-  opacity: 0;
-  visibility: hidden; /* This makes sure the element is removed from the accessibility tree. */
-
-  position: absolute;
-  transform: translateY(-10px); /* Start the animation slightly above */
-  padding-top: .5em;
-  
   border-top-width: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -770,42 +764,33 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
-.search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
+.search-facet .search-facet-header .facet-toggle.collapsed &gt; span, button.facet-value-toggle &gt; span,
+.search-facet .search-facet-header .facet-toggle.collapsed &gt; img, button.facet-value-toggle &gt; img {
   transform: rotate(90deg);
 }
 
-.search-facet.expanded .search-facet-header .facet-toggle > span, .expanded > button.facet-value-toggle > span,
-.search-facet.expanded .search-facet-header .facet-toggle > img, .expanded > button.facet-value-toggle > img {
+.search-facet .search-facet-header .facet-toggle &gt; span, .expanded &gt; button.facet-value-toggle &gt; span,
+.search-facet .search-facet-header .facet-toggle &gt; img, .expanded &gt; button.facet-value-toggle &gt; img {
   transform: rotate(0deg);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
-  .search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
+  .search-facet .search-facet-header .facet-toggle &gt; span, button.facet-value-toggle &gt; span,
+  .search-facet .search-facet-header .facet-toggle &gt; img, button.facet-value-toggle &gt; img {
     transition: transform 0.2s ease;
-  }
-  
-  .search-facet-body {
-    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 }
 
-.search-facet.expanded {
+.search-facet:has(.search-facet-body.collapse.in),
+.search-facet:has(.search-facet-body.collapsing) {
   &amp; .search-facet-header {
     border-bottom-width: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     
     &amp; label {
-    font-weight: var(--font-weight-semibold);
+      font-weight: var(--font-weight-semibold);
     }
-  }
-  &amp; .search-facet-body {
-    opacity: 1;
-    position: unset; /* This element should be positioned normally when shown. */
-    visibility: visible;
-    transform: translateY(0);
   }
 }
 

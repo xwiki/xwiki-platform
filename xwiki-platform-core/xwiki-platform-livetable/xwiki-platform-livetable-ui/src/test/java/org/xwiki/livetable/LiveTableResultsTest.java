@@ -568,6 +568,32 @@ class LiveTableResultsTest extends PageTest
     }
 
     @Test
+    void noAccessToPasswordFieldsWithClassPerProperty() throws Exception
+    {
+        // Initialize an XClass with a password field.
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "MyClass");
+        XWikiDocument xwikiDocument = this.xwiki.getDocument(documentReference, this.context);
+        BaseClass xClass = xwikiDocument.getXClass();
+        xClass.addPasswordField("password", "Password", 30);
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(0L);
+        when(this.query.execute()).thenReturn(Collections.emptyList());
+
+        this.request.put("password", "abcd");
+        this.request.put("password_class", "XWiki.MyClass");
+        this.request.put("collist", "password");
+
+        renderPage();
+
+        verify(this.queryService).hql("  where 1=1  ");
+    }
+
+    @Test
     void highLimitIsRejected() throws Exception
     {
         setLimit(2000);

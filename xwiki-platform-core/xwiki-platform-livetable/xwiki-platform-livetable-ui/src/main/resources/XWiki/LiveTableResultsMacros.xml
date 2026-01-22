@@ -75,9 +75,10 @@
   #foreach($colname in $collist)
     ## If a classname is defined and the class field corresponding to the column name,
     ## we check the type of the field and skip it if it's Password.
-    #if ($className != '' &amp;&amp; $class.get($colname))
-      #set ($isPasswordType = $class.get($colname).classType == 'Password')
-      #set ($isEmailType = $class.get($colname).classType == 'Email')
+    #livetable_getPropertyClassAndType($colname)
+    #if ($propType != '')
+      #set ($isPasswordType = $propClass.get($colname).classType == 'Password')
+      #set ($isEmailType = $propClass.get($colname).classType == 'Email')
       #set ($emailObfuscated = $services.mail.general.shouldObfuscate())
       #if (!($isPasswordType || ($isEmailType &amp;&amp; $emailObfuscated)))
         #livetable_addColumnToQuery($colname)

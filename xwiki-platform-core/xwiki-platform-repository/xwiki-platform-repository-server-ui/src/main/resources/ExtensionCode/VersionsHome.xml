@@ -27,12 +27,12 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
   <comment/>
-  <parent>WebHome</parent>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
@@ -50,18 +50,26 @@
 
 {{liveData
   id="versions"
-  properties="version,notes"
+  properties="index,version,notes"
   source="liveTable"
-  sort="version:desc"
+  sort="index:desc"
   limit="5"
   sourceParameters="$services.rendering.escape($escapetool.url($optionsLD), 'xwiki/2.1')"
 }}{
 "meta": {
     "propertyDescriptors": [
       {
+        "id": "index",
+        "visible": false
+      },
+      {
         "id": "version",
         "displayer": {"id": "link", "propertyHref": "doc.url"},
-        "editable": false
+        "sortable": false
+      },
+      {
+        "id": "notes",
+        "sortable": false
       }
     ]
   }

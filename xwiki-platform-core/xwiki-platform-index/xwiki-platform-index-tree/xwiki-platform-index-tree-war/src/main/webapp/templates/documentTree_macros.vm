@@ -108,6 +108,8 @@
   ##   configuration becomes complex.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.webjars:font-awesome', 'css/all.min.css'), {
     'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.webjars:font-awesome', 'css/v4-shims.min.css'), {
+    'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($_options = $macro.options)
   #tree($_options)
 #end

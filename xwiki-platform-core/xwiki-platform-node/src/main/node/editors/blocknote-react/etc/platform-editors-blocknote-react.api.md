@@ -703,7 +703,15 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
-export type ImageEditionOverrideFn = (image: BlockOfType<"image">, update: (newProps: Partial<BlockOfType<"image">["props"]>) => void) => void;
+export type ImageEditionOverrideFn = (image: BlockOfType<"image">["props"], update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageUpdateResult = {
+    type: "update";
+    updatedProps: Partial<BlockOfType<"image">["props"]>;
+} | {
+    type: "aborted";
+};
 
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;

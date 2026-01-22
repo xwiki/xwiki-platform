@@ -1,6 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,25 +16,30 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package com.xpn.xwiki.objects;
 
-<xwikidoc version="1.1" locale="ko">
-  <web>Scheduler</web>
-  <name>Translations</name>
-  <language>ko</language>
-  <defaultLanguage>en</defaultLanguage>
-  <translation>1</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <parent>Scheduler.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <version>1.1</version>
-  <title>Translations</title>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
-  <hidden>true</hidden>
-  <content>scheduler.disabled=스케줄러가 비활성화됩니다. 작업이 실행되지 않습니다.
-scheduler.applicationsPanelEntryLabel=스케줄러
-</content>
-  </xwikidoc>
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiContext;
+
+/**
+ * Property for containing a password value.
+ * @version $Id$
+ * @since 18.0.0RC1
+ */
+@Unstable
+public class PasswordProperty extends BaseStringProperty
+{
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * {@inheritDoc}
+     * @return {@code true} as this property is always sensitive.
+     */
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        return true;
+    }
+}

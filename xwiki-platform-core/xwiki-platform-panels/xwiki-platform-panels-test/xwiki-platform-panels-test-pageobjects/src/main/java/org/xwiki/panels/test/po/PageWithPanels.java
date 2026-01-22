@@ -119,7 +119,7 @@ public class PageWithPanels extends BasePage
         // Define the drag and drop action
         Actions action = new Actions(this.getDriver().getWrappedDriver());
         action.clickAndHold(panelResizeHandle);
-        int panelSideInvert = Objects.equals(panelSide, Column.RIGHT)? -1 : 1;
+        int panelSideInvert = Objects.equals(panelSide, Column.RIGHT) ? -1 : 1;
         // We need to correct a bit the shift induced by the exact place where the handled is taken.
         action.moveByOffset((panelSizeDiff + 6) * panelSideInvert, 0);
         action.release();

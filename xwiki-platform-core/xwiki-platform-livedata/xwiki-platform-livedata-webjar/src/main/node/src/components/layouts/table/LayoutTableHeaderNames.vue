@@ -291,6 +291,8 @@ export default {
   border-width: 2px;
   border-radius: 0;
   margin-left: 2px;
+  /* Ensure that the resize handle is above the next column name. */
+  z-index: 1;
 }
 
 .layout-table .draggable-item:focus-within .resize-handle,

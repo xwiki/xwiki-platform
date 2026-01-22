@@ -316,11 +316,17 @@ export default {
 .layout-table .draggable-item .handle {
   opacity: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: baseline;
   white-space: nowrap;
   background: transparent;
   border: 0;
   text-align: left;
+}
+
+.layout-table .draggable-item .property-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .layout-table .sort-icon {
@@ -328,10 +334,6 @@ export default {
   opacity: 0;
   padding-left: var(--table-cell-padding);
   cursor: pointer;
-}
-
-.layout-table .property-name + .sort-icon {
-  vertical-align: baseline;
 }
 
 .layout-table .sort-icon.sorted {

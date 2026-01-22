@@ -440,10 +440,13 @@
       <groupId>jakarta.mail</groupId>
       <artifactId>jakarta.mail-api</artifactId>
     </dependency>
+    <!--
+		FIXME: Angus Mail isconflicting with Sun Mail (javax) so impossible to have both in the same classpath.
+		They both define a META-INF/javamail.default.providers which is unfortunately using the same identifier in javax and jakarta cases.
     <dependency>
       <groupId>org.eclipse.angus</groupId>
       <artifactId>angus-mail</artifactId>
-    </dependency>
+    </dependency>-->
     <!-- javax -->
     <dependency>
       <groupId>com.sun.mail</groupId>

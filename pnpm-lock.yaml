@@ -148,8 +148,8 @@ catalogs:
       specifier: 27.3.0
       version: 27.3.0
     lodash-es:
-      specifier: 4.17.22
-      version: 4.17.22
+      specifier: 4.17.23
+      version: 4.17.23
     lz-string:
       specifier: 1.5.0
       version: 1.5.0
@@ -190,8 +190,8 @@ catalogs:
       specifier: 7.0.1
       version: 7.0.1
     publint:
-      specifier: 0.3.16
-      version: 0.3.16
+      specifier: 0.3.17
+      version: 0.3.17
     react:
       specifier: 19.2.3
       version: 19.2.3
@@ -492,7 +492,7 @@ importers:
         version: 27.3.0
       lodash-es:
         specifier: 'catalog:'
-        version: 4.17.22
+        version: 4.17.23
       npm-run-all2:
         specifier: 'catalog:'
         version: 8.0.4
@@ -558,7 +558,7 @@ importers:
         version: 16.5.0
       publint:
         specifier: 'catalog:'
-        version: 0.3.16
+        version: 0.3.17
       typescript-eslint:
         specifier: 'catalog:'
         version: 8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
@@ -1439,7 +1439,7 @@ importers:
         version: 5.0.1
       lodash-es:
         specifier: 'catalog:'
-        version: 4.17.22
+        version: 4.17.23
       vue-i18n:
         specifier: 'catalog:'
         version: 11.1.12(vue@3.5.26(typescript@5.9.3))
@@ -1536,7 +1536,7 @@ importers:
         version: 25.5.3(typescript@5.9.3)
       lodash-es:
         specifier: 'catalog:'
-        version: 4.17.22
+        version: 4.17.23
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -2278,8 +2278,8 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
-  '@publint/pack@0.1.2':
-    resolution: {integrity: sha512-S+9ANAvUmjutrshV4jZjaiG8XQyuJIZ8a4utWmN/vW1sgQ9IfBnPndwkmQYw53QmouOIytT874u65HEmu6H5jw==}
+  '@publint/pack@0.1.3':
+    resolution: {integrity: sha512-dHDWeutAerz+Z2wFYAce7Y51vd4rbLBfUh0BNnyul4xKoVsPUVJBrOAFsJvtvYBwGFJSqKsxyyHf/7evZ8+Q5Q==}
     engines: {node: '>=18'}
 
   '@remirror/core-constants@3.0.0':
@@ -4341,8 +4341,8 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash-es@4.17.22:
-    resolution: {integrity: sha512-XEawp1t0gxSi9x01glktRZ5HDy0HXqrM0x5pXQM98EaI0NxO6jVM7omDOxsuEo5UIASAnm2bRp1Jt/e0a2XU8Q==}
+  lodash-es@4.17.23:
+    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -4950,8 +4950,8 @@ packages:
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
-  publint@0.3.16:
-    resolution: {integrity: sha512-MFqyfRLAExPVZdTQFwkAQELzA8idyXzROVOytg6nEJ/GEypXBUmMGrVaID8cTuzRS1U5L8yTOdOJtMXgFUJAeA==}
+  publint@0.3.17:
+    resolution: {integrity: sha512-Q3NLegA9XM6usW+dYQRG1g9uEHiYUzcCVBJDJ7yMcWRqVU9LYZUWdqbwMZfmTCFC5PZLQpLAmhvRcQRl3exqkw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -6728,7 +6728,7 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@publint/pack@0.1.2': {}
+  '@publint/pack@0.1.3': {}
 
   '@remirror/core-constants@3.0.0': {}
 
@@ -9054,7 +9054,7 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash-es@4.17.22: {}
+  lodash-es@4.17.23: {}
 
   lodash.merge@4.6.2: {}
 
@@ -9891,9 +9891,9 @@ snapshots:
 
   proxy-from-env@1.1.0: {}
 
-  publint@0.3.16:
+  publint@0.3.17:
     dependencies:
-      '@publint/pack': 0.1.2
+      '@publint/pack': 0.1.3
       package-manager-detector: 1.6.0
       picocolors: 1.1.1
       sade: 1.8.1

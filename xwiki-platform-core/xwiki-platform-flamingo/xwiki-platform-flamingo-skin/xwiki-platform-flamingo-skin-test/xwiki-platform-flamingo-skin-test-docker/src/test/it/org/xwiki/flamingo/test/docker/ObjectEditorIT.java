@@ -39,6 +39,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
@@ -608,5 +609,48 @@ class ObjectEditorIT
         SuggestInputElement.SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
         assertEquals("Admin", author.getLabel());
         assertEquals("XWiki.Admin", author.getValue());
+    }
+
+    @Test
+    @Order(11)
+    void deprecatedObfuscatedProperties(TestUtils testUtils, TestReference testReference)
+    {
+        String testClass = testUtils.serializeLocalReference(testReference);
+        ClassEditPage classEditPage = ClassEditPage.gotoPage(testReference);
+        classEditPage.addProperty("stringTest", "String");
+        ClassPropertyEditPane classPropertyEditPane = classEditPage.addProperty("mypass", "Password");
+        classPropertyEditPane.setMetaProperty("storageType", "Clear");
+        classEditPage.clickSaveAndView();
+
+        ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = objectEditor.addObject(testClass);
+        objectEditPane.setPropertyValue("stringTest", "My value 42");
+        objectEditPane.setPropertyValue("mypass", "foobar");
+        objectEditor.clickSaveAndView();
+
+        objectEditor = ObjectEditPage.gotoPage(testReference);
+        List<ObjectEditPane> objectsOfClass = objectEditor.getObjectsOfClass(testClass, true);
+        assertEquals(1, objectsOfClass.size());
+
+        objectEditPane = objectsOfClass.get(0);
+        assertEquals("My value 42", objectEditPane.getFieldValue(objectEditPane.byPropertyName("stringTest")));
+        assertEquals("********", objectEditPane.getFieldValue(objectEditPane.byPropertyName("mypass")));
+
+        classEditPage = ClassEditPage.gotoPage(testReference);
+        classEditPage.deleteProperty("stringTest");
+        classEditPage.deleteProperty("mypass");
+        classEditPage.clickSaveAndView();
+
+        objectEditor = ObjectEditPage.gotoPage(testReference);
+        objectsOfClass = objectEditor.getObjectsOfClass(testClass, true);
+        assertEquals(1, objectsOfClass.size());
+        objectEditPane = objectsOfClass.get(0);
+
+        assertTrue(objectEditor.isPropertyDeprecated(testClass, "stringTest"));
+        assertTrue(objectEditor.isPropertyDeprecated(testClass, "mypass"));
+
+        assertFalse(objectEditPane.isDeprecatedPropertyObfuscated("stringTest"));
+        assertEquals("My value 42", objectEditPane.getDeprecatedPropertyValue("stringTest"));
+        assertTrue(objectEditPane.isDeprecatedPropertyObfuscated("mypass"));
     }
 }

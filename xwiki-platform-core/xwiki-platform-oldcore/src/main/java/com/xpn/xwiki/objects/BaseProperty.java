@@ -438,4 +438,15 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
         return null;
     }
+
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        PropertyClass propertyClass = getPropertyClass(context);
+        boolean result = false;
+        if (propertyClass != null) {
+            result = propertyClass.isSensitive(context);
+        }
+        return result;
+    }
 }

@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/model/model-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -20,6 +20,13 @@
     }
   },
   "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",

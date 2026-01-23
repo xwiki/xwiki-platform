@@ -36,6 +36,7 @@
     item-key="id"
     @change="reorderProperty"
     tag="tr"
+    handle=".column-name"
   >
     <!-- Entry Select All -->
     <template #header>
@@ -271,6 +272,9 @@ export default {
 .layout-table .column-name {
   display: flex;
   justify-content: space-between;
+  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
+ when the column has been resized to a smaller width that is prevented by some table cell. */
+  min-width: 100%;
 }
 
 .layout-table .draggable-item .resize-handle {
@@ -288,6 +292,8 @@ export default {
   border-width: 2px;
   border-radius: 0;
   margin-left: 2px;
+  /* Ensure that the resize handle is above the next column name. */
+  z-index: 1;
 }
 
 .layout-table .draggable-item:focus-within .resize-handle,
@@ -310,11 +316,17 @@ export default {
 .layout-table .draggable-item .handle {
   opacity: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: baseline;
   white-space: nowrap;
   background: transparent;
   border: 0;
   text-align: left;
+}
+
+.layout-table .draggable-item .property-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .layout-table .sort-icon {
@@ -322,10 +334,6 @@ export default {
   opacity: 0;
   padding-left: var(--table-cell-padding);
   cursor: pointer;
-}
-
-.layout-table .property-name + .sort-icon {
-  vertical-align: baseline;
 }
 
 .layout-table .sort-icon.sorted {

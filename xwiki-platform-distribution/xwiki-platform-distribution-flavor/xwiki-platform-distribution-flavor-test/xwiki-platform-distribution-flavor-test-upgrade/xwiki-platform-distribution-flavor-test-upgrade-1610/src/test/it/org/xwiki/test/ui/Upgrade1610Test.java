@@ -19,6 +19,10 @@
  */
 package org.xwiki.test.ui;
 
+import org.xwiki.rendering.syntax.Syntax;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Execute upgrade tests.
  * 
@@ -26,4 +30,24 @@ package org.xwiki.test.ui;
  */
 public class Upgrade1610Test extends UpgradeTest
 {
+    @Override
+    protected void postUpdateValidate() throws Exception
+    {
+        // Make sure the Solr migration went as planned
+        assertSolrMigration();
+    }
+
+    private void assertSolrMigration() throws Exception
+    {
+        // We expect the default Sandbox home page which id was generated based on the default locale to be removed
+        String result = getUtil().executeWikiPlain("""
+{{velocity}}
+  #if ($services.component.getInstance('org.xwiki.search.solr.internal.api.SolrInstance').get('xwiki:Sandbox.WebHome_en'))true#{else}false#end
+
+  #if ($services.component.getInstance('org.xwiki.search.solr.internal.api.SolrInstance').get('xwiki:Sandbox.WebHome_'))true#{else}false#end
+{{/velocity}}
+            """, Syntax.XWIKI_2_1);
+
+        assertEquals("false\ntrue", result.trim());
+    }
 }

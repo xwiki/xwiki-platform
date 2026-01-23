@@ -47,7 +47,7 @@ catalog:
   "@tiptap/core": 3.13.0
   "@tiptap/extensions": 3.13.0
   "@tiptap/pm": 3.13.0
-  "@tsconfig/node24": 24.0.3
+  "@tsconfig/node24": 24.0.4
   "@types/jsdom": 27.0.0
   "@types/lodash-es": 4.17.12
   "@types/mdast": 4.0.4

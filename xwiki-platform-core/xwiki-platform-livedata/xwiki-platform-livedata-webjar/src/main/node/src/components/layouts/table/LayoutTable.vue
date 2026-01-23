@@ -25,7 +25,8 @@
   It contains a header row containing LivedataFilter componenents for each column.
 -->
 <template>
-  <div class="layout-table">
+  <!-- Make the property count available to CSS, it is used for responsive design. -->
+  <div class="layout-table" :style="{'--livedata-property-count': properties.length}">
 
     <!--
       The layout Topbar
@@ -141,6 +142,9 @@ export default {
     },
     canAddEntry() {
       return this.logic.canAddEntry();
+    },
+    properties() {
+      return this.logic.getPropertyDescriptors();
     },
   },
 

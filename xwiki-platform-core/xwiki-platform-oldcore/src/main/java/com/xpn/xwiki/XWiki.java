@@ -2281,6 +2281,21 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Find the document reference corresponding to the string entity reference based on what exist in the database
+     * (page reference can means two different documents for example).
+     * 
+     * @param reference the reference of the entity as String
+     * @param type the type of the reference
+     * @param context the XWiki context
+     * @return the document reference
+     * @since 18.1.0RC1
+     */
+    public DocumentReference getDocumentReference(String reference, EntityType type, XWikiContext context)
+    {
+        return getDocumentReference(getRelativeEntityReferenceResolver().resolve(reference, type), context);
+    }
+
+    /**
      * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead

@@ -6,11 +6,10 @@
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [
-    "./src/index.ts",
-    "./src/**/*"
+    "src/**/*"
   ],
   "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }

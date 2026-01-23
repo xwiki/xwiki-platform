@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*"
-  }
+  },
+  "files": [
+    "*.json"
+  ]
 }

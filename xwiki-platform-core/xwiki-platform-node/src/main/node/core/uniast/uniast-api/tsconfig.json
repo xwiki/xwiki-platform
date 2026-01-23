@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "emitDeclarationOnly": true,
-    "noEmit": false,
-    "declarationMap": true
+    "outDir": "dist"
   },
-  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.types.json",
   "include": [
-    "./src/index.ts",
-    "./src/**/*"
+    "src/**/*"
   ],
   "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }

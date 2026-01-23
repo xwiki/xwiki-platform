@@ -2,12 +2,17 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "lib": ["dom", "ESNext"],
     "isolatedDeclarations": false,
-    "jsx": "preserve",
-    "types": ["@xwiki/platform-dsapi"],
+    "types": [
+      "@xwiki/platform-dsapi"
+    ]
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
-  "include": ["src"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

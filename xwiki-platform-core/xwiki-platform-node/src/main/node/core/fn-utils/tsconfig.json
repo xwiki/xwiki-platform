@@ -4,6 +4,11 @@
     "outDir": "dist"
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
-  "include": ["./src/index.ts", "./src/**/*"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

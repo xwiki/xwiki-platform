@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "resolveJsonModule": true,
-    "noEmit": false
+    "outDir": "dist"
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

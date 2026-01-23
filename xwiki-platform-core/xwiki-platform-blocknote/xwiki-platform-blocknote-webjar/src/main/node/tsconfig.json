@@ -28,9 +28,18 @@
     "isolatedDeclarations": false,
     "resolveJsonModule": true,
     "strict": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "rootDir": "src",
+    "outDir": "dist"
   },
   "vueCompilerOptions": {
     "strictTemplates": true
-  }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

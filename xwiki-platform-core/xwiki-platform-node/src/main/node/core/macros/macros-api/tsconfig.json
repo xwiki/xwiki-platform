@@ -1,16 +1,14 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "noEmit": false
+    "outDir": "dist"
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [
-    "./src/index.ts",
-    "./src/**/*"
+    "src/**/*"
   ],
   "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }

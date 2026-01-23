@@ -6,10 +6,10 @@
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [
-    "./src/**/*"
+    "src/**/*"
   ],
   "exclude": [
-    "src/**/__tests__",
-    "src/vue.d.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }

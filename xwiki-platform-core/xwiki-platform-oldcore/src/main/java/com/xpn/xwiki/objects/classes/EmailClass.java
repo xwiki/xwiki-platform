@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.xwiki.mail.GeneralMailConfiguration;
+
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Email Field Class allows to create a field for email values. This will allow using a custom displayer assigned to
@@ -60,5 +64,16 @@ public class EmailClass extends StringClass
     {
         super();
         setValidationRegExp(DEFAULT_EMAIL_VALIDATION_REGEXP);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return {@code true} if the {@link GeneralMailConfiguration} requires to obfuscate.
+     */
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        GeneralMailConfiguration generalMailConfiguration = Utils.getComponent(GeneralMailConfiguration.class);
+        return generalMailConfiguration.shouldObfuscate();
     }
 }

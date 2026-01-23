@@ -149,14 +149,16 @@ export default {
 </script>
 
 <style>
+.displayer-actions .actions-container {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.5em;
+}
+
 .displayer-actions .action {
   color: var(--text-muted);
   white-space: nowrap;
   text-transform: capitalize;
-}
-
-.displayer-actions .action + .action {
-  margin-left: 0.5em;
 }
 
 .displayer-actions .action-name {

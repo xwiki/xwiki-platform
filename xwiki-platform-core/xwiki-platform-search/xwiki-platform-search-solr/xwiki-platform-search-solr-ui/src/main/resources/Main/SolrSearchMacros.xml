@@ -194,9 +194,11 @@
     ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
     ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
-    &lt;div class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end" data-name="$facetField.name"&gt;
-      #displaySearchFacetHeader($facetField)
-      #displaySearchFacetBody($facetField)
+    &lt;div class="search-facet" data-name="$facetField.name"&gt;
+    #set ($expanded = ($facetRequestValues || $facetValuesLimit))
+      $expanded
+      #displaySearchFacetHeader($facetField $expanded)
+      #displaySearchFacetBody($facetField $expanded)
     &lt;/div&gt;
   #end
 #end
@@ -213,7 +215,7 @@
   #setVariable("$property" $classDocument.xWikiClass.get($classPropertyReference.name))
 #end
 
-#macro (displaySearchFacetHeader $facetField)
+#macro (displaySearchFacetHeader $facetField $expanded)
   #set ($facetPrettyNameKey = "solr.field.$facetField.name")
   #if ($services.localization.get($facetPrettyNameKey))
     #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
@@ -229,7 +231,11 @@
   #end
   &lt;div class="search-facet-header"&gt;
     &lt;label&gt;$escapetool.xml($facetPrettyName)
-    &lt;button class="btn btn-xs facet-toggle"
+    &lt;button class="btn btn-xs facet-toggle#if(!$expanded) collapsed#end"
+      type="button"
+      data-toggle="collapse"
+      data-target="#$escapetool.xml($facetField.name)-dropdown"
+      aria-expanded="$expanded"
       aria-controls="$escapetool.xml($facetField.name)-dropdown"&gt;
       $services.icon.renderHTML('caret-down')
     &lt;/button&gt;
@@ -237,8 +243,8 @@
   &lt;/div&gt;
 #end
 
-#macro (displaySearchFacetBody $facetField)
-  &lt;div id="$escapetool.xml($facetField.name)-dropdown" class="search-facet-body"&gt;
+#macro (displaySearchFacetBody $facetField $expanded)
+  &lt;div id="$escapetool.xml($facetField.name)-dropdown" class="search-facet-body collapse#if($expanded) in#end"&gt;
     #set ($facetDisplayer = $solrConfig.facetDisplayers.get($facetField.name))
     #if (!$facetDisplayer &amp;&amp; $facetField.name.startsWith('property.'))
       ## Choose a facet displayer based on the property type.

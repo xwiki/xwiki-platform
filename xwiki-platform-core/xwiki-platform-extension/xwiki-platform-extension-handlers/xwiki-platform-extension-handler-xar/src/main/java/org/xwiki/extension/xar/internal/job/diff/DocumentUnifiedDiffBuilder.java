@@ -257,19 +257,7 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     private boolean isPrivateProperty(BaseProperty<?> property)
     {
-        BaseCollection<?> object = property == null ? null : property.getObject();
-        if (object != null) {
-            BaseClass xclass = object.getXClass(this.xcontextProvider.get());
-            if (xclass != null) {
-                PropertyClass propertyClass = (PropertyClass) xclass.get(property.getName());
-                String propertyType = propertyClass == null ? null : propertyClass.getClassType();
-
-                return "Password".equals(propertyType)
-                    || ("Email".equals(propertyType) && this.emailProvider.get().shouldObfuscate());
-            }
-        }
-
-        return false;
+        return property != null && property.isSensitive(this.xcontextProvider.get());
     }
 
     private void addClassPropertyDiffs(BaseClass previousClass, BaseClass nextClass, DocumentUnifiedDiff documentDiff)

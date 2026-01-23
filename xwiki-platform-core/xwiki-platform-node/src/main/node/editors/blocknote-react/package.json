@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/editors/blocknote-react",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -24,6 +24,13 @@
     }
   },
   "main": "./src/index.tsx",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",

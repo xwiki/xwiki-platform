@@ -22,6 +22,7 @@ package org.xwiki.panels.test.ui.docker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,6 +56,12 @@ class PanelIT
     private static final String SPECIAL_CONTENT = "Is # & \\u0163 triky\\\"? c:windows /root $util";
 
     private static final String SPECIAL_TITLE = "Is # & \u0163 triky\"? c:windows /root $util";
+
+    private static final String PANELSIZE_SMALL = "Small";
+    private static final String PANELSIZE_MEDIUM = "Medium";
+    private static final String PANELSIZE_LARGE = "Large";
+    private static final String PANEL_FIELD_WIDTH_RIGHT = "rightPanelsWidth";
+    private static final String PANEL_FIELD_WIDTH_LEFT = "leftPanelsWidth";
 
     @BeforeEach
     void setUp(TestUtils testUtils)
@@ -174,6 +181,113 @@ class PanelIT
         testUtils.deletePage(new DocumentReference("xwiki", "Panels", SPECIAL_TITLE));
     }
 
+    @Test
+    @Order(4)
+    void togglePanels(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.setWikiPreference("rightPanels", "Panels.QuickLinks");
+        testUtils.setWikiPreference("leftPanels", "Panels.Welcome");
+        testUtils.setWikiPreference("showRightPanels", "1");
+        testUtils.setWikiPreference("showLeftPanels", "1");
+        testUtils.gotoPage(testReference);
+        PageWithPanels panelPage = new PageWithPanels();
+        // Check the initial state
+        assertTrue(panelPage.hasLeftPanels());
+        assertTrue(panelPage.hasRightPanels());
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        // Toggle the left panels ON and OFF
+        panelPage.togglePanel(PageWithPanels.Column.LEFT);
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        panelPage.togglePanel(PageWithPanels.Column.LEFT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        // Toggle the right panels OFF and ON
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        // Toggle both panels OFF at once
+        panelPage.togglePanel(PageWithPanels.Column.LEFT);
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        // Reload the page to make sure the preference is kept in the localstorage
+        testUtils.getDriver().navigate().refresh();
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+        panelPage.togglePanel(PageWithPanels.Column.LEFT);
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        testUtils.getDriver().navigate();
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.Column.RIGHT));
+    }
+
+    @Test
+    @Order(5)
+    void resizePanels(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.setWikiPreference("rightPanels", "Panels.QuickLinks");
+        testUtils.setWikiPreference("leftPanels", "Panels.Welcome");
+        testUtils.setWikiPreference("showRightPanels", "1");
+        testUtils.setWikiPreference("showLeftPanels", "1");
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
+        testUtils.gotoPage(testReference);
+        PageWithPanels panelPage = new PageWithPanels();
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Test that the defaults are respected.
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_SMALL);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_SMALL);
+        // Reload the page with the new preferences taken into account.
+        testUtils.gotoPage(testReference);
+        panelPage = new PageWithPanels();
+        assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_LARGE);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_LARGE);
+        // Get back to the test page after updating the preferences.
+        testUtils.gotoPage(testReference);
+        panelPage = new PageWithPanels();
+        assertAlmostEqualSize(300, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(300, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Check how the resize feature works.
+        panelPage.resizePanel(PageWithPanels.Column.LEFT, -30);
+        panelPage.resizePanel(PageWithPanels.Column.RIGHT, 30);
+        assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Check if the user preferences are kept on page reload.
+        testUtils.gotoPage(testReference);
+        panelPage = new PageWithPanels();
+        assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Check if the user preferences are kept on page reload even when defaults have changed.
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
+        testUtils.gotoPage(testReference);
+        panelPage = new PageWithPanels();
+        assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Check that the user preferences are reset when toggling the panel off and on.
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        panelPage.togglePanel(PageWithPanels.Column.RIGHT);
+        assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        // Check that the values are set to default if close enough to the default.
+        // The value does not snap to the default, but when reloading, the default will be applied
+        panelPage.resizePanel(PageWithPanels.Column.LEFT, -60);
+        assertAlmostEqualSize(210, panelPage.getPanelWidth(PageWithPanels.Column.LEFT));
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        testUtils.gotoPage(testReference);
+        panelPage = new PageWithPanels();
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
+    }
+
     private void setRightPanelInAdministration(String panelName)
     {
         AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");
@@ -186,5 +300,11 @@ class PanelIT
             pageLayout.setRightPanels(StringUtils.join(new Object[] { rightPanels, newPanelString }, ','));
         }
         panelsAdminPage.clickSave();
+    }
+
+    private void assertAlmostEqualSize(int expected, int actual)
+    {
+        /* We allow a margin of 2px difference due to small inconsistencies in the driver operations. */
+        assertTrue(Math.abs(expected - actual) <= 2, "Expected " + expected + " but got " + actual);
     }
 }

@@ -24,6 +24,13 @@ import fs from 'fs';
 import {execSync} from 'child_process';
 import path from 'path';
 
+// Allow skipping the npm publication process. This is useful the case where the maven
+// release failed after the npm publication process passed successfully as we want to
+// avoid republishing the npm packages again (it would lead to errors).
+if (process.env.SKIP_NPM_PUBLICATION === "true") {
+  process.exit(0);
+}
+
 /**
  * Script to conditionally publish npm packages based on version type (SNAPSHOT vs release)
  * Step 1: Updates all package.json files with the same timestamp

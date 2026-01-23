@@ -20,6 +20,9 @@
 package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiContext;
 
 public interface PropertyInterface extends ElementInterface
 {
@@ -46,4 +49,17 @@ public interface PropertyInterface extends ElementInterface
     Element toXML();
 
     PropertyInterface clone();
+
+    /**
+     * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
+     * @return {@code false} if the property is never sensitive (default), {@code true} if the property needs to be
+     * obfuscated.
+     * @param context when needed to compute if the property is sensitive or not.
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    default boolean isSensitive(XWikiContext context)
+    {
+        return false;
+    }
 }

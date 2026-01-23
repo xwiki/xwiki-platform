@@ -238,13 +238,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     @Override
     public void unregister(Right right) throws AuthorizationException
     {
-        if (Right.getStandardRights().contains(right)) {
-            throw new AuthorizationException(
-                String.format("Attempt to unregister the static right [%s]", right.getName()));
-        }
-        right.unregister();
-        // cleanup the cache since a new right scheme enter in action
-        securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
+        this.logger.warn("Right unregistration is disabled on purpose as it's creating cache problems right now. In "
+            + "case of a need to debug this call was triggered for right [{}] and stack trace is [{}]",
+            right.getName(), Thread.currentThread().getStackTrace());
     }
 
     /**

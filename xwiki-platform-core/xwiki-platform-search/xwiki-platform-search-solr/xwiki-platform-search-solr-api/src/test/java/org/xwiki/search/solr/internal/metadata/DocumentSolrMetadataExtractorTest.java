@@ -395,6 +395,7 @@ class DocumentSolrMetadataExtractorTest
         BaseProperty<EntityReference> passwordField = mock(BaseProperty.class);
         when(passwordField.getName()).thenReturn("password");
         when(passwordField.getValue()).thenReturn(commentPassword);
+        when(passwordField.isSensitive(this.xcontext)).thenReturn(true);
         commentFields.add(passwordField);
 
         List<String> commentList = Arrays.asList("a", "list");
@@ -506,6 +507,9 @@ class DocumentSolrMetadataExtractorTest
         when(emailField.getName()).thenReturn("email");
         when(emailField.getValue()).thenReturn(email);
         when(emailField.getObject()).thenReturn(userObject);
+        if (obfuscate) {
+            when(emailField.isSensitive(xcontext)).thenReturn(true);
+        }
 
         // Mock the class reference
         DocumentReference userClassRef = new DocumentReference("wiki", "space", "userClass");

@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -59,9 +58,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.ListItem;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -123,9 +120,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
     @Inject
     protected SolrLinkSerializer linkSerializer;
-
-    @Inject
-    protected GeneralMailConfiguration generalMailConfiguration;
 
     private int shortTextLimit = -1;
 
@@ -440,9 +434,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // Boolean properties are stored as integers (0 is false and 1 is true).
             Boolean booleanValue = ((Integer) propertyValue) != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
-        } else if (!(propertyClass instanceof PasswordClass)
-            && !((propertyClass instanceof EmailClass) && this.generalMailConfiguration.shouldObfuscate()))
-        {
+        } else if (!property.isSensitive(xcontextProvider.get())) {
             // Avoid indexing passwords and, when obfuscation is enabled, emails.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
         }

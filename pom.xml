@@ -69,7 +69,7 @@
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.150.2</metaeffekt.version>
+    <metaeffekt.version>0.151.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -121,7 +121,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.8</pgsql.version>
+    <pgsql.version>42.7.9</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.20.0.0</oracle.version>
@@ -1575,7 +1575,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.15.1</version>
+          <version>2.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>

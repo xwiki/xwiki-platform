@@ -111,7 +111,6 @@
                 <resource>
                   <directory>${basedir}/src/main/node/src</directory>
                   <includes>
-                    <include>variables.less</include>
                     <include>reactive.less</include>
                   </includes>
                 </resource>

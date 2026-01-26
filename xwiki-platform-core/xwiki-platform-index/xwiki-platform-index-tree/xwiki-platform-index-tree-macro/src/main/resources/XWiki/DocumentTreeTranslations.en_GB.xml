@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="en_GB">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: rendering.macro.documentTree.name=
+### Missing: rendering.macro.documentTree.description=
+### Missing: rendering.macro.documentTree.parameter.readOnly.name=
+### Missing: rendering.macro.documentTree.parameter.readOnly.description=
+### Missing: rendering.macro.documentTree.parameter.showWikis.name=
+### Missing: rendering.macro.documentTree.parameter.showWikis.description=
+### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.name=
+### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.description=
+### Missing: rendering.macro.documentTree.parameter.showSpaces.name=
+### Missing: rendering.macro.documentTree.parameter.showSpaces.description=
+### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.name=
+### Missing: rendering.macro.documentTree.parameter.showDocumentTitle.description=
+### Missing: rendering.macro.documentTree.parameter.showTranslations.name=
+### Missing: rendering.macro.documentTree.parameter.showTranslations.description=
+### Missing: rendering.macro.documentTree.parameter.showAttachments.name=
+### Missing: rendering.macro.documentTree.parameter.showAttachments.description=
+### Missing: rendering.macro.documentTree.parameter.showObjects.name=
+### Missing: rendering.macro.documentTree.parameter.showObjects.description=
+### Missing: rendering.macro.documentTree.parameter.showClassProperties.name=
+### Missing: rendering.macro.documentTree.parameter.showClassProperties.description=
+### Missing: rendering.macro.documentTree.parameter.root.name=
+### Missing: rendering.macro.documentTree.parameter.root.description=
+### Missing: rendering.macro.documentTree.parameter.showRoot.name=
+### Missing: rendering.macro.documentTree.parameter.showRoot.description=
+### Missing: rendering.macro.documentTree.parameter.compact.name=
+### Missing: rendering.macro.documentTree.parameter.compact.description=
+### Missing: rendering.macro.documentTree.parameter.links.name=
+### Missing: rendering.macro.documentTree.parameter.links.description=
+### Missing: rendering.macro.documentTree.parameter.checkboxes.name=
+### Missing: rendering.macro.documentTree.parameter.checkboxes.description=
+### Missing: rendering.macro.documentTree.parameter.openTo.name=
+### Missing: rendering.macro.documentTree.parameter.openTo.description=
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.name=
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.description=
+### Missing: rendering.macro.documentTree.parameter.filterByClass.name=
+### Missing: rendering.macro.documentTree.parameter.filterByClass.description=
+### Missing: rendering.macro.documentTree.parameter.finder.name=
+### Missing: rendering.macro.documentTree.parameter.finder.description=
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.name=
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.description=
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=
+### Missing: rendering.macro.documentTree.parameter.limit.name=
+### Missing: rendering.macro.documentTree.parameter.limit.description=
+### Missing: rendering.macro.documentTree.parameter.exclusions.name=
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=
+### Missing: index.documentTree.empty=
+### Missing: index.documentTree.more=
+
+## Deprecated translation keys
+
+## Until 7.2M2
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=
+</content>
+</xwikidoc>

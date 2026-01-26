@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="en_GB">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+### Missing: tour.app.name=
+
+# Class fields
+### Missing: TourCode.TourClass_description=
+### Missing: TourCode.TourClass_isActive=
+### Missing: TourCode.TourClass_targetPage=
+
+# Live table generic keys
+### Missing: tour.livetable.doc.title=
+### Missing: tour.livetable._actions=
+### Missing: tour.livetable._actions.edit=
+### Missing: tour.livetable._actions.delete=
+### Missing: tour.livetable._actions.launch=
+### Missing: tour.livetable.emptyvalue=
+
+# Live table specific keys
+### Missing: tour.livetable.description=
+### Missing: tour.livetable.isActive=
+### Missing: tour.livetable.targetPage=
+### Missing: tour.livetable.targetClass=
+
+# Tour popover
+### Missing: tour.popover.previous=
+### Missing: tour.popover.next=
+### Missing: tour.popover.end=
+### Missing: tour.popover.quit=
+### Missing: tour.popover.show=
+### Missing: tour.popover.show.hint=
+
+# Steps
+### Missing: TourCode.StepClass_order=
+### Missing: TourCode.StepClass_element=
+### Missing: TourCode.StepClass_title=
+### Missing: TourCode.StepClass_content=
+### Missing: TourCode.StepClass_backdrop=
+### Missing: TourCode.StepClass_placement=
+### Missing: TourCode.StepClass_targetPage=
+### Missing: TourCode.StepClass_action=
+### Missing: TourCode.StepClass_queryString=
+### Missing: tour.steps=
+### Missing: tour.steps.new_step=
+### Missing: tour.steps.add_step=
+### Missing: tour.steps.edit_step=
+### Missing: tour.steps.save_step=
+### Missing: tour.steps.delete_confirm=
+### Missing: tour.steps.delete_done=
+### Missing: tour.steps.deleting=
+### Missing: tour.steps.yes=
+### Missing: tour.steps.no=
+### Missing: tour.steps.edit=
+### Missing: tour.steps.delete=
+
+# Upgrade
+### Missing: tour.upgrade.title=
+### Missing: tour.upgrade.successList=
+### Missing: tour.upgrade.successNothing=
+
+# Template
+### Missing: tour.template.name=
+### Missing: tour.template.description=
+</content>
+</xwikidoc>

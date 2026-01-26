@@ -47,5 +47,5 @@ export const FilePanel: React.FC<FilePanelProps> = ({
     );
   }
 
-  return <>Assertion failed: unkown block type: {block.type}</>;
+  throw new Error(`Assertion failed: unkown block type: ${block.type}`);
 };

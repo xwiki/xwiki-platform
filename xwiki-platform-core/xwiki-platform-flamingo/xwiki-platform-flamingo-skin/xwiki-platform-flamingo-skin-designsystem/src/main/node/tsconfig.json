@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "extends": "../../../xwiki-platform-node/src/main/node/tsconfig",
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "*.config.*"
+  ]
+}

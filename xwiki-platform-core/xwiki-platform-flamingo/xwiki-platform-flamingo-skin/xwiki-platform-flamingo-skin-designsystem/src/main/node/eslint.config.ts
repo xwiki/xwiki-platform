@@ -1,0 +1,1 @@
+export * from "../../../../../../xwiki-platform-node/src/main/node/eslint.config"

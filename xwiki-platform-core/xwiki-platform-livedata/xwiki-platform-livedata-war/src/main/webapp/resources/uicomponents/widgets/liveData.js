@@ -27,8 +27,6 @@
     'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js')
   },
   'css': {
-    'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'xwiki-platform-livedata.css'),
     'liveDataLessVariables': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'variables.less', {'evaluate': true}),
     'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
@@ -107,7 +105,6 @@
   });
 
   loadModule(paths.module["xwiki-livedata"]);
-  loadCSS(paths.css.liveData);
   // Load a small less file with the declarations of a few LESS values that are not exported
   // elsewhere
   loadCSS(paths.css.liveDataLessVariables);

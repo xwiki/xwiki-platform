@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { componentStore } from "xwiki-livedata";
+import { componentStore } from "@xwiki/platform-livedata-ui";
 
 /**
  * Register the custom displayer used for the notification Live Data.
  */
-(function initNotificationDisplayers() {
+export function initNotificationDisplayers() {
   componentStore.register("displayer", "scope", async () => {
     return (await import("./components/DisplayerScope.vue")).default;
   });
@@ -34,4 +34,4 @@ import { componentStore } from "xwiki-livedata";
   componentStore.register("displayer", "toggle", async () => {
     return (await import("./components/DisplayerToggle.vue")).default;
   });
-})();
+};

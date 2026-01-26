@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "xwiki-platform-livedata-node-ui",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@xwiki/platform-livedata-ui": "workspace:*"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "catalog:"
+  }
+}

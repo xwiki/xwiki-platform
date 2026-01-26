@@ -39,13 +39,19 @@
     <xwiki.minification.skip>true</xwiki.minification.skip>
     <xwiki.extension.javascript.modules.importmap>
     {
-      "xwiki-livedata": "org.xwiki.platform:xwiki-platform-livedata-webjar/main.es.js",
+      "@xwiki/platform-livedata-ui": "org.xwiki.platform:xwiki-platform-livedata-node-ui/index.es.js",
       "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
       "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
     }
     </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
+    <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>

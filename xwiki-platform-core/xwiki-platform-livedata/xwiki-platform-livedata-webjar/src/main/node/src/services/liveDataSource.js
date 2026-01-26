@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { loadById } from "@/services/require.js";
+import { loadById } from "@xwiki/platform-livedata-ui";
 
 function init($) {
   let baseURL = `${XWiki.contextPath}/rest/liveData/sources/`;

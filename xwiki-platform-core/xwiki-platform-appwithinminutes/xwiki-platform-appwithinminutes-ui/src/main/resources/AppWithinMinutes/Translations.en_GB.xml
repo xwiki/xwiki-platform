@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-### Missing: platform.appwithinminutes.homePageTitle=
+platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.description=
 ### Missing: platform.appwithinminutes.createAppButtonLabel=
 ### Missing: platform.appwithinminutes.appsLiveTableHeading=

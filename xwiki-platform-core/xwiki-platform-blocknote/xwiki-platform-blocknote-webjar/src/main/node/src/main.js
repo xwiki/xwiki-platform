@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -22,41 +22,52 @@ import "./services/inplace";
 
 const factory = new Factory();
 
+// eslint-disable-next-line no-undef
 define("xwiki-blocknote", [], () => factory);
 
 function init(event, data) {
   const containers = data?.elements || [document];
   containers
-    .flatMap((container) => [...container.querySelectorAll(".xwiki-blocknote-wrapper")])
+    .flatMap((container) => [
+      ...container.querySelectorAll(".xwiki-blocknote-wrapper"),
+    ])
     .forEach((host) => factory.create(host));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 require(["jquery", "xwiki-events-bridge"], ($) => {
-  $(document).on("xwiki:actions:beforePreview xwiki:actions:beforeSave", async (event) => {
-    // Make sure that all BlockNote instances update their data before the form is submitted.
-    const dataAsynchronousSerializationKey = 'xwiki-blocknote-asynchronous-serialization';
-    const target = $(event.target);
-    const firstEvent = target.data(dataAsynchronousSerializationKey) !== 'true';
-    // On the first click, prevent the event, let the editors serialize their content asynchronously, then resubmit.
-    // The second programmatically triggered click will just remove the data marker and pass through to let the content
-    // be saved.
-    if (firstEvent) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      target.data(dataAsynchronousSerializationKey, 'true');
-      target.prop('disabled', true);
-      try {
-        await Promise.all(factory.getAll().map((blockNote) => blockNote.data()));
-      } finally {
-        target.prop('disabled', false);
+  $(document).on(
+    "xwiki:actions:beforePreview xwiki:actions:beforeSave",
+    // eslint-disable-next-line max-statements
+    async (event) => {
+      // Make sure that all BlockNote instances update their data before the form is submitted.
+      const dataAsynchronousSerializationKey =
+        "xwiki-blocknote-asynchronous-serialization";
+      const target = $(event.target);
+      const firstEvent =
+        target.data(dataAsynchronousSerializationKey) !== "true";
+      // On the first click, prevent the event, let the editors serialize their content asynchronously, then resubmit.
+      // The second programmatically triggered click will just remove the data marker and pass through to let the content
+      // be saved.
+      if (firstEvent) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        target.data(dataAsynchronousSerializationKey, "true");
+        target.prop("disabled", true);
+        try {
+          await Promise.all(
+            factory.getAll().map((blockNote) => blockNote.data()),
+          );
+        } finally {
+          target.prop("disabled", false);
+        }
+        event.target.click();
+      } else {
+        // Clear the data to let the user click again on save?
+        target.removeData(dataAsynchronousSerializationKey);
       }
-      event.target.click();
-    } else {
-      // Clear the data to let the user click again on save?
-      target.removeData(dataAsynchronousSerializationKey)
-    }
-  });
+    },
+  );
 
   $(document).on("xwiki:dom:updated", init);
   $(init);

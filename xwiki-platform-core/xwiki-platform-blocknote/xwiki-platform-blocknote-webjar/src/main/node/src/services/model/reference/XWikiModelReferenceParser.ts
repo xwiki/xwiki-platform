@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,10 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityReference, EntityType } from "@xwiki/platform-model-api";
-import { ModelReferenceParser, ModelReferenceParserOptions } from "@xwiki/platform-model-reference-api";
-import { Container, injectable } from "inversify";
 import { toCristalEntityReference } from "./XWikiEntityReference";
+import { EntityReference, EntityType } from "@xwiki/platform-model-api";
+import {
+  ModelReferenceParser,
+  ModelReferenceParserOptions,
+} from "@xwiki/platform-model-reference-api";
+import { Container, injectable } from "inversify";
 
 type ResourceReference = {
   type: string;
@@ -48,12 +51,23 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
   ];
 
   public static bind(container: Container): void {
-    container.bind("ModelReferenceParser").to(XWikiModelReferenceParser).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("ModelReferenceParser")
+      .to(XWikiModelReferenceParser)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
-  public parse(reference: string, options?: ModelReferenceParserOptions): EntityReference {
-    const defaultType = options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
-    const resourceReference = this.parseResourceReference(reference, defaultType);
+  public parse(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): EntityReference {
+    const defaultType =
+      options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
+    const resourceReference = this.parseResourceReference(
+      reference,
+      defaultType,
+    );
     const entityType = this.getEntityType(resourceReference);
     if (entityType) {
       return this.parseEntityReference(resourceReference.reference, entityType);
@@ -62,14 +76,17 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     }
   }
 
-    public async parseAsync(
-        reference: string,
-        options?: ModelReferenceParserOptions,
-    ): Promise<EntityReference> {
-      return this.parse(reference, options)
-    }
+  public async parseAsync(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): Promise<EntityReference> {
+    return this.parse(reference, options);
+  }
 
-  private parseResourceReference(reference: string, defaultType: string): ResourceReference {
+  private parseResourceReference(
+    reference: string,
+    defaultType: string,
+  ): ResourceReference {
     const parts = reference.split(":");
     if (parts.length > 1) {
       const type = parts[0];
@@ -92,7 +109,9 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     };
   }
 
-  private getEntityType(resourceReference: ResourceReference): number | undefined {
+  private getEntityType(
+    resourceReference: ResourceReference,
+  ): number | undefined {
     switch (resourceReference.type) {
       case "space":
         return XWiki.EntityType.SPACE;
@@ -105,7 +124,10 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     }
   }
 
-  private parseEntityReference(reference: string, type: number): EntityReference {
+  private parseEntityReference(
+    reference: string,
+    type: number,
+  ): EntityReference {
     return toCristalEntityReference(XWiki.Model.resolve(reference, type))!;
   }
 }

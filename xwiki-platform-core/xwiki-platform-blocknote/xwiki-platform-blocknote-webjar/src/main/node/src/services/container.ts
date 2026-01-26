@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,9 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DefaultLogger } from "@xwiki/platform-api";
-import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
-import { Container, injectable } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
@@ -39,8 +36,11 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
-import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/platform-uniast-markdown"
-import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service"
+import { DefaultLogger } from "@xwiki/platform-api";
+import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
+import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/platform-uniast-markdown";
+import { Container, injectable } from "inversify";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -80,16 +80,16 @@ new MacroServiceComponentList(container);
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
 @injectable()
 class MinimalApp {
-    getContainer() {
-        return container;
-    }
-    getWikiConfig() {
-        return {
-            getType: () => "XWiki"
-        }
-    }
+  getContainer() {
+    return container;
+  }
+  getWikiConfig() {
+    return {
+      getType: () => "XWiki",
+    };
+  }
 }
 
-container.bind("CristalApp").to(MinimalApp).inSingletonScope()
+container.bind("CristalApp").to(MinimalApp).inSingletonScope();
 
 export { container };

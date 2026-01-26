@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,14 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentsData, Document, PageAttachment, PageData, type Logger } from "@xwiki/platform-api";
+import { AttachmentsData, PageAttachment, PageData } from "@xwiki/platform-api";
 import { AbstractStorage } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable } from "inversify";
+import type { Logger } from "@xwiki/platform-api";
 
 @injectable("Singleton")
 export class XWikiStorage extends AbstractStorage {
   public static override bind(container: Container): void {
-    container.bind("Storage").to(XWikiStorage).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("Storage")
+      .to(XWikiStorage)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   constructor(@inject("Logger") logger: Logger) {
@@ -35,26 +40,22 @@ export class XWikiStorage extends AbstractStorage {
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getPageRestURL(page: string, syntax: string, revision?: string): string {
+  public getPageRestURL(): string {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getPageFromViewURL(url: string): string | null {
+  public getPageFromViewURL(): string | null {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getImageURL(page: string, image: string): string {
+  public getImageURL(): string {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getPageContent(page: string, syntax: string, revision?: string): Promise<PageData | undefined> {
+  public async getPageContent(): Promise<PageData | undefined> {
     // TODO
     throw new Error("Method not implemented.");
   }
@@ -65,32 +66,35 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  public async getAttachment(page: string, name: string): Promise<PageAttachment | undefined> {
+  public async getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined> {
     const attachments = await this.getAttachments(page);
     if (attachments) {
       return attachments.attachments.filter((a) => a.reference == name)[0];
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getPanelContent(panel: string, contextPage: string): Promise<PageData> {
+  public async getPanelContent(): Promise<PageData> {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getEditField(document: Document, fieldName: string): Promise<string> {
+  public async getEditField(): Promise<string> {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async save(page: string, title: string, content: string): Promise<unknown> {
+  public async save(): Promise<unknown> {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  public async saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | string)[]> {
+  public async saveAttachments(
+    page: string,
+    files: File[],
+  ): Promise<undefined | (undefined | string)[]> {
     await Promise.all(files.map((file) => this.saveAttachment(page, file)));
     return undefined;
   }
@@ -101,8 +105,7 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async delete(page: string): Promise<{ success: boolean; error?: string }> {
+  public async delete(): Promise<{ success: boolean; error?: string }> {
     // TODO
     throw new Error("Method not implemented.");
   }

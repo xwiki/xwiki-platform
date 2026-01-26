@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-macros-service",
+  "name": "@xwiki/platform-tool-eslintconfig",
   "version": "18.1.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-eslintconfig",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -28,29 +28,27 @@
     "!src/**/__tests__"
   ],
   "scripts": {
-    "api-extractor:ci": "api-extractor run",
-    "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "test": "vitest --run",
-    "typecheck": "tsc"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-macros-api": "workspace:*"
-  },
-  "peerDependencies": {
-    "inversify": "7.x"
+    "@eslint/config-helpers": "catalog:",
+    "@eslint/js": "catalog:",
+    "eslint-import-resolver-typescript": "catalog:",
+    "eslint-plugin-headers": "catalog:",
+    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "eslint-plugin-promise": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vue-eslint-parser": "catalog:"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "catalog:",
-    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
-    "inversify": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest-mock-extended": "catalog:"
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

@@ -13,25 +13,14 @@
     "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
-    "@eslint/config-helpers": "catalog:",
-    "@eslint/js": "catalog:",
     "@microsoft/api-extractor": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
-    "eslint": "catalog:",
-    "eslint-import-resolver-typescript": "catalog:",
-    "eslint-plugin-headers": "catalog:",
-    "eslint-plugin-import": "catalog:",
-    "eslint-plugin-prettier": "catalog:",
-    "eslint-plugin-promise": "catalog:",
-    "eslint-plugin-tsdoc": "catalog:",
-    "eslint-plugin-vue": "catalog:",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "globals": "catalog:",
     "publint": "catalog:",
-    "typescript-eslint": "catalog:",
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",
     "vite-plugin-dts": "catalog:",
-    "vitest": "catalog:",
-    "vue-eslint-parser": "catalog:"
+    "vitest": "catalog:"
   }
 }

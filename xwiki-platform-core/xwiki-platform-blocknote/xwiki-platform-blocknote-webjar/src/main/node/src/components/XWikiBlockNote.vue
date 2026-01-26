@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
   <div class="xwiki-blocknote">
@@ -31,21 +31,56 @@
         @debounced-change="updateValue"
       ></BlocknoteEditor>
     </suspense>
-    <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />
-    <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
-    <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
-    <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
+    <input
+      v-if="name"
+      ref="valueInput"
+      type="hidden"
+      :name
+      :value
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      name="RequiresConversion"
+      :value="name"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_inputSyntax'"
+      :value="inputSyntax"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_outputSyntax'"
+      :value="outputSyntax"
+      :form
+      :disabled
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { Container } from "inversify";
 import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import {
+  markdownToUniAstConverterName,
+  uniAstToMarkdownConverterName,
+} from "@xwiki/platform-uniast-markdown";
+import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
-import type { MarkdownToUniAstConverter, UniAstToMarkdownConverter } from "@xwiki/platform-uniast-markdown";
-import { markdownToUniAstConverterName, uniAstToMarkdownConverterName } from "@xwiki/platform-uniast-markdown";
 import type { UniAst } from "@xwiki/platform-uniast-api";
+import type {
+  MarkdownToUniAstConverter,
+  UniAstToMarkdownConverter,
+} from "@xwiki/platform-uniast-markdown";
 
 //
 // Injected
@@ -89,19 +124,21 @@ const value = ref(initialValue);
 const dirty = ref(false);
 
 const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
-    markdownToUniAstConverterName,
+  markdownToUniAstConverterName,
 );
 const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
-    uniAstToMarkdownConverterName,
+  uniAstToMarkdownConverterName,
 );
 
 const editorContent = ref();
 
 onBeforeMount(async () => {
   editorContent.value = await markdownToUniAst.parseMarkdown(initialValue);
-})
+});
 
-const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]>({
+const editorProps = shallowRef<
+  InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
+>({
   blockNoteOptions: {
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
     // consistency between edit and view modes.
@@ -115,11 +152,13 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
 // Computed
 //
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
-const editorInstance = useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
+const editorInstance =
+  useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
 
 //
 // Methods
 //
+// eslint-disable-next-line max-statements
 async function updateValue(editorContent?: UniAst | Error): Promise<string> {
   if (!dirty.value) {
     // The value is already up-to-date.

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -22,7 +22,11 @@ import { I18n } from "vue-i18n";
 declare global {
   // RequireJS API.
   const define: (moduleName: string, moduleDefinition: unknown) => void;
-  const requirejs: (modules: string[], onLoad: (...args: unknown[]) => void, onError?: (error: Error) => void) => void;
+  const requirejs: (
+    modules: string[],
+    onLoad: (...args: unknown[]) => void,
+    onError?: (error: Error) => void,
+  ) => void;
 }
 
 type Config = {
@@ -44,11 +48,17 @@ async function fetchTranslation(): Promise<Translation> {
   });
   const translation = await new Promise<Translation>((resolve, reject) => {
     requirejs(
-      ["xwiki-blocknote-translation-keys", "xwiki-l10n!xwiki-blocknote-translation-keys"],
+      [
+        "xwiki-blocknote-translation-keys",
+        "xwiki-l10n!xwiki-blocknote-translation-keys",
+      ],
       (config, messages) => {
-        resolve({ config: config as Config, messages: messages as Record<string, string> });
+        resolve({
+          config: config as Config,
+          messages: messages as Record<string, string>,
+        });
       },
-      reject
+      reject,
     );
   });
   // Add back the prefix to the keys.
@@ -64,7 +74,10 @@ async function fetchTranslation(): Promise<Translation> {
 export async function i18nResolver(i18n: I18n): Promise<I18n> {
   try {
     const translation = await fetchTranslation();
-    i18n.global.setLocaleMessage(translation.config.locale, translation.messages);
+    i18n.global.setLocaleMessage(
+      translation.config.locale,
+      translation.messages,
+    );
   } catch (error) {
     console.error("Failed to load translations: ", error);
   }

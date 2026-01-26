@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,9 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // The Inplace edit mode is looking for a RequireJS module named "xwiki-<editorId>-inline".
-define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote", "css!xwiki-blocknote"], function ($, BlockNote) {
+// eslint-disable-next-line no-undef
+define("xwiki-blocknote-inline", [
+  "jquery",
+  "xwiki-blocknote",
+  "css!xwiki-blocknote",
+], function ($, BlockNote) {
   $(document).on("xwiki:actions:edit", function (event, config) {
-    if (config && config.contentType === "org.xwiki.rendering.syntax.SyntaxContent" && config.editMode === "wysiwyg") {
+    if (
+      config &&
+      config.contentType === "org.xwiki.rendering.syntax.SyntaxContent" &&
+      config.editMode === "wysiwyg"
+    ) {
       createEditor(event.target, config);
     }
   });
@@ -34,15 +43,24 @@ define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote", "css!xwiki-blockn
       inputSyntax: `${BlockNote.syntax.type}/${BlockNote.syntax.version}`,
       outputSyntax: config.document.syntax,
       startupFocus: config.startupFocus,
-      sourceDocumentReference: XWiki.Model.serialize(config.document.documentReference),
+      // eslint-disable-next-line no-undef
+      sourceDocumentReference: XWiki.Model.serialize(
+        config.document.documentReference,
+      ),
     });
     const blockNote = await BlockNote.create(container);
 
     const beforeSubmitHandler = beforeSubmit.bind(null, blockNote, config);
-    $(document).on("xwiki:actions:beforeSave xwiki:actions:beforePreview", beforeSubmitHandler);
+    $(document).on(
+      "xwiki:actions:beforeSave xwiki:actions:beforePreview",
+      beforeSubmitHandler,
+    );
 
     $(document).one("xwiki:actions:view", () => {
-      $(document).off("xwiki:actions:beforeSave xwiki:actions:beforePreview", beforeSubmitHandler);
+      $(document).off(
+        "xwiki:actions:beforeSave xwiki:actions:beforePreview",
+        beforeSubmitHandler,
+      );
       BlockNote.destroy(container);
       container.classList.remove("xwiki-blocknote-wrapper");
       container.removeAttribute("data-config");

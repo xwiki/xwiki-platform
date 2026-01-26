@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,13 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { RemoteURLParser, RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
+import {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
 export class DefaultRemoteURLParserProvider implements RemoteURLParserProvider {
   public static bind(container: Container): void {
-    container.bind("RemoteURLParserProvider").to(DefaultRemoteURLParserProvider).inSingletonScope();
+    container
+      .bind("RemoteURLParserProvider")
+      .to(DefaultRemoteURLParserProvider)
+      .inSingletonScope();
   }
 
   constructor(@inject("Container") private readonly container: Container) {}

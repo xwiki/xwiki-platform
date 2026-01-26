@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,19 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { DesignSystemLoader, SkinManager } from "@xwiki/platform-api";
 import { Container, injectable } from "inversify";
 import { App, Component } from "vue";
+import type { DesignSystemLoader, SkinManager } from "@xwiki/platform-api";
 
 @injectable("Singleton")
 export class DefaultSkinManager implements SkinManager {
   public static readonly DEFAULT_DESIGN_SYSTEM = "xwiki";
 
   private designSystem: string = DefaultSkinManager.DEFAULT_DESIGN_SYSTEM;
-  private readonly templates: Map<string, Component> = new Map<string, Component>();
+  private readonly templates: Map<string, Component> = new Map<
+    string,
+    Component
+  >();
 
   public static bind(container: Container): void {
-    container.bind<SkinManager>("SkinManager").to(DefaultSkinManager).inSingletonScope();
+    container
+      .bind<SkinManager>("SkinManager")
+      .to(DefaultSkinManager)
+      .inSingletonScope();
   }
 
   constructor() {}
@@ -51,15 +57,24 @@ export class DefaultSkinManager implements SkinManager {
     let designSystemLoader: DesignSystemLoader | null = null;
 
     try {
-      designSystemLoader = container.get<DesignSystemLoader>("DesignSystemLoader", { name: this.designSystem });
+      designSystemLoader = container.get<DesignSystemLoader>(
+        "DesignSystemLoader",
+        { name: this.designSystem },
+      );
     } catch {
-      console.error("Exception while loading design system ", this.designSystem);
+      console.error(
+        "Exception while loading design system ",
+        this.designSystem,
+      );
 
       if (this.designSystem !== DefaultSkinManager.DEFAULT_DESIGN_SYSTEM) {
         // Fallback to the default design system.
-        designSystemLoader = container.get<DesignSystemLoader>("DesignSystemLoader", {
-          name: DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
-        });
+        designSystemLoader = container.get<DesignSystemLoader>(
+          "DesignSystemLoader",
+          {
+            name: DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
+          },
+        );
       }
     }
 

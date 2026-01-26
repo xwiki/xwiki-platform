@@ -1,0 +1,345 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="CKEditor.Translations" locale="en_GB">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: CKEditor.ConfigClass_removePlugins=
+### Missing: CKEditor.ConfigClass_removePlugins.hint=
+### Missing: CKEditor.ConfigClass_removeButtons=
+### Missing: CKEditor.ConfigClass_removeButtons.hint=
+### Missing: CKEditor.ConfigClass_linkShowAdvancedTab=
+### Missing: CKEditor.ConfigClass_linkShowAdvancedTab.hint=
+### Missing: CKEditor.ConfigClass_linkShowTargetTab=
+### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=
+### Missing: CKEditor.ConfigClass_advanced=
+### Missing: CKEditor.ConfigClass_advanced.hint=
+### Missing: ckeditor.content.placeholder=
+### Missing: ckeditor.admin.saveComment=
+### Missing: ckeditor.admin.reset=
+### Missing: ckeditor.admin.reset.hint=
+### Missing: ckeditor.admin.reset.confirmation=
+### Missing: ckeditor.plugin.link.options=
+### Missing: ckeditor.plugin.link.anchor=
+### Missing: ckeditor.plugin.link.queryString=
+### Missing: ckeditor.plugin.link.defaultLabel=
+### Missing: ckeditor.plugin.link.openInNewTab=
+### Missing: ckeditor.plugin.link.upload=
+### Missing: ckeditor.plugin.link.uploadHint=
+### Missing: ckeditor.plugin.list.listType.none=
+### Missing: ckeditor.plugin.macro.placeholder=
+### Missing: ckeditor.plugin.macro.buttonHint=
+### Missing: ckeditor.plugin.macro.editButtonHint=
+### Missing: ckeditor.plugin.macro.refreshFailed=
+### Missing: ckeditor.plugin.macro.dedicatedInsertButtonHint=
+### Missing: ckeditor.plugin.macro.installPending=
+### Missing: ckeditor.plugin.macro.installSuccessful=
+### Missing: ckeditor.plugin.macro.installFailed=
+### Missing: ckeditor.plugin.office.importer.title=
+### Missing: ckeditor.plugin.office.importer.filePath=
+### Missing: ckeditor.plugin.office.importer.filePath.hint=
+### Missing: ckeditor.plugin.office.importer.filterStyles=
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer=
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=
+### Missing: ckeditor.plugin.office.importer.required=
+### Missing: ckeditor.plugin.office.importer.import=
+### Missing: ckeditor.plugin.office.importer.inProgress=
+### Missing: ckeditor.plugin.office.importer.done=
+### Missing: ckeditor.plugin.office.importer.fail=
+### Missing: ckeditor.plugin.office.importer.noUploadURL=
+### Missing: ckeditor.plugin.office.importer.failedToLoadForm=
+### Missing: ckeditor.plugin.resource.notSpecified=
+### Missing: ckeditor.plugin.resource.selectValue=
+### Missing: ckeditor.plugin.save.leaveConfirmationMessage=
+### Missing: ckeditor.plugin.save.failed=
+### Missing: ckeditor.plugin.source.conversionFailed=
+### Missing: ckeditor.plugin.selection.restoring=
+### Missing: ckeditor.plugin.toolbar.basicStyles=
+### Missing: ckeditor.plugin.toolbar.lists=
+### Missing: ckeditor.plugin.toolbar.bulletedlist=
+### Missing: ckeditor.plugin.toolbar.numberedlist=
+### Missing: ckeditor.plugin.toolbar.insert=
+### Missing: ckeditor.plugin.toolbar.horizontalrule=
+### Missing: ckeditor.plugin.toolbar.specialchar=
+### Missing: ckeditor.plugin.toolbar.infoBox=
+### Missing: ckeditor.plugin.toolbar.successBox=
+### Missing: ckeditor.plugin.toolbar.warningBox=
+### Missing: ckeditor.plugin.toolbar.errorBox=
+### Missing: ckeditor.plugin.toolbar.toc=
+### Missing: ckeditor.plugin.toolbar.include=
+### Missing: ckeditor.plugin.toolbar.code=
+### Missing: ckeditor.plugin.toolbar.otherMacros=
+### Missing: ckeditor.plugin.syntax.update.inProgress=
+### Missing: ckeditor.plugin.syntax.update.done=
+### Missing: ckeditor.plugin.syntax.update.failed=
+### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=
+### Missing: ckeditor.plugin.icon.iconsFetchFailed=
+### Missing: ckeditor.plugin.icon.iconThemesFetchFailed=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.title=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.title=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.alt.label=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.alt.hint=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.caption.label=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.caption.hint=
+### Missing: ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.size.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.size.hint=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.border.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.border.hint=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=
+### Missing: ckeditor.plugin.image.imageSelector.treeTab.title=
+### Missing: ckeditor.plugin.image.imageSelector.uploadTab.title=
+### Missing: ckeditor.plugin.image.imageSelector.uploadTab.file.title=
+### Missing: ckeditor.plugin.image.imageSelector.uploadTab.file.hint=
+### Missing: ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.title=
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.icon.title=
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.icon.hint=
+### Missing: ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.title=
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.title=
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.hint=
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=
+### Missing: ckeditor.plugin.image.slash.currentPageBadge=
+### Missing: ckeditor.plugin.image.slash.externalBadge=
+### Missing: ckeditor.plugin.image.slash.loading=
+### Missing: ckeditor.plugin.image.slash.upload=
+### Missing: ckeditor.plugin.slash.group.Layout=
+### Missing: ckeditor.plugin.slash.group.Content=
+### Missing: ckeditor.plugin.slash.group.Formatting=
+### Missing: ckeditor.plugin.slash.group.Navigation=
+### Missing: ckeditor.plugin.slash.group.Actions=
+### Missing: ckeditor.plugin.slash.group.Table=
+### Missing: ckeditor.plugin.slash.group.Macro=
+### Missing: ckeditor.plugin.slash.action.h1.hint=
+### Missing: ckeditor.plugin.slash.action.h2.hint=
+### Missing: ckeditor.plugin.slash.action.h3.hint=
+### Missing: ckeditor.plugin.slash.action.h4.hint=
+### Missing: ckeditor.plugin.slash.action.h5.hint=
+### Missing: ckeditor.plugin.slash.action.h6.hint=
+### Missing: ckeditor.plugin.slash.action.p.name=
+### Missing: ckeditor.plugin.slash.action.p.hint=
+### Missing: ckeditor.plugin.slash.action.ul.hint=
+### Missing: ckeditor.plugin.slash.action.ol.hint=
+### Missing: ckeditor.plugin.slash.action.table.hint=
+### Missing: ckeditor.plugin.slash.action.blockquote.name=
+### Missing: ckeditor.plugin.slash.action.blockquote.hint=
+### Missing: ckeditor.plugin.slash.action.info.hint=
+### Missing: ckeditor.plugin.slash.action.info.defaultContent=
+### Missing: ckeditor.plugin.slash.action.success.hint=
+### Missing: ckeditor.plugin.slash.action.success.defaultContent=
+### Missing: ckeditor.plugin.slash.action.warning.hint=
+### Missing: ckeditor.plugin.slash.action.warning.defaultContent=
+### Missing: ckeditor.plugin.slash.action.error.hint=
+### Missing: ckeditor.plugin.slash.action.error.defaultContent=
+### Missing: ckeditor.plugin.slash.action.hr.hint=
+### Missing: ckeditor.plugin.slash.action.a.hint=
+### Missing: ckeditor.plugin.slash.action.img.hint=
+### Missing: ckeditor.plugin.slash.action.icon.name=
+### Missing: ckeditor.plugin.slash.action.icon.hint=
+### Missing: ckeditor.plugin.slash.action.mention.name=
+### Missing: ckeditor.plugin.slash.action.mention.hint=
+### Missing: ckeditor.plugin.slash.action.emoji.name=
+### Missing: ckeditor.plugin.slash.action.emoji.hint=
+### Missing: ckeditor.plugin.slash.action.code.hint=
+### Missing: ckeditor.plugin.slash.action.toc.hint=
+### Missing: ckeditor.plugin.slash.action.include.hint=
+### Missing: ckeditor.plugin.slash.action.macros.name=
+### Missing: ckeditor.plugin.slash.action.macros.hint=
+### Missing: ckeditor.plugin.slash.action.find.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_row_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_col_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_split_horizontal.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_split_vertical.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_right.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_right.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_down.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_down.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_delete.hint=
+### Missing: ckeditor.plugin.slash.placeholder=
+### Missing: ckeditor.plugin.slash.dropdown.hint=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.body=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.address=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.aside=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.footer=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.header=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h1=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h2=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h3=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h4=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h5=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h6=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.main=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.nav=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.section=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.blockquote=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dl=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dt=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dd=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.figcaption=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.figure=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.ol=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.ul=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.menu=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.li=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.p=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.pre=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.caption=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.th=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.td=
+### Missing: ckeditor.plugin.realtime.leavingCollaboration=
+### Missing: ckeditor.plugin.realtime.joiningCollaboration=
+### Missing: ckeditor.plugin.upload.downloadingPastedImages=
+### Missing: ckeditor.plugin.upload.imageDownloadFailed=
+### Missing: ckeditor.plugin.upload.starting=
+### Missing: ckeditor.plugin.upload.uploadingPastedImages=
+### Missing: ckeditor.plugin.upload.imageUploadFailed=
+### Missing: ckeditor.inline.failedToInit=
+### Missing: ckeditor.upload.error.csrf=
+### Missing: ckeditor.upload.error.emptyReturn=
+### Missing: modal.ok=
+### Missing: modal.cancel=
+### Missing: modal.close=
+### Missing: resource.attach.label=
+### Missing: resource.attach.placeholder=
+### Missing: resource.data.label=
+### Missing: resource.doc.label=
+### Missing: resource.doc.placeholder=
+### Missing: resource.icon.label=
+### Missing: resource.mailto.label=
+### Missing: resource.mailto.placeholder=
+### Missing: resource.path.label=
+### Missing: resource.path.placeholder=
+### Missing: resource.unc.label=
+### Missing: resource.unc.placeholder=
+### Missing: resource.unknown.label=
+### Missing: resource.url.label=
+### Missing: resource.url.placeholder=
+### Missing: resource.user.label=
+### Missing: resource.user.placeholder=
+### Missing: resourcePicker.attach.hint=
+### Missing: resourcePicker.doc.hint=
+### Missing: resourcePicker.dropdown.toggle.title=
+### Missing: entityResourceSuggester.doc.placeholder=
+### Missing: entityResourceSuggester.attach.placeholder=
+### Missing: entityResourceSuggester.create.resolvedInSpace=
+### Missing: entityResourceSuggester.create.fullyResolvedInput=
+### Missing: entityResourcePicker.select=
+### Missing: entityResourcePicker.doc.title=
+### Missing: entityResourcePicker.attach.title=
+### Missing: macroSelector.title=
+### Missing: macroSelector.filter.text.placeholder=
+### Missing: macroSelector.filter.category.all=
+### Missing: macroSelector.filter.category.other=
+### Missing: macroSelector.filter.category.notinstalled=
+### Missing: macroSelector.failedToRetrieveMacros=
+### Missing: macroSelector.select=
+### Missing: macroSelector.recommended=
+### Missing: macroSelector.install=
+### Missing: macroSelector.install.confirm=
+### Missing: macroSelector.install.notAllowed=
+### Missing: macroSelector.filter.category.placeholder=
+### Missing: macroEditor.title=
+### Missing: macroEditor.more=
+### Missing: macroEditor.changeMacro=
+### Missing: macroEditor.submit=
+### Missing: macroEditor.content=
+### Missing: macroEditor.noParameters=
+### Missing: macroEditor.descriptorRequestFailed=
+### Missing: macroEditor.installRequestFailed=
+
+
+### Missing: imageEditor.modal.changeImage.button=
+### Missing: imageEditor.modal.loadFail.message=
+### Missing: imageEditor.modal.title=
+### Missing: imageEditor.modal.insertButton=
+### Missing: imageEditor.modal.updateButton=
+### Missing: imageEditor.modal.initialization.fail=
+### Missing: imageEditor.modal.outscaleWarning=
+### Missing: imageSelector.modal.title=
+### Missing: imageSelector.modal.selectButton=
+### Missing: imageSelector.modal.loadFail.message=
+### Missing: imageSelector.modal.fileUpload.success=
+### Missing: imageSelector.modal.fileUpload.fail=
+### Missing: imageSelector.modal.fileUpload.abort=
+### Missing: imageSelector.modal.initialization.fail=
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+### Missing: imageEditor.modal.backToEditor.button=
+### Missing: ckeditor.plugin.image.imageSelector.documentTreeTab.title=
+### Missing: ckeditor.plugin.link.uploadProgress=
+### Missing: ckeditor.plugin.link.uploadSuccess=
+### Missing: ckeditor.plugin.link.uploadError=
+### Missing: ckeditor.plugin.image.slash.uploadProgress=
+### Missing: ckeditor.plugin.image.slash.uploadSuccess=
+### Missing: ckeditor.plugin.image.slash.uploadError=
+
+## Deprecated since 16.10.12, 17.4.5, 17.8.0
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

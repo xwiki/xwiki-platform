@@ -1,0 +1,93 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Applications.Movies.Code.MoviesTranslations" locale="en_GB">
+  <web>Help.Applications.Movies.Code</web>
+  <name>MoviesTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>MoviesClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+### Missing: Help.Applications.Movies.Code.MoviesClass_title1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_longText1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_action=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_drama=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_horror=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_musical=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_romance=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_sf=
+### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=
+### Missing: Help.Applications.Movies.Code.MoviesClass_date1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_number1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_boolean1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1=
+### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=
+### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=
+### Missing: Help.Applications.Movies.Code.MoviesClass_content1=
+
+# Live table generic keys
+### Missing: movies.livetable.doc.title=
+### Missing: movies.livetable.doc.name=
+### Missing: movies.livetable.doc.space=
+### Missing: movies.livetable.doc.fullname=
+### Missing: movies.livetable.doc.location=
+### Missing: movies.livetable.doc.author=
+### Missing: movies.livetable.doc.creator=
+### Missing: movies.livetable.doc.date=
+### Missing: movies.livetable.doc.creationDate=
+### Missing: movies.livetable._avatar=
+### Missing: movies.livetable._images=
+### Missing: movies.livetable._attachments=
+### Missing: movies.livetable._actions=
+### Missing: movies.livetable._actions.edit=
+### Missing: movies.livetable._actions.delete=
+### Missing: movies.livetable.emptyvalue=
+
+# Live table specific keys
+### Missing: movies.livetable.title1=
+### Missing: movies.livetable.longText1=
+### Missing: movies.livetable.staticList1=
+### Missing: movies.livetable.date1=
+### Missing: movies.livetable.number1=
+### Missing: movies.livetable.boolean1=
+### Missing: movies.livetable.databaseList1=
+### Missing: movies.livetable.content1=
+
+# Other keys
+### Missing: movies.entry.name=
+
+# Deprecated keys
+### Missing: movies.dataSpace.title=
+</content>
+</xwikidoc>

@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: annotations.title=
+  <content>annotations.title=Annotate
 ### Missing: annotations.menu.loading=
 ### Missing: annotations.menu.loaderror=
 ### Missing: annotations.tab.info.noannotations=

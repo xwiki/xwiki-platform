@@ -347,7 +347,7 @@ class DeletePageIT
         }
         // Assert that we have at least some actions. Testing individual items is not so easy because the action URLs
         // are not what the LD page object expects.
-        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "RestoreDelete");
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "Restore\nDelete");
 
         // Trigger the actual restore.
         RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();

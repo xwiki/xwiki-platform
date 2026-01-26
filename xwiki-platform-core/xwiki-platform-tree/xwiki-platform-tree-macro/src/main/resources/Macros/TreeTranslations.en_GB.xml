@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Macros.TreeTranslations" locale="en_GB">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: rendering.macro.tree.name=
+### Missing: rendering.macro.tree.description=
+### Missing: rendering.macro.tree.parameter.reference.name=
+### Missing: rendering.macro.tree.parameter.reference.description=
+### Missing: rendering.macro.tree.parameter.root.name=
+### Missing: rendering.macro.tree.parameter.root.description=
+### Missing: rendering.macro.tree.parameter.showRoot.name=
+### Missing: rendering.macro.tree.parameter.showRoot.description=
+### Missing: rendering.macro.tree.parameter.dragAndDrop.name=
+### Missing: rendering.macro.tree.parameter.dragAndDrop.description=
+### Missing: rendering.macro.tree.parameter.contextMenu.name=
+### Missing: rendering.macro.tree.parameter.contextMenu.description=
+### Missing: rendering.macro.tree.parameter.class.name=
+### Missing: rendering.macro.tree.parameter.class.description=
+### Missing: rendering.macro.tree.parameter.icons.name=
+### Missing: rendering.macro.tree.parameter.icons.description=
+### Missing: rendering.macro.tree.parameter.edges.name=
+### Missing: rendering.macro.tree.parameter.edges.description=
+### Missing: rendering.macro.tree.parameter.links.name=
+### Missing: rendering.macro.tree.parameter.links.description=
+### Missing: rendering.macro.tree.parameter.checkboxes.name=
+### Missing: rendering.macro.tree.parameter.checkboxes.description=
+### Missing: rendering.macro.tree.parameter.openTo.name=
+### Missing: rendering.macro.tree.parameter.openTo.description=
+### Missing: rendering.macro.tree.parameter.finder.name=
+### Missing: rendering.macro.tree.parameter.finder.description=
+### Missing: rendering.macro.tree.parameter.limit.name=
+### Missing: rendering.macro.tree.parameter.limit.description=
+### Missing: rendering.macro.tree.content.description=
+### Missing: tree.macro.editModeWarning=
+</content>
+</xwikidoc>

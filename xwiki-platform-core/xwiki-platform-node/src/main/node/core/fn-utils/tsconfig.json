@@ -3,7 +3,12 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "extends": "../../tsconfig.json",
-  "include": ["./src/index.ts", "./src/**/*"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

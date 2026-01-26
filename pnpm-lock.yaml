@@ -307,7 +307,7 @@ importers:
         version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-api
       '@xwiki/platform-dsapi':
         specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/ds/api
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/ds/api
       '@xwiki/platform-editors-blocknote-headless':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/editors/blocknote-headless
@@ -864,6 +864,40 @@ importers:
         specifier: 'catalog:'
         version: 3.5.26(typescript@5.9.3)
 
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/api:
+    dependencies:
+      '@xwiki/platform-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.55.1(@types/node@24.10.3)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.1(jiti@2.6.1)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.0.10
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.7(@types/node@24.10.3)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.15(@types/node@24.10.3)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.26(typescript@5.9.3)
+
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils:
     devDependencies:
       '@microsoft/api-extractor':
@@ -1278,40 +1312,6 @@ importers:
         specifier: 'catalog:'
         version: 4.0.15(@types/node@24.10.3)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
 
-  xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api:
-    dependencies:
-      '@xwiki/platform-fn-utils':
-        specifier: workspace:*
-        version: link:../../core/fn-utils
-      reflect-metadata:
-        specifier: 0.x
-        version: 0.2.2
-    devDependencies:
-      '@microsoft/api-extractor':
-        specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.3)
-      '@xwiki/platform-dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.1(jiti@2.6.1)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.0.10
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vite:
-        specifier: 'catalog:'
-        version: 7.2.7(@types/node@24.10.3)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.0.15(@types/node@24.10.3)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
-      vue:
-        specifier: 'catalog:'
-        version: 3.5.26(typescript@5.9.3)
-
   xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless:
     dependencies:
       '@blocknote/core':
@@ -1340,7 +1340,7 @@ importers:
         version: link:../../core/document/document-api
       '@xwiki/platform-dsapi':
         specifier: workspace:*
-        version: link:../../ds/api
+        version: link:../../core/ds/api
       '@xwiki/platform-editors-blocknote-react':
         specifier: workspace:*
         version: link:../blocknote-react

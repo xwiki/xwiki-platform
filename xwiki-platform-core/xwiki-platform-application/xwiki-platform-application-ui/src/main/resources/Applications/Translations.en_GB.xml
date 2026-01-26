@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: application.index.title=
-### Missing: application.index.drawer=
+  <content>application.index.title=Application Index
+application.index.drawer=Application Index
 </content>
 </xwikidoc>

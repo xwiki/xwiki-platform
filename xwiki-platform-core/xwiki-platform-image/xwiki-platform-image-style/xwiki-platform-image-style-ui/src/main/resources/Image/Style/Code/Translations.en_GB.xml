@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="en_GB">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: admin.image.style=
+### Missing: image.style.admin.heading=
+### Missing: image.style.administration.imageStyleList.heading=
+### Missing: image.style.administation.newImageStyle.button=
+### Missing: image.style.administation.defaultImageStyle.button=
+### Missing: image.style.imageStyleSheet.backToAdministration.link=
+### Missing: image.style.administration.liveData.doc.title=
+### Missing: image.style.administration.liveData._actions=
+### Missing: image.style.administration.liveData.prettyName=
+### Missing: image.style.administration.liveData.prettyName.hint=
+### Missing: image.style.administration.liveData.type=
+### Missing: image.style.administration.liveData.type.hint=
+### Missing: image.style.administration.liveData.emptyvalue=
+### Missing: image.style.administation.newImageStyle.label=
+### Missing: image.style.administation.newImageStyle.hint=
+### Missing: image.style.administation.newImageStyle.placeHolder=
+### Missing: image.style.administation.newImageStyle.normalizedTitle=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableAlignment=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableBorder=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableBorder_hint=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableSize=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableSize_hint=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableTextWrap=
+### Missing: Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_center=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_hint=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_none=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_start=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_center=
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_end=
+### Missing: Image.Style.Code.ImageStyleClass_defaultBorder=
+### Missing: Image.Style.Code.ImageStyleClass_defaultBorder_hint=
+### Missing: Image.Style.Code.ImageStyleClass_defaultHeight=
+### Missing: Image.Style.Code.ImageStyleClass_defaultHeight_hint=
+### Missing: Image.Style.Code.ImageStyleClass_defaultTextWrap=
+### Missing: Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=
+### Missing: Image.Style.Code.ImageStyleClass_defaultWidth=
+### Missing: Image.Style.Code.ImageStyleClass_defaultWidth_hint=
+### Missing: Image.Style.Code.ImageStyleClass_prettyName=
+### Missing: Image.Style.Code.ImageStyleClass_prettyName_hint=
+### Missing: Image.Style.Code.ImageStyleClass_type=
+### Missing: Image.Style.Code.ImageStyleClass_type_hint=
+### Missing: Image.Style.Code.ConfigurationClass_defaultStyle=
+### Missing: Image.Style.Code.ConfigurationClass_defaultStyle_hint=
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle=
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=
+</content>
+</xwikidoc>

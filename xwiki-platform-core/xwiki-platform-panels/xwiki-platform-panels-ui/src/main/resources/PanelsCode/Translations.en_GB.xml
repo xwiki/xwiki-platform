@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="en_GB">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: platform.panels.applications.helper=
+### Missing: platform.panels.applications.displayedapps=
+### Missing: platform.panels.applications.blacklistedapps=
+### Missing: platform.panels.applications.save=
+### Missing: platform.panels.applications.revert=
+### Missing: platform.panels.applications.ajax.success=
+### Missing: platform.panels.applications.ajax.csrf=
+### Missing: platform.panels.applications.ajax.noright=
+### Missing: platform.panels.applications.ajax.error=
+### Missing: admin.panels.applications=
+### Missing: admin.panels.applications.description=
+### Missing: admin.panels.navigation=
+### Missing: admin.panels.navigation.description=
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=
+### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions=
+### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions=
+### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=
+### Missing: platform.panels.navigation.configuration.excludedPages=
+### Missing: platform.panels.navigation.configuration.excludedPages.hint=
+### Missing: platform.panels.navigation.configuration.excludedPages.empty=
+### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=
+### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=
+### Missing: platform.panels.navigation.configuration.otherPages=
+### Missing: platform.panels.navigation.configuration.saveComment=
+</content>
+</xwikidoc>

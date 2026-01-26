@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="en_GB">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: skin.sheet.title=
+### Missing: skin.sheet.properties=
+### Missing: skin.sheet.properties.logo.warning=
+### Missing: skin.sheet.deprecatedProperties=
+### Missing: skin.sheet.overriddenTemplates=
+### Missing: skin.sheet.addTemplate=
+### Missing: skin.sheet.add=
+### Missing: skin.sheet.overrideTemplateWarning=
+### Missing: skin.sheet.deprecatedPropertiesWarning=
+### Missing: skin.sheet.nojs=
+### Missing: skin.sheet.js.deleting=
+### Missing: skin.sheet.js.deletingDone=
+### Missing: skin.sheet.js.error.csrf=
+### Missing: skin.sheet.js.error.rights=
+### Missing: skin.sheet.js.deleteConfirmationText=
+### Missing: skin.sheet.js.deleteConfirmationYes=
+### Missing: skin.sheet.js.deleteConfirmationNo=
+### Missing: skin.sheet.js.adding=
+### Missing: skin.sheet.js.addingDone=
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+### Missing: skin.sheet.overridedTemplates=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

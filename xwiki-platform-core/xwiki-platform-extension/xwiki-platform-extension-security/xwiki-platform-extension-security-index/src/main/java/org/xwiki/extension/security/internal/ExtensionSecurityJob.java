@@ -104,7 +104,10 @@ public class ExtensionSecurityJob
         this.progressManager.pushLevelProgress(installedExtensions.size() + coreExtensions.size(), this);
 
         ReviewsMap reviewsMap = fetchReviewsMap();
-        try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+        ExecutorService executorService = null;
+        try {
+            executorService = Executors.newFixedThreadPool(10);
+
             List<Future<Boolean>> tasks = new ArrayList<>();
             for (InstalledExtension extension : installedExtensions) {
                 tasks.add(executorService.submit(() -> handleExtension(extension, reviewsMap)));
@@ -121,6 +124,9 @@ public class ExtensionSecurityJob
             Thread.currentThread().interrupt();
         } finally {
             this.progressManager.popLevelProgress(this);
+            if (executorService != null) {
+                executorService.shutdown();
+            }
         }
     }
 

@@ -218,12 +218,12 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         builder.append('(');
 
         // All entries which don't have a docId set
-        builder.append(FieldUtils.DOC_ID);
+        builder.append(isSet(FieldUtils.DOC_ID));
 
         builder.append(AND);
 
         // All entries which don't have a fullName set
-        builder.append(FieldUtils.FULLNAME);
+        builder.append(isSet(FieldUtils.FULLNAME));
 
         // TODO: Remove from the core all entries for which no corresponding DOCUMENT type entry exist (see
         // https://jira.xwiki.org/browse/XWIKI-22949)
@@ -235,5 +235,10 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
         // Commit
         this.solrInstance.commit();
+    }
+
+    private String isSet(String field)
+    {
+        return field + ":*";
     }
 }

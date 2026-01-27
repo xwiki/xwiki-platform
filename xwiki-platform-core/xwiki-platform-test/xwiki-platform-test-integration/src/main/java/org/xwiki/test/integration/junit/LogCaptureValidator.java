@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -162,8 +163,18 @@ public class LogCaptureValidator
             + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true),
 
         // See https://github.com/testcontainers/testcontainers-java/issues/2209
-        new Line("WARNING: A connection to http://docker.socket/ was leaked. Did you forget to close a response body?",
-            false)
+        new Line("WARNING: A connection to http://docker.socket/ was leaked. Did you forget to close a response body?"),
+
+        // See https://jira.xwiki.org/browse/XCOMMONS-2911
+        new Line("Can't find any existing component with class \\[org.xwiki.([\\w]+\\.?)+\\]. "
+            + "Ignoring it.", true),
+
+        // See https://jira.xwiki.org/browse/XWIKI-23939
+        new Line("Right unregistration is disabled on purpose as it's creating cache problems right now. "
+            + "In case of a need to debug this call was triggered for right [like]."),
+
+        // See https://jira.xwiki.org/browse/XWIKI-22043
+        new Line("org.xwiki.script.internal.safe.ScriptSafeProvider")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(
@@ -198,6 +209,25 @@ public class LogCaptureValidator
      */
     public void validate(String logContent, LogCaptureConfiguration configuration, boolean displayMissing)
     {
+        validate(LOG_PARSER.parse(logContent).stream(), configuration, displayMissing, false);
+    }
+
+    /**
+     * Validate the given logs.
+     * @param logContent the log content to validate
+     * @param configuration the user-registered excludes and expected log lines
+     * @param displayMissing true if warning should be logged when excluded/expected logs are not found
+     * @param jobLog if {@code true} we don't perform any pre-filtering of the logs using {@link #SEARCH_STRINGS} are
+     * we consider they are already prefiltered to select warning and error logs, otherwise if {@code false} a
+     * prefiltering is performed to only select the logs matching {@link #SEARCH_STRINGS}.
+     * @since 18.1.0RC1
+     * @since 17.10.3
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public void validate(Stream<String> logContent, LogCaptureConfiguration configuration, boolean displayMissing,
+        boolean jobLog)
+    {
         List<Line> allExcludes = new ArrayList<>();
         allExcludes.addAll(GLOBAL_EXCLUDES);
         allExcludes.addAll(configuration.getExcludedLines());
@@ -209,7 +239,7 @@ public class LogCaptureValidator
         List<String> matchingExcludes = new ArrayList<>();
         List<Line> matchingDefinitions = new ArrayList<>();
         List<String> matchingLines =
-            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions);
+            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions, jobLog);
 
         // At the end of the tests, output warnings for matching excluded lines so that developers can see that
         // there  are excludes that need to be fixed.
@@ -234,13 +264,17 @@ public class LogCaptureValidator
         }
     }
 
-    private List<String> getMatchingLines(String logContent, List<Line> allExcludes, List<Line> allExpected,
-        List<String> matchingExcludes, List<Line> matchingDefinitions)
+    private List<String> getMatchingLines(Stream<String> logContent, List<Line> allExcludes, List<Line> allExpected,
+        List<String> matchingExcludes, List<Line> matchingDefinitions, boolean jobLog)
     {
-        return LOG_PARSER.parse(logContent).stream().filter(p -> {
-            for (String searchString : SEARCH_STRINGS) {
-                if (p.contains(searchString)) {
-                    return true;
+        return logContent.filter(p -> {
+            if (jobLog) {
+                return true;
+            } else {
+                for (String searchString : SEARCH_STRINGS) {
+                    if (p.contains(searchString)) {
+                        return true;
+                    }
                 }
             }
             return false;

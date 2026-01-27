@@ -67,6 +67,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

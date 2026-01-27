@@ -77,7 +77,7 @@ class WikisIT
         try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
             PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
             try {
-                assertEquals(HttpStatus.SC_FORBIDDEN, post.getStatusCode());
+                assertEquals(HttpStatus.SC_UNAUTHORIZED, post.getStatusCode());
             } finally {
                 post.releaseConnection();
             }

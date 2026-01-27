@@ -36,6 +36,9 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.resources.wikis.WikiResource;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -56,6 +59,9 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
     @Inject
     private WikiDescriptorManager wikis;
 
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
     @Override
     public Wiki get(String wikiName) throws XWikiRestException
     {
@@ -74,6 +80,13 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
     public Wiki importXAR(String wikiName, Boolean backup, String historyStrategy, InputStream is)
         throws XWikiRestException
     {
+        // Importing a XAR require wiki admin right
+        try {
+            this.authorizationManager.checkAccess(Right.ADMIN, new WikiReference(wikiName));
+        } catch (AccessDeniedException e) {
+            throw new WebApplicationException(e.getMessage(), Response.Status.FORBIDDEN);
+        }
+
         try {
             if (!this.wikis.exists(wikiName)) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -191,12 +192,32 @@ public class LogCaptureValidator
     }
 
     /**
+     * Validate the job log: we don't perform any pre-filtering of the given logs using {@link #SEARCH_STRINGS} for
+     * those as we consider they already have been filtered.
+     *
+     * @param jobLogs the warning or error logs to analyze.
+     * @param configuration the configuration to apply.
+     * @since 17.10.3
+     * @since 18.1.0RC1
+     */
+    public void validateJobLog(List<String> jobLogs, LogCaptureConfiguration configuration)
+    {
+        validate(jobLogs.stream(), configuration, false, true);
+    }
+
+    /**
      * @param logContent the log content to validate
      * @param configuration the user-registered excludes and expected log lines
      * @param displayMissing true if warning should be logged when excluded/expected logs are not found
      * @since 11.10
      */
     public void validate(String logContent, LogCaptureConfiguration configuration, boolean displayMissing)
+    {
+        validate(LOG_PARSER.parse(logContent).stream(), configuration, displayMissing, false);
+    }
+
+    private void validate(Stream<String> logContent, LogCaptureConfiguration configuration, boolean displayMissing,
+        boolean jobLog)
     {
         List<Line> allExcludes = new ArrayList<>();
         allExcludes.addAll(GLOBAL_EXCLUDES);
@@ -209,7 +230,7 @@ public class LogCaptureValidator
         List<String> matchingExcludes = new ArrayList<>();
         List<Line> matchingDefinitions = new ArrayList<>();
         List<String> matchingLines =
-            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions);
+            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions, jobLog);
 
         // At the end of the tests, output warnings for matching excluded lines so that developers can see that
         // there  are excludes that need to be fixed.
@@ -234,13 +255,17 @@ public class LogCaptureValidator
         }
     }
 
-    private List<String> getMatchingLines(String logContent, List<Line> allExcludes, List<Line> allExpected,
-        List<String> matchingExcludes, List<Line> matchingDefinitions)
+    private List<String> getMatchingLines(Stream<String> logContent, List<Line> allExcludes, List<Line> allExpected,
+        List<String> matchingExcludes, List<Line> matchingDefinitions, boolean jobLog)
     {
-        return LOG_PARSER.parse(logContent).stream().filter(p -> {
-            for (String searchString : SEARCH_STRINGS) {
-                if (p.contains(searchString)) {
-                    return true;
+        return logContent.filter(p -> {
+            if (jobLog) {
+                return true;
+            } else {
+                for (String searchString : SEARCH_STRINGS) {
+                    if (p.contains(searchString)) {
+                        return true;
+                    }
                 }
             }
             return false;

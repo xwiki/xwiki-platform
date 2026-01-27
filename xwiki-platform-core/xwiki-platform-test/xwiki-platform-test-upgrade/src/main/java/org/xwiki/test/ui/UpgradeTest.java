@@ -423,14 +423,9 @@ public class UpgradeTest extends AbstractTest
     {
         List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 
-        StringBuilder builder = new StringBuilder();
-        for (LogItemPane log : logs) {
-            builder.append(log.getMessage());
-            builder.append('\n');
-        }
-
         LogCaptureValidator validator = new LogCaptureValidator();
-        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration(), false);
+        validator.validateJobLog(logs.stream().map(LogItemPane::getMessage).toList(),
+            validateConsole.getLogCaptureConfiguration());
     }
 
     private void orphanedDependenciesStep()

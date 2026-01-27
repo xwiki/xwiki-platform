@@ -18,15 +18,6 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #if ($request.livetable == "true")
-    #macro (displayUserAliasWithAvatar $userReference $disabled)
-    <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
-    <span class="user-avatar-wrapper">
-      #getUserAvatarURL($userReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
-    </span>
-      <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
-    </div>
-    #end
     $response.setContentType('application/json')
     #set ($documentReference = $doc.documentReference)
     ##==============================
@@ -66,7 +57,7 @@
                 'doc_wiki': $userDoc.wiki,
                 'doc_url': $userDoc.getURL(),
                 'doc_viewable': true,
-                'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
+                'name': "#_displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
                 'first_name': $userProperties.firstName,
                 'last_name': $userProperties.lastName
             })

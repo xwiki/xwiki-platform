@@ -1,0 +1,113 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="en_GB">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: export.pdf.options.template=
+### Missing: export.pdf.options.template.hint=
+### Missing: export.pdf.options.loadFailure=
+### Missing: export.pdf.hint=
+### Missing: export.pdf.modal.close=
+### Missing: export.pdf.inProgress=
+### Missing: export.pdf.failed=
+### Missing: export.pdf.lastError=
+### Missing: export.pdf.canceling=
+### Missing: export.pdf.canceled=
+### Missing: export.pdf.cancelFailed=
+### Missing: export.pdf.loading=
+### Missing: export.pdf.pageReadyTimeout=
+### Missing: export.pdf.templates.default=
+### Missing: export.pdf.templates.default.versionInfo=
+### Missing: export.pdf.template.name=
+### Missing: export.pdf.template.hint=
+### Missing: export.pdf.template.provider=
+### Missing: export.pdf.template.skinExtensionInfo=
+### Missing: admin.export.pdf=
+### Missing: admin.export.pdf.description=
+### Missing: export.pdf.admin.status=
+### Missing: export.pdf.admin.configuration=
+### Missing: export.pdf.admin.saveComment=
+### Missing: export.pdf.admin.reset=
+### Missing: export.pdf.admin.reset.hint=
+### Missing: export.pdf.admin.reset.confirmation=
+### Missing: export.pdf.config.default=
+### Missing: export.pdf.config.empty=
+### Missing: export.pdf.generator.label=
+### Missing: export.pdf.generator.hint=
+### Missing: export.pdf.generator.checking=
+### Missing: export.pdf.generator.checkFailed=
+### Missing: export.pdf.generator.available=
+### Missing: export.pdf.generator.unavailable=
+### Missing: export.pdf.generator.userBrowser.label=
+### Missing: export.pdf.generator.userBrowser.hint=
+### Missing: export.pdf.generator.chromeDockerContainer.label=
+### Missing: export.pdf.generator.chromeDockerContainer.hint=
+### Missing: export.pdf.generator.remoteChrome.label=
+### Missing: export.pdf.generator.remoteChrome.hint=
+### Missing: XWiki.PDFExport.TemplateClass_cover=
+### Missing: XWiki.PDFExport.TemplateClass_cover.hint=
+### Missing: XWiki.PDFExport.TemplateClass_toc=
+### Missing: XWiki.PDFExport.TemplateClass_toc.hint=
+### Missing: XWiki.PDFExport.TemplateClass_header=
+### Missing: XWiki.PDFExport.TemplateClass_header.hint=
+### Missing: XWiki.PDFExport.TemplateClass_footer=
+### Missing: XWiki.PDFExport.TemplateClass_footer.hint=
+### Missing: XWiki.PDFExport.TemplateClass_metadata=
+### Missing: XWiki.PDFExport.TemplateClass_metadata.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_templates=
+### Missing: XWiki.PDFExport.ConfigurationClass_templates.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_serverSide=
+### Missing: XWiki.PDFExport.ConfigurationClass_serverSide.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeHost=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeHost.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_xwikiURI=
+### Missing: XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeDockerImage=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=
+### Missing: XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_dockerNetwork=
+### Missing: XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=
+### Missing: XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_maxContentSize=
+### Missing: XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=
+### Missing: XWiki.PDFExport.ConfigurationClass_replaceFOP=
+### Missing: XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=
+</content>
+</xwikidoc>

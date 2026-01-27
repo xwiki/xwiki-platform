@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="en_GB">
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>annotations.title=Annotate
+### Missing: annotations.menu.loading=
+### Missing: annotations.menu.loaderror=
+### Missing: annotations.tab.info.noannotations=
+### Missing: annotations.settings.display=
+### Missing: annotations.settings.error.wrongsyntax=
+### Missing: annotations.settings.error.notarget=
+### Missing: annotations.annotated.loading=
+### Missing: annotations.annotated.loaderror=
+### Missing: annotations.annotated.loaderror.wrongresponse=
+### Missing: annotations.annotated.error.noannotatedelement=
+### Missing: annotations.annotated.error.wrongsyntax=
+### Missing: annotations.action.edit.text=
+### Missing: annotations.action.edit.tooltip=
+### Missing: annotations.action.edit.submit.text=
+### Missing: annotations.action.edit.cancel.text=
+### Missing: annotations.action.edit.success=
+### Missing: annotations.action.edit.loaderror=
+### Missing: annotations.action.edit.error.notfound=
+### Missing: annotations.action.delete.text=
+### Missing: annotations.action.delete.tooltip=
+### Missing: annotations.action.delete.confirm=
+### Missing: annotations.action.delete.inProgress=
+### Missing: annotations.action.delete.done=
+### Missing: annotations.action.delete.failed=
+### Missing: annotations.action.create.submit.text=
+### Missing: annotations.action.create.cancel.text=
+### Missing: annotations.action.create.selection.invalid=
+### Missing: annotations.action.create.form.loaderror=
+### Missing: annotations.action.create.success=
+### Missing: annotations.action.create.loaderror=
+### Missing: annotations.action.create.error.unauthorized=
+### Missing: annotations.action.create.error.unauthorizedguest=
+### Missing: annotations.action.create.helpmessage=
+### Missing: annotations.action.create.error.wrongsyntax=
+### Missing: annotations.action.create.error.notarget=
+### Missing: annotations.action.view.hide.text=
+### Missing: annotations.action.view.form.loaderror=
+### Missing: annotations.action.view.error.notfound=
+### Missing: annotations.action.view.thread=
+### Missing: annotations.altered.text=
+### Missing: annotations.updated.text=
+### Missing: annotations.action.validate.text=
+### Missing: annotations.action.validate.tooltip=
+### Missing: annotations.action.validate.success=
+### Missing: annotations.action.validate.loaderror=
+### Missing: annotations.filters.show=
+### Missing: annotations.filters.nooption=
+### Missing: annotations.filters.anyvalue=
+### Missing: annotations.filters.clearvalue=
+### Missing: annotations.config.title=
+### Missing: annotations.config.display.title=
+### Missing: annotations.config.type.title=
+### Missing: annotations.config.activate.title=
+### Missing: annotations.config.activate.explanation=
+### Missing: annotations.config.type.explanation=
+### Missing: admin.annotations=
+### Missing: admin.annotations.description=
+### Missing: AnnotationCode.AnnotationConfig_activated=
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=
+### Missing: AnnotationCode.AnnotationConfig_displayed=
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=
+### Missing: AnnotationCode.AnnotationConfig_annotationClass=
+</content>
+</xwikidoc>

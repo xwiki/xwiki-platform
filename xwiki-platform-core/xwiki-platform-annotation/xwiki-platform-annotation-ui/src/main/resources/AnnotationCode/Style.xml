@@ -435,6 +435,10 @@ mark.annotation:not(.annotation-highlight) {
 .annotationHeader{
   padding: 2px 0px 6px;
 }
+.annotatedText .decorative-quote { 
+  font-size: 4rem;
+  font-family: var(--font-family-serif);
+}
 #allAnnotations .annotationHeader:hover {
   background-color: $theme.highlightColor;
 }

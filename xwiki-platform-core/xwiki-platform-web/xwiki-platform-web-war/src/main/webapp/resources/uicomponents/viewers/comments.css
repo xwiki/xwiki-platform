@@ -69,39 +69,26 @@ ul.commentreplies, .reply {
   padding: 0 36px 0 0;
   text-align: justify;
 }
-/* Comment "toolbox": delete, reply */
-.commenttools {
-  display: block;
-  float: right;
-  margin-top: -1.5em;
+
+.commenttools .btn {
+  border-color: transparent;
 }
-.commenttool a {
-  background: transparent left top no-repeat;
-  display: block;
-  float: left;
-  height: 16px;
-  line-height: 30px;
-  margin: 0 0 0 4px;
-  overflow: hidden;
-  text-indent: 30px;
-  width: 16px;
+
+/* We assume that the caret icon is the first child of the button.*/
+.commenttools .thread-toggle> *:first-child {
+  transition: transform 200ms ease-in-out;
+  transform-origin: center left;
 }
-.comment-permalink a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
+
+.commenttools .thread-toggle[aria-expanded="true"] > *:first-child {
+  transform: rotateZ(90deg) ;
 }
-.commentdelete a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-.commentreply a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.png')");
-}
-.commentedit a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
+
+/* If we use a font icon theme, we recolor the  delete icon to put a little emphasize on danger here. */
+.commenttools .delete .fa {
+  color: var(--brand-danger);
 }
 /* Form */
-.skin-colibri #AddComment {
-  border-top: 1px solid $theme.borderColor;
-}
 #AddComment fieldset {
   padding-left: 60px;
 }

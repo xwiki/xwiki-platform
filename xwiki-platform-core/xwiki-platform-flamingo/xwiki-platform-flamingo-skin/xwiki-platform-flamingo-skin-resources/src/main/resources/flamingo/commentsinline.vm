@@ -143,7 +143,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #foreach($commentID in $thread)
       <li class="reply">
       #displayComment($doc.getObject($xCommentClass, $commentID), $commentDoc)
-      <div class="commentthread">
+      <div id="comment-thread-${commentID}" class="commentthread collapse">
         #displayThread($commentID, $commentThreads, $commentDoc)
       </div>
       </li>
@@ -175,16 +175,32 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ## Don't indent, otherwise the comma will be misplaced
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
-      <div class="btn-group commenttools">
-      #if($xwiki.hasAccessLevel('comment'))
-        <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
-        #if($hasAdmin || $isUserComment)
-          <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
-        #end
+    </div>## commentheader
+    #if ($isAnnotation)
+      <a href="#ID$comment.number"><blockquote class="annotatedText"><span class="decorative-quote"aria-hidden="true">“</span>$!escapetool.xml($commentSelection)</blockquote></a>
+    #end
+    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+    <div class="commenttools">
+      #set($threadCount = $commentThreads.get("$!commentID").size())
+      #if($threadCount > 0)
+        <button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${commentID}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
+          $services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
+        </button>
       #end
-      <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
-        href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
-        title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
+      #if($xwiki.hasAccessLevel('comment'))
+        <a class="commentreply btn btn-default" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>
+          $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
+        </a>
+      #end
+      <a class="permalink btn btn-default" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}">
+        $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
+      </a>
+      #if($xwiki.hasAccessLevel('comment') && ($hasAdmin || $isUserComment))
+        <a class="edit btn btn-default" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")">
+          $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
+        </a>
+      #end
       #if ($hasAdmin || ($hasEdit && $isUserComment))
         ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
         ## By providing an anchor this behavior is stoped, without altering the URL functionality.
@@ -195,17 +211,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           'xredirect': $doc.getURL('view')
         }))
         #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
-        <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-          href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
-          $services.icon.renderHTML('trash')
+        <a class="delete btn btn-default" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+           href="$deleteURL">
+          $services.icon.renderHTML('cross') $services.localization.render('core.viewers.comments.delete')
         </a>
-       #end
-      </div>## btn-group
-    </div>## commentheader
-    #if ($isAnnotation)
-      <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
-    #end
-    <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+      #end
+    </div>## btn-group
   </div>## xwikicomment
 #end
 ##

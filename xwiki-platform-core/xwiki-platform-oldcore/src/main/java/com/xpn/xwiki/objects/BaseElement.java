@@ -635,6 +635,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * Allow to load the owner document when it's not set and the document reference is provided.
      * @return {@code true} if the owner document has been loaded, {@code false} otherwise.
      * @since 18.1.0RC1
+     * @since 17.10.3
      */
     @Unstable
     protected boolean loadOwnerDocument()

@@ -119,26 +119,34 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            try {
-                SecurityConfiguration securityConfiguration = Utils.getComponent(SecurityConfiguration.class);
-                DefaultParameterizedType dbListQueryBuilderType =
-                    new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
-                QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
-                // Execute the query with the rights of the class last author.
-                AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
-                list = makeList(authorExecutor.call(() -> {
-                    Query query = dbListQueryBuilder.build(this);
-                    int configuredLimit = securityConfiguration.getQueryItemsLimit();
-                    // Limit unlimited queries or queries with a high limit to the configured limit.
-                    if (configuredLimit > 0 && (query.getLimit() <= 0 || query.getLimit() > configuredLimit)) {
-                        query.setLimit(configuredLimit);
-                    }
-                    return query.execute();
-                }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
-            } catch (Exception e) {
-                LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
-                    ExceptionUtils.getRootCauseMessage(e));
+            if (getOwnerDocument() == null && !loadOwnerDocument()) {
+                LOGGER.error("Cannot load the owner document of [{}] with reference [{}]. Falling back on empty "
+                        + "database list values.",
+                    this, getDocumentReference());
                 list = new ArrayList<>();
+            } else {
+                try {
+                    SecurityConfiguration securityConfiguration = Utils.getComponent(SecurityConfiguration.class);
+                    DefaultParameterizedType dbListQueryBuilderType =
+                        new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
+                    QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
+                    // Execute the query with the rights of the class last author.
+                    AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+
+                    list = makeList(authorExecutor.call(() -> {
+                        Query query = dbListQueryBuilder.build(this);
+                        int configuredLimit = securityConfiguration.getQueryItemsLimit();
+                        // Limit unlimited queries or queries with a high limit to the configured limit.
+                        if (configuredLimit > 0 && (query.getLimit() <= 0 || query.getLimit() > configuredLimit)) {
+                            query.setLimit(configuredLimit);
+                        }
+                        return query.execute();
+                    }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
+                } catch(Exception e){
+                    LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
+                        ExceptionUtils.getRootCauseMessage(e));
+                    list = new ArrayList<>();
+                }
             }
             setCachedDBList(list, context);
         }

@@ -19,7 +19,7 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
-import { ImageFilePanel } from "./images/ImageFilePanel";
+import { FilePanel } from "./files/FilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
   createBlockNoteSchema,
@@ -370,18 +370,13 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       />
 
       <FilePanelController
-        filePanel={(props) => {
-          const block = props.block as unknown as BlockType;
-
-          return block.type === "image" ? (
-            <ImageFilePanel
-              linkEditionCtx={linkEditionCtx}
-              currentBlock={block}
-            />
-          ) : (
-            <>Unknown block type: {block.type}</>
-          );
-        }}
+        filePanel={({ blockId }) => (
+          <FilePanel
+            blockId={blockId}
+            editor={editor}
+            linkEditionCtx={linkEditionCtx}
+          />
+        )}
       />
     </BlockNoteView>
   );

@@ -93,7 +93,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
 
   return (
     <>
-      <Components.Generic.Popover.Root opened={showImageEditor}>
+      <Components.Generic.Popover.Root open={showImageEditor}>
         <Components.Generic.Popover.Trigger>
           {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}

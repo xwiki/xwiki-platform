@@ -84,7 +84,7 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
         try {
             this.authorizationManager.checkAccess(Right.ADMIN, new WikiReference(wikiName));
         } catch (AccessDeniedException e) {
-            throw new WebApplicationException(e.getMessage(), Response.Status.FORBIDDEN);
+            throw new WebApplicationException(e.getMessage(), Response.Status.UNAUTHORIZED);
         }
 
         try {

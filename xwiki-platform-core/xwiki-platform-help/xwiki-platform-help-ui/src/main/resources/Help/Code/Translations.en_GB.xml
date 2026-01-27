@@ -1,0 +1,203 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.Translations" locale="en_GB">
+  <web>Help.Code</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: help.applications.blog.description=
+### Missing: help.applications.blog.title=
+### Missing: help.applications.browse.description=
+### Missing: help.applications.browse.tip=
+### Missing: help.applications.browse.title=
+### Missing: help.applications.create.demo.label=
+### Missing: help.applications.create.description=
+### Missing: help.applications.create.tip=
+### Missing: help.applications.create.title=
+### Missing: help.applications.description=
+### Missing: help.applications.description1=
+### Missing: help.applications.fileManager.description=
+### Missing: help.applications.fileManager.title=
+### Missing: help.applications.forum.description=
+### Missing: help.applications.forum.title=
+### Missing: help.applications.ideas.description=
+### Missing: help.applications.ideas.title=
+### Missing: help.applications.link=
+### Missing: help.applications.meetings.description=
+### Missing: help.applications.meetings.title=
+### Missing: help.applications.menu.description=
+### Missing: help.applications.menu.title=
+### Missing: help.applications.movie.title=
+### Missing: help.applications.title=
+### Missing: help.applications.title1=
+### Missing: help.browse.label=
+### Missing: help.description1=
+### Missing: help.description2=
+### Missing: help.edit.description=
+### Missing: help.edit.title=
+### Missing: help.example.label=
+### Missing: help.history.description=
+### Missing: help.history.title1=
+### Missing: help.history.title=
+### Missing: help.history.version11.content=
+### Missing: help.history.version11.comment=
+### Missing: help.history.version21.title=
+### Missing: help.history.version21.content=
+### Missing: help.history.version22.title=
+### Missing: help.history.version22.content=
+### Missing: help.history.version22.comment=
+### Missing: help.history.version31.content=
+### Missing: help.history.version31.content1=
+### Missing: help.import.description=
+### Missing: help.import.title=
+### Missing: help.macros.box=
+### Missing: help.macros.box.description=
+### Missing: help.macros.box.description1=
+### Missing: help.macros.box.description2=
+### Missing: help.macros.box.message=
+### Missing: help.macros.box.subtitle=
+### Missing: help.macros.box.title=
+### Missing: help.macros.browseMacros.description=
+### Missing: help.macros.browseMacros.tip=
+### Missing: help.macros.browseMacros.title=
+### Missing: help.macros.chart=
+### Missing: help.macros.chart.bar=
+### Missing: help.macros.chart.description=
+### Missing: help.macros.chart.pie=
+### Missing: help.macros.chart.time=
+### Missing: help.macros.chart.title=
+### Missing: help.macros.description=
+### Missing: help.macros.error=
+### Missing: help.macros.error.message=
+### Missing: help.macros.example=
+### Missing: help.macros.examples.description=
+### Missing: help.macros.examples.title=
+### Missing: help.macros.gallery=
+### Missing: help.macros.gallery.description=
+### Missing: help.macros.gallery.title=
+### Missing: help.macros.header=
+### Missing: help.macros.header1=
+### Missing: help.macros.info=
+### Missing: help.macros.info.message=
+### Missing: help.macros.more=
+### Missing: help.macros.notifications.activity.title1=
+### Missing: help.macros.notifications.activity.title2=
+### Missing: help.macros.notifications.content=
+### Missing: help.macros.notifications.description=
+### Missing: help.macros.notifications.title=
+### Missing: help.macros.success=
+### Missing: help.macros.success.message=
+### Missing: help.macros.title=
+### Missing: help.macros.toc=
+### Missing: help.macros.toc.description.content=
+### Missing: help.macros.toc.description=
+### Missing: help.macros.toc.description.title=
+### Missing: help.macros.toc.examples.title=
+### Missing: help.macros.toc.insideBox=
+### Missing: help.macros.toc.simple=
+### Missing: help.macros.toc.startingPoint=
+### Missing: help.macros.toc.title=
+### Missing: help.macros.tree.description=
+### Missing: help.macros.tree.subtitle=
+### Missing: help.macros.tree.pageDescription=
+### Missing: help.macros.tree.title=
+### Missing: help.macros.tree.header1=
+### Missing: help.macros.tree.header2=
+### Missing: help.macros.tree.header3=
+### Missing: help.macros.tree.header4=
+### Missing: help.macros.useMacros.description=
+### Missing: help.macros.useMacros.tip=
+### Missing: help.macros.useMacros.title=
+### Missing: help.macros.warning=
+### Missing: help.macros.warning.message=
+### Missing: help.more.label=
+### Missing: help.organization.description=
+### Missing: help.organization.title=
+### Missing: help.start.description=
+### Missing: help.start.title=
+### Missing: help.templates.article.description=
+### Missing: help.templates.article.title=
+### Missing: help.templates.create.description=
+### Missing: help.templates.create.tip=
+### Missing: help.templates.create.title=
+### Missing: help.templates.description=
+### Missing: help.templates.encyclopedia.description=
+### Missing: help.templates.encyclopedia.title=
+### Missing: help.templates.examples.description=
+### Missing: help.templates.examples.title=
+### Missing: help.templates.meeting.title=
+### Missing: help.templates.meeting.description=
+### Missing: help.templates.simple.description=
+### Missing: help.templates.simple.title=
+### Missing: help.templates.more=
+### Missing: help.templates.title=
+### Missing: help.templates.useTemplates.description=
+### Missing: help.templates.useTemplates.tip=
+### Missing: help.templates.useTemplates.title=
+### Missing: help.title=
+### Missing: help.title1=
+### Missing: help.title2=
+### Missing: help.try.label=
+### Missing: help.videos.description=
+### Missing: help.videos.more=
+### Missing: help.videos.title=
+### Missing: help.videos.videoCard1.title=
+### Missing: help.videos.videoCard1.topic1=
+### Missing: help.videos.videoCard1.topic2=
+### Missing: help.videos.videoCard2.title=
+### Missing: help.videos.videoCard2.topic1=
+### Missing: help.videos.videoCard2.topic2=
+### Missing: help.videos.videoCard2.topic3=
+### Missing: help.videos.videoCard3.title=
+### Missing: help.videos.videoCard3.topic1=
+### Missing: help.videos.videoCard3.topic2=
+### Missing: help.videos.videoCard3.topic3=
+### Missing: help.videos.videoCard4.title=
+### Missing: help.videos.videoCard4.topic1=
+### Missing: help.videos.videoCard4.topic2=
+### Missing: help.videos.videoCard5.title=
+### Missing: help.videos.videoCard5.topic1=
+### Missing: help.videos.videoCard5.topic2=
+### Missing: help.videos.videoCard6.title=
+### Missing: help.videos.videoCard6.topic1=
+### Missing: help.videos.videoCard6.topic2=
+### Missing: help.videos.hint=
+### Missing: help.videos.watch=
+
+## Example Macro
+### Missing: rendering.macro.example.name=
+### Missing: rendering.macro.example.description=
+### Missing: rendering.macro.example.content.description=
+</content>
+</xwikidoc>

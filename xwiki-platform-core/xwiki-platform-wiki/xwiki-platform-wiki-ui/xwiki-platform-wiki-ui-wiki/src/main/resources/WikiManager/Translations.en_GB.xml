@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="en_GB">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+### Missing: core.menu.type.wiki=
+### Missing: core.menu.watchlist.add.wiki=
+### Missing: core.menu.watchlist.remove.wiki=
+### Missing: core.menu.admin.wiki=
+
+# WIKI INFORMATION PANEL
+### Missing: platform.wiki.panel.title=
+
+# MESSAGES
+### Missing: platform.wiki.currentwiki.welcome=
+### Missing: platform.wiki.currentwiki.currentUserIsOwner=
+### Missing: platform.wiki.currentwiki.currentUserIsAdmin=
+### Missing: platform.wiki.currentwiki.joinNeedToLogin=
+### Missing: platform.wiki.currentwiki.currentUserNotMember=
+### Missing: platform.wiki.currentwiki.currentuserCanJoin=
+### Missing: platform.wiki.currentwiki.currentUserIsMember=
+### Missing: platform.wiki.currentwiki.currentUserCanLeave=
+### Missing: platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=
+### Missing: platform.wiki.currentwiki.invitationPendingForCurrentWiki=
+### Missing: platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=
+### Missing: platform.wiki.currentwiki.joinRequestAcceptedNotification=
+### Missing: platform.wiki.currentwiki.joinRequestRejectedNotification=
+### Missing: platform.wiki.currentwiki.candidateHandledSaveComment=
+### Missing: platform.wiki.currentwiki.candidateHandledComment=
+### Missing: platform.wiki.currentwiki.candidateAcceptedSuccess=
+### Missing: platform.wiki.currentwiki.candidateRejectedSuccess=
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyMember=
+### Missing: platform.wiki.currentwiki.inviteRequestAlreadyExists=
+### Missing: platform.wiki.currentwiki.inviteUserAlreadyInvited=
+### Missing: platform.wiki.currentwiki.inviteSaveComment=
+### Missing: platform.wiki.currentwiki.inviteNotification=
+### Missing: platform.wiki.currentwiki.inviteSuccess=
+### Missing: platform.wiki.currentwiki.invitationCancelSaveComment=
+### Missing: platform.wiki.currentwiki.invitationCancelNotification=
+### Missing: platform.wiki.currentwiki.invitationCancelSuccess=
+### Missing: platform.wiki.currentwiki.invitationCancelFailure=
+### Missing: platform.wiki.currentwiki.candidateReviewFailure=
+
+# LABELS
+### Missing: platform.wiki.currentwiki.prop.wikiprettyname.label=
+### Missing: platform.wiki.currentwiki.prop.description.label=
+### Missing: platform.wiki.currentwiki.prop.owner.label=
+### Missing: platform.wiki.currentwiki.prop.membershipType.label=
+### Missing: platform.wiki.currentwiki.prop.secure.label=
+### Missing: platform.wiki.currentwiki.member.add=
+### Missing: platform.wiki.currentwiki.gadget.wikiInformation.label=
+### Missing: platform.wiki.currentwiki.gadget.topActiveUsers.label=
+### Missing: platform.wiki.currentwiki.panel.information.name.label=
+### Missing: platform.wiki.currentwiki.panel.information.description.label=
+### Missing: platform.wiki.currentwiki.panel.information.members.label=
+### Missing: platform.wiki.currentwiki.invitation.view.label=
+### Missing: platform.wiki.currentwiki.joinrequest.cancel.label=
+### Missing: platform.wiki.currentwiki.joinreques.request.label=
+### Missing: platform.wiki.currentwiki.join.label=
+### Missing: platform.wiki.currentwiki.leave.label=
+### Missing: platform.wiki.currentwiki.invite.username.label=
+### Missing: platform.wiki.currentwiki.invite.message.label=
+### Missing: platform.wiki.currentwiki.invite.button.label=
+### Missing: platform.wiki.currentwiki.candidates.label=
+### Missing: platform.wiki.currentwiki.candidates.status.label=
+### Missing: platform.wiki.currentwiki.candidates.type.label=
+### Missing: platform.wiki.currentwiki.candidates.reviewer.label=
+### Missing: platform.wiki.currentwiki.candidates.reviewermessage.label=
+### Missing: platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=
+### Missing: platform.wiki.currentwiki.candidates.accept.label=
+### Missing: platform.wiki.currentwiki.candidates.reject.label=
+### Missing: platform.wiki.currentwiki.candidates.invitation.cancel.label=
+### Missing: platform.wiki.currentwiki.wikiusers.title=
+### Missing: platform.wiki.currentwiki.managewikis.title=
+### Missing: WikiManager.WikiCandidateMemberClass_status_pending=
+### Missing: WikiManager.WikiCandidateMemberClass_status_accepted=
+### Missing: WikiManager.WikiCandidateMemberClass_status_rejected=
+### Missing: WikiManager.WikiCandidateMemberClass_type_request=
+### Missing: WikiManager.WikiCandidateMemberClass_type_invitation=
+
+# HINTS
+### Missing: platform.wiki.currentwiki.prop.wikiprettyname.hint=
+### Missing: platform.wiki.currentwiki.prop.description.hint=
+### Missing: platform.wiki.currentwiki.prop.owner.hint=
+### Missing: platform.wiki.currentwiki.prop.membershipType.hint=
+### Missing: platform.wiki.currentwiki.prop.secure.hint=
+### Missing: platform.wiki.currentwiki.invite.username.hint=
+### Missing: platform.wiki.currentwiki.invite.message.hint=
+### Missing: platform.wiki.currentwiki.candidates.hint=
+### Missing: platform.wiki.currentwiki.candidates.empty=
+
+# ADMIN
+### Missing: admin.xwiki.manageworkspace.description=
+### Missing: admin.xwiki.workspaceusers.description=
+### Missing: admin.xwiki.usersconfiguration.title=
+### Missing: admin.xwiki.members.title=
+### Missing: admin.xwiki.users.title=
+
+# DRAWER ITEM
+### Missing: platform.wiki.drawer.homeWiki=
+</content>
+</xwikidoc>

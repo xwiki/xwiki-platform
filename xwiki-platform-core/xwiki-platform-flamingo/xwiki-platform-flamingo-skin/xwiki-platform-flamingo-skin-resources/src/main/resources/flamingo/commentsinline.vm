@@ -181,41 +181,41 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #end
     <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
     <div class="commenttools">
-      #set($threadCount = $commentThreads.get("$!commentID").size())
-      ## We always add this button to the DOM, because the user can respond and create a thread without reloading the page.
-      ## When there's no thread to show, we hide it with CSS.
-      <button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${commentID}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
-        $services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
-      </button>
-      #if($xwiki.hasAccessLevel('comment'))
-        <a class="commentreply btn btn-default" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>
-          $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
-        </a>
-      #end
-      <a class="permalink btn btn-default" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
-         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}">
-        $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
-      </a>
-      #if($xwiki.hasAccessLevel('comment') && ($hasAdmin || $isUserComment))
-        <a class="edit btn btn-default" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")">
-          $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
-        </a>
-      #end
-      #if ($hasAdmin || ($hasEdit && $isUserComment))
-        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
-        ## By providing an anchor this behavior is stoped, without altering the URL functionality.
-        #set ($queryString = $escapetool.url({
-          'form_token': $services.csrf.token,
-          'classname': $xCommentClass,
-          'classid': $comment.number,
-          'xredirect': $doc.getURL('view')
-        }))
-        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
-        <a class="delete btn btn-default" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-           href="$deleteURL">
-          $services.icon.renderHTML('cross') $services.localization.render('core.viewers.comments.delete')
-        </a>
-      #end
+#set($threadCount = $commentThreads.get("$!commentID").size())
+## We always add this button to the DOM, because the user can respond and create a thread without reloading the page.
+## When there's no thread to show, we hide it with CSS.
+<button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${commentID}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
+$services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
+</button>##
+#if($xwiki.hasAccessLevel('comment'))
+<a class="commentreply btn btn-default" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>##
+$services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
+</a>##
+#end
+<a class="permalink btn btn-default" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}">##
+$services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
+</a>##
+#if($xwiki.hasAccessLevel('comment') && ($hasAdmin || $isUserComment))
+<a class="edit btn btn-default" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")">##
+$services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
+</a>##
+#end
+#if ($hasAdmin || ($hasEdit && $isUserComment))
+## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+## By providing an anchor this behavior is stoped, without altering the URL functionality.
+#set ($queryString = $escapetool.url({
+  'form_token': $services.csrf.token,
+  'classname': $xCommentClass,
+  'classid': $comment.number,
+  'xredirect': $doc.getURL('view')
+}))
+#set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
+<a class="delete btn btn-default" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+   href="$deleteURL">##
+  $services.icon.renderHTML('cross') $services.localization.render('core.viewers.comments.delete')
+</a>##
+#end
     </div>## btn-group
   </div>## xwikicomment
 #end

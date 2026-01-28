@@ -65,7 +65,7 @@
 (% style="color:blue" %)
 = encabezado =
 )))
-|Encabezados con sintaxis XWiki|1.1.1 encabezado con *negrita*|(((=== Encabezado con **negrita** ===)))
+|Encabezados con sintaxis XWiki|1.1 encabezado con *negrita*|(((== Encabezado con **negrita** ==)))
 
 === Encabezados 2.0 ===
 
@@ -89,5 +89,5 @@
 (% style="color:blue" %)
 = encabezado =
 )))
-|Encabezados con sintaxis XWiki|{{{=== Encabezado con **negrita** ===}}}|(((=== Encabezado con **negrita** ===)))</content>
+|Encabezados con sintaxis XWiki|{{{== Encabezado con **negrita** ==}}}|(((== Encabezado con **negrita** ==)))</content>
 </xwikidoc>

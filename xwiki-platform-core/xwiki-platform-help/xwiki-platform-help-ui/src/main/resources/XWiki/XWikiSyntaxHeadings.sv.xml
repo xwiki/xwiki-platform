@@ -63,7 +63,7 @@
 (% style="color:blue" %)
 = rubrik =
 )))
-|Rubriker med wikisyntax|1.1.1 Rubrik med *fetstil*|(((=== Rubrik med **fetstil** ===)))
+|Rubriker med wikisyntax|1.1 Rubrik med *fetstil*|(((== Rubrik med **fetstil** ==)))
 
 
 === 2.0 Headings ===
@@ -86,5 +86,5 @@
 (% style="color:blue" %)
 = rubrik =
 )))
-|Rubriker med wikisyntax|{{{=== Rubrik med **fetstil** ===}}}|(((=== Rubrik med **fetstil** ===)))</content>
+|Rubriker med wikisyntax|{{{== Rubrik med **fetstil** ==}}}|(((== Rubrik med **fetstil** ==)))</content>
 </xwikidoc>

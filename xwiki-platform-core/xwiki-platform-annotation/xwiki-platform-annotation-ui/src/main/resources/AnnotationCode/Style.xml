@@ -417,9 +417,8 @@ mark.annotation:not(.annotation-highlight) {
 #allAnnotations .annotation {
   margin: 0 0 8px;
 }
-#allAnnotations .annotation .annotationText, #Commentspane .annotation .annotationText {
-  padding: 0 36px 0 14px;
-  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+.annotationText {
+  padding: 0 36px 0 0;
   text-align: justify;
 }
 #allAnnotations .UPDATED .annotationText, #xwikicontent .UPDATED {
@@ -435,10 +434,28 @@ mark.annotation:not(.annotation-highlight) {
 .annotationHeader{
   padding: 2px 0px 6px;
 }
-.annotatedText .decorative-quote { 
-  font-size: 4rem;
-  font-family: var(--font-family-serif);
+
+.annotatedText {
+  font-style: italic;
+  font-size: 1.2em;
+  border-left: none;
+  padding: 10px 0;
+  margin: 0;
+  /* We hide the overflow so that the decorative quote doesn't go over the rest of the UI. */
+  overflow: hidden;
+
+  &:before {
+    content: "“";
+    font-size: 4em;
+    line-height: .1em;
+    margin-right: .1em;
+    vertical-align: -.45em;
+    font-family: var(--font-family-serif);
+    font-weight: var(--font-weight-semibold);
+    font-style: normal;
+  }
 }
+
 #allAnnotations .annotationHeader:hover {
   background-color: $theme.highlightColor;
 }

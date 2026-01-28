@@ -177,16 +177,16 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       </div>
     </div>## commentheader
     #if ($isAnnotation)
-      <a href="#ID$comment.number"><blockquote class="annotatedText"><span class="decorative-quote"aria-hidden="true">“</span>$!escapetool.xml($commentSelection)</blockquote></a>
+      <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
     #end
     <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
     <div class="commenttools">
       #set($threadCount = $commentThreads.get("$!commentID").size())
-      #if($threadCount > 0)
-        <button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${commentID}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
-          $services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
-        </button>
-      #end
+      ## We always add this button to the DOM, because the user can respond and create a thread without reloading the page.
+      ## When there's no thread to show, we hide it with CSS.
+      <button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${commentID}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
+        $services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
+      </button>
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>
           $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))

@@ -745,6 +745,22 @@ require([
       if (node.data.type === 'document' &amp;&amp; node.parent === $.jstree.root) {
         const $node = tree.get_node(nodeId, true);
         $node.children('.jstree-actions').append(pinActionTemplate.clone());
+        // We NEED to move around the semantics a bit to make that DOM make sense. 
+        // This could probably be done at the xwiki tree macro level but it would cause regressions 
+        // and doing it here only is enough for now.
+        // The proper solution would be to actually make the ".jstree-node" a treeitem from JStree itself.
+        // Like other places in JSTree, there is a lot of semantic markup but it's used approximatively.
+        // This poor markup leaves no place where JStree actions could be added correctly.
+        let anchor = $node.children('.jstree-anchor');
+        // Check if the markup is still an issue. We don't want to move it around if things have been fixed upstream.
+        if(anchor.attr('role') === 'treeitem') {
+          $node.attr('role', anchor.attr('role'));
+          anchor.removeAttr('role');
+          $node.attr('aria-selected', anchor.attr('aria-selected'));
+          anchor.removeAttr('aria-selected');
+          $node.attr('aria-level', anchor.attr('aria-level'));
+          anchor.removeAttr('aria-level');
+        }
       }
     });
   });

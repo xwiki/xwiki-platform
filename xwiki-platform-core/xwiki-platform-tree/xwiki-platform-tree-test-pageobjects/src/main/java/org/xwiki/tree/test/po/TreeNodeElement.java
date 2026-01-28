@@ -100,7 +100,7 @@ public class TreeNodeElement extends BaseElement
      */
     public WebElement getLabelElement()
     {
-        return getElement().findElement(By.xpath("./*[@role = 'treeitem']"));
+        return getElement().findElement(By.xpath("./a"));
     }
 
     /**

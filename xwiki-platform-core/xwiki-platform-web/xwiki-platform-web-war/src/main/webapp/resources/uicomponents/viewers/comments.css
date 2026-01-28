@@ -74,6 +74,14 @@ ul.commentreplies, .reply {
   border-color: transparent;
 }
 
+.commenttools .thread-toggle {
+  display: none;
+}
+
+/* If there's a thread, then we show its toggle. */
+.xwikicomment:has(+ .commentthread > *) .commenttools .thread-toggle {
+  display: unset;
+}
 /* We assume that the caret icon is the first child of the button.*/
 .commenttools .thread-toggle> *:first-child {
   transition: transform 200ms ease-in-out;

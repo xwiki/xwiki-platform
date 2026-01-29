@@ -456,6 +456,22 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #if ($request.wizard == 'true')
         ## Preserve the wizard mode.
         &lt;input type="hidden" name="wizard" value="true" /&gt;
+        ## Compute the URL of the next wizard step (used by the AJAX Save &amp; View implementation).
+        #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+        #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+        #set ($queryString = {
+          'wizard': true,
+          'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
+        })
+        #if (!$xwiki.exists($templateProviderReference))
+          #set ($discard = $queryString.putAll({
+            'form_token': $services.csrf.getToken(),
+            'template': 'XWiki.TemplateProviderTemplate',
+            'parent': $doc.fullName
+          }))
+        #end
+        #set ($appWizardNextStepURL = $xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString)))
+        &lt;input type="hidden" id="xredirect" name="xredirect" value="$escapetool.xml($appWizardNextStepURL)" /&gt;
       #end
       ## Compute the application title to be used as the wizard step title.
       #getAppTitle
@@ -703,7 +719,15 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #updateAndSaveSheet
   #updateAndSaveTranslations
   #if ($action == 'save')
-    #if ($errorMessage)
+    #if ("$!request.ajax" == 'true')
+      ## When saving through AJAX, don't redirect and don't render an error page. Let the client-side handle both.
+      #if ($errorMessage)
+        $response.setStatus(400)
+        #rawResponse($errorMessage, 'text/plain')
+      #else
+        $response.setStatus(204)
+      #end
+    #elseif ($errorMessage)
       #error($errorMessage)
     #elseif ("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
@@ -727,7 +751,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #end
   #else
     #if ($errorMessage)
-      $response.sendError(400, $errorMessage)
+      $response.setStatus(400)
+      #rawResponse($errorMessage, 'text/plain')
     #else
       $response.setStatus(204)
     #end
@@ -1627,17 +1652,9 @@ return XWiki;
     form.down("input[name='action_save']").name = 'xaction_save';
     form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
 
-    // Make sure the 'Save &amp; Continue' button is submitted when clicked.
-    document.observe('xwiki:class:save', function(event) {
-      event = event.memo.originalEvent;
-      if (event.memo['continue']) {
-        var submitButton = event.memo.originalEvent.element();
-        submitButton.insert({after: new Element('input', {type: 'hidden', 'name': submitButton.name})});
-        (function () {
-          submitButton.next().remove();
-        }).defer();
-      }
-    }.bindAsEventListener(window));
+    // Allow core actionButtons.js to handle this as a non-custom form and to submit the name of the clicked button.
+    form.dataset.customForm = 'false';
+    form.dataset.submitButtonName = 'true';
 
     // Be prepared to enhance some of the field properties.
     new XWiki.FormFieldNameManager();

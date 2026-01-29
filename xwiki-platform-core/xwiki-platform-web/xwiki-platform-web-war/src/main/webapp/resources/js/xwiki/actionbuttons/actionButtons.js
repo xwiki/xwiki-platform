@@ -274,7 +274,11 @@ var XWiki = (function(XWiki) {
       this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1;
+      let isCustomForm = this.form.action.indexOf("/preview/") === -1 && this.form.action.indexOf("/save/") === -1;
+      const customFormAttribute = this.form.dataset.customForm;
+      if (customFormAttribute !== null) {
+        isCustomForm = customFormAttribute !== 'false' && customFormAttribute !== '0';
+      }
       if (isCustomForm && !isContinue) {
         return;
       }
@@ -311,6 +315,13 @@ var XWiki = (function(XWiki) {
       var submitValue = 'action_save';
       if (isContinue) {
         submitValue = 'action_saveandcontinue';
+      }
+      const useSubmitButtonName = this.form.dataset.submitButtonName;
+      if (useSubmitButtonName && useSubmitButtonName !== 'false' && useSubmitButtonName !== '0') {
+        const submitButtonName = event.element()?.getAttribute('name');
+        if (submitButtonName) {
+          submitValue = submitButtonName;
+        }
       }
       var formData = this.getFormData(submitValue);
       if (isContinue) {

@@ -196,7 +196,6 @@
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     &lt;div class="search-facet" data-name="$facetField.name"&gt;
     #set ($expanded = ($facetRequestValues || $facetValuesLimit))
-      $expanded
       #displaySearchFacetHeader($facetField $expanded)
       #displaySearchFacetBody($facetField $expanded)
     &lt;/div&gt;

@@ -19,9 +19,16 @@
  */
 package org.xwiki.attachment.test.ui.docker;
 
+import java.io.InputStream;
+
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.wikis.WikiResource;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
@@ -59,5 +66,40 @@ class WikisIT
         } finally {
             get.releaseConnection();
         }
+    }
+
+    @Test
+    void testImportXAR(TestUtils setup) throws Exception
+    {
+        // Try as guest
+        setup.setDefaultCredentials(null);
+
+        try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
+            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
+            try {
+                assertEquals(HttpStatus.SC_UNAUTHORIZED, post.getStatusCode());
+            } finally {
+                post.releaseConnection();
+            }
+        }
+
+        // Switch to superadmin
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
+            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
+            try {
+                assertEquals(HttpStatus.SC_OK, post.getStatusCode());
+            } finally {
+                post.releaseConnection();
+            }
+        }
+
+        Page page = setup.rest().get(new LocalDocumentReference("Main", "Foo"));
+
+        assertEquals("xwiki", page.getWiki());
+        assertEquals("Main", page.getSpace());
+        assertEquals("Foo", page.getName());
+        assertEquals("Foo", page.getContent());
     }
 }

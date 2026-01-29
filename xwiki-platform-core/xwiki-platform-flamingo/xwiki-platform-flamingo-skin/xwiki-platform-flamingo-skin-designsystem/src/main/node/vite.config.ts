@@ -17,15 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { FlamingoDesignSystemLoader } from "./flamingoDesignSystemLoader";
-import type { DesignSystemLoader } from "@xwiki/platform-api";
-import type { Container } from "inversify";
 
-export default class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<DesignSystemLoader>("DesignSystemLoader")
-      .to(FlamingoDesignSystemLoader)
-      .whenNamed("flamingo");
-  }
-}
+import { generateConfigVue } from "../../../../../../xwiki-platform-node/src/main/node/vite.config.ts";
+import { defineConfig, mergeConfig } from "vite";
+
+const defaults = generateConfigVue(import.meta.url);
+
+// Exclude @xwiki/platform-api from external dependencies because it is currently not distributed as a webjar.
+// TODO: See XWIKI-XYZ
+// We proceed by mutation of the default configuration because the merge strategy of vite does not propose a
+// substractive operation (i.e., it's only possible to add new externals, but not to remove them).
+defaults.build.rollupOptions.external =
+  defaults.build.rollupOptions.external.filter(
+    (it) => it !== "@xwiki/platform-api",
+  );
+
+export default mergeConfig(
+  defaults,
+  defineConfig({
+    build: {
+      outDir: "../../../target/node-dist",
+    },
+  }),
+);

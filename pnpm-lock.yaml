@@ -402,6 +402,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem/src/main/node:
     dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/api
       '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/ds/api
@@ -415,6 +418,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/dev/config
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)

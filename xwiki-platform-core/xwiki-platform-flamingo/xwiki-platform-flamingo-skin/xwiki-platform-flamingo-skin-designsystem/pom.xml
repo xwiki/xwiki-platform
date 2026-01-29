@@ -37,5 +37,26 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>{
+        "inversify": "org.webjars.npm:inversify/lib/esm/index.js",
+        "@inversifyjs/common": "org.webjars.npm:inversifyjs__common/lib/esm/index.js",
+        "@inversifyjs/container": "org.webjars.npm:inversifyjs__container/lib/esm/index.js",
+        "@inversifyjs/core": "org.webjars.npm:inversifyjs__core/lib/esm/index.js",
+        "@inversifyjs/reflect-metadata-utils": "org.webjars.npm:inversifyjs__reflect-metadata-utils/lib/esm/index.js",
+        "@inversifyjs/plugin": "org.webjars.npm:inversifyjs__plugin/lib/esm/index.js",
+        "reflect-metadata": "org.webjars.npm:reflect-metadata/Reflect.js"
+    }</xwiki.extension.javascript.modules.importmap>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>inversify</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>reflect-metadata</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

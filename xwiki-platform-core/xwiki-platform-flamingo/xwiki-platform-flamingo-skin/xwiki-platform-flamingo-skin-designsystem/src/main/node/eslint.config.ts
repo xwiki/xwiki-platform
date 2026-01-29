@@ -1,1 +1,3 @@
-export * from "../../../../../../xwiki-platform-node/src/main/node/eslint.config"
+import config from "@xwiki/platform-tool-eslintconfig"
+
+export default config;

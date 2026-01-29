@@ -17,15 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { FlamingoDesignSystemLoader } from "./flamingoDesignSystemLoader";
+import { registerAsyncComponent } from "@xwiki/platform-api";
+import { injectable } from "inversify";
 import type { DesignSystemLoader } from "@xwiki/platform-api";
-import type { Container } from "inversify";
+import type { App } from "vue";
 
-export default class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<DesignSystemLoader>("DesignSystemLoader")
-      .to(FlamingoDesignSystemLoader)
-      .whenNamed("flamingo");
+@injectable()
+export class FlamingoDesignSystemLoader implements DesignSystemLoader {
+  loadDesignSystem(app: App): void {
+    registerAsyncComponent(app, "XLoad", () => import("./vue/x-load.vue"));
   }
 }

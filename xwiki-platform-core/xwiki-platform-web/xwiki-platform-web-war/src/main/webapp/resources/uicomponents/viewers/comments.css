@@ -49,23 +49,17 @@ ul.commentreplies, .reply {
   max-height: 30px;
 }
 .commentheader {
-  border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.textSecondaryColor;
-  margin: 0;        /* Overriding toucan */
-  padding: 2px 0;   /* Overriding toucan */
+  color: var(--text-muted);
 }
-.commentheader:hover {
-  background-color: $theme.highlightColor;
-}
+
 .commentauthor {
-  font-size: 1em; /* Overriding toucan */
+  font-weight: var(--font-weight-semibold);
 }
 .commentdate {
   font-size: 80%;
 }
 .commentcontent {
-  border: none;       /* Overriding toucan */
-  margin: 0;
+  margin-top: 10px;
   padding: 0 36px 0 0;
   text-align: justify;
 }

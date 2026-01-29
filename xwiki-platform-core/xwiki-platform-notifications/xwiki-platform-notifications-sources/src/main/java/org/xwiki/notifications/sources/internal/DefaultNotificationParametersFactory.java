@@ -451,16 +451,6 @@ public class DefaultNotificationParametersFactory
         String pages = parameters.get(ParametersKey.PAGES);
         String spaces = parameters.get(ParametersKey.SPACES);
 
-        // We check if the parameters contain a location, and we remove ScopeNotificationFilter if it doesn't:
-        // this filter would automatically discard all events not matching a given location.
-        boolean noLocationFilter =
-            (StringUtils.isBlank(wikis) && StringUtils.isBlank(pages) && StringUtils.isBlank(spaces));
-        notificationParameters.filters = notificationFilterManager.getAllFilters(true)
-            .stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())
-                && (!noLocationFilter || !filter.getName().equals(ScopeNotificationFilter.FILTER_NAME)))
-            .collect(Collectors.toSet());
-
         String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
 
@@ -472,7 +462,17 @@ public class DefaultNotificationParametersFactory
         handleLocationParameter(spaces, notificationParameters, NotificationFilterProperty.SPACE, currentWiki);
         handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
-        handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
+        // We check if the parameters contain a location, and we remove ScopeNotificationFilter if it doesn't:
+        // this filter would automatically discard all events not matching a given location.
+        // We need to do that only after having handled subwiki without location parameter as this might add a filter
+        // preference.
+        boolean noLocationFilter =
+            !handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
+        notificationParameters.filters = notificationFilterManager.getAllFilters(true)
+            .stream()
+            .filter(filter -> !excludedFilters.contains(filter.getName())
+                && (!noLocationFilter || !filter.getName().equals(ScopeNotificationFilter.FILTER_NAME)))
+            .collect(Collectors.toSet());
 
         try {
             usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
@@ -515,16 +515,20 @@ public class DefaultNotificationParametersFactory
      * @param notificationParameters the parameters which are passed to the notification API.
      * @param parameters the parameters of the notification macro
      * @param currentWiki the identifier of the current wiki
+     * @return {@code true} if a location filter preference was added to handle the wiki.
      */
-    private void handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
+    private boolean handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
         Map<ParametersKey, String> parameters, String currentWiki)
     {
+        boolean result = false;
         if (StringUtils.isBlank(parameters.get(ParametersKey.WIKIS))
             && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
             && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
             && !Strings.CS.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
             handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
+            result = true;
         }
+        return result;
     }
 
     private void handleLocationParameter(String locations, NotificationParameters parameters,

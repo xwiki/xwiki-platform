@@ -196,14 +196,6 @@ body {
         }
       }
 
-      a {
-        &.user-name, &.group-name // Usually user names and group names displayed with the userDisplayMacro
-          // are next to the user avatar. This specific rule can be removed once XWIKI-22269 is fixed.
-        {
-          .not-inline-link();
-        }
-      }
-
       /* Remove the underlining from links styled like buttons.
        Those are already different enough from their neighboring text. */
       & a.btn,

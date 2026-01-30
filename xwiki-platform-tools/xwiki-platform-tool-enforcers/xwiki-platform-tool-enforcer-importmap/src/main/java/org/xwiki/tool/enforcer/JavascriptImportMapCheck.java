@@ -129,56 +129,6 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
         } catch (JavascriptImportmapException e) {
             throw new EnforcerRuleException(
                 "Failed to parse the [%s] property".formatted(JAVASCRIPT_IMPORTMAP_PROPERTY), e);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<Dependency> getProjectTransitiveDependencies() throws EnforcerRuleException
-    {
-        try {
-            DefaultRepositorySystemSession defaultRepositorySystemSession =
-                new DefaultRepositorySystemSession(this.session.getRepositorySession());
-
-            MavenProject mavenProject = this.session.getCurrentProject();
-            ArtifactTypeRegistry artifactTypeRegistry = this.session.getRepositorySession().getArtifactTypeRegistry();
-
-            List<Dependency> dependencies = mavenProject.getDependencies().stream()
-                .filter(d -> !d.isOptional())
-                .filter(d -> !Objects.equals("test", d.getScope()))
-                .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
-                .toList();
-
-            List<Dependency> managedDependencies =
-                ofNullable(mavenProject.getDependencyManagement())
-                    .map(DependencyManagement::getDependencies)
-                    .map(list -> list.stream()
-                        .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
-                        .toList())
-                    .orElse(null);
-
-            CollectRequest collectRequest =
-                new CollectRequest(dependencies, managedDependencies, mavenProject.getRemoteProjectRepositories());
-            collectRequest.setRootArtifact(RepositoryUtils.toArtifact(mavenProject.getArtifact()));
-
-            var collectedDependencies =
-                this.repositorySystem.collectDependencies(defaultRepositorySystemSession, collectRequest);
-
-            var remaining = new LinkedBlockingQueue<>(List.of(collectedDependencies.getRoot()));
-            List<Dependency> res = new ArrayList<>();
-
-            while (!remaining.isEmpty()) {
-                var current = remaining.poll();
-                remaining.addAll(current.getChildren());
-                Dependency dependency = current.getDependency();
-                if (dependency != null) {
-                    res.add(dependency);
-                }
-            }
-
-            return res;
-        } catch (DependencyCollectionException e) {
-            throw new EnforcerRuleException("Could not build dependency tree " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -198,6 +148,7 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
                 .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
                 .toList();
 
+            // Get the list of managed dependencies of the project
             List<Dependency> managedDependencies =
                 ofNullable(mavenProject.getDependencyManagement())
                     .map(DependencyManagement::getDependencies)

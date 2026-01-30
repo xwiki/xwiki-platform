@@ -456,21 +456,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #if ($request.wizard == 'true')
         ## Preserve the wizard mode.
         &lt;input type="hidden" name="wizard" value="true" /&gt;
-        ## Compute the URL of the next wizard step (used by the AJAX Save &amp; View implementation).
-        #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
-        #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-        #set ($queryString = {
-          'wizard': true,
-          'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
-        })
-        #if (!$xwiki.exists($templateProviderReference))
-          #set ($discard = $queryString.putAll({
-            'form_token': $services.csrf.getToken(),
-            'template': 'XWiki.TemplateProviderTemplate',
-            'parent': $doc.fullName
-          }))
-        #end
-        #set ($appWizardNextStepURL = $xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString)))
+        ## Provide the URL of the next wizard step as xredirect value (used by the AJAX Save &amp; View implementation).
+        #set ($appWizardNextStepURL = "#getNextStepURL()")
         &lt;input type="hidden" id="xredirect" name="xredirect" value="$escapetool.xml($appWizardNextStepURL)" /&gt;
       #end
       ## Compute the application title to be used as the wizard step title.
@@ -709,6 +696,26 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
+ * Prints the URL of the next wizard step.
+ *#
+#macro (getNextStepURL)
+  #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+  #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+  #set ($queryString = {
+    'wizard': true,
+    'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
+  })
+  #if (!$xwiki.exists($templateProviderReference))
+    #set ($discard = $queryString.putAll({
+        'form_token': $services.csrf.getToken(),
+        'template': 'XWiki.TemplateProviderTemplate',
+        'parent': $doc.fullName
+      }))
+  #end
+$xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString))##
+#end
+
+#**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
 #macro (doSave)
@@ -731,20 +738,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #error($errorMessage)
     #elseif ("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
-      #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-      #set ($queryString = {
-        'wizard': true,
-        'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
-      })
-      #if (!$xwiki.exists($templateProviderReference))
-        #set ($discard = $queryString.putAll({
-          'form_token': $services.csrf.getToken(),
-          'template': 'XWiki.TemplateProviderTemplate',
-          'parent': $doc.fullName
-        }))
-      #end
-      $response.sendRedirect($xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString)))
+      $response.sendRedirect("#getNextStepURL()")
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

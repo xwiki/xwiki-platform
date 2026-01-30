@@ -66,6 +66,7 @@ function initWrapper({ options, afterEntryFetchWrapper }) {
               afterEntryFetchWrapper.callback = callback;
             }
           },
+          getPropertyDescriptors: () => [],
           data: {
             data: {
               entries: [],
@@ -92,6 +93,21 @@ describe("LayoutTable.vue", () => {
     afterEntryFetchWrapper.callback();
     await nextTick();
     expect(wrapper.find(".noentries-table").text()).toBe("livedata.bottombar.noEntries");
+  });
+
+  it("Provides a non-zero property count as CSS variable", async () => {
+    const wrapper = initWrapper({
+      options: {
+        global: {
+          provide: {
+            logic: {
+              getPropertyDescriptors: () => [{ id: "prop1" }],
+            },
+          },
+        },
+      },
+    });
+    expect(wrapper.find(".layout-table").element.style.getPropertyValue("--livedata-property-count")).toBe("1");
   });
 
   it("Renders with some entries", async () => {

@@ -44,6 +44,7 @@
         "@inversifyjs/core": "org.webjars.npm:inversifyjs__core/lib/esm/index.js",
         "@inversifyjs/reflect-metadata-utils": "org.webjars.npm:inversifyjs__reflect-metadata-utils/lib/esm/index.js",
         "@inversifyjs/plugin": "org.webjars.npm:inversifyjs__plugin/lib/esm/index.js",
+        "@inversifyjs/prototype-utils": "org.webjars.npm:inversifyjs__prototype-utils/lib/esm/index.js",
         "reflect-metadata": "org.webjars.npm:reflect-metadata/Reflect.js"
     }</xwiki.extension.javascript.modules.importmap>
   </properties>

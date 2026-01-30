@@ -2,7 +2,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "isolatedDeclarations": false
+    "isolatedDeclarations": false,
+    "types": ["@xwiki/platform-dsapi"]
   },
   "extends": "../../../../../../xwiki-platform-node/src/main/node/tsconfig.json",
   "include": [

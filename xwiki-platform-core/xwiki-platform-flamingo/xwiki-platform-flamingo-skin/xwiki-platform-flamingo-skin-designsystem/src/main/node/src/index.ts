@@ -18,5 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import ComponentInit from "./componentsInit";
+import DemoComponent from "./vue/DemoComponent.vue";
 
-export { ComponentInit };
+export { ComponentInit, DemoComponent };

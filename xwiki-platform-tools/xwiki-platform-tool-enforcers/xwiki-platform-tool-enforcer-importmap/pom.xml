@@ -31,6 +31,10 @@
   <name>XWiki Platform - Tools - Importmap Enforcer</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tools - Importmap Enforcer</description>
+  <properties>
+    <!-- Skipping spoon since it is not analyzing the @Inject annotation correctly. -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -54,6 +58,12 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.enforcer</groupId>
+      <artifactId>enforcer-rules</artifactId>
+      <version>${maven-enforcer.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

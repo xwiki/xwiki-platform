@@ -266,7 +266,7 @@ export default {
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;
-  padding: 8px 0 8px 4px;
+  padding: 0;
 }
 
 .layout-table .column-name {
@@ -278,32 +278,36 @@ export default {
 }
 
 .layout-table .draggable-item .resize-handle {
+  /* Position the resize handle at the right edge of the column name and ensure it spans the full height. */
   position: absolute;
   right: 0;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  /* TODO: Discussion about the exact display of resize handles.
-      See https://jira.xwiki.org/browse/XWIKI-21816 */
+  top: 0;
+  bottom: 0;
+  /* Hide the resize handle by default. */
   opacity: 0;
+  /* Reset button styles. */
   padding: 0;
-  cursor: col-resize;
+  margin: 0;
   min-width: 0;
-  width: 0;
-  border-width: 2px;
+  border: none;
   border-radius: 0;
-  margin-left: 2px;
+  /* Indicate with the mouse cursor that this is a resize handle. */
+  cursor: col-resize;
+  /* Style the resize handle as 4px wide in default state. */
+  width: 4px;
   /* Ensure that the resize handle is above the next column name. */
   z-index: 1;
 }
 
 .layout-table .draggable-item:focus-within .resize-handle,
 .layout-table .draggable-item:hover .resize-handle {
+  /* Show the resize handle and increase its width when the column is focused or hovered. */
   opacity: 1;
-  border-color: var(--text-muted);
-  border-width: 3px;
-  margin-left: 0;
+  background: var(--text-muted);
+  width: 6px;
 }
 
+/* Center the resize handle between the current and the next column name, if there is one. */
 .layout-table .draggable-item:not(:last-child) .resize-handle {
   margin-right: -2px;
 }
@@ -322,6 +326,7 @@ export default {
   background: transparent;
   border: 0;
   text-align: left;
+  padding: var(--table-cell-padding);
 }
 
 .layout-table .draggable-item .property-name {

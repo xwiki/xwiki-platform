@@ -24,7 +24,60 @@ import type { App } from "vue";
 
 @injectable()
 export class FlamingoDesignSystemLoader implements DesignSystemLoader {
+  // eslint-disable-next-line max-statements
   loadDesignSystem(app: App): void {
-    registerAsyncComponent(app, "XLoad", () => import("./vue/x-load.vue"));
+    registerAsyncComponent(app, "XAlert", () => import("./vue/XAlert.vue"));
+    registerAsyncComponent(app, "XAvatar", () => import("./vue/XAvatar.vue"));
+    registerAsyncComponent(app, "XBtn", () => import("./vue/XBtn.vue"));
+    registerAsyncComponent(
+      app,
+      "XBreadcrumb",
+      () => import("./vue/XBreadcrumb.vue"),
+    );
+    registerAsyncComponent(app, "XCard", () => import("./vue/XCard.vue"));
+    registerAsyncComponent(
+      app,
+      "XCheckbox",
+      () => import("./vue/XCheckbox.vue"),
+    );
+    registerAsyncComponent(app, "XDialog", () => import("./vue/XDialog.vue"));
+    registerAsyncComponent(app, "XDivider", () => import("./vue/XDivider.vue"));
+    registerAsyncComponent(
+      app,
+      "XFileInput",
+      () => import("./vue/XFileInput.vue"),
+    );
+    registerAsyncComponent(app, "XForm", () => import("./vue/XForm.vue"));
+    registerAsyncComponent(app, "XImg", () => import("./vue/XImg.vue"));
+    registerAsyncComponent(app, "XLoad", () => import("./vue/XLoad.vue"));
+    registerAsyncComponent(app, "XMenu", () => import("./vue/XMenu.vue"));
+    registerAsyncComponent(
+      app,
+      "XMenuItem",
+      () => import("./vue/XMenuItem.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XMenuLabel",
+      () => import("./vue/XMenuLabel.vue"),
+    );
+    registerAsyncComponent(app, "XSelect", () => import("./vue/XSelect.vue"));
+    registerAsyncComponent(app, "XTab", () => import("./vue/XTab.vue"));
+    registerAsyncComponent(
+      app,
+      "XTabGroup",
+      () => import("./vue/XTabGroup.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XTabPanel",
+      () => import("./vue/XTabPanel.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XTextField",
+      () => import("./vue/XTextField.vue"),
+    );
+    registerAsyncComponent(app, "XTree", () => import("./vue/XTree.vue"));
   }
 }

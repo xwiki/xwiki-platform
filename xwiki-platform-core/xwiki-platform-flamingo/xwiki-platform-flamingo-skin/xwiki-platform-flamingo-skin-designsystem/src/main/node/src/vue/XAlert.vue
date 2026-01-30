@@ -20,51 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <h2>XAlert</h2>
-  <XAlert type="success" />
-  <XAlert type="warning" />
-  <XAlert type="error" />
-  <XAlert type="info" />
-  <h2>XAvatar</h2>
-  <XAvatar />
-  <h2>XBtn</h2>
-  <XBtn />
-  <h2>XBreadcrumb</h2>
-  <XBreadcrumb />
-  <h2>XCard</h2>
-  <XCard />
-  <h2>XCheckbox</h2>
-  <XCheckbox />
-  <h2>XDialog</h2>
-  <XDialog />
-  <h2>XDivider</h2>
-  <XDivider />
-  <h2>XFileInput</h2>
-  <XFileInput />
-  <h2>XForm</h2>
-  <XForm />
-  <h2>XImg</h2>
-  <XImg />
-  <h2>XLoad</h2>
-  <XLoad />
-  <h2>XMenu</h2>
-  <XMenu />
-  <h2>XMenuItem</h2>
-  <XMenuItem />
-  <h2>XMenuLabel</h2>
-  <XMenuLabel />
-  <h2>XSelect</h2>
-  <XSelect />
-  <h2>XTab</h2>
-  <XTab />
-  <h2>XTabGroup</h2>
-  <XTabGroup />
-  <h2>XTabPanel</h2>
-  <XTabPanel />
-  <h2>XTextField</h2>
-  <XTextField />
-  <h2>XTree</h2>
-  <XTree />
+  <div>TODO</div>
 </template>
 
 <style scoped></style>

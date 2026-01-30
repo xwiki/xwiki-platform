@@ -182,6 +182,57 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
         }
     }
 
+    private List<Dependency> getProjectTransitiveDependencies() throws EnforcerRuleException
+    {
+        try {
+            DefaultRepositorySystemSession defaultRepositorySystemSession =
+                new DefaultRepositorySystemSession(this.session.getRepositorySession());
+
+            MavenProject mavenProject = this.session.getCurrentProject();
+            ArtifactTypeRegistry artifactTypeRegistry = this.session.getRepositorySession().getArtifactTypeRegistry();
+
+            // Resolve the direct dependencies of the project that are not optional and not test.
+            List<Dependency> dependencies = mavenProject.getDependencies().stream()
+                .filter(d -> !d.isOptional())
+                .filter(d -> !Objects.equals("test", d.getScope()))
+                .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                .toList();
+
+            List<Dependency> managedDependencies =
+                ofNullable(mavenProject.getDependencyManagement())
+                    .map(DependencyManagement::getDependencies)
+                    .map(list -> list.stream()
+                        .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                        .toList())
+                    .orElse(null);
+
+            CollectRequest collectRequest =
+                new CollectRequest(dependencies, managedDependencies, mavenProject.getRemoteProjectRepositories());
+            collectRequest.setRootArtifact(RepositoryUtils.toArtifact(mavenProject.getArtifact()));
+
+            // Resolve the transitive dependencies.
+            var collectedDependencies =
+                this.repositorySystem.collectDependencies(defaultRepositorySystemSession, collectRequest);
+
+            // The dependencies are presented as a tree, we loop over this tree to flatten it.
+            var remaining = new LinkedBlockingQueue<>(List.of(collectedDependencies.getRoot()));
+            var res = new ArrayList<Dependency>();
+
+            while (!remaining.isEmpty()) {
+                var current = remaining.poll();
+                remaining.addAll(current.getChildren());
+                var dependency = current.getDependency();
+                if (dependency != null) {
+                    res.add(dependency);
+                }
+            }
+
+            return res;
+        } catch (DependencyCollectionException e) {
+            throw new EnforcerRuleException("Could not build dependency tree " + e.getLocalizedMessage(), e);
+        }
+    }
+
     private static boolean areDependenciesEquals(String groupId0, String artifactId0, String groupId1,
         String artifactId1)
     {

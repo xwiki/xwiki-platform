@@ -2089,7 +2089,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Resolve the merge conflict caused by the fact that we saved from Source mode.
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.submitCurrentChoice(true);
-        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.getContent());
+        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.waitForView().getContent());
     }
 
     @Test

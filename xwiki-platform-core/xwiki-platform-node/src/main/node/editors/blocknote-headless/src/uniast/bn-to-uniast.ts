@@ -45,6 +45,7 @@ import type {
   InlineContent,
   LinkTarget,
   ListItem,
+  ListType,
   TableCell,
   UniAst,
 } from "@xwiki/platform-uniast-api";
@@ -83,6 +84,7 @@ export class BlockNoteToUniAstConverter {
     const out: Block[] = [];
 
     for (const block of blocks) {
+      // Skip list items (handled below)
       if (
         block.type !== "bulletListItem" &&
         block.type !== "numberedListItem" &&
@@ -100,14 +102,30 @@ export class BlockNoteToUniAstConverter {
       const lastBlock = out.at(-1);
       const currentList = lastBlock?.type === "list" ? lastBlock : null;
 
-      const listItem = this.convertListItem(block, currentList);
+      const listItem = this.convertListItem(block);
 
+      // If we are already in a list, push into it...
       if (currentList) {
         currentList.items.push(listItem);
-      } else {
+      }
+
+      // ...otherwise start a new one
+      else {
+        // Given lists should be consistent inside BlockNote, we can determine an entire list's type
+        // by simply looking at its first item
+        const listType: ListType =
+          block.type === "numberedListItem"
+            ? { type: "ordered", firstIndex: block.props.start ?? null }
+            : block.type === "checkListItem"
+              ? { type: "checkable" }
+              : { type: "unordered" };
+
+        console.log({ listType });
+
         out.push({
           type: "list",
           items: [listItem],
+          listType,
           styles: {},
         });
       }
@@ -303,7 +321,6 @@ export class BlockNoteToUniAstConverter {
         type: "bulletListItem" | "numberedListItem" | "checkListItem";
       }
     >,
-    currentList: Extract<Block, { type: "list" }> | null,
   ): ListItem {
     switch (block.type) {
       case "bulletListItem":
@@ -323,12 +340,7 @@ export class BlockNoteToUniAstConverter {
         };
 
       case "numberedListItem": {
-        const prevNumber = currentList?.items.at(-1)?.number;
-
-        const number = (prevNumber ?? 0) + 1;
-
         return {
-          number,
           content: [
             // TODO: change when nested blocks are supported in blocknote
             {

@@ -40,6 +40,7 @@ type Block =
     }
   | {
       type: "list";
+      listType: ListType;
       items: ListItem[];
       styles: BlockStyles;
     }
@@ -86,11 +87,19 @@ type BlockStyles = {
 type Alignment = "left" | "center" | "right" | "justify";
 
 /**
+ * @since 18.1.0RC1
+ * @beta
+ */
+type ListType =
+  | { type: "unordered" }
+  | { type: "ordered"; firstIndex: number | null }
+  | { type: "checkable" };
+
+/**
  * @since 18.0.0RC1
  * @beta
  */
 type ListItem = {
-  number?: number;
   checked?: boolean;
   content: Block[];
   styles: BlockStyles;
@@ -236,6 +245,7 @@ export type {
   Link,
   LinkTarget,
   ListItem,
+  ListType,
   MacroInvocation,
   TableCell,
   TableColumn,

@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -2160,7 +2161,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = new RealtimeCKEditor().getRichTextArea();
 
         secondTextArea.sendKeys("three");
-        secondTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("three"));
 
         //
         // First Tab
@@ -2227,7 +2229,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
         firstTextArea.waitUntilTextContains("four");
         firstTextArea.sendKeys("zero ");
-        firstTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("zero four"));
 
         //
         // Second Tab
@@ -2800,5 +2803,23 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().addPageNotYetReloadedMarker();
         sectionPage.clickSave();
         setup.getDriver().waitUntilPageIsReloaded();
+    }
+
+    private void editInSeparateTab(TestUtils setup, DocumentReference documentReference,
+        Consumer<RealtimeRichTextAreaElement> editAction)
+    {
+        String currentTabHandle = setup.getDriver().getWindowHandle();
+        setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(documentReference);
+        RealtimeRichTextAreaElement textArea = editPage.getContenEditor().getRichTextArea();
+
+        editAction.accept(textArea);
+        setup.leaveEditMode();
+
+        setup.getDriver().close();
+        if (currentTabHandle != null) {
+            setup.getDriver().switchTo().window(currentTabHandle);
+        }
     }
 }

@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <div>XCARD</div>
 </template>
 
 <style scoped></style>

@@ -105,11 +105,10 @@ type MacroListType =
  * @beta
  */
 type MacroListItem = {
-  content: MacroInlineContent[];
-  styles: MacroBlockStyles;
-
   /** Is the item checked? (only applicable for lists with the `checkable` type) */
   checked?: boolean;
+  content: MacroInlineContent[];
+  styles: MacroBlockStyles;
 };
 
 /**

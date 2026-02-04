@@ -120,8 +120,6 @@ export class BlockNoteToUniAstConverter {
               ? { type: "checkable" }
               : { type: "unordered" };
 
-        console.log({ listType });
-
         out.push({
           type: "list",
           items: [listItem],

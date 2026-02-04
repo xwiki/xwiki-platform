@@ -100,6 +100,7 @@ type ListType =
  * @beta
  */
 type ListItem = {
+  /** Is the item checked? (only applicable for lists with the `checkable` type) */
   checked?: boolean;
   content: Block[];
   styles: BlockStyles;

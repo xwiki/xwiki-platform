@@ -158,7 +158,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>18.1.0-SNAPSHOT</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>

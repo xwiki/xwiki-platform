@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
@@ -2087,7 +2088,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Resolve the merge conflict caused by the fact that we saved from Source mode.
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.submitCurrentChoice(true);
-        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.getContent());
+        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.waitForView().getContent());
     }
 
     @Test
@@ -2159,7 +2160,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = new RealtimeCKEditor().getRichTextArea();
 
         secondTextArea.sendKeys("three");
-        secondTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("three"));
 
         //
         // First Tab
@@ -2226,7 +2228,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
         firstTextArea.waitUntilTextContains("four");
         firstTextArea.sendKeys("zero ");
-        firstTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("zero four"));
 
         //
         // Second Tab
@@ -2799,5 +2802,23 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().addPageNotYetReloadedMarker();
         sectionPage.clickSave();
         setup.getDriver().waitUntilPageIsReloaded();
+    }
+
+    private void editInSeparateTab(TestUtils setup, DocumentReference documentReference,
+        Consumer<RealtimeRichTextAreaElement> editAction)
+    {
+        String currentTabHandle = setup.getDriver().getWindowHandle();
+        setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(documentReference);
+        RealtimeRichTextAreaElement textArea = editPage.getContenEditor().getRichTextArea();
+
+        editAction.accept(textArea);
+        setup.leaveEditMode();
+
+        setup.getDriver().close();
+        if (currentTabHandle != null) {
+            setup.getDriver().switchTo().window(currentTabHandle);
+        }
     }
 }

@@ -189,7 +189,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     {
         SolrCore core = this.container.getCore(coreName);
 
-        return core != null ? new EmbeddedSolrServer(core) : null;
+        return core != null ? new EmbeddedClient(core) : null;
     }
 
     @Override

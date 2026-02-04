@@ -62,7 +62,7 @@
     <pdfbox.version>3.0.6</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.5</jetty.server.version>
+    <jetty.server.version>12.1.6</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.2.9.Final</netty.version>
@@ -112,7 +112,7 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.5.0</mysql.version>
+    <mysql.version>9.6.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.5.7</mariadb.version>
@@ -1221,7 +1221,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
-        <version>7.0.1</version>
+        <version>7.1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

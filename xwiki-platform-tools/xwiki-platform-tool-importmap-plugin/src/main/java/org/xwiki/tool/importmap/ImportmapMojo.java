@@ -33,13 +33,13 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
 import org.xwiki.webjars.WebjarPathDescriptor;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.VALIDATE;
+import static org.apache.maven.plugins.annotations.ResolutionScope.RUNTIME;
 import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser.JAVASCRIPT_IMPORTMAP_PROPERTY;
 
 /**
@@ -48,7 +48,7 @@ import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmap
  * @version $Id$
  * @since 18.1.0RC1
  */
-@Mojo(name = "verify", defaultPhase = VALIDATE, requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "verify", defaultPhase = VALIDATE, requiresDependencyResolution = RUNTIME, threadSafe = true)
 public class ImportmapMojo extends AbstractMojo
 {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)

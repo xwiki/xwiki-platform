@@ -37,18 +37,15 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.42.3
-  "@blocknote/mantine": 0.42.3
-  "@blocknote/react": 0.42.3
+  "@blocknote/core": 0.46.1
+  "@blocknote/mantine": 0.46.1
+  "@blocknote/react": 0.46.1
   "@eslint/config-helpers": 0.4.2
   "@eslint/js": 9.39.1
   "@mantine/core": 8.3.10
   "@mantine/hooks": 8.3.10
   "@microsoft/api-extractor": 7.55.1
   "@playwright/experimental-ct-react": 1.56.1
-  "@tiptap/core": 3.13.0
-  "@tiptap/extensions": 3.13.0
-  "@tiptap/pm": 3.13.0
   "@tsconfig/node24": 24.0.3
   "@types/jsdom": 27.0.0
   "@types/lodash-es": 4.17.12

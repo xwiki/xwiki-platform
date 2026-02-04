@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -73,7 +73,7 @@ public class ImportmapMojo extends AbstractMojo
         }
         try {
             var importMap = new JavascriptImportmapParser().parse(property);
-            var dependencies = model.getDependencies();
+            var dependencies = this.project.getArtifacts();
             for (Map.Entry<String, WebjarPathDescriptor> entry : importMap.entrySet()) {
                 var key = entry.getKey();
                 var value = entry.getValue();
@@ -120,19 +120,19 @@ public class ImportmapMojo extends AbstractMojo
         return Objects.equals(groupId0, groupId1) && Objects.equals(artifactId0, artifactId1);
     }
 
-    private void checkIfPathExistsInDependency(Dependency dependency, String artifactId, String path)
+    private void checkIfPathExistsInDependency(Artifact artifact, String artifactId, String path)
         throws MojoExecutionException
     {
-        var jar = resolveDependencyJar(dependency, this.project);
+        var jar = resolveDependencyJar(artifact, this.project);
         if (jar == null) {
-            throw new MojoExecutionException("Unable to resolve jar for dependency [%s]".formatted(dependency));
+            throw new MojoExecutionException("Unable to resolve jar for dependency [%s]".formatted(artifact));
         }
         try {
-            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, dependency.getVersion(), path))) {
+            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, artifact.getVersion(), path))) {
                 throw new MojoExecutionException("Unable to find path [%s] in jar [%s]".formatted(path, jar));
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to open jar [%s] for dependency [%s]".formatted(path, dependency),
+            throw new MojoExecutionException("Failed to open jar [%s] for dependency [%s]".formatted(path, artifact),
                 e);
         }
     }
@@ -142,15 +142,15 @@ public class ImportmapMojo extends AbstractMojo
         return "META-INF/resources/webjars/%s/%s/%s".formatted(artifactId, version, path);
     }
 
-    private File resolveDependencyJar(Dependency dependency, MavenProject project)
+    private File resolveDependencyJar(Artifact artifact, MavenProject project)
     {
         // Loop over project artifacts.
-        for (var artifact : project.getArtifacts()) {
-            if (Objects.equals(artifact.getGroupId(), dependency.getGroupId())
-                && Objects.equals(artifact.getArtifactId(), dependency.getArtifactId())
-                && Objects.equals(artifact.getVersion(), dependency.getVersion()))
+        for (var projectArtifact : project.getArtifacts()) {
+            if (Objects.equals(projectArtifact.getGroupId(), artifact.getGroupId())
+                && Objects.equals(projectArtifact.getArtifactId(), artifact.getArtifactId())
+                && Objects.equals(projectArtifact.getVersion(), artifact.getVersion()))
             {
-                return artifact.getFile();
+                return projectArtifact.getFile();
             }
         }
         return null;

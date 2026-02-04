@@ -10,9 +10,15 @@ ul.commentreplies, .reply {
   padding: 0;
   text-indent: 0;
 }
+ul.commentreplies {
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+}
 .reply {
   list-style-type: none;
   padding-left: 60px;
+  border-radius: var(--border-radius-base);
 }
 .reply form.reply {
   padding-left: 0;
@@ -25,7 +31,7 @@ ul.commentreplies, .reply {
   border: 0 none;   /* Overriding toucan */
   padding: 0 0 8px; /* Overriding toucan */
 }
-.xwikicomment:target {
+.reply:has(.xwikicomment:target) {
   background: $theme.highlightColor;
 }
 .commentavatar {
@@ -66,10 +72,17 @@ ul.commentreplies, .reply {
 
 .commenttools .btn {
   border-color: transparent;
+  background-color: transparent;
 }
 
 .commenttools .thread-toggle {
   display: none;
+}
+
+/* We offset the first action 'button' to the left so that its content is aligned to the comment text. */
+.commenttools > .thread-toggle,
+.xwikicomment:not(:has(+ .commentthread > *)) .commenttools  > .commentreply {
+  margin-left: -12px;
 }
 
 /* If there's a thread, then we show its toggle. */

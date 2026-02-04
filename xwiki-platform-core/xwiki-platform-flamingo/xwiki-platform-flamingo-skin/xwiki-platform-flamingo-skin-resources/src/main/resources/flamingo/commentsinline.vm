@@ -172,8 +172,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <div>
       <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
       #set($date = $comment.getProperty('date').value)
-## Don't indent, otherwise the comma will be misplaced
-#if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
+#if($date) <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
     </div>## commentheader
     #if ($isAnnotation)

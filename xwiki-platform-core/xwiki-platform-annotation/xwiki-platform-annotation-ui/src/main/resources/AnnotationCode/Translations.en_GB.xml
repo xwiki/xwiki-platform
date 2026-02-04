@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="AnnotationCode.Translations" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.Translations" locale="en_GB">
   <web>AnnotationCode</web>
   <name>Translations</name>
-  <language/>
+  <language>en_GB</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
@@ -36,7 +36,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <enforceRequiredRights>true</enforceRequiredRights>
   <content>annotations.title=Annotate
 ### Missing: annotations.menu.loading=Loading annotation settings
 ### Missing: annotations.menu.loaderror=Failed:
@@ -106,78 +105,4 @@
 ### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
 ### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure
 </content>
-  <object>
-    <name>AnnotationCode.Translations</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>14d5c433-2f73-4f91-b647-e846abcae7b8</guid>
-    <class>
-      <name>XWiki.RequiredRightClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <level>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>level</name>
-        <number>1</number>
-        <prettyName>Level</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>edit|script|wiki_admin|programming</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </level>
-    </class>
-    <property>
-      <level>wiki_admin</level>
-    </property>
-  </object>
-  <object>
-    <name>AnnotationCode.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>6e5e105f-6c05-4103-80c7-c938025deb4c</guid>
-    <class>
-      <name>XWiki.TranslationDocumentClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>1</number>
-        <prettyName>Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <scope>WIKI</scope>
-    </property>
-  </object>
 </xwikidoc>

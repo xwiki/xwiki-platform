@@ -1,6 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
-
-<!--
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,28 +16,36 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+import { ImageFilePanel } from "../images/ImageFilePanel";
+import type { EditorType } from "../../blocknote";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
+import type React from "react";
 
-<xwikidoc reference="Applications.Translations" locale="en_GB">
-  <web>Applications</web>
-  <name>Translations</name>
-  <language>en_GB</language>
-  <defaultLanguage>en</defaultLanguage>
-  <translation>1</translation>
-  <parent>Applications.WebHome</parent>
-  <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <version>1.1</version>
-  <title>Translations</title>
-  <defaultTemplate/>
-  <validationScript/>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
-  <hidden>true</hidden>
-  <content>application.index.title=Application Index
-application.index.drawer=Application Index
-</content>
-</xwikidoc>
+export type FilePanelProps = {
+  editor: EditorType;
+  blockId: string;
+  linkEditionCtx: LinkEditionContext;
+};
+
+export const FilePanel: React.FC<FilePanelProps> = ({
+  blockId,
+  editor,
+  linkEditionCtx,
+}) => {
+  const block = editor.getBlock(blockId);
+
+  if (!block) {
+    throw new Error(
+      "Assertion failed: provided blockId was not found in editor (file panel)",
+    );
+  }
+
+  if (block.type === "image") {
+    return (
+      <ImageFilePanel linkEditionCtx={linkEditionCtx} currentBlock={block} />
+    );
+  }
+
+  throw new Error(`Assertion failed: unkown block type: ${block.type}`);
+};

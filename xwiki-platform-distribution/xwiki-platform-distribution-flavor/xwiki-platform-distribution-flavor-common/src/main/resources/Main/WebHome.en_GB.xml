@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Main.WebHome" locale="">
+<xwikidoc version="1.4" reference="Main.WebHome" locale="en_GB">
   <web>Main</web>
   <name>WebHome</name>
-  <language/>
+  <language>en_GB</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>

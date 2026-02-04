@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Sandbox.TestPage1" locale="">
+<xwikidoc version="1.3" reference="Sandbox.TestPage1" locale="en_GB">
   <web>Sandbox</web>
   <name>TestPage1</name>
-  <language/>
+  <language>en_GB</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Sandbox.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>

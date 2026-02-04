@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Sandbox.WebHome" locale="">
+<xwikidoc version="1.3" reference="Sandbox.WebHome" locale="en_GB">
   <web>Sandbox</web>
   <name>WebHome</name>
-  <language/>
+  <language>en_GB</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
@@ -36,40 +36,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <attachment>
-    <filename>XWikiLogo.png</filename>
-    <mimetype>image/png</mimetype>
-    <filesize>1390</filesize>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAIgAAACFCAYAAACAJLCMAAAFNUlEQVR4Xu2dsY3rRhRF1YDB3AlL
-UAksYUtg8uFUJTBzaGVOWQJLYAEOWAIBN0D8CsZvARoLCNKDPsXZq8c5HzjJj3aJo+WcR83wxL/T
-6e/xt8bojItx/v//ATHOxmSkGwajQoCy5aiMxUgPGBGgbEGuqwgeHwhQKF+3FpcrAhSKIwW3GUAQ
-GT9+/FEZjXExOuPDqBFkt+tbr9e0W69xE0WM2uiN9IBx+y+DIKsU04Nruxi94aS5/odfjPQEPYL8
-Gvc+eI4o53eUI/0iPYLsJ4cviX69sRhpAx2CvCCHz2xU7yBIZ6QXaBHkoRzti9f2IhdkNTW9yBlB
-nNv2diZ5tTgCbLxnIogJcPZv28+jFqQx0k5MRhVQEP2azqeJJYjPVIQgvhyTkZSC6G8xPn3Bggx7
-X8+4i1SfLogg+pz1mWJnrk9biiDr85SUgUuMQdl2mgCCCGYdgkGZttn9/FULoshZyWyJT4JAEH+B
-v4S6PesXWv6MRCmIPmf1C3x9qvn0BxJkjHGNjGCfjqtCEEHOCpM2ftm0gm+1q3JW/5gi6Aq92UmQ
-7uV9MfqcXYw66peXG13+6nfW+Tmrvw7k7/N7c8c7cvRGJZBDkLN6Sa6C/N0iSrNSC3JWMEYvY0Yy
-vHHRTQFytoj87Qv6QIxH33E3a/JX/4Rbn7Pk70tJSs6Sv9nlf//fi/xdtpQNOUv+ChbgyEH+krNc
-YKXgoP4TzS3SIH9bFtlZIRP1mQ76QRODPh9G1TwqeAYedvGwkfwlZ/XE/8INOUv+sncWSTZkJTnr
-QP4Ktm1AhI1Hgo1fEGmDuGjrKETa/CzYfA6R8leQsxDgABYfcpb8JWfJ350hZ8lfcpb8FZwTBuHP
-RyNnyV/FOWHx+fOfymiNzhh3ZjA6o9acjxZ/1vHzr1NrdJlojcqT42zMRvoGWkH+hs1ZE+BszEbK
-zGKc78lROXLk4iPO8eA+meWojcURIIck9a0gFyN9M/NBZiRt5ttKb6Rvpr8VZBAIkgT5Gy5nTYBJ
-IMh8K8h4YEHGyEnr3F6ycitIJxBkOcjw7JpZkFEgyHgrSC0QpDvQ+L3NmbYCQdp7JdN+oxyTUR3s
-AV5zkIVq781CGmMwloxiXCQzkPizkEvmWchsdGyPyAB7XXgOw2459vGy35atEDz25ywRvlUGspzl
-1CDOM9sOG7XJWU4uJGdbXuXhwLFUHDd1H3J2EIgIgY+95oWEPrxbhnfA+PB2Kt4ixfvteA/dbvCG
-TPKXd+zyLlxydoMc5C8vOuR9/OTsbFSC89HIX8FeWkFOao4HhwDHXovyF0kEx16HPR48D+Ts9SjH
-gxeL4NjrkMeDM+sQ5Gyw4V6nFYCcJX/J2fhFJigbLh75S87KJCk+f1nAkb8kICnPp+jf0++dMRtp
-ZTI+GAYyhv6UozfSA9qC11+s5D8FWEXwqAt9IEnOmgDjE4J0hc6AmCZ+SeAyRpsik7N6QeI/hyJn
-9YKQv/otAXpByF99zqoFCb45TL8oFWxLlAkS7MvPdYBbiyzb9ILoN6hf30GQRZOzekEC5O8sH4gJ
-dpcJBAm9q7BSCtIIEk0gSOgabIIJ4ucsguyev2fp5HTPnEWQ/fP3HSpm3ivHEGT3/B0CPdb3cxZB
-vPyNPyybXjknDEGy5O8YazuDbzeC+JJ0cc6G9yWZnvrhVzkQJMutfHz3R/7tA1Fm4+osSBHkuede
-vbE8KME24CG4hi8FgmyXpbkzCAMEAQQBPV+bpVwGBChXkOEJQS4IUK4gjZEcFqNCgLIlaR05OIrS
-+A9RR3TQati61AAAAABJRU5ErkJggg==
-</content>
-  </attachment>
   <content>The sandbox is a part of your wiki that you can freely modify. It's meant to let you practice editing. You will discover how page editing works and create new pages. Simply click on **Edit** to get started!
 
 {{info}}

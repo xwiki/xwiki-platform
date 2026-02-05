@@ -763,6 +763,13 @@ public class ModelFactory
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
     {
+        return this.toRestPage(baseUri, self, doc, useVersion, withPrettyNames, withObjects, withXClass,
+            withAttachments, List.of());
+    }
+
+    public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<String> checkRights) throws XWikiException
+    {
         Page page = this.objectFactory.createPage();
         toRestPageSummary(page, baseUri, doc, useVersion, withPrettyNames);
 
@@ -856,6 +863,15 @@ public class ModelFactory
         // Add xclass
         if (withXClass) {
             page.setClazz(toRestClass(baseUri, doc.getxWikiClass()));
+        }
+
+        // Add rights
+        for (String rightName : checkRights) {
+            org.xwiki.rest.model.jaxb.Right right = this.objectFactory.createRight();
+            right.setName(rightName);
+            right.setValue(this.authorizationManagerProvider.get().hasAccess(Right.toRight(rightName),
+                doc.getDocumentReference()));
+            page.withRights(right);
         }
 
         return page;

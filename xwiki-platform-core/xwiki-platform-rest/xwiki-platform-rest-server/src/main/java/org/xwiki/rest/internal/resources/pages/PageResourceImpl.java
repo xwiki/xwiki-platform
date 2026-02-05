@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.pages;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
@@ -41,7 +42,8 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
 {
     @Override
     public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames,
-        Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiRestException
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<String> checkRights
+    ) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -51,7 +53,7 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
             URI baseUri = uriInfo.getBaseUri();
 
             return this.factory.toRestPage(baseUri, uriInfo.getAbsolutePath(), doc, false, withPrettyNames, withObjects,
-                withXClass, withAttachments);
+                withXClass, withAttachments, checkRights);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

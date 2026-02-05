@@ -307,6 +307,7 @@ class CommentsIT
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(2);
+        commentsTab.toggleCommentThread(1);
         assertEquals("Comment object 7 at date 66 reply to 1", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
         assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);

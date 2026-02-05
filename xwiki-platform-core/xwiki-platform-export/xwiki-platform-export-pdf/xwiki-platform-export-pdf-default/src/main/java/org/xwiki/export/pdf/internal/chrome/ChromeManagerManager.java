@@ -219,7 +219,11 @@ public class ChromeManagerManager implements Disposable
                     // WebSocket API).
                     "--remote-allow-origins=" + chromeRemoteAllowOrigins,
                     // This seems to fix the net::ERR_INSUFFICIENT_RESOURCES error.
-                    "--disable-dev-shm-usage"));
+                    "--disable-dev-shm-usage",
+                    // Disable component updates to avoid Chrome trying to update itself. This also disables the
+                    // download of the hyphenation dictionaries which leaves us with suboptimal language-independent
+                    // hyphenation.
+                    "--disable-component-update"));
 
                 if (inSandboxMode) {
                     this.logger.debug("Starting Chrome headless in sandbox mode.");

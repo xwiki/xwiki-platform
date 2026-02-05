@@ -444,7 +444,7 @@ mark.annotation:not(.annotation-highlight) {
   /* We hide the overflow so that the decorative quote doesn't go over the rest of the UI. */
   overflow: hidden;
 
-  &:before {
+  &amp;:before {
     content: "“";
     font-size: 4em;
     line-height: .1em;

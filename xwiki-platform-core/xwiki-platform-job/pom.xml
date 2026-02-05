@@ -36,5 +36,6 @@
     <module>xwiki-platform-job-webjar</module>
     <module>xwiki-platform-job-handler</module>
     <module>xwiki-platform-job-api</module>
+    <module>xwiki-platform-job-store</module>
   </modules>
 </project>

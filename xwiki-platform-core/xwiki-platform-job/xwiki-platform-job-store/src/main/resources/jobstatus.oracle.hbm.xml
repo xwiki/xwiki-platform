@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ See the NOTICE file distributed with this work for additional
+  ~ information regarding copyright ownership.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="true">
+
+  <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
+    <composite-id>
+      <key-property name="nodeId" type="string">
+        <column name="node_id" length="63" not-null="true" index="JOB_STATUS_SUMMARY_NODE"/>
+      </key-property>
+      <key-property name="statusKey" type="string">
+        <column name="status_key" length="512" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
+      </key-property>
+    </composite-id>
+
+    <property name="fullJobId" type="materialized_clob" not-null="true">
+      <column name="full_job_id"/>
+    </property>
+
+    <property name="jobType" type="string">
+      <column name="job_type" length="255" index="JOB_STATUS_SUMMARY_JOB_TYPE"/>
+    </property>
+
+    <property name="state" type="string" not-null="true">
+      <column name="state" length="32" index="JOB_STATUS_SUMMARY_STATE"/>
+    </property>
+
+    <property name="startDate" type="timestamp">
+      <column name="start_date" index="JOB_STATUS_SUMMARY_START"/>
+    </property>
+
+    <property name="endDate" type="timestamp">
+      <column name="end_date" index="JOB_STATUS_SUMMARY_END"/>
+    </property>
+
+    <property name="serialized" type="boolean">
+      <column name="serialized" not-null="true"/>
+    </property>
+
+    <property name="isolated" type="boolean">
+      <column name="isolated" not-null="true"/>
+    </property>
+
+    <property name="cancelable" type="boolean">
+      <column name="cancelable" not-null="true"/>
+    </property>
+
+    <property name="canceled" type="boolean">
+      <column name="canceled" not-null="true"/>
+    </property>
+
+    <property name="blobLocator" type="string" not-null="true">
+      <column name="blob_locator" length="1024"/>
+    </property>
+  </class>
+
+  <class name="org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity" table="job_status_logs">
+    <composite-id>
+      <key-property name="nodeId" type="string">
+        <column name="node_id" length="63" not-null="true" index="JOB_STATUS_LOG_NODE"/>
+      </key-property>
+      <key-property name="statusKey" type="string">
+        <column name="status_key" length="512" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
+      </key-property>
+      <key-property name="lineIndex" type="long">
+        <column name="line_index" not-null="true" index="JOB_STATUS_LOG_INDEX"/>
+      </key-property>
+    </composite-id>
+
+    <property name="level" type="integer">
+      <column name="level" not-null="true" index="JOB_STATUS_LOG_LEVEL"/>
+    </property>
+
+    <property name="timeStamp" type="long">
+      <column name="timestamp" not-null="true" index="JOB_STATUS_LOG_TS"/>
+    </property>
+
+    <property name="message" type="string">
+      <column name="message" length="2000"/>
+    </property>
+
+    <property name="formattedMessage" type="string">
+      <column name="formatted_message" length="2000"/>
+    </property>
+
+    <property name="throwableType" type="string">
+      <column name="throwable_type" length="512"/>
+    </property>
+
+    <property name="throwableMessage" type="string">
+      <column name="throwable_message" length="2000"/>
+    </property>
+
+    <property name="logSerialized" type="materialized_clob" not-null="true">
+      <column name="log_serialized"/>
+    </property>
+  </class>
+
+</hibernate-mapping>

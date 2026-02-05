@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -55,6 +53,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

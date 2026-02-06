@@ -798,6 +798,9 @@ var XWiki = (function(XWiki){
         var iconElement = new Element('i', {'class': 'icon ' + data.icon});
       }
       displayNode.insert({top: iconElement});
+    } else if (source.icon.indexOf('<') === 0) {
+      // The icon is specified as an HTML tag from the source
+      displayNode.insert({top: source.icon});
     }
     return displayNode;
   },

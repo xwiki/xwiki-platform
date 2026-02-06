@@ -1000,4 +1000,18 @@ public class XWikiWebDriver extends RemoteWebDriver
         script.append("return false;\n");
         return (boolean) executeScript(script.toString(), element, xOffset, yOffset);
     }
+
+    /**
+     * See https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation .
+     * 
+     * @return {@code true} if the given element meets the validation constraints, {@code false} otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean isValid(WebElement element)
+    {
+        return Boolean.TRUE.equals(executeScript("return arguments[0]?.validity?.valid", element));
+    }
 }

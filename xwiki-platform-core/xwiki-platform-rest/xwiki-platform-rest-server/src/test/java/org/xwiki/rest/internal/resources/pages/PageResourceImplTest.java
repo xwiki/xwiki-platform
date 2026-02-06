@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.inject.Provider;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -55,10 +57,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -159,5 +161,8 @@ class PageResourceImplTest
         assertTrue(rights.get(1).isValue());
         assertEquals("delete", rights.get(2).getName());
         assertFalse(rights.get(2).isValue());
+
+        assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
+            false, false, false, List.of("unknownRight")));
     }
 }

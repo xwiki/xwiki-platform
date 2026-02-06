@@ -93,6 +93,8 @@ import org.xwiki.store.hibernate.HibernateStoreException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.internal.store.hibernate.datasource.HibernateDataSourceProvider;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
@@ -146,6 +148,9 @@ public class HibernateStore implements Disposable, Initializable
 
     @Inject
     private LoggerConfiguration loggerConfiguration;
+
+    @Inject
+    private Provider<HibernateDataSourceProvider> dataSourceProviderProvider;
 
     @Inject
     private List<HibernateAdapterFactory> adapterFactories;
@@ -265,6 +270,27 @@ public class HibernateStore implements Disposable, Initializable
         LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
         // Resolve some variables
         replaceVariables(baseConfiguration);
+
+        // Ensure that all Hibernate SessionFactory instances share the same JDBC connection pool.
+        //
+        // We do it by injecting a shared DataSource into Hibernate settings before building the registry.
+        // This allows using the same hibernate.cfg.xml without changing it.
+        this.dataSourceProviderProvider.get().getDataSource().ifPresent(dataSource -> {
+            Map values = baseConfiguration.getConfigurationValues();
+            values.put(org.hibernate.cfg.AvailableSettings.DATASOURCE, dataSource);
+            // Make sure Hibernate does not instantiate the configured provider class (which would create its own pool).
+            values.remove("hibernate.connection.provider_class");
+            values.remove("connection.provider_class");
+
+            // When a DataSource is provided, Hibernate will call DataSource#getConnection(username, password) if those
+            // properties are still present. Apache DBCP's BasicDataSource does not support that method and throws an
+            // UnsupportedOperationException. The credentials are already configured on the DataSource itself.
+            values.remove(org.hibernate.cfg.AvailableSettings.USER);
+            values.remove(org.hibernate.cfg.AvailableSettings.PASS);
+            // Backward-compatibility keys sometimes found in old configurations.
+            values.remove("connection.username");
+            values.remove("connection.password");
+        });
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);

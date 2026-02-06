@@ -3,3 +3,5 @@ org.xwiki.job.store.internal.DatabaseLoggerTail
 org.xwiki.job.store.internal.FilesystemPersistentJobStatusStore
 org.xwiki.job.store.internal.JobStatusIdentifierSerializer
 org.xwiki.job.store.internal.MainWikiHibernateExecutor
+org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor
+org.xwiki.job.store.internal.hibernate.JobStatusHibernateStore

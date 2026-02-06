@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
@@ -2785,6 +2786,151 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify the care position after a redo/undo sequence.
         secondTextArea.sendKeys("]");
         assertEquals("one[ two | -] green", secondTextArea.getText());
+    }
+
+    @Test
+    @Order(28)
+    void mandatoryTitleAndVersionSummary(TestUtils setup, TestReference testReference) throws Exception
+    {
+        //
+        // Make title mandatory and disable the version summary.
+        //
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("xwiki.title.mandatory", "1");
+        setup.setWikiPreference("editcomment", "0");
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor editor = editPage.getContenEditor();
+        RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
+        textArea.sendKeys("zero");
+
+        // Check that the mandatory title has a initial value.
+        assertEquals(testReference.getLastSpaceReference().getName(), editPage.getDocumentTitle());
+        assertTrue(editPage.isDocumentTitleValid());
+
+        // Check that the "Summarize & Done" and "Summarize Changes" actions are not available.
+        assertFalse(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertFalse(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+
+        // Check that Done acts as Save & View. We can save because the title is not empty.
+        ViewPage viewPage = editPage.clickDone();
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitle());
+
+        // Edit again and check that we can't save with an empty title.
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        editPage.getDocumentTitleField().clear();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with Save & Continue.
+        textArea.clear();
+        textArea.sendKeys("one");
+        editPage.getToolbar().sendSaveShortcutKey(false);
+        editPage.waitUntilDocumentTitleIsFocused();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with Done.
+        textArea.sendKeys(" two");
+        editPage.getToolbar().clickDone();
+        editPage.waitUntilDocumentTitleIsFocused();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with auto-save.
+        textArea.sendKeys(" three");
+        // Use a larger timeout in order to match the auto-save delay.
+        editPage.waitUntilDocumentTitleIsFocused(70);
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Now set the title and check that we can save again.
+        editPage.getDocumentTitleField().sendKeys("Mandatory Title And Version Summary");
+        assertTrue(editPage.isDocumentTitleValid());
+        viewPage = editPage.clickDone();
+        assertEquals("Mandatory Title And Version Summary", viewPage.getDocumentTitle());
+
+        // Check that we have only two versions in the document history.
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(2, historyPane.getNumberOfVersions());
+
+        //
+        // Now make the title optional again, then enable the version summary and make it mandatory.
+        //
+        setup.setWikiPreference("xwiki.title.mandatory", "0");
+        setup.setWikiPreference("editcomment", "1");
+        setup.setWikiPreference("editcomment_mandatory", "1");
+
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        editPage.getDocumentTitleField().clear();
+        assertTrue(editPage.isDocumentTitleValid());
+
+        // Check that only "Summarize Changes" action is available. The "Summarize & Done" action is actually offered
+        // by the Done button.
+        assertFalse(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertTrue(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+
+        // Try to save with an empty version summary.
+        textArea.clear();
+        SummaryModal summaryModal = editPage.getToolbar().getHistoryDropdown().open().summarizeChanges();
+        summaryModal.viewChanges();
+        summaryModal.clickSave(false);
+        summaryModal.waitUntilSummaryIsFocused();
+        assertFalse(summaryModal.isSummaryValid());
+
+        // Try again with a summary.
+        summaryModal.setSummary("empty content");
+        summaryModal.clickSave(true);
+
+        // Try the Save & Continue shortcut key. The user should be forced to enter a summary.
+        textArea.sendKeys("red");
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+        editPage.getToolbar().sendSaveShortcutKey(false);
+        Alert alert = editPage.waitForVersionSummaryAlert();
+        alert.sendKeys("color");
+        alert.accept();
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
+
+        // Try the auto-save. In this case a default summary is used.
+        textArea.sendKeys(" green");
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
+
+        // Try the Done button. It should behave like Summarize & Done, i.e. force the user to enter a summary.
+        textArea.sendKeys(" blue");
+        editPage.getToolbar().clickDone();
+        summaryModal = new SummaryModal();
+        // The previously typed version summary is preserved.
+        assertEquals("empty content", summaryModal.getSummary());
+        summaryModal.getSummaryTextArea().clear();
+        assertFalse(summaryModal.isSummaryValid());
+        summaryModal.setSummary("done with summary");
+        assertTrue(summaryModal.isSummaryValid());
+        summaryModal.clickSave(true);
+
+        viewPage = new ViewPage();
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitle());
+
+        historyPane = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(6, historyPane.getNumberOfVersions());
+        assertTrue(historyPane.hasVersionWithSummary("empty content"));
+        assertTrue(historyPane.hasVersionWithSummary("color"));
+        assertTrue(historyPane.hasVersionWithSummary("Auto-saved during real-time collaboration"));
+        assertTrue(historyPane.hasVersionWithSummary("done with summary"));
+
+        //
+        // Make the version summary optional again.
+        //
+        setup.setWikiPreference("editcomment_mandatory", "0");
+
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        assertTrue(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertTrue(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+        viewPage = editPage.clickDone();
+        assertEquals(6, viewPage.openHistoryDocExtraPane().showMinorEdits().getNumberOfVersions());
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

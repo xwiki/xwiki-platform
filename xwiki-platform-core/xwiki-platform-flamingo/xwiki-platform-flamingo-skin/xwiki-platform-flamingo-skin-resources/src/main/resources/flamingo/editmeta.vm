@@ -19,7 +19,12 @@
 ## ---------------------------------------------------------------------------
 #set($docTitle = $request.getParameter('title'))
 #if("$!docTitle" == '')
-  #set($docTitle = $!tdoc.title)
+  #set($docTitle = $tdoc.title)
+#end
+#set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+#if ("$!docTitle" == '' && $titleIsMandatory)
+  ## Provide a reasonable default value for the mandatory document title.
+  #set ($docTitle = $tdoc.pageReference.name)
 #end
 #set($docParent = $request.getParameter('parent'))
 #if("$!docParent" == '')
@@ -37,7 +42,6 @@
   <dt>
     <label for="xwikidoctitleinput">
       $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
-      #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
       #if ($titleIsMandatory)
         <span class="xRequired">$escapetool.xml($services.localization.render('core.validation.required'))</span>
       #end

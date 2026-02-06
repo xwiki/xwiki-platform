@@ -570,7 +570,15 @@ ul.realtime-versions &gt; li.divider:last-child {
         &lt;button
           type="button"
           class="btn btn-primary realtime-action-done"
-          title="$escapetool.xml($services.localization.render('realtime.done.hint'))"
+          #if ($xwiki.hasEditComment() &amp;&amp; $xwiki.isEditCommentMandatory())
+            ## Open the Change Summary modal instead of saving directly, because change summary is mandatory.
+            title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
+            data-continue="false"
+            data-toggle="modal"
+            data-target="#realtime-changeSummaryModal"
+          #else
+            title="$escapetool.xml($services.localization.render('realtime.done.hint'))"
+          #end
         &gt;
           $services.icon.renderHTML('check')
           $escapetool.xml($services.localization.render('realtime.done'))
@@ -586,7 +594,9 @@ ul.realtime-versions &gt; li.divider:last-child {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul class="dropdown-menu"&gt;
-          #if ($xwiki.hasEditComment())
+          ## If the change summary is mandatory then this entry is not needed because the Done button (above) will open
+          ## the Change Summary modal.
+          #if ($xwiki.hasEditComment() &amp;&amp; !$xwiki.isEditCommentMandatory())
             &lt;li&gt;
               &lt;a
                 href="#"
@@ -778,6 +788,7 @@ ul.realtime-versions &gt; li.divider:last-child {
                   &lt;/label&gt;
                   &lt;span class="xHint"&gt;
                     $escapetool.xml($services.localization.render('core.comment.tooltip'))
+                    $escapetool.xml($services.localization.render('core.validation.required'))
                   &lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
@@ -785,6 +796,9 @@ ul.realtime-versions &gt; li.divider:last-child {
                     id="realtime-changeSummaryModal-summary"
                     name="summary"
                     maxlength="1023"
+                    #if ($xwiki.isEditCommentMandatory())
+                      required
+                    #end
                     rows="10"
                     title="$escapetool.xml($services.localization.render('realtime.summary'))"
                   &gt;&lt;/textarea&gt;

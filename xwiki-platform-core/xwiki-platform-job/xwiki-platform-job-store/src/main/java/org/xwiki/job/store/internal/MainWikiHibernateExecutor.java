@@ -19,17 +19,12 @@
  */
 package org.xwiki.job.store.internal;
 
-import javax.inject.Named;
-
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor;
 
 /**
  * Executes Hibernate operations in the main wiki.
@@ -42,11 +37,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 public class MainWikiHibernateExecutor
 {
     @Inject
-    @Named("hibernate")
-    private XWikiStoreInterface hibernateStore;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
+    private JobStatusHibernateExecutor hibernateExecutor;
 
     /**
      * Execute a read-only Hibernate action.
@@ -56,9 +47,9 @@ public class MainWikiHibernateExecutor
      * @return the result of the action
      * @throws JobStatusStoreException if an error occurs during the action execution
      */
-    public <T> T executeRead(XWikiHibernateBaseStore.HibernateCallback<T> action) throws JobStatusStoreException
+    public <T> T executeRead(JobStatusHibernateExecutor.HibernateCallback<T> action) throws JobStatusStoreException
     {
-        return execute(action, false);
+        return this.hibernateExecutor.executeRead(action);
     }
 
     /**
@@ -67,31 +58,9 @@ public class MainWikiHibernateExecutor
      * @param action the Hibernate action to execute
      * @throws JobStatusStoreException if an error occurs during the action execution
      */
-    public void executeWrite(XWikiHibernateBaseStore.HibernateCallback<Void> action) throws JobStatusStoreException
+    public void executeWrite(JobStatusHibernateExecutor.HibernateCallback<Void> action) throws JobStatusStoreException
     {
-        execute(action, true);
-    }
-
-    private <T> T execute(XWikiHibernateBaseStore.HibernateCallback<T> action, boolean write)
-        throws JobStatusStoreException
-    {
-        // Execute all database queries in the main wiki as jobs are global.
-        XWikiContext context = this.contextProvider.get();
-        String currentWiki = context.getWikiId();
-        context.setWikiId(context.getMainXWiki());
-
-        try {
-            XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
-            if (write) {
-                return store.executeWrite(context, action);
-            } else {
-                return store.executeRead(context, action);
-            }
-        } catch (Exception e) {
-            throw new JobStatusStoreException("Failed to execute Hibernate operation.", e);
-        } finally {
-            context.setWikiId(currentWiki);
-        }
+        this.hibernateExecutor.executeWrite(action);
     }
 
 }

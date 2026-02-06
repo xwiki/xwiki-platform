@@ -73,12 +73,14 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         "from org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity "
             + NODE_AND_STATUS_WHERE;
 
-    private static final String SELECT_LOGS_HQL = SELECT_LOGS_BASE_HQL + "order by lineIndex asc";
+    private static final String SORT_BY_LINE_INDEX_ASC = "order by lineIndex asc";
+
+    private static final String SELECT_LOGS_HQL = SELECT_LOGS_BASE_HQL + SORT_BY_LINE_INDEX_ASC;
 
     private static final String SELECT_LOGS_REVERSE_HQL = SELECT_LOGS_BASE_HQL + "order by lineIndex desc";
 
     private static final String SELECT_LOGS_BY_LEVEL_HQL =
-        SELECT_LOGS_BASE_HQL + "and level >= :minLevel order by lineIndex asc";
+        SELECT_LOGS_BASE_HQL + "and level >= :minLevel " + SORT_BY_LINE_INDEX_ASC;
 
     private static final String SELECT_LAST_LOG_BY_LEVEL_HQL =
         SELECT_LOGS_BASE_HQL + "and level >= :minLevel order by lineIndex desc";
@@ -87,11 +89,11 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         SELECT_LOGS_BASE_HQL + "and lineIndex = :lineIndex";
 
     private static final String SELECT_LOGS_AFTER_LINE_INDEX_BEFORE_LINE_INDEX_HQL =
-        SELECT_LOGS_BASE_HQL + "and lineIndex > :lineIndex and lineIndex < :toLineIndex order by lineIndex asc";
+        SELECT_LOGS_BASE_HQL + "and lineIndex > :lineIndex and lineIndex < :toLineIndex " + SORT_BY_LINE_INDEX_ASC;
 
     private static final String SELECT_LOGS_BY_LEVEL_AFTER_LINE_INDEX_BEFORE_LINE_INDEX_HQL =
         SELECT_LOGS_BASE_HQL + "and level >= :minLevel and lineIndex > :lineIndex and lineIndex < :toLineIndex "
-            + "order by lineIndex asc";
+            + SORT_BY_LINE_INDEX_ASC;
 
     private static final String COUNT_LOGS_HQL =
         "select count(*) from org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity " + NODE_AND_STATUS_WHERE;

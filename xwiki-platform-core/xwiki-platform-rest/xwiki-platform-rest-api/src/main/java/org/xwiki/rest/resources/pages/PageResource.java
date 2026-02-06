@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -45,7 +47,8 @@ public interface PageResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("objects") @DefaultValue("false") Boolean withObjects,
             @QueryParam("class") @DefaultValue("false") Boolean withClass,
-            @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments
+            @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments,
+            @QueryParam("checkRight") List<String> checkRights
     ) throws XWikiRestException;
 
     @PUT Response putPage(

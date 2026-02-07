@@ -17,14 +17,14 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#set($docTitle = $request.getParameter('title'))
-#if("$!docTitle" == '')
-  #set($docTitle = $tdoc.title)
-#end
 #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
-#if ("$!docTitle" == '' && $titleIsMandatory)
-  ## Provide a reasonable default value for the mandatory document title.
-  #set ($docTitle = $tdoc.pageReference.name)
+#set ($docTitle = $request.getParameter('title'))
+#if ("$!docTitle" == '')
+  #set ($docTitle = $tdoc.title)
+  #if ("$!docTitle" == '' && $titleIsMandatory)
+    ## Provide a reasonable initial value for the mandatory document title.
+    #set ($docTitle = $tdoc.pageReference.name)
+  #end
 #end
 #set($docParent = $request.getParameter('parent'))
 #if("$!docParent" == '')

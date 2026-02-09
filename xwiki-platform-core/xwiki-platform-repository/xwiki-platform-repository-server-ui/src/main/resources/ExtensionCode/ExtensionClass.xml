@@ -560,6 +560,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </validExtension>
+    <versionPage>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>versionPage</name>
+      <number>29</number>
+      <prettyName>Versions stored in dedicated pages</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </versionPage>
     <website>
       <contenttype>PureText</contenttype>
       <customDisplay/>

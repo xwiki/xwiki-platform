@@ -1276,6 +1276,8 @@
 #end
 
 #macro (addCommonDocTreeSolrParams $params)
+  ## Enable prefix matching, besides standard language-dependent matching.
+  #set ($discard = $params.add('q=__INPUT__ __INPUT__*'))
   #if ($rootType == 'wiki')
     ## Limit the search to the specified wiki.
     #addWikiLocationSolrParams($rootReference $params)

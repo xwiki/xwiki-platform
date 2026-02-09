@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <input type="text" id="id-name" name="title" value="" placeholder="Placeholder text">
 </template>
 
 <style scoped></style>

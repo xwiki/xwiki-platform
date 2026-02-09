@@ -20,7 +20,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <select name="options" id="option-select">
+  <option value="">Choose an option</option>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+
+</select>
 </template>
 
 <style scoped></style>

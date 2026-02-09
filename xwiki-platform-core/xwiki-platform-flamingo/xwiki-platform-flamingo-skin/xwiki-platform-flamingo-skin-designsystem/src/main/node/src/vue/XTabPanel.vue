@@ -20,7 +20,11 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active xform" id="PageLayoutSection">
+      individual tab panel
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

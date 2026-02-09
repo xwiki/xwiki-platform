@@ -133,7 +133,7 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
-     * @return {@code true} if the "Summarize & Done" action is available, {@code false} otherwise
+     * @return {@code true} if the "Summarize &amp; Done" action is available, {@code false} otherwise
      * @since 18.1.0RC1
      * @since 17.10.4
      * @since 17.4.9

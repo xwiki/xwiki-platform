@@ -20,7 +20,10 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+    <figure>
+    <img src=" " />
+    <figcaption>Image info (not required)</figcaption>
+</figure>
 </template>
 
 <style scoped></style>

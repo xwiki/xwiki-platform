@@ -17,10 +17,31 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue'
+
+type NotificationType =
+  | 'inprogress'
+  | 'done'
+  | 'error'
+  | 'warning'
+  | 'info'
+
+const props = defineProps<{
+  type: NotificationType
+}>()
+
+const notificationClass = computed(
+  () => `xnotification-${props.type}`
+)
+</script>
 
 <template>
-  <div>TODO</div>
+  <div class="xnotification-container" role="alert">
+    <div class="xnotification" :class="notificationClass">
+      <slot />
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

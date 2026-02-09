@@ -20,7 +20,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>XCARD</div>
+  <div class="gadget">
+     <h2 class="gadget-title wikigeneratedheader"><span>Card Title</span></h2>
+     <div class="gadget-content">
+        Card contents
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

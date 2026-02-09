@@ -20,7 +20,33 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO XDIALOG</div>
+  
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close close-modal">
+            <span aria-hidden="true">
+              <span class="fa fa-times" aria-hidden="true"></span>
+            </span></button>
+          <div class="modal-title">
+            <span class="fa fa-circle"></span> Modal Title
+          </div>
+        </div>
+        <div class="modal-body">
+
+modal content
+        </div><!-- end modal body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default close-modal">
+            Close 
+          </button>
+          <button type="button" class="btn btn-primary">
+            Save changes
+          </button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  
 </template>
 
 <style scoped></style>

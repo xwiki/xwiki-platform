@@ -68,6 +68,7 @@ define('xwiki-selectize', [
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
     output.find('.xwiki-selectize-option-label').text(label);
+    output.find('.xwiki-selectize-option-icon').prependTo(output.find('.xwiki-selectize-option-label'));
     return output;
   };
 

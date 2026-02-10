@@ -25,7 +25,8 @@
 #end
 #set ($paths = {
   'jsTree': $services.webjars.url('jstree', "jstree${minified}"),
-  'xwiki-tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}"),
+  'xwiki-tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}", 
+    {'evaluate': true}),
   'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree${minified}")
 })
 #[[*/

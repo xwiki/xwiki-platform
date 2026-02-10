@@ -17,8 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($iconNames = ['search'])
+#set ($icons = {})
+#foreach ($name in $iconNames)
+#set ($discard = $icons.put($name, $services.icon.renderHTML($name)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(icons) {
+  "use strict";
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
-  'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
   // jshint camelcase:false
@@ -38,7 +47,10 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   $.jstree.defaults.core.allow_reselect = true;
 
   var createSuggestInput = function(options) {
-    var input = document.createElement('input');
+    let container = document.createElement('div');
+    container.classList.add('xtree-finder-container');
+    container.update(icons.search);
+    let input = document.createElement('input');
     input.type = 'text';
     input.className = 'xtree-finder';
     input.placeholder = options.finder.placeholder;
@@ -61,8 +73,8 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       timeout: 0,
       varname: 'query'
     });
-
-    return input;
+    container.appendChild(input);
+    return container;
   };
 
   var findNode = function(event, data) {
@@ -120,3 +132,5 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     };
   };
 });
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$icons]));

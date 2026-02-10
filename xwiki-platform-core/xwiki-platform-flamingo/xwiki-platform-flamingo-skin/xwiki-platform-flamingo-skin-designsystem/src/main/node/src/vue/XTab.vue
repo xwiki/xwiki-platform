@@ -31,6 +31,16 @@
         Inactive Tab
       </a>
     </li>
+    <li>
+      <a href="#" rel="nofollow">
+        Inactive Tab
+      </a>
+    </li>
+    <li>
+      <a href="#" rel="nofollow">
+        Inactive Tab
+      </a>
+    </li>
   </ul>
 </template>
 

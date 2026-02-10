@@ -21,7 +21,7 @@
 
 <template>
   
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close close-modal">

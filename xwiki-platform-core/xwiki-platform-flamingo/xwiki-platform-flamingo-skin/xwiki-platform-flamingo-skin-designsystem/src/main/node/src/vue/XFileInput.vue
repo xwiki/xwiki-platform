@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <input type="file" name="filepath" size="40" class="uploadFileInput noitems" multiple="">
+  <input type="file" name="filepath" class="uploadFileInput" multiple="">
 </template>
 
 <style scoped></style>

@@ -21,7 +21,7 @@
 
 <template>
     <figure>
-    <img src=" " />
+    <img src=" "/>
     <figcaption>Image info (not required)</figcaption>
 </figure>
 </template>

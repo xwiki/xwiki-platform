@@ -20,8 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <ol id="hierarchy" class="breadcrumb breadcrumb-expandable" data-entity="XWiki.Admin" data-id="hierarchy"
-    data-limit="5" data-treenavigation="true" data-entities="{xwiki:XWiki.Admin=XWiki.Admin}">
+  <ol class="breadcrumb breadcrumb-expandable">
     <li class="wiki"><a href="/xwiki/bin/view/Main/" title="Home"><span class="fa fa-home"
           aria-hidden="true"></span></a>
     </li>

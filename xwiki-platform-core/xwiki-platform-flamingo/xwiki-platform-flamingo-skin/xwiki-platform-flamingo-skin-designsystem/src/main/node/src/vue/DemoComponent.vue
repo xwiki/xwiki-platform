@@ -21,10 +21,7 @@
 
 <template>
   <h2>XAlert</h2>
-  <XAlert type="success" />
-  <XAlert type="warning" />
-  <XAlert type="error" />
-  <XAlert type="info" />
+  <XAlert type="done">Done</XAlert>
   <h2>XAvatar</h2>
   <XAvatar />
   <h2>XBtn</h2>

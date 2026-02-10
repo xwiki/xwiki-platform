@@ -22,7 +22,7 @@ const logo = new URL('/xwiki/bin/skin/resources/icons/xwiki/noavatar.png', impor
 </script>
 
 <template>
-  <img class="avatar avatar_50" :src="logo" alt="username" title="username"></img>
+  <img class="avatar avatar_50"  alt="username" title="username"></img>
 </template>
 
 <style scoped></style>

@@ -103,7 +103,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     }
 
     @Override
-    public JobStatus loadStatusWithLock(List<String> id) throws IOException
+    public JobStatus loadJobStatusWithLock(List<String> id) throws IOException
     {
         try {
             JobStatus status = loadFromDatabase(id);
@@ -117,7 +117,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
         this.fileSystemLock.lock();
         try {
-            JobStatus legacyStatus = this.filesystemStore.loadStatusWithLock(id);
+            JobStatus legacyStatus = this.filesystemStore.loadJobStatusWithLock(id);
             // Migrate the job status to the database if found in the filesystem, so that next time it can be loaded
             // directly from the database.
             saveJobStatusWithLock(legacyStatus);
@@ -131,7 +131,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     }
 
     @Override
-    public void removeWithLock(List<String> id) throws IOException
+    public void removeJobStatusWithLock(List<String> id) throws IOException
     {
         if (id == null) {
             return;
@@ -139,7 +139,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
         this.fileSystemLock.lock();
         try {
-            this.filesystemStore.removeWithLock(id);
+            this.filesystemStore.removeJobStatusWithLock(id);
         } finally {
             this.fileSystemLock.unlock();
         }
@@ -195,7 +195,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
             // Trigger on-demand migration to make sure the logs are moved to the database if needed.
             this.fileSystemLock.lock();
             try {
-                JobStatus legacyStatus = this.filesystemStore.loadStatusWithLock(jobId);
+                JobStatus legacyStatus = this.filesystemStore.loadJobStatusWithLock(jobId);
                 if (legacyStatus != null) {
                     saveJobStatusWithLock(legacyStatus);
                 }
@@ -211,7 +211,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
             // when the logs shall be read. We only log a warning here because in most cases, it shouldn't cause any
             // issues.
             try {
-                this.filesystemStore.removeWithLock(jobId);
+                this.filesystemStore.removeJobStatusWithLock(jobId);
             } catch (IOException e) {
                 this.logger.warn("Failed to remove legacy job status [{}] from filesystem: [{}].", jobId,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -274,7 +274,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
             this.jobStatusBlobStore.store(status, blobLocator);
 
-            this.filesystemStore.removeWithLock(request.getId());
+            this.filesystemStore.removeJobStatusWithLock(request.getId());
         } catch (JobStatusStoreException e) {
             throw new IOException(
                 "Failed to persist job status metadata for [%s].".formatted(status.getRequest().getId()), e);

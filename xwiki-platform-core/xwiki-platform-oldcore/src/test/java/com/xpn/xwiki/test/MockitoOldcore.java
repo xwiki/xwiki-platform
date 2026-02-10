@@ -348,14 +348,30 @@ public class MockitoOldcore
             // DocumentAuthorizationManager are available
             if (!getMocker().hasComponent(AuthorizationManager.class)) {
                 this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+            } else {
+                AuthorizationManager registered = getMocker().getInstance(AuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            } else {
+                ContextualAuthorizationManager registered =
+                    getMocker().getInstance(ContextualAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockContextualAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(DocumentAuthorizationManager.class)) {
                 this.mockDocumentAuthorizationManager =
                     getMocker().registerMockComponent(DocumentAuthorizationManager.class);
+            } else {
+                DocumentAuthorizationManager registered = getMocker().getInstance(DocumentAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockDocumentAuthorizationManager = registered;
+                }
             }
         }
 

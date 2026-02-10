@@ -63,11 +63,13 @@ public class JobStatusHibernateExecutor
      * Execute a write Hibernate action.
      *
      * @param action the Hibernate action to execute
+     * @param <T> the return type of the action
+     * @return the result of the action
      * @throws JobStatusStoreException if an error occurs during the action execution
      */
-    public void executeWrite(HibernateCallback<Void> action) throws JobStatusStoreException
+    public <T> T executeWrite(HibernateCallback<T> action) throws JobStatusStoreException
     {
-        execute(action, true);
+        return execute(action, true);
     }
 
     private <T> T execute(HibernateCallback<T> action, boolean write)

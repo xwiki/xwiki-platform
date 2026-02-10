@@ -56,8 +56,7 @@ import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
  */
 @Component
 @Singleton
-public class DBCPHibernateDataSourceProvider
-    implements HibernateDataSourceProvider, Disposable
+public class DBCPHibernateDataSourceProvider implements HibernateDataSourceProvider, Disposable
 {
     private static final String DBCP_PREFIX = "hibernate.dbcp.";
 
@@ -100,7 +99,8 @@ public class DBCPHibernateDataSourceProvider
             LoadedConfig loadedConfig =
                 this.cfgXmlLoader.loadConfig(bootstrapServiceRegistry, configurationURL);
 
-            Map values = loadedConfig.getConfigurationValues();
+            @SuppressWarnings("unchecked")
+            Map<String, String> values = loadedConfig.getConfigurationValues();
 
             this.dataSource = createBasicDataSource(values);
 
@@ -151,7 +151,7 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 
-    private BasicDataSource createBasicDataSource(Map props) throws SQLException
+    private BasicDataSource createBasicDataSource(Map<String, String> props) throws SQLException
     {
         Properties dbcpProperties = new Properties();
 
@@ -174,9 +174,9 @@ public class DBCPHibernateDataSourceProvider
         return BasicDataSourceFactory.createDataSource(dbcpProperties);
     }
 
-    private void applyDriverClass(Map props, Properties dbcpProperties)
+    private void applyDriverClass(Map<String, String> props, Properties dbcpProperties)
     {
-        String jdbcDriverClass = (String) props.get(AvailableSettings.DRIVER);
+        String jdbcDriverClass = props.get(AvailableSettings.DRIVER);
         // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
         // to set the "driverClassName" property.
         if (jdbcDriverClass != null) {
@@ -184,44 +184,44 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 
-    private void applyJdbcURL(Map props, Properties dbcpProperties)
+    private void applyJdbcURL(Map<String, String> props, Properties dbcpProperties)
     {
         String jdbcUrl = System.getProperty(AvailableSettings.URL);
         if (jdbcUrl == null) {
-            jdbcUrl = (String) props.get(AvailableSettings.URL);
+            jdbcUrl = props.get(AvailableSettings.URL);
         }
         dbcpProperties.put("url", jdbcUrl);
     }
 
-    private void applyCredentials(Map props, Properties dbcpProperties)
+    private void applyCredentials(Map<String, String> props, Properties dbcpProperties)
     {
         // Username / password. Only put username and password if they're not null. This allows
         // external authentication support (OS authenticated). It'll thus work if the hibernate
         // config does not specify a username and/or password.
-        String username = (String) props.get(AvailableSettings.USER);
+        String username = props.get(AvailableSettings.USER);
         if (username != null) {
             dbcpProperties.put("username", username);
         }
 
-        String password = (String) props.get(AvailableSettings.PASS);
+        String password = props.get(AvailableSettings.PASS);
         if (password != null) {
             dbcpProperties.put("password", password);
         }
     }
 
-    private void applyIsolation(Map props, Properties dbcpProperties)
+    private void applyIsolation(Map<String, String> props, Properties dbcpProperties)
     {
-        String isolationLevel = (String) props.get(AvailableSettings.ISOLATION);
+        String isolationLevel = props.get(AvailableSettings.ISOLATION);
         if (StringUtils.isNotBlank(isolationLevel)) {
             dbcpProperties.put("defaultTransactionIsolation", isolationLevel);
         }
     }
 
-    private void applyAutoCommit(Map props, Properties dbcpProperties)
+    private void applyAutoCommit(Map<String, String> props, Properties dbcpProperties)
     {
         // Turn off autocommit (unless autocommit property is set)
         // Note that this property can be overwritten below if the DBCP "defaultAutoCommit" property is defined.
-        String autocommit = (String) props.get(AUTOCOMMIT);
+        String autocommit = props.get(AUTOCOMMIT);
         if (StringUtils.isNotBlank(autocommit)) {
             dbcpProperties.put(PROPERTY_DEFAULT_AUTOCOMMIT, autocommit);
         } else {
@@ -229,21 +229,21 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 
-    private void applyPoolSize(Map props, Properties dbcpProperties)
+    private void applyPoolSize(Map<String, String> props, Properties dbcpProperties)
     {
-        String poolSize = (String) props.get(AvailableSettings.POOL_SIZE);
+        String poolSize = props.get(AvailableSettings.POOL_SIZE);
         if (StringUtils.isNotBlank(poolSize) && Integer.parseInt(poolSize) > 0) {
             dbcpProperties.put(PROPERTY_MAX_TOTAL, poolSize);
         }
     }
 
-    private void applyConnectionProperties(Map props, Properties dbcpProperties)
+    private void applyConnectionProperties(Map<String, String> props, Properties dbcpProperties)
     {
         // Copy all "driver" properties into "connectionProperties"
         Properties driverProps = ConnectionProviderInitiator.getConnectionProperties(props);
         if (!driverProps.isEmpty()) {
             StringBuilder connectionProperties = new StringBuilder();
-            for (Iterator iter = driverProps.keySet().iterator(); iter.hasNext();) {
+            for (Iterator<Object> iter = driverProps.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
                 String value = driverProps.getProperty(key);
                 connectionProperties.append(key).append('=').append(value);
@@ -255,14 +255,14 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 
-    private void applyDBCPProperties(Map props, Properties dbcpProperties)
+    private void applyDBCPProperties(Map<String, String> props, Properties dbcpProperties)
     {
         // Copy all DBCP properties removing the prefix
-        for (Object element : props.keySet()) {
-            String key = String.valueOf(element);
+        for (Map.Entry<String, String> entry : props.entrySet()) {
+            String key = entry.getKey();
             if (key.startsWith(DBCP_PREFIX)) {
                 String property = key.substring(DBCP_PREFIX.length());
-                String value = (String) props.get(key);
+                String value = entry.getValue();
 
                 applyDBCPProperty(dbcpProperties, property, value);
             }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.store.hibernate.datasource;
+package org.xwiki.store.hibernate.internal.datasource;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,7 +35,6 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.cfgxml.spi.LoadedConfig;
-import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator;
@@ -43,6 +42,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
+import org.xwiki.store.hibernate.HibernateDataSourceProvider;
 import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
 
 /**
@@ -81,8 +81,6 @@ public class DBCPHibernateDataSourceProvider
 
     private BasicDataSource dataSource;
 
-    private BootstrapServiceRegistry bootstrapServiceRegistry;
-
     private synchronized void maybeInitialize() throws SQLException
     {
         // Don't initialize more than once (in case multiple SessionFactory instances are created).
@@ -98,18 +96,33 @@ public class DBCPHibernateDataSourceProvider
             throw new SQLException(errorMessage);
         }
 
-        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build();
+        try (var bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build()) {
+            LoadedConfig loadedConfig =
+                this.cfgXmlLoader.loadConfig(bootstrapServiceRegistry, configurationURL);
 
-        LoadedConfig loadedConfig =
-            this.cfgXmlLoader.loadConfig(this.bootstrapServiceRegistry, configurationURL);
+            Map values = loadedConfig.getConfigurationValues();
 
-        Map values = loadedConfig.getConfigurationValues();
+            this.dataSource = createBasicDataSource(values);
 
-        this.dataSource = createBasicDataSource(values);
+            // The BasicDataSource has lazy initialization.
+            // Borrowing a connection will start the DataSource and make sure it is configured correctly.
+            this.dataSource.getConnection().close();
+        } catch (Exception e) {
+            if (this.dataSource != null) {
+                try {
+                    this.dataSource.close();
+                } catch (Exception ignored) {
+                    // Ignore.
+                }
+                this.dataSource = null;
+            }
 
-        // The BasicDataSource has lazy initialization.
-        // Borrowing a connection will start the DataSource and make sure it is configured correctly.
-        this.dataSource.getConnection().close();
+            if (e instanceof SQLException sqlException) {
+                throw sqlException;
+            }
+
+            throw new SQLException("Failed to create shared datasource", e);
+        }
     }
 
     @Override
@@ -135,11 +148,6 @@ public class DBCPHibernateDataSourceProvider
                 this.logger.debug("Failed to close shared datasource", e);
             }
             this.dataSource = null;
-        }
-
-        if (this.bootstrapServiceRegistry != null) {
-            this.bootstrapServiceRegistry.close();
-            this.bootstrapServiceRegistry = null;
         }
     }
 

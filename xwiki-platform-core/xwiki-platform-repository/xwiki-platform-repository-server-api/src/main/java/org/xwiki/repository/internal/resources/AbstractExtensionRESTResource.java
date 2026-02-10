@@ -98,9 +98,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected static final String DEFAULT_FL;
 
-    protected static final Map<String, Integer> EPROPERTIES_INDEX =
-        Map.of(XWikiRepositoryModel.PROP_EXTENSION_ID, 0, XWikiRepositoryModel.PROP_EXTENSION_NAME, 1,
-            XWikiRepositoryModel.PROP_EXTENSION_TYPE, 2, XWikiRepositoryModel.PROP_VERSION_VERSION, 3);
+    protected static final Map<String, Integer> EPROPERTIES_INDEX = Map.of(XWikiRepositoryModel.PROP_EXTENSION_ID, 2,
+        XWikiRepositoryModel.PROP_EXTENSION_NAME, 3, XWikiRepositoryModel.PROP_EXTENSION_TYPE, 4,
+        XWikiRepositoryModel.PROP_VERSION_VERSION, 5, XWikiRepositoryModel.PROP_VERSION_INDEX, 6);
 
     // Note that the order of the retrieved information is stable and documented by EPROPERTIES_INDEX,
     // therefore it shouldn't be changed or it would break some of the APIs relying on it.
@@ -444,6 +444,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                                 XWikiRepositoryModel.PROP_DEPENDENCY_ID));
                             dependency.setConstraint(this.extensionStore.getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
+                            List<String> dependencyExclusions = this.extensionStore.getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS);
+                            dependency.withExclusions(dependencyExclusions);
                             dependency.setOptional(this.extensionStore.getBooleanValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
                             List<String> dependencyRepositories = this.extensionStore.getValue(dependencyObject,

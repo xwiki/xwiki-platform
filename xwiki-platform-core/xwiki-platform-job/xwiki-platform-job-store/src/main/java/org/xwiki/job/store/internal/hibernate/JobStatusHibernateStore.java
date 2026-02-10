@@ -45,12 +45,12 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.store.hibernate.HibernateDataSourceProvider;
 import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.internal.store.hibernate.datasource.HibernateDataSourceProvider;
 import com.xpn.xwiki.store.DatabaseProduct;
 
 /**
@@ -64,7 +64,6 @@ import com.xpn.xwiki.store.DatabaseProduct;
  * @version $Id$
  * @since 18.1.0RC1
  */
-@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component(roles = JobStatusHibernateStore.class)
 @Singleton
 public class JobStatusHibernateStore implements Initializable, Disposable

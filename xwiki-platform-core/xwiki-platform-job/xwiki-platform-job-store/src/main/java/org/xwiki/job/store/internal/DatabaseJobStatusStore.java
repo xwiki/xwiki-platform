@@ -47,6 +47,7 @@ import org.xwiki.job.internal.JobStatusSerializer;
 import org.xwiki.job.internal.JobUtils;
 import org.xwiki.job.internal.PersistentJobStatusStore;
 import org.xwiki.job.store.internal.entity.JobStatusSummaryEntity;
+import org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.logging.tail.LogTail;
@@ -116,7 +117,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     private Provider<DatabaseLoggerTail> databaseLoggerTailProvider;
 
     @Inject
-    private MainWikiHibernateExecutor hibernateExecutor;
+    private JobStatusHibernateExecutor hibernateExecutor;
 
     private final ReentrantLock fileSystemLock = new ReentrantLock();
 
@@ -148,7 +149,12 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         this.fileSystemLock.lock();
         try {
             JobStatus legacyStatus = this.filesystemStore.loadStatusWithLock(id);
-            migrateFromFilesystem(id, legacyStatus);
+            // Migrate the job status to the database if found in the filesystem, so that next time it can be loaded
+            // directly from the database.
+            saveJobStatusWithLock(legacyStatus);
+            // As the logs have been migrated to the database, we need to re-attach the logger tail to read the logs
+            // from the database instead of the filesystem.
+            attachReadOnlyLoggerTail(legacyStatus, getNodeId(), this.identifierResolver.getDatabaseKey(id));
             return legacyStatus;
         } finally {
             this.fileSystemLock.unlock();
@@ -214,38 +220,33 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
             try {
                 JobStatus legacyStatus = this.filesystemStore.loadStatusWithLock(jobId);
                 if (legacyStatus != null) {
-                    migrateFromFilesystem(jobId, legacyStatus);
+                    saveJobStatusWithLock(legacyStatus);
                 }
             } catch (Exception e) {
-                this.logger.warn("Failed to load job status [{}] from filesystem: [{}].", jobId,
+                this.logger.warn("Failed to migrate job status [{}] from filesystem: [{}].", jobId,
                     ExceptionUtils.getRootCauseMessage(e));
                 return this.filesystemStore.createLoggerTail(jobId, true);
             } finally {
                 this.fileSystemLock.unlock();
             }
         } else {
-            // TODO: also delete logs from filesystem.
             this.hibernateExecutor.executeWrite(session -> {
                 deleteLogs(session, nodeId, statusKey);
                 return null;
             });
+
+            // Try deleting the logs from the filesystem to avoid wrongly migrating the logs to the database later
+            // when the logs shall be read. We only log a warning here because in most cases, it shouldn't cause any
+            // issues.
+            try {
+                this.filesystemStore.removeWithLock(jobId);
+            } catch (IOException e) {
+                this.logger.warn("Failed to remove legacy job status [{}] from filesystem: [{}].", jobId,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
 
         return this.databaseLoggerTailProvider.get().initialize(nodeId, statusKey, readonly);
-    }
-
-    private void migrateFromFilesystem(List<String> id, JobStatus legacyStatus) throws IOException
-    {
-        if (legacyStatus == null || id == null) {
-            return;
-        }
-
-        try {
-            saveJobStatusWithLock(legacyStatus);
-            this.filesystemStore.removeWithLock(id);
-        } catch (Exception e) {
-            throw new IOException("Failed to migrate filesystem job status [%s] to database.".formatted(id), e);
-        }
     }
 
     @Override
@@ -302,7 +303,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
             persistBlob(status, blobLocator);
 
-            // TODO: delete filesystem job status files to avoid duplication that could cause confusion.
+            this.filesystemStore.removeWithLock(request.getId());
         } catch (JobStatusStoreException e) {
             throw new IOException(
                 "Failed to persist job status metadata for [%s].".formatted(status.getRequest().getId()), e);
@@ -382,14 +383,19 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
         try {
             JobStatus status = loadStatusFromBlob(entity.getBlobLocator());
-            if (status instanceof AbstractJobStatus<?> abstractJobStatus) {
-                LoggerTail tail = this.databaseLoggerTailProvider.get().initialize(nodeId, statusKey, true);
-                abstractJobStatus.setLoggerTail(tail);
-            }
+            attachReadOnlyLoggerTail(status, nodeId, statusKey);
             return status;
         } catch (BlobStoreException e) {
             throw new JobStatusStoreException("Failed to read job status [%s] from blob store."
                 .formatted(this.identifierResolver.getRawId(id)), e);
+        }
+    }
+
+    private void attachReadOnlyLoggerTail(JobStatus status, String nodeId, String statusKey)
+    {
+        if (status instanceof AbstractJobStatus<?> abstractJobStatus) {
+            LoggerTail tail = this.databaseLoggerTailProvider.get().initialize(nodeId, statusKey, true);
+            abstractJobStatus.setLoggerTail(tail);
         }
     }
 

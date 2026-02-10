@@ -41,6 +41,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity;
+import org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.logging.internal.tail.AbstractLoggerTail;
@@ -108,9 +109,6 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
 
     private static final String TO_LINE_INDEX = "toLineIndex";
 
-    private static final String SELECT_SUMMARY_FOR_UPDATE_HQL =
-        "from org.xwiki.job.store.internal.entity.JobStatusSummaryEntity " + NODE_AND_STATUS_WHERE;
-
     private String nodeId;
 
     private String statusKey;
@@ -124,9 +122,9 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
     private SafeXStream xstream;
 
     @Inject
-    private MainWikiHibernateExecutor hibernateExecutor;
+    private JobStatusHibernateExecutor hibernateExecutor;
 
-    private AtomicInteger nextLineIndex = new AtomicInteger();
+    private final AtomicInteger nextLineIndex = new AtomicInteger();
 
     DatabaseLoggerTail initialize(String nodeId, String statusKey, boolean readOnly)
     {

@@ -1,0 +1,321 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="en_GB">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: platform.core.profile.category.notifications=
+### Missing: notifications.filters.cancel=
+### Missing: notifications.filters.submit=
+### Missing: notifications.filters.type.label=
+### Missing: notifications.filters.type.hint=
+### Missing: notifications.filters.location.label=
+### Missing: notifications.filters.location.hint=
+
+## Advanced filters options
+### Missing: notifications.settings.filters.advanced=
+### Missing: notifications.filters.advanced.toggles.hint=
+### Missing: notifications.filters.advanced.toggles.table.name=
+### Missing: notifications.filters.advanced.toggles.table.description=
+### Missing: notifications.filters.advanced.toggles.table.toggle=
+### Missing: notifications.filters.advanced.modal.close=
+
+## Filters names
+### Missing: notifications.filters.name.systemUserNotificationFilter=
+### Missing: notifications.filters.description.systemUserNotificationFilter=
+### Missing: notifications.filters.name.ownEventsNotificationFilter=
+### Missing: notifications.filters.description.ownEventsNotificationFilter=
+### Missing: notifications.filters.name.eventReadAlertFilter=
+### Missing: notifications.filters.description.eventReadAlertFilter=
+### Missing: notifications.filters.name.eventReadEmailFilter=
+### Missing: notifications.filters.description.eventReadEmailFilter=
+### Missing: notifications.filters.name.minorEventAlertNotificationFilter=
+### Missing: notifications.filters.description.minorEventAlertNotificationFilter=
+### Missing: notifications.filters.name.minorEventEmailNotificationFilter=
+### Missing: notifications.filters.description.minorEventEmailNotificationFilter=
+
+## Translation keys for the scopeNotificationFilter
+### Missing: notifications.filters.preferences.scopeNotificationFilter.name=
+### Missing: notifications.filters.preferences.scopeNotificationFilter.page=
+### Missing: notifications.filters.preferences.scopeNotificationFilter.space=
+### Missing: notifications.filters.preferences.scopeNotificationFilter.wiki=
+### Missing: notifications.filters.preferences.scopeNotificationFilter.user=
+
+## Notifications toggles
+### Missing: notifications.toggle.disabled.hint=
+
+## Notifications formats
+### Missing: notifications.format.alert=
+### Missing: notifications.format.email=
+
+## Filter preferences settings
+### Missing: notifications.filters.preferences.delete.inProgress=
+### Missing: notifications.filters.preferences.delete.done=
+### Missing: notifications.filters.preferences.delete.error=
+### Missing: notifications.filters.preferences.setEnabled.inProgress=
+### Missing: notifications.filters.preferences.setEnabled.done=
+### Missing: notifications.filters.preferences.setEnabled.error=
+### Missing: notifications.filters.preferences.allEvents=
+
+## System Filter preferences settings
+### Missing: notifications.settings.filters.preferences.system.title=
+### Missing: notifications.settings.filters.preferences.system.hint=
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.system.table.name=
+### Missing: notifications.settings.filters.preferences.system.table.filterDescription=
+### Missing: notifications.settings.filters.preferences.system.table.filterType=
+### Missing: notifications.settings.filters.preferences.system.table.notificationFormats=
+### Missing: notifications.settings.filters.preferences.system.table.isEnabled=
+
+## Custom Filter preferences settings
+### Missing: notifications.settings.filters.preferences.custom.title=
+### Missing: notifications.settings.filters.preferences.custom.hint=
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=
+### Missing: notifications.settings.filters.preferences.custom.table.scope=
+### Missing: notifications.settings.filters.preferences.custom.table.location=
+### Missing: notifications.settings.filters.preferences.custom.table.filterType=
+### Missing: notifications.settings.filters.preferences.custom.table.eventTypes=
+### Missing: notifications.settings.filters.preferences.custom.table.notificationFormats=
+### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=
+### Missing: notifications.settings.filters.preferences.custom.table._actions=
+### Missing: notifications.filters.type.custom.inclusive=
+### Missing: notifications.filters.type.custom.exclusive=
+
+
+## Add filter modal
+### Missing: notifications.settings.addFilter=
+### Missing: notifications.settings.addFilter.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.location.label=
+### Missing: notifications.filters.preferences.custom.addFilter.location.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.type.label=
+### Missing: notifications.filters.preferences.custom.addFilter.type.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.filterType.inclusive=
+### Missing: notifications.filters.preferences.custom.addFilter.filterType.exclusive=
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.label=
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.label=
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=
+### Missing: notifications.menu.header=
+### Missing: notifications.menu.header.settings=
+### Missing: notifications.menu.clear=
+### Missing: notifications.menu.clearing=
+### Missing: notifications.menu.cleared=
+### Missing: notifications.settings.title=
+### Missing: notifications.settings.error.notAdmin=
+### Missing: notifications.settings.menu=
+### Missing: notifications.settings.menu.hint=
+### Missing: notifications.settings.email=
+### Missing: notifications.settings.email.forGuest=
+### Missing: notifications.settings.email.disabled=
+### Missing: notifications.settings.email.hint=
+### Missing: notifications.settings.email.title=
+### Missing: notifications.settings.email.frequency=
+### Missing: notifications.settings.email.frequency.hint=
+### Missing: notifications.settings.email.diffType.hint=
+### Missing: notifications.settings.saving=
+### Missing: notifications.settings.saved=
+### Missing: notifications.settings.savingfailed=
+### Missing: notifications.settings.filters=
+### Missing: notifications.settings.errorFilterWiki=
+### Missing: notifications.settings.preferences=
+### Missing: notifications.settings.preferences.hint=
+### Missing: notifications.settings.applications.title=
+### Missing: notifications.settings.applications.hint=
+### Missing: notifications.settings.applications.forGuest=
+### Missing: notifications.settings.applications.appName=
+### Missing: notifications.settings.applications.table.dropdown.toggle.label=
+### Missing: notifications.settings.events=
+### Missing: notifications.settings.watch.title=
+### Missing: notifications.settings.watch.autowatchmode=
+### Missing: notifications.settings.watch.autowatchmode.hint=
+### Missing: notifications.settings.watch.forGuest=
+### Missing: notifications.settings.watch.disabled=
+### Missing: notifications.events.by=
+### Missing: notifications.events.lastChange=
+### Missing: notifications.events.lastComment=
+### Missing: notifications.preferences.scope.table.scope=
+### Missing: notifications.preferences.scope.table.location=
+### Missing: notifications.preferences.scope.table.scopeFilterType=
+### Missing: notifications.preferences.scope.table._actions=
+### Missing: notifications.email.title=
+### Missing: notifications.email.subject=
+### Missing: notifications.email.seeChanges=
+### Missing: notifications.email.linkDetails=
+### Missing: notifications.rss.feedLink=
+### Missing: notifications.rss.feedLinkDescription=
+### Missing: notifications.rss.feedTitle=
+### Missing: notifications.rss.feedDescription=
+### Missing: notifications.rss.seeChanges=
+### Missing: notifications.rss.defaultTitleWithPage=
+### Missing: notifications.rss.defaultTitle=
+### Missing: notifications.globalsettings.email=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=
+
+## Common notification settings errors
+### Missing: notifications.settings.error.userReferenceNotSupported=
+### Missing: notifications.settings.error.userReferenceAdminForbidden=
+### Missing: notifications.settings.error.badCSRF=
+### Missing: notifications.settings.badParameters=
+
+## User profile
+### Missing: notifications.userprofile.following=
+### Missing: notifications.userprofile.notfollowing=
+### Missing: notifications.userprofile.follow=
+### Missing: notifications.userprofile.unfollow=
+### Missing: notifications.userprofile.done=
+### Missing: notifications.userprofile.saving=
+### Missing: notifications.userprofile.error=
+
+## Macros description
+### Missing: rendering.macro.notificationsApplicationsPreferences.name=
+### Missing: rendering.macro.notificationsApplicationsPreferences.description=
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=
+
+## Toggle notification filters labels
+### Missing: notifications.filters.preferences.label.page=
+### Missing: notifications.filters.preferences.label.space=
+### Missing: notifications.filters.preferences.label.wiki=
+
+## Notifications switches
+### Missing: notifications.switches.tooltip.page=
+### Missing: notifications.switches.tooltip.pageAndChildren=
+### Missing: notifications.switches.tooltip.space=
+### Missing: notifications.switches.tooltip.wiki=
+### Missing: notifications.switches.changeStatusError=
+
+## Watch button and modal
+
+### Missing: notifications.watch.button.title=
+### Missing: notifications.watch.button.status.notset=
+### Missing: notifications.watch.button.status.followed=
+### Missing: notifications.watch.button.status.blocked=
+### Missing: notifications.watch.button.status.custom=
+### Missing: notifications.watch.modal.title=
+### Missing: notifications.watch.modal.description.options=
+### Missing: notifications.watch.modal.description.ancestoroption=
+### Missing: notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.NOT_SET=
+### Missing: notifications.watch.modal.description.NOT_SET=
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.CUSTOM=
+### Missing: notifications.watch.modal.description.CUSTOM=
+### Missing: notifications.watch.modal.option.watchpage.title=
+### Missing: notifications.watch.modal.option.watchpage.hint=
+### Missing: notifications.watch.modal.option.watchspace.title=
+### Missing: notifications.watch.modal.option.watchspace.hint=
+### Missing: notifications.watch.modal.option.watchwiki.title=
+### Missing: notifications.watch.modal.option.watchwiki.hint=
+### Missing: notifications.watch.modal.option.blockpage.title=
+### Missing: notifications.watch.modal.option.blockpage.hint=
+### Missing: notifications.watch.modal.option.blockspace.title=
+### Missing: notifications.watch.modal.option.blockspace.hint=
+### Missing: notifications.watch.modal.option.unwatchpage.title=
+### Missing: notifications.watch.modal.option.unwatchpage.hint=
+### Missing: notifications.watch.modal.option.unwatchspace.title=
+### Missing: notifications.watch.modal.option.unwatchspace.hint=
+### Missing: notifications.watch.modal.option.unwatchwiki.title=
+### Missing: notifications.watch.modal.option.unwatchwiki.hint=
+### Missing: notifications.watch.modal.option.unblockpage.title=
+### Missing: notifications.watch.modal.option.unblockpage.hint=
+### Missing: notifications.watch.modal.option.unblockspace.title=
+### Missing: notifications.watch.modal.option.unblockspace.hint=
+### Missing: notifications.watch.modal.option.unblockwiki.title=
+### Missing: notifications.watch.modal.option.unblockwiki.hint=
+### Missing: notifications.watch.modal.close=
+### Missing: notifications.watch.modal.savechanges=
+### Missing: notifications.watch.modal.gotosettings=
+## until 13.2RC1
+### Missing: notifications.settings.filters.preferences.title=
+### Missing: notifications.settings.filters.preferences.hint=
+### Missing: notifications.settings.filters.preferences.forGuest=
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.table.name=
+### Missing: notifications.settings.filters.preferences.table.filterType=
+### Missing: notifications.settings.filters.preferences.table.eventTypes=
+### Missing: notifications.settings.filters.preferences.table.notificationFormats=
+### Missing: notifications.settings.filters.preferences.table.isEnabled=
+### Missing: notifications.settings.filters.preferences.table._actions=
+### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=
+### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.label=
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=
+### Missing: notifications.filters.preferences.addPreference.eventType.label=
+### Missing: notifications.filters.preferences.addPreference.eventType.hint=
+### Missing: notifications.filters.preferences.addPreference.location.label=
+### Missing: notifications.filters.preferences.addPreference.location.hint=
+
+
+## Filter Types
+### Missing: notifications.filters.type.inclusive=
+### Missing: notifications.filters.type.exclusive=
+
+## until 16.2.0RC1
+### Missing: notifications.settings.filters.preferences.custom.table.description=
+### Missing: notifications.settings.filters.preferences.system.table.description=
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.custom.table.name=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

@@ -1,0 +1,186 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="en_GB">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: administration.title=
+### Missing: administration.title.page=
+### Missing: administration.title.wiki=
+### Missing: administration.title.global=
+### Missing: administration.sectionTitle=
+### Missing: administration.sectionTitle.page=
+### Missing: administration.sectionTitle.wiki=
+### Missing: administration.sectionTitle.global=
+### Missing: administration.menu.search.hint=
+### Missing: administration.menu.search.noResults=
+
+# Registration Section
+### Missing: XWiki.XWikiPreferences_use_email_verification.hint=
+### Missing: XWiki.XWikiPreferences_validation_email_content.hint=
+### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=
+### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=
+### Missing: XWiki.Registration_heading.hint=
+### Missing: XWiki.Registration_welcomeMessage.hint=
+### Missing: XWiki.Registration_liveValidation_enabled.hint=
+### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=
+### Missing: XWiki.Registration_loginButton_enabled.hint=
+### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=
+### Missing: XWiki.Registration_defaultRedirect.hint=
+### Missing: XWiki.Registration_requireCaptcha.hint=
+### Missing: XWiki.Registration_registrationSuccessMessage.hint=
+### Missing: XWiki.Registration_passwordLength.hint=
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=
+
+# Look &amp; Feel Sections
+### Missing: admin.themes=
+### Missing: admin.themes.description=
+### Missing: admin.colorthemes.local=
+### Missing: admin.colorthemes.global=
+### Missing: XWiki.XWikiPreferences_showannotations.hint=
+### Missing: XWiki.XWikiPreferences_showcomments.hint=
+### Missing: XWiki.XWikiPreferences_showattachments.hint=
+### Missing: XWiki.XWikiPreferences_showhistory.hint=
+### Missing: XWiki.XWikiPreferences_showinformation.hint=
+### Missing: XWiki.XWikiPreferences_title.hint=
+### Missing: XWiki.XWikiPreferences_meta.hint=
+### Missing: XWiki.XWikiPreferences_webcopyright.hint=
+### Missing: XWiki.XWikiPreferences_version.hint=
+### Missing: XWiki.XWikiPreferences_skin.hint=
+### Missing: XWiki.XWikiPreferences_iconTheme.hint=
+### Missing: XWiki.XWikiPreferences_colorTheme.hint=
+
+# Editing Sections
+### Missing: admin.edit=
+### Missing: admin.edit.description=
+### Missing: admin.title=
+### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=
+### Missing: XWiki.XWikiPreferences_editor.hint=
+### Missing: XWiki.XWikiPreferences_editcomment.hint=
+### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=
+### Missing: XWiki.XWikiPreferences_minoredit.hint=
+### Missing: admin.wysiwyg.description=
+### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=
+
+# Localization Section
+### Missing: XWiki.XWikiPreferences_multilingual.hint=
+### Missing: XWiki.XWikiPreferences_languages.hint=
+### Missing: XWiki.XWikiPreferences_default_language.hint=
+### Missing: XWiki.XWikiPreferences_dateformat.hint=
+### Missing: XWiki.XWikiPreferences_timezone.hint=
+
+# Import Section
+### Missing: administration.section.import.hint=
+
+# Export Section
+### Missing: administration.section.export.pages=
+### Missing: administration.section.export.pages.all=
+### Missing: administration.section.export.withHistory.hint=
+### Missing: administration.section.export.targetXWikiVersion=
+### Missing: administration.section.export.targetXWikiVersion.hint=
+### Missing: administration.section.export.targetXWikiVersion.12plus=
+### Missing: administration.section.export.targetXWikiVersion.below12=
+### Missing: administration.section.export.packageName.hint=
+### Missing: administration.section.export.moreOptions=
+### Missing: administration.section.export.lessOptions=
+### Missing: administration.section.export.description.hint=
+### Missing: administration.section.export.author.hint=
+### Missing: administration.section.export.licence.hint=
+### Missing: administration.section.export.version.hint=
+### Missing: administration.section.export.backupPack.hint=
+
+# Users Section
+### Missing: administration.section.users.enableUser.inProgress=
+### Missing: administration.section.users.enableUser.done=
+### Missing: administration.section.users.enableUser.failed=
+### Missing: administration.section.users.disableUser.inProgress=
+### Missing: administration.section.users.disableUser.done=
+### Missing: administration.section.users.disableUser.failed=
+### Missing: administration.section.users.deleteUser.confirmationMessage=
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=
+### Missing: administration.section.users.deleteUser.newAuthor=
+### Missing: administration.section.users.deleteUser.newAuthor.hint=
+### Missing: administration.section.users.deleteUser.newAuthor.error=
+### Missing: administration.section.users.deleteUser.newAuthor.programming=
+### Missing: administration.section.users.deleteUser.newAuthor.script=
+### Missing: admin.usersgroups.extensionrights=
+
+# Other Category
+### Missing: admin.other=
+### Missing: admin.other.description=
+### Missing: administration.section.analytics.status=
+### Missing: administration.section.analytics.status.hint=
+
+# Social category
+### Missing: admin.social=
+### Missing: admin.social.description=
+
+# Configurable Class
+### Missing: XWiki.ConfigurableClass_displayInSection=
+### Missing: XWiki.ConfigurableClass_heading=
+### Missing: XWiki.ConfigurableClass_configurationClass=
+### Missing: XWiki.ConfigurableClass_linkPrefix=
+### Missing: XWiki.ConfigurableClass_propertiesToShow=
+### Missing: XWiki.ConfigurableClass_codeToExecute=
+### Missing: XWiki.ConfigurableClass_iconAttachment=
+### Missing: XWiki.ConfigurableClass_displayInCategory=
+### Missing: XWiki.ConfigurableClass_displayBeforeCategory=
+### Missing: XWiki.ConfigurableClass_categoryIcon=
+### Missing: XWiki.ConfigurableClass_scope=
+### Missing: XWiki.ConfigurableClass_scope_WIKI=
+### Missing: XWiki.ConfigurableClass_scope_SPACE=
+### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=
+### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=
+### Missing: XWiki.ConfigurableClass_sectionOrder=
+
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+### Missing: XWiki.XWikiPreferences_auth_active_check.hint=
+### Missing: administration.section.users.deleteUser.markInactiveMessage=
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

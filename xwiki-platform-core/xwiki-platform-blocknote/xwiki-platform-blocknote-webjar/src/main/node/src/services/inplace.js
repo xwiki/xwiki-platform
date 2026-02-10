@@ -81,10 +81,7 @@ define("xwiki-blocknote-inline", [
     getRenderingConfig: function () {
       return {
         outputSyntax: BlockNote.syntax,
-        // We currently use Markdown as output syntax, for which we don't have a way to protect the rendering
-        // transformations, so we disable all of them. We'll have to add support for protecting the macro
-        // transformation, at least, when switching to the UniAst syntax.
-        transformations: [""],
+        transformations: ["macro"],
       };
     },
   };

@@ -70,17 +70,9 @@
 <script setup lang="ts">
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
-import {
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "@xwiki/platform-uniast-markdown";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
 import type { UniAst } from "@xwiki/platform-uniast-api";
-import type {
-  MarkdownToUniAstConverter,
-  UniAstToMarkdownConverter,
-} from "@xwiki/platform-uniast-markdown";
 
 //
 // Injected
@@ -95,7 +87,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "markdown/1.2",
+  inputSyntax = "uniast/1.0",
   outputSyntax = "xwiki/2.1",
 } = defineProps<{
   // The key used to submit the edited content.
@@ -123,17 +115,12 @@ const {
 const value = ref(initialValue);
 const dirty = ref(false);
 
-const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
-  markdownToUniAstConverterName,
-);
-const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
-  uniAstToMarkdownConverterName,
-);
-
 const editorContent = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = await markdownToUniAst.parseMarkdown(initialValue);
+  editorContent.value = initialValue
+    ? JSON.parse(initialValue)
+    : { blocks: [] };
 });
 
 const editorProps = shallowRef<
@@ -171,10 +158,7 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = await uniAstToMarkdown.toMarkdown(editorContent as UniAst);
-  if (newValue instanceof Error) {
-    throw newValue;
-  }
+  const newValue = JSON.stringify(editorContent);
 
   value.value = newValue;
   dirty.value = false;

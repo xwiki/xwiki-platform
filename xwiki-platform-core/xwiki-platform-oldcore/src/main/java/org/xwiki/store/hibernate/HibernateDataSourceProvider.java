@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.store.hibernate.datasource;
+package org.xwiki.store.hibernate;
 
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides a shared JDBC {@link DataSource} for Hibernate-based stores.
@@ -34,6 +35,7 @@ import org.xwiki.component.annotation.Role;
  * @since 18.1.0RC1
  */
 @Role
+@Unstable
 public interface HibernateDataSourceProvider
 {
     /**

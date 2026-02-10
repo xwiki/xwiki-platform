@@ -90,7 +90,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.store.hibernate.datasource.HibernateDataSourceProvider;
+import org.xwiki.store.hibernate.HibernateDataSourceProvider;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
@@ -132,7 +132,7 @@ public class HibernateStore implements Disposable, Initializable
     private LoggerConfiguration loggerConfiguration;
 
     @Inject
-    private HibernateDataSourceProvider dataSourceProviderProvider;
+    private HibernateDataSourceProvider dataSourceProvider;
 
     @Inject
     private HibernateCfgXmlLoader cfgXmlLoader;
@@ -222,7 +222,7 @@ public class HibernateStore implements Disposable, Initializable
         //
         // We do it by injecting a shared DataSource into Hibernate settings before building the registry.
         // This allows using the same hibernate.cfg.xml without changing it.
-        DataSource dataSource = this.dataSourceProviderProvider.getDataSource();
+        DataSource dataSource = this.dataSourceProvider.getDataSource();
         Map values = baseConfiguration.getConfigurationValues();
         this.cfgXmlLoader.applySharedDataSourceOverrides(values, dataSource);
 
@@ -388,7 +388,7 @@ public class HibernateStore implements Disposable, Initializable
                 }
             }
         } else {
-            try (Connection connection = this.dataSourceProviderProvider.getDataSource().getConnection()) {
+            try (Connection connection = this.dataSourceProvider.getDataSource().getConnection()) {
                 return connection.getMetaData();
             } catch (SQLException e) {
                 this.logger.debug("Failed to retrieve database metadata", e);

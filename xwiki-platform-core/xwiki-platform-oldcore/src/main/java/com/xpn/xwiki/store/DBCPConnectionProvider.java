@@ -40,6 +40,7 @@ import org.hibernate.service.spi.Configurable;
 import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.store.hibernate.HibernateDataSourceProvider;
 
 /**
  * <p>
@@ -88,7 +89,10 @@ import org.slf4j.LoggerFactory;
  *
  * @see org.hibernate.engine.jdbc.connections.spi.ConnectionProvider
  * @author Dirk Verbeeck
+ * @deprecated Use {@link HibernateDataSourceProvider} instead.
+ * @version $Id$
  */
+@Deprecated(since = "18.1.0RC1")
 public class DBCPConnectionProvider implements ConnectionProvider, Configurable, Stoppable
 {
     /**
@@ -116,6 +120,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
     public void configure(Map props) throws HibernateException
     {
         try {
+            LOGGER.warn("DBCPConnectionProvider is deprecated; use HibernateDataSourceProvider instead");
             LOGGER.debug("Configure DBCPConnectionProvider");
 
             // DBCP properties used to create the BasicDataSource

@@ -22,12 +22,10 @@ package com.xpn.xwiki.internal.store.hibernate.datasource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,20 +34,16 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.boot.cfgxml.internal.ConfigLoader;
 import org.hibernate.boot.cfgxml.spi.LoadedConfig;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.environment.Environment;
-
-import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
+import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
 
 /**
  * Creates a single shared {@link BasicDataSource} based on the same properties as the standard
@@ -63,12 +57,8 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 @Component
 @Singleton
 public class DBCPHibernateDataSourceProvider
-    implements HibernateDataSourceProvider, Initializable, Disposable
+    implements HibernateDataSourceProvider, Disposable
 {
-    private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
-
-    private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
-
     private static final String DBCP_PREFIX = "hibernate.dbcp.";
 
     private static final String COMPATIBILITY_PS_MAXACTIVE = "ps.maxActive";
@@ -87,56 +77,52 @@ public class DBCPHibernateDataSourceProvider
     private Logger logger;
 
     @Inject
-    private HibernateConfiguration hibernateConfiguration;
-
-    @Inject
-    private Environment environment;
+    private HibernateCfgXmlLoader cfgXmlLoader;
 
     private BasicDataSource dataSource;
 
     private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    @Override
-    public void initialize() throws InitializationException
+    private synchronized void maybeInitialize() throws SQLException
     {
-        URL configurationURL = getHibernateConfigurationURL();
-        if (configurationURL == null) {
-            this.logger.debug("No hibernate configuration found, cannot create shared datasource");
+        // Don't initialize more than once (in case multiple SessionFactory instances are created).
+        // We check this again in the synchronized method here to avoid race conditions.
+        if (this.dataSource != null) {
             return;
+        }
+
+        URL configurationURL = this.cfgXmlLoader.getConfigurationURL();
+        if (configurationURL == null) {
+            String errorMessage = "No hibernate configuration found, cannot create datasource";
+            this.logger.error(errorMessage);
+            throw new SQLException(errorMessage);
         }
 
         this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build();
 
-        ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
-        LoadedConfig loadedConfig = configLoader.loadConfigXmlUrl(configurationURL);
+        LoadedConfig loadedConfig =
+            this.cfgXmlLoader.loadConfig(this.bootstrapServiceRegistry, configurationURL);
 
         Map values = loadedConfig.getConfigurationValues();
-        replaceVariables(values);
 
-        // Only create the shared pool if XWiki's DBCP provider is configured.
-        // Otherwise we keep empty and let callers fallback to standard Hibernate bootstrap.
-        Object provider = values.get("hibernate.connection.provider_class");
+        this.dataSource = createBasicDataSource(values);
 
-        if (provider == null || !StringUtils.contains(String.valueOf(provider), "DBCPConnectionProvider")) {
-            this.logger.debug("Hibernate is not configured to use XWiki DBCPConnectionProvider (found [{}]); "
-                + "shared pool will not be created", provider);
-            return;
-        }
-
-        try {
-            this.dataSource = createBasicDataSource(values);
-
-            // Force early init (mirrors DBCPConnectionProvider behavior)
-            this.dataSource.getConnection().close();
-        } catch (Exception e) {
-            throw new InitializationException("Failed to create the shared DBCP datasource", e);
-        }
+        // The BasicDataSource has lazy initialization.
+        // Borrowing a connection will start the DataSource and make sure it is configured correctly.
+        this.dataSource.getConnection().close();
     }
 
     @Override
-    public Optional<DataSource> getDataSource()
+    public DataSource getDataSource() throws SQLException
     {
-        return Optional.ofNullable(this.dataSource);
+        // First, check without any lock to avoid calling the synchronized method too frequently.
+        if (this.dataSource == null) {
+            // Initialize the data source lazily only when it is called to avoid too early initialization, e.g., in
+            // unit tests that include all components.
+            maybeInitialize();
+        }
+
+        return this.dataSource;
     }
 
     @Override
@@ -157,55 +143,7 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 
-    private URL getHibernateConfigurationURL()
-    {
-        String path = this.hibernateConfiguration.getPath();
-
-        if (StringUtils.isEmpty(path)) {
-            return null;
-        }
-
-        try {
-            URL res = this.environment.getResource(path);
-            if (res != null) {
-                return res;
-            }
-        } catch (Exception e) {
-            // ignore
-        }
-
-        return Thread.currentThread().getContextClassLoader().getResource(path);
-    }
-
-    private void replaceVariables(Map values)
-    {
-        Object urlValue = values.get(org.hibernate.cfg.AvailableSettings.URL);
-        if (urlValue instanceof String url) {
-            String resolved = resolveURL(url);
-            if (resolved != null) {
-                values.put(org.hibernate.cfg.AvailableSettings.URL, resolved);
-            }
-        }
-    }
-
-    private String resolveURL(String url)
-    {
-        if (StringUtils.isNotEmpty(url) && url.matches(".*\\$\\{.*\\}.*")) {
-            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                this.environment.getPermanentDirectory().getAbsolutePath());
-
-            try {
-                return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
-                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
-            } catch (Exception e) {
-                this.logger.debug("Failed to encode the current timezone id", e);
-            }
-        }
-
-        return null;
-    }
-
-    private BasicDataSource createBasicDataSource(Map props) throws Exception
+    private BasicDataSource createBasicDataSource(Map props) throws SQLException
     {
         Properties dbcpProperties = new Properties();
 
@@ -230,7 +168,7 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyDriverClass(Map props, Properties dbcpProperties)
     {
-        String jdbcDriverClass = (String) props.get(org.hibernate.cfg.Environment.DRIVER);
+        String jdbcDriverClass = (String) props.get(AvailableSettings.DRIVER);
         // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
         // to set the "driverClassName" property.
         if (jdbcDriverClass != null) {
@@ -240,21 +178,24 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyJdbcURL(Map props, Properties dbcpProperties)
     {
-        String jdbcUrl = System.getProperty(org.hibernate.cfg.Environment.URL);
+        String jdbcUrl = System.getProperty(AvailableSettings.URL);
         if (jdbcUrl == null) {
-            jdbcUrl = (String) props.get(org.hibernate.cfg.Environment.URL);
+            jdbcUrl = (String) props.get(AvailableSettings.URL);
         }
         dbcpProperties.put("url", jdbcUrl);
     }
 
     private void applyCredentials(Map props, Properties dbcpProperties)
     {
-        String username = (String) props.get(org.hibernate.cfg.Environment.USER);
+        // Username / password. Only put username and password if they're not null. This allows
+        // external authentication support (OS authenticated). It'll thus work if the hibernate
+        // config does not specify a username and/or password.
+        String username = (String) props.get(AvailableSettings.USER);
         if (username != null) {
             dbcpProperties.put("username", username);
         }
 
-        String password = (String) props.get(org.hibernate.cfg.Environment.PASS);
+        String password = (String) props.get(AvailableSettings.PASS);
         if (password != null) {
             dbcpProperties.put("password", password);
         }
@@ -262,7 +203,7 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyIsolation(Map props, Properties dbcpProperties)
     {
-        String isolationLevel = (String) props.get(org.hibernate.cfg.Environment.ISOLATION);
+        String isolationLevel = (String) props.get(AvailableSettings.ISOLATION);
         if (StringUtils.isNotBlank(isolationLevel)) {
             dbcpProperties.put("defaultTransactionIsolation", isolationLevel);
         }
@@ -282,7 +223,7 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyPoolSize(Map props, Properties dbcpProperties)
     {
-        String poolSize = (String) props.get(org.hibernate.cfg.Environment.POOL_SIZE);
+        String poolSize = (String) props.get(AvailableSettings.POOL_SIZE);
         if (StringUtils.isNotBlank(poolSize) && Integer.parseInt(poolSize) > 0) {
             dbcpProperties.put(PROPERTY_MAX_TOTAL, poolSize);
         }
@@ -290,6 +231,7 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyConnectionProperties(Map props, Properties dbcpProperties)
     {
+        // Copy all "driver" properties into "connectionProperties"
         Properties driverProps = ConnectionProviderInitiator.getConnectionProperties(props);
         if (!driverProps.isEmpty()) {
             StringBuilder connectionProperties = new StringBuilder();
@@ -307,6 +249,7 @@ public class DBCPHibernateDataSourceProvider
 
     private void applyDBCPProperties(Map props, Properties dbcpProperties)
     {
+        // Copy all DBCP properties removing the prefix
         for (Object element : props.keySet()) {
             String key = String.valueOf(element);
             if (key.startsWith(DBCP_PREFIX)) {
@@ -337,4 +280,3 @@ public class DBCPHibernateDataSourceProvider
         }
     }
 }
-

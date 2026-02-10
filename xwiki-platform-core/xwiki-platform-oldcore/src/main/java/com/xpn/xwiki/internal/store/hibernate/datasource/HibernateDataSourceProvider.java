@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.datasource;
 
-import java.util.Optional;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -37,8 +37,7 @@ import org.xwiki.component.annotation.Role;
 public interface HibernateDataSourceProvider
 {
     /**
-     * @return the shared {@link DataSource}, or empty if it could not be created and callers should fallback to the
-     *         default Hibernate bootstrap (i.e. the connection provider configured in {@code hibernate.cfg.xml})
+     * @return the shared {@link DataSource} for Hibernate-based stores
      */
-    Optional<DataSource> getDataSource();
+    DataSource getDataSource() throws SQLException;
 }

@@ -74,6 +74,8 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         "from org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity "
             + NODE_AND_STATUS_WHERE;
 
+    private static final String DELETE_LOGS_HQL = "delete " + SELECT_LOGS_BASE_HQL;
+
     private static final String SORT_BY_LINE_INDEX_ASC = "order by lineIndex asc";
 
     private static final String SELECT_LOGS_HQL = SELECT_LOGS_BASE_HQL + SORT_BY_LINE_INDEX_ASC;
@@ -126,13 +128,63 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
 
     private final AtomicInteger nextLineIndex = new AtomicInteger();
 
+    /**
+     * Initialize the logger tail for the given nodeId and statusKey. If not read-only, it will delete any existing log
+     * entries for the nodeId/statusKey to start with a clean slate.
+     *
+     * @param nodeId the cluster node ID of the log entries to manage
+     * @param statusKey the job status key of the log entries to manage
+     * @param readOnly whether the tail will be used in read-only mode (e.g., for completed jobs) or in read-write
+     * mode (e.g., for running jobs)
+     * @return this tail instance for chaining
+     */
     DatabaseLoggerTail initialize(String nodeId, String statusKey, boolean readOnly)
     {
         this.nodeId = nodeId;
         this.statusKey = statusKey;
         this.readOnly = readOnly;
 
+        if (!readOnly) {
+            // Delete existing log entries for the nodeId/statusKey.
+            this.hibernateExecutor.executeWrite(session -> {
+                deleteLogs(session);
+                return null;
+            });
+        }
+
         return this;
+    }
+
+    /**
+     * Initialize the logger tail for the given nodeId and statusKey in read-write mode, deleting any existing log
+     * entries for the nodeId/statusKey to start with a clean slate.
+     *
+     * @param nodeId the cluster node ID of the log entries to manage
+     * @param statusKey the job status key of the log entries to manage
+     * @param session the Hibernate session to use for deleting existing log entries
+     * @return this tail instance for chaining
+     */
+    DatabaseLoggerTail initialize(String nodeId, String statusKey, Session session)
+    {
+        this.nodeId = nodeId;
+        this.statusKey = statusKey;
+        this.readOnly = false;
+
+        deleteLogs(session);
+
+        return this;
+    }
+
+    private void deleteLogs(Session session)
+    {
+        // Delete logs only if there are existing entries to avoid warning logs from Hibernate about "no data"
+        // with some databases.
+        if (countLogEntries(session) > 0) {
+            session.createQuery(DELETE_LOGS_HQL)
+                .setParameter(NODE_ID, this.nodeId)
+                .setParameter(STATUS_KEY, this.statusKey)
+                .executeUpdate();
+        }
     }
 
     @Override
@@ -237,12 +289,18 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         return entries.isEmpty() ? null : deserialize(entries.getFirst());
     }
 
-    long countLogEntries()
+    private long countLogEntries()
     {
-        Long count = this.hibernateExecutor.executeRead(session -> session.createQuery(COUNT_LOGS_HQL, Long.class)
+        return this.hibernateExecutor.executeRead(this::countLogEntries);
+    }
+
+    private long countLogEntries(Session session)
+    {
+        Long count = session.createQuery(COUNT_LOGS_HQL, Long.class)
             .setParameter(NODE_ID, this.nodeId)
             .setParameter(STATUS_KEY, this.statusKey)
-            .uniqueResult());
+            .uniqueResult();
+
         return count != null ? count : 0;
     }
 

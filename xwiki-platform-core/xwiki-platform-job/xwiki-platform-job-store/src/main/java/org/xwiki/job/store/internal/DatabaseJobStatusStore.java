@@ -35,7 +35,6 @@ import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJobStatus;
@@ -66,7 +65,7 @@ import org.xwiki.store.blob.BlobWriteMode;
  * @version $Id$
  * @since 18.1.0RC1
  */
-// TODO: Refactor this class to reduce its complexity, currently at 25.
+// TODO: Refactor this class to reduce its complexity, currently at 24.
 @SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component
 @Singleton
@@ -78,19 +77,11 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
     private static final String NODE_ID = "nodeId";
 
-    private static final String NODE_AND_STATUS_WHERE =
-        "where nodeId = :nodeId and statusKey = :statusKey";
+    private static final String STATUS_KEY = "statusKey";
 
     private static final String SELECT_SUMMARY_HQL =
-        "from org.xwiki.job.store.internal.entity.JobStatusSummaryEntity " + NODE_AND_STATUS_WHERE;
-
-    private static final String DELETE_LOGS_HQL =
-        "delete from org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity " + NODE_AND_STATUS_WHERE;
-
-    private static final String DELETE_SUMMARY_HQL =
-        "delete from org.xwiki.job.store.internal.entity.JobStatusSummaryEntity " + NODE_AND_STATUS_WHERE;
-
-    private static final String STATUS_KEY = "statusKey";
+        "from org.xwiki.job.store.internal.entity.JobStatusSummaryEntity "
+            + "where nodeId = :nodeId and statusKey = :statusKey";
 
     private static final String PATH_SEPARATOR = "/";
 
@@ -121,16 +112,9 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
     private final ReentrantLock fileSystemLock = new ReentrantLock();
 
-    private volatile String cachedNodeId;
-
     private String getNodeId()
     {
-        String nodeId = this.cachedNodeId;
-        if (nodeId == null) {
-            nodeId = this.remoteObservationManagerConfiguration.getId();
-            this.cachedNodeId = nodeId;
-        }
-        return nodeId;
+        return this.remoteObservationManagerConfiguration.getId();
     }
 
     @Override
@@ -179,20 +163,27 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         String statusKey = this.identifierResolver.getDatabaseKey(id);
 
         try {
-            JobStatusSummaryEntity entity = this.hibernateExecutor.executeRead(session -> session
-                .createQuery(SELECT_SUMMARY_HQL, JobStatusSummaryEntity.class)
-                .setParameter(NODE_ID, nodeId)
-                .setParameter(STATUS_KEY, statusKey)
-                .setMaxResults(1)
-                .uniqueResult());
+            JobStatusSummaryEntity entity = this.hibernateExecutor.executeWrite(session -> {
+                JobStatusSummaryEntity result = session
+                    .createQuery(SELECT_SUMMARY_HQL, JobStatusSummaryEntity.class)
+                    .setParameter(NODE_ID, nodeId)
+                    .setParameter(STATUS_KEY, statusKey)
+                    // Use pessimistic lock to make sure that the job status won't be modified by another thread
+                    // while we are deleting it.
+                    .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                    .setMaxResults(1)
+                    .uniqueResult();
 
-            this.hibernateExecutor.executeWrite(session -> {
-                deleteLogs(session, nodeId, statusKey);
-                Query<?> deleteSummary = session.createQuery(DELETE_SUMMARY_HQL);
-                deleteSummary.setParameter(NODE_ID, nodeId);
-                deleteSummary.setParameter(STATUS_KEY, statusKey);
-                deleteSummary.executeUpdate();
-                return null;
+                // Initialize a DatabaseLoggerTail to delete the logs from the database.
+                try (DatabaseLoggerTail tail = this.databaseLoggerTailProvider.get()) {
+                    tail.initialize(nodeId, statusKey, session);
+                }
+
+                if (result != null) {
+                    session.delete(result);
+                }
+
+                return result;
             });
 
             if (entity != null) {
@@ -230,11 +221,6 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 this.fileSystemLock.unlock();
             }
         } else {
-            this.hibernateExecutor.executeWrite(session -> {
-                deleteLogs(session, nodeId, statusKey);
-                return null;
-            });
-
             // Try deleting the logs from the filesystem to avoid wrongly migrating the logs to the database later
             // when the logs shall be read. We only log a warning here because in most cases, it shouldn't cause any
             // issues.
@@ -294,7 +280,6 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 session.saveOrUpdate(entity);
 
                 if (rewriteLogs) {
-                    deleteLogs(session, nodeId, statusKey);
                     persistLogs(session, nodeId, statusKey, logTail);
                 }
 
@@ -320,6 +305,8 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
             return;
         }
 
+        // This initialization deletes the existing logs for the given job status, so we can be sure that only the
+        // new logs will be stored in the database.
         try (DatabaseLoggerTail tail = this.databaseLoggerTailProvider.get().initialize(nodeId, statusKey, false)) {
             long lineIndex = 0;
             for (LogEvent event : loggerTail) {
@@ -329,14 +316,6 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 tail.appendLogEntry(lineIndex++, event, session);
             }
         }
-    }
-
-    private void deleteLogs(Session session, String nodeId, String statusKey)
-    {
-        Query<?> deleteLogs = session.createQuery(DELETE_LOGS_HQL);
-        deleteLogs.setParameter(NODE_ID, nodeId);
-        deleteLogs.setParameter(STATUS_KEY, statusKey);
-        deleteLogs.executeUpdate();
     }
 
     private void persistBlob(JobStatus status, String blobLocator) throws BlobStoreException, IOException

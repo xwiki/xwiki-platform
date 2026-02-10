@@ -1,0 +1,73 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.UserProfileTranslations" locale="en_GB">
+  <web>XWiki</web>
+  <name>UserProfileTranslations</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>User Profile Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=
+### Missing: XWiki.XWikiUsers_underline.hint=
+### Missing: XWiki.XWikiUsers_timezone.hint=
+### Missing: XWiki.XWikiUsers_editor.hint=
+### Missing: XWiki.XWikiUsers_usertype.hint=
+### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=
+### Missing: userprofile.default=
+### Missing: user.profile.groups.title=
+### Missing: user.profile.groups.description=
+### Missing: user.profile.groups.table.group=
+### Missing: platform.core.profile.category.groups=
+### Missing: user.profile.notifications=
+### Missing: user.profile.network.unfollow.question=
+### Missing: user.profile.network.unfollow.question.yes=
+### Missing: user.profile.network.unfollow.question.no=
+### Missing: user.profile.network.following=
+### Missing: user.profile.network.notfollowing=
+### Missing: user.profile.network.follow=
+### Missing: user.profile.network.unfollow=
+### Missing: user.profile.network.done=
+### Missing: user.profile.network.saving=
+### Missing: user.profile.network.error=
+### Missing: user.profile.status.done=
+### Missing: user.profile.status.saving=
+### Missing: user.profile.status.error=
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+### Missing: XWiki.XWikiUsers_accessibility.hint=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

@@ -1,6 +1,5 @@
 .xtree-finder-container {
   display: flex;
-  flex-direction: row;
   gap: .5em;
   align-items: center;
 }

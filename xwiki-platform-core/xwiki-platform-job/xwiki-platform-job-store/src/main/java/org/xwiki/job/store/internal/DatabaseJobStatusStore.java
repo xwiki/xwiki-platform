@@ -20,8 +20,6 @@
 package org.xwiki.job.store.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,7 +30,6 @@ import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -42,7 +39,6 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.CancelableJobStatus;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.job.internal.JobStatusSerializer;
 import org.xwiki.job.internal.JobUtils;
 import org.xwiki.job.internal.PersistentJobStatusStore;
 import org.xwiki.job.store.internal.entity.JobStatusSummaryEntity;
@@ -52,12 +48,7 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.logging.tail.LogTail;
 import org.xwiki.logging.tail.LoggerTail;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
-import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobPath;
-import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.blob.BlobStoreManager;
-import org.xwiki.store.blob.BlobWriteMode;
 
 /**
  * Database-backed {@link JobStatusStore} that replaces the filesystem implementation.
@@ -65,14 +56,10 @@ import org.xwiki.store.blob.BlobWriteMode;
  * @version $Id$
  * @since 18.1.0RC1
  */
-// TODO: Refactor this class to reduce its complexity, currently at 24.
-@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component
 @Singleton
 public class DatabaseJobStatusStore implements PersistentJobStatusStore
 {
-    private static final String BLOB_STORE_NAME = "jobstatus-db";
-
     private static final String BLOB_FILENAME = "status.xml.zip";
 
     private static final String NODE_ID = "nodeId";
@@ -96,10 +83,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     private JobStatusIdentifierSerializer identifierResolver;
 
     @Inject
-    private JobStatusSerializer serializer;
-
-    @Inject
-    private BlobStoreManager blobStoreManager;
+    private JobStatusBlobStore jobStatusBlobStore;
 
     @Inject
     private RemoteObservationManagerConfiguration remoteObservationManagerConfiguration;
@@ -110,6 +94,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     @Inject
     private JobStatusHibernateExecutor hibernateExecutor;
 
+    // Lock around filesystem operations as they expect to avoid concurrency issues.
     private final ReentrantLock fileSystemLock = new ReentrantLock();
 
     private String getNodeId()
@@ -187,7 +172,8 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
             });
 
             if (entity != null) {
-                deleteBlob(entity.getBlobLocator());
+                String blobLocator = entity.getBlobLocator();
+                this.jobStatusBlobStore.delete(blobLocator);
             }
         } catch (JobStatusStoreException e) {
             throw new IOException("Failed to remove job status [%s] from the database."
@@ -286,7 +272,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 return null;
             });
 
-            persistBlob(status, blobLocator);
+            this.jobStatusBlobStore.store(status, blobLocator);
 
             this.filesystemStore.removeWithLock(request.getId());
         } catch (JobStatusStoreException e) {
@@ -318,34 +304,6 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         }
     }
 
-    private void persistBlob(JobStatus status, String blobLocator) throws BlobStoreException, IOException
-    {
-        BlobStore store = this.blobStoreManager.getBlobStore(BLOB_STORE_NAME);
-        Blob blob = store.getBlob(BlobPath.parse(blobLocator));
-        try (OutputStream outputStream = blob.getOutputStream(BlobWriteMode.REPLACE_EXISTING)) {
-            this.serializer.write(status, outputStream, isZipFile(blobLocator));
-        }
-    }
-
-    private static boolean isZipFile(String blobLocator)
-    {
-        return blobLocator.endsWith(".zip");
-    }
-
-    private void deleteBlob(String blobLocator)
-    {
-        if (StringUtils.isBlank(blobLocator)) {
-            return;
-        }
-
-        try {
-            BlobStore store = this.blobStoreManager.getBlobStore(BLOB_STORE_NAME);
-            store.deleteBlob(BlobPath.parse(blobLocator));
-        } catch (BlobStoreException e) {
-            this.logger.warn("Failed to delete job status blob [{}].", blobLocator, e);
-        }
-    }
-
     private JobStatus loadFromDatabase(List<String> id) throws JobStatusStoreException
     {
         String nodeId = getNodeId();
@@ -361,7 +319,8 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         }
 
         try {
-            JobStatus status = loadStatusFromBlob(entity.getBlobLocator());
+            String blobLocator = entity.getBlobLocator();
+            JobStatus status = this.jobStatusBlobStore.load(blobLocator);
             attachReadOnlyLoggerTail(status, nodeId, statusKey);
             return status;
         } catch (BlobStoreException e) {
@@ -375,18 +334,6 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         if (status instanceof AbstractJobStatus<?> abstractJobStatus) {
             LoggerTail tail = this.databaseLoggerTailProvider.get().initialize(nodeId, statusKey, true);
             abstractJobStatus.setLoggerTail(tail);
-        }
-    }
-
-    private JobStatus loadStatusFromBlob(String blobLocator) throws BlobStoreException
-    {
-        BlobStore store = this.blobStoreManager.getBlobStore(BLOB_STORE_NAME);
-        Blob blob = store.getBlob(BlobPath.parse(blobLocator));
-
-        try (InputStream stream = blob.getStream()) {
-            return this.serializer.read(stream, isZipFile(blobLocator));
-        } catch (Exception e) {
-            throw new BlobStoreException("Failed to deserialize job status blob at [%s].".formatted(blobLocator), e);
         }
     }
 

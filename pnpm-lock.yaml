@@ -320,9 +320,6 @@ importers:
       '@xwiki/platform-uniast-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-api
-      '@xwiki/platform-uniast-markdown':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
       inversify:
         specifier: 'catalog:'
         version: 7.10.4(reflect-metadata@0.2.2)

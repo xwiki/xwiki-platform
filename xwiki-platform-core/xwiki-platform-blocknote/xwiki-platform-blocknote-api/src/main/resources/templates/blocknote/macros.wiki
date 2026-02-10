@@ -63,9 +63,18 @@
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
+  #set ($targetSyntax = 'uniast/1.0')
   #set ($restricted = "$!source.restricted" == 'true')
   #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
-  #set ($renderedContent = $services.rendering.render($xdom, 'markdown/1.2'))
+  #set ($discard = $services.rendering.transform($xdom
+    ).withId("BlockNote:${source.documentReference}"
+    ).withSyntax($source.syntax
+    ).withTargetSyntax($targetSyntax
+    ).withRestricted($restricted
+    ).withTransformations(['macro']
+    ).withContentDocument($source.documentReference
+    ).execute())
+  #set ($renderedContent = $services.rendering.render($xdom, $targetSyntax))
   ## Restore the previous display mode.
   #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
   $!renderedContent##

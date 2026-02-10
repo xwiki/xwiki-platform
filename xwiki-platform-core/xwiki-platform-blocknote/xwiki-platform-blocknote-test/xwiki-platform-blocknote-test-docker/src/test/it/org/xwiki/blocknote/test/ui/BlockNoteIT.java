@@ -62,7 +62,7 @@ class BlockNoteIT
         // Create a page with a small content, edit it, add a little basic content, save and observe the content
         // changed.
         String textContent = "Test";
-        ViewPage page = setup.createPage(testReference, textContent, "", "markdown/1.2");
+        ViewPage page = setup.createPage(testReference, textContent, "");
         page.edit();
         XWikiWebDriver driver = setup.getDriver();
         WebElement blocknoteEditableContent =

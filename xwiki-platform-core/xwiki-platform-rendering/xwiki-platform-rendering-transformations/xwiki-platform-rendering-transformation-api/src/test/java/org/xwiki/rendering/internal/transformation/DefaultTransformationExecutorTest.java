@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.transformation;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -101,6 +102,6 @@ class DefaultTransformationExecutorTest
         assertEquals(XWIKI_2_1, transformationContext.getSyntax());
         assertEquals(PLAIN_1_0, transformationContext.getTargetSyntax());
         assertTrue(transformationContext.isRestricted());
-        assertEquals(List.of("icon", "macro"), transformationContext.getTransformationNames());
+        assertEquals(Optional.of(List.of("icon", "macro")), transformationContext.getTransformationNames());
     }
 }

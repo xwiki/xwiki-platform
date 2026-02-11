@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Executes rendering transformations on an XDOM.
@@ -33,6 +34,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * @since 18.1.0RC1
  */
 @Role
+@Unstable
 public interface TransformationExecutor
 {
     /**

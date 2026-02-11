@@ -53,6 +53,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.TransformationExecutor;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -168,6 +169,7 @@ public class RenderingScriptService implements ScriptService
      *         transformations
      * @since 18.1.0RC1
      */
+    @Unstable
     public TransformationExecutor transform(XDOM xdom)
     {
         return this.transformationExecutorProvider.get().withXDOM(xdom);

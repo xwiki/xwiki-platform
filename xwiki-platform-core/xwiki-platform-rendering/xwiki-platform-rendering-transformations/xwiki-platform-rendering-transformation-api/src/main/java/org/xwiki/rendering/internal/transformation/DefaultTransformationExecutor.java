@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.transformation;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 
@@ -94,7 +95,7 @@ public class DefaultTransformationExecutor implements TransformationExecutor
     @Override
     public TransformationExecutor withTransformations(List<String> transformationNames)
     {
-        this.transformationContext.setTransformationNames(transformationNames);
+        this.transformationContext.setTransformationNames(Optional.ofNullable(transformationNames));
         return this;
     }
 

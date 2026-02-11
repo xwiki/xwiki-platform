@@ -34,7 +34,6 @@
   <modules>
     <module>xwiki-platform-flamingo-skin-resources</module>
     <module>xwiki-platform-flamingo-skin-designsystem</module>
-    <module>xwiki-platform-flamingo-skin-designsystem-xar</module>
   </modules>
   <profiles>
     <profile>

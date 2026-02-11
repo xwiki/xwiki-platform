@@ -17,14 +17,53 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from "vue";
+import type { BtnProps } from "@xwiki/platform-dsapi";
+const { size, variant, pill } = defineProps<BtnProps>();
+// TODO: implement emit
+defineEmits(["click"]);
+
+if (pill) {
+  console.warn("Pill parameter is unsupported");
+}
+
+const computedSize = computed(() => {
+  if (size === "small") {
+    return ["btn-sm"];
+  } else {
+    return [];
+  }
+});
+
+const computedVariant = computed(() => {
+  switch (variant) {
+    case "default":
+      return "btn-default";
+    case "primary":
+      return "btn-primary";
+    case "success":
+      return "btn-success";
+    case "neutral":
+      return "btn-default";
+    case "warning":
+      return "btn-warning";
+    case "danger":
+      return "btn-danger";
+    case "text":
+      return "btn-link";
+  }
+  return "btn-default";
+});
+
+const classes = computed(() => {
+  return ["btn", ...computedSize.value, computedVariant.value];
+});
+</script>
 
 <template>
-  <button type="button" class="btn btn-default btn-primary">
-    Primary Button
-  </button>
-  <button type="button" class="btn btn-default">
-    Standard Button
+  <button :class="classes" @click="$emit('click')">
+    <slot />
   </button>
 </template>
 

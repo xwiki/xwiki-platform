@@ -21,10 +21,8 @@
 
 <template>
   <div class="gadget">
-     <h2 class="gadget-title wikigeneratedheader"><span>Card Title</span></h2>
-     <div class="gadget-content">
-        Card contents
-    </div>
+    <h2 class="gadget-title wikigeneratedheader"><span>Card Title</span></h2>
+    <div class="gadget-content">Card contents</div>
   </div>
 </template>
 

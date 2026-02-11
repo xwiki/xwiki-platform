@@ -17,17 +17,27 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { BreadcrumbProps } from "@xwiki/platform-dsapi";
+
+const { items } = defineProps<BreadcrumbProps>();
+</script>
 
 <template>
-  <ol class="breadcrumb breadcrumb-expandable">
-    <li class="wiki"><a href="/xwiki/bin/view/Main/" title="Home"><span class="fa fa-home"
-          aria-hidden="true"></span></a>
+  <ol class="breadcrumb">
+    <li v-for="({ url, label }, index) in items" :key="index">
+      <a :href="url" v-if="url">{{ label }}</a>
+      <template v-else>{{ label }}</template>
     </li>
-    <li class="space"><a href="/xwiki/bin/view/XWiki/">XWiki</a>
-    </li>
-    <li class="document active"><a href="/xwiki/bin/view/XWiki/Admin">Profile of Administrator </a>
-    </li>
+    <!--    <li class="wiki">-->
+    <!--      <a href="/xwiki/bin/view/Main/" title="Home"-->
+    <!--        ><span class="fa fa-home" aria-hidden="true"></span-->
+    <!--      ></a>-->
+    <!--    </li>-->
+    <!--    <li class="space"><a href="/xwiki/bin/view/XWiki/">XWiki</a></li>-->
+    <!--    <li class="document active">-->
+    <!--      <a href="/xwiki/bin/view/XWiki/Admin">Profile of Administrator </a>-->
+    <!--    </li>-->
   </ol>
 </template>
 

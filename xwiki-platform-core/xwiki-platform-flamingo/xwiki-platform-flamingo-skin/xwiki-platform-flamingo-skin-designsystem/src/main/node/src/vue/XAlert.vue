@@ -18,29 +18,65 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed } from 'vue'
+import xBtn from "./XBtn.vue";
+import { nextTick, onMounted, useTemplateRef } from "vue";
+import type { AlertProps } from "@xwiki/platform-dsapi";
 
-type NotificationType =
-  | 'inprogress'
-  | 'done'
-  | 'error'
-  | 'warning'
-  | 'info'
+type NotificationType = "done" | "error" | "warning" | "info";
 
-const props = defineProps<{
-  type: NotificationType
-}>()
+const { type, closable, title, description, flatCorners } =
+  defineProps<AlertProps>();
 
-const notificationClass = computed(
-  () => `xnotification-${props.type}`
-)
+if (closable !== undefined) {
+  console.warn("XAlert closable is not supported.");
+}
+
+function getVariant(): NotificationType {
+  switch (type) {
+    case "success":
+      return "done";
+    case "warning":
+      return "warning";
+    case "error":
+      return "error";
+    case "info":
+      return "info";
+  }
+}
+
+const alertContent = useTemplateRef("alertContent");
+
+onMounted(() => {
+  const value = alertContent.value!;
+  const html = value.getHTML();
+
+  // TODO: see how to make this non-intereactive to let users click on buttons.
+  const notif = new XWiki.widgets.Notification(html, getVariant());
+
+  if (flatCorners) {
+    notif.element.children[0].style.setProperty("border-radius", 0);
+  }
+});
 </script>
 
 <template>
-  <div class="xnotification-container" role="alert">
-    <div class="xnotification" :class="notificationClass">
-      <slot />
-    </div>
+  <div v-show="false" ref="alertContent">
+    <strong v-if="title">{{ title }}</strong>
+    <br v-if="title" />
+    {{ description }}
+    <x-btn
+      v-for="action of actions"
+      :key="action.name"
+      size="small"
+      variant="default"
+      @click="action.callback"
+    >
+      {{ action.name }}
+    </x-btn>
+    <br v-if="details && actions" />
+    <small v-if="details">{{ details }}</small>
+    <br />
+    <slot />
   </div>
 </template>
 

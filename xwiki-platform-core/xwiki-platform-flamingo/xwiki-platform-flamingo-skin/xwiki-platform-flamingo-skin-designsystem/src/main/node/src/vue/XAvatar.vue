@@ -18,11 +18,38 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-const logo = new URL('/xwiki/bin/skin/resources/icons/xwiki/noavatar.png', import.meta.url).href
+import { computed } from "vue";
+import type { AvatarProps } from "@xwiki/platform-dsapi";
+const { name, image, size } = defineProps<AvatarProps>();
+
+const classes = computed(() => {
+  const defaultClasses = ["avatar"];
+  if (size) {
+    return [...defaultClasses];
+  } else {
+    // Only add the avatar_50 class if no size is defined.
+    return [...defaultClasses, "avatar_50"];
+  }
+});
+
+const src = computed(() => {
+  if (image) {
+    return image;
+  } else {
+    // XWiki is untype and glovally defined
+    // eslint-disable-next-line no-undef
+    return `${XWiki.contextPath}/bin/skin/resources/icons/xwiki/noavatar.png`;
+  }
+});
 </script>
 
 <template>
-  <img class="avatar avatar_50"  alt="username" title="username"></img>
+  <img :class="classes" :alt="name" :title="name" :src :width="size" />
 </template>
 
-<style scoped></style>
+<style scoped>
+img:not(.avatar_50) {
+  /** Define a default border radius for when a size is defined (and therefore, the avatar_50 class is not applied)  */
+  border-radius: var(--border-radius-base);
+}
+</style>

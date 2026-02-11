@@ -20,7 +20,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <button type="button" class="btn btn-default btn-primary">
+    Primary Button
+  </button>
+  <button type="button" class="btn btn-default">
+    Standard Button
+  </button>
 </template>
 
 <style scoped></style>

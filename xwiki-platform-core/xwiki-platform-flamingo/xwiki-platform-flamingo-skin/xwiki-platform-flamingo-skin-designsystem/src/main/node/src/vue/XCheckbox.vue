@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <label class="checkbox-label" for="#"><input type="checkbox" name="checkbox-name" id="checkbox-id"> Checkbox Label</label>
 </template>
 
 <style scoped></style>

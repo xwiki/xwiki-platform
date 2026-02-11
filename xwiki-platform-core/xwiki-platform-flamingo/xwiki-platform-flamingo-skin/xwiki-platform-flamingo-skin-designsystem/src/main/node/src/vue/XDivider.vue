@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <hr />
 </template>
 
 <style scoped></style>

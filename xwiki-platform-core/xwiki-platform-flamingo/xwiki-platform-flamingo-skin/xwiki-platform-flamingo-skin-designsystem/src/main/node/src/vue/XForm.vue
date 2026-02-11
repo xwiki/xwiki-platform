@@ -20,7 +20,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <form class="xform" action="..." method="post" id="...">
+    Form content
+  </form>
 </template>
 
 <style scoped></style>

@@ -20,7 +20,25 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <!-- this is Xtab.vue-->
+  <ul class="nav nav-tabs">
+    <li class="active">
+      <a href="#" rel="nofollow">
+        Active Tab
+      </a>
+    </li>
+    <li>
+      <a href="#" rel="nofollow">
+        Inactive Tab
+      </a>
+    </li>
+  </ul>
+  <!--This is XTabPanel.vue-->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active xform" id="PageLayoutSection">
+      individual tab panel
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

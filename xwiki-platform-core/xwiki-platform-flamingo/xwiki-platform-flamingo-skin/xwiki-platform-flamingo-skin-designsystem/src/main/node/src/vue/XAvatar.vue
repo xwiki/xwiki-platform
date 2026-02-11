@@ -17,10 +17,12 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const logo = new URL('/xwiki/bin/skin/resources/icons/xwiki/noavatar.png', import.meta.url).href
+</script>
 
 <template>
-  <div>TODO</div>
+  <img class="avatar avatar_50"  alt="username" title="username"></img>
 </template>
 
 <style scoped></style>

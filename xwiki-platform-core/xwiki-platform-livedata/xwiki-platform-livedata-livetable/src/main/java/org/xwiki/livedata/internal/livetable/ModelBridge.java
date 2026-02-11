@@ -42,6 +42,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,6 +84,9 @@ public class ModelBridge
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
 
     /**
      * Update a property of an xobject located in the specified document. If the property starts with {@code doc.} the
@@ -268,8 +274,12 @@ public class ModelBridge
             if (!validate) {
                 throw new LiveDataException("Document not validated.");
             }
-            document.setAuthorReference(xcontext.getUserReference());
-            xcontext.getWiki().saveDocument(document, "LiveData update.", true, xcontext);
+            UserReference userReference = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
+            document.setAuthor(userReference);
+            String comment = "LiveData update.";
+            DocumentReference documentUserReference = xcontext.getUserReference();
+            xcontext.getWiki().checkSavingDocument(documentUserReference, document, comment, true, xcontext);
+            xcontext.getWiki().saveDocument(document, comment, true, xcontext);
         }
     }
 

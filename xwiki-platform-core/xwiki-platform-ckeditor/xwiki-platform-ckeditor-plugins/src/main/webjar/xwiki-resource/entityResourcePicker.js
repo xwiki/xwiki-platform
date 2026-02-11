@@ -124,6 +124,13 @@ define('entityResourcePicker', [
       }
     });
 
+    modal.on('hide.bs.modal', function() {
+      const tree = $.jstree.reference(treeElement);
+      // The dropdown used to display the tree finder suggestions is attached to the BODY element, so outside the modal.
+      // This means we need to clear the suggestions manually when the modal is closed.
+      tree?.clearFinderSuggestions?.();
+    });
+
     selectButton.on('click', function() {
       modal.modal('hide');
       var tree = $.jstree.reference(treeElement);
@@ -133,7 +140,11 @@ define('entityResourcePicker', [
 
     handler.open = function(openToNodeId) {
       this.openToNodeId = openToNodeId;
-      modal.modal();
+      modal.modal({
+        // Don't close the modal when the ESC key is pressed because we have the tree finder input for which the user
+        // may want to close the suggestions dropdown using the ESC key.
+        keyboard: false
+      });
     };
 
     return handler;

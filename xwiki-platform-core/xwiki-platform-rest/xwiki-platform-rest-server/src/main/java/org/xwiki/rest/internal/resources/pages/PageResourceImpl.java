@@ -20,17 +20,23 @@
 package org.xwiki.rest.internal.resources.pages;
 
 import java.net.URI;
+import java.util.List;
 
-import javax.inject.Named;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * @version $Id$
@@ -39,9 +45,13 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.pages.PageResourceImpl")
 public class PageResourceImpl extends ModifiablePageResource implements PageResource
 {
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @Override
     public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames,
-        Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiRestException
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<String> checkRights
+    ) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -50,8 +60,21 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
 
             URI baseUri = uriInfo.getBaseUri();
 
+            // We parse the rights' names here to detect unknown ones and throw a BAD REQUEST http error if needed.
+            List<Right> parsedRights = checkRights.stream().map(
+                rightName -> {
+                    Right parsedRight = Right.toRight(rightName);
+                    if (parsedRight == Right.ILLEGAL) {
+                        throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(
+                            this.contextualLocalizationManager.getTranslationPlain(
+                                "rest.exception.pageResource.unknownRight", rightName)).build());
+                    }
+                    return parsedRight;
+                }
+            ).toList();
+
             return this.factory.toRestPage(baseUri, uriInfo.getAbsolutePath(), doc, false, withPrettyNames, withObjects,
-                withXClass, withAttachments);
+                withXClass, withAttachments, parsedRights);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

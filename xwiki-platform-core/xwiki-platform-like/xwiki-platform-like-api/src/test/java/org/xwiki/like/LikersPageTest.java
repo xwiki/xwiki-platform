@@ -23,12 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.inject.Inject;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.like.internal.LikeRatingsConfiguration;
 import org.xwiki.like.script.LikeScriptServiceComponentList;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.ratings.internal.DefaultRating;
@@ -45,6 +48,7 @@ import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.user.script.UserScriptService;
 import org.xwiki.velocity.tools.JSONTool;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Arrays.asList;
@@ -64,9 +68,7 @@ import static org.mockito.Mockito.when;
  * @since 13.9RC1
  * @since 13.4.4
  */
-@ComponentList({
-    UserScriptService.class
-})
+@ComponentList({UserScriptService.class})
 @DefaultUserComponentList
 @LikeScriptServiceComponentList
 @SecurityScriptServiceComponentList
@@ -79,6 +81,9 @@ class LikersPageTest extends PageTest
     private Map<String, Object> results;
 
     private RatingsManager ratingsManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -124,15 +129,13 @@ class LikersPageTest extends PageTest
         user2Properties.put("last_name", "User2LN");
         this.xwiki.createUser("user2", user2Properties, this.context);
 
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user1DocumentReference)).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user2DocumentReference)).thenReturn(false);
+        setupHasView(user1DocumentReference, true);
+        setupHasView(user2DocumentReference, false);
 
         when(this.ratingsManager.getRatings(anyMap(), eq(0), eq(5), eq(RatingsManager.RatingQueryField.UPDATED_DATE),
             eq(false)))
-            .thenReturn(asList(
-                createRating(user1DocumentReference, likedDocumentReference),
-                createRating(user2DocumentReference, likedDocumentReference)
-            ));
+                .thenReturn(asList(createRating(user1DocumentReference, likedDocumentReference),
+                    createRating(user2DocumentReference, likedDocumentReference)));
         when(this.ratingsManager.countRatings(any())).thenReturn(2L);
 
         render();
@@ -156,12 +159,11 @@ class LikersPageTest extends PageTest
         XWikiDocument likedDoc = this.xwiki.getDocument(likedDocumentReference, this.context);
         this.context.setDoc(likedDoc);
 
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user1DocumentReference)).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user2DocumentReference)).thenReturn(false);
+        setupHasView(user1DocumentReference, true);
+        setupHasView(user2DocumentReference, false);
 
         when(this.ratingsManager.getRatings(anyMap(), eq(0), eq(1), eq(RatingsManager.RatingQueryField.UPDATED_DATE),
-            eq(false)))
-            .thenReturn(singletonList(createRating(user2DocumentReference, likedDocumentReference)));
+            eq(false))).thenReturn(singletonList(createRating(user2DocumentReference, likedDocumentReference)));
         when(this.ratingsManager.countRatings(any())).thenReturn(2L);
 
         render();
@@ -171,14 +173,18 @@ class LikersPageTest extends PageTest
         assertEquals("obfuscated", rows.get(0).get("doc_fullName"));
     }
 
+    private void setupHasView(DocumentReference userDocumentReference, boolean hasAccess) throws XWikiException
+    {
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, userDocumentReference)).thenReturn(hasAccess);
+        when(this.oldcore.getMockRightService().hasAccessLevel("view", this.oldcore.getXWikiContext().getUser(),
+            this.entityReferenceSerializer.serialize(userDocumentReference), this.oldcore.getXWikiContext()))
+                .thenReturn(hasAccess);
+    }
+
     private DefaultRating createRating(DocumentReference author, DocumentReference reference)
     {
-        return new DefaultRating("r1")
-            .setReference(reference)
-            .setAuthor(new DocumentUserReference(author, false))
-            .setVote(1)
-            .setScaleUpperBound(1)
-            .setManagerId("ratings");
+        return new DefaultRating("r1").setReference(reference).setAuthor(new DocumentUserReference(author, false))
+            .setVote(1).setScaleUpperBound(1).setManagerId("ratings");
     }
 
     private void render() throws Exception

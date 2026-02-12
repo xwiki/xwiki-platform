@@ -20,7 +20,13 @@
 <script setup lang="ts"></script>
 
 <template>
-  <input type="text" id="id-name" name="title" value="" placeholder="Placeholder text">
+  <input
+    type="text"
+    id="id-name"
+    name="title"
+    value=""
+    placeholder="Placeholder text"
+  />
 </template>
 
 <style scoped></style>

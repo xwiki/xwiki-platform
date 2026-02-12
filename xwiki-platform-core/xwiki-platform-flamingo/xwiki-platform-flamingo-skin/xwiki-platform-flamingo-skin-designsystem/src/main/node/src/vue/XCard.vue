@@ -17,12 +17,16 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { CardProps } from "@xwiki/platform-dsapi";
+
+const { title } = defineProps<CardProps>();
+</script>
 
 <template>
   <div class="gadget">
-    <h2 class="gadget-title wikigeneratedheader"><span>Card Title</span></h2>
-    <div class="gadget-content">Card contents</div>
+    <h2 class="gadget-title wikigeneratedheader">{{ title }}</h2>
+    <div class="gadget-content"><slot></slot></div>
   </div>
 </template>
 

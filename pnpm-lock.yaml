@@ -36,6 +36,9 @@ catalogs:
     '@tsconfig/node24':
       specifier: 24.0.3
       version: 24.0.3
+    '@types/jquery':
+      specifier: 3.5.33
+      version: 3.5.33
     '@types/jsdom':
       specifier: 27.0.0
       version: 27.0.0
@@ -406,6 +409,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.55.1(@types/node@24.10.3)
+      '@types/jquery':
+        specifier: 'catalog:'
+        version: 3.5.33
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/dev/config
@@ -2570,6 +2576,9 @@ packages:
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
+  '@types/jquery@3.5.33':
+    resolution: {integrity: sha512-SeyVJXlCZpEki5F0ghuYe+L+PprQta6nRZqhONt9F13dWBtR/ftoaIbdRQ7cis7womE+X2LKhsDdDtkkDhJS6g==}
+
   '@types/jsdom@27.0.0':
     resolution: {integrity: sha512-NZyFl/PViwKzdEkQg96gtnB8wm+1ljhdDay9ahn4hgb+SfVtPCbm3TlmDUFXTA+MGN3CijicnMhG18SI5H3rFw==}
 
@@ -2613,6 +2622,9 @@ packages:
 
   '@types/react@19.2.7':
     resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
+
+  '@types/sizzle@2.3.10':
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -6897,6 +6909,10 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/jquery@3.5.33':
+    dependencies:
+      '@types/sizzle': 2.3.10
+
   '@types/jsdom@27.0.0':
     dependencies:
       '@types/node': 24.10.3
@@ -6943,6 +6959,8 @@ snapshots:
   '@types/react@19.2.7':
     dependencies:
       csstype: 3.2.3
+
+  '@types/sizzle@2.3.10': {}
 
   '@types/tough-cookie@4.0.5': {}
 

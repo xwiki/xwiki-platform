@@ -17,10 +17,35 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useId } from "vue";
+import type { CheckboxProps } from "@xwiki/platform-dsapi";
+
+const { label, help } = defineProps<CheckboxProps>();
+
+const model = defineModel<boolean>();
+
+const checkboxId = useId();
+
+defineOptions({
+  // See https://vuejs.org/api/options-misc.html#inheritattrs
+  // Unknown attrs are by default added to the root element (i.e., the dl), but we want to disable that and instead add
+  // them to the input field. That way it's possible for instance to add a name to the input field without having to
+  // explicitly declare it on the props.
+  inheritAttrs: false,
+});
+</script>
 
 <template>
-  <label class="checkbox-label" for="#"><input type="checkbox" name="checkbox-name" id="checkbox-id"> Checkbox Label</label>
+  <dl>
+    <dt>
+      <label :for="checkboxId">{{ label }}</label>
+      <span class="xHint" v-if="help">{{ help }}</span>
+    </dt>
+    <dd>
+      <input :id="checkboxId" type="checkbox" v-model="model" v-bind="$attrs" />
+    </dd>
+  </dl>
 </template>
 
 <style scoped></style>

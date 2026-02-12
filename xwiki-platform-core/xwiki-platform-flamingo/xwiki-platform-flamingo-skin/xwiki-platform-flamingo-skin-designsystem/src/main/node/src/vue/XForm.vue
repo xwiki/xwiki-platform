@@ -20,9 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <form class="xform" action="..." method="post" id="...">
-    Form content
-  </form>
+  <form class="xform" action="..." method="post" id="...">Form content</form>
 </template>
 
 <style scoped></style>

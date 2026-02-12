@@ -19,7 +19,7 @@
 -->
 <script setup lang="ts">
 import xBtn from "./XBtn.vue";
-import { nextTick, onMounted, useTemplateRef } from "vue";
+import { onMounted, useTemplateRef } from "vue";
 import type { AlertProps } from "@xwiki/platform-dsapi";
 
 type NotificationType = "done" | "error" | "warning" | "info";

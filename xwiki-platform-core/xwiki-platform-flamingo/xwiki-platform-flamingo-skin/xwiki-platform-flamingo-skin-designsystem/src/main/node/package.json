@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
+    "@types/jquery": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "eslint": "catalog:",

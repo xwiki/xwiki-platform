@@ -18,6 +18,9 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import XBtn from "./XBtn.vue";
+import { ref } from "vue";
+
 const breadcrumbItems = [
   { label: "Home" },
   { label: "Page" },
@@ -32,6 +35,8 @@ const actions = [
     },
   },
 ];
+
+const preserveChildren = ref(false);
 </script>
 
 <template>
@@ -61,14 +66,28 @@ const actions = [
   <XAvatar name="hello world" size="200" />
   <h2>XBtn</h2>
   <XBtn @click="console.log('HELLO WORLD')">BUTTON</XBtn>
+  <XBtn size="small">SMALL BUTTON</XBtn>
+  <XBtn size="small" variant="primary">SMALL BUTTON</XBtn>
   <h2>XBreadcrumb</h2>
   <XBreadcrumb :items="breadcrumbItems"></XBreadcrumb>
   <h2>XCard</h2>
-  <XCard />
+  <XCard title="card title"><strong>Card</strong> content</XCard>
   <h2>XCheckbox</h2>
-  <XCheckbox />
+  <XCheckbox
+    v-model="preserveChildren"
+    label="LABEL"
+    help="HELP"
+    name="testname"
+  ></XCheckbox>
+  Preserve children {{ preserveChildren }}
   <h2>XDialog</h2>
-  <XDialog />
+  <XDialog v-model="preserveChildren" title="Modal TITLE"
+    >MODAL CONTENT</XDialog
+  >
+  <!--  <XDialog title="Modal TITLE">-->
+  <!--    MODAL CONTENT-->
+  <!--    <template #footer>THIS IS THE FOOTER!</template>-->
+  <!--  </XDialog>-->
   <h2>XDivider</h2>
   <XDivider />
   <h2>XFileInput</h2>

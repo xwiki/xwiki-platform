@@ -29,15 +29,6 @@ const { items } = defineProps<BreadcrumbProps>();
       <a :href="url" v-if="url">{{ label }}</a>
       <template v-else>{{ label }}</template>
     </li>
-    <!--    <li class="wiki">-->
-    <!--      <a href="/xwiki/bin/view/Main/" title="Home"-->
-    <!--        ><span class="fa fa-home" aria-hidden="true"></span-->
-    <!--      ></a>-->
-    <!--    </li>-->
-    <!--    <li class="space"><a href="/xwiki/bin/view/XWiki/">XWiki</a></li>-->
-    <!--    <li class="document active">-->
-    <!--      <a href="/xwiki/bin/view/XWiki/Admin">Profile of Administrator </a>-->
-    <!--    </li>-->
   </ol>
 </template>
 

@@ -20,10 +20,10 @@
 <script setup lang="ts"></script>
 
 <template>
-    <figure>
-    <img src=" "/>
+  <figure>
+    <img src=" " />
     <figcaption>Image info (not required)</figcaption>
-</figure>
+  </figure>
 </template>
 
 <style scoped></style>

@@ -22,24 +22,16 @@
 <template>
   <ul class="nav nav-tabs">
     <li class="active">
-      <a href="#" rel="nofollow">
-        Active Tab
-      </a>
+      <a href="#" rel="nofollow"> Active Tab </a>
     </li>
     <li>
-      <a href="#" rel="nofollow">
-        Inactive Tab
-      </a>
+      <a href="#" rel="nofollow"> Inactive Tab </a>
     </li>
     <li>
-      <a href="#" rel="nofollow">
-        Inactive Tab
-      </a>
+      <a href="#" rel="nofollow"> Inactive Tab </a>
     </li>
     <li>
-      <a href="#" rel="nofollow">
-        Inactive Tab
-      </a>
+      <a href="#" rel="nofollow"> Inactive Tab </a>
     </li>
   </ul>
 </template>

@@ -17,36 +17,67 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted, ref, useTemplateRef, watch, watchEffect } from "vue";
+import type { DialogProps } from "@xwiki/platform-dsapi";
+import type { Ref } from "vue";
+
+const { width, title } = defineProps<DialogProps>();
+
+// eslint-disable-next-line no-undef
+const jQuery: Promise<JQuery> = new Promise((resolve) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
+  require(["jquery"], ($: JQuery) => resolve($));
+});
+
+const root = useTemplateRef("root");
+const open = defineModel<boolean>();
+
+const modal: Ref = ref(undefined);
+onMounted(async () => {
+  const $ = await jQuery;
+  modal.value = $(root.value!).modal({ show: false });
+});
+
+watchEffect(() => {
+  if (modal.value && open.value) {
+    console.log("show");
+    modal.value.show();
+  } else if (modal.value && !open.value) {
+    console.log("hide");
+    modal.value.hide();
+  }
+});
+</script>
 
 <template>
-  
-    <div class="modal-dialog">
+  <div class="modal fade" tabindex="-1" role="dialog" ref="root">
+    <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close close-modal">
-            <span aria-hidden="true">
-              <span class="fa fa-times" aria-hidden="true"></span>
-            </span></button>
-          <div class="modal-title">
-            <span class="fa fa-circle"></span> Modal Title
-          </div>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">{{ title }}</h4>
         </div>
         <div class="modal-body">
-
-modal content
-        </div><!-- end modal body -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default close-modal">
-            Close 
-          </button>
-          <button type="button" class="btn btn-primary">
-            Save changes
-          </button>
+          <slot></slot>
         </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  
+        <div class="modal-footer" v-if="$slots.footer">
+          <slot name="footer"></slot>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.modal-dialog {
+  width: v-bind(width);
+}
+</style>

@@ -58,7 +58,7 @@ class PathWikiReferenceExtractorTest
     private StandardURLConfiguration urlConfiguration;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }

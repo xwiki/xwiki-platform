@@ -129,15 +129,12 @@ export class DefaultUniAstToMarkdownConverter
       const md = await this.blockToMarkdown(listItem.content[i]);
 
       contents.push(
-        md
-          .split("\n")
-          .map(
-            (line, j) =>
-              // Don't indent the very first line, but indent every following one
-              // If the list item contains multiple blocks, these will use the same indentation
-              (i > 0 || j > 0 ? " ".repeat(prefix.length) : "") + line,
-          )
-          .join("\n"),
+        ...md.split("\n").map(
+          (line, j) =>
+            // Don't indent the very first line, but indent every following one
+            // If the list item contains multiple blocks, these will use the same indentation
+            (i > 0 || j > 0 ? " ".repeat(prefix.length) : "") + line,
+        ),
       );
     }
 

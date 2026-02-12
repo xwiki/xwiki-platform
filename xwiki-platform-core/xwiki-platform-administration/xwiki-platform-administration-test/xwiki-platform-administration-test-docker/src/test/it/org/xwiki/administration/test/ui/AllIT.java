@@ -67,7 +67,7 @@ public class AllIT
     }
 
     @Nested
-    class NestedDateFormatIT extends DateFormatIT
+    class NestedDateTimeIT extends DateTimeIT
     {
     }
 }

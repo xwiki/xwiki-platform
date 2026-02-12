@@ -89,6 +89,12 @@
       <artifactId>xwiki-platform-wiki-template-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed to display the timezones in the date and time configuration page -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-jodatime</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

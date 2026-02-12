@@ -133,6 +133,8 @@ export class DefaultUniAstToMarkdownConverter
           .split("\n")
           .map(
             (line, j) =>
+              // Don't indent the very first line, but indent every following one
+              // If the list item contains multiple blocks, these will use the same indentation
               (i > 0 || j > 0 ? " ".repeat(prefix.length) : "") + line,
           )
           .join("\n"),

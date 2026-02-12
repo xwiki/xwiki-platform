@@ -47,6 +47,9 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         + " and ../input[@id='XWiki.XWikiPreferences_0_languages']]")
     private WebElement supportedLanguagesSelect;
 
+    @FindBy(id = "XWiki.XWikiPreferences_0_dateformat")
+    private WebElement dateFormatInput;
+
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
@@ -78,5 +81,29 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     {
         BootstrapSelect select = new BootstrapSelect(this.supportedLanguagesSelect, getDriver());
         select.selectByValues(supportedLanguages);
+    }
+
+    /**
+     * @return the configured date format, or an empty string if not set
+     * @since 17.10.4
+     * @since 18.2.0RC1
+     */
+    public String getDateFormat()
+    {
+        return this.dateFormatInput.getAttribute("value");
+    }
+
+    /**
+     * Sets the date format to be used in the wiki. The date format should follow the patterns defined in the Java
+     * SimpleDateFormat class (e.g., "yyyy-MM-dd" for a date format like 2024-06-30).
+     *
+     * @param dateFormat the desired date format to be set (e.g., "yyyy-MM-dd")
+     * @since 17.10.4
+     * @since 18.2.0RC1
+     */
+    public void setDateFormat(String dateFormat)
+    {
+        this.dateFormatInput.clear();
+        this.dateFormatInput.sendKeys(dateFormat);
     }
 }

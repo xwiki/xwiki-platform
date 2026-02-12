@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef, watch, watchEffect } from "vue";
+import { onMounted, ref, useTemplateRef, watchEffect } from "vue";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 import type { Ref } from "vue";
 
@@ -36,16 +36,21 @@ const open = defineModel<boolean>();
 const modal: Ref = ref(undefined);
 onMounted(async () => {
   const $ = await jQuery;
-  modal.value = $(root.value!).modal({ show: false });
+  const modalElement = $(root.value!);
+  modal.value = modalElement.modal({ show: false });
+  modalElement.on("show.bs.modal", () => {
+    open.value = true;
+  });
+  modalElement.on("hidden.bs.modal", () => {
+    open.value = false;
+  });
 });
 
 watchEffect(() => {
   if (modal.value && open.value) {
-    console.log("show");
-    modal.value.show();
+    modal.value.modal("show");
   } else if (modal.value && !open.value) {
-    console.log("hide");
-    modal.value.hide();
+    modal.value.modal("hide");
   }
 });
 </script>

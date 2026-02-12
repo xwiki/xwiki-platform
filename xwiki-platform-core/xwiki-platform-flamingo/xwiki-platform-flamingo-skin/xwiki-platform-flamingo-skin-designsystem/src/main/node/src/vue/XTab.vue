@@ -17,23 +17,18 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { TabProps } from "@xwiki/platform-dsapi";
+
+const { tabId } = defineProps<TabProps>();
+</script>
 
 <template>
-  <ul class="nav nav-tabs">
-    <li class="active">
-      <a href="#" rel="nofollow"> Active Tab </a>
-    </li>
-    <li>
-      <a href="#" rel="nofollow"> Inactive Tab </a>
-    </li>
-    <li>
-      <a href="#" rel="nofollow"> Inactive Tab </a>
-    </li>
-    <li>
-      <a href="#" rel="nofollow"> Inactive Tab </a>
-    </li>
-  </ul>
+  <li role="presentation">
+    <a :href="`#${tabId}`" aria-controls="profile" role="tab" data-toggle="tab">
+      <slot></slot>
+    </a>
+  </li>
 </template>
 
 <style scoped></style>

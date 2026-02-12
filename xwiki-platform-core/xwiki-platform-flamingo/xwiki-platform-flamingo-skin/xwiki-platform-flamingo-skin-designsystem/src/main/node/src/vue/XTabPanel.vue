@@ -17,13 +17,15 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { TabPanelProps } from "@xwiki/platform-dsapi";
+
+const { tabId } = defineProps<TabPanelProps>();
+</script>
 
 <template>
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active xform" id="PageLayoutSection">
-      individual tab panel
-    </div>
+  <div role="tabpanel" class="tab-pane" :id="tabId">
+    <slot></slot>
   </div>
 </template>
 

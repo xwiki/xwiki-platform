@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>LOAD</div>
+  <div class="loading"></div>
 </template>
 
 <style scoped></style>

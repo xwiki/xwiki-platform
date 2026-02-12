@@ -17,16 +17,35 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useId } from "vue";
+import type { TextFieldProps } from "@xwiki/platform-dsapi";
+
+const { label, help } = defineProps<TextFieldProps>();
+
+const model = defineModel<boolean>();
+
+const textId = useId();
+
+defineOptions({
+  // See https://vuejs.org/api/options-misc.html#inheritattrs
+  // Unknown attrs are by default added to the root element (i.e., the dl), but we want to disable that and instead add
+  // them to the input field. That way it's possible for instance to add a name to the input field without having to
+  // explicitly declare it on the props.
+  inheritAttrs: false,
+});
+</script>
 
 <template>
-  <input
-    type="text"
-    id="id-name"
-    name="title"
-    value=""
-    placeholder="Placeholder text"
-  />
+  <dl>
+    <dt>
+      <label :for="textId">{{ label }}</label>
+      <span class="xHint" v-if="help">{{ help }}</span>
+    </dt>
+    <dd>
+      <input :id="textId" type="text" v-model="model" v-bind="$attrs" />
+    </dd>
+  </dl>
 </template>
 
 <style scoped></style>

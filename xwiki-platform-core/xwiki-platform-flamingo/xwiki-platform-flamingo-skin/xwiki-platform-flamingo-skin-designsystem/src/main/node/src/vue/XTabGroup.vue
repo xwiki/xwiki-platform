@@ -17,22 +17,38 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted, useTemplateRef } from "vue";
+
+const tabs = useTemplateRef("tabs");
+
+const jQuery: Promise<JQuery> = new Promise((resolve) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
+  require(["jquery"], ($: JQuery) => resolve($));
+});
+
+onMounted(async () => {
+  const $ = await jQuery;
+  const tabsElement = $(tabs.value);
+  if (tabsElement.find('[role="presentation"].active').length == 0) {
+    // If not tab is active, show the first one
+    const find = tabsElement.find("a:first");
+    console.log("find", find);
+    find.tab("show");
+  }
+});
+</script>
 
 <template>
-  <!-- this is Xtab.vue-->
-  <ul class="nav nav-tabs">
-    <li class="active">
-      <a href="#" rel="nofollow"> Active Tab </a>
-    </li>
-    <li>
-      <a href="#" rel="nofollow"> Inactive Tab </a>
-    </li>
-  </ul>
-  <!--This is XTabPanel.vue-->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active xform" id="PageLayoutSection">
-      individual tab panel
+  <div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" ref="tabs">
+      <slot name="tabs"></slot>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <slot name="panels"></slot>
     </div>
   </div>
 </template>

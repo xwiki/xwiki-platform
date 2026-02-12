@@ -17,10 +17,16 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { FormProps } from "@xwiki/platform-dsapi";
+
+const { onFormSubmit } = defineProps<FormProps>();
+</script>
 
 <template>
-  <form class="xform" action="..." method="post" id="...">Form content</form>
+  <form class="xform" @submit.prevent="onFormSubmit">
+    <slot></slot>
+  </form>
 </template>
 
 <style scoped></style>

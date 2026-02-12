@@ -84,7 +84,7 @@ type AbstractElements = {
   XDivider: DefineComponent<DividerProps & HTMLAttributes>;
   XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
   XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-  XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
+  XImg: DefineComponent<ImgProps>;
   XLoad: DefineComponent<LoadProps & HTMLAttributes>;
   XMenu: DefineComponent<MenuProps & HTMLAttributes>;
   XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;

@@ -17,14 +17,42 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script lang="ts" setup>
+import { useId } from "vue";
+import type { SelectProps } from "@xwiki/platform-dsapi";
 
+const { items, label, required, help } = defineProps<SelectProps>();
+
+const selected = defineModel<string>();
+
+const selectId = useId();
+
+defineOptions({
+  // See https://vuejs.org/api/options-misc.html#inheritattrs
+  // Unknown attrs are by default added to the root element (i.e., the dl), but we want to disable that and instead add
+  // them to the input field. That way it's possible for instance to add a name to the input field without having to
+  // explicitly declare it on the props.
+  inheritAttrs: false,
+});
+</script>
 <template>
-  <select name="options" id="option-select">
-    <option value="">Choose an option</option>
-    <option value="option1">Option 1</option>
-    <option value="option2">Option 2</option>
-  </select>
+  <dl>
+    <dt>
+      <label :for="selectId">{{ label }}</label>
+      <span class="xHint" v-if="help">{{ help }}</span>
+    </dt>
+    <dd>
+      <select
+        ref="inputElement"
+        :id="selectId"
+        v-bind="$attrs"
+        v-model="selected"
+        :required
+      >
+        <option v-for="item in items" :key="item" :value="item">
+          {{ item }}
+        </option>
+      </select>
+    </dd>
+  </dl>
 </template>
-
-<style scoped></style>

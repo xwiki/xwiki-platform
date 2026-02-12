@@ -1265,24 +1265,13 @@ public class TestUtils
      * @since 15.10.11
      * @since 14.10.22
      */
-    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters)
+        throws Exception
     {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        // Remember the current credentials
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
-
-        try {
-            // Make sure the page is saved with superadmin author
-            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
-
-            // Save the page with the content to execute
-            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
-        } finally {
-            // Restore initial credentials
-            setDefaultCredentials(currentCredentials);
-        }
+        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -2905,6 +2894,53 @@ public class TestUtils
             page.setHidden(isHidden);
 
             save(page, true);
+        }
+
+        /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param syntaxId the syntax id of the page to save
+         * @param title the title of the page to save
+         * @param parentFullPageName the full page name of the parent page to set to the page to save
+         * @param isHidden whether the page to save should be hidden or not
+         *
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
+        {
+            // Remember the current credentials
+            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
+
+            try {
+                this.testUtils.setDefaultCredentials(credentials);
+
+                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+            } finally {
+                // Restore initial credentials
+                this.testUtils.setDefaultCredentials(currentCredentials);
+            }
+        }
+
+        /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param title the title of the page to save
+         * @throws Exception if an error occurs while saving the page
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String title) throws Exception
+        {
+            savePageAs(credentials, reference, content, null, title, null, false);
         }
 
         /**

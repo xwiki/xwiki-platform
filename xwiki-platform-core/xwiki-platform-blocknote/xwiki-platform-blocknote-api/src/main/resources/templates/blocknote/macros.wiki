@@ -66,14 +66,15 @@
   #set ($targetSyntax = 'uniast/1.0')
   #set ($restricted = "$!source.restricted" == 'true')
   #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
-  #set ($discard = $services.rendering.transform($xdom
-    ).withId("BlockNote:${source.documentReference}"
-    ).withSyntax($source.syntax
-    ).withTargetSyntax($targetSyntax
-    ).withRestricted($restricted
-    ).withTransformations(['macro']
-    ).withContentDocument($source.documentReference
-    ).execute())
+  #set ($transformationContext = $services.rendering.createTransformationContext())
+  #set ($discard = $transformationContext.setId("BlockNote:${source.documentReference}"))
+  #set ($discard = $transformationContext.setXDOM($xdom))
+  #set ($discard = $transformationContext.setSyntax($source.syntax))
+  #set ($discard = $transformationContext.setTargetSyntax($targetSyntax))
+  #set ($discard = $transformationContext.setRestricted($restricted))
+  #set ($discard = $transformationContext.setTransformationNames(['macro']))
+  #set ($discard = $transformationContext.setContentDocument($source.documentReference))
+  #set ($discard = $services.rendering.transform($xdom, $transformationContext))
   #set ($renderedContent = $services.rendering.render($xdom, $targetSyntax))
   ## Restore the previous display mode.
   #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))

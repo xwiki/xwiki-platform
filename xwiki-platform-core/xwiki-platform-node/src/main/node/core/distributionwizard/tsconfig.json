@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "isolatedDeclarations": false
+  },
+  "extends": "../../tsconfig.json",
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "src/**/__tests__",
+    "src/vue.d.ts"
+  ]
+}

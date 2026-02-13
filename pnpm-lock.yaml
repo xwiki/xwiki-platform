@@ -406,6 +406,25 @@ importers:
         specifier: 'catalog:'
         version: 3.2.5(typescript@5.9.3)
 
+  xwiki-platform-core/xwiki-platform-distributionwizard/xwiki-platform-distributionwizard-webjar/src/main/node:
+    dependencies:
+      '@xwiki/platform-distributionwizard':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/distributionwizard
+    devDependencies:
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.3(jiti@2.6.1)
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+
   xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node:
     dependencies:
       '@xwiki/platform-api':
@@ -962,6 +981,36 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard:
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.57.7(@types/node@24.12.0)
+      '@vue/test-utils':
+        specifier: 'catalog:'
+        version: 2.4.6
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.3(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.30(typescript@5.9.3)
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.2.5(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api:
     dependencies:

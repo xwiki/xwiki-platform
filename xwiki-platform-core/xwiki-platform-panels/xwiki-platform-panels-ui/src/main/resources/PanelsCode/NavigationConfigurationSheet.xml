@@ -754,12 +754,10 @@ require([
         let anchor = $node.children('.jstree-anchor');
         // Check if the markup is still an issue. We don't want to move it around if things have been fixed upstream.
         if(anchor.attr('role') === 'treeitem') {
-          $node.attr('role', anchor.attr('role'));
-          anchor.removeAttr('role');
-          $node.attr('aria-selected', anchor.attr('aria-selected'));
-          anchor.removeAttr('aria-selected');
-          $node.attr('aria-level', anchor.attr('aria-level'));
-          anchor.removeAttr('aria-level');
+          for (let attributeName in ['role', 'aria-selected', 'aria-level']) {
+            $node.attr(attributeName, anchor.attr(attributeName));
+            anchor.removeAttr(attributeName);
+          }
         }
       }
     });

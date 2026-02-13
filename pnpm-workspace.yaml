@@ -115,7 +115,7 @@ catalog:
   vitest: 4.0.15
   vitest-mock-extended: 3.1.0
   vue: 3.5.26
-  vue-eslint-parser: 10.2.0
+  vue-eslint-parser: 10.3.0
   vue-i18n: 11.1.12
   vue-router: 4.5.1
   vue-tippy: 6.7.1

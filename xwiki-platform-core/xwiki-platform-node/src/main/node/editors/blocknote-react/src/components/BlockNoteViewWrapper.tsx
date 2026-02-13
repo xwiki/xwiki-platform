@@ -58,6 +58,7 @@ import type {
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
+import type { WikiDisableSyntaxFeaturesConfig } from "@xwiki/platform-api";
 import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
@@ -166,6 +167,14 @@ type BlockNoteViewWrapperProps = {
   refs?: {
     setEditor?: (editor: EditorType) => void;
   };
+
+  /**
+   * Disable unsupported features (all enabled by default)
+   *
+   * @since 18.1.0RC1
+   * @beta
+   */
+  disableSyntaxFeatures?: WikiDisableSyntaxFeaturesConfig;
 };
 
 /**
@@ -182,6 +191,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   lang,
   linkEditionCtx,
   overrides,
+  disableSyntaxFeatures,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
@@ -202,7 +212,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
-  const schema = createBlockNoteSchema(builtMacros);
+  const schema = createBlockNoteSchema(
+    builtMacros,
+    disableSyntaxFeatures ?? {},
+  );
 
   const initializer: CollaborationInitializer | undefined =
     collaborationProvider ? collaborationProvider() : undefined;

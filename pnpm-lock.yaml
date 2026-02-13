@@ -1366,6 +1366,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.7)
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../api
       '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api

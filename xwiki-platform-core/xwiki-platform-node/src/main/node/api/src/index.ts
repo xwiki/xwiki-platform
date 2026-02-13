@@ -26,7 +26,10 @@ import { DefaultLogger } from "./components/defaultLogger.js";
 import { DefaultLoggerConfig } from "./components/defaultLoggerConfig.js";
 import { DefaultWikiConfig } from "./components/defaultWikiConfig.js";
 import type { PageData } from "./api/PageData.js";
-import type { WikiConfig } from "./api/WikiConfig.js";
+import type {
+  WikiConfig,
+  WikiDisableSyntaxFeaturesConfig,
+} from "./api/WikiConfig.js";
 import type { AttachmentsData } from "./api/attachmentsData";
 import type { CristalApp } from "./api/cristalApp.js";
 import type { DesignSystemLoader } from "./api/designSystemLoader.js";
@@ -52,6 +55,7 @@ export type {
   SkinManager,
   Storage,
   WikiConfig,
+  WikiDisableSyntaxFeaturesConfig,
   WrappingStorage,
 };
 export {

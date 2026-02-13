@@ -50,7 +50,7 @@ onMounted(() => {
   const value = alertContent.value!;
   const html = value.getHTML();
 
-  // TODO: see how to make this non-intereactive to let users click on buttons.
+  // TODO: see how to make this non-interactive to let users click on buttons.
   const notif = new XWiki.widgets.Notification(html, getVariant());
 
   if (flatCorners) {

@@ -19,9 +19,14 @@
 -->
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from "vue";
+// Preemptively import XTab and XTabPanel to make sure they are available during onMounted. Otherwise, they can be
+// rendered with a delay since DS components are loaded lazily, and that breaks the modal initialization.
+import "./XTab.vue";
+import "./XTabPanel.vue";
 
 const tabs = useTemplateRef("tabs");
 
+// eslint-disable-next-line no-undef
 const jQuery: Promise<JQuery> = new Promise((resolve) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
   require(["jquery"], ($: JQuery) => resolve($));

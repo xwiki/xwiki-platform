@@ -21,6 +21,9 @@
 import { onMounted, ref, useTemplateRef, watchEffect } from "vue";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 import type { Ref } from "vue";
+// Preemptively import XBtn to make sure it is available during onMounted. Otherwise, they can be rendered with a delay
+// since DS components are loaded lazily, and that breaks the modal initialization.
+import "./XBtn.vue";
 
 const { width, title } = defineProps<DialogProps>();
 

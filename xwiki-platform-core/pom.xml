@@ -224,6 +224,7 @@
     <module>xwiki-platform-date</module>
     <module>xwiki-platform-diff</module>
     <module>xwiki-platform-display</module>
+    <module>xwiki-platform-distributionwizard</module>
     <module>xwiki-platform-edit</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-export</module>

@@ -1,0 +1,72 @@
+{
+  "name": "@xwiki/platform-livedata-ui",
+  "version": "18.2.0-SNAPSHOT",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-node/src/main/node/core/livedata/livedata-ui",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.umd.js"
+      }
+    }
+  },
+  "main": "./dist/index.es.js",
+  "scripts": {
+    "api-extractor:ci": "api-extractor run",
+    "api-extractor:local": "api-extractor run --local",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-livedata-api": "workspace:*",
+    "dompurify": "catalog:",
+    "eventemitter3": "catalog:",
+    "lz-string": "catalog:",
+    "tippy.js": "catalog:",
+    "u-node": "catalog:",
+    "vue-tippy": "catalog:",
+    "vuedraggable": "catalog:"
+  },
+  "peerDependencies": {
+    "@xwiki/platform-livedata-componentstore": "workspace:*",
+    "jquery": "3.x",
+    "vue": "3.x",
+    "vue-i18n": "11.x"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@types/jquery": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-livedata-componentstore": "workspace:*",
+    "eslint": "catalog:",
+    "flush-promises": "catalog:",
+    "jquery": "catalog:",
+    "lodash-es": "catalog:",
+    "sinon": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

@@ -51,8 +51,12 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
-import org.xwiki.rendering.transformation.TransformationExecutor;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.transformation.XWikiTransformationContext;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -95,7 +99,13 @@ public class RenderingScriptService implements ScriptService
     private XWikiSyntaxEscaper escaper;
 
     @Inject
-    private Provider<TransformationExecutor> transformationExecutorProvider;
+    private TransformationManager transformationManager;
+
+    /**
+     * Used to check programming rights.
+     */
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private SyntaxRegistry syntaxRegistry;
@@ -160,19 +170,30 @@ public class RenderingScriptService implements ScriptService
     }
 
     /**
-     * Start preparing the context to execute transformations on the given XDOM. The returned
-     * {@link TransformationExecutor} allows to configure the transformation context before executing the
-     * transformations.
-     * 
-     * @param xdom the XDOM on which to execute transformations
-     * @return a {@link TransformationExecutor} allowing to configure the transformation context before executing the
-     *         transformations
+     * Create a new transformation context.
+     *
+     * @return a new transformation context
      * @since 18.1.0RC1
      */
     @Unstable
-    public TransformationExecutor transform(XDOM xdom)
+    public XWikiTransformationContext createTransformationContext()
     {
-        return this.transformationExecutorProvider.get().withXDOM(xdom);
+        return new XWikiTransformationContext();
+    }
+
+    /**
+     * Performs transformations on the passed block using the passed transformation context.
+     * 
+     * @param block the block on which to perform the transformations
+     * @param transformationContext the context in which to perform the transformations
+     * @since 18.1.0RC1
+     */
+    @Unstable
+    public void transform(Block block, XWikiTransformationContext transformationContext) throws TransformationException
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            this.transformationManager.performTransformations(block, transformationContext);
+        }
     }
 
     /**

@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.transformation;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.stability.Unstable;
 
 /**
  * Extends the generic {@link TransformationContext} to add XWiki specific information.
@@ -28,6 +28,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
  * @version $Id$
  * @since 18.1.0RC1
  */
+@Unstable
 public class XWikiTransformationContext extends TransformationContext
 {
     private DocumentReference contentDocumentReference;

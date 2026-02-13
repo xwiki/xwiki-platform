@@ -762,7 +762,25 @@ require([
       }
     });
   });
-
+  
+  $navigationTree.on('select_node.jstree deselect_all.jstree', function(event, data) {
+    let selectValue;
+    let $node;
+    if (event.type === 'select_node') {
+      selectValue = true;
+      $node = document.getElementById(data.node.id);
+    } else {
+      selectValue = false;
+      $node = document.getElementById(data.node[0]);
+    }
+    if (!$node) return;
+    let anchor = $node.querySelector('.jstree-anchor');
+    let attributeName = 'aria-selected';
+    $node.setAttribute(attributeName, selectValue);
+    anchor.removeAttribute(attributeName);
+    event.stopPropagation();
+  });
+  
   // Pin top level pages when they are manually re-ordered.
   $navigationTree.on('move_node.jstree', function(event, data) {
     if (data.instance === data.old_instance &amp;&amp; data.parent === data.old_parent &amp;&amp; data.parent === $.jstree.root) {

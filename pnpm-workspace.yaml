@@ -1,5 +1,6 @@
 packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-distributionwizard/xwiki-platform-distributionwizard-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-componentstore/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-ui/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
@@ -11,6 +12,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils
@@ -36,13 +38,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
 
-catalogMode: strict
-cleanupUnusedCatalogs: true
-ignoredBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-onlyBuiltDependencies:
-  - nx
 catalog:
   "@blocknote/core": 0.46.1
   "@blocknote/mantine": 0.46.1
@@ -132,3 +127,14 @@ catalog:
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
   yjs: 13.6.29
+
+catalogMode: strict
+
+cleanupUnusedCatalogs: true
+
+ignoredBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - nx

@@ -1,0 +1,64 @@
+{
+  "name": "@xwiki/platform-distributionwizard",
+  "version": "18.2.0-SNAPSHOT",
+  "description": "Provide UI components for the Distribution Wizard.",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.umd.js"
+      }
+    }
+  },
+  "main": "./dist/index.es.js",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
+  "scripts": {
+    "api-extractor:ci": "api-extractor run",
+    "api-extractor:local": "api-extractor run --local",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run",
+    "typecheck": "vue-tsc"
+  },
+  "types": "./dist/index.d.ts",
+  "peerDependencies": {
+    "vue": "3.x"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "keywords": [
+    "wizard"
+  ]
+}

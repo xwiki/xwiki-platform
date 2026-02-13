@@ -39,7 +39,6 @@ import { XWikiStorage } from "./storage/XWikiStorage";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
-import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/platform-uniast-markdown";
 import { Container, injectable } from "inversify";
 
 const container: Container = new Container();
@@ -74,7 +73,6 @@ XWikiDesignSystemLoader.bind(container);
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
-new UniastMarkdownComponentList(container);
 new MacroServiceComponentList(container);
 
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.

@@ -53,7 +53,6 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "eventemitter3": "catalog:",
     "lodash-es": "catalog:",
     "vue-i18n": "catalog:"
   },

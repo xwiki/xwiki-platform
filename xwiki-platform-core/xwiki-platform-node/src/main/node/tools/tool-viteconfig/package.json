@@ -1,0 +1,33 @@
+{
+  "name": "@xwiki/platform-tool-viteconfig",
+  "version": "18.2.0-SNAPSHOT",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
+  "scripts": {
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "vite": "catalog:"
+  },
+  "devDependencies": {
+    "eslint": "catalog:"
+  }
+}

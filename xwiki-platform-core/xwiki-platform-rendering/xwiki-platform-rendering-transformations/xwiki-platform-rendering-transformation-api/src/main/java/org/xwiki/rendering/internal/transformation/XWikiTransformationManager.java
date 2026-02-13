@@ -26,13 +26,19 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.XWikiTransformationContext;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 /**
- * Override the default component implementation to be able to define the list of transformations to execute defined
- * in the query string using the {@code transformations} parameter.
+ * Override the default component implementation to be able to define the list of transformations to execute defined in
+ * the query string using the {@code transformations} parameter.
  *
  * @version $Id$
  * @since 12.10.4
@@ -45,9 +51,54 @@ public class XWikiTransformationManager extends DefaultTransformationManager
     @Inject
     private Container container;
 
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Override
+    public void performTransformations(Block block, TransformationContext transformationContext)
+        throws TransformationException
+    {
+        if (transformationContext instanceof XWikiTransformationContext xwikiTransformationContext) {
+            try {
+                // Even if the content on which transformations are executed has an associated document, we can't be
+                // sure who is the author of the content so we assume it's the current user (i.e. the content may have
+                // changes compared to the saved version of the document, and these changes are attributed to the
+                // current user).
+                //
+                // Note that there are two main cases we need to protect against:
+                // * a user executing transformations that require more access rights that they have; we hope to prevent
+                // this by treating the current user as the last author of the transformed content and by associating
+                // the proper content document (to check access rights for)
+                // * a user executing transformations for which they have the required access rights but the content has
+                // been modified by someone else, with less access rights; this is handled at the level of the script
+                // calling this API, e.g. by checking the presence of the CSRF token, i.e. by making sure the current
+                // user is aware that transformations are going to be executed.
+                this.authorExecutor.call(() -> {
+                    superPerformTransformations(block, transformationContext);
+                    return null;
+                }, this.documentAccessBridge.getCurrentUserReference(),
+                    xwikiTransformationContext.getContentDocumentReference());
+            } catch (Exception e) {
+                throw new TransformationException("Failed to execute transformations", e);
+            }
+        } else {
+            superPerformTransformations(block, transformationContext);
+        }
+    }
+
+    void superPerformTransformations(Block block, TransformationContext transformationContext)
+        throws TransformationException
+    {
+        super.performTransformations(block, transformationContext);
+    }
+
     /**
      * @return the ordered list of Transformations to execute
      */
+    @Override
     public List<Transformation> getTransformations()
     {
         // The transformations to execute are computed using the following order:
@@ -67,9 +118,9 @@ public class XWikiTransformationManager extends DefaultTransformationManager
     {
         String transformationNamesString = null;
         if (this.container.getRequest() != null) {
-            Object object = this.container.getRequest().getProperty("transformations");
-            if (object instanceof String) {
-                transformationNamesString = (String) object;
+            Object value = this.container.getRequest().getParameter("transformations");
+            if (value instanceof String stringValue) {
+                transformationNamesString = stringValue;
             }
         }
         return transformationNamesString;

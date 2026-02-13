@@ -51,8 +51,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/no-unresolved
-import { BaseDisplayer, displayerMixin } from "xwiki-livedata";
+import { BaseDisplayer, displayerMixin } from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-staticList",

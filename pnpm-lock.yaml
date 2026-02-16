@@ -308,6 +308,9 @@ importers:
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
+      '@xwiki/platform-macros-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/macros/macros-api
       '@xwiki/platform-macros-service':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/macros/macros-service

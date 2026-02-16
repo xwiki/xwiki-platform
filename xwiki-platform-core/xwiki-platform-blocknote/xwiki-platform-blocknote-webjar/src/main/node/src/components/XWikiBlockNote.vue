@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
@@ -78,6 +79,9 @@ import type { UniAst } from "@xwiki/platform-uniast-api";
 // Injected
 //
 const container = inject<Container>("container")!;
+const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
+  name: "XWiki",
+});
 
 //
 // Props
@@ -118,9 +122,7 @@ const dirty = ref(false);
 const editorContent = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = initialValue
-    ? JSON.parse(initialValue)
-    : { blocks: [] };
+  editorContent.value = uniAstProcessor.load(initialValue);
 });
 
 const editorProps = shallowRef<
@@ -158,7 +160,7 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = JSON.stringify(editorContent);
+  const newValue = uniAstProcessor.save(editorContent);
 
   value.value = newValue;
   dirty.value = false;

@@ -31,4 +31,16 @@
   <name>XWiki Platform - Distribution Wizard - Default</name>
   <packaging>jar</packaging>
   <description>Default implementations of the Distribution Wizard.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distributionwizard-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

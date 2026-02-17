@@ -60,5 +60,8 @@
   },
   "keywords": [
     "wizard"
-  ]
+  ],
+  "dependencies": {
+    "@xwiki/platform-tool-tsconfig": "workspace:*"
+  }
 }

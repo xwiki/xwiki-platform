@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,7 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { App } from "@xwiki/platform-distributionwizard";
-import { createApp } from "vue";
+package org.xwiki.distributionwizard;
 
-createApp(App).mount("#distributionWizard");
+public class DistributionWizardException extends Exception
+{
+    public DistributionWizardException(String message)
+    {
+        super(message);
+    }
+
+    public DistributionWizardException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+}

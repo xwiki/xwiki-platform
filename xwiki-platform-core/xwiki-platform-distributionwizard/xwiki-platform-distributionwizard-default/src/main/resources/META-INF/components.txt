@@ -1,0 +1,5 @@
+org.xwiki.distributionwizard.internal.steps.FirstAdminUserStep
+org.xwiki.distributionwizard.internal.steps.UIDistributionStep
+org.xwiki.distributionwizard.internal.steps.WelcomeStep
+org.xwiki.distributionwizard.internal.DefaultDistributionWizardManager
+org.xwiki.distributionwizard.script.DistributionWizardScriptService

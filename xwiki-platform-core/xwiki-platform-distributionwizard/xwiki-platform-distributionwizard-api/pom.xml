@@ -31,4 +31,11 @@
   <name>XWiki Platform - Distribution Wizard - API</name>
   <packaging>jar</packaging>
   <description>Provides APIs for the Distribution Wizard.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

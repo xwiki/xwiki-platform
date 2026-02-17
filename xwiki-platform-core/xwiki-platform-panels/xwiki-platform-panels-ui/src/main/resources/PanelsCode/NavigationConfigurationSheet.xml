@@ -735,6 +735,25 @@ require([
     }
   });
 
+  // We NEED to move around the semantics a bit to make that DOM make sense. 
+  // This could probably be done at the xwiki tree macro level but it would cause regressions 
+  // and doing it here only is enough for now.
+  // The proper solution would be to actually make the ".jstree-node" a treeitem from JStree itself.
+  // Like other places in JSTree, there is a lot of semantic markup but it's used approximatively.
+  // This poor markup leaves no place where JStree actions could be added correctly.
+  function fixNodeMarkup($node) {
+    let $anchor = $node.children('.jstree-anchor');
+    if ($anchor.attr('role') === 'treeitem' || $anchor.data('hadTreeItemRole')) {
+      $anchor.data('hadTreeItemRole', true);
+      for (let attributeName of ['role', 'aria-selected', 'aria-level']) {
+        if ($anchor.attr(attributeName)) {
+          $node.attr(attributeName, $anchor.attr(attributeName));
+          $anchor.removeAttr(attributeName);
+        }
+      }
+    }
+  }
+
   // Add the pin action. The redraw event is triggered only for top level nodes, but that is fine because we allow the
   // user to pin only the top level pages from the Navigation tree.
   $navigationTree.on('redraw.jstree', function(event, data) {
@@ -745,39 +764,20 @@ require([
       if (node.data.type === 'document' &amp;&amp; node.parent === $.jstree.root) {
         const $node = tree.get_node(nodeId, true);
         $node.children('.jstree-actions').append(pinActionTemplate.clone());
-        // We NEED to move around the semantics a bit to make that DOM make sense. 
-        // This could probably be done at the xwiki tree macro level but it would cause regressions 
-        // and doing it here only is enough for now.
-        // The proper solution would be to actually make the ".jstree-node" a treeitem from JStree itself.
-        // Like other places in JSTree, there is a lot of semantic markup but it's used approximatively.
-        // This poor markup leaves no place where JStree actions could be added correctly.
-        let anchor = $node.children('.jstree-anchor');
-        // Check if the markup is still an issue. We don't want to move it around if things have been fixed upstream.
-        if(anchor.attr('role') === 'treeitem') {
-          for (let attributeName in ['role', 'aria-selected', 'aria-level']) {
-            $node.attr(attributeName, anchor.attr(attributeName));
-            anchor.removeAttr(attributeName);
-          }
-        }
+        fixNodeMarkup($node);
       }
     });
   });
   
   $navigationTree.on('select_node.jstree deselect_all.jstree', function(event, data) {
-    let selectValue;
     let $node;
     if (event.type === 'select_node') {
-      selectValue = true;
-      $node = document.getElementById(data.node.id);
+      $node = $(document.getElementById(data.node.id));
     } else {
-      selectValue = false;
-      $node = document.getElementById(data.node[0]);
+      $node = $(document.getElementById(data.node[0]));
     }
     if (!$node) return;
-    let anchor = $node.querySelector('.jstree-anchor');
-    let attributeName = 'aria-selected';
-    $node.setAttribute(attributeName, selectValue);
-    anchor.removeAttribute(attributeName);
+    fixNodeMarkup($node);
   });
   
   // Pin top level pages when they are manually re-ordered.

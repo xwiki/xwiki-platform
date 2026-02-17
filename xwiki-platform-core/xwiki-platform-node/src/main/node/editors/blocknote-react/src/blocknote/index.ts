@@ -26,8 +26,8 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
-  filterSuggestionItems,
 } from "@blocknote/core";
+import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";

@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Main.WebHome" locale="en_GB">
+  <web>Main</web>
+  <name>WebHome</name>
+  <language>en_GB</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Home</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>== Welcome to your wiki ==
+
+XWiki is the best tool to organize your knowledge. A //wiki// is organized in a hierarchy of //pages//. You can create multiple wikis, each with its own set of pages.
+
+XWiki can be used as a knowledge base (support, documentation, sales, etc.), for collaborative workspaces or even as a complete intranet.
+
+== The basics ==
+
+To make the most out of your wiki, log-in and:
+
+Use the {{displayIcon name="pencil"/}} button above to //edit// this page and start customizing your wiki to your needs.
+
+Use the {{displayIcon name="add"/}} button above to //add// more pages to your wiki and create the //hierarchy// that best organises your content.
+
+Use the {{displayIcon name="home"/}} breadcrumbs located above the title to //navigate// inside your pages. It's easy to get lost in a big wiki without them.
+
+You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
+
+ {{box}}Learn more on how to use XWiki with the [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
+
+(% class="row" %)
+(((
+(% class="col-xs-12 col-sm-6" %)
+(((
+== Extend your wiki ==
+
+To extend the power and functionalities of your wiki with the features that //you// need, head over to the [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] where you can search for and install extensions.
+
+To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
+)))
+
+(% class="col-xs-12 col-sm-6" %)
+(((
+== Create your application ==
+
+Go beyond the available extensions and define the //structure// of your data based on //your// needs, creating //your// own applications with [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
+
+AWM will take care of making it easy for you and your users to create and manage the data.
+)))
+)))</content>
+</xwikidoc>

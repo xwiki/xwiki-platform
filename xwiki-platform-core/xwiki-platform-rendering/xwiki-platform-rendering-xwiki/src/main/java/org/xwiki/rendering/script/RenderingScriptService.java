@@ -32,7 +32,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
@@ -45,14 +44,20 @@ import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.transformation.XWikiTransformationContext;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -93,22 +98,31 @@ public class RenderingScriptService implements ScriptService
     @Inject
     private XWikiSyntaxEscaper escaper;
 
+    @Inject
+    private TransformationManager transformationManager;
+
+    /**
+     * Used to check programming rights.
+     */
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private SyntaxRegistry syntaxRegistry;
+
     /**
      * @return the list of syntaxes for which a Parser is available
      */
     public List<Syntax> getAvailableParserSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<>();
         try {
-            for (Parser parser : this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class)) {
-                syntaxes.add(parser.getSyntax());
-            }
-        } catch (ComponentLookupException e) {
+            return this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class).stream()
+                .map(Parser::getSyntax).toList();
+        } catch (Exception e) {
             // Failed to lookup parsers, consider there are no syntaxes available
             this.logger.error("Failed to lookup parsers", e);
+            return List.of();
         }
-
-        return syntaxes;
     }
 
     /**
@@ -116,19 +130,14 @@ public class RenderingScriptService implements ScriptService
      */
     public List<Syntax> getAvailableRendererSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<>();
         try {
-            List<PrintRendererFactory> factories =
-                this.componentManagerProvider.get().getInstanceList(PrintRendererFactory.class);
-            for (PrintRendererFactory factory : factories) {
-                syntaxes.add(factory.getSyntax());
-            }
-        } catch (ComponentLookupException e) {
+            return this.componentManagerProvider.get().<PrintRendererFactory>getInstanceList(PrintRendererFactory.class)
+                .stream().map(PrintRendererFactory::getSyntax).toList();
+        } catch (Exception e) {
             // Failed to lookup renderers, consider there are no syntaxes available
             this.logger.error("Failed to lookup renderers", e);
+            return List.of();
         }
-
-        return syntaxes;
     }
 
     /**
@@ -158,6 +167,33 @@ public class RenderingScriptService implements ScriptService
             result = null;
         }
         return result;
+    }
+
+    /**
+     * Create a new transformation context.
+     *
+     * @return a new transformation context
+     * @since 18.1.0RC1
+     */
+    @Unstable
+    public XWikiTransformationContext createTransformationContext()
+    {
+        return new XWikiTransformationContext();
+    }
+
+    /**
+     * Performs transformations on the passed block using the passed transformation context.
+     * 
+     * @param block the block on which to perform the transformations
+     * @param transformationContext the context in which to perform the transformations
+     * @since 18.1.0RC1
+     */
+    @Unstable
+    public void transform(Block block, XWikiTransformationContext transformationContext) throws TransformationException
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            this.transformationManager.performTransformations(block, transformationContext);
+        }
     }
 
     /**
@@ -193,8 +229,8 @@ public class RenderingScriptService implements ScriptService
     {
         Syntax syntax;
         try {
-            syntax = Syntax.valueOf(syntaxId);
-        } catch (ParseException exception) {
+            syntax = this.syntaxRegistry.resolveSyntax(syntaxId);
+        } catch (Exception exception) {
             syntax = null;
         }
         return syntax;
@@ -265,7 +301,7 @@ public class RenderingScriptService implements ScriptService
     {
         try {
             return this.macroIdFactory.createMacroId(macroIdAsString);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             this.logger.warn("Failed to resolve macro id [{}]. Root cause is: [{}]", macroIdAsString,
                 ExceptionUtils.getRootCauseMessage(e));
             return null;

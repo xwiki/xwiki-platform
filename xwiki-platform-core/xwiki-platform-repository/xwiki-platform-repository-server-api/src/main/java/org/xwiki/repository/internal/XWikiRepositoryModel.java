@@ -225,6 +225,12 @@ public class XWikiRepositoryModel
     public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
 
     /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static final String PROP_DEPENDENCY_EXCLUSIONS = "exclusions";
+
+    /**
      * @since 9.6RC1
      */
     public static final String PROP_DEPENDENCY_OPTIONAL = "optional";

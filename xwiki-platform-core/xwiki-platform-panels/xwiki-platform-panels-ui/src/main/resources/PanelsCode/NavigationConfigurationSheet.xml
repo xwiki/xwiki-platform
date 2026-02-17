@@ -778,7 +778,6 @@ require([
     let attributeName = 'aria-selected';
     $node.setAttribute(attributeName, selectValue);
     anchor.removeAttribute(attributeName);
-    event.stopPropagation();
   });
   
   // Pin top level pages when they are manually re-ordered.

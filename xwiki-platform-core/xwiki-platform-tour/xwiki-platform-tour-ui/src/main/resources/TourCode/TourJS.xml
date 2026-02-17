@@ -177,16 +177,17 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       .appendTo(buttonContainer);
 
     if (showPopover) {
-      buttonContainer.addClass('opened');
+      buttonContainer.addClass('hint-opened');
       button.removeAttr('hidden');
       popover.attr('open','open');
+    } else {
+      buttonContainer.addClass('closed');
     }
 
     button.on('click', function() {
       if (showPopover) {
         popover.removeAttr('open');
         button.attr('hidden', true);
-        buttonContainer.removeClass('opened');
       }
 
       if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
@@ -200,7 +201,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         tour.restart();
       }
       button.attr('hidden', true);
-      buttonContainer.removeClass('opened');
+      buttonContainer.removeClass('hint-opened');
+      buttonContainer.removeClass('hint-closed');
     });
   }
 
@@ -350,7 +352,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
           if (buttonContainer.length === 0) {
             createResumeButton(tour, true);
           } else {
-            buttonContainer.addClass('opened');
+            buttonContainer.addClass('hint-opened');
             let button = $('#tourResume');
             button.removeAttr('hidden');
             // Show the popover
@@ -358,7 +360,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
             popover.attr('open','open');
             // Hide it after 7 seconds
             setTimeout(function() {
-              buttonContainer.removeClass('opened');
+              buttonContainer.removeClass('hint-opened');
+              // Completely hide it after the transition
+              setTimeout(() => buttonContainer.addClass('hint-closed'), 200);
               popover.removeAttr('open');
             }, 7000);
           }
@@ -560,39 +564,42 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   &amp; &gt; .popover-content {
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
+    /* Using an actual 0s here gets minified to 0, which is incorrect CSS. */
+    transition: opacity .2s ease-in-out, visibility .001s .2s; 
     position: relative;
     max-width: 276px;
     padding: 1px;
     line-break: auto;
     text-align: left;
     padding: 0.5em;
-    background-color: @dropdown-bg;
-    border: solid 0.2em @dropdown-border;
+    background-color: var(--dropdown-bg);
+    border: solid .2em var(--dropdown-border);
     border-radius: 1em 1em 0 1em;
     width: 100%;
 
     &amp;::after {
       position: absolute;
-      right: 0em;
       content: '';
+      right: .1em;
       bottom: -1em;
-      width: 0;
-      height: 0;
-      border-left: 1em solid transparent;
-      border-right: 1em solid transparent;
-      border-top: 1em solid @dropdown-bg;
-      clear: both;
+      height: 2.1em;
+      width: 2.1em;
+      background-color: var(--dropdown-bg);
+      border: solid .2em var(--dropdown-border);
+      transform: rotate(45deg);
+      clip-path: polygon(100% 100%, 0 100%, 100% 0);
     }
   }
 }
 
-#tourResumeContainer.opened {
-  &amp; &gt; .popover-content {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.2s ease-in-out;
-  }
+#tourResumeContainer.hint-opened &gt; .popover-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* The transition is finished*/
+#tourResumeContainer.hint-closed &gt; .popover-content {
+  display: none;
 }
 
 @media print {
@@ -626,13 +633,13 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 </code>
     </property>
     <property>
-      <contentType>LESS</contentType>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>always</use>

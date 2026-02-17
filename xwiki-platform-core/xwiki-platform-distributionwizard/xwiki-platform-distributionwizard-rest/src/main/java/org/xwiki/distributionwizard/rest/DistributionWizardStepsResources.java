@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,7 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { App } from "@xwiki/platform-distributionwizard";
-import { createApp } from "vue";
+package org.xwiki.distributionwizard.rest;
 
-createApp(App).mount("#distributionWizard");
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
+
+@Path("/distributionWizard/{wikiId}/steps/")
+public interface DistributionWizardStepsResources
+{
+    @GET
+    Steps getSteps(@PathParam("wikiId") String wikiId) throws Exception;
+}

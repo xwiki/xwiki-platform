@@ -31,4 +31,61 @@
   <name>XWiki Platform - Distribution Wizard - REST</name>
   <packaging>jar</packaging>
   <description>REST API for the Distribution Wizard.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Distribution Wizard REST Services</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distributionwizard-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- We reuse the LinkCollection and Map types from xwiki.rest.model.xsd  -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-rest-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Distribution Wizard REST resources extend XWikiResource -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <!-- Xerces is causing problems with the jaxb plugin -->
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb</groupId>
+        <artifactId>jaxb-maven-plugin</artifactId>
+        <configuration>
+          <generatePackage>org.xwiki.distributionwizard.rest.model.jaxb</generatePackage>
+          <!-- Make sure we don't regenerate / duplicate the xwiki-platform-rest-model classes. -->
+          <useDependenciesAsEpisodes>true</useDependenciesAsEpisodes>
+          <!-- Use a catalog to specify the path to the xwiki.rest.model.xsd -->
+          <!-- See also https://github.com/highsource/maven-jaxb2-plugin/wiki/Modular-Schema-Compilation -->
+          <catalog>src/main/resources/catalog.cat</catalog>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

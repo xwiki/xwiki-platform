@@ -1,0 +1,89 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.distributionwizard.internal.steps;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.distributionwizard.DistributionWizardException;
+import org.xwiki.rendering.block.Block;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
+@Component
+@Singleton
+@Named("FirstAdminUserStep")
+public class FirstAdminUserStep extends AbstractStep
+{
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Override
+    public String getTitle()
+    {
+        return "First admin user step";
+    }
+
+    @Override
+    public Block render()
+    {
+        return null;
+    }
+
+    @Override
+    public int getIndex()
+    {
+        return 1;
+    }
+
+    @Override
+    public boolean isHidden()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isOptional()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isStepDone() throws DistributionWizardException
+    {
+        try {
+            return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null,
+                this.contextProvider.get()) == 0;
+        } catch (XWikiException e) {
+            throw new DistributionWizardException("Error when trying to compute if the step is done", e);
+        }
+    }
+
+    @Override
+    public String getTemplateId()
+    {
+        return "";
+    }
+}

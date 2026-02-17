@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,7 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { App } from "@xwiki/platform-distributionwizard";
-import { createApp } from "vue";
+package org.xwiki.distributionwizard.internal.steps;
 
-createApp(App).mount("#distributionWizard");
+import org.xwiki.component.annotation.Component;
+import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.rendering.block.Block;
+
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
+@Component
+@Singleton
+@Named("UIDistributionStep")
+public class UIDistributionStep implements DistributionWizardStep
+{
+    @Override
+    public String getTitle()
+    {
+        return "UI Distribution Choice";
+    }
+
+    @Override
+    public Block render()
+    {
+        return null;
+    }
+
+    @Override
+    public int getIndex()
+    {
+        return 2;
+    }
+
+    @Override
+    public boolean isHidden()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isOptional()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isStepDone()
+    {
+        return false;
+    }
+}

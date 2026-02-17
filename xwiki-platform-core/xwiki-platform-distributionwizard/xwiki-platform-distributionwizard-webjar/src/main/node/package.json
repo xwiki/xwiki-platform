@@ -11,10 +11,14 @@
   "dependencies": {
     "@xwiki/platform-distributionwizard": "workspace:*"
   },
+  "peerDependencies": {
+    "vue": "3.x"
+  },
   "devDependencies": {
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vue": "catalog:"
   }
 }

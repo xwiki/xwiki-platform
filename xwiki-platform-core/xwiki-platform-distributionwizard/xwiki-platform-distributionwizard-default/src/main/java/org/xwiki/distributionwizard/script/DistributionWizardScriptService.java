@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,7 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { App } from "@xwiki/platform-distributionwizard";
-import { createApp } from "vue";
+package org.xwiki.distributionwizard.script;
 
-createApp(App).mount("#distributionWizard");
+import org.xwiki.component.annotation.Component;
+import org.xwiki.distributionwizard.DistributionWizardManager;
+import org.xwiki.script.service.ScriptService;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
+@Component
+@Singleton
+@Named("distributionwizard")
+public class DistributionWizardScriptService implements ScriptService
+{
+    @Inject
+    private DistributionWizardManager distributionWizardManager;
+
+    public boolean shouldBeDisplayed()
+    {
+        return this.distributionWizardManager.shouldBeDisplayed();
+    }
+}

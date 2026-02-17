@@ -9,6 +9,9 @@ import { ComponentProvideOptions } from 'vue';
 import { DefineComponent } from 'vue';
 import { PublicProps } from 'vue';
 
+// @public (undocumented)
+export const App: DefineComponent<    {}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {}, any>;
+
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -16,11 +19,11 @@ export const WizardBreadcrumb: DefineComponent<__VLS_Props, {}, {}, {}, {}, Comp
 
 // @public (undocumented)
 export const WizardDialog: DefineComponent<    {}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
-closed: (...args: any[]) => void;
+    closed: (...args: any[]) => void;
 }, string, PublicProps, Readonly<{}> & Readonly<{
-onClosed?: ((...args: any[]) => any) | undefined;
+    onClosed?: ((...args: any[]) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {
-wizardDialog: HTMLDialogElement;
+    wizardDialog: HTMLDialogElement;
 }, any>;
 
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props_2" needs to be exported by the entry point index.d.ts

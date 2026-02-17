@@ -1,0 +1,198 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.rest.internal.user;
+
+import java.net.URI;
+import java.util.Objects;
+
+import javax.inject.Provider;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.Relations;
+import org.xwiki.rest.UserReferenceModelSerializer;
+import org.xwiki.rest.internal.Utils;
+import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.model.jaxb.User;
+import org.xwiki.rest.model.jaxb.UserPreferences;
+import org.xwiki.rest.model.jaxb.UserSummary;
+import org.xwiki.rest.resources.pages.PageHistoryResource;
+import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.user.UserResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
+/**
+ * Implementation of {@link UserReferenceModelSerializer} for instances of {@link DocumentUserReference}.
+ *
+ * @since 18.2.0RC1
+ * @version $Id$
+ */
+@Component
+@Named("document")
+@Singleton
+public class DocumentUserReferenceModelSerializer implements UserReferenceModelSerializer
+{
+    private final ObjectFactory objectFactory = new ObjectFactory();
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private UserPropertiesResolver userPropertiesResolver;
+
+    @Inject
+    private Provider<ContextualAuthorizationManager> authorizationManagerProvider;
+
+    private void toRestUserSummary(URI baseUri, UserSummary userSummary, String userId,
+        DocumentUserReference userReference, UserProperties userProperties) throws XWikiException
+    {
+        userSummary.setId(userId);
+        userSummary.setGlobal(userReference.isGlobal());
+        userSummary.setFirstName(userProperties.getFirstName());
+        userSummary.setLastName(userProperties.getLastName());
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(userReference.getReference(), xcontext);
+        String avatarFileName = userProperties.getProperty("avatar");
+
+        if (avatarFileName != null) {
+            XWikiAttachment avatarAttachment = xwikiDocument.getAttachment(avatarFileName);
+            userSummary.setAvatarUrl(xcontext.getWiki().getURL(avatarAttachment.getReference(), xcontext));
+        } else {
+            String defaultAvatarUrl = xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", xcontext);
+            userSummary.setAvatarUrl(defaultAvatarUrl);
+        }
+        userSummary.setXwikiRelativeUrl(xwikiDocument.getURL(Right.VIEW.getName(), xcontext));
+        userSummary.setXwikiAbsoluteUrl(xwikiDocument.getExternalURL(Right.VIEW.getName(), xcontext));
+
+        String pageUri = Utils.createURI(baseUri, PageResource.class,
+                xwikiDocument.getDocumentReference().getWikiReference().getName(),
+                Utils.getSpacesURLElements(xwikiDocument.getDocumentReference()),
+                xwikiDocument.getDocumentReference().getName())
+            .toString();
+        Link pageLink = this.objectFactory.createLink();
+        pageLink.setHref(pageUri);
+        pageLink.setRel(Relations.PAGE);
+        userSummary.withLinks(pageLink);
+
+        String historyUri = Utils.createURI(baseUri, PageHistoryResource.class,
+                xwikiDocument.getDocumentReference().getWikiReference().getName(),
+                Utils.getSpacesURLElements(xwikiDocument.getDocumentReference()),
+                xwikiDocument.getDocumentReference().getName())
+            .toString();
+        Link historyLink = this.objectFactory.createLink();
+        historyLink.setHref(historyUri);
+        historyLink.setRel(Relations.HISTORY);
+        userSummary.withLinks(historyLink);
+    }
+
+    @Override
+    public UserSummary toRestUserSummary(URI baseUri, String userId, UserReference userReference) throws XWikiException
+    {
+        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
+        if (!this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference())) {
+            return null;
+        }
+
+        UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
+        UserSummary userSummary = this.objectFactory.createUserSummary();
+        toRestUserSummary(baseUri, userSummary, userId, documentUserReference, userProperties);
+
+        String historyUri = Utils.createURI(baseUri, UserResource.class,
+                documentUserReference.getReference().getWikiReference().getName(), userId)
+            .toString();
+        Link historyLink = this.objectFactory.createLink();
+        historyLink.setHref(historyUri);
+        historyLink.setRel(Relations.USER);
+        userSummary.withLinks(historyLink);
+
+        return userSummary;
+    }
+
+    @Override
+    public User toRestUser(URI baseUri, String userId, UserReference userReference, boolean preferences)
+        throws XWikiException
+    {
+        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
+        if (!this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference())) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+
+        UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
+        if (userProperties.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        User user = this.objectFactory.createUser();
+        toRestUserSummary(baseUri, user, userId, documentUserReference, userProperties);
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        user.setDisplayName(xcontext.getWiki().getUserName(documentUserReference.getReference(), null, false, true,
+            xcontext));
+        user.setCompany(Objects.toString(userProperties.getProperty("company"), ""));
+        user.setAbout(Objects.toString(userProperties.getProperty("comment"), ""));
+        user.setEmail(Objects.toString(userProperties.getProperty("email"), ""));
+        user.setPhone(Objects.toString(userProperties.getProperty("phone"), ""));
+        user.setAddress(Objects.toString(userProperties.getProperty("address"), ""));
+        user.setBlog(Objects.toString(userProperties.getProperty("blog"), ""));
+        user.setBlogFeed(Objects.toString(userProperties.getProperty("blogfeed"), ""));
+
+        if (preferences) {
+            UserPreferences userPreferences = this.objectFactory.createUserPreferences();
+            userPreferences.setDisplayHiddenDocuments(userProperties.displayHiddenDocuments());
+
+            String underlineProperty = "underline";
+            userPreferences.setUnderlineLinks(Objects.toString(userProperties.getProperty(underlineProperty),
+                xcontext.getWiki().getXWikiPreference(underlineProperty, xcontext)));
+
+            String timezoneProperty = "timezone";
+            userPreferences.setTimezone(Objects.toString(userProperties.getProperty(timezoneProperty),
+                xcontext.getWiki().getXWikiPreference(timezoneProperty, xcontext)));
+
+            String editorProperty = "editor";
+            userPreferences.setEditor(Objects.toString(userProperties.getProperty(editorProperty),
+                xcontext.getWiki().getXWikiPreference(editorProperty, xcontext)));
+
+            userPreferences.setAdvanced("Advanced".equals(userProperties.getProperty("usertype")));
+
+            user.setPreferences(userPreferences);
+        }
+
+        return user;
+    }
+}

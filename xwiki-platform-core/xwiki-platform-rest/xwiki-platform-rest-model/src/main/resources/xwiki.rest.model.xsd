@@ -660,4 +660,58 @@
       </extension>
     </simpleContent>
   </complexType>
+
+  <complexType name="UserSummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="firstName" type="string"></element>
+          <element name="lastName" type="string"></element>
+          <element name="avatarUrl" type="string"></element>
+          <element name="global" type="boolean"></element>
+          <element name="xwikiRelativeUrl" type="string"></element>
+          <element name="xwikiAbsoluteUrl" type="string"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="UserPreferences">
+    <sequence>
+      <element name="displayHiddenDocuments" type="boolean"></element>
+      <element name="underlineLinks" type="string"></element>
+      <element name="timezone" type="string"></element>
+      <element name="editor" type="string"></element>
+      <element name="advanced" type="boolean"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="User">
+    <complexContent>
+      <extension base="xwiki:UserSummary">
+        <sequence>
+          <element name="displayName" type="string"></element>
+          <element name="company" type="string"></element>
+          <element name="about" type="string"></element>
+          <element name="email" type="string"></element>
+          <element name="phone" type="string"></element>
+          <element name="address" type="string"></element>
+          <element name="blog" type="string"></element>
+          <element name="blogFeed" type="string"></element>
+          <element name="preferences" type="xwiki:UserPreferences" minOccurs="0"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="users">
+    <complexType>
+      <sequence>
+        <element name="userSummary" type="xwiki:UserSummary" minOccurs="0" maxOccurs="unbounded"></element>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="user" type="xwiki:User"></element>
 </schema>

@@ -10,15 +10,9 @@ ul.commentreplies, .reply {
   padding: 0;
   text-indent: 0;
 }
-ul.commentreplies {
-  display: flex;
-  flex-direction: column;
-  gap: .2em;
-}
 .reply {
   list-style-type: none;
   padding-left: 60px;
-  border-radius: var(--border-radius-base);
 }
 .reply form.reply {
   padding-left: 0;
@@ -31,7 +25,7 @@ ul.commentreplies {
   border: 0 none;   /* Overriding toucan */
   padding: 0 0 8px; /* Overriding toucan */
 }
-.reply:has(.xwikicomment:target) {
+.xwikicomment:target {
   background: $theme.highlightColor;
 }
 .commentavatar {
@@ -55,40 +49,31 @@ ul.commentreplies {
   max-height: 30px;
 }
 .commentheader {
-  color: var(--text-muted);
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  margin: 0;        /* Overriding toucan */
+  padding: 2px 0;   /* Overriding toucan */
 }
-
+.commentheader:hover {
+  background-color: $theme.highlightColor;
+}
 .commentauthor {
-  font-weight: var(--font-weight-semibold);
+  font-size: 1em; /* Overriding toucan */
 }
 .commentdate {
   font-size: 80%;
 }
 .commentcontent {
-  margin-top: 10px;
+  border: none;       /* Overriding toucan */
+  margin: 0;
   padding: 0 36px 0 0;
   text-align: justify;
 }
 
 .commenttools .btn {
   border-color: transparent;
-  background-color: transparent;
 }
 
-.commenttools .thread-toggle {
-  display: none;
-}
-
-/* We offset the first action 'button' to the left so that its content is aligned to the comment text. */
-.commenttools > .thread-toggle,
-.xwikicomment:not(:has(+ .commentthread > *)) .commenttools  > .commentreply {
-  margin-left: -12px;
-}
-
-/* If there's a thread, then we show its toggle. */
-.xwikicomment:has(+ .commentthread > *) .commenttools .thread-toggle {
-  display: unset;
-}
 /* We assume that the caret icon is the first child of the button.*/
 .commenttools .thread-toggle> *:first-child {
   transition: transform 200ms ease-in-out;

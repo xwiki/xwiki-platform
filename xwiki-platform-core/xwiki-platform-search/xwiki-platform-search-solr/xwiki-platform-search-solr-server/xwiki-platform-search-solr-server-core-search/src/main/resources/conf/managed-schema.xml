@@ -542,6 +542,9 @@
          finally applies Porter's stemming.  The query time analyzer also applies synonyms from synonyms.txt. -->
     <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
     <dynamicField name="*_en" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_en_EN" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_en_GB" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_en_US" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_en" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer name="standard"/>

@@ -20,6 +20,52 @@
               </wikiClass>
               <wikiObjectProperty name="prop1" value="1"/>
               <wikiObjectProperty name="unexisting" value="value"/>
+              <wikiObjectProperty name="property2">
+                <p>
+                  <value t="java.util.ArrayList">
+                    <string>value1</string>
+                    <string>value2</string>
+                    <string>value3</string>
+                  </value>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>StringList</string>
+                    </entry>
+                  </parameters>
+                </p>
+              </wikiObjectProperty>
+              <wikiObjectProperty name="mypass" value="somevalue">
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>Password</string>
+                    </entry>
+                  </parameters>
+                </p>
+              </wikiObjectProperty>
+              <wikiObjectProperty name="mydate">
+                <p>
+                  <value t="java.util.Date">2026-03-03 09:37:29.0 UTC</value>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>Date</string>
+                    </entry>
+                  </parameters>
+                </p>
+              </wikiObjectProperty>
+              <wikiObjectProperty name="myboolean" value="1">
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>Integer</string>
+                    </entry>
+                  </parameters>
+                </p>
+              </wikiObjectProperty>
             </wikiObject>
           </wikiDocumentRevision>
         </wikiDocumentLocale>

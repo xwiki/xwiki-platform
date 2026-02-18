@@ -39,9 +39,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 /**
  * @version $Id$
  */
-// TODO: shouldn't this be abstract? toFormString and toText
-// will never work unless getValue is overriden
-public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface,
+    Cloneable
 {
     private static final long serialVersionUID = 1L;
 

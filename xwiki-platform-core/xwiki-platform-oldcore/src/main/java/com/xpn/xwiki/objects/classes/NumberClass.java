@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects.classes;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -34,6 +35,13 @@ import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+/**
+ * Class for providing fields holding number values.
+ *
+ * @version $Id$
+ */
+// FIXME: CyclomaticComplexity is 13 while it should be 10.
+@SuppressWarnings("checkstyle:CyclomaticComplexity")
 public class NumberClass extends PropertyClass
 {
     /**
@@ -64,43 +72,73 @@ public class NumberClass extends PropertyClass
      */
     public static final String TYPE_LONG = "long";
 
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Number";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "number";
+    private static final String SIZE = "size";
+    private static final String NUMBER_TYPE = "numberType";
 
     /** Logging helper object. */
     private static final Logger LOG = LoggerFactory.getLogger(NumberClass.class);
 
+    /**
+     * Constructor with a meta class.
+     * @param wclass the meta class to be used.
+     */
     public NumberClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Number", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
         setSize(30);
         setNumberType(TYPE_LONG);
     }
 
+    /**
+     * Empty constructor with a null metaclass.
+     */
     public NumberClass()
     {
         this(null);
     }
 
+    /**
+     * @return the size of the field.
+     */
     public int getSize()
     {
-        return getIntValue("size");
+        return getIntValue(SIZE);
     }
 
+    /**
+     * Set the size of the field.
+     * @param size the requested size.
+     */
     public void setSize(int size)
     {
-        setIntValue("size", size);
+        setIntValue(SIZE, size);
     }
 
+    /**
+     * @return the type of the number (check the constants for supported types)
+     */
     public String getNumberType()
     {
-        return getStringValue("numberType");
+        return getStringValue(NUMBER_TYPE);
     }
 
+    /**
+     * Set the type of the number, see the constants for supported types.
+     * @param ntype the type of the number
+     */
     public void setNumberType(String ntype)
     {
-        setStringValue("numberType", ntype);
+        setStringValue(NUMBER_TYPE, ntype);
     }
 
     @Override
@@ -119,6 +157,12 @@ public class NumberClass extends PropertyClass
         }
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override
@@ -155,7 +199,8 @@ public class NumberClass extends PropertyClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());

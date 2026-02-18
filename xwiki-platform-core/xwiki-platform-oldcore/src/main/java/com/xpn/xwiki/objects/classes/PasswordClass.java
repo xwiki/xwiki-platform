@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,13 +39,21 @@ import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+/**
+ * Define a property field to hold a password.
+ *
+ * @version $Id$
+ */
 public class PasswordClass extends StringClass
 {
-    private static final long serialVersionUID = 1L;
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Password";
 
-    private static final String XCLASSNAME = "password";
-
-    protected static Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
 
     protected static final String DEFAULT_STORAGE = PasswordMetaClass.HASH;
 
@@ -60,11 +69,25 @@ public class PasswordClass extends StringClass
 
     protected static final String FORM_PASSWORD_PLACEHODLER = "********";
 
+    private static final long serialVersionUID = 1L;
+
+    // "password" is used for both the field type and the xclass name:
+    // we use a single constant to comply with checkstyle here.
+    private static final String PASSWORD_FIELD_TYPE = "password";
+    private static final String XCLASSNAME = PASSWORD_FIELD_TYPE;
+
+    /**
+     * Default constructor with a metaclass.
+     * @param wclass the metaclass value.
+     */
     public PasswordClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Password", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
+    /**
+     * Empty constructor with a null metaclass.
+     */
     public PasswordClass()
     {
         this(null);
@@ -94,7 +117,8 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         ElementInterface prop = object.safeget(name);
         if (prop != null) {
@@ -103,7 +127,8 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
@@ -114,7 +139,7 @@ public class PasswordClass extends StringClass
             input.setValue(FORM_PASSWORD_PLACEHODLER);
         }
 
-        input.setType("password");
+        input.setType(PASSWORD_FIELD_TYPE);
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
@@ -226,6 +251,11 @@ public class PasswordClass extends StringClass
         return result;
     }
 
+    /**
+     * Process the given password to hash or encrypt it depending on the storage type and the defined algorithm.
+     * @param password the password to be hashed or encrypted.
+     * @return a hashed or encrypted password
+     */
     public String getProcessedPassword(String password)
     {
         String storageType = getStorageType();
@@ -251,9 +281,9 @@ public class PasswordClass extends StringClass
 
     /**
      * @param password the password to hash.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>} is
-     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
-     *         salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>}
+     * is the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
+     * salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
      */
     public String getPasswordHash(String password)
     {
@@ -263,9 +293,9 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a random
-     *         64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
-     *         hashing algorithm.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a
+     * random 64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
+     * hashing algorithm.
      */
     public String getPasswordHash(String password, String algorithmName)
     {
@@ -275,14 +305,15 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @param salt the string to pad the password with before hashing. If {@code null}, a random 64 character salt will
-     *            be used. To disable salting, use an empty ({@code ""}) salt string.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>} is
-     *         the salted hash of the given password, using the given hashing algorithm.
+     * @param providedSalt the string to pad the password with before hashing. If {@code null}, a random 64 character
+     * salt will be used. To disable salting, use an empty ({@code ""}) salt string.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>}
+     * is the salted hash of the given password, using the given hashing algorithm.
      * @since 6.3M2
      */
-    public String getPasswordHash(String password, String algorithmName, String salt)
+    public String getPasswordHash(String password, String algorithmName, String providedSalt)
     {
+        String salt = providedSalt;
         // If no salt given, let's generate one.
         if (salt == null) {
             salt = randomSalt();
@@ -328,11 +359,14 @@ public class PasswordClass extends StringClass
         return password;
     }
 
+    /**
+     * @return a random salt built using {@link SecureRandom}.
+     */
     public static String randomSalt()
     {
         StringBuilder salt = new StringBuilder();
         SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[32];
+        byte[] bytes = new byte[32];
         random.nextBytes(bytes);
         for (byte temp : bytes) {
             String s = Integer.toHexString(Byte.valueOf(temp));
@@ -361,5 +395,11 @@ public class PasswordClass extends StringClass
     public boolean isSensitive(XWikiContext context)
     {
         return true;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

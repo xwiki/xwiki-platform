@@ -17,40 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.xar.internal.input;
-
-import javax.inject.Singleton;
+package org.xwiki.internal.objects;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
-import org.xwiki.filter.type.FilterStreamType;
-import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
+
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+
+import jakarta.inject.Singleton;
 
 /**
- * Generate events from XAR FilterStream package.
- * 
+ * Component implementation for string property types.
+ *
  * @version $Id$
- * @since 6.2M1
+ * @since 18.2.0RC1
  */
 @Component(hints = {
-    XARFilterUtils.ROLEHINT_17,
-    XARFilterUtils.ROLEHINT_16,
-    XARFilterUtils.ROLEHINT_15,
-    XARFilterUtils.ROLEHINT_14,
-    XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12,
-    XARFilterUtils.ROLEHINT_11
+    StringProperty.PROPERTY_TYPE,
+    LargeStringProperty.PROPERTY_TYPE
 })
 @Singleton
-public class XARInputFilterStreamFactory
-    extends AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>
+public class StringPropertyParser extends AbstractObjectPropertyParser
 {
-    public XARInputFilterStreamFactory()
+    @Override
+    protected PropertyClass getBaseClass()
     {
-        super(FilterStreamType.XWIKI_XAR_CURRENT);
-
-        setName("XAR input stream");
-        setDescription("Generates wiki events from XAR package.");
+        return new StringClass();
     }
 }

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.xwiki.mail.GeneralMailConfiguration;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -34,6 +35,13 @@ import com.xpn.xwiki.web.Utils;
  */
 public class EmailClass extends StringClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Email";
+
     /**
      * Constant defining the field name.
      **/
@@ -54,7 +62,7 @@ public class EmailClass extends StringClass
      **/
     public EmailClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Email", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     /**
@@ -75,5 +83,11 @@ public class EmailClass extends StringClass
     {
         GeneralMailConfiguration generalMailConfiguration = Utils.getComponent(GeneralMailConfiguration.class);
         return generalMailConfiguration.shouldObfuscate();
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

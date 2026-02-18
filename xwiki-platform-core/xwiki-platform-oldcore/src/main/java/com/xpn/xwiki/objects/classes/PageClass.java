@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
@@ -29,6 +31,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class PageClass extends DBListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Page";
+
     /**
      * Constant defining the field name.
      **/
@@ -43,7 +52,7 @@ public class PageClass extends DBListClass
      */
     public PageClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Page", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     /**
@@ -52,5 +61,11 @@ public class PageClass extends DBListClass
     public PageClass()
     {
         super();
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

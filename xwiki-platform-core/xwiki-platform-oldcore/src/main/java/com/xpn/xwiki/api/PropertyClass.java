@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -263,5 +264,16 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     public int compareTo(PropertyClass other)
     {
         return this.getBasePropertyClass().compareTo(other.getBasePropertyClass());
+    }
+
+    /**
+     * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
+     * @return {@code false} if the property is never sensitive, {@code true} otherwise.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public boolean isSensitive()
+    {
+        return this.getBasePropertyClass().isSensitive(getXWikiContext());
     }
 }

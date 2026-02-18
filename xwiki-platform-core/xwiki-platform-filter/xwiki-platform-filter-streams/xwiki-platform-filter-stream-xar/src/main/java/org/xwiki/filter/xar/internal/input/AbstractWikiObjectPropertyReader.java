@@ -34,6 +34,7 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
+import org.xwiki.xar.internal.model.XarObjectPropertyModel;
 
 /**
  * @version $Id$
@@ -67,6 +68,7 @@ public class AbstractWikiObjectPropertyReader extends AbstractReader
     protected WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
         WikiClass wikiClass, String classReference) throws XMLStreamException, FilterException
     {
+        String typeAttribute = xmlReader.getAttributeValue(null, XarObjectPropertyModel.ATTRIBUTE_TYPE);
         xmlReader.nextTag();
 
         WikiObjectProperty property = new WikiObjectProperty();
@@ -80,6 +82,11 @@ public class AbstractWikiObjectPropertyReader extends AbstractReader
         } else {
             type = properties.getObjectPropertyType();
         }
+        boolean useTypeAttribute = false;
+        if (type == null && !StringUtils.isEmpty(typeAttribute)) {
+            type = typeAttribute;
+            useTypeAttribute = true;
+        }
 
         // last fallback: try to load the type from current xclass
         if (type == null && StringUtils.isNotEmpty(classReference)) {
@@ -92,6 +99,10 @@ public class AbstractWikiObjectPropertyReader extends AbstractReader
             throw new FilterException("Failed to get a property parser", e);
         }
 
+        // only use and serialize the object property type when needed (i.e. when the type is missing).
+        if (useTypeAttribute) {
+            property.parameters.put(WikiObjectPropertyFilter.PARAMETER_OBJECTPROPERTY_TYPE, typeAttribute);
+        }
         property.parameters.put(WikiObjectPropertyFilter.PARAMETER_TYPE, type);
 
         xmlReader.nextTag();

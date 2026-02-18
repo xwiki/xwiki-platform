@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects;
 
 import java.util.Date;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 /**
@@ -30,6 +31,13 @@ import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
  */
 public class DateProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Date";
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -95,6 +103,12 @@ public class DateProperty extends BaseProperty implements Cloneable
     public DateProperty clone()
     {
         return (DateProperty) super.clone();
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

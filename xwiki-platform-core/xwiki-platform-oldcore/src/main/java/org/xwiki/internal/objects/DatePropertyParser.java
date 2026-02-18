@@ -17,40 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.xar.internal.input;
-
-import javax.inject.Singleton;
+package org.xwiki.internal.objects;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
-import org.xwiki.filter.type.FilterStreamType;
-import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
+
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.classes.DateClass;
+
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 /**
- * Generate events from XAR FilterStream package.
- * 
+ * Component implementation for a Date property.
+ *
  * @version $Id$
- * @since 6.2M1
  */
-@Component(hints = {
-    XARFilterUtils.ROLEHINT_17,
-    XARFilterUtils.ROLEHINT_16,
-    XARFilterUtils.ROLEHINT_15,
-    XARFilterUtils.ROLEHINT_14,
-    XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12,
-    XARFilterUtils.ROLEHINT_11
-})
+@Component
 @Singleton
-public class XARInputFilterStreamFactory
-    extends AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>
+@Named(DateProperty.PROPERTY_TYPE)
+public class DatePropertyParser extends AbstractObjectPropertyParser
 {
-    public XARInputFilterStreamFactory()
+    @Override
+    protected DateClass getBaseClass()
     {
-        super(FilterStreamType.XWIKI_XAR_CURRENT);
-
-        setName("XAR input stream");
-        setDescription("Generates wiki events from XAR package.");
+        return new DateClass();
     }
 }

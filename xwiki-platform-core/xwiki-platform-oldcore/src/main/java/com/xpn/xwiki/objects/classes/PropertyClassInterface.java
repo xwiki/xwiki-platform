@@ -67,8 +67,6 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
      * @param prefix the prefix to use for the name of the field
      * @param object the object where to find the property to display
      * @param context the wiki context to use for computing the values
-     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
-     * BaseCollection, XWikiContext)
      */
     void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
@@ -79,8 +77,6 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
      * @param prefix the prefix to use for the name of the field
      * @param object the object where to find the property to display
      * @param context the wiki context to use for computing the values
-     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
-     * BaseCollection, XWikiContext)
      */
     void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
@@ -92,8 +88,6 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
      * @param object the object where to find the property to display
      * @param isolated true if the content should be executed in this document's context
      * @param context the wiki context to use for computing the values
-     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
-     * BaseCollection, XWikiContext)
      * @since 13.0
      */
     default void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, boolean isolated,
@@ -109,8 +103,6 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
      * @param prefix the prefix to use for the name of the field
      * @param object the object where to find the property to display
      * @param context the wiki context to use for computing the values
-     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
-     * BaseCollection, XWikiContext)
      */
     void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 

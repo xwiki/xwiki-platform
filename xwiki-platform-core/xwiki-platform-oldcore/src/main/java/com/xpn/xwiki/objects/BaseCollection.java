@@ -815,6 +815,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
+        // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
         ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseCollection oldCollection = (BaseCollection) oldObject;
 
@@ -839,10 +840,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
         String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
 
         if (oldProperty == null) {
             // The property exist in the new object, but not in the old one
-            addPropertyAddedDiff(propertyName, newProperty, pclass, propertyType, context, difflist);
+            addPropertyAddedDiff(propertyName, newProperty, pclass, propertyType, isSensitive, context, difflist);
         } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
             // The property exists in both objects and is different
             addPropertyChangedDiff(propertyName, oldProperty, newProperty, oldCollection, pclass, context, difflist);
@@ -850,7 +852,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     private void addPropertyAddedDiff(String propertyName, BaseProperty newProperty, PropertyClass pclass,
-        String propertyType, XWikiContext context, List<ObjectDiff> difflist)
+        String propertyType, boolean isSensitive, XWikiContext context, List<ObjectDiff> difflist)
     {
         if (newProperty == null || "".equals(newProperty.toText()) || pclass == null) {
             return;
@@ -858,13 +860,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         String newPropertyValue = getPropertyDisplayValue(newProperty, pclass, this, propertyName, context);
         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
-            propertyName, propertyType, "", newPropertyValue));
+            propertyName, propertyType, "", newPropertyValue, isSensitive));
     }
 
     private void addPropertyChangedDiff(String propertyName, BaseProperty oldProperty, BaseProperty newProperty,
         BaseCollection oldCollection, PropertyClass pclass, XWikiContext context, List<ObjectDiff> difflist)
     {
         String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
 
         String oldPropertyValue;
         String newPropertyValue;
@@ -878,7 +881,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             oldPropertyValue = oldProperty.toText();
         }
         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-            propertyName, propertyType, oldPropertyValue, newPropertyValue));
+            propertyName, propertyType, oldPropertyValue, newPropertyValue, isSensitive));
     }
 
     /**
@@ -904,6 +907,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
         String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
 
         // The property exists in the old object, but not in the new one
         if (newProperty == null && (oldProperty != null) && (!"".equals(oldProperty.toText()))) {
@@ -912,13 +916,27 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
                     : pclass.displayView(propertyName, oldCollection, context);
                 difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                    isSensitive));
             } else {
                 // Cannot get property definition, so use the plain value
                 difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                    isSensitive));
             }
         }
+    }
+
+    private boolean isSensitive(BaseProperty newProperty, BaseProperty oldProperty, XWikiContext context)
+    {
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
+        return isSensitive;
     }
 
     /**

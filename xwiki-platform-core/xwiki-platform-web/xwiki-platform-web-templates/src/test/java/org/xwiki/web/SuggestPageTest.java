@@ -34,13 +34,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.xwiki.mail.script.GeneralMailScriptService;
-import org.xwiki.mail.script.MailScriptService;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -77,6 +77,9 @@ class SuggestPageTest extends PageTest
     private TemplateManager templateManager;
 
     private ScriptQuery query;
+
+    @MockComponent
+    private GeneralMailConfiguration generalMailConfiguration;
 
     @BeforeEach
     void setUp() throws Exception
@@ -180,11 +183,7 @@ class SuggestPageTest extends PageTest
 
     private void mockEmailObfuscation(boolean shallObfuscate) throws Exception
     {
-        GeneralMailScriptService generalMailScriptService = mock(GeneralMailScriptService.class);
-        MailScriptService mailScriptService = mock(MailScriptService.class);
-        when(mailScriptService.get("general")).thenReturn(generalMailScriptService);
-        this.oldcore.getMocker().registerComponent(ScriptService.class, "mail", mailScriptService);
-        when(generalMailScriptService.shouldObfuscate()).thenReturn(shallObfuscate);
+        when(generalMailConfiguration.shouldObfuscate()).thenReturn(shallObfuscate);
     }
 
     private Document getResult(String fieldName) throws Exception

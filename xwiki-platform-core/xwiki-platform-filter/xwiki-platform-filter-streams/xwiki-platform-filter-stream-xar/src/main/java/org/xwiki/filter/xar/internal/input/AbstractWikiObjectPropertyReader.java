@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
@@ -31,6 +32,7 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
+import org.xwiki.xar.internal.model.XarObjectPropertyModel;
 
 /**
  * @version $Id$
@@ -76,6 +78,7 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
     protected WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
         WikiClass wikiClass) throws XMLStreamException, FilterException
     {
+        String typeAttribute = xmlReader.getAttributeValue(null, XarObjectPropertyModel.ATTRIBUTE_TYPE);
         xmlReader.nextTag();
 
         WikiObjectProperty property = new WikiObjectProperty();
@@ -89,6 +92,11 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
         } else {
             type = properties.getObjectPropertyType();
         }
+        boolean useTypeAttribute = false;
+        if (type == null && !StringUtils.isEmpty(typeAttribute)) {
+            type = typeAttribute;
+            useTypeAttribute = true;
+        }
 
         try {
             property.value = this.propertySerializerManager.getPropertySerializer(type).read(xmlReader);
@@ -96,6 +104,10 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
             throw new FilterException("Failed to get a property parser", e);
         }
 
+        // only use and serialize the object property type when needed (i.e. when the type is missing).
+        if (useTypeAttribute) {
+            property.parameters.put(WikiObjectPropertyFilter.PARAMETER_OBJECTPROPERTY_TYPE, typeAttribute);
+        }
         property.parameters.put(WikiObjectPropertyFilter.PARAMETER_TYPE, type);
 
         xmlReader.nextTag();

@@ -105,6 +105,7 @@ import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.pages.PagesResource;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -247,6 +248,9 @@ public class TestUtils
      */
     private String currentWiki = "xwiki";
 
+    private ServletEngine servletEngine;
+    private boolean useDockerBaseUrl;
+
     private RestTestUtils rest;
 
     public TestUtils()
@@ -273,6 +277,30 @@ public class TestUtils
     public void switchExecutor(int index)
     {
         this.currentExecutorIndex = index;
+    }
+
+    /**
+     * Define the servlet engine currently used in the test: this is useful to compute the base URL when needing to
+     * access dedicated resources in docker tests.
+     * @param servletEngine the servlet engine information currently used by the test
+     * @since 18.2.0RC1
+     */
+    public void setServletEngine(ServletEngine servletEngine)
+    {
+        this.servletEngine = servletEngine;
+    }
+
+    /**
+     * Use this when needing to rely on a specific URL for accessing a resource when using docker tests and not
+     * relying on selenium API. e.g. when using {@link #getInputStream(String, Map)} APIs.
+     * Note that the servlet engine information then needs to be properly given.
+     * @param useDockerBaseUrl {@code true} to compute the base URL based on servlet engine information.
+     * @see #setServletEngine(ServletEngine)
+     * @since 18.2.0RC1
+     */
+    public void setUseDockerBaseUrl(boolean useDockerBaseUrl)
+    {
+        this.useDockerBaseUrl = useDockerBaseUrl;
     }
 
     /**
@@ -1326,9 +1354,12 @@ public class TestUtils
     {
         String baseURL;
 
+        if (this.useDockerBaseUrl && this.servletEngine != null) {
+            baseURL = String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+                XWikiExecutor.DEFAULT_CONTEXT);
         // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
         // webapp context
-        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
+        } else if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
             baseURL = TestUtils.urlPrefix;
         } else {
             baseURL = TestUtils.urlPrefix + ":"

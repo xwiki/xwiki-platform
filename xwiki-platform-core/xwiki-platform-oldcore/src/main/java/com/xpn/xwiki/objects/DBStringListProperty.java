@@ -19,10 +19,29 @@
  */
 package com.xpn.xwiki.objects;
 
-// There is no difference..
-// This is just to get a different storage
-// mecanism from Hibernate
+import org.xwiki.stability.Unstable;
+
+/**
+ * Property defining a list created through a DB query.
+ * Technically this property is the same as a {@link ListProperty} but it's not stored the same way in DB, hence the
+ * need for this class.
+ *
+ * @version $Id$
+ */
 public class DBStringListProperty extends ListProperty
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "DBStringList";
+
     private static final long serialVersionUID = 1L;
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
 }

@@ -19,10 +19,24 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.objects.classes.ListClass;
 
+/**
+ * Property defining a list stored in a string.
+ *
+ * @version $Id$
+ */
 public class StringListProperty extends ListProperty
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "StringList";
+
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -41,4 +55,9 @@ public class StringListProperty extends ListProperty
         setList(ListClass.getListFromString(value));
     }
 
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
 }

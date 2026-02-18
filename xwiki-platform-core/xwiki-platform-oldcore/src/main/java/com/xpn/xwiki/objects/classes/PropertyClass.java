@@ -693,7 +693,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
      *
      * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
+     * @deprecated Use {@link #getPropertyType()} instead.
      */
+    @Deprecated(since = "18.2.0RC1")
     public String getClassType()
     {
         // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
@@ -847,7 +849,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         return fromString(strings[0]);
     }
-
+    
     @Override
     public BaseProperty fromValue(Object value)
     {

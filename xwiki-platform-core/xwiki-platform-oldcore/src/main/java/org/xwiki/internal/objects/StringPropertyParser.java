@@ -17,29 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects;
+package org.xwiki.internal.objects;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+
+import jakarta.inject.Singleton;
 
 /**
- * Property defining a {@link Double}.
+ * Component implementation for string property types.
  *
  * @version $Id$
+ * @since 18.2.0RC1
  */
-public class DoubleProperty extends NumberProperty<Double>
+@Component(hints = {
+    StringProperty.PROPERTY_TYPE,
+    LargeStringProperty.PROPERTY_TYPE
+})
+@Singleton
+public class StringPropertyParser extends AbstractObjectPropertyParser
 {
-    /**
-     * The type used as a hint to find the property.
-     * @since 18.2.0RC1
-     */
-    @Unstable
-    public static final String PROPERTY_TYPE = "Double";
-
-    private static final long serialVersionUID = 1L;
-
     @Override
-    public String getPropertyType()
+    protected PropertyClass getBaseClass()
     {
-        return PROPERTY_TYPE;
+        return new StringClass();
     }
 }

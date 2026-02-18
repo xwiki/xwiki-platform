@@ -17,29 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.objects;
+package org.xwiki.internal.objects;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.classes.DateClass;
+
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 /**
- * Property defining a {@link Double}.
+ * Component implementation for a Date property.
  *
  * @version $Id$
  */
-public class DoubleProperty extends NumberProperty<Double>
+@Component
+@Singleton
+@Named(DateProperty.PROPERTY_TYPE)
+public class DatePropertyParser extends AbstractObjectPropertyParser
 {
-    /**
-     * The type used as a hint to find the property.
-     * @since 18.2.0RC1
-     */
-    @Unstable
-    public static final String PROPERTY_TYPE = "Double";
-
-    private static final long serialVersionUID = 1L;
-
     @Override
-    public String getPropertyType()
+    protected DateClass getBaseClass()
     {
-        return PROPERTY_TYPE;
+        return new DateClass();
     }
 }

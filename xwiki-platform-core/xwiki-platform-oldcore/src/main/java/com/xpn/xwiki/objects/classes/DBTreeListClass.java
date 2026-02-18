@@ -32,6 +32,7 @@ import org.apache.ecs.xhtml.select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -46,6 +47,13 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DBTreeListClass extends DBListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "DBTreeList";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "dbtreelist";
@@ -538,5 +546,11 @@ public class DBTreeListClass extends DBListClass
             LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
         }
         return sql;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

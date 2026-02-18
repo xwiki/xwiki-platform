@@ -45,6 +45,7 @@ import org.xwiki.model.reference.EntityReference;
  * @since 6.2M1
  */
 @Component(hints = {
+    XARFilterUtils.ROLEHINT_17,
     XARFilterUtils.ROLEHINT_16,
     XARFilterUtils.ROLEHINT_15,
     XARFilterUtils.ROLEHINT_14,

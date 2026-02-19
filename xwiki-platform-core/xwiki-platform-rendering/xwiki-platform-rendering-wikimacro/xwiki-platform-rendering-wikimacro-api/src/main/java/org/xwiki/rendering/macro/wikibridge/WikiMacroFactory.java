@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Create a Wiki Macro object by gathering the Macro metadata from a document.
@@ -34,12 +36,22 @@ public interface WikiMacroFactory
     /**
      * Searches the given document for a wiki macro definition.
      * 
-     * @param documentReference name of the document to search for a wiki macro definition.
+     * @param documentReference the reference of the document in which to search for a wiki macro definition.
      * @return true if the given document contains a wiki macro definition, false otherwise.
      * @since 2.2M1
      */
     boolean containsWikiMacro(DocumentReference documentReference);
-    
+
+    /**
+     * Searches the given document for a wiki macro definition.
+     * 
+     * @param document the document in which to search for a wiki macro definition.
+     * @return true if the given document contains a wiki macro definition, false otherwise.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    boolean containsWikiMacro(DocumentModelBridge document);
+
     /**
      * Tries to build a {@link WikiMacro} if a definition is found on the given document.
      * 

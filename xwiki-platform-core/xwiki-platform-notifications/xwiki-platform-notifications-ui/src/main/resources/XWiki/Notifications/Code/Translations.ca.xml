@@ -54,9 +54,9 @@ notifications.filters.advanced.modal.close=Tanca
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Filtre de cerca
-notifications.filters.description.systemUserNotificationFilter=Amaga les notificacions de l'usuari de sistema
+notifications.filters.description.systemUserNotificationFilter=Oculta les notificacions de l'usuari del sistema llevat que l'esdeveniment us adreci específicament
 notifications.filters.name.ownEventsNotificationFilter=Filtre d'esdeveniments propis
-### Missing: notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
+notifications.filters.description.ownEventsNotificationFilter=Oculta les notificacions sobre la teva pròpia activitat llevat que l'esdeveniment s'orienti específicament a tu
 ### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
 ### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
 ### Missing: notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
@@ -85,7 +85,7 @@ notifications.filters.preferences.scopeNotificationFilter.user=Usuari
 ### Missing: notifications.filters.preferences.setEnabled.inProgress=Saving...
 ### Missing: notifications.filters.preferences.setEnabled.done=Filter preference saved!
 ### Missing: notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
-### Missing: notifications.filters.preferences.allEvents=-
+notifications.filters.preferences.allEvents=Tots els esdeveniments (fins i tot desactivats)
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=Filtres del sistema
@@ -254,6 +254,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Estàs ignorant aquesta pàgina i els seus fills: no rebràs cap notificació per ella.
 ### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
 ### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.hint.toggle=Toggle details about this option
 ### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
 ### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
 ### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children

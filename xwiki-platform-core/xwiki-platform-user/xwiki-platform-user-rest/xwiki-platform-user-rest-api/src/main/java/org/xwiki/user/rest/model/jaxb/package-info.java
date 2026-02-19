@@ -17,27 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.user;
+@XmlSchema(namespace = "http://www.xwiki.org/user",
+    xmlns = {
+        @XmlNs(namespaceURI = "http://www.xwiki.org", prefix = "xwiki"),
+        @XmlNs(namespaceURI = "http://www.xwiki.org/user", prefix = "")
+    },
+    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
+)
+package org.xwiki.user.rest.model.jaxb;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
-import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.Users;
-
-/**
- * @since 18.2.0RC1
- * @version $Id$
- */
-@Path("/wikis/{wikiName}/users")
-public interface UsersResource
-{
-    @GET Users getUsers(
-        @PathParam("wikiName") String wikiName,
-        @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") Integer number
-    ) throws XWikiRestException;
-}
+import javax.xml.bind.annotation.XmlNs;
+import javax.xml.bind.annotation.XmlSchema;

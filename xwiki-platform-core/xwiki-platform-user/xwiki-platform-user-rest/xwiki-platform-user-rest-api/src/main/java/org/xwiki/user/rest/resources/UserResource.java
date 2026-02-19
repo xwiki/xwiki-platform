@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.user;
+package org.xwiki.user.rest.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,17 +25,31 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.User;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.rest.model.jaxb.User;
 
 /**
+ * Represent a user identified by an id.
+ *
  * @since 18.2.0RC1
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/user")
-public interface CurrentUserResource
+@Unstable
+@Path("/wikis/{wikiName}/users/{userId}")
+public interface UserResource
 {
+    /**
+     * Return all the available information on the user {userId}.
+     *
+     * @param wikiName the wiki used to resolve the id to a user
+     * @param userId the id of the user
+     * @param preferences whether to include user preferences in the response
+     * @return the information of the user identified by {userId}
+     * @throws XWikiRestException if no user could be found or if the requester is missing rights to read the info
+     */
     @GET User getUser(
         @PathParam("wikiName") String wikiName,
+        @PathParam("userId") String userId,
         @QueryParam("preferences") boolean preferences
     ) throws XWikiRestException;
 }

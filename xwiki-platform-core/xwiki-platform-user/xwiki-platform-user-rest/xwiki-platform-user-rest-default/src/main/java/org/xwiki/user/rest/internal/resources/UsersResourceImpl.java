@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.resources.user;
+package org.xwiki.user.rest.internal.resources;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Objects;
 
 import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rest.UserReferenceModelSerializer;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.User;
-import org.xwiki.rest.resources.user.CurrentUserResource;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.user.rest.UserReferenceModelSerializer;
+import org.xwiki.user.rest.model.jaxb.Users;
+import org.xwiki.user.rest.resources.UsersResource;
+import org.xwiki.wiki.user.UserScope;
+import org.xwiki.wiki.user.WikiUserManager;
+import org.xwiki.wiki.user.WikiUserManagerException;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -48,15 +50,14 @@ import jakarta.inject.Provider;
  * @version $Id$
  */
 @Component
-@Named("org.xwiki.rest.internal.resources.user.CurrentUserResourceImpl")
-public class CurrentUserResourceImpl extends XWikiResource implements CurrentUserResource
+@Named("org.xwiki.user.rest.internal.resources.UsersResourceImpl")
+public class UsersResourceImpl extends XWikiResource implements UsersResource
 {
     @Inject
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+    private WikiUserManager wikiUserManager;
 
     @Inject
-    private UserReferenceSerializer<String> stringUserReferenceSerializer;
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
@@ -65,8 +66,9 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @Override
-    public User getUser(String wikiName, boolean preferences) throws XWikiRestException
+    public Users getUsers(String wikiName, Integer start, Integer number) throws XWikiRestException
     {
+        Users users = new Users();
         URI baseUri = this.uriInfo.getBaseUri();
 
         // Fail if we don't have a serializer for the current user store.
@@ -77,18 +79,35 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
                     "rest.exception.userResource.unsupportedStore")).build());
         }
 
-        DocumentReference userDocumentReference = this.xcontextProvider.get().getUserReference();
-        if (userDocumentReference == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
-
         try {
-            UserReference userReference = this.userReferenceResolver.resolve(userDocumentReference);
+            UserScope wikiUserScope = this.wikiUserManager.getUserScope(wikiName);
+            Collection<String> wikiMembers = this.wikiUserManager.getMembers(wikiName);
 
-            return userReferenceModelSerializer.toRestUser(baseUri,
-                this.stringUserReferenceSerializer.serialize(userReference), userReference, preferences);
-        } catch (XWikiException e) {
+            // We use streams to handle pagination.
+            wikiMembers.stream().map(userId -> {
+                UserReference userReference = this.userReferenceResolver.resolve(userId,
+                    this.getXWikiContext().getWikiReference());
+
+                if (userReference.isGlobal() && wikiUserScope == UserScope.LOCAL_ONLY
+                    || !userReference.isGlobal() && wikiUserScope == UserScope.GLOBAL_ONLY)
+                {
+                    return null;
+                } else {
+                    try {
+                        return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
+                    } catch (XWikiException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            })
+                .filter(Objects::nonNull)
+                .skip(start)
+                .limit(number != null ? number : wikiMembers.size())
+                .forEach(users.getUserSummaries()::add);
+        } catch (WikiUserManagerException | RuntimeException e) {
             throw new XWikiRestException(e);
         }
+
+        return users;
     }
 }

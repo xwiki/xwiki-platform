@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest;
+package org.xwiki.user.rest;
 
 import java.net.URI;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.rest.model.jaxb.User;
-import org.xwiki.rest.model.jaxb.UserSummary;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.rest.model.jaxb.User;
+import org.xwiki.user.rest.model.jaxb.UserSummary;
 
 import com.xpn.xwiki.XWikiException;
 

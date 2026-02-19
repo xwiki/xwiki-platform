@@ -70,9 +70,6 @@ org.xwiki.rest.internal.resources.ModificationsResourceImpl
 org.xwiki.rest.internal.resources.DatabaseKeywordSearchSource
 org.xwiki.rest.internal.resources.DefaultKeywordSearchSource
 org.xwiki.rest.internal.resources.user.CurrentUserPropertyResourceImpl
-org.xwiki.rest.internal.resources.user.CurrentUserResourceImpl
-org.xwiki.rest.internal.resources.user.UserResourceImpl
-org.xwiki.rest.internal.resources.user.UsersResourceImpl
 org.xwiki.rest.internal.representations.pages.TextPlainPageReader
 org.xwiki.rest.internal.representations.pages.FormUrlEncodedPageReader
 org.xwiki.rest.internal.representations.objects.TextPlainPropertyReader
@@ -87,6 +84,4 @@ org.xwiki.rest.internal.url.DefaultRestURLGenerator
 org.xwiki.rest.internal.url.resources.DocumentRestURLGenerator
 org.xwiki.rest.internal.url.resources.JobStatusRestURLGenerator
 org.xwiki.rest.internal.url.resources.SpaceRestURLGenerator
-org.xwiki.rest.internal.user.DocumentUserReferenceModelSerializer
-org.xwiki.rest.internal.user.UserReferenceModelSerializerProvider
 org.xwiki.rest.script.RESTScriptService

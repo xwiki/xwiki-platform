@@ -17,26 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.resources.user;
+package org.xwiki.user.rest.resources;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.User;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.rest.model.jaxb.Users;
 
 /**
+ * Represent a list of users.
+ *
  * @since 18.2.0RC1
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/users/{userId}")
-public interface UserResource
+@Unstable
+@Path("/wikis/{wikiName}/users")
+public interface UsersResource
 {
-    @GET User getUser(
+    /**
+     * Return the list of users on the wiki {wikiName}.
+     *
+     * @param wikiName the wiki from which to list the users
+     * @param start a list offset
+     * @param number a maximum number of entries to return
+     * @return the list of users on the wiki {wikiName}
+     * @throws XWikiRestException if there was an issue when compiling the list
+     */
+    @GET Users getUsers(
         @PathParam("wikiName") String wikiName,
-        @PathParam("userId") String userId,
-        @QueryParam("preferences") boolean preferences
+        @QueryParam("start") @DefaultValue("0") Integer start,
+        @QueryParam("number") Integer number
     ) throws XWikiRestException;
 }

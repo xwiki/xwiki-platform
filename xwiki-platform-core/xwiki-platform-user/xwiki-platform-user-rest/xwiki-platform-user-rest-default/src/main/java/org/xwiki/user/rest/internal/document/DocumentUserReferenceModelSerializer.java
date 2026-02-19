@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.user;
+package org.xwiki.user.rest.internal.document;
 
 import java.net.URI;
 import java.util.Objects;
@@ -29,22 +29,22 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
-import org.xwiki.rest.UserReferenceModelSerializer;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
-import org.xwiki.rest.model.jaxb.ObjectFactory;
-import org.xwiki.rest.model.jaxb.User;
-import org.xwiki.rest.model.jaxb.UserPreferences;
-import org.xwiki.rest.model.jaxb.UserSummary;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
-import org.xwiki.rest.resources.user.UserResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
+import org.xwiki.user.rest.UserReferenceModelSerializer;
+import org.xwiki.user.rest.model.jaxb.ObjectFactory;
+import org.xwiki.user.rest.model.jaxb.User;
+import org.xwiki.user.rest.model.jaxb.UserPreferences;
+import org.xwiki.user.rest.model.jaxb.UserSummary;
+import org.xwiki.user.rest.resources.UserResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,7 +66,9 @@ import jakarta.inject.Singleton;
 @Singleton
 public class DocumentUserReferenceModelSerializer implements UserReferenceModelSerializer
 {
-    private final ObjectFactory objectFactory = new ObjectFactory();
+    private final ObjectFactory userObjectFactory = new ObjectFactory();
+    private final org.xwiki.rest.model.jaxb.ObjectFactory xwikiObjectFactory =
+        new org.xwiki.rest.model.jaxb.ObjectFactory();
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -104,7 +106,7 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
                 Utils.getSpacesURLElements(xwikiDocument.getDocumentReference()),
                 xwikiDocument.getDocumentReference().getName())
             .toString();
-        Link pageLink = this.objectFactory.createLink();
+        Link pageLink = this.xwikiObjectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
         userSummary.withLinks(pageLink);
@@ -114,7 +116,7 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
                 Utils.getSpacesURLElements(xwikiDocument.getDocumentReference()),
                 xwikiDocument.getDocumentReference().getName())
             .toString();
-        Link historyLink = this.objectFactory.createLink();
+        Link historyLink = this.xwikiObjectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.HISTORY);
         userSummary.withLinks(historyLink);
@@ -129,13 +131,13 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
         }
 
         UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
-        UserSummary userSummary = this.objectFactory.createUserSummary();
+        UserSummary userSummary = this.userObjectFactory.createUserSummary();
         toRestUserSummary(baseUri, userSummary, userId, documentUserReference, userProperties);
 
         String historyUri = Utils.createURI(baseUri, UserResource.class,
                 documentUserReference.getReference().getWikiReference().getName(), userId)
             .toString();
-        Link historyLink = this.objectFactory.createLink();
+        Link historyLink = this.xwikiObjectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.USER);
         userSummary.withLinks(historyLink);
@@ -157,7 +159,7 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
             throw new NotFoundException();
         }
 
-        User user = this.objectFactory.createUser();
+        User user = this.userObjectFactory.createUser();
         toRestUserSummary(baseUri, user, userId, documentUserReference, userProperties);
 
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -173,7 +175,7 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
         user.setBlogFeed(Objects.toString(userProperties.getProperty("blogfeed"), ""));
 
         if (preferences) {
-            UserPreferences userPreferences = this.objectFactory.createUserPreferences();
+            UserPreferences userPreferences = this.userObjectFactory.createUserPreferences();
             userPreferences.setDisplayHiddenDocuments(userProperties.displayHiddenDocuments());
 
             String underlineProperty = "underline";

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.resources.user;
+package org.xwiki.user.rest.internal.resources;
 
 import java.net.URI;
 
@@ -26,13 +26,13 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.rest.UserReferenceModelSerializer;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.model.jaxb.User;
-import org.xwiki.rest.resources.user.UserResource;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.rest.UserReferenceModelSerializer;
+import org.xwiki.user.rest.model.jaxb.User;
+import org.xwiki.user.rest.resources.UserResource;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -45,7 +45,7 @@ import jakarta.inject.Provider;
  * @version $Id$
  */
 @Component
-@Named("org.xwiki.rest.internal.resources.user.UserResourceImpl")
+@Named("org.xwiki.user.rest.internal.resources.UserResourceImpl")
 public class UserResourceImpl extends XWikiResource implements UserResource
 {
     @Inject

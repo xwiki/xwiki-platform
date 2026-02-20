@@ -168,9 +168,9 @@ describe("MarkdownToUniAstConverter", () => {
   test("parse some text styling", async () => {
     await testTwoWayConversion({
       startingFrom:
-        "Normal **Bold** *Italic1* _Italic2_ ~~Strikethrough~~ __Underline__ `Code` **_~~wow!~~_**",
+        "Normal **Bold** *Italic1* _Italic2_ ~~Strikethrough~~ __Underline__ `Code` **_~~wow!~~_** <sup>superscript</sup> <sub>subscript</sub>",
       convertsBackTo:
-        "Normal **Bold** _Italic1_ _Italic2_ ~~Strikethrough~~ **Underline** Code ~~_**wow!**_~~",
+        "Normal **Bold** _Italic1_ _Italic2_ ~~Strikethrough~~ **Underline** Code ~~_**wow!**_~~ <sup>superscript</sup> <sub>subscript</sub>",
       withUniAst: {
         blocks: [
           {
@@ -258,6 +258,26 @@ describe("MarkdownToUniAstConverter", () => {
                   strikethrough: true,
                 },
                 type: "text",
+              },
+              {
+                content: " ",
+                styles: {},
+                type: "text",
+              },
+              {
+                content: "superscript",
+                styles: {},
+                type: "superscript",
+              },
+              {
+                content: " ",
+                styles: {},
+                type: "text",
+              },
+              {
+                content: "subscript",
+                styles: {},
+                type: "subscript",
               },
             ],
             styles: {},

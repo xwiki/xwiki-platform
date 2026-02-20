@@ -26,13 +26,11 @@ import {
   assertUnreachable,
   tryFallibleOrError,
 } from "@xwiki/platform-fn-utils";
-import type { TableCell } from "@blocknote/core";
+import type { Styles, TableCell } from "@blocknote/core";
 import type {
   BlockType,
   EditorInlineContentSchema,
-  EditorLink,
   EditorStyleSchema,
-  EditorStyledText,
   InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
@@ -42,6 +40,7 @@ import type {
   Image,
   InlineContent,
   TableCell as TableCellUniast,
+  TextStyles,
   UniAst,
 } from "@xwiki/platform-uniast-api";
 
@@ -218,7 +217,7 @@ export class UniAstToBlockNoteConverter {
 
   private convertCustomBlockContent(
     content: Block[],
-  ): Array<EditorStyledText | EditorLink> {
+  ): Array<InlineContentType> {
     if (content.length > 1 || content[0].type !== "paragraph") {
       throw new Error("Expected a single paragraph inside custom block");
     }
@@ -334,28 +333,10 @@ export class UniAstToBlockNoteConverter {
   ): InlineContentType {
     switch (inlineContent.type) {
       case "text": {
-        const {
-          bold,
-          italic,
-          underline,
-          strikethrough,
-          code,
-          backgroundColor,
-          textColor,
-        } = inlineContent.styles;
-
         return {
           type: "text",
           text: inlineContent.content,
-          styles: {
-            ...(bold && { bold }),
-            ...(italic && { italic }),
-            ...(underline && { underline }),
-            ...(strikethrough && { strike: true }),
-            ...(code && { code }),
-            ...(backgroundColor && { backgroundColor }),
-            ...(textColor && { textColor }),
-          },
+          styles: this.convertTextStyles(inlineContent.styles),
         };
       }
 
@@ -428,7 +409,55 @@ export class UniAstToBlockNoteConverter {
 
         return out;
       }
+
+      case "subscript":
+        return {
+          type: "subscript",
+          content: [
+            {
+              type: "text",
+              text: inlineContent.content,
+              styles: inlineContent.styles,
+            },
+          ],
+          props: {},
+        };
+
+      case "superscript":
+        return {
+          type: "superscript",
+          content: [
+            {
+              type: "text",
+              text: inlineContent.content,
+              styles: inlineContent.styles,
+            },
+          ],
+          props: {},
+        };
     }
+  }
+
+  private convertTextStyles(styles: TextStyles): Styles<EditorStyleSchema> {
+    const {
+      bold,
+      italic,
+      underline,
+      strikethrough,
+      code,
+      backgroundColor,
+      textColor,
+    } = styles;
+
+    return {
+      ...(bold && { bold }),
+      ...(italic && { italic }),
+      ...(underline && { underline }),
+      ...(strikethrough && { strike: true }),
+      ...(code && { code }),
+      ...(backgroundColor && { backgroundColor }),
+      ...(textColor && { textColor }),
+    };
   }
 }
 

@@ -75,6 +75,14 @@ interface WikiConfig {
    */
   editor?: string;
 
+  /**
+   * List of features to disable. See type documentation.
+   *
+   * @since 18.1.0RC1
+   * @beta
+   */
+  disableSyntaxFeatures?: WikiDisableSyntaxFeaturesConfig;
+
   setConfig(
     name: string,
     baseURL: string,
@@ -119,4 +127,18 @@ interface WikiConfig {
   getNewPageDefaultName(): string;
 }
 
-export type { WikiConfig };
+/**
+ * List of features unsupported by the wiki
+ *
+ * All features are considered as supported by default,
+ * setting them to `true` (unsupported) will disable them in the WYSIWYG editor
+ *
+ * @since 18.1.0RC1
+ * @beta
+ */
+type WikiDisableSyntaxFeaturesConfig = {
+  /** Disable support for checkable list items */
+  checkableListItems?: boolean;
+};
+
+export type { WikiConfig, WikiDisableSyntaxFeaturesConfig };

@@ -49,6 +49,7 @@
     "@mantine/hooks": "catalog:",
     "@types/react-dom": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
+    "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",

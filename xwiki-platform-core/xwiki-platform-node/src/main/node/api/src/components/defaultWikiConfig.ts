@@ -19,7 +19,10 @@
  */
 
 import { inject, injectable } from "inversify";
-import type { WikiConfig } from "../api/WikiConfig";
+import type {
+  WikiConfig,
+  WikiDisableSyntaxFeaturesConfig,
+} from "../api/WikiConfig";
 import type { CristalApp } from "../api/cristalApp";
 import type { Logger } from "../api/logger";
 import type { Storage } from "../api/storage";
@@ -103,6 +106,12 @@ export class DefaultWikiConfig implements WikiConfig {
   public offlineSetup: boolean;
 
   /**
+   * @since 18.1.0RC1
+   * @beta
+   */
+  public disableSyntaxFeatures?: WikiDisableSyntaxFeaturesConfig;
+
+  /**
    * Root location to store pages.
    * @since 18.0.0RC1
    * @beta
@@ -134,6 +143,7 @@ export class DefaultWikiConfig implements WikiConfig {
       authenticationBaseURL?: string;
       authenticationManager?: string;
       storageRoot?: string;
+      disableSyntaxFeatures?: WikiDisableSyntaxFeaturesConfig;
     },
   ): void {
     Object.assign<WikiConfig, ConfigObjectType>(this, {

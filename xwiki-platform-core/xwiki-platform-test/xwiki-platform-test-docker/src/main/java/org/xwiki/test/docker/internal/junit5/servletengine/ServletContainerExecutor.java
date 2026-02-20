@@ -45,6 +45,7 @@ import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -84,6 +85,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String JETTY = "jetty";
 
+    private final int index;
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -95,17 +98,22 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private GenericContainer<?> servletContainer;
 
     /**
+     * @param index the index of the executor
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
+     * @since 18.1.0RC1
+     * @since 17.10.4
      */
-    public ServletContainerExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+    public ServletContainerExecutor(int index, TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
+        this.index = index;
         this.mavenResolver = mavenResolver;
         this.testConfiguration = testConfiguration;
-        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(testConfiguration, artifactResolver, mavenResolver);
+        this.jettyStandaloneExecutor =
+            new JettyStandaloneExecutor(this.index, testConfiguration, artifactResolver, mavenResolver);
         this.repositoryResolver = repositoryResolver;
     }
 
@@ -129,12 +137,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     /**
      * @param sourceWARDirectory the location where the built WAR is located
+     * @return the executor used to interact with the started XWiki instance
      * @throws Exception if an error occurred during the build or start
+     * @since 18.1.0RC1
+     * @since 17.10.4
      */
-    public void start(File sourceWARDirectory) throws Exception
+    public XWikiExecutor start(File sourceWARDirectory) throws Exception
     {
-        String xwikiIPAddress = "localhost";
-        int xwikiPort = 8080;
+        XWikiExecutor executor = null;
+
+        int httpPort = 8080 + this.index;
 
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
@@ -153,7 +165,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 // http://www.eclipse.org/jetty/documentation/9.4.x/embedding-jetty.html) but we decided against that
                 // as it would mean maintaining 2 Jetty configurations (one for the Jetty standalone packaging and
                 // one for Jetty in embedded mode).
-                this.jettyStandaloneExecutor.start();
+                executor = this.jettyStandaloneExecutor.start();
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
@@ -161,16 +173,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         if (this.servletContainer != null) {
+            String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
+                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb";
+            int internalPort = 8080;
 
-            startContainer();
+            startContainer(internalHost, internalPort);
 
-            xwikiIPAddress = this.servletContainer.getHost();
-            xwikiPort =
-                this.servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
+            String xwikiIPAddress = this.servletContainer.getHost();
+            httpPort = this.servletContainer.getMappedPort(httpPort);
+
+            executor = new XWikiExecutor(this.index, internalHost, internalPort, internalHost, httpPort, xwikiIPAddress,
+                httpPort);
         }
 
-        this.testConfiguration.getServletEngine().setIP(xwikiIPAddress);
-        this.testConfiguration.getServletEngine().setPort(xwikiPort);
+        return executor;
     }
 
     private void configureWildFly(File sourceWARDirectory) throws Exception
@@ -284,10 +300,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
     }
 
-    private void startContainer() throws Exception
+    private void startContainer(String internalHost, int internalPort) throws Exception
     {
         List<String> networkAliases = new ArrayList<>();
-        networkAliases.add(this.testConfiguration.getServletEngine().getInternalIP());
+        networkAliases.add(internalHost);
         networkAliases.addAll(this.testConfiguration.getServletEngineNetworkAliases());
 
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
@@ -300,7 +316,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         List<Integer> exposedPorts = new ArrayList<>();
-        exposedPorts.add(this.testConfiguration.getServletEngine().getInternalPort());
+        exposedPorts.add(internalPort);
         // In debug mode, we need to map the debug port so that the host can attach the remote debugger to the JVM
         // inside the container.
         if (this.testConfiguration.isDebug()) {

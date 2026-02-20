@@ -73,6 +73,8 @@ public class UITestTestConfigurationResolver
 
     private static final String BLOBSTORETAG_PROPERTY = "xwiki.test.ui.blobStoreTag";
 
+    private static final String REMOTESOLR_PROPERTY = "xwiki.test.ui.remoteSolr";
+
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
@@ -91,6 +93,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
 
+    private static final String XWIKIINSTANCES_PROPERTY = "xwiki.test.ui.xwikiInstances";
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
@@ -98,6 +102,7 @@ public class UITestTestConfigurationResolver
     public TestConfiguration resolve(UITest uiTestAnnotation)
     {
         TestConfiguration configuration = new TestConfiguration();
+
         configuration.setBrowser(resolveBrowser(uiTestAnnotation.browser()));
         configuration.setDatabase(resolveDatabase(uiTestAnnotation.database()));
         configuration.setServletEngine(resolveServletEngine(uiTestAnnotation.servletEngine()));
@@ -127,6 +132,9 @@ public class UITestTestConfigurationResolver
             uiTestAnnotation.servletEngineNetworkAliases(), SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY));
         configuration.setBlobStore(resolveBlobStore(uiTestAnnotation.blobStore()));
         configuration.setBlobStoreTag(resolveBlobStoreTag(uiTestAnnotation.blobStoreTag()));
+        configuration.setRemoteSolr(resolveRemoteSolr(uiTestAnnotation.remoteSolr()));
+        configuration.setXWikiInstances(uiTestAnnotation.xwikiInstances());
+
         return configuration;
     }
 
@@ -376,5 +384,10 @@ public class UITestTestConfigurationResolver
     private String resolveBlobStoreTag(String blobStoreTag)
     {
         return resolve(blobStoreTag, BLOBSTORETAG_PROPERTY);
+    }
+
+    private boolean resolveRemoteSolr(boolean remoteSolr)
+    {
+        return resolve(remoteSolr, REMOTESOLR_PROPERTY);
     }
 }

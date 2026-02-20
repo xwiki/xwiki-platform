@@ -154,7 +154,13 @@ export class UniAstToBlockNoteConverter {
         return this.convertImage(block);
 
       case "break":
-        throw new Error("TODO: handle block of type " + block.type);
+        return {
+          type: "divider",
+          id: genId(),
+          children: [],
+          content: undefined,
+          props: {},
+        };
 
       case "macroBlock": {
         let content: InlineContentType[] | null = null;

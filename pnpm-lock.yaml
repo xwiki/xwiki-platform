@@ -130,8 +130,8 @@ catalogs:
       specifier: 2.6.1
       version: 2.6.1
     jquery:
-      specifier: 3.7.1
-      version: 3.7.1
+      specifier: 4.0.0
+      version: 4.0.0
     jsdom:
       specifier: 28.0.0
       version: 28.0.0
@@ -459,7 +459,7 @@ importers:
         version: 2.6.1
       jquery:
         specifier: 'catalog:'
-        version: 3.7.1
+        version: 4.0.0
       jsdom:
         specifier: 'catalog:'
         version: 28.0.0
@@ -4194,8 +4194,8 @@ packages:
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
 
-  jquery@3.7.1:
-    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
+  jquery@4.0.0:
+    resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
 
   js-beautify@1.15.4:
     resolution: {integrity: sha512-9/KXeZUKKJwqCXUdBxFJ3vPh467OCckSBmYDwSK/EtV090K+iMJ7zx2S3HLVDIWFQdqMIsZWbnaGiba18aWhaA==}
@@ -8835,7 +8835,7 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jquery@3.7.1: {}
+  jquery@4.0.0: {}
 
   js-beautify@1.15.4:
     dependencies:

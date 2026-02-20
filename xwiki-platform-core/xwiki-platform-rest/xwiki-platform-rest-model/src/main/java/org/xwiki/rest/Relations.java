@@ -178,6 +178,11 @@ public final class Relations
     public static final String CLIENT = "http://www.xwiki.org/rel/client";
 
     /**
+     * Relation for links pointing to the user.
+     */
+    public static final String USER = "http://www.xwiki.org/rel/user";
+
+    /**
      * Avoid instantiation.
      */
     private Relations()

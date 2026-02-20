@@ -1,0 +1,5 @@
+org.xwiki.user.rest.internal.UserReferenceModelSerializerProvider
+org.xwiki.user.rest.internal.document.DocumentUserReferenceModelSerializer
+org.xwiki.user.rest.internal.resources.CurrentUserResourceImpl
+org.xwiki.user.rest.internal.resources.UserResourceImpl
+org.xwiki.user.rest.internal.resources.UsersResourceImpl

@@ -69,7 +69,7 @@ catalog:
   eslint-plugin-prettier: 5.5.5
   eslint-plugin-promise: 7.2.1
   eslint-plugin-tsdoc: 0.5.0
-  eslint-plugin-vue: 10.7.0
+  eslint-plugin-vue: 10.8.0
   eventemitter3: 5.0.1
   fast-xml-parser: 5.3.4
   flush-promises: 1.0.2

@@ -1,7 +1,7 @@
-// Avatars ====================================================================
+/* Avatars */
 
 .avatar_30, .avatar_50 {
-  border-radius: @thumbnail-border-radius;
+  border-radius: var(--border-radius-base);
 }
 
 .avatar_30 {
@@ -14,7 +14,7 @@
   max-height: 50px;
 }
 
-// Users and Groups Displayer =================================================
+/* Users and Groups Displayer */
 
 ul.users,
 ul.groups {
@@ -69,7 +69,7 @@ li.group {
 
 .user img.user-avatar,
 .group img.group-avatar {
-  border-radius: @border-radius-small;
+  border-radius: var(--border-radius-small);
   max-height: 18px;
   max-width: 18px;
   vertical-align: text-top;
@@ -83,7 +83,7 @@ li.group {
 
 .user .user-alias,
 .group .group-alias {
-  color: @text-muted;
+  color: var(--text-muted);
   margin-left: .3em;
 }
 .user .user-alias:before,

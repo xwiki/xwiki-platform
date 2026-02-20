@@ -55,14 +55,42 @@ import type {
 export class UniAstToBlockNoteConverter {
   constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
 
+  // eslint-disable-next-line max-statements
   uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error {
-    return tryFallibleOrError(() =>
-      uniAst.blocks.flatMap((item) => this.convertBlock(item)),
-    );
+    const out: BlockType[] = [];
+
+    for (const block of uniAst.blocks) {
+      const prevBlock = out.at(-1);
+
+      const isPrevBlockList =
+        prevBlock !== undefined &&
+        (prevBlock.type === "bulletListItem" ||
+          prevBlock.type === "numberedListItem" ||
+          prevBlock.type === "checkListItem");
+
+      const converted = tryFallibleOrError(() =>
+        this.convertBlock(block, isPrevBlockList),
+      );
+
+      if (converted instanceof Error) {
+        return converted;
+      }
+
+      if (Array.isArray(converted)) {
+        out.push(...converted);
+      } else {
+        out.push(converted);
+      }
+    }
+
+    return out;
   }
 
   // eslint-disable-next-line max-statements
-  private convertBlock(block: Block): BlockType | BlockType[] {
+  private convertBlock(
+    block: Block,
+    isPrevBlockList: boolean,
+  ): BlockType | BlockType[] {
     switch (block.type) {
       case "paragraph":
         if (block.content.length === 1 && block.content[0].type === "image") {
@@ -116,8 +144,29 @@ export class UniAstToBlockNoteConverter {
           },
         };
 
-      case "list":
-        return this.convertList(block);
+      case "list": {
+        const list: BlockType[] = this.convertList(block);
+
+        // Due to BlockNote not having a concept of list inside the AST,
+        // it actually considers a list as long as there consecutive blocks
+        // with a "list item" type.
+        //
+        // This causes problems during conversion with consecutive lists from
+        // UniAst, so we insert an empty paragraph between lists to ensure there
+        // is no interpretation problem on BlockNote's side.
+
+        if (isPrevBlockList) {
+          list.splice(0, 0, {
+            type: "paragraph",
+            id: genId(),
+            content: [],
+            children: [],
+            props: this.convertBlockStyles({}),
+          });
+        }
+
+        return list;
+      }
 
       case "table": {
         const headerRow: {
@@ -240,8 +289,7 @@ export class UniAstToBlockNoteConverter {
     BlockType,
     { type: "bulletListItem" | "checkListItem" | "numberedListItem" }
   >[] {
-    // eslint-disable-next-line max-statements
-    return list.items.map((listItem) => {
+    return list.items.map((listItem, i) => {
       const contentParagraph = listItem.content.at(0);
 
       if (contentParagraph && contentParagraph.type !== "paragraph") {
@@ -270,33 +318,34 @@ export class UniAstToBlockNoteConverter {
 
       const children = subList ? this.convertList(subList) : [];
 
-      if (listItem.checked !== undefined) {
-        return {
-          id: genId(),
-          type: "checkListItem",
-          content,
-          children,
-          props: { ...styles, checked: listItem.checked },
-        };
-      }
+      switch (list.listType.type) {
+        case "unordered":
+          return {
+            id: genId(),
+            type: "bulletListItem",
+            content,
+            children,
+            props: styles,
+          };
 
-      if (listItem.number !== undefined) {
-        return {
-          id: genId(),
-          type: "numberedListItem",
-          content,
-          children,
-          props: { ...styles, start: listItem.number },
-        };
-      }
+        case "ordered":
+          return {
+            id: genId(),
+            type: "numberedListItem",
+            content,
+            children,
+            props: { ...styles, start: (list.listType.firstIndex ?? 1) + i },
+          };
 
-      return {
-        id: genId(),
-        type: "bulletListItem",
-        content,
-        children,
-        props: styles,
-      };
+        case "checkable":
+          return {
+            id: genId(),
+            type: "checkListItem",
+            content,
+            children,
+            props: { ...styles, checked: listItem.checked ?? false },
+          };
+      }
     });
   }
 

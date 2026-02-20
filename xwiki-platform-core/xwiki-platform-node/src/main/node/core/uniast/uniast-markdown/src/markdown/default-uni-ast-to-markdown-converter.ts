@@ -83,7 +83,14 @@ export class DefaultUniAstToMarkdownConverter
       case "list": {
         return (
           await Promise.all(
-            block.items.map((item) => this.convertListItem(item)),
+            block.items.map((item, i) =>
+              this.convertListItem(
+                item,
+                block.listType.type === "ordered"
+                  ? (block.listType.firstIndex ?? 1) + i
+                  : undefined,
+              ),
+            ),
           )
         ).join("\n");
       }
@@ -116,23 +123,30 @@ export class DefaultUniAstToMarkdownConverter
     }
   }
 
-  private async convertListItem(listItem: ListItem): Promise<string> {
-    let prefix = listItem.number !== undefined ? `${listItem.number}. ` : "* ";
-
-    if (listItem.checked !== undefined) {
-      prefix += `[${listItem.checked ? "x" : " "}] `;
-    }
+  private async convertListItem(
+    listItem: ListItem,
+    number?: number,
+  ): Promise<string> {
+    const prefix =
+      number !== undefined
+        ? `${number}. `
+        : listItem.checked !== undefined
+          ? `* [${listItem.checked ? "x" : " "}] `
+          : "* ";
 
     const contents: string[] = [];
+
     for (const item of listItem.content) {
       const md = await this.blockToMarkdown(item);
       const lines = md.split("\n");
+
       contents.push(
         lines
           .map((line, i) => (i > 0 ? " ".repeat(prefix.length) : "") + line)
           .join("\n"),
       );
     }
+
     return `${prefix}${contents.join("\n")}`;
   }
 

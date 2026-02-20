@@ -75,7 +75,7 @@ catalog:
   flush-promises: 1.0.2
   globals: 16.5.0
   happy-dom: 20.0.10
-  i18next: 25.5.3
+  i18next: 25.8.13
   inversify: 7.10.4
   jiti: 2.6.1
   jquery: 3.7.1

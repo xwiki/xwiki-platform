@@ -50,7 +50,10 @@ public interface WikiMacroFactory
      * @since 18.2.0RC1
      */
     @Unstable
-    boolean containsWikiMacro(DocumentModelBridge document);
+    default boolean containsWikiMacro(DocumentModelBridge document)
+    {
+        return containsWikiMacro(document.getDocumentReference());
+    }
 
     /**
      * Tries to build a {@link WikiMacro} if a definition is found on the given document.

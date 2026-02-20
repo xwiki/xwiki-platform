@@ -1223,6 +1223,16 @@
         <artifactId>font-awesome</artifactId>
         <version>7.1.0</version>
       </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>inversify</artifactId>
+        <version>7.10.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>reflect-metadata</artifactId>
+        <version>0.2.2</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

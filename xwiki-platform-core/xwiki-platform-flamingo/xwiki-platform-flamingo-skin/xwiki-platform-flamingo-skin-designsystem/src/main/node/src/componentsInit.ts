@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { FlamingoDesignSystemLoader } from "./flamingoDesignSystemLoader";
+import type { DesignSystemLoader } from "@xwiki/platform-api";
+import type { Container } from "inversify";
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
-
-export type { DialogProps };
+export default class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<DesignSystemLoader>("DesignSystemLoader")
+      .to(FlamingoDesignSystemLoader)
+      .whenNamed("flamingo");
+  }
+}

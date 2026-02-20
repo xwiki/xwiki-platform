@@ -104,9 +104,9 @@ export type CheckboxProps = {
 
 // @beta (undocumented)
 export type DialogProps = {
-    width?: "auto";
+    title: string;
+    width?: string | number | undefined;
     modelValue?: boolean;
-    logo?: string;
 };
 
 // @beta

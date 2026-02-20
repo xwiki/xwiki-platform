@@ -22,6 +22,6 @@
  * @since 18.0.0RC1
  * @beta
  */
-type ImgProps = unknown;
+type ImgProps = never;
 
 export type { ImgProps };

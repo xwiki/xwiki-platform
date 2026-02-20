@@ -36,6 +36,9 @@ catalogs:
     '@tsconfig/node24':
       specifier: 24.0.3
       version: 24.0.3
+    '@types/jquery':
+      specifier: 3.5.33
+      version: 3.5.33
     '@types/jsdom':
       specifier: 27.0.0
       version: 27.0.0
@@ -387,6 +390,52 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.1.8(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem/src/main/node:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/api
+      '@xwiki/platform-dsapi':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/core/ds/api
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.55.1(@types/node@24.10.3)
+      '@types/jquery':
+        specifier: 'catalog:'
+        version: 3.5.33
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/dev/config
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.1(jiti@2.6.1)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.0.10
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.4(reflect-metadata@0.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.7(@types/node@24.10.3)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.15(@types/node@24.10.3)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.26(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node:
     dependencies:
@@ -2539,6 +2588,9 @@ packages:
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
+  '@types/jquery@3.5.33':
+    resolution: {integrity: sha512-SeyVJXlCZpEki5F0ghuYe+L+PprQta6nRZqhONt9F13dWBtR/ftoaIbdRQ7cis7womE+X2LKhsDdDtkkDhJS6g==}
+
   '@types/jsdom@27.0.0':
     resolution: {integrity: sha512-NZyFl/PViwKzdEkQg96gtnB8wm+1ljhdDay9ahn4hgb+SfVtPCbm3TlmDUFXTA+MGN3CijicnMhG18SI5H3rFw==}
 
@@ -2582,6 +2634,9 @@ packages:
 
   '@types/react@19.2.7':
     resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
+
+  '@types/sizzle@2.3.10':
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -6958,6 +7013,10 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/jquery@3.5.33':
+    dependencies:
+      '@types/sizzle': 2.3.10
+
   '@types/jsdom@27.0.0':
     dependencies:
       '@types/node': 24.10.13
@@ -7004,6 +7063,8 @@ snapshots:
   '@types/react@19.2.7':
     dependencies:
       csstype: 3.2.3
+
+  '@types/sizzle@2.3.10': {}
 
   '@types/tough-cookie@4.0.5': {}
 

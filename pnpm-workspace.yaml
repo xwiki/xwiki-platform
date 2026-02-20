@@ -1,5 +1,6 @@
 packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-node/src/main/node
   - xwiki-platform-core/xwiki-platform-node/src/main/node/api
@@ -47,6 +48,7 @@ catalog:
   "@microsoft/api-extractor": 7.56.3
   "@playwright/experimental-ct-react": 1.56.1
   "@tsconfig/node24": 24.0.3
+  "@types/jquery": 3.5.33
   "@types/jsdom": 27.0.0
   "@types/lodash-es": 4.17.12
   "@types/mdast": 4.0.4

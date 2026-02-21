@@ -74,7 +74,7 @@ catalog:
   fast-xml-parser: 5.3.4
   flush-promises: 1.0.2
   globals: 16.5.0
-  happy-dom: 20.0.10
+  happy-dom: 20.7.0
   i18next: 25.5.3
   inversify: 7.10.4
   jiti: 2.6.1

@@ -89,7 +89,7 @@ catalog:
   micromark-extension-gfm-table: 2.1.1
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-run-all2: 8.0.4
-  nx: 22.0.2
+  nx: 22.5.2
   pinia: 3.0.4
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0

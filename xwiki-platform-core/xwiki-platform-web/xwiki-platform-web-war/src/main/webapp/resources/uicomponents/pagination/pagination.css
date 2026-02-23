@@ -34,7 +34,7 @@
   align-items: baseline;
   flex-wrap: wrap;
 }
-.pagination-item .btn {
+.pagination-item .btn, .controlPagination .btn {
   border-width: 2px;
   border-color: transparent;
 

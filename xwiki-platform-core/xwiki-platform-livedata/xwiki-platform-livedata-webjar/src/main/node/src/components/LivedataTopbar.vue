@@ -57,8 +57,8 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-top: var(--padding-large-vertical);
-  padding-bottom: var(--padding-large-vertical);
+  margin-top: var(--padding-large-vertical);
+  margin-bottom: var(--padding-large-vertical);
 }
 
 .livedata-topbar-left,

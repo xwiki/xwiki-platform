@@ -1,12 +1,12 @@
 {
   "name": "@xwiki/platform-navigation-tree-api",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/navigation-tree/navigation-tree-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -20,6 +20,13 @@
     }
   },
   "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",

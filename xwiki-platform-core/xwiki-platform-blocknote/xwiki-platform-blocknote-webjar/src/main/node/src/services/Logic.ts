@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { SkinManager } from "@xwiki/platform-api";
-import { createPinia } from "pinia";
-import { App, createApp, reactive } from "vue";
-import { createI18n, I18n } from "vue-i18n";
-import XWikiBlockNote from "../components/XWikiBlockNote.vue";
 import { container } from "./container";
 import { i18nResolver } from "./i18nResolver";
+import XWikiBlockNote from "../components/XWikiBlockNote.vue";
+import { createPinia } from "pinia";
+import { App, createApp, reactive } from "vue";
+import { I18n, createI18n } from "vue-i18n";
+import type { SkinManager } from "@xwiki/platform-api";
 
 type Data = {
   initialValue?: string;
@@ -44,6 +44,7 @@ export class Logic {
   private readonly _vueApp: App;
   private readonly _root: InstanceType<typeof XWikiBlockNote>;
 
+  // eslint-disable-next-line max-statements
   constructor(host: HTMLElement) {
     this._host = host;
     this._name = host.getAttribute("name") ?? host.id ?? host.dataset.name;
@@ -75,11 +76,13 @@ export class Logic {
 
     skinManager.loadDesignSystem(this._vueApp, container);
 
-    this._root = this._vueApp.mount(host) as InstanceType<typeof XWikiBlockNote>;
+    this._root = this._vueApp.mount(host) as InstanceType<
+      typeof XWikiBlockNote
+    >;
   }
 
   /**
-   * @returns {String} the name of the form field associated with this BlockNote instance; this is the key used to
+   * @returns the name of the form field associated with this BlockNote instance; this is the key used to
    *            submit the edited content
    */
   get name(): string | undefined {
@@ -87,14 +90,14 @@ export class Logic {
   }
 
   /**
-   * @returns {HTMLElement} the HTML Element that hosts this BlockNote instance
+   * @returns the HTML Element that hosts this BlockNote instance
    */
   get host(): HTMLElement {
     return this._host;
   }
 
   /**
-   * @returns {Data} the data managed by this BlockNote instance
+   * @returns the data managed by this BlockNote instance
    */
   async data(): Promise<Data> {
     this._data.value = await this._root.updateValue();
@@ -102,7 +105,7 @@ export class Logic {
   }
 
   /**
-   * @returns {Promise} a promise that resolves when the BlockNote instance is ready
+   * @returns a promise that resolves when the BlockNote instance is ready
    */
   get ready(): Promise<Logic> {
     return this._ready;
@@ -115,15 +118,18 @@ export class Logic {
   /**
    * Returns a translation only once the translations have been loaded from the server.
    *
-   * @param {String} key the translation key to translate
-   * @param {...*} args the arguments to pass to the translation function
+   * @param key - the translation key to translate
+   * @param args - the arguments to pass to the translation function
    */
   async translate(key: string, ...args: unknown[]): Promise<string> {
     // Make sure that the translations are loaded from the server before translating.
     const i18n = await this._i18nPromise;
     // FIXME: This type assertion shouldn't be necessary but I haven't found a way to avoid it. Using the Key type from
     // vue-i18n doesn't help and, what's more strange, it fails to build even when calling i18n.global.t("some.key")
-    return (i18n.global.t as (key: string, params: unknown[]) => string)(key, args);
+    return (i18n.global.t as (key: string, params: unknown[]) => string)(
+      key,
+      args,
+    );
   }
 
   /**
@@ -134,12 +140,15 @@ export class Logic {
   }
 
   /**
-   * @returns {Object} the data parsed from the host element
+   * @returns the data parsed from the host element
    */
   _parseDataFromHost(): Data {
-    const data = Object.assign(this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {}, {
-      ...this._host.dataset,
-    });
+    const data = Object.assign(
+      this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {},
+      {
+        ...this._host.dataset,
+      },
+    );
     delete data.config;
     data.initialValue = data.value;
     return data;

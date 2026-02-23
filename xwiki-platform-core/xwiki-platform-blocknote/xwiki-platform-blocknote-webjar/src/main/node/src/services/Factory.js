@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -34,8 +34,8 @@ export class Factory {
   /**
    * Creates (if it doesn't exist yet) and returns the BlockNote instance associated with the given host element.
    *
-   * @param {HTMLElement} element the HTML Element that will host the created BlockNote editor instance
-   * @returns {Promise<Logic>} a promise that resolves to the BlockNote instance associated with the given host element
+   * @param element - the HTML Element that will host the created BlockNote editor instance
+   * @returns a promise that resolves to the BlockNote instance associated with the given host element
    */
   async create(element, ...args) {
     if (!this._instancesByHost.has(element)) {
@@ -50,9 +50,8 @@ export class Factory {
   }
 
   /**
-   * @param {String | HTMLElement} hostOrName the name of a form field or the host element for which to get the
-   *          BlockNote instance
-   * @returns {Logic} the BlockNote instance associated with the given host element or form field name
+   * @param hostOrName - the name of a form field or the host element for which to get the BlockNote instance
+   * @returns the BlockNote instance associated with the given host element or form field name
    */
   get(hostOrName) {
     if (typeof hostOrName === "string") {
@@ -63,7 +62,7 @@ export class Factory {
   }
 
   /**
-   * @returns {Logic[]} an array of all BlockNote editor instances created by this factory
+   * @returns an array of all BlockNote editor instances created by this factory
    */
   getAll() {
     return [...this._instancesByName.values()];
@@ -72,9 +71,8 @@ export class Factory {
   /**
    * Destroys the BlockNote instance associated with the given host element or form field name.
    *
-   * @param {String | HTMLElement} hostOrName the name of a form field or the host element for which to destroy the
-   *          BlockNote instance
-   * @return {boolean} true if the BlockNote instance was destroyed, false otherwise
+   * @param hostOrName - the name of a form field or the host element for which to destroy the BlockNote instance
+   * @returns true if the BlockNote instance was destroyed, false otherwise
    */
   destroy(hostOrName) {
     const instance = this.get(hostOrName);
@@ -88,12 +86,12 @@ export class Factory {
   }
 
   /**
-   * @returns {Object} the syntax used by BlockNote
+   * @returns the syntax used by BlockNote
    */
   get syntax() {
     return {
-      type: "markdown",
-      version: "1.2",
+      type: "uniast",
+      version: "1.0",
     };
   }
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,17 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { PageData } from "@xwiki/platform-api";
-import { DocumentChange, DocumentService } from "@xwiki/platform-document-api";
-import type { DocumentReference } from "@xwiki/platform-model-api";
-import { Container, injectable } from "inversify";
-import { type Ref, ref } from "vue";
 import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";
+import { DocumentChange, DocumentService } from "@xwiki/platform-document-api";
+import { Container, injectable } from "inversify";
+import { ref } from "vue";
+import type { PageData } from "@xwiki/platform-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { Ref } from "vue";
 
 @injectable("Singleton")
 export class DefaultDocumentService implements DocumentService {
   public static bind(container: Container): void {
-    container.bind("DocumentService").to(DefaultDocumentService).inSingletonScope();
+    container
+      .bind("DocumentService")
+      .to(DefaultDocumentService)
+      .inSingletonScope();
   }
 
   public getCurrentDocument(): Ref<PageData | undefined> {
@@ -36,7 +40,11 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   public getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
-    return ref(toCristalEntityReference(XWiki.currentDocument.documentReference) as DocumentReference);
+    return ref(
+      toCristalEntityReference(
+        XWiki.currentDocument.documentReference,
+      ) as DocumentReference,
+    );
   }
 
   public getCurrentDocumentReferenceString(): Ref<string | undefined> {
@@ -49,8 +57,8 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   public getCurrentDocumentAction(): Ref<string | undefined> {
-      // TODO
-      throw new Error("Method not implemented.");
+    // TODO
+    throw new Error("Method not implemented.");
   }
 
   public getDisplayTitle(): Ref<string> {
@@ -73,8 +81,12 @@ export class DefaultDocumentService implements DocumentService {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public setCurrentDocument(documentReference: string, revision?: string): Promise<void> {
+  public setCurrentDocument(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    documentReference: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    revision?: string,
+  ): Promise<void> {
     // TODO
     throw new Error("Method not implemented.");
   }
@@ -88,14 +100,18 @@ export class DefaultDocumentService implements DocumentService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     change: DocumentChange,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    listener: (page: DocumentReference) => Promise<void>
+    listener: (page: DocumentReference) => Promise<void>,
   ): void {
     // TODO
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public notifyDocumentChange(change: DocumentChange, page: DocumentReference): Promise<void> {
+  public notifyDocumentChange(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    change: DocumentChange,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    page: DocumentReference,
+  ): Promise<void> {
     // TODO
     throw new Error("Method not implemented.");
   }

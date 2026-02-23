@@ -97,15 +97,16 @@ LiveValidation.prototype = {
       onlyOnBlur: false,
       wait: 0,
       onlyOnSubmit: false,
-	  // hooks
-	  beforeValidation: function(){},
-	  beforeValid: function(){},
-	  onValid: function(){this.addFieldClass(); },
-	  afterValid: function(){},
-	  beforeInvalid: function(){},
-	  onInvalid: function(){this.addFieldClass(); },
-	  afterInvalid: function(){},
-	  afterValidation: function(){},
+      keepSingleValidMessage: true,
+      // hooks
+      beforeValidation: function(){},
+      beforeValid: function(){},
+      onValid: function(){this.addFieldClass(); },
+      afterValid: function(){},
+      beforeInvalid: function(){},
+      onInvalid: function(){this.addFieldClass(); },
+      afterInvalid: function(){},
+      afterValidation: function(){},
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
@@ -278,10 +279,33 @@ LiveValidation.prototype = {
    */
   doValidations: function(){
     this.validationFailed = false;
-    for(var i = 0, len = this.validations.length; i < len; ++i){
-      let isValid = this.validateElement(this.validations[i].type, this.validations[i].params);
-      this.insertMessage(this.validations[i], isValid);
+    let len = this.validations.length;
+    let isInvalid = false;
+    let validationValidMessageIndex = -1;
+    for(var i = 0; i < len; ++i){
+      let currentValidation = this.validations[i];
+      let isValid = this.validateElement(currentValidation.type, currentValidation.params);
+      this.removeMessageClass(currentValidation.messageHolder);
+      // if the validation fails we always want to display the error message
+      // also if there's only one validation we want to display the valid message
+      // and finally if the setting to keep a single valid message is off we will display them
+      if (!isValid || !this.keepSingleValidMessage || len === 1) {
+        this.insertMessage(currentValidation, isValid);
+        this.toggleDisplayMessageHolder(currentValidation, true);
+        isInvalid = true;
+      // make sure to get the index of a validation that has a valid message to display it in case of a displaying
+      // a single valid message
+      } else if (isValid && this.keepSingleValidMessage && !this.isValidMessageEmpty(currentValidation)) {
+        validationValidMessageIndex = i;
+        this.toggleDisplayMessageHolder(currentValidation, false);
+      }
       this.validationFailed = this.validationFailed || !isValid;
+    }
+    // if there was several validations and all were valid and we want to display only one, then we display it now
+    // using the parameters of the first validation
+    if (len > 1 && !isInvalid && this.keepSingleValidMessage && validationValidMessageIndex > -1) {
+      this.insertMessage(this.validations[validationValidMessageIndex], true);
+      this.toggleDisplayMessageHolder(this.validations[validationValidMessageIndex], true);
     }
     return !this.validationFailed;
   },
@@ -396,12 +420,25 @@ LiveValidation.prototype = {
     return span;
   },
 
+  isValidMessageEmpty: function (validation) {
+    return (validation.params.validMessage=="" && !validation.params.validMessage);
+  },
+
+  toggleDisplayMessageHolder: function (validation, shouldBeVisible) {
+    let messageHolder = validation.messageHolder;
+    if (shouldBeVisible) {
+      messageHolder.removeClassName('hidden');
+    } else {
+      messageHolder.addClassName('hidden');
+    }
+  },
+
   /**
    *  inserts the message in its container.
    */
   insertMessage: function(validation, isValid) {
     let messageHolder = validation.messageHolder;
-    if(validation.params.validMessage=="" && !validation.params.validMessage) return; // dont insert anything if validMessage is an empty string
+    if (this.isValidMessageEmpty(validation)) return; // dont insert anything if validMessage is an empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) ||
       this.element.value != '' ||
       validation.params.identifier.includes("regex")){

@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,17 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Link, LinkSuggestService, LinkType } from "@xwiki/platform-link-suggest-api";
+import {
+  Link,
+  LinkSuggestService,
+  LinkType,
+} from "@xwiki/platform-link-suggest-api";
 import { Container, injectable } from "inversify";
 
 @injectable("Singleton")
 export class XWikiLinkSuggestService implements LinkSuggestService {
   public static bind(container: Container): void {
-    container.bind("LinkSuggestService").to(XWikiLinkSuggestService).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("LinkSuggestService")
+      .to(XWikiLinkSuggestService)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getLinks(query: string, linkType?: LinkType, mimetype?: string): Promise<Link[]> {
+  public async getLinks(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    query: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    linkType?: LinkType,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    mimetype?: string,
+  ): Promise<Link[]> {
     // TODO
     return Promise.resolve([]);
   }

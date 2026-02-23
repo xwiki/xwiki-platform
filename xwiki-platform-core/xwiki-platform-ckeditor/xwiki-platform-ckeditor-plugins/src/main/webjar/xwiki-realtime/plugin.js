@@ -89,7 +89,9 @@
           // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the
           // dirty state in order to avoid getting the leave confirmation when leaving the editor just after it was
           // loaded.
-          editor.resetDirty();
+          if (editor.mode === 'wysiwyg') {
+            editor.resetDirty();
+          }
 
           // Leave / rejoin the realtime session when switching between WYSIWYG and Source modes.
           // We flush uncommitted work before leaving the WYSIWYG mode, in order to avoid losing local changes. We do
@@ -247,6 +249,10 @@
       return await new Promise((resolve, reject) => {
         require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
           editor._realtime.connect = async () => {
+            if (editor.mode !== 'wysiwyg') {
+              // Realtime collaboration is supported, but we can't join until the user switches to WYSIWYG mode.
+              return true;
+            }
             if (!editor._realtime.editor) {
               editor._realtime.editor = new RealtimeWysiwygEditor(editor._realtime.adapter, editor._realtime.context);
               await editor._realtime.editor.toBeConnected();

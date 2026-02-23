@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,13 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkSuggestService, LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
+import {
+  LinkSuggestService,
+  LinkSuggestServiceProvider,
+} from "@xwiki/platform-link-suggest-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
-export class DefaultLinkSuggestServiceProvider implements LinkSuggestServiceProvider {
+export class DefaultLinkSuggestServiceProvider
+  implements LinkSuggestServiceProvider
+{
   public static bind(container: Container): void {
-    container.bind("LinkSuggestServiceProvider").to(DefaultLinkSuggestServiceProvider).inSingletonScope();
+    container
+      .bind("LinkSuggestServiceProvider")
+      .to(DefaultLinkSuggestServiceProvider)
+      .inSingletonScope();
   }
 
   constructor(@inject("Container") private readonly container: Container) {}

@@ -309,12 +309,7 @@ public class XWiki extends Api
      */
     public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
-        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
-            return null;
-        }
-
-        return doc.newDocument(getXWikiContext());
+        return getDocument(this.xwiki.getDocumentReference(reference, type, getXWikiContext()));
     }
 
     /**
@@ -329,11 +324,11 @@ public class XWiki extends Api
     public Document getDocument(DocumentReference reference) throws XWikiException
     {
         try {
-            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
-                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+            if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
                 return null;
             }
+
+            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
 
             return doc.newDocument(getXWikiContext());
         } catch (Exception ex) {

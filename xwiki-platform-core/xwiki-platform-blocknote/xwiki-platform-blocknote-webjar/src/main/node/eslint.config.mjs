@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,29 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import eslint from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import eslintPluginVue from "eslint-plugin-vue";
-import globals from "globals";
-import typescriptEslint from "typescript-eslint";
+import config from "@xwiki/platform-tool-eslintconfig";
 
-export default [
-  eslint.configs.recommended,
-  ...typescriptEslint.configs.recommended,
-  ...eslintPluginVue.configs["flat/recommended"],
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        XWiki: "readonly",
-        require: "readonly",
-        define: "readonly",
-        global: "readonly",
-      },
-      parserOptions: {
-        parser: typescriptEslint.parser,
-      },
-    },
-  },
-  eslintConfigPrettier,
-];
+export default config;

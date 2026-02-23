@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@ declare global {
     EntityReference: new (
       name: string,
       type: number,
-      parent?: XWikiEntityReference | undefined
+      parent?: XWikiEntityReference | undefined,
     ) => XWikiEntityReference;
     EntityType: {
       WIKI: number;
@@ -49,7 +49,11 @@ declare global {
       ATTACHMENT: number;
     };
     Model: {
-      resolve: (referenceString: string, type: number, contextReference?: XWikiEntityReference) => XWikiEntityReference;
+      resolve: (
+        referenceString: string,
+        type: number,
+        contextReference?: XWikiEntityReference,
+      ) => XWikiEntityReference;
       serialize: (reference: XWikiEntityReference) => string;
     };
     Document: new (reference: XWikiEntityReference) => {
@@ -64,7 +68,9 @@ declare global {
   };
 }
 
-function toXWikiEntityReference(reference: EntityReference): XWikiEntityReference {
+function toXWikiEntityReference(
+  reference: EntityReference,
+): XWikiEntityReference {
   const referenceType = reference.type;
   switch (referenceType) {
     case EntityType.WIKI:
@@ -84,36 +90,50 @@ function toXWikiWikiReference(reference: WikiReference): XWikiEntityReference {
   return new XWiki.EntityReference(reference.name, XWiki.EntityType.WIKI);
 }
 
-function toXWikiSpaceReference(reference: SpaceReference): XWikiEntityReference {
+function toXWikiSpaceReference(
+  reference: SpaceReference,
+): XWikiEntityReference {
   if (reference.names.length) {
-    const wikiReference = reference.wiki ? toXWikiWikiReference(reference.wiki) : undefined;
+    const wikiReference = reference.wiki
+      ? toXWikiWikiReference(reference.wiki)
+      : undefined;
     return reference.names.reduce(
       (parent: XWikiEntityReference | undefined, name: string) =>
         new XWiki.EntityReference(name, XWiki.EntityType.SPACE, parent),
-      wikiReference
+      wikiReference,
     )!;
   } else {
-    throw new Error("XWiki space references must have at least one space name.");
+    throw new Error(
+      "XWiki space references must have at least one space name.",
+    );
   }
 }
 
-function toXWikiDocumentReference(reference: DocumentReference): XWikiEntityReference {
+function toXWikiDocumentReference(
+  reference: DocumentReference,
+): XWikiEntityReference {
   return new XWiki.EntityReference(
     reference.name,
     XWiki.EntityType.DOCUMENT,
-    reference.space ? toXWikiSpaceReference(reference.space) : undefined
+    reference.space ? toXWikiSpaceReference(reference.space) : undefined,
   );
 }
 
-function toXWikiAttachmentReference(reference: AttachmentReference): XWikiEntityReference {
+function toXWikiAttachmentReference(
+  reference: AttachmentReference,
+): XWikiEntityReference {
   return new XWiki.EntityReference(
     reference.name,
     XWiki.EntityType.ATTACHMENT,
-    reference.document ? toXWikiDocumentReference(reference.document) : undefined
+    reference.document
+      ? toXWikiDocumentReference(reference.document)
+      : undefined,
   );
 }
 
-function toCristalEntityReference(reference?: XWikiEntityReference): EntityReference | undefined {
+function toCristalEntityReference(
+  reference?: XWikiEntityReference,
+): EntityReference | undefined {
   if (!reference) {
     return undefined;
   }
@@ -122,37 +142,55 @@ function toCristalEntityReference(reference?: XWikiEntityReference): EntityRefer
       return new WikiReference(reference.name);
     case XWiki.EntityType.SPACE:
       return new SpaceReference(
-        toCristalEntityReference(reference.extractReference(XWiki.EntityType.WIKI)) as WikiReference,
+        toCristalEntityReference(
+          reference.extractReference(XWiki.EntityType.WIKI),
+        ) as WikiReference,
         ...reference
           .getReversedReferenceChain()
-          .filter((item: XWikiEntityReference) => item.type === XWiki.EntityType.SPACE)
-          .map((item: XWikiEntityReference) => item.name)
+          .filter(
+            (item: XWikiEntityReference) =>
+              item.type === XWiki.EntityType.SPACE,
+          )
+          .map((item: XWikiEntityReference) => item.name),
       );
     case XWiki.EntityType.DOCUMENT:
       return new DocumentReference(
         reference.name,
         toCristalEntityReference(reference.parent) as SpaceReference,
-        reference.name !== "WebHome"
+        reference.name !== "WebHome",
       );
     case XWiki.EntityType.ATTACHMENT:
-      return new AttachmentReference(reference.name, toCristalEntityReference(reference.parent) as DocumentReference);
+      return new AttachmentReference(
+        reference.name,
+        toCristalEntityReference(reference.parent) as DocumentReference,
+      );
     default:
       throw new Error(`Unsupported entity type: ${reference.type}`);
   }
 }
 
-function absoluteXWikiEntityReference(reference: XWikiEntityReference): XWikiEntityReference {
-  return XWiki.Model.resolve(XWiki.Model.serialize(reference), reference.type, XWiki.currentDocument.documentReference);
+function absoluteXWikiEntityReference(
+  reference: XWikiEntityReference,
+): XWikiEntityReference {
+  return XWiki.Model.resolve(
+    XWiki.Model.serialize(reference),
+    reference.type,
+    XWiki.currentDocument.documentReference,
+  );
 }
 
-function absoluteCristalEntityReference(reference: EntityReference): EntityReference | undefined {
-  return toCristalEntityReference(absoluteXWikiEntityReference(toXWikiEntityReference(reference)));
+function absoluteCristalEntityReference(
+  reference: EntityReference,
+): EntityReference | undefined {
+  return toCristalEntityReference(
+    absoluteXWikiEntityReference(toXWikiEntityReference(reference)),
+  );
 }
 
 export {
+  type XWikiEntityReference,
   absoluteCristalEntityReference,
   absoluteXWikiEntityReference,
   toCristalEntityReference,
   toXWikiEntityReference,
-  type XWikiEntityReference,
 };

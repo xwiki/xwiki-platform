@@ -98,8 +98,18 @@
       <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
         #foreach ($prop in $deprecatedProperties)
-          <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-          <dd class="disabled">${escapetool.xml($prop.value)}</dd>
+          <dt class="disabled property-name"><label>${escapetool.xml($prop.name)}:</label></dt>
+          #if ($prop.sensitive)
+            <dd class="disabled obfuscated property-value" data-property-name="$escapetool.xml($prop.name)">
+              <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+                $services.icon.renderHTML('info')
+              </span>
+            </dd>
+          #else
+            <dd class="disabled property-value" data-property-name="$escapetool.xml($prop.name)">
+              ${escapetool.xml($prop.value)}
+            </dd>
+          #end
         #end
       </dl>
       <div>
@@ -410,9 +420,6 @@
       <input type="hidden" name="xcontinue" value="$doc.getURL($xcontext.action, $q)"/>
       ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from other views.
       <input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}" />
-      ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
-      ## to prevent from accidentally adding objects when pressing enter.
-      #editActionButton('preview', 'preview')
     </div>
     <div id="xwikiobjects">
   #if (!$hasCustomClass)

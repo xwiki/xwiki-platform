@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -24,7 +24,11 @@ import { Container, injectable } from "inversify";
 @injectable("Singleton")
 export class XWikiRemoteURLParser implements RemoteURLParser {
   public static bind(container: Container): void {
-    container.bind("RemoteURLParser").to(XWikiRemoteURLParser).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("RemoteURLParser")
+      .to(XWikiRemoteURLParser)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

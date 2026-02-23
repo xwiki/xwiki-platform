@@ -630,4 +630,28 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     {
         return toXMLString(true);
     }
+
+    /**
+     * Allow to load the owner document when it's not set and the document reference is provided.
+     * @return {@code true} if the owner document has been loaded, {@code false} otherwise.
+     * @since 18.1.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
+    protected boolean loadOwnerDocument()
+    {
+        boolean result = false;
+        if (this.ownerDocument == null && this.documentReference != null) {
+            XWikiContext context = getXWikiContext();
+            try {
+                XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
+                setOwnerDocument(document);
+                result = true;
+            } catch (XWikiException e) {
+                LOGGER.error("Error while trying to load document [{}] as owner document of [{}]", documentReference,
+                    this);
+            }
+        }
+        return result;
+    }
 }

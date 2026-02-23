@@ -1,12 +1,12 @@
 {
   "name": "@xwiki/platform-editors-blocknote-headless",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/editors/blocknote-headless",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -20,6 +20,13 @@
     }
   },
   "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
@@ -32,9 +39,6 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@blocknote/core": "catalog:",
-    "@tiptap/core": "catalog:",
-    "@tiptap/extensions": "catalog:",
-    "@tiptap/pm": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",

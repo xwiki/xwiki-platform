@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -87,6 +88,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
     @Inject
     private ModelContext modelContext;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
@@ -238,13 +242,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     @Override
     public void unregister(Right right) throws AuthorizationException
     {
-        if (Right.getStandardRights().contains(right)) {
-            throw new AuthorizationException(
-                String.format("Attempt to unregister the static right [%s]", right.getName()));
+        if (loggerConfiguration.isDeprecatedLogEnabled()) {
+            this.logger.warn(
+                "Right unregistration is disabled on purpose as it's creating cache problems right now. In "
+                    + "case of a need to debug this call was triggered for right [{}].", right);
         }
-        right.unregister();
-        // cleanup the cache since a new right scheme enter in action
-        securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
     }
 
     /**

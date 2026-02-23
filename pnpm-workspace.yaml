@@ -70,7 +70,7 @@ catalog:
   eslint-plugin-promise: 7.2.1
   eslint-plugin-tsdoc: 0.5.0
   eslint-plugin-vue: 10.8.0
-  eventemitter3: 5.0.1
+  eventemitter3: 5.0.4
   fast-xml-parser: 5.3.4
   flush-promises: 1.0.2
   globals: 17.3.0

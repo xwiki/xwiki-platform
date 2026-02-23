@@ -17,15 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import ComponentInit from "./componentsInit";
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
-
-export type { DialogProps };
+export { ComponentInit };

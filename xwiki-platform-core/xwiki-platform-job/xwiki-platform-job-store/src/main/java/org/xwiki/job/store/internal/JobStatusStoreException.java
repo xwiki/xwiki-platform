@@ -23,7 +23,7 @@ package org.xwiki.job.store.internal;
  * Runtime exception used to bubble failures produced while interacting with the database.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 public class JobStatusStoreException extends RuntimeException
 {

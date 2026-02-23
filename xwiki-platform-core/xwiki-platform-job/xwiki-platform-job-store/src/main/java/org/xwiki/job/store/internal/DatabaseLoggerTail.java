@@ -53,7 +53,7 @@ import org.xwiki.xstream.internal.SafeXStream;
  * from the database when needed and appends new entries incrementally for running jobs.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = DatabaseLoggerTail.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

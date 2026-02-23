@@ -62,7 +62,7 @@ import com.xpn.xwiki.store.DatabaseProduct;
  * It also explicitly targets the main wiki database/schema (main wiki id is always {@code xwiki}).
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = JobStatusHibernateStore.class)
 @Singleton

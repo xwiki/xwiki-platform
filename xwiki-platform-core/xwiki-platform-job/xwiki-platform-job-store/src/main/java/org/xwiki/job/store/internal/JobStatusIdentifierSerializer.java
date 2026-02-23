@@ -34,7 +34,7 @@ import org.xwiki.job.internal.JobStatusFolderResolver;
  * Computes normalized identifiers for relational tables and blob stores.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = JobStatusIdentifierSerializer.class)
 @Singleton

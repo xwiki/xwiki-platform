@@ -29,7 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * Hibernate entity mapping the {@code job_status_summary} table.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 public class JobStatusSummaryEntity implements Serializable
 {

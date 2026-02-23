@@ -92,7 +92,7 @@ import org.xwiki.store.hibernate.HibernateDataSourceProvider;
  * @deprecated Use {@link HibernateDataSourceProvider} instead.
  * @version $Id$
  */
-@Deprecated(since = "18.1.0RC1")
+@Deprecated(since = "18.2.0RC1")
 public class DBCPConnectionProvider implements ConnectionProvider, Configurable, Stoppable
 {
     /**

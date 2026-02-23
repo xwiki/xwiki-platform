@@ -48,7 +48,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
  * Utility component to load and adjust Hibernate cfg.xml configuration.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = HibernateCfgXmlLoader.class)
 @Singleton

@@ -115,8 +115,8 @@ catalogs:
       specifier: 1.0.2
       version: 1.0.2
     globals:
-      specifier: 16.5.0
-      version: 16.5.0
+      specifier: 17.3.0
+      version: 17.3.0
     happy-dom:
       specifier: 20.7.0
       version: 20.7.0
@@ -365,7 +365,7 @@ importers:
         version: 9.39.2(jiti@2.6.1)
       globals:
         specifier: 'catalog:'
-        version: 16.5.0
+        version: 17.3.0
       jiti:
         specifier: 'catalog:'
         version: 2.6.1
@@ -501,7 +501,7 @@ importers:
         version: link:tools/tool-eslintconfig
       globals:
         specifier: 'catalog:'
-        version: 16.5.0
+        version: 17.3.0
       publint:
         specifier: 'catalog:'
         version: 0.3.17
@@ -3870,8 +3870,8 @@ packages:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
     engines: {node: '>=18'}
 
-  globals@16.5.0:
-    resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
+  globals@17.3.0:
+    resolution: {integrity: sha512-yMqGUQVVCkD4tqjOJf3TnrvaaHDMYp4VlUSObbkIiuCPe/ofdMBFIAcBbCSRFWOnos6qRiTVStDwqPLUclaxIw==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -8452,7 +8452,7 @@ snapshots:
 
   globals@14.0.0: {}
 
-  globals@16.5.0: {}
+  globals@17.3.0: {}
 
   globalthis@1.0.4:
     dependencies:

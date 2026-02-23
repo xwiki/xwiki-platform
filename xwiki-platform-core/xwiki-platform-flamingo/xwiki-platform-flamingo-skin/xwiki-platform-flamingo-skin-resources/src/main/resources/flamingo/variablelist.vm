@@ -203,37 +203,42 @@
 ############################################
 ## Bootstrap variables
 ############################################
-## List of Bootstrap variables we need to give default values for XWiki standard variables shown above
+## List of Bootstrap variables we need to give default values for:
+## * XWiki standard variables values shown above
+## * used in XWiki standard
 #set($bootstrapVariables = {
-    "btn-danger-color" : "#fff",
-    "btn-default-border" : "#ccc",
-    "btn-font-weight" : "normal",
-    "btn-info-color" : "#fff",
+    "btn-danger-color": "#fff",
+    "btn-default-border": "#ccc",
+    "btn-font-weight": "normal",
+    "btn-info-color": "#fff",
     "btn-info-bg" : "var(--brand-info)",
     "btn-warning-bg" : "var(--brand-warning)",
     "breadcrumb-bg": "#f5f5f5",
     "breadcrumb-link-color": "var(--link-color)",
     "breadcrumb-separator": "/",
     "component-active-color": "#fff",
-    "component-active-bg":"var(--brand-primary)",
-    "dropdown-border" : "rgba(0, 0, 0, .15)",
-    "dropdown-divider-bg" : "#e5e5e5",
+    "component-active-bg": "var(--brand-primary)",
+    "dropdown-border": "rgba(0, 0, 0, .15)",
+    "dropdown-divider-bg": "#e5e5e5",
     "font-family-base": "var(--font-family-sans-serif)",
     "font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
     "font-family-serif": 'Georgia, "Times New Roman", Times, serif',
     "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
     "font-size-base": "1rem",
     "grid-gutter-width": "30px",
-    "input-bg" : "#fff",
+    "input-bg": "#fff",
     "input-border-focus": "#66afe9",
-    "legend-color" : "#333",
+    "legend-color": "#333",
     "legend-border-color": "#e5e5e5",
     "list-group-hover-bg": "#f5f5f5",
     "list-group-link-color": "#555",
     "list-group-link-hover-color": "var(--list-group-link-color)",
-    "navbar-height" : "50px",
+    "navbar-height": "50px",
     "table-bg-hover": "#f5f5f5",
-    "table-border-color": "#ddd"
+    "table-border-color": "#ddd",
+    "table-cell-padding": "8px",
+    "screen-xs-max": "767px",
+    "panel-default-heading-bg": "#f5f5f5"
 })
 
 ############################################

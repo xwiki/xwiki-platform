@@ -32,7 +32,7 @@ import org.xwiki.job.internal.PersistentJobStatusStore;
  * <p>The database-backed job status store {@link DatabaseJobStatusStore} overrides the default implementation. To
  * be able to still inject the filesystem-backed implementation, we need to explicitly name it.</p>
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component
 @Named("filesystem")

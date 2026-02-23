@@ -52,7 +52,7 @@ import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
  * This is used to ensure that multiple Hibernate {@code SessionFactory} instances can share the same pool.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component
 @Singleton

@@ -44,7 +44,7 @@ import org.xwiki.store.blob.BlobWriteMode;
  * Stores and loads job status blobs from the configured blob store.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = JobStatusBlobStore.class)
 @Singleton

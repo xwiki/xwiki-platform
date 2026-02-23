@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * The main goal is to allow multiple Hibernate {@code SessionFactory} instances to share the same connection pool.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Role
 @Unstable

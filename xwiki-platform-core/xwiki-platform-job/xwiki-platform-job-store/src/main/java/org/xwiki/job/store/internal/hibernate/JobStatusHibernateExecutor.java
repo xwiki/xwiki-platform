@@ -37,7 +37,7 @@ import org.xwiki.job.store.internal.JobStatusStoreException;
  * XWiki's main transactions.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component(roles = JobStatusHibernateExecutor.class)
 @Singleton

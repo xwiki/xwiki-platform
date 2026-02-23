@@ -54,7 +54,7 @@ import org.xwiki.store.blob.BlobStoreException;
  * Database-backed {@link JobStatusStore} that replaces the filesystem implementation.
  *
  * @version $Id$
- * @since 18.1.0RC1
+ * @since 18.2.0RC1
  */
 @Component
 @Singleton

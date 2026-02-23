@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.1.0</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -186,7 +186,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>18.1.0-SNAPSHOT</version>
+        <version>18.1.0</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>

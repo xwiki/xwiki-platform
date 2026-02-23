@@ -110,6 +110,8 @@ export default {
   width: 100%;
   height: 0.4rem;
   visibility: hidden;
+  /* Make sure the loader doesn't get any space allocated when not shown. */
+  display: none;
 }
 
 .layout-loader .loader-fill {
@@ -123,6 +125,7 @@ export default {
 
 .layout-loader.waiting.visible {
   visibility: visible;
+  display: unset;
 }
 
 .layout-loader.waiting.visible .loader-fill {

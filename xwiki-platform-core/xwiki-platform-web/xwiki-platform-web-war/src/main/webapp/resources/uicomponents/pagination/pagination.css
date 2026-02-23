@@ -34,25 +34,35 @@
   align-items: baseline;
   flex-wrap: wrap;
 }
-
-.pagination-item .btn-default {
-  /* Remove some of the btn-default styles so that they are more discreet here. */
-  background-color: transparent;
+.pagination-item .btn, .controlPagination .btn {
+  border-width: 2px;
   border-color: transparent;
 
   &:active {
     box-shadow: none;
   }
-  
+
   &:active:focus {
     color: unset;
     background-color: transparent;
     border-color: transparent;
   }
-}
+  
+  &.btn-default {
+    /* Remove some of the btn-default styles so that they are more discreet here. */
+    background-color: transparent;
+    border-color: transparent;
+  }
+  
+  &.btn-primary {
+    /* Replace some of the btn-primary styles so that they are more discreet here. */
+    background-color: var(--btn-default-bg);
+    color: var(--btn-default-color);
+  }
 
-.pagination-item:hover {
-  border-color: hsl(from var(--dropdown-divider-bg) h s calc(l-10));
+  &.btn-default:hover, &.btn-primary:hover {
+    border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 10));
+  }
 }
 
 /* Controls to move one page right/left from the current page */

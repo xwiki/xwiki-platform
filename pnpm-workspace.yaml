@@ -73,7 +73,7 @@ catalog:
   eventemitter3: 5.0.1
   fast-xml-parser: 5.3.4
   flush-promises: 1.0.2
-  globals: 16.5.0
+  globals: 17.3.0
   happy-dom: 20.7.0
   i18next: 25.8.13
   inversify: 7.10.4

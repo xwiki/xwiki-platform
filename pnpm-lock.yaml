@@ -31,8 +31,8 @@ catalogs:
       specifier: 7.57.3
       version: 7.57.3
     '@playwright/experimental-ct-react':
-      specifier: 1.56.1
-      version: 1.56.1
+      specifier: 1.58.2
+      version: 1.58.2
     '@tsconfig/node24':
       specifier: 24.0.3
       version: 24.0.3
@@ -1420,7 +1420,7 @@ importers:
         version: 7.57.3(@types/node@24.10.13)
       '@playwright/experimental-ct-react':
         specifier: 'catalog:'
-        version: 1.56.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.2.7(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))(yaml@2.8.2)
+        version: 1.58.2(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.2.7(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))(yaml@2.8.2)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -2174,12 +2174,12 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@playwright/experimental-ct-core@1.56.1':
-    resolution: {integrity: sha512-xonl51bJxQpX4O5awQZlUJ4eMdu6WE6xdALz8VeJmWL04A6xZICXAOHu03msFqYRydbW0vvTfp5zaeHLsXoiSA==}
+  '@playwright/experimental-ct-core@1.58.2':
+    resolution: {integrity: sha512-Imif9ggQp6YIblHAX6MvJuqDFrCGHYspoibxLP3+1soXp+1wBNuuSRajv0VWXzFbh//4l29I+xy2tpTgej0vEA==}
     engines: {node: '>=18'}
 
-  '@playwright/experimental-ct-react@1.56.1':
-    resolution: {integrity: sha512-1L0AxZ5f7ekd7uKF8kDY1eu90MTBRMdYlZVUSgVydBqKUQhlwJuQTzZLoh6e8JWnHECH/5Rkq+uWPfa0ab9TsQ==}
+  '@playwright/experimental-ct-react@1.58.2':
+    resolution: {integrity: sha512-8IdT7b+c3Wv8RVRKmAkAL2PWJU85Tu0IfqsvsbaS520OOoZJqytIoxdU7gog9gjaONpgw6SOKDykEWup3SeO7g==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -4738,13 +4738,13 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  playwright-core@1.56.1:
-    resolution: {integrity: sha512-hutraynyn31F+Bifme+Ps9Vq59hKuUCz7H1kDOcBs+2oGguKkWTU50bBWrtz34OUWmIwpBTWDxaRPXrIXkgvmQ==}
+  playwright-core@1.58.2:
+    resolution: {integrity: sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.56.1:
-    resolution: {integrity: sha512-aFi5B0WovBHTEvpM3DzXTUaeN6eN0qWnTkKx4NQaH4Wvcmc153PdaY2UBdSYKaGYw+UyWXSVyxDUg5DoPEttjw==}
+  playwright@1.58.2:
+    resolution: {integrity: sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -6602,10 +6602,10 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@playwright/experimental-ct-core@1.56.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)':
+  '@playwright/experimental-ct-core@1.58.2(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)':
     dependencies:
-      playwright: 1.56.1
-      playwright-core: 1.56.1
+      playwright: 1.58.2
+      playwright-core: 1.58.2
       vite: 6.4.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
     transitivePeerDependencies:
       - '@types/node'
@@ -6620,9 +6620,9 @@ snapshots:
       - tsx
       - yaml
 
-  '@playwright/experimental-ct-react@1.56.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.2.7(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))(yaml@2.8.2)':
+  '@playwright/experimental-ct-react@1.58.2(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.2.7(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))(yaml@2.8.2)':
     dependencies:
-      '@playwright/experimental-ct-core': 1.56.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
+      '@playwright/experimental-ct-core': 1.58.2(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
       '@vitejs/plugin-react': 4.7.0(vite@7.2.7(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))
     transitivePeerDependencies:
       - '@types/node'
@@ -9609,11 +9609,11 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  playwright-core@1.56.1: {}
+  playwright-core@1.58.2: {}
 
-  playwright@1.56.1:
+  playwright@1.58.2:
     dependencies:
-      playwright-core: 1.56.1
+      playwright-core: 1.58.2
     optionalDependencies:
       fsevents: 2.3.2
 

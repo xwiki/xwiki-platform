@@ -204,6 +204,7 @@
 ## Bootstrap variables
 ############################################
 ## List of Bootstrap variables we need to give default values for XWiki standard variables shown above
+## or used as is in XS.
 #set($bootstrapVariables = {
     "btn-danger-color" : "#fff",
     "btn-default-border" : "#ccc",
@@ -232,6 +233,7 @@
     "list-group-link-color": "#555",
     "list-group-link-hover-color": "var(--list-group-link-color)",
     "navbar-height" : "50px",
+    "padding-large-vertical": "10px",
     "table-bg-hover": "#f5f5f5",
     "table-border-color": "#ddd"
 })

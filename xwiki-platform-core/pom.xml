@@ -149,35 +149,8 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>
-                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
-                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
-              </justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method org.xwiki.rest.model.jaxb.Page org.xwiki.rest.resources.pages.PageResource::getPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
-                  <new>method org.xwiki.rest.model.jaxb.Page org.xwiki.rest.resources.pages.PageResource::getPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean, java.lang.Boolean, java.lang.Boolean, java.util.List&lt;java.lang.String&gt;) throws org.xwiki.rest.XWikiRestException</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Change in generated class of the REST model to add the rights property.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <code>java.annotation.attributeValueChanged</code>
-                  <old>class org.xwiki.rest.model.jaxb.Page</old>
-                  <new>class org.xwiki.rest.model.jaxb.Page</new>
-                  <annotationType>javax.xml.bind.annotation.XmlType</annotationType>
-                  <attribute>propOrder</attribute>
-                  <oldValue>{"language", "majorVersion", "minorVersion", "hidden", "enforceRequiredRights", "created", "creator", "creatorName", "modified", "modifier", "modifierName", "originalMetadataAuthor", "originalMetadataAuthorName", "comment", "content", "clazz", "objects", "attachments", "hierarchy"}</oldValue>
-                  <newValue>{"language", "majorVersion", "minorVersion", "hidden", "enforceRequiredRights", "created", "creator", "creatorName", "modified", "modifier", "modifierName", "originalMetadataAuthor", "originalMetadataAuthorName", "comment", "content", "clazz", "objects", "attachments", "hierarchy", "rights"}</newValue>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
 
             
           </analysisConfiguration>

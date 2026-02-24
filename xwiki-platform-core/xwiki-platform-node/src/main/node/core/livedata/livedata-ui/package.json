@@ -26,6 +26,13 @@
     }
   },
   "main": "./dist/index.es.js",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",

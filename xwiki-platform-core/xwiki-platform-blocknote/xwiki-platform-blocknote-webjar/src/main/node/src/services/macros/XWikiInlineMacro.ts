@@ -60,6 +60,6 @@ export class XWikiInlineMacro implements InlineMacro<MacroParams> {
   render({
     output,
   }: GetConcreteMacroParametersType<MacroParams>): MacroInlineContent[] {
-    return JSON.parse(output);
+    return JSON.parse(output || "[]");
   }
 }

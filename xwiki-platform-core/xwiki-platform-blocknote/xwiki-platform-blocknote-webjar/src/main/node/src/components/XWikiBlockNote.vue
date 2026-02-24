@@ -26,7 +26,7 @@
         :editor-props
         :editor-content
         :container
-        :macros="false"
+        :macros
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
@@ -70,6 +70,10 @@
 <script setup lang="ts">
 import { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
+import {
+  MacroWithUnknownParamsType,
+  UnknownMacroParamsType,
+} from "@xwiki/platform-macros-api";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
 import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
@@ -136,6 +140,27 @@ const editorProps = shallowRef<
   theme: "light",
   lang: getLanguage(),
 });
+
+const macros = {
+  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+  ctx: {
+    openParamsEditor: (
+      macro: MacroWithUnknownParamsType,
+      params: UnknownMacroParamsType,
+      update: (newProps: UnknownMacroParamsType) => void,
+    ) => {
+      // TODO: Open the macro modal.
+      console.debug(
+        "Open macro editor for macro",
+        macro,
+        "with params",
+        params,
+        "and update callback",
+        update,
+      );
+    },
+  },
+};
 
 //
 // Computed

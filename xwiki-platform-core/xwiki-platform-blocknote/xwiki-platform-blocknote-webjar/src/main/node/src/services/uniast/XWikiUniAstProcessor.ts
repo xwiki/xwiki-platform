@@ -103,7 +103,10 @@ export class XWikiUniAstProcessor implements UniAstProcessor {
       macroNode.call.id === "xwikiInlineMacro"
     ) {
       const call = JSON.parse(macroNode.call.params.call as string);
-      const output = JSON.parse(macroNode.call.params.output as string);
+      let output = macroNode.call.params.output;
+      if (typeof output === "string") {
+        output = JSON.parse(output as string);
+      }
       macroNode.call = call;
       macroNode.output = output;
     }

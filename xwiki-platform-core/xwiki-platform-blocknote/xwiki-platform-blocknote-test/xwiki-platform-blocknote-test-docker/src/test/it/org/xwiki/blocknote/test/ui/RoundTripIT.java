@@ -304,6 +304,46 @@ class RoundTripIT extends AbstractBlockNoteIT
         // TODO: See XWIKI-24001: Dividers (horizontal rule) are not saved and content after them is lost
     }
 
+    @Test
+    @Order(15)
+    void macro(TestUtils setup, TestReference testReference) throws Exception
+    {
+        roundTrip(setup, testReference, """
+            before
+
+            one {{html clean="false"}}two{{/html}} three
+
+            empty {{html/}} macro
+
+            {{velocity wiki="true"}}
+            > quoted text
+            {{/velocity}}
+
+            {{include reference="Missing.Page"/}}
+
+            after""",
+            // The content is modified on save:
+            // * the editor outputs the default paragraph styles
+            """
+                (% style="color:default;background-color:default;text-align:left" %)
+                before
+
+                (% style="color:default;background-color:default;text-align:left" %)
+                one {{html clean="false"}}two{{/html}} three
+
+                (% style="color:default;background-color:default;text-align:left" %)
+                empty {{html/}} macro
+
+                {{velocity wiki="true"}}
+                > quoted text
+                {{/velocity}}
+
+                {{include reference="Missing.Page"/}}
+
+                (% style="color:default;background-color:default;text-align:left" %)
+                after""");
+    }
+
     void roundTrip(TestUtils setup, TestReference testReference, String content) throws Exception
     {
         roundTrip(setup, testReference, content, content);

@@ -61,6 +61,6 @@ export class XWikiMacroBlock implements BlockMacro<MacroParams> {
   render({
     output,
   }: GetConcreteMacroParametersType<MacroParams>): MacroBlock[] {
-    return JSON.parse(output);
+    return JSON.parse(output || "[]");
   }
 }

@@ -49,6 +49,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

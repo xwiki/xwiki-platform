@@ -1,0 +1,25 @@
+{
+  "name": "@xwiki/platform-tool-tsconfig",
+  "version": "18.1.0-SNAPSHOT",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsconfig",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "5.x"
+  },
+  "devDependencies": {
+    "@xwiki/platform-tool-tsconfig": "workspace:*"
+  },
+  "files": [
+    "*.json"
+  ]
+}

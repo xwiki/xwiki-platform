@@ -20,12 +20,12 @@
 import { absoluteCristalEntityReference } from "./XWikiEntityReference";
 import {
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
-import { ModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { ModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 
 @injectable("Singleton")
 export class XWikiModelReferenceHandler implements ModelReferenceHandler {

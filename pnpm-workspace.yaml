@@ -34,6 +34,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
 

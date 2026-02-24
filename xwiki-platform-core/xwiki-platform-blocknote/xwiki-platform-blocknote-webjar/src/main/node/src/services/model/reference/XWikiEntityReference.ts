@@ -20,11 +20,11 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
   WikiReference,
 } from "@xwiki/platform-model-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
 
 type XWikiEntityReference = {
   name: string;

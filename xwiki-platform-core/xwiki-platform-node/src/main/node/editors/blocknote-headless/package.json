@@ -65,6 +65,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

@@ -28,6 +28,7 @@
     "vite": "catalog:"
   },
   "devDependencies": {
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:"
   }
 }

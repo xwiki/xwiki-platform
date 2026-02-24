@@ -18,12 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toCristalEntityReference } from "./XWikiEntityReference";
-import { EntityReference, EntityType } from "@xwiki/platform-model-api";
-import {
+import { EntityType } from "@xwiki/platform-model-api";
+import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type {
   ModelReferenceParser,
   ModelReferenceParserOptions,
 } from "@xwiki/platform-model-reference-api";
-import { Container, injectable } from "inversify";
 
 type ResourceReference = {
   type: string;

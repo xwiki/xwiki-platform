@@ -45,6 +45,7 @@
     "@types/jquery": "catalog:",
     "@types/sinon": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "jquery": "catalog:",
     "sinon": "catalog:",

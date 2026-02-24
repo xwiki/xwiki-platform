@@ -21,9 +21,11 @@ import { container } from "./container";
 import { i18nResolver } from "./i18nResolver";
 import XWikiBlockNote from "../components/XWikiBlockNote.vue";
 import { createPinia } from "pinia";
-import { App, createApp, reactive } from "vue";
-import { I18n, createI18n } from "vue-i18n";
+import { createApp, reactive } from "vue";
+import { createI18n } from "vue-i18n";
 import type { SkinManager } from "@xwiki/platform-api";
+import type { App } from "vue";
+import type { I18n } from "vue-i18n";
 
 type Data = {
   initialValue?: string;

@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "vite": "catalog:"

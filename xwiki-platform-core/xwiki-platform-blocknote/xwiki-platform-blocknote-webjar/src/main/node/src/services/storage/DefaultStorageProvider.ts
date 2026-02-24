@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { StorageProvider } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable, named } from "inversify";
 import type { Storage } from "@xwiki/platform-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 
 @injectable("Singleton")
 export class DefaultStorageProvider implements StorageProvider {

@@ -64,7 +64,7 @@ export interface Logic {
     data?: Reactive<LogicData>;
     filter(property: string, index: number, filterEntry: {
         index: number;
-    }, { filterOperator, skipFetch, }: {
+    }, input: {
         filterOperator?: unknown;
         skipFetch?: boolean;
     }): Promise<void>;
@@ -78,7 +78,7 @@ export interface Logic {
     removeSort(property: string): Promise<void>;
     reorderSort(propertyId: string, toIndex: number): void;
     setElement(element: HTMLElement): void;
-    setValues({ entryId, values, }: {
+    setValues(input: {
         entryId: string;
         values: unknown;
     }): Promise<unknown>;

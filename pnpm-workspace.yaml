@@ -114,7 +114,7 @@ catalog:
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
   vitest-mock-extended: 3.1.0
-  vue: 3.5.28
+  vue: 3.5.29
   vue-eslint-parser: 10.4.0
   vue-i18n: 11.2.8
   vue-router: 5.0.3

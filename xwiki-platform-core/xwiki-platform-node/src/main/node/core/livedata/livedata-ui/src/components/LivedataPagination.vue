@@ -367,24 +367,17 @@ export default {
   background-color: transparent;
   border-color: transparent;
   min-height: 30px;
+  border-width: 2px;
 }
 
 .livedata-pagination .page-nav.current {
   font-weight: bold;
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-color);
+  background-color: var(--btn-default-bg);
+  color: var(--text-muted);
 }
 
 .livedata-pagination .page-nav:hover {
   border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.1));
-}
-
-/* We make sure that the icons to navigate through the pages are big enough. */
-.livedata-pagination .page-nav.first-page,
-.livedata-pagination .page-nav.previous-page,
-.livedata-pagination .page-nav.next-page,
-.livedata-pagination .page-nav.last-page {
-  font-size: 1.3em;
 }
 
 .livedata-pagination .page-nav.previous-page > * {

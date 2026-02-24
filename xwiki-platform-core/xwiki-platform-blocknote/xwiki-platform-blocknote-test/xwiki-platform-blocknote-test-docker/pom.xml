@@ -44,6 +44,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used to test the integration with the in-place edit mode. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- Test only dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -54,6 +62,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-blocknote-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

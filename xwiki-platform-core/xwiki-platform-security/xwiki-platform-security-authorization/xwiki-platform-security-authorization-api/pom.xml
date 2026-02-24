@@ -72,6 +72,7 @@
       <artifactId>xwiki-commons-logging-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -82,6 +83,12 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

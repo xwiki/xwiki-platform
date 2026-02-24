@@ -36,3 +36,10 @@ export default {
   name: "LivedataBottombar",
 };
 </script>
+
+<style>
+.livedata-bottombar {
+  padding-top: var(--padding-large-vertical);
+  padding-bottom: var(--padding-large-vertical);
+}
+</style>

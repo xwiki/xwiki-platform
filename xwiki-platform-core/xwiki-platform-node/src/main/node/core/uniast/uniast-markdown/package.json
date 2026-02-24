@@ -39,12 +39,10 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-macros-service": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "fast-xml-parser": "catalog:",
     "mdast-util-gfm-strikethrough": "catalog:",
     "mdast-util-gfm-table": "catalog:",
     "mdast-util-gfm-task-list-item": "catalog:",

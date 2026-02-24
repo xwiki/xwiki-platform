@@ -24,7 +24,6 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "@xwiki/platform-uniast-markdown": "workspace:*",
     "inversify": "catalog:",
     "pinia": "catalog:",
     "react": "catalog:",

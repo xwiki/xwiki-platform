@@ -76,7 +76,7 @@ catalog:
   globals: 17.3.0
   happy-dom: 20.7.0
   i18next: 25.8.13
-  inversify: 7.10.4
+  inversify: 7.11.0
   jiti: 2.6.1
   jquery: 3.7.1
   jsdom: 28.1.0

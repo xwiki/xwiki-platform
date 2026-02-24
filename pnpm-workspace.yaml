@@ -44,7 +44,7 @@ catalog:
   "@eslint/js": 9.39.2
   "@mantine/core": 8.3.14
   "@mantine/hooks": 8.3.14
-  "@microsoft/api-extractor": 7.57.3
+  "@microsoft/api-extractor": 7.57.4
   "@playwright/experimental-ct-react": 1.58.2
   "@tsconfig/node24": 24.0.4
   "@types/jsdom": 27.0.0

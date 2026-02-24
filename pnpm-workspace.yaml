@@ -63,7 +63,7 @@ catalog:
   "@types/react": 19.2.7
   "@types/react-dom": 19.2.3
   "@types/sinon": 21.0.0
-  "@vitejs/plugin-react": 5.1.0
+  "@vitejs/plugin-react": 5.1.4
   "@vitejs/plugin-vue": 6.0.4
   "@vitest/eslint-plugin": 1.6.9
   "@vue/eslint-config-prettier": 10.2.0

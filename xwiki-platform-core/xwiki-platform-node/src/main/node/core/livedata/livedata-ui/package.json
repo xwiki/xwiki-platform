@@ -64,6 +64,7 @@
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-livedata-componentstore": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "flush-promises": "catalog:",
     "jquery": "catalog:",

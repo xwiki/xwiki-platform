@@ -42,6 +42,7 @@
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "globals": "catalog:",
     "jiti": "catalog:",

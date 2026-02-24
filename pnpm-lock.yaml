@@ -363,6 +363,9 @@ importers:
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -562,6 +565,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -605,6 +611,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -651,6 +660,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -687,6 +699,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -715,6 +730,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -749,6 +767,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -783,6 +804,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -814,6 +838,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -845,6 +872,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -872,6 +902,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -903,6 +936,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -934,6 +970,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -961,6 +1000,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -988,6 +1030,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1046,6 +1091,9 @@ importers:
       '@xwiki/platform-livedata-componentstore':
         specifier: workspace:*
         version: link:../livedata-componentstore
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1098,6 +1146,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1128,6 +1179,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1162,6 +1216,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1196,6 +1253,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1220,6 +1280,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1248,6 +1311,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1282,6 +1348,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1316,6 +1385,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1338,6 +1410,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.57.4(@types/node@24.10.13)
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1408,6 +1483,9 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1454,6 +1532,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.57.4(@types/node@24.10.13)
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1527,6 +1608,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1639,6 +1723,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1700,6 +1787,9 @@ importers:
         specifier: 'catalog:'
         version: 10.4.0(eslint@9.39.3(jiti@2.6.1))
     devDependencies:
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1707,12 +1797,25 @@ importers:
         specifier: 'catalog:'
         version: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
 
+  xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsconfig:
+    dependencies:
+      typescript:
+        specifier: 5.x
+        version: 5.9.3
+    devDependencies:
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: 'link:'
+
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig:
     dependencies:
       vite:
         specifier: 'catalog:'
         version: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
     devDependencies:
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)

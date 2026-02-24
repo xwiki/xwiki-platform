@@ -22,6 +22,8 @@ package org.xwiki.livedata;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xwiki.stability.Unstable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -49,6 +51,8 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     private Boolean showFirstLast;
 
     private Boolean showPageSizeDropdown;
+    
+    private Boolean showPaginationOnSinglePage;
 
     /**
      * @return the maximum number of page links to display in the pagination
@@ -158,6 +162,27 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     public void setShowPageSizeDropdown(Boolean showPageSizeDropdown)
     {
         this.showPageSizeDropdown = showPageSizeDropdown;
+    }
+
+    /**
+     * @since 17.10.0RC1
+     * @return whether to show or not the pagination should be shown when there's only one page.
+     */
+    @Unstable
+    public Boolean getShowPaginationOnSinglePage()
+    {
+        return showPaginationOnSinglePage;
+    }
+
+    /**
+     * Sets whether to show or not the pagination should be shown when there's only one page.
+     * @since 17.10.0RC1
+     * @param showPaginationOnSinglePage {@code true} to always show the pagination, {@code false} otherwise
+     */
+    @Unstable
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        this.showPaginationOnSinglePage = showPaginationOnSinglePage;
     }
 
     @Override

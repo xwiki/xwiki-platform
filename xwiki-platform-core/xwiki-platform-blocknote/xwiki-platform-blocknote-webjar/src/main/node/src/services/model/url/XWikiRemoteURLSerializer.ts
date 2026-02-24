@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,15 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/platform-model-api";
+import {
+  absoluteXWikiEntityReference,
+  toXWikiEntityReference,
+} from "../reference/XWikiEntityReference";
+import {
+  DocumentReference,
+  EntityReference,
+  EntityType,
+  SpaceReference,
+} from "@xwiki/platform-model-api";
 import { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import { Container, injectable } from "inversify";
-import { absoluteXWikiEntityReference, toXWikiEntityReference } from "../reference/XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
   public static bind(container: Container): void {
-    container.bind("RemoteURLSerializer").to(XWikiRemoteURLSerializer).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("RemoteURLSerializer")
+      .to(XWikiRemoteURLSerializer)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   public serialize(reference?: EntityReference): string | undefined {
@@ -49,10 +61,14 @@ export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
   }
 
   private getDocumentURL(reference: EntityReference): string {
-    return new XWiki.Document(absoluteXWikiEntityReference(toXWikiEntityReference(reference))).getURL();
+    return new XWiki.Document(
+      absoluteXWikiEntityReference(toXWikiEntityReference(reference)),
+    ).getURL();
   }
 
   private getAttachmentURL(reference: EntityReference): string {
-    return new XWiki.Attachment(absoluteXWikiEntityReference(toXWikiEntityReference(reference))).getURL();
+    return new XWiki.Attachment(
+      absoluteXWikiEntityReference(toXWikiEntityReference(reference)),
+    ).getURL();
   }
 }

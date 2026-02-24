@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-uniast-markdown",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -39,12 +39,10 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-macros-service": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "fast-xml-parser": "catalog:",
     "mdast-util-gfm-strikethrough": "catalog:",
     "mdast-util-gfm-table": "catalog:",
     "mdast-util-gfm-task-list-item": "catalog:",

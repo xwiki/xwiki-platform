@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,22 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { toXWikiEntityReference } from "./XWikiEntityReference";
 import { EntityReference, EntityType } from "@xwiki/platform-model-api";
 import { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 import { Container, injectable } from "inversify";
-import { toXWikiEntityReference } from "./XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
   public static bind(container: Container): void {
-    container.bind("ModelReferenceSerializer").to(XWikiModelReferenceSerializer).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("ModelReferenceSerializer")
+      .to(XWikiModelReferenceSerializer)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   public serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
       return undefined;
     }
-    return this.getPrefix(reference.type) + XWiki.Model.serialize(toXWikiEntityReference(reference));
+    return (
+      this.getPrefix(reference.type) +
+      XWiki.Model.serialize(toXWikiEntityReference(reference))
+    );
   }
 
   private getPrefix(type: EntityType): string {

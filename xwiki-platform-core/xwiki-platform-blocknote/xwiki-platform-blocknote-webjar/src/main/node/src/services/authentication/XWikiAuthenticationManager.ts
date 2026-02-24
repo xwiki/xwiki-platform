@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,13 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AuthenticationManager, UserDetails } from "@xwiki/platform-authentication-api";
+import {
+  AuthenticationManager,
+  UserDetails,
+} from "@xwiki/platform-authentication-api";
 import { Container, injectable } from "inversify";
 
 @injectable("Singleton")
 export class XWikiAuthenticationManager implements AuthenticationManager {
   public static bind(container: Container): void {
-    container.bind("AuthenticationManager").to(XWikiAuthenticationManager).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("AuthenticationManager")
+      .to(XWikiAuthenticationManager)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   public async start(): Promise<void> {

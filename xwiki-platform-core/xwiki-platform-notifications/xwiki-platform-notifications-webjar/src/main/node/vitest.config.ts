@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,17 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { fileURLToPath } from 'node:url'
-import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import viteConfig from "./vite.config";
+import { configDefaults, defineConfig, mergeConfig } from "vitest/config";
+import { fileURLToPath } from "node:url";
 
 export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/**'],
-      root: fileURLToPath(new URL('./', import.meta.url)),
+      environment: "jsdom",
+      exclude: [...configDefaults.exclude, "e2e/**"],
+      root: fileURLToPath(new URL("./", import.meta.url)),
     },
   }),
-)
+);

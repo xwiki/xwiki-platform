@@ -19,77 +19,83 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
-import java.util.TreeSet;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
+import org.apache.commons.collections4.set.AbstractSetTest;
+import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.testing.SampleElements;
-import com.google.common.collect.testing.SetTestSuiteBuilder;
-import com.google.common.collect.testing.TestSetGenerator;
-import com.google.common.collect.testing.features.CollectionFeature;
-import com.google.common.collect.testing.features.CollectionSize;
-import com.google.common.collect.testing.features.SetFeature;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Test Set interface of RightSet using guava test library.
+ * Test Set interface of RightSet.
  *
  * @version $Id$
  * @since 4.0M2
  */
-@RunWith(AllTests.class)
-public class RightSetTest
+public class RightSetTest extends AbstractSetTest<Right>
 {
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
+    @Override
+    public RightSet makeObject()
+    {
+        return new RightSet();
+    }
 
-        suite.addTest(SetTestSuiteBuilder.using(new TestSetGenerator<Right>() {
-                @Override
-                public SampleElements<Right> samples()
-                {
-                    return new SampleElements<Right>(
-                        Right.VIEW,
-                        Right.EDIT,
-                        Right.DELETE,
-                        Right.COMMENT,
-                        Right.ADMIN
-                    );
-                }
+    @Override
+    public RightSet makeConfirmedCollection()
+    {
+        return new RightSet();
+    }
 
-                @Override
-                public Set<Right> create(Object... elements)
-                {
-                    Set<Right> set = new RightSet();
-                    for (Object e : elements) {
-                        set.add((Right) e);
-                    }
-                    return set;
-                }
+    @Override
+    public Right[] getFullNonNullElements()
+    {
+        return new Right[] {Right.VIEW, Right.EDIT, Right.DELETE, Right.COMMENT, Right.ADMIN};
+    }
 
-                @Override
-                public Right[] createArray(int length)
-                {
-                    return new Right[length];
-                }
+    @Override
+    public Right[] getOtherNonNullElements()
+    {
+        return new Right[] {Right.CREATE_WIKI, Right.CREATOR, Right.ILLEGAL};
+    }
 
-                @Override
-                public Iterable<Right> order(List<Right> insertionOrder)
-                {
-                    return new TreeSet<Right>(insertionOrder);
-                }
-            })
-            .named("RightSet")
-            .withFeatures(SetFeature.GENERAL_PURPOSE,
-                CollectionSize.ANY,
-                CollectionFeature.ALLOWS_NULL_QUERIES,
-                CollectionFeature.KNOWN_ORDER)
-            .suppressing(com.google.common.collect.testing.testers.SetHashCodeTester.getHashCodeMethods())
-            .createTestSuite());
-        return suite;
+    @Override
+    public boolean isNullSupported()
+    {
+        return false;
+    }
+
+    @Override
+    protected boolean skipSerializedCanonicalTests()
+    {
+        return true;
+    }
+
+    // Methods we need to override because AbstractSetTest use Strings to validate the Set
+
+    /**
+     * Tests {@link Set#equals(Object)}.
+     */
+    @Test
+    @Override
+    public void testSetEquals()
+    {
+        resetEmpty();
+        assertEquals(getCollection(), getConfirmed(), "Empty sets should be equal");
+        verify();
+
+        final RightSet set2 = makeConfirmedCollection();
+        // CUSTOM: the standard #testSetEquals add a String here, which does not make any sense for RightSet
+        set2.add(Right.VIEW);
+        assertFalse(getCollection().equals(set2), "Empty set shouldn't equal nonempty set");
+
+        resetFull();
+        assertEquals(getCollection(), getConfirmed(), "Full sets should be equal");
+        verify();
+
+        set2.clear();
+        set2.addAll(Arrays.asList(getOtherElements()));
+        assertFalse(getCollection().equals(set2), "Sets with different contents shouldn't be equal");
     }
 }

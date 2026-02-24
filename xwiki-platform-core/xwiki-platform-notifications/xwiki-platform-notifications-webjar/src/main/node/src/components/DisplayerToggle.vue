@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -36,14 +36,14 @@
   >
     <template #viewer>
       <input
-        type='checkbox'
-        class='toggleableFilterPreferenceCheckbox'
+        type="checkbox"
+        class="toggleableFilterPreferenceCheckbox"
         ref="input"
       />
       <!-- We keep this section hidden as it is only there to be copied when initializing the toggle. -->
       <span v-show="false">
         <XWikiIcon
-          :icon-descriptor="{name: iconName}"
+          :icon-descriptor="{ name: iconName }"
           ref="icon"
           @ready="iconReady = true"
         />
@@ -60,7 +60,11 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin, XWikiIcon } from "xwiki-livedata";
+import {
+  BaseDisplayer,
+  XWikiIcon,
+  displayerMixin,
+} from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-toggle",
@@ -86,11 +90,13 @@ export default {
     };
   },
   watch: {
-    iconReady: function(val) {
+    iconReady: function (val) {
       if (val) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           require(["xwiki-bootstrap-switch"], () => {
             this.jQuery(this.$refs.input).bootstrapSwitch({
               size: "mini",
@@ -112,7 +118,7 @@ export default {
                   data: toggleData,
                   checked: state,
                   disabled: disabledVal,
-                  callback: function({
+                  callback: function ({
                     data = toggleData,
                     checked = state,
                     disabled = disabledVal,
@@ -121,8 +127,15 @@ export default {
                     component.innerChecked = checked;
                     component.innerDisabled = disabled;
                     // The last parameter is skip, preventing to call onSwitchChange again.
-                    this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                    this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
+                    this.jQuery(component.$refs.input).bootstrapSwitch(
+                      "state",
+                      checked,
+                      true,
+                    );
+                    this.jQuery(component.$refs.input).bootstrapSwitch(
+                      "disabled",
+                      disabled,
+                    );
                   },
                 });
               },

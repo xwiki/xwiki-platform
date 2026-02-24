@@ -308,9 +308,8 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             this.xwiki.saveDocument(document, this.xcontext);
         }
 
-        when(this.oldCore.getMockRightService()
-            .hasAccessLevel("view", this.xcontext.getUser(), serializedDocumentReference, this.xcontext)).thenReturn(
-            hasView);
+        when(this.oldCore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, documentReference))
+            .thenReturn(hasView);
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(hasEdit);
 
         return this.xwiki.getDocument(documentReference, this.xcontext);

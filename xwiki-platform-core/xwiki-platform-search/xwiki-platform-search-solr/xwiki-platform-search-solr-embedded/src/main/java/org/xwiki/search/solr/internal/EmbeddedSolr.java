@@ -51,7 +51,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
 import org.apache.solr.core.CoreDescriptor;
@@ -189,7 +188,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     {
         SolrCore core = this.container.getCore(coreName);
 
-        return core != null ? new EmbeddedSolrServer(core) : null;
+        return core != null ? new EmbeddedClient(core) : null;
     }
 
     @Override
@@ -218,7 +217,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         SolrCore core = this.container.create(solrCoreName, parameters);
 
         // Return a usable SolrClient instance
-        return new EmbeddedSolrServer(core);
+        return new EmbeddedClient(core);
     }
 
     private Path prepareCore(String solrCoreName) throws IOException

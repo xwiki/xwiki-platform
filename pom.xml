@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.2.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.1.0-SNAPSHOT</version>
+  <version>18.2.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -62,14 +62,14 @@
     <pdfbox.version>3.0.6</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.5</jetty.server.version>
+    <jetty.server.version>12.1.6</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.9.Final</netty.version>
+    <netty.version>4.2.10.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.151.0</metaeffekt.version>
+    <metaeffekt.version>0.152.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -84,7 +84,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>25.2.7</libreoffice.version>
+    <libreoffice.version>25.8.4</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -112,7 +112,7 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.5.0</mysql.version>
+    <mysql.version>9.6.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.5.7</mariadb.version>
@@ -121,7 +121,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.9</pgsql.version>
+    <pgsql.version>42.7.10</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.20.0.0</oracle.version>
@@ -149,12 +149,12 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>mchange-commons-java</artifactId>
-        <version>0.3.2</version>
+        <version>0.4.0</version>
       </dependency>
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.11.2</version>
+        <version>0.12.0</version>
       </dependency>
       <!-- Hibernate -->
       <dependency>
@@ -539,7 +539,7 @@
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.4.0</version>
+        <version>2.5.2</version>
       </dependency>
 
       <dependency>
@@ -1148,7 +1148,7 @@
       <dependency>
         <groupId>com.jayway.jsonpath</groupId>
         <artifactId>json-path</artifactId>
-        <version>2.10.0</version>
+        <version>3.0.0</version>
       </dependency>
 
       <!-- Database connectors -->
@@ -1211,17 +1211,17 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.26</version>
+        <version>3.5.29</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.1.12</version>
+        <version>11.2.8</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
-        <version>7.0.1</version>
+        <version>7.2.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1580,7 +1580,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.2.1</version>
+          <version>4.3.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

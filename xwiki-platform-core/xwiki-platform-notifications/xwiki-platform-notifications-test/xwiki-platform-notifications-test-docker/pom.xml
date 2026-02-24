@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-docker</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Docker Tests</name>
@@ -66,6 +66,22 @@
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to execute tests on subwikis -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Nedded for computing diff in notification emails -->
     <dependency>

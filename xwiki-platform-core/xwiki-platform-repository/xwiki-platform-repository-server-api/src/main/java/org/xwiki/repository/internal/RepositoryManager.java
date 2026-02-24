@@ -61,6 +61,7 @@ import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.internal.converter.ExtensionComponentConverter;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.internal.converter.ExtensionPatternConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -1171,6 +1172,8 @@ public class RepositoryManager
                                 this.extensionStore.getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID);
                             String xobjectConstraint = this.extensionStore.getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
+                            List<String> xobjectExclusions = (List<String>) this.extensionStore
+                                .getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS);
                             List<String> xobjectRepositories = (List<String>) this.extensionStore
                                 .getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
                             boolean xobjectOptional = this.extensionStore.getBooleanValue(dependencyObject,
@@ -1182,6 +1185,8 @@ public class RepositoryManager
                                 DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
                                     new DefaultVersionConstraint(xobjectConstraint), xobjectOptional,
                                     dependency.getProperties());
+                                xobjectDependency.setExclusions(ExtensionPatternConverter
+                                    .toExtensionPatternList(xobjectExclusions, this.extensionFactory));
                                 xobjectDependency.setRepositories(XWikiRepositoryModel
                                     .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 
@@ -1216,6 +1221,8 @@ public class RepositoryManager
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
                     dependency.getVersionConstraint().getValue(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS,
+                    ExtensionPatternConverter.toStringList(dependency.getExclusions()), xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0,
                     xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES,

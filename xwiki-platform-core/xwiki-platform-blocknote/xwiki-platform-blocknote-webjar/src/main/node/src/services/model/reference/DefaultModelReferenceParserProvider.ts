@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,18 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ModelReferenceParser, ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import {
+  ModelReferenceParser,
+  ModelReferenceParserProvider,
+} from "@xwiki/platform-model-reference-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
-export class DefaultModelReferenceParserProvider implements ModelReferenceParserProvider {
+export class DefaultModelReferenceParserProvider
+  implements ModelReferenceParserProvider
+{
   public static bind(container: Container): void {
-    container.bind("ModelReferenceParserProvider").to(DefaultModelReferenceParserProvider).inSingletonScope();
+    container
+      .bind("ModelReferenceParserProvider")
+      .to(DefaultModelReferenceParserProvider)
+      .inSingletonScope();
   }
 
   constructor(@inject("Container") private readonly container: Container) {}
 
   get(type?: string): ModelReferenceParser | undefined {
-    return this.container.get("ModelReferenceParser", { name: type || "XWiki" });
+    return this.container.get("ModelReferenceParser", {
+      name: type || "XWiki",
+    });
   }
 }

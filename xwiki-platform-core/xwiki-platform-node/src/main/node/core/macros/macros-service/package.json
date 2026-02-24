@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-macros-service",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -47,6 +47,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "eslint": "catalog:",
     "inversify": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

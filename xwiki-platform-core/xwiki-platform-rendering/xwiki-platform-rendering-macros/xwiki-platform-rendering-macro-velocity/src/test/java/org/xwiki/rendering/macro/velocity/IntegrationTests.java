@@ -28,6 +28,7 @@ import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
 import org.xwiki.rendering.test.integration.Initialized;
 import org.xwiki.rendering.test.integration.Scope;
 import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -51,6 +52,11 @@ public class IntegrationTests extends RenderingTest
     @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
+        // The default TransformationManager implementation depends on the AuthorExecutor component but it doesn't use
+        // it unless a specific TransformationContext is used, which is not the case here. So we just register a mock
+        // AuthorExecutor to satisfy the dependency.
+        componentManager.registerMockComponent(AuthorExecutor.class);
+
         new JUnit5ScriptMockSetup(componentManager);
 
         // Set up the permanent directory in the target directory (so that it doesn't fall back on a temporary directory

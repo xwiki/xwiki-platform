@@ -19,12 +19,12 @@
  */
 package org.xwiki.url.internal.standard.entity;
 
-import java.net.URL;
-import java.util.Arrays;
+import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,7 +39,7 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.standard.StandardURLConfiguration;
 import org.xwiki.url.internal.standard.WikiReferenceExtractor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.3M1
  */
-public class WikiEntityResourceReferenceResolverTest
+class WikiEntityResourceReferenceResolverTest
 {
     private WikiEntityResourceReferenceResolver resolver;
 
@@ -58,12 +58,8 @@ public class WikiEntityResourceReferenceResolverTest
 
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
-    private EntityResourceActionLister entityResourceActionLister;
-
-    private StandardURLConfiguration configuration;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
         this.resolver = new WikiEntityResourceReferenceResolver();
 
@@ -74,64 +70,52 @@ public class WikiEntityResourceReferenceResolverTest
         ReflectionUtils.setFieldValue(this.resolver, "defaultReferenceEntityReferenceResolver",
             this.entityReferenceResolver);
 
-        this.configuration = mock(StandardURLConfiguration.class);
-        when(this.configuration.isViewActionHidden()).thenReturn(false);
-        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.configuration);
+        StandardURLConfiguration configuration = mock(StandardURLConfiguration.class);
+        when(configuration.isViewActionHidden()).thenReturn(false);
+        ReflectionUtils.setFieldValue(this.resolver, "configuration", configuration);
 
-        this.entityResourceActionLister = mock(EntityResourceActionLister.class);
-        when(this.entityResourceActionLister.listActions()).thenReturn(Arrays.asList("view", "download"));
-        ReflectionUtils.setFieldValue(this.resolver, "entityResourceActionLister", this.entityResourceActionLister);
+        EntityResourceActionLister entityResourceActionLister = mock(EntityResourceActionLister.class);
+        when(entityResourceActionLister.listActions()).thenReturn(List.of("view", "download"));
+        ReflectionUtils.setFieldValue(this.resolver, "entityResourceActionLister", entityResourceActionLister);
     }
 
     @Test
-    public void resolve() throws Exception
+    void resolve() throws Exception
     {
-        ExtendedURL url = new ExtendedURL(new URL("http://localhost/wiki/somewiki/view/space/page"), null);
-        url.getSegments().remove(0);
+        ExtendedURL url = new ExtendedURL(new URI("http://localhost/wiki/somewiki/view/space/page").toURL(), null);
+        url.getSegments().removeFirst();
         when(wikiReferenceExtractor.extract(url)).thenReturn(this.wikiReference);
 
-        EntityReference reference = buildEntityReference("somewiki", "space", "page");
+        EntityReference reference = buildEntityReference();
         EntityResourceReference result = (EntityResourceReference) testCreateResource(
-            "http://localhost/wiki/somewiki/view/space/page", "view", reference, reference, EntityType.DOCUMENT);
+            reference, reference);
 
         assertEquals(new DocumentReference("somewiki", "space", "page"), result.getEntityReference());
     }
     
-    private ResourceReference testCreateResource(String testURL, String expectedActionName,
-        EntityReference expectedReference, EntityReference returnedReference, EntityType expectedEntityType)
+    private ResourceReference testCreateResource(EntityReference expectedReference, EntityReference returnedReference)
         throws Exception
     {
-        when(this.entityReferenceResolver.resolve(expectedReference, expectedEntityType)).thenReturn(
+        when(this.entityReferenceResolver.resolve(expectedReference, EntityType.DOCUMENT)).thenReturn(
             returnedReference);
-        ExtendedURL extendedURL = new ExtendedURL(new URL(testURL), null);
+        ExtendedURL extendedURL = new ExtendedURL(
+            new URI("http://localhost/wiki/somewiki/view/space/page").toURL(), null);
         // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
-        extendedURL.getSegments().remove(0);
+        extendedURL.getSegments().removeFirst();
         EntityResourceReference entityResource =
-            this.resolver.resolve(extendedURL, new ResourceType("wiki"), Collections.<String, Object>emptyMap());
+            this.resolver.resolve(extendedURL, new ResourceType("wiki"), Collections.emptyMap());
 
-        assertEquals(expectedActionName, entityResource.getAction().getActionName());
+        assertEquals("view", entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());
 
         return entityResource;
     }
 
-    private EntityReference buildEntityReference(String wiki, String space, String page)
+    private EntityReference buildEntityReference()
     {
-        return buildEntityReference(wiki, space, page, null);
-    }
-
-    private EntityReference buildEntityReference(String wiki, String space, String page, String attachment)
-    {
-        EntityReference entityReference = new WikiReference(wiki);
-        if (space != null) {
-            entityReference = new EntityReference(space, EntityType.SPACE, entityReference);
-        }
-        if (page != null) {
-            entityReference = new EntityReference(page, EntityType.DOCUMENT, entityReference);
-        }
-        if (attachment != null) {
-            entityReference = new EntityReference(attachment, EntityType.ATTACHMENT, entityReference);
-        }
+        EntityReference entityReference = new WikiReference("somewiki");
+        entityReference = new EntityReference("space", EntityType.SPACE, entityReference);
+        entityReference = new EntityReference("page", EntityType.DOCUMENT, entityReference);
         return entityReference;
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-editors-blocknote-headless",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -39,9 +39,6 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@blocknote/core": "catalog:",
-    "@tiptap/core": "catalog:",
-    "@tiptap/extensions": "catalog:",
-    "@tiptap/pm": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
@@ -56,7 +53,6 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "eventemitter3": "catalog:",
     "lodash-es": "catalog:",
     "vue-i18n": "catalog:"
   },

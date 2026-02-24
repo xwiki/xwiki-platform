@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.test.po;
 
 import java.awt.geom.Rectangle2D;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -59,6 +60,11 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
  */
 public class PDFDocument implements AutoCloseable
 {
+    /**
+     * Holds recently created PDF documents. This list is normally reset before / after each test execution.
+     */
+    public static final List<byte[]> BLOBS = new ArrayList<>();
+
     private final PDDocument document;
 
     private final PDFImageExtractor imageExtractor;
@@ -94,6 +100,14 @@ public class PDFDocument implements AutoCloseable
         }
         this.document = Loader.loadPDF(IOUtils.toByteArray(connection));
         this.imageExtractor = new PDFImageExtractor();
+        save();
+    }
+
+    private void save() throws IOException
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        this.document.save(outputStream);
+        BLOBS.add(outputStream.toByteArray());
     }
 
     @Override

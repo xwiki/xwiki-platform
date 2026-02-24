@@ -84,8 +84,8 @@ class SolrSearchIT
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage = searchPage.search("\"Test Document\"");
-        searchPage.toggleSpaceFaucet();
-        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
+        searchPage.toggleSpaceFacet();
+        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFacetContent());
     }
 
     @ParameterizedTest

@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-api",
-  "version": "18.1.0-SNAPSHOT",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -46,7 +46,7 @@
     "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x",
-    "vue-router": "4.x"
+    "vue-router": "5.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

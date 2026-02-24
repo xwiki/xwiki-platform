@@ -175,6 +175,7 @@ public class WikiDescriptor implements Cloneable
     /**
      * @return the pretty name of the wiki
      */
+    // FIXME: shouldn't the pretty name fallback on the ID if it's empty?
     public String getPrettyName()
     {
         return prettyName;

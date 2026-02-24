@@ -18,11 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
-export { type InternalLinksSerializer } from "./markdown/internal-links/serializer/internal-links-serializer";
+import localConfig from "./vite.config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(defaultConfig, localConfig);

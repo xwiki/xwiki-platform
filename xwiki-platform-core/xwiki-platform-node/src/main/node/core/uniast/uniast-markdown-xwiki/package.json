@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-uniast-markdown",
+  "name": "@xwiki/platform-uniast-markdown-xwiki",
   "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown",
+    "directory": "xwiki-platform-node/src/main/node/core/core/uniast/uniast-markdown-xwiki",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -20,13 +20,6 @@
     }
   },
   "main": "./src/index.ts",
-  "files": [
-    "dist",
-    "src",
-    "!src/**/*.spec.*",
-    "!src/**/*.test.*",
-    "!src/**/__tests__"
-  ],
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
@@ -38,35 +31,17 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-macros-service": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
-    "mdast-util-gfm-strikethrough": "catalog:",
-    "mdast-util-gfm-table": "catalog:",
-    "mdast-util-gfm-task-list-item": "catalog:",
-    "micromark-extension-gfm-strikethrough": "catalog:",
-    "micromark-extension-gfm-table": "catalog:",
-    "micromark-extension-gfm-task-list-item": "catalog:",
-    "remark-parse": "catalog:",
-    "unified": "catalog:"
+    "@xwiki/platform-uniast-markdown": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "catalog:",
-    "@types/mdast": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-model-reference-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:",
-    "vitest-mock-extended": "catalog:"
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

@@ -23,6 +23,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react
@@ -71,7 +72,6 @@ catalog:
   eslint-plugin-tsdoc: 0.5.0
   eslint-plugin-vue: 10.8.0
   eventemitter3: 5.0.4
-  fast-xml-parser: 5.3.4
   flush-promises: 1.0.2
   globals: 17.3.0
   happy-dom: 20.7.0

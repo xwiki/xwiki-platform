@@ -17,39 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
+import { injectable } from "inversify";
 import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
+import type {
+  InternalLinksSerializer,
+  UniAstToMarkdownConverter,
+} from "@xwiki/platform-uniast-markdown";
 
 /**
- * Serialize internal links and images for a specific backend.
- *
- * @beta
- * @since 18.2.0RC1
+ * @since 18.0.0RC1
  */
-export interface InternalLinksSerializer {
-  /**
-   * Serialize an internal link to Markdown.
-   *
-   * @param content - the link content
-   * @param target - the internal target of the link
-   * @param uniAstToMarkdownConverter - the Markdown converter to convert the link content to markdown
-   * @returns the serialized internal link string
-   */
-  serialize(
+@injectable()
+export class XWikiInternalLinkSerializer implements InternalLinksSerializer {
+  async serialize(
     content: Link["content"],
     target: Extract<LinkTarget, { type: "internal" }>,
     uniAstToMarkdownConverter: UniAstToMarkdownConverter,
-  ): Promise<string>;
+  ): Promise<string> {
+    return `[[${await uniAstToMarkdownConverter.convertInlineContents(
+      content,
+    )}|${target.rawReference}]]`;
+  }
 
-  /**
-   * Serialize an internal image to markdown.
-   *
-   * @param target - the internal target of the image
-   * @param alt - the alt text of the image
-   * @returns the serialized internal image string
-   */
-  serializeImage(
+  async serializeImage(
     target: Extract<LinkTarget, { type: "internal" }>,
     alt?: string,
-  ): Promise<string>;
+  ): Promise<string> {
+    return `![[${alt ?? ""}${alt ? "|" : ""}${target.rawReference}]]`;
+  }
 }

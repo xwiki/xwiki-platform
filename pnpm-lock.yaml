@@ -37,8 +37,8 @@ catalogs:
       specifier: 24.0.4
       version: 24.0.4
     '@types/jquery':
-      specifier: 3.5.33
-      version: 3.5.33
+      specifier: 4.0.0
+      version: 4.0.0
     '@types/jsdom':
       specifier: 28.0.0
       version: 28.0.0
@@ -133,8 +133,8 @@ catalogs:
       specifier: 2.6.1
       version: 2.6.1
     jquery:
-      specifier: 3.7.1
-      version: 3.7.1
+      specifier: 4.0.0
+      version: 4.0.0
     jsdom:
       specifier: 28.1.0
       version: 28.1.0
@@ -485,7 +485,7 @@ importers:
         version: 2.6.1
       jquery:
         specifier: 'catalog:'
-        version: 3.7.1
+        version: 4.0.0
       jsdom:
         specifier: 'catalog:'
         version: 28.1.0
@@ -1036,7 +1036,7 @@ importers:
         version: 7.57.4(@types/node@24.10.13)
       '@types/jquery':
         specifier: 'catalog:'
-        version: 3.5.33
+        version: 4.0.0
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.6
@@ -1054,7 +1054,7 @@ importers:
         version: 1.0.2
       jquery:
         specifier: 'catalog:'
-        version: 3.7.1
+        version: 4.0.0
       lodash-es:
         specifier: 'catalog:'
         version: 4.17.23
@@ -1091,7 +1091,7 @@ importers:
         version: 7.57.4(@types/node@24.10.13)
       '@types/jquery':
         specifier: 'catalog:'
-        version: 3.5.33
+        version: 4.0.0
       '@types/sinon':
         specifier: 'catalog:'
         version: 21.0.0
@@ -1103,7 +1103,7 @@ importers:
         version: 9.39.3(jiti@2.6.1)
       jquery:
         specifier: 'catalog:'
-        version: 3.7.1
+        version: 4.0.0
       sinon:
         specifier: 'catalog:'
         version: 21.0.1
@@ -2938,8 +2938,8 @@ packages:
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
-  '@types/jquery@3.5.33':
-    resolution: {integrity: sha512-SeyVJXlCZpEki5F0ghuYe+L+PprQta6nRZqhONt9F13dWBtR/ftoaIbdRQ7cis7womE+X2LKhsDdDtkkDhJS6g==}
+  '@types/jquery@4.0.0':
+    resolution: {integrity: sha512-Z+to+A2VkaHq1DfI2oSwsoCdhCHMpTSgjWzNcbNlRGYzksDBpPUgEcAL+RQjOBJRaLoEAOHXxqDGBVP+BblBwg==}
 
   '@types/jsdom@28.0.0':
     resolution: {integrity: sha512-A8TBQQC/xAOojy9kM8E46cqT00sF0h7dWjV8t8BJhUi2rG6JRh7XXQo/oLoENuZIQEpXsxLccLCnknyQd7qssQ==}
@@ -2987,9 +2987,6 @@ packages:
 
   '@types/sinonjs__fake-timers@15.0.1':
     resolution: {integrity: sha512-Ko2tjWJq8oozHzHV+reuvS5KYIRAokHnGbDwGh/J64LntgpbuylF74ipEL24HCyRjf9FOlBiBHWBR1RlVKsI1w==}
-
-  '@types/sizzle@2.3.10':
-    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -4709,8 +4706,8 @@ packages:
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
 
-  jquery@3.7.1:
-    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
+  jquery@4.0.0:
+    resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
 
   js-beautify@1.15.4:
     resolution: {integrity: sha512-9/KXeZUKKJwqCXUdBxFJ3vPh467OCckSBmYDwSK/EtV090K+iMJ7zx2S3HLVDIWFQdqMIsZWbnaGiba18aWhaA==}
@@ -7613,9 +7610,7 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  '@types/jquery@3.5.33':
-    dependencies:
-      '@types/sizzle': 2.3.10
+  '@types/jquery@4.0.0': {}
 
   '@types/jsdom@28.0.0':
     dependencies:
@@ -7666,8 +7661,6 @@ snapshots:
       '@types/sinonjs__fake-timers': 15.0.1
 
   '@types/sinonjs__fake-timers@15.0.1': {}
-
-  '@types/sizzle@2.3.10': {}
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -9704,7 +9697,7 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jquery@3.7.1: {}
+  jquery@4.0.0: {}
 
   js-beautify@1.15.4:
     dependencies:

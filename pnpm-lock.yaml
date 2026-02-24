@@ -1517,6 +1517,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)

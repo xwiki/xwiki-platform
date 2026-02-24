@@ -69,9 +69,9 @@
 
 <script setup lang="ts">
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
 //

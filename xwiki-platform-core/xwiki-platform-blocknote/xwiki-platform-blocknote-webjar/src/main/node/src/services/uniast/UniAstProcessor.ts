@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { UniAst } from "@xwiki/platform-uniast-api";
+import type { UniAst } from "@xwiki/platform-uniast-api";
 
 /**
  * Processes the UniAst content before it is loaded in the editor and before it is submitted to be saved server-side. In

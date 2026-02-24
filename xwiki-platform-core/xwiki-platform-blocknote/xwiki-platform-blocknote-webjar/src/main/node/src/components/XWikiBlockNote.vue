@@ -68,15 +68,15 @@
 </template>
 
 <script setup lang="ts">
-import { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import {
+import { Container } from "inversify";
+import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
+import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
-import { Container } from "inversify";
-import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
-import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
 //

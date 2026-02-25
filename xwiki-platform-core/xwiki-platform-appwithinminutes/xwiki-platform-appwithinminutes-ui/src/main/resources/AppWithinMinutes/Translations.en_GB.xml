@@ -48,7 +48,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=
 
 ### AWM Applications panel entry
-### Missing: platform.appwithinminutes.appPanelCreateEntry=
+platform.appwithinminutes.appPanelCreateEntry=Create your own!
 
 ### Wizard step
 ### Missing: platform.appwithinminutes.wizardStepHeading=
@@ -56,7 +56,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: appWithinMinutes.wizardStep.name.title=
 ### Missing: appWithinMinutes.wizardStep.name.description=
 ### Missing: appWithinMinutes.wizardStep.structure.name=
-### Missing: appWithinMinutes.wizardStep.structure.title=
+appWithinMinutes.wizardStep.structure.title=Structure your data
 ### Missing: appWithinMinutes.wizardStep.structure.description=
 ### Missing: appWithinMinutes.wizardStep.entries.name=
 ### Missing: appWithinMinutes.wizardStep.entries.title=
@@ -91,7 +91,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.appNameEmptyError=
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=
+platform.appwithinminutes.classEditorPaletteTitle=Field Palette
 ### Missing: platform.appwithinminutes.classEditorPaletteHint=
 ### Missing: platform.appwithinminutes.classEditorCanvasHint=
 ### Missing: platform.appwithinminutes.classEditorUpdateTemplateLabel=
@@ -103,12 +103,12 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=
 ### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=
 ### Missing: platform.appwithinminutes.classEditorTemplateSaveComment=
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
 ### Missing: platform.appwithinminutes.classEditorSheetSaveComment=
 ### Missing: platform.appwithinminutes.classEditorTranslationsSaveComment=
 ### Missing: platform.appwithinminutes.classEditorStandardCategoryName=
 ### Missing: platform.appwithinminutes.classEditorPickersCategoryName=
-### Missing: platform.appwithinminutes.classEditorDocumentCategoryName=
+platform.appwithinminutes.classEditorDocumentCategoryName=Page
 ### Missing: platform.appwithinminutes.classEditorAdvancedCategoryName=
 ### Missing: platform.appwithinminutes.classEditorDBListFieldName=
 ### Missing: platform.appwithinminutes.classEditorGroupsFieldName=
@@ -127,7 +127,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.classEditorPreviewFieldLabel=
 ### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=
 ### Missing: platform.appwithinminutes.classEditorMoveFieldLabel=
-### Missing: platform.appwithinminutes.classEditorMoveFieldHint=
+platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop to change the order
 ### Missing: platform.appwithinminutes.classEditorFieldDefaultValueToolTip=
 ### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
 ### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
@@ -143,14 +143,14 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=
 ### Missing: platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=
 ### Missing: platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=
-### Missing: appWithinMinutes.templateProviderEditor.hint=
+appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 ### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=
 ### Missing: appWithinMinutes.templateProviderEditor.description.name=
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=
 ### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=
 ### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=
@@ -163,9 +163,9 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=
 ### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=
 ### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnName=
-### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=
-### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnName=
-### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnDescription=
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains application data
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=
 ### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnName=
@@ -216,8 +216,8 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=
 ### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=
+platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
+platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
 
 ### Rename Application
 ### Missing: appWithinMinutes.renameApp.label=
@@ -251,7 +251,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 #@deprecated appWithinMinutes.wizardStep.name.description
 ### Missing: platform.appwithinminutes.wizardStep1Description=
 #@deprecated appWithinMinutes.wizardStep.structure.name
-### Missing: platform.appwithinminutes.wizardStep2Name=
+platform.appwithinminutes.wizardStep2Name=Structure
 #@deprecated appWithinMinutes.wizardStep.structure.title
 ### Missing: platform.appwithinminutes.wizardStep2Title=
 #@deprecated appWithinMinutes.wizardStep.structure.description

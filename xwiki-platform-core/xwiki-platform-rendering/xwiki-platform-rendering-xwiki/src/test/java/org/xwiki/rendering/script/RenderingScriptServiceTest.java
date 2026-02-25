@@ -42,6 +42,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -107,6 +108,9 @@ class RenderingScriptServiceTest
     @Named("xwiki/2.0")
     private BlockRenderer blockRenderer;
 
+    @MockComponent
+    private SyntaxRegistry syntaxRegistry;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -142,14 +146,16 @@ class RenderingScriptServiceTest
     }
 
     @Test
-    void resolveSyntax()
+    void resolveSyntax() throws Exception
     {
+        when(this.syntaxRegistry.resolveSyntax("xwiki/2.1")).thenReturn(XWIKI_2_1);
         assertEquals(XWIKI_2_1, this.renderingScriptService.resolveSyntax("xwiki/2.1"));
     }
 
     @Test
-    void resolveSyntaxWhenInvalid()
+    void resolveSyntaxWhenInvalid() throws Exception
     {
+        when(this.syntaxRegistry.resolveSyntax("unknown")).thenThrow(new ParseException("Invalid syntax"));
         assertNull(this.renderingScriptService.resolveSyntax("unknown"));
     }
 

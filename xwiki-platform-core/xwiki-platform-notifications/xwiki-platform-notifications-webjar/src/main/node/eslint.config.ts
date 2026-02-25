@@ -19,4 +19,4 @@
  */
 import config from "@xwiki/platform-tool-eslintconfig";
 
-export default config;
+export default [...config, { ignores: ["env.d.ts"] }];

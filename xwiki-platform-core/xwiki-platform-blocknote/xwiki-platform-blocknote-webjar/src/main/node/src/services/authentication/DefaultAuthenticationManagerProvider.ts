@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
+import { Container, inject, injectable } from "inversify";
+import type {
   AuthenticationManager,
   AuthenticationManagerProvider,
 } from "@xwiki/platform-authentication-api";
-import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
 export class DefaultAuthenticationManagerProvider

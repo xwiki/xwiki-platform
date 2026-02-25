@@ -48,8 +48,11 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/no-unresolved
-import { BaseDisplayer, XWikiIcon, displayerMixin } from "xwiki-livedata";
+import {
+  BaseDisplayer,
+  XWikiIcon,
+  displayerMixin,
+} from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-scope",

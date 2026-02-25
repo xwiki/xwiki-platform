@@ -13,7 +13,11 @@
     "test:unit": "vitest --run --passWithNoTests",
     "type-check": "vue-tsc --build"
   },
+  "dependencies": {
+    "@xwiki/platform-livedata-ui": "workspace:*"
+  },
   "peerDependencies": {
+    "@xwiki/platform-livedata-componentstore": "workspace:*",
     "vue": "3.x"
   },
   "devDependencies": {
@@ -23,6 +27,7 @@
     "@vitejs/plugin-vue": "catalog:",
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
+    "@xwiki/platform-livedata-componentstore": "workspace:*",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "eslint": "catalog:",
     "jiti": "catalog:",

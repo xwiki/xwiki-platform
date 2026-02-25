@@ -47,6 +47,7 @@
     "vue-eslint-parser": "catalog:"
   },
   "devDependencies": {
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "vite": "catalog:"
   },

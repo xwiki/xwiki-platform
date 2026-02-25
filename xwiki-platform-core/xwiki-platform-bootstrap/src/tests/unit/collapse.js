@@ -384,8 +384,8 @@ $(function () {
     var done = assert.async()
 
     var accordionHTML = '<div id="accordion">'
-        + '<div class="panel"/>'
-        + '<div class="panel"/>'
+        + '<div class="panel"></div>'
+        + '<div class="panel"></div>'
         + '</div>'
     var showFired = false
     var $groups   = $(accordionHTML).appendTo('#qunit-fixture').find('.panel')

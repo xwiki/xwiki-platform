@@ -2,6 +2,6 @@
   "extends" : "../js/.jshintrc",
   "asi"     : false,
   "browser" : false,
-  "es3"     : false,
+  "esversion": 11,
   "node"    : true
 }

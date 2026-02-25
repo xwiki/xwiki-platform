@@ -26,7 +26,8 @@ module.exports = function (config) {
     concurrency: Infinity,
     client: {
       qunit: {
-        showUI: true
+        showUI: true,
+        testTimeout: 3000
       }
     }
   };

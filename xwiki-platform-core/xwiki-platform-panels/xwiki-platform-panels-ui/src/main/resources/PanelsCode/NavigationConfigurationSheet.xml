@@ -776,7 +776,6 @@ require([
     } else {
       $node = $(document.getElementById(data.node[0]));
     }
-    if (!$node) return;
     fixNodeMarkup($node);
   });
   

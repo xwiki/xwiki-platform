@@ -80,14 +80,20 @@ public class JobStatusBlobStore implements Initializable
      *
      * @param status the job status to store
      * @param blobLocator the path in the blob store where the job status should be stored
-     * @throws BlobStoreException if an error occurs while accessing the blob store
      * @throws IOException if an error occurs while writing the job status to the blob store
      */
-    public void store(JobStatus status, String blobLocator) throws BlobStoreException, IOException
+    public void store(JobStatus status, String blobLocator) throws IOException
     {
-        Blob blob = this.blobStore.getBlob(BlobPath.parse(blobLocator));
-        try (OutputStream outputStream = blob.getOutputStream(BlobWriteMode.REPLACE_EXISTING)) {
-            this.serializer.write(status, outputStream, isZipFile(blobLocator));
+        try {
+            Blob blob = this.blobStore.getBlob(BlobPath.parse(blobLocator));
+            try (OutputStream outputStream = blob.getOutputStream(BlobWriteMode.REPLACE_EXISTING)) {
+                this.serializer.write(status, outputStream, isZipFile(blobLocator));
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException ioException) {
+                throw ioException;
+            }
+            throw new IOException("Failed to store job status blob at [%s].".formatted(blobLocator), e);
         }
     }
 
@@ -116,16 +122,21 @@ public class JobStatusBlobStore implements Initializable
      *
      * @param blobLocator the path in the blob store where the job status is stored
      * @return the loaded job status
-     * @throws BlobStoreException if an error occurs while accessing the blob store or deserializing the job status
+     * @throws IOException if an error occurs while accessing the blob store or deserializing the job status
      */
-    public JobStatus load(String blobLocator) throws BlobStoreException
+    public JobStatus load(String blobLocator) throws IOException
     {
-        Blob blob = this.blobStore.getBlob(BlobPath.parse(blobLocator));
+        try {
+            Blob blob = this.blobStore.getBlob(BlobPath.parse(blobLocator));
 
-        try (InputStream stream = blob.getStream()) {
-            return this.serializer.read(stream, isZipFile(blobLocator));
+            try (InputStream stream = blob.getStream()) {
+                return this.serializer.read(stream, isZipFile(blobLocator));
+            }
         } catch (Exception e) {
-            throw new BlobStoreException("Failed to deserialize job status blob at [%s].".formatted(blobLocator), e);
+            if (e instanceof IOException ioException) {
+                throw ioException;
+            }
+            throw new IOException("Failed to deserialize job status blob at [%s].".formatted(blobLocator), e);
         }
     }
 

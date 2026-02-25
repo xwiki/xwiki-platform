@@ -21,7 +21,7 @@ package org.xwiki.job.store.internal;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 
 import javax.persistence.LockModeType;
 
@@ -32,6 +32,7 @@ import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJobStatus;
@@ -48,7 +49,8 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.logging.tail.LogTail;
 import org.xwiki.logging.tail.LoggerTail;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
-import org.xwiki.store.blob.BlobStoreException;
+
+import com.google.common.util.concurrent.Striped;
 
 /**
  * Database-backed {@link JobStatusStore} that replaces the filesystem implementation.
@@ -94,8 +96,10 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     @Inject
     private JobStatusHibernateExecutor hibernateExecutor;
 
-    // Lock around filesystem operations as they expect to avoid concurrency issues.
-    private final ReentrantLock fileSystemLock = new ReentrantLock();
+    // Use striped locks to limit the number of concurrent locks while still allowing some level of concurrency for
+    // different job statuses. The lock is used to protect the on-demand migration process in loadJobStatus and avoid
+    // multiple threads trying to migrate the same job status at the same time.
+    private final Striped<Lock> stripedLocks = Striped.lazyWeakLock(64);
 
     private String getNodeId()
     {
@@ -103,51 +107,52 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     }
 
     @Override
-    public JobStatus loadJobStatusWithLock(List<String> id) throws IOException
+    public JobStatus loadJobStatus(List<String> id) throws IOException
     {
+        // As this code should only be called when there is a cache miss, there is no need to optimize the lock
+        // acquisition as much as possible - in theory, the lock is only needed for migration.
+        Lock lock = getLock(id);
+        lock.lock();
         try {
             JobStatus status = loadFromDatabase(id);
             if (status != null) {
                 return status;
             }
-        } catch (JobStatusStoreException e) {
-            throw new IOException("Failed to load job status [%s] from the database."
-                .formatted(this.identifierResolver.getRawId(id)), e);
-        }
 
-        this.fileSystemLock.lock();
-        try {
-            JobStatus legacyStatus = this.filesystemStore.loadJobStatusWithLock(id);
+            JobStatus legacyStatus = this.filesystemStore.loadJobStatus(id);
             // Migrate the job status to the database if found in the filesystem, so that next time it can be loaded
             // directly from the database.
-            saveJobStatusWithLock(legacyStatus);
+            saveJobStatus(legacyStatus);
             // As the logs have been migrated to the database, we need to re-attach the logger tail to read the logs
             // from the database instead of the filesystem.
             attachReadOnlyLoggerTail(legacyStatus, getNodeId(), this.identifierResolver.getDatabaseKey(id));
             return legacyStatus;
         } finally {
-            this.fileSystemLock.unlock();
+            lock.unlock();
         }
     }
 
+    private @NonNull Lock getLock(List<String> id)
+    {
+        String rawId = this.identifierResolver.getRawId(id);
+        return this.stripedLocks.get(rawId);
+    }
+
     @Override
-    public void removeJobStatusWithLock(List<String> id) throws IOException
+    public void removeJobStatus(List<String> id) throws IOException
     {
         if (id == null) {
             return;
         }
 
-        this.fileSystemLock.lock();
+        Lock lock = getLock(id);
+        lock.lock();
         try {
-            this.filesystemStore.removeJobStatusWithLock(id);
-        } finally {
-            this.fileSystemLock.unlock();
-        }
+            this.filesystemStore.removeJobStatus(id);
 
-        String nodeId = getNodeId();
-        String statusKey = this.identifierResolver.getDatabaseKey(id);
+            String nodeId = getNodeId();
+            String statusKey = this.identifierResolver.getDatabaseKey(id);
 
-        try {
             JobStatusSummaryEntity entity = this.hibernateExecutor.executeWrite(session -> {
                 JobStatusSummaryEntity result = session
                     .createQuery(SELECT_SUMMARY_HQL, JobStatusSummaryEntity.class)
@@ -175,9 +180,11 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 String blobLocator = entity.getBlobLocator();
                 this.jobStatusBlobStore.delete(blobLocator);
             }
-        } catch (JobStatusStoreException e) {
+        } catch (Exception e) {
             throw new IOException("Failed to remove job status [%s] from the database."
                 .formatted(this.identifierResolver.getRawId(id)), e);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -193,25 +200,26 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
 
         if (readonly) {
             // Trigger on-demand migration to make sure the logs are moved to the database if needed.
-            this.fileSystemLock.lock();
+            Lock lock = getLock(jobId);
+            lock.lock();
             try {
-                JobStatus legacyStatus = this.filesystemStore.loadJobStatusWithLock(jobId);
+                JobStatus legacyStatus = this.filesystemStore.loadJobStatus(jobId);
                 if (legacyStatus != null) {
-                    saveJobStatusWithLock(legacyStatus);
+                    saveJobStatus(legacyStatus);
                 }
             } catch (Exception e) {
                 this.logger.warn("Failed to migrate job status [{}] from filesystem: [{}].", jobId,
                     ExceptionUtils.getRootCauseMessage(e));
                 return this.filesystemStore.createLoggerTail(jobId, true);
             } finally {
-                this.fileSystemLock.unlock();
+                lock.unlock();
             }
         } else {
             // Try deleting the logs from the filesystem to avoid wrongly migrating the logs to the database later
             // when the logs shall be read. We only log a warning here because in most cases, it shouldn't cause any
             // issues.
             try {
-                this.filesystemStore.removeJobStatusWithLock(jobId);
+                this.filesystemStore.removeJobStatus(jobId);
             } catch (IOException e) {
                 this.logger.warn("Failed to remove legacy job status [{}] from filesystem: [{}].", jobId,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -222,7 +230,7 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
     }
 
     @Override
-    public void saveJobStatusWithLock(JobStatus status) throws IOException
+    public void saveJobStatus(JobStatus status) throws IOException
     {
         if (!JobUtils.isSerializable(status)) {
             return;
@@ -233,9 +241,17 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         String statusKey = this.identifierResolver.getDatabaseKey(request.getId());
         String blobLocator = buildBlobLocator(this.identifierResolver.getBlobKey(request.getId()));
 
+        // Lock to avoid parallel loading and migrations.
+        Lock lock = getLock(request.getId());
+        lock.lock();
+
         try {
             LogTail logTail = status.getLogTail();
             boolean rewriteLogs = !(logTail instanceof DatabaseLoggerTail);
+
+            // Store first in the blob store, so if another cluster node finds the blob locator in the database, we're
+            // sure the blob exists already.
+            this.jobStatusBlobStore.store(status, blobLocator);
 
             this.hibernateExecutor.executeWrite(session -> {
                 JobStatusSummaryEntity entity = session
@@ -272,15 +288,12 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
                 return null;
             });
 
-            this.jobStatusBlobStore.store(status, blobLocator);
-
-            this.filesystemStore.removeJobStatusWithLock(request.getId());
+            this.filesystemStore.removeJobStatus(request.getId());
         } catch (JobStatusStoreException e) {
             throw new IOException(
                 "Failed to persist job status metadata for [%s].".formatted(status.getRequest().getId()), e);
-        } catch (BlobStoreException e) {
-            throw new IOException("Failed to write job status blob for [%s].".formatted(status.getRequest().getId()),
-                e);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -304,29 +317,31 @@ public class DatabaseJobStatusStore implements PersistentJobStatusStore
         }
     }
 
-    private JobStatus loadFromDatabase(List<String> id) throws JobStatusStoreException
+    private JobStatus loadFromDatabase(List<String> id) throws IOException
     {
         String nodeId = getNodeId();
         String statusKey = this.identifierResolver.getDatabaseKey(id);
-        JobStatusSummaryEntity entity = this.hibernateExecutor.executeRead(session -> session
-            .createQuery(SELECT_SUMMARY_HQL, JobStatusSummaryEntity.class)
-            .setParameter(NODE_ID, nodeId)
-            .setParameter(STATUS_KEY, statusKey)
-            .setMaxResults(1)
-            .uniqueResult());
+        JobStatusSummaryEntity entity;
+
+        try {
+            entity = this.hibernateExecutor.executeRead(session -> session
+                .createQuery(SELECT_SUMMARY_HQL, JobStatusSummaryEntity.class)
+                .setParameter(NODE_ID, nodeId)
+                .setParameter(STATUS_KEY, statusKey)
+                .setMaxResults(1)
+                .uniqueResult());
+        } catch (Exception e) {
+            throw new IOException("Failed to read job status summary from database.", e);
+        }
+
         if (entity == null) {
             return null;
         }
 
-        try {
-            String blobLocator = entity.getBlobLocator();
-            JobStatus status = this.jobStatusBlobStore.load(blobLocator);
-            attachReadOnlyLoggerTail(status, nodeId, statusKey);
-            return status;
-        } catch (BlobStoreException e) {
-            throw new JobStatusStoreException("Failed to read job status [%s] from blob store."
-                .formatted(this.identifierResolver.getRawId(id)), e);
-        }
+        String blobLocator = entity.getBlobLocator();
+        JobStatus status = this.jobStatusBlobStore.load(blobLocator);
+        attachReadOnlyLoggerTail(status, nodeId, statusKey);
+        return status;
     }
 
     private void attachReadOnlyLoggerTail(JobStatus status, String nodeId, String statusKey)

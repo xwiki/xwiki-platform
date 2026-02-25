@@ -135,7 +135,7 @@ export type FormProps = {
 };
 
 // @beta (undocumented)
-export type ImgProps = unknown;
+export type ImgProps = never;
 
 // @beta (undocumented)
 export type LoadProps = unknown;

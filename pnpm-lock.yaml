@@ -421,6 +421,9 @@ importers:
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-tsconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)

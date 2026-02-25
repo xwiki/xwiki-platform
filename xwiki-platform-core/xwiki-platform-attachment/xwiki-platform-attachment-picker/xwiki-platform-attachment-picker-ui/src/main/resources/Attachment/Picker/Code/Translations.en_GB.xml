@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: attachment.picker.ckeditor.pluginsImageSelector.title=
-### Missing: attachment.picker.searchField.placeholder=
-### Missing: attachment.picker.searchField.scope.currentPage=
-### Missing: attachment.picker.searchField.scope.allPages=
+  <content>attachment.picker.ckeditor.pluginsImageSelector.title=Gallery
+attachment.picker.searchField.placeholder=Search...
+attachment.picker.searchField.scope.currentPage=Current Page
+attachment.picker.searchField.scope.allPages=All Pages
 </content>
 </xwikidoc>

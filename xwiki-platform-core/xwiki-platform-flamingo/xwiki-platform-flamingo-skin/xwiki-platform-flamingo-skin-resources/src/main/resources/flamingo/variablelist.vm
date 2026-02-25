@@ -224,6 +224,7 @@
     "font-family-serif": 'Georgia, "Times New Roman", Times, serif',
     "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
     "font-size-base": "1rem",
+    "font-size-small": ".85rem",
     "grid-gutter-width": "30px",
     "input-bg" : "#fff",
     "input-border-focus": "#66afe9",
@@ -235,7 +236,8 @@
     "navbar-height" : "50px",
     "padding-large-vertical": "10px",
     "table-bg-hover": "#f5f5f5",
-    "table-border-color": "#ddd"
+    "table-border-color": "#ddd",
+    "state-danger-text": "#a94442"
 })
 
 ############################################

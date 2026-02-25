@@ -60,6 +60,9 @@
 #if ("$!xcontext.userReference" != '')
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
+## This user-advanced attribute can be used for styles or frontend scripts to act differently based on the type of user. 
+## @since 18.1.0RC1
+#addMetaAttribute($metaAttributes, 'user-advanced', $isAdvancedUser)
 #addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>

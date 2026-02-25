@@ -36,10 +36,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rendering.macro.documentTree.name=
-### Missing: rendering.macro.documentTree.description=
-### Missing: rendering.macro.documentTree.parameter.readOnly.name=
-### Missing: rendering.macro.documentTree.parameter.readOnly.description=
+  <content>rendering.macro.documentTree.name=Page Tree
+rendering.macro.documentTree.description=Displays the tree of XWiki pages.
+rendering.macro.documentTree.parameter.readOnly.name=Read Only
+rendering.macro.documentTree.parameter.readOnly.description=Should the user be able to modify the tree structure, provided that they have the necessary rights?
 ### Missing: rendering.macro.documentTree.parameter.showWikis.name=
 ### Missing: rendering.macro.documentTree.parameter.showWikis.description=
 ### Missing: rendering.macro.documentTree.parameter.showWikiPrettyName.name=

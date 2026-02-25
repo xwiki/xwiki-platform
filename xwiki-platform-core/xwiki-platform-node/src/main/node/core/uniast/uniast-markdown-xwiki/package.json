@@ -42,6 +42,7 @@
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:"
   },
   "publishConfig": {

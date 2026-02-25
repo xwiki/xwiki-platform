@@ -40,6 +40,7 @@ public interface CurrentUserResource
 {
     /**
      * Return all the available information on the user making the request.
+     * If the user is Guest (unauthenticated), only include id, name fields and avatar.
      *
      * @param wikiName the wiki to log in
      * @param preferences whether to include user preferences in the response

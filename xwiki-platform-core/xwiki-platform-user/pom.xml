@@ -40,8 +40,6 @@
     <module>xwiki-platform-user-script</module>
     <module>xwiki-platform-user-resource</module>
     <module>xwiki-platform-user-rest</module>
-    <module>xwiki-platform-user-rest/xwiki-platform-user-rest-api</module>
-    <module>xwiki-platform-user-rest/xwiki-platform-user-rest-default</module>
   </modules>
   <profiles>
     <profile>

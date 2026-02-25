@@ -22,6 +22,7 @@ package org.xwiki.user.rest.internal.resources;
 import java.net.URI;
 
 import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
@@ -73,6 +74,10 @@ public class UserResourceImpl extends XWikiResource implements UserResource
         try {
             UserReference userReference = this.userReferenceResolver.resolve(userId,
                 this.getXWikiContext().getWikiReference());
+
+            if (!userReferenceModelSerializer.hasAccess(userReference)) {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
 
             return userReferenceModelSerializer.toRestUser(baseUri, userId, userReference, preferences);
         } catch (XWikiException e) {

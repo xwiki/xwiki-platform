@@ -40,6 +40,7 @@ public interface UserResource
 {
     /**
      * Return all the available information on the user {userId}.
+     * This requires the logged-in user to have read access on the profile of {userId}.
      *
      * @param wikiName the wiki used to resolve the id to a user
      * @param userId the id of the user

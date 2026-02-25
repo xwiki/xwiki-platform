@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,6 +49,9 @@ public class UserReferenceModelSerializerProvider implements Provider<UserRefere
     @Named("context")
     private ComponentManager componentManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public UserReferenceModelSerializer get()
     {
@@ -55,6 +59,8 @@ public class UserReferenceModelSerializerProvider implements Provider<UserRefere
             return this.componentManager.getInstance(UserReferenceModelSerializer.class,
                 this.userConfiguration.getStoreHint());
         } catch (ComponentLookupException e) {
+            this.logger.error("Could not find an instance of UserReferenceModelSerializer for the user store [{}].",
+                this.userConfiguration.getStoreHint(), e);
             return null;
         }
     }

@@ -94,7 +94,11 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
                     return null;
                 } else {
                     try {
-                        return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
+                        if (userReferenceModelSerializer.hasAccess(userReference)) {
+                            return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
+                        } else {
+                            return null;
+                        }
                     } catch (XWikiException e) {
                         throw new RuntimeException(e);
                     }

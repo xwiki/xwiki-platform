@@ -24,10 +24,10 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.EmailAddressObfuscator;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
@@ -35,12 +35,12 @@ import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserProperties;
-import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.user.rest.UserReferenceModelSerializer;
-import org.xwiki.user.rest.model.jaxb.ObjectFactory;
+import org.xwiki.user.rest.internal.AbstractUserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.model.jaxb.UserPreferences;
 import org.xwiki.user.rest.model.jaxb.UserSummary;
@@ -64,20 +64,16 @@ import jakarta.inject.Singleton;
 @Component
 @Named("document")
 @Singleton
-public class DocumentUserReferenceModelSerializer implements UserReferenceModelSerializer
+public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceModelSerializer
 {
-    private final ObjectFactory userObjectFactory = new ObjectFactory();
-    private final org.xwiki.rest.model.jaxb.ObjectFactory xwikiObjectFactory =
-        new org.xwiki.rest.model.jaxb.ObjectFactory();
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private UserPropertiesResolver userPropertiesResolver;
-
     @Inject
     private Provider<ContextualAuthorizationManager> authorizationManagerProvider;
+
+    @Inject
+    private GeneralMailConfiguration mailConfiguration;
+
+    @Inject
+    private EmailAddressObfuscator emailAddressObfuscator;
 
     private void toRestUserSummary(URI baseUri, UserSummary userSummary, String userId,
         DocumentUserReference userReference, UserProperties userProperties) throws XWikiException
@@ -126,9 +122,6 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
     public UserSummary toRestUserSummary(URI baseUri, String userId, UserReference userReference) throws XWikiException
     {
         DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-        if (!this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference())) {
-            return null;
-        }
 
         UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
         UserSummary userSummary = this.userObjectFactory.createUserSummary();
@@ -149,10 +142,11 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
     public User toRestUser(URI baseUri, String userId, UserReference userReference, boolean preferences)
         throws XWikiException
     {
-        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-        if (!this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference())) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        if (userReference == GuestUserReference.INSTANCE) {
+            return guestToRestUser();
         }
+
+        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
 
         UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
         if (userProperties.isEmpty()) {
@@ -164,37 +158,66 @@ public class DocumentUserReferenceModelSerializer implements UserReferenceModelS
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
+        // We switch the context's wiki to the fetched user's to access wiki-specific preferences.
+        String oldWikiId = xcontext.getWikiId();
+        xcontext.setWikiId(documentUserReference.getReference().getWikiReference().getName());
+
+        // Handle email obfuscation based on wiki's configuration.
+        String emailAddress = "";
+        if (userProperties.getEmail() != null) {
+            if (this.mailConfiguration.shouldObfuscate()) {
+                emailAddress = this.emailAddressObfuscator.obfuscate(userProperties.getEmail());
+            } else {
+                emailAddress = userProperties.getEmail().toString();
+            }
+        }
+        user.setEmail(emailAddress);
+
         user.setDisplayName(xcontext.getWiki().getUserName(documentUserReference.getReference(), null, false, true,
             xcontext));
         user.setCompany(Objects.toString(userProperties.getProperty("company"), ""));
         user.setAbout(Objects.toString(userProperties.getProperty("comment"), ""));
-        user.setEmail(Objects.toString(userProperties.getProperty("email"), ""));
         user.setPhone(Objects.toString(userProperties.getProperty("phone"), ""));
         user.setAddress(Objects.toString(userProperties.getProperty("address"), ""));
         user.setBlog(Objects.toString(userProperties.getProperty("blog"), ""));
         user.setBlogFeed(Objects.toString(userProperties.getProperty("blogfeed"), ""));
 
         if (preferences) {
-            UserPreferences userPreferences = this.userObjectFactory.createUserPreferences();
-            userPreferences.setDisplayHiddenDocuments(userProperties.displayHiddenDocuments());
-
-            String underlineProperty = "underline";
-            userPreferences.setUnderlineLinks(Objects.toString(userProperties.getProperty(underlineProperty),
-                xcontext.getWiki().getXWikiPreference(underlineProperty, xcontext)));
-
-            String timezoneProperty = "timezone";
-            userPreferences.setTimezone(Objects.toString(userProperties.getProperty(timezoneProperty),
-                xcontext.getWiki().getXWikiPreference(timezoneProperty, xcontext)));
-
-            String editorProperty = "editor";
-            userPreferences.setEditor(Objects.toString(userProperties.getProperty(editorProperty),
-                xcontext.getWiki().getXWikiPreference(editorProperty, xcontext)));
-
-            userPreferences.setAdvanced("Advanced".equals(userProperties.getProperty("usertype")));
-
-            user.setPreferences(userPreferences);
+            user.setPreferences(toRestUserPreferences(userProperties, xcontext));
         }
 
+        // We reset the context's wiki.
+        xcontext.setWikiId(oldWikiId);
+
         return user;
+    }
+
+    private UserPreferences toRestUserPreferences(UserProperties userProperties, XWikiContext xcontext)
+    {
+        UserPreferences userPreferences = this.userObjectFactory.createUserPreferences();
+        userPreferences.setDisplayHiddenDocuments(userProperties.displayHiddenDocuments());
+
+        String underlineProperty = "underline";
+        userPreferences.setUnderlineLinks(Objects.toString(userProperties.getProperty(underlineProperty),
+            xcontext.getWiki().getXWikiPreference(underlineProperty, xcontext)));
+
+        String timezoneProperty = "timezone";
+        userPreferences.setTimezone(Objects.toString(userProperties.getProperty(timezoneProperty),
+            xcontext.getWiki().getXWikiPreference(timezoneProperty, xcontext)));
+
+        String editorProperty = "editor";
+        userPreferences.setEditor(Objects.toString(userProperties.getProperty(editorProperty),
+            xcontext.getWiki().getXWikiPreference(editorProperty, xcontext)));
+
+        userPreferences.setAdvanced("Advanced".equals(userProperties.getProperty("usertype")));
+
+        return userPreferences;
+    }
+
+    @Override
+    public boolean hasAccess(UserReference userReference)
+    {
+        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
+        return this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference());
     }
 }

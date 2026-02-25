@@ -22,7 +22,6 @@ package org.xwiki.user.rest.internal.resources;
 import java.net.URI;
 
 import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
@@ -30,6 +29,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -78,12 +78,14 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
         }
 
         DocumentReference userDocumentReference = this.xcontextProvider.get().getUserReference();
-        if (userDocumentReference == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
-
         try {
-            UserReference userReference = this.userReferenceResolver.resolve(userDocumentReference);
+            UserReference userReference;
+            if (userDocumentReference != null) {
+                userReference = this.userReferenceResolver.resolve(userDocumentReference);
+            } else {
+                // The resource was accessed by guest.
+                userReference = GuestUserReference.INSTANCE;
+            }
 
             return userReferenceModelSerializer.toRestUser(baseUri,
                 this.stringUserReferenceSerializer.serialize(userReference), userReference, preferences);

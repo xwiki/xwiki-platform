@@ -22,6 +22,7 @@ package org.xwiki.user.rest;
 import java.net.URI;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.model.jaxb.UserSummary;
@@ -35,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  */
 @Role
+@Unstable
 public interface UserReferenceModelSerializer
 {
     /**
@@ -59,4 +61,12 @@ public interface UserReferenceModelSerializer
      * @throws XWikiException if there was a problem during serialization
      */
     User toRestUser(URI baseUri, String userId, UserReference userReference, boolean preferences) throws XWikiException;
+
+    /**
+     * Check that the current user has access to the user information.
+     *
+     * @param userReference the user reference we're trying to access
+     * @return true if the current user can read information from {userReference}, false otherwise
+     */
+    boolean hasAccess(UserReference userReference);
 }

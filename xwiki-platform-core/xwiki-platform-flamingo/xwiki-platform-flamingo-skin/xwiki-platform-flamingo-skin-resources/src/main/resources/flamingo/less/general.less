@@ -212,8 +212,9 @@ body {
         .not-inline-link();
       }
       
-      // Repeat the force-underline rule here to make sure it has enough specificity.
-      // The :has with FA icons adds a lot of specificity...
+      // Repeat the force-underline rule here to make sure it has enough specificity to
+      // gain priority against any of the rules above.
+      // The :has(span.fa) is an especially high priority bump compared to the other selectors.
       .force-underline a,
       a.force-underline {
         &:has(img),

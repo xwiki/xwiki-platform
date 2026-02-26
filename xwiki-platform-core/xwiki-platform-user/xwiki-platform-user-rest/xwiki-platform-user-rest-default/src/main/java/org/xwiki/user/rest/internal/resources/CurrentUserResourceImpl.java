@@ -29,7 +29,6 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -79,13 +78,7 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
 
         DocumentReference userDocumentReference = this.xcontextProvider.get().getUserReference();
         try {
-            UserReference userReference;
-            if (userDocumentReference != null) {
-                userReference = this.userReferenceResolver.resolve(userDocumentReference);
-            } else {
-                // The resource was accessed by guest.
-                userReference = GuestUserReference.INSTANCE;
-            }
+            UserReference userReference = this.userReferenceResolver.resolve(userDocumentReference);
 
             return userReferenceModelSerializer.toRestUser(baseUri,
                 this.stringUserReferenceSerializer.serialize(userReference), userReference, preferences);

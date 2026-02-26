@@ -19,55 +19,26 @@
  */
 package org.xwiki.job.store.internal;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity;
 import org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor;
-import org.xwiki.job.store.internal.hibernate.JobStatusHibernateStore;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.store.hibernate.HibernateDataSourceProvider;
-import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
-import org.xwiki.test.TestEnvironment;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.xstream.internal.SafeXStream;
-import org.xwiki.xstream.internal.XStreamUtils;
-
-import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
-import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.store.DatabaseProduct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 /**
  * Component integration tests for {@link DatabaseLoggerTail}.
@@ -75,16 +46,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({
-    DatabaseLoggerTail.class,
-    HibernateCfgXmlLoader.class,
-    JobStatusHibernateStore.class,
-    JobStatusHibernateExecutor.class,
-    SafeXStream.class,
-    XStreamUtils.class,
-    TestEnvironment.class
-})
-class DatabaseLoggerTailTest
+@ComponentList(JobStatusHibernateExecutor.class)
+class DatabaseLoggerTailTest extends AbstractJobStatusHibernateTest
 {
     private static final String NODE_ID = "node-logger-tail";
 
@@ -93,33 +56,8 @@ class DatabaseLoggerTailTest
     @InjectMockComponents
     private DatabaseLoggerTail loggerTail;
 
-    @MockComponent
-    private HibernateDataSourceProvider dataSourceProvider;
-
-    @MockComponent
-    private HibernateStore hibernateStore;
-
-    @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @MockComponent
-    private HibernateConfiguration hibernateConfiguration;
-
-    @InjectComponentManager
-    private MockitoComponentManager componentManager;
-
-    @XWikiTempDir
-    private File tmpDir;
-
-    @BeforeComponent
-    void configureComponents() throws Exception
-    {
-        DataSource dataSource = createDataSource();
-        when(this.hibernateConfiguration.getPath()).thenReturn(createHibernateConfigurationFile().toString());
-        when(this.dataSourceProvider.getDataSource()).thenReturn(dataSource);
-        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
-        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.HSQLDB);
-    }
+    @InjectMockComponents
+    private JobStatusHibernateExecutor executor;
 
     @BeforeEach
     void setUp()
@@ -247,9 +185,7 @@ class DatabaseLoggerTailTest
 
         // Directly insert a log entry with malformed XML that will cause the XML parser to fail before
         // SafeTreeUnmarshaller.convert() can catch the exception.
-        JobStatusHibernateExecutor executor =
-            this.componentManager.getInstance(JobStatusHibernateExecutor.class);
-        executor.executeWrite(session -> {
+        this.executor.executeWrite(session -> {
             JobStatusLogEntryEntity entity = new JobStatusLogEntryEntity();
             entity.setNodeId(NODE_ID);
             entity.setStatusKey(STATUS_KEY);
@@ -277,9 +213,7 @@ class DatabaseLoggerTailTest
 
         // <null/> is valid XML that XStream deserializes to null. This simulates the case where
         // SafeTreeUnmarshaller.convert() swallows a top-level exception and returns null.
-        JobStatusHibernateExecutor executor =
-            this.componentManager.getInstance(JobStatusHibernateExecutor.class);
-        executor.executeWrite(session -> {
+        this.executor.executeWrite(session -> {
             JobStatusLogEntryEntity entity = new JobStatusLogEntryEntity();
             entity.setNodeId(NODE_ID);
             entity.setStatusKey(STATUS_KEY);
@@ -298,36 +232,5 @@ class DatabaseLoggerTailTest
         assertEquals("formatted message", result.getMessage());
         assertEquals(timeStamp, result.getTimeStamp());
         assertNull(result.getArgumentArray());
-    }
-
-    private DataSource createDataSource()
-    {
-        JDBCDataSource dataSource = new JDBCDataSource();
-        dataSource.setUrl("jdbc:hsqldb:mem:jobstore_logger_" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1");
-        dataSource.setUser("sa");
-        dataSource.setPassword("");
-        return dataSource;
-    }
-
-    private Path createHibernateConfigurationFile() throws Exception
-    {
-        Path target = this.tmpDir.toPath().resolve("hibernate-logger-tail.cfg.xml");
-        Files.createDirectories(target.getParent());
-
-        VelocityContext context = new VelocityContext();
-        context.put("xwikiDbConnectionUrl", "none");
-        context.put("xwikiDbDbcpMaxTotal", "");
-        context.put("xwikiDbHbmCommonExtraMappings", "");
-        context.put("xwikiDbHbmDefaultExtraMappings", "");
-
-        Velocity.init();
-        try (InputStream stream = getClass().getClassLoader().getResourceAsStream("hibernate.cfg.xml.vm");
-            Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8))
-        {
-            String template = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            Velocity.evaluate(context, writer, "hibernate.cfg.xml.vm", template);
-        }
-
-        return target;
     }
 }

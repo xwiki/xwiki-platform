@@ -19,25 +19,14 @@
  */
 package org.xwiki.job.store.internal;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Named;
-import javax.sql.DataSource;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.job.DefaultJobStatus;
@@ -46,8 +35,6 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.internal.JobStatusFolderResolver;
 import org.xwiki.job.internal.JobStatusSerializer;
 import org.xwiki.job.internal.PersistentJobStatusStore;
-import org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor;
-import org.xwiki.job.store.internal.hibernate.JobStatusHibernateStore;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
@@ -56,22 +43,10 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.store.blob.BlobStoreManager;
 import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
-import org.xwiki.store.hibernate.HibernateDataSourceProvider;
-import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
-import org.xwiki.test.TestEnvironment;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.xstream.internal.SafeXStream;
-import org.xwiki.xstream.internal.XStreamUtils;
-
-import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
-import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.store.DatabaseProduct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -80,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,35 +68,16 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 @ComponentList({
     DatabaseJobStatusStore.class,
-    DatabaseLoggerTail.class,
     JobStatusBlobStore.class,
     JobStatusIdentifierSerializer.class,
-    JobStatusSerializer.class,
-    HibernateCfgXmlLoader.class,
-    JobStatusHibernateStore.class,
-    JobStatusHibernateExecutor.class,
-    SafeXStream.class,
-    XStreamUtils.class,
-    TestEnvironment.class
+    JobStatusSerializer.class
 })
-class DatabaseJobStatusStoreTest
+class DatabaseJobStatusStoreTest extends AbstractJobStatusHibernateTest
 {
     private static final String NODE_ID = "node-job-store";
 
     @InjectMockComponents
     private DatabaseJobStatusStore store;
-
-    @MockComponent
-    private HibernateDataSourceProvider dataSourceProvider;
-
-    @MockComponent
-    private HibernateStore hibernateStore;
-
-    @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @MockComponent
-    private HibernateConfiguration hibernateConfiguration;
 
     @MockComponent
     private BlobStoreManager blobStoreManager;
@@ -136,17 +93,9 @@ class DatabaseJobStatusStoreTest
     @Named("version3")
     private JobStatusFolderResolver folderResolver;
 
-    @XWikiTempDir
-    private File tmpDir;
-
-    @BeforeComponent
-    void configureComponents() throws Exception
+    @Override
+    protected void configureAdditionalComponents() throws Exception
     {
-        DataSource dataSource = createDataSource();
-        when(this.hibernateConfiguration.getPath()).thenReturn(createHibernateConfigurationFile().toString());
-        when(this.dataSourceProvider.getDataSource()).thenReturn(dataSource);
-        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
-        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.HSQLDB);
         when(this.remoteObservationManagerConfiguration.getId()).thenReturn(NODE_ID);
         when(this.filesystemStore.loadJobStatus(ArgumentMatchers.anyList())).thenReturn(null);
         when(this.folderResolver.getFolderSegments(ArgumentMatchers.anyList()))
@@ -219,34 +168,118 @@ class DatabaseJobStatusStoreTest
         verify(this.filesystemStore, times(2)).removeJobStatus(request.getId());
     }
 
-    private DataSource createDataSource()
+    @Test
+    void loadJobStatusMigratesFromFilesystem() throws Exception
     {
-        JDBCDataSource dataSource = new JDBCDataSource();
-        dataSource.setUrl("jdbc:hsqldb:mem:jobstore_status_" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1");
-        dataSource.setUser("sa");
-        dataSource.setPassword("");
-        return dataSource;
+        List<String> id = List.of("jobs", "migration", "load");
+        DefaultRequest request = new DefaultRequest();
+        request.setId(id);
+
+        DefaultJobStatus<DefaultRequest> filesystemStatus = new DefaultJobStatus<>("migrate-job", request, null,
+            mock(), mock());
+        filesystemStatus.setState(JobStatus.State.FINISHED);
+        filesystemStatus.setStartDate(new Date(3000L));
+        filesystemStatus.setEndDate(new Date(4000L));
+
+        LogQueue logs = new LogQueue();
+        for (int i = 0; i < 5; ++i) {
+            logs.log(new LogEvent(LogLevel.INFO, "migrated-message-" + i, null, null));
+        }
+        filesystemStatus.setLoggerTail(logs);
+
+        when(this.filesystemStore.loadJobStatus(id)).thenReturn(filesystemStatus).thenReturn(null);
+
+        // First load: status should be migrated from filesystem to database. The same instance is returned
+        // with the logger tail replaced with a DatabaseLoggerTail.
+        JobStatus loaded = this.store.loadJobStatus(id);
+        assertNotNull(loaded);
+        assertInstanceOf(DefaultJobStatus.class, loaded);
+        @SuppressWarnings("unchecked")
+        DefaultJobStatus<DefaultRequest> defaultStatus = (DefaultJobStatus<DefaultRequest>) loaded;
+        assertEquals("migrate-job", defaultStatus.getJobType());
+        assertEquals(JobStatus.State.FINISHED, defaultStatus.getState());
+
+        // The migrated status should have a DatabaseLoggerTail attached with all migrated log entries.
+        assertNotNull(defaultStatus.getLoggerTail());
+        assertInstanceOf(DatabaseLoggerTail.class, defaultStatus.getLoggerTail());
+        assertEquals(5, defaultStatus.getLoggerTail().size());
+
+        List<String> messages = new ArrayList<>();
+        defaultStatus.getLoggerTail().iterator().forEachRemaining(event -> messages.add(event.getFormattedMessage()));
+        assertEquals("migrated-message-0", messages.getFirst());
+        assertEquals("migrated-message-4", messages.getLast());
+
+        // The filesystem store should have been asked to remove the status (via saveJobStatus).
+        verify(this.filesystemStore).removeJobStatus(id);
+
+        // Second load: status should now come from the database without consulting the filesystem again.
+        JobStatus reloaded = this.store.loadJobStatus(id);
+        assertNotNull(reloaded);
+        assertInstanceOf(DefaultJobStatus.class, reloaded);
+        // filesystemStore.loadJobStatus should have been called once only (already returned null on second call).
+        verify(this.filesystemStore, times(1)).loadJobStatus(id);
     }
 
-    private Path createHibernateConfigurationFile() throws Exception
+    @Test
+    void loadJobStatusReturnsNullWhenNotFoundInDatabaseOrFilesystem() throws Exception
     {
-        Path target = this.tmpDir.toPath().resolve("hibernate-job-store.cfg.xml");
-        Files.createDirectories(target.getParent());
+        List<String> id = List.of("jobs", "missing", "status");
 
-        VelocityContext context = new VelocityContext();
-        context.put("xwikiDbConnectionUrl", "none");
-        context.put("xwikiDbDbcpMaxTotal", "");
-        context.put("xwikiDbHbmCommonExtraMappings", "");
-        context.put("xwikiDbHbmDefaultExtraMappings", "");
+        // filesystemStore already returns null by default from configureComponents.
+        JobStatus result = this.store.loadJobStatus(id);
 
-        Velocity.init();
-        try (InputStream stream = getClass().getClassLoader().getResourceAsStream("hibernate.cfg.xml.vm");
-            Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8))
-        {
-            String template = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            Velocity.evaluate(context, writer, "hibernate.cfg.xml.vm", template);
+        assertNull(result);
+        // saveJobStatus on a null status shouldn't write anything - the filesystem store's removeJobStatus
+        // should never have been called.
+        verify(this.filesystemStore, never()).removeJobStatus(id);
+    }
+
+    @Test
+    void createReadOnlyLoggerTailMigratesFromFilesystem() throws Exception
+    {
+        List<String> id = List.of("jobs", "migration", "logtail");
+        DefaultRequest request = new DefaultRequest();
+        request.setId(id);
+
+        DefaultJobStatus<DefaultRequest> filesystemStatus = new DefaultJobStatus<>("migrate-log-job", request, null,
+            mock(), mock());
+        filesystemStatus.setState(JobStatus.State.FINISHED);
+
+        LogQueue logs = new LogQueue();
+        for (int i = 0; i < 3; ++i) {
+            logs.log(new LogEvent(LogLevel.WARN, "warn-message-" + i, null, null));
         }
+        filesystemStatus.setLoggerTail(logs);
 
-        return target;
+        when(this.filesystemStore.loadJobStatus(id)).thenReturn(filesystemStatus).thenReturn(null);
+
+        // Creating a read-only logger tail should trigger migration of the filesystem status to the database.
+        LoggerTail loggerTail = this.store.createLoggerTail(id, true);
+
+        assertNotNull(loggerTail);
+        assertInstanceOf(DatabaseLoggerTail.class, loggerTail);
+        assertEquals(3, loggerTail.size());
+
+        List<String> messages = new ArrayList<>();
+        loggerTail.iterator().forEachRemaining(event -> messages.add(event.getFormattedMessage()));
+        assertEquals("warn-message-0", messages.getFirst());
+        assertEquals("warn-message-2", messages.getLast());
+
+        // The filesystem status should have been removed as part of the migration (via saveJobStatus).
+        verify(this.filesystemStore).removeJobStatus(id);
+    }
+
+    @Test
+    void createWritableLoggerTailRemovesFilesystemStatus() throws Exception
+    {
+        List<String> id = List.of("jobs", "migration", "writable");
+
+        // Creating a writable logger tail should remove the filesystem status to prevent future migration.
+        LoggerTail loggerTail = this.store.createLoggerTail(id, false);
+
+        assertNotNull(loggerTail);
+        assertInstanceOf(DatabaseLoggerTail.class, loggerTail);
+
+        verify(this.filesystemStore).removeJobStatus(id);
     }
 }

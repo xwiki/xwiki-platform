@@ -1270,7 +1270,7 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
 
   function updateMeta(xwikiDocument) {
     $('html').attr({
-      'data-xwiki-isnew': xwikiDocument.isNew,
+      'data-xwiki-isnew': `${xwikiDocument.isNew}`,
       'data-xwiki-version': xwikiDocument.version || '',
       'data-xwiki-modified': xwikiDocument.modified,
       'data-xwiki-locale': xwikiDocument.language,

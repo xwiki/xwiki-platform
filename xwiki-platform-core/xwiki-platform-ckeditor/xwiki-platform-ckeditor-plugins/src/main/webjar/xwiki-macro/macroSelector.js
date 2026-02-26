@@ -76,7 +76,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'macroService'
           'data-extensionId': macro.extensionId,
           'data-extensionVersion': macro.extensionVersion,
           'data-extensionName': macro.extensionName,
-          'data-extensionInstallAllowed': `${macro.extensionInstallAllowed === true || macro.extensionInstallAllowed === 'true'}`
+          'data-extensionInstallAllowed':
+            `${macro.extensionInstallAllowed === true || macro.extensionInstallAllowed === 'true'}`
         });
       }
       macro.categories.forEach(function (category) {

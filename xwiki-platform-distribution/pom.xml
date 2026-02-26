@@ -72,7 +72,7 @@
     <xwiki.db.common.extraMappings>
       instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
-    <xwiki.db.default.extraMappings>mailsender.hbm.xml,jobstatus.hbm.xml</xwiki.db.default.extraMappings>
+    <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
 
     <!-- Features -->
     <platform.distribution.features>xwiki/${platform.version}</platform.distribution.features>
@@ -142,7 +142,7 @@
     <xwiki.db.hsqldb.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.hsqldb.connection.driver_class>
     <xwiki.db.hsqldb.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hsqldb.hbm.xwiki>
     <xwiki.db.hsqldb.hbm.feeds>feeds.hbm.xml</xwiki.db.hsqldb.hbm.feeds>
-    <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml,jobstatus.hbm.xml</xwiki.db.hsqldb.extraMappings>
+    <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml</xwiki.db.hsqldb.extraMappings>
     <xwiki.db.hsqldb.hbm.virtualMode />
     <xwiki.db.hsqldb.hbm.compressionAllowed />
 
@@ -157,7 +157,7 @@
     <xwiki.db.mysql.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.mysql.connection.driver_class>
     <xwiki.db.mysql.hbm.xwiki>xwiki.hbm.xml</xwiki.db.mysql.hbm.xwiki>
     <xwiki.db.mysql.hbm.feeds>feeds.hbm.xml</xwiki.db.mysql.hbm.feeds>
-    <xwiki.db.mysql.extraMappings>mailsender.hbm.xml,jobstatus.hbm.xml</xwiki.db.mysql.extraMappings>
+    <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
 
     <!-- MariaDB -->
     <xwiki.db.mariadb>mariadb</xwiki.db.mariadb>
@@ -170,7 +170,7 @@
     <xwiki.db.mariadb.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.mariadb.connection.driver_class>
     <xwiki.db.mariadb.hbm.xwiki>xwiki.hbm.xml</xwiki.db.mariadb.hbm.xwiki>
     <xwiki.db.mariadb.hbm.feeds>feeds.hbm.xml</xwiki.db.mariadb.hbm.feeds>
-    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml,jobstatus.hbm.xml</xwiki.db.mariadb.extraMappings>
+    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml</xwiki.db.mariadb.extraMappings>
 
     <!-- Postgres SQL -->
     <xwiki.db.pgsql>pgsql</xwiki.db.pgsql>
@@ -183,12 +183,12 @@
     <xwiki.db.pgsql.connection.driver_class>org.postgresql.Driver</xwiki.db.pgsql.connection.driver_class>
     <xwiki.db.pgsql.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.pgsql.hbm.xwiki>
     <xwiki.db.pgsql.hbm.feeds>feeds.hbm.xml</xwiki.db.pgsql.hbm.feeds>
-    <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml,jobstatus.hbm.xml</xwiki.db.pgsql.extraMappings>
+    <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
     <xwiki.db.pgsql.hbm.virtualMode>schema</xwiki.db.pgsql.hbm.virtualMode>
 
     <!-- Oracle -->
     <xwiki.db.oracle>oracle</xwiki.db.oracle>
-    <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml,jobstatus.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
+    <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
 
     <!-- Set HSQLDB by default -->
     <xwiki.db>${xwiki.db.hsqldb}</xwiki.db>

@@ -87,7 +87,7 @@ abstract class AbstractJobStatusHibernateTest
         Path target = this.tmpDir.toPath().resolve("hibernate-test.cfg.xml");
         Files.createDirectories(target.getParent());
 
-        String jdbcUrl = "jdbc:hsqldb:mem:jobstore_" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        String jdbcUrl = "jdbc:hsqldb:mem:jobstore_" + UUID.randomUUID();
 
         VelocityContext context = new VelocityContext();
         context.put("xwikiDbConnectionUrl", jdbcUrl);

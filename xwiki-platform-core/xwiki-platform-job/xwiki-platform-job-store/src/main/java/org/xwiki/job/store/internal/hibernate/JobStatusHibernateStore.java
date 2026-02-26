@@ -173,9 +173,11 @@ public class JobStatusHibernateStore implements Initializable, Disposable
 
         StandardServiceRegistryBuilder registryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
-        registryBuilder.configure(baseConfiguration);
+        // Use applySettings() instead of configure(baseConfiguration) to avoid including the <mapping> entries
+        // from the cfg.xml file (e.g., xwiki.hbm.xml) in the job-status-specific session factory.
+        // Only the connection/pool settings are needed here; the mappings are added explicitly below.
+        registryBuilder.applySettings(values);
 
-        // Explicitly avoid creating/updating the main mappings; we add only jobstatus mapping resources below.
         this.standardServiceRegistry = registryBuilder.build();
 
         MetadataSources metadataSources = new MetadataSources(this.standardServiceRegistry);

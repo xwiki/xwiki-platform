@@ -31,7 +31,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Job - Store</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
   </properties>
 
   <dependencies>

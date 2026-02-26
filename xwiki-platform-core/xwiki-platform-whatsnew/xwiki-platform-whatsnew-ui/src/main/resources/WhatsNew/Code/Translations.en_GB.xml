@@ -37,6 +37,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.whatsnew.drawer.text=What's New
-### Missing: platform.whatsnew.title=
+platform.whatsnew.title=What's new in XWiki
 </content>
 </xwikidoc>

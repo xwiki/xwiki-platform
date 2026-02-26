@@ -229,8 +229,8 @@ catalogs:
       specifier: 7.3.1
       version: 7.3.1
     vite-plugin-css-injected-by-js:
-      specifier: 3.5.2
-      version: 3.5.2
+      specifier: 4.0.1
+      version: 4.0.1
     vite-plugin-dts:
       specifier: 4.5.4
       version: 4.5.4
@@ -542,7 +542,7 @@ importers:
         version: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
       vite-plugin-css-injected-by-js:
         specifier: 'catalog:'
-        version: 3.5.2(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))
+        version: 4.0.1(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))
       vite-plugin-dts:
         specifier: 'catalog:'
         version: 4.5.4(@types/node@24.10.13)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2))
@@ -6236,8 +6236,8 @@ packages:
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
 
-  vite-plugin-css-injected-by-js@3.5.2:
-    resolution: {integrity: sha512-2MpU/Y+SCZyWUB6ua3HbJCrgnF0KACAsmzOQt1UvRVJCGF6S8xdA3ZUhWcWdM9ivG4I5az8PnQmwwrkC2CAQrQ==}
+  vite-plugin-css-injected-by-js@4.0.1:
+    resolution: {integrity: sha512-WfyRojojQyAO/KzWf+efcXpTPv6zJPXaRmr9EYq5a4v5I3PWCR7kR01hiri2lW6+rHm3a57kpwsf+iahIJi1Qw==}
     peerDependencies:
       vite: '>2.0.0-0'
 
@@ -11550,7 +11550,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-plugin-css-injected-by-js@3.5.2(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)):
+  vite-plugin-css-injected-by-js@4.0.1(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)):
     dependencies:
       vite: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.2)
 

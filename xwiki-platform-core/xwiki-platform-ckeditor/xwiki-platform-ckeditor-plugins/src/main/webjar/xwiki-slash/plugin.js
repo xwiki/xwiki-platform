@@ -481,11 +481,16 @@
         return CKEDITOR.plugins.textMatch.match(range, function(text, offset) {
           // Get the text before the caret.
           var left = text.slice(0, offset),
-              // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
-          if (match) {
+            partRegEx = escapeRegExp(config.marker) + '.{0,30}$',
+            // Will look for the marker followed by text.
+            // We make a distinction between the match starting at the beginning of a line
+            // and the match starting after a space, since we want to keep the space the
+            // so the index is different then.
+            matchBeginLine = left.match(new RegExp('^' + partRegEx)),
+            matchAfterSpace = left.match(new RegExp('\\s' + partRegEx));
+          if (matchBeginLine || matchAfterSpace) {
             return {
-              start: match.index,
+              start: (matchBeginLine) ? matchBeginLine.index : matchAfterSpace.index + 1,
               end: offset
             };
           }

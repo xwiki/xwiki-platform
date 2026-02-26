@@ -70,7 +70,15 @@ public class JobStatusHibernateStore implements Initializable, Disposable
 {
     private static final String HBM_JOBSTATUS_DEFAULT = "jobstatus.hbm.xml";
 
+    private static final String HBM_JOBSTATUS_POSTGRESQL = "jobstatus.postgresql.hbm.xml";
+
     private static final String HBM_JOBSTATUS_ORACLE = "jobstatus.oracle.hbm.xml";
+
+    private static final String HBM_JOBSTATUS_MSSQL = "jobstatus.mssql.hbm.xml";
+
+    private static final String HBM_JOBSTATUS_DERBY = "jobstatus.derby.hbm.xml";
+
+    private static final String HBM_JOBSTATUS_DB2 = "jobstatus.db2.hbm.xml";
 
     private static final String UPDATE_SCHEMA_FAILED_MESSAGE = "Failed to update job status database schema";
 
@@ -207,7 +215,23 @@ public class JobStatusHibernateStore implements Initializable, Disposable
 
     private String selectJobStatusMapping()
     {
-        return this.hibernateStore.getDatabaseProductName() == DatabaseProduct.ORACLE ? HBM_JOBSTATUS_ORACLE
-            : HBM_JOBSTATUS_DEFAULT;
+        DatabaseProduct databaseProduct = this.hibernateStore.getDatabaseProductName();
+
+        String fileName;
+        if (databaseProduct == DatabaseProduct.ORACLE) {
+            fileName = HBM_JOBSTATUS_ORACLE;
+        } else if (databaseProduct == DatabaseProduct.POSTGRESQL) {
+            fileName = HBM_JOBSTATUS_POSTGRESQL;
+        } else if (databaseProduct == DatabaseProduct.MSSQL) {
+            fileName = HBM_JOBSTATUS_MSSQL;
+        } else if (databaseProduct == DatabaseProduct.DERBY) {
+            fileName = HBM_JOBSTATUS_DERBY;
+        } else if (databaseProduct == DatabaseProduct.DB2) {
+            fileName = HBM_JOBSTATUS_DB2;
+        } else {
+            fileName = HBM_JOBSTATUS_DEFAULT;
+        }
+
+        return fileName;
     }
 }

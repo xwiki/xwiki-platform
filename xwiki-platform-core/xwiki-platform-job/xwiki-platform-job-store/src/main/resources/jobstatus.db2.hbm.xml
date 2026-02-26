@@ -25,17 +25,22 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
+    <!-- This file is a copy of jobstatus.hbm.xml with the following modifications:
+         - For large strings (i.e. when size > 32K) the property type was changed to materialized_clob,
+           as otherwise Hibernate uses VARCHAR, which are limited to 32K
+    -->
+
     <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
         <composite-id>
             <key-property name="nodeId" type="string">
                 <column name="XWJS_NODE_ID" length="63" not-null="true" index="JOB_STATUS_SUMMARY_NODE"/>
             </key-property>
             <key-property name="statusKey" type="string">
-                <column name="XWJS_STATUS_KEY" length="512" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
+                <column name="XWJS_STATUS_KEY" length="255" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
             </key-property>
         </composite-id>
 
-        <property name="fullJobId" type="text" not-null="true">
+        <property name="fullJobId" type="materialized_clob" not-null="true">
             <column name="XWJS_FULL_JOB_ID"/>
         </property>
 
@@ -72,7 +77,7 @@
         </property>
 
         <property name="blobLocator" type="string" not-null="true">
-            <column name="XWJS_BLOB_LOCATOR" length="768"/>
+            <column name="XWJS_BLOB_LOCATOR" length="255"/>
         </property>
     </class>
 
@@ -82,7 +87,7 @@
                 <column name="XWJL_NODE_ID" length="63" not-null="true" index="JOB_STATUS_LOG_NODE"/>
             </key-property>
             <key-property name="statusKey" type="string">
-                <column name="XWJL_STATUS_KEY" length="512" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
+                <column name="XWJL_STATUS_KEY" length="255" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
             </key-property>
             <key-property name="lineIndex" type="long">
                 <column name="XWJL_LINE_INDEX" not-null="true" index="JOB_STATUS_LOG_INDEX"/>
@@ -98,22 +103,22 @@
         </property>
 
         <property name="message" type="string">
-            <column name="XWJL_MESSAGE" length="768"/>
+            <column name="XWJL_MESSAGE" length="255"/>
         </property>
 
         <property name="formattedMessage" type="string">
-            <column name="XWJL_FORMATTED_MESSAGE" length="768"/>
+            <column name="XWJL_FORMATTED_MESSAGE" length="255"/>
         </property>
 
         <property name="throwableType" type="string">
-            <column name="XWJL_THROWABLE_TYPE" length="768"/>
+            <column name="XWJL_THROWABLE_TYPE" length="255"/>
         </property>
 
         <property name="throwableMessage" type="string">
-            <column name="XWJL_THROWABLE_MESSAGE" length="768"/>
+            <column name="XWJL_THROWABLE_MESSAGE" length="255"/>
         </property>
 
-        <property name="logSerialized" type="text" not-null="true">
+        <property name="logSerialized" type="materialized_clob" not-null="true">
             <column name="XWJL_LOG_SERIALIZED"/>
         </property>
     </class>

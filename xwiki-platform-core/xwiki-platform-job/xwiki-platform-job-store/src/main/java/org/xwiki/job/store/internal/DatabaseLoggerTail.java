@@ -59,9 +59,7 @@ import org.xwiki.xstream.internal.SafeXStream;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DatabaseLoggerTail extends AbstractLoggerTail
 {
-    private static final int MESSAGE_COLUMN_LENGTH = 2000;
-
-    private static final int THROWABLE_TYPE_LENGTH = 512;
+    private static final int STRING_COLUMN_LENGTH = 768;
 
     private static final int LOG_PAGE_SIZE = 200;
 
@@ -76,17 +74,21 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
 
     private static final String DELETE_LOGS_HQL = "delete " + SELECT_LOGS_BASE_HQL;
 
-    private static final String SORT_BY_LINE_INDEX_ASC = "order by lineIndex asc";
+    private static final String SORT_BY_LINE_INDEX_ASC = " order by lineIndex asc";
+
+    private static final String SORT_BY_LINE_INDEX_DESC = " order by lineIndex desc";
 
     private static final String SELECT_LOGS_HQL = SELECT_LOGS_BASE_HQL + SORT_BY_LINE_INDEX_ASC;
 
-    private static final String SELECT_LOGS_REVERSE_HQL = SELECT_LOGS_BASE_HQL + "order by lineIndex desc";
+    private static final String SELECT_LOGS_REVERSE_HQL = SELECT_LOGS_BASE_HQL + SORT_BY_LINE_INDEX_DESC;
+
+    private static final String AND_MIN_LEVEL = " and level <= :minLevel";
 
     private static final String SELECT_LOGS_BY_LEVEL_HQL =
-        SELECT_LOGS_BASE_HQL + "and level >= :minLevel " + SORT_BY_LINE_INDEX_ASC;
+        SELECT_LOGS_BASE_HQL + AND_MIN_LEVEL + SORT_BY_LINE_INDEX_ASC;
 
     private static final String SELECT_LAST_LOG_BY_LEVEL_HQL =
-        SELECT_LOGS_BASE_HQL + "and level >= :minLevel order by lineIndex desc";
+        SELECT_LOGS_BASE_HQL + AND_MIN_LEVEL + SORT_BY_LINE_INDEX_DESC;
 
     private static final String SELECT_LOG_BY_LINE_INDEX_HQL =
         SELECT_LOGS_BASE_HQL + "and lineIndex = :lineIndex";
@@ -95,13 +97,13 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         SELECT_LOGS_BASE_HQL + "and lineIndex > :lineIndex and lineIndex < :toLineIndex " + SORT_BY_LINE_INDEX_ASC;
 
     private static final String SELECT_LOGS_BY_LEVEL_AFTER_LINE_INDEX_BEFORE_LINE_INDEX_HQL =
-        SELECT_LOGS_BASE_HQL + "and level >= :minLevel and lineIndex > :lineIndex and lineIndex < :toLineIndex "
+        SELECT_LOGS_BASE_HQL + AND_MIN_LEVEL + " and lineIndex > :lineIndex and lineIndex < :toLineIndex "
             + SORT_BY_LINE_INDEX_ASC;
 
     private static final String COUNT_LOGS_HQL =
         "select count(*) from org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity " + NODE_AND_STATUS_WHERE;
 
-    private static final String COUNT_LOGS_BY_LEVEL_HQL = COUNT_LOGS_HQL + "and level >= :minLevel";
+    private static final String COUNT_LOGS_BY_LEVEL_HQL = COUNT_LOGS_HQL + AND_MIN_LEVEL;
 
     private static final String STATUS_KEY = "statusKey";
 
@@ -304,7 +306,7 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         return count != null ? count : 0;
     }
 
-    private List<JobStatusLogEntryEntity> fetchLogEntries(LogLevel minLevel, int limit, int offset, boolean reverse)
+    private List<JobStatusLogEntryEntity> fetchLogEntries(LogLevel minLevel, int offset, int limit, boolean reverse)
     {
         int actualLimit = Math.max(1, limit);
         return this.hibernateExecutor.executeRead(session -> {
@@ -363,11 +365,11 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
         entity.setLineIndex(lineIndex);
         entity.setLevel(event.getLevel() != null ? event.getLevel().ordinal() : LogLevel.INFO.ordinal());
         entity.setTimeStamp(event.getTimeStamp());
-        entity.setMessage(truncate(event.getMessage(), MESSAGE_COLUMN_LENGTH));
-        entity.setFormattedMessage(truncate(event.getFormattedMessage(), MESSAGE_COLUMN_LENGTH));
+        entity.setMessage(truncate(event.getMessage(), STRING_COLUMN_LENGTH));
+        entity.setFormattedMessage(truncate(event.getFormattedMessage(), STRING_COLUMN_LENGTH));
         if (event.getThrowable() != null) {
-            entity.setThrowableType(truncate(event.getThrowable().getClass().getName(), THROWABLE_TYPE_LENGTH));
-            entity.setThrowableMessage(truncate(event.getThrowable().getMessage(), MESSAGE_COLUMN_LENGTH));
+            entity.setThrowableType(truncate(event.getThrowable().getClass().getName(), STRING_COLUMN_LENGTH));
+            entity.setThrowableMessage(truncate(event.getThrowable().getMessage(), STRING_COLUMN_LENGTH));
         }
         entity.setLogSerialized(serialize(event));
         return entity;
@@ -377,7 +379,13 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
     private LogEvent deserialize(JobStatusLogEntryEntity entity)
     {
         try {
-            return (LogEvent) this.xstream.fromXML(entity.getLogSerialized());
+            LogEvent event = (LogEvent) this.xstream.fromXML(entity.getLogSerialized());
+            if (event == null) {
+                this.logger.debug("Deserialized log entry [{}] is null, falling back to metadata.",
+                    entity.getLineIndex());
+                return buildFallbackEvent(entity);
+            }
+            return event;
         } catch (Exception e) {
             this.logger.debug("Failed to deserialize log entry [{}], falling back to metadata.", entity.getLineIndex(),
                 e);
@@ -502,12 +510,12 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
 
         private void prepareNext()
         {
-            if (this.nextLineIndex + 1 >= this.endLineIndexExclusive) {
-                this.nextEvent = null;
-                return;
-            }
-
             if (this.bufferIndex >= this.buffer.size()) {
+                if (this.nextLineIndex + 1 >= this.endLineIndexExclusive) {
+                    this.nextEvent = null;
+                    return;
+                }
+
                 this.buffer = this.tail.fetchLogEntriesAfterLineIndex(this.minLevel, LOG_PAGE_SIZE,
                     this.nextLineIndex, this.endLineIndexExclusive);
                 this.bufferIndex = 0;
@@ -515,11 +523,10 @@ public class DatabaseLoggerTail extends AbstractLoggerTail
                     this.nextEvent = null;
                     return;
                 }
-
-                this.nextLineIndex = this.buffer.getLast().getLineIndex();
             }
 
             JobStatusLogEntryEntity entry = this.buffer.get(this.bufferIndex++);
+            this.nextLineIndex = entry.getLineIndex();
             this.nextEvent = this.tail.deserialize(entry);
         }
     }

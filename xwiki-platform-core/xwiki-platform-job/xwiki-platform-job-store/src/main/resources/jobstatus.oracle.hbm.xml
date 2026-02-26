@@ -25,97 +25,108 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
-  <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
-    <composite-id>
-      <key-property name="nodeId" type="string">
-        <column name="node_id" length="63" not-null="true" index="JOB_STATUS_SUMMARY_NODE"/>
-      </key-property>
-      <key-property name="statusKey" type="string">
-        <column name="status_key" length="512" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
-      </key-property>
-    </composite-id>
+    <!-- This file is a copy of jobstatus.hbm.xml with the following modifications:
+         - When using "text" or "string" types:
+           - When size <= 2000 Hibernate maps it to CHAR
+           - When size > 2000 and <= 4000 Hibernates maps it to VARCHAR2
+           - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
+             since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
+             size > 4000 chars we must use a "materialized_clob" type
+             See https://hibernate.atlassian.net/browse/HHH-5569
+         - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
+    -->
 
-    <property name="fullJobId" type="materialized_clob" not-null="true">
-      <column name="full_job_id"/>
-    </property>
+    <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
+        <composite-id>
+            <key-property name="nodeId" type="string">
+                <column name="XWJS_NODE_ID" length="63" not-null="true" index="JOB_STATUS_SUMMARY_NODE"/>
+            </key-property>
+            <key-property name="statusKey" type="string">
+                <column name="XWJS_STATUS_KEY" length="512" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
+            </key-property>
+        </composite-id>
 
-    <property name="jobType" type="string">
-      <column name="job_type" length="255" index="JOB_STATUS_SUMMARY_JOB_TYPE"/>
-    </property>
+        <property name="fullJobId" type="materialized_clob" not-null="true">
+            <column name="XWJS_FULL_JOB_ID"/>
+        </property>
 
-    <property name="state" type="string" not-null="true">
-      <column name="state" length="32" index="JOB_STATUS_SUMMARY_STATE"/>
-    </property>
+        <property name="jobType" type="string">
+            <column name="XWJS_JOB_TYPE" length="255" index="JOB_STATUS_SUMMARY_JOB_TYPE"/>
+        </property>
 
-    <property name="startDate" type="timestamp">
-      <column name="start_date" index="JOB_STATUS_SUMMARY_START"/>
-    </property>
+        <property name="state" type="string" not-null="true">
+            <column name="XWJS_STATE" length="32" index="JOB_STATUS_SUMMARY_STATE"/>
+        </property>
 
-    <property name="endDate" type="timestamp">
-      <column name="end_date" index="JOB_STATUS_SUMMARY_END"/>
-    </property>
+        <property name="startDate" type="timestamp">
+            <column name="XWJS_START_DATE" index="JOB_STATUS_SUMMARY_START"/>
+        </property>
 
-    <property name="serialized" type="boolean">
-      <column name="serialized" not-null="true"/>
-    </property>
+        <property name="endDate" type="timestamp">
+            <column name="XWJS_END_DATE" index="JOB_STATUS_SUMMARY_END"/>
+        </property>
 
-    <property name="isolated" type="boolean">
-      <column name="isolated" not-null="true"/>
-    </property>
+        <property name="serialized" type="boolean">
+            <column name="XWJS_SERIALIZED" not-null="true"/>
+        </property>
 
-    <property name="cancelable" type="boolean">
-      <column name="cancelable" not-null="true"/>
-    </property>
+        <property name="isolated" type="boolean">
+            <column name="XWJS_ISOLATED" not-null="true"/>
+        </property>
 
-    <property name="canceled" type="boolean">
-      <column name="canceled" not-null="true"/>
-    </property>
+        <property name="cancelable" type="boolean">
+            <column name="XWJS_CANCELABLE" not-null="true"/>
+        </property>
 
-    <property name="blobLocator" type="string" not-null="true">
-      <column name="blob_locator" length="1024"/>
-    </property>
-  </class>
+        <property name="canceled" type="boolean">
+            <column name="XWJS_CANCELED" not-null="true"/>
+        </property>
 
-  <class name="org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity" table="job_status_logs">
-    <composite-id>
-      <key-property name="nodeId" type="string">
-        <column name="node_id" length="63" not-null="true" index="JOB_STATUS_LOG_NODE"/>
-      </key-property>
-      <key-property name="statusKey" type="string">
-        <column name="status_key" length="512" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
-      </key-property>
-      <key-property name="lineIndex" type="long">
-        <column name="line_index" not-null="true" index="JOB_STATUS_LOG_INDEX"/>
-      </key-property>
-    </composite-id>
+        <property name="blobLocator" type="string" not-null="true">
+            <column name="XWJS_BLOB_LOCATOR" length="1024"/>
+        </property>
+    </class>
 
-    <property name="level" type="integer">
-      <column name="level" not-null="true" index="JOB_STATUS_LOG_LEVEL"/>
-    </property>
+    <class name="org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity" table="job_status_logs">
+        <composite-id>
+            <key-property name="nodeId" type="string">
+                <column name="XWJL_NODE_ID" length="63" not-null="true" index="JOB_STATUS_LOG_NODE"/>
+            </key-property>
+            <key-property name="statusKey" type="string">
+                <column name="XWJL_STATUS_KEY" length="512" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
+            </key-property>
+            <key-property name="lineIndex" type="long">
+                <column name="XWJL_LINE_INDEX" not-null="true" index="JOB_STATUS_LOG_INDEX"/>
+            </key-property>
+        </composite-id>
 
-    <property name="timeStamp" type="long">
-      <column name="timestamp" not-null="true" index="JOB_STATUS_LOG_TS"/>
-    </property>
+        <property name="level" type="integer">
+            <column name="XWJL_LEVEL" not-null="true" index="JOB_STATUS_LOG_LEVEL"/>
+        </property>
 
-    <property name="message" type="string">
-      <column name="message" length="2000"/>
-    </property>
+        <property name="timeStamp" type="long">
+            <column name="XWJL_TIMESTAMP" not-null="true" index="JOB_STATUS_LOG_TS"/>
+        </property>
 
-    <property name="formattedMessage" type="string">
-      <column name="formatted_message" length="2000"/>
-    </property>
+        <property name="message" type="string">
+            <column name="XWJL_MESSAGE" length="2000"/>
+        </property>
 
-    <property name="throwableType" type="string">
-      <column name="throwable_type" length="512"/>
-    </property>
+        <property name="formattedMessage" type="string">
+            <column name="XWJL_FORMATTED_MESSAGE" length="2000"/>
+        </property>
 
-    <property name="throwableMessage" type="string">
-      <column name="throwable_message" length="2000"/>
-    </property>
+        <property name="throwableType" type="string">
+            <column name="XWJL_THROWABLE_TYPE" length="768"/>
+        </property>
 
-    <property name="logSerialized" type="materialized_clob" not-null="true">
-      <column name="log_serialized"/>
-    </property>
-  </class>
+        <property name="throwableMessage" type="string">
+            <column name="XWJL_THROWABLE_MESSAGE" length="2000"/>
+        </property>
+
+        <property name="logSerialized" type="materialized_clob" not-null="true">
+            <column name="XWJL_LOG_SERIALIZED"/>
+        </property>
+    </class>
 
 </hibernate-mapping>

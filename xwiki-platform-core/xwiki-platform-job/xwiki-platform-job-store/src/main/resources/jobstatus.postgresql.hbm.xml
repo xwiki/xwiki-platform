@@ -25,6 +25,15 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
+    <!-- This file is a copy of jobstatus.hbm.xml.
+         - Redefine materialized_clob as TextType
+    -->
+
+    <!-- Redefine materialized_clob as TextType for historical reason
+         (used to be mapped to StringClobType which was no a log at all despite its name),
+         getting rid of that hack means converting all materialized_clob fields in PostgreSQL -->
+    <typedef name="materialized_clob" class="org.hibernate.type.TextType" />
+
     <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
         <composite-id>
             <key-property name="nodeId" type="string">
@@ -35,7 +44,7 @@
             </key-property>
         </composite-id>
 
-        <property name="fullJobId" type="text" not-null="true">
+        <property name="fullJobId" type="materialized_clob" not-null="true">
             <column name="XWJS_FULL_JOB_ID"/>
         </property>
 
@@ -113,7 +122,7 @@
             <column name="XWJL_THROWABLE_MESSAGE" length="768"/>
         </property>
 
-        <property name="logSerialized" type="text" not-null="true">
+        <property name="logSerialized" type="materialized_clob" not-null="true">
             <column name="XWJL_LOG_SERIALIZED"/>
         </property>
     </class>

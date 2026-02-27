@@ -34,10 +34,10 @@ public class TagPage extends ViewPage
 {
     private final String tag;
 
-    @FindBy(xpath = "//a[@class='button rename']")
+    @FindBy(xpath = "//a[@class='btn btn-default rename']")
     private WebElement buttonRenameTag;
 
-    @FindBy(xpath = "//a[@class='button delete']")
+    @FindBy(xpath = "//a[@class='btn btn-default delete']")
     private WebElement buttonDeleteTag;
     
     @FindBy(xpath = "//input[@class='button' and contains(@value,'Delete')]")

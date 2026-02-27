@@ -36,8 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: logging.admin.unsetLevel.success=
-### Missing: logging.admin.setLevel.success=
-### Missing: logging.admin.setLevel.error=
+  <content>logging.admin.unsetLevel.success=Logger "{0}" level has been unset.
+logging.admin.setLevel.success=Logger "{0}" level has been set to "{1}".
+logging.admin.setLevel.error=Failed to set log level: the logger "{0}" doesn''t exist.
 </content>
 </xwikidoc>

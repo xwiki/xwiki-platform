@@ -61,7 +61,7 @@ appWithinMinutes.wizardStep.structure.title=Structure your data
 ### Missing: appWithinMinutes.wizardStep.entries.name=
 ### Missing: appWithinMinutes.wizardStep.entries.title=
 ### Missing: appWithinMinutes.wizardStep.entries.description=
-### Missing: appWithinMinutes.wizardStep.presentation.name=
+appWithinMinutes.wizardStep.presentation.name=Presentation
 ### Missing: appWithinMinutes.wizardStep.presentation.title=
 ### Missing: appWithinMinutes.wizardStep.presentation.description=
 ### Missing: platform.appwithinminutes.wizardStepNextButtonLabel=
@@ -71,11 +71,11 @@ appWithinMinutes.wizardStep.structure.title=Structure your data
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=
 ### Missing: platform.appwithinminutes.wizardStepHelpTitle=
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=
+platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
 
 ### Wizard Step 1: Application Name
 ### Missing: appWithinMinutes.createApp.location.label=
-### Missing: appWithinMinutes.createApp.location.hint=
+appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
 ### Missing: appWithinMinutes.createApp.parent.label=
 ### Missing: appWithinMinutes.createApp.parent.hint=
 ### Missing: appWithinMinutes.createApp.parent.placeholder=
@@ -158,7 +158,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to creat
 ### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=
 
 ### Wizard Step 3: Application Presentation
-### Missing: platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
 ### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=
 ### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=
 ### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=
@@ -176,7 +176,7 @@ platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of th
 ### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnDescription=
 ### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=
 ### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=
-### Missing: platform.appwithinminutes.liveTableEditorActionsColumnName=
+platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 ### Missing: platform.appwithinminutes.liveTableEditorActionsColumnDescription=
 ### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnName=
 ### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=
@@ -214,7 +214,7 @@ platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of th
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
@@ -253,9 +253,9 @@ platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was spe
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Structure
 #@deprecated appWithinMinutes.wizardStep.structure.title
-### Missing: platform.appwithinminutes.wizardStep2Title=
+platform.appwithinminutes.wizardStep2Title=Structure your data
 #@deprecated appWithinMinutes.wizardStep.structure.description
-### Missing: platform.appwithinminutes.wizardStep2Description=
+platform.appwithinminutes.wizardStep2Description=Describe the application data
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 ### Missing: platform.appwithinminutes.wizardStep3Name=
 #@deprecated appWithinMinutes.wizardStep.presentation.title
@@ -265,7 +265,7 @@ platform.appwithinminutes.wizardStep2Name=Structure
 
 ### Since 11.0
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.space=
-### Missing: appWithinMinutes.classEditor.title=
+appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title=
 </content>
 </xwikidoc>

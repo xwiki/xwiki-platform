@@ -39,7 +39,7 @@
   <content>annotations.title=Annotate
 ### Missing: annotations.menu.loading=
 ### Missing: annotations.menu.loaderror=
-### Missing: annotations.tab.info.noannotations=
+annotations.tab.info.noannotations=No annotations on this page
 ### Missing: annotations.settings.display=
 ### Missing: annotations.settings.error.wrongsyntax=
 ### Missing: annotations.settings.error.notarget=

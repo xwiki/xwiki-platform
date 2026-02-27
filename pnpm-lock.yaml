@@ -25,8 +25,8 @@ catalogs:
       specifier: 8.3.14
       version: 8.3.14
     '@mantine/hooks':
-      specifier: 8.3.14
-      version: 8.3.14
+      specifier: 8.3.15
+      version: 8.3.15
     '@microsoft/api-extractor':
       specifier: 7.57.4
       version: 7.57.4
@@ -1649,16 +1649,16 @@ importers:
         version: 0.47.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@types/hast@3.0.4)
       '@blocknote/mantine':
         specifier: 'catalog:'
-        version: 0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@mantine/core@8.3.14(@mantine/hooks@8.3.14(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@mantine/hooks@8.3.14(react@19.2.4))(@mantine/utils@6.0.22(react@19.2.4))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@mantine/core@8.3.14(@mantine/hooks@8.3.15(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@mantine/hooks@8.3.15(react@19.2.4))(@mantine/utils@6.0.22(react@19.2.4))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@blocknote/react':
         specifier: 'catalog:'
         version: 0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@mantine/core':
         specifier: 'catalog:'
-        version: 8.3.14(@mantine/hooks@8.3.14(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 8.3.14(@mantine/hooks@8.3.15(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 8.3.14(react@19.2.4)
+        version: 8.3.15(react@19.2.4)
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.7)
@@ -2580,8 +2580,8 @@ packages:
       react: ^18.x || ^19.x
       react-dom: ^18.x || ^19.x
 
-  '@mantine/hooks@8.3.14':
-    resolution: {integrity: sha512-0SbHnGEuHcF2QyjzBBcqidpjNmIb6n7TC3obnhkBToYhUTbMcJSK/8ei/yHtAelridJH4CPeohRlQdc0HajHyQ==}
+  '@mantine/hooks@8.3.15':
+    resolution: {integrity: sha512-AUSnpUlzttHzJht3CJ1YWi16iy6NWRwtyWO5RLGHHsmiW05DyG0qOPKF8+R5dLHuOCnl3XOu4roI2Y1ku9U04Q==}
     peerDependencies:
       react: ^18.x || ^19.x
 
@@ -6792,12 +6792,12 @@ snapshots:
       - sugar-high
       - supports-color
 
-  '@blocknote/mantine@0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@mantine/core@8.3.14(@mantine/hooks@8.3.14(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@mantine/hooks@8.3.14(react@19.2.4))(@mantine/utils@6.0.22(react@19.2.4))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@blocknote/mantine@0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@mantine/core@8.3.14(@mantine/hooks@8.3.15(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@mantine/hooks@8.3.15(react@19.2.4))(@mantine/utils@6.0.22(react@19.2.4))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@blocknote/core': 0.47.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@types/hast@3.0.4)
       '@blocknote/react': 0.47.0(@floating-ui/dom@1.7.4)(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@mantine/core': 8.3.14(@mantine/hooks@8.3.14(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@mantine/hooks': 8.3.14(react@19.2.4)
+      '@mantine/core': 8.3.14(@mantine/hooks@8.3.15(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@mantine/hooks': 8.3.15(react@19.2.4)
       '@mantine/utils': 6.0.22(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -7246,10 +7246,10 @@ snapshots:
   '@lifeomic/attempt@3.1.0':
     optional: true
 
-  '@mantine/core@8.3.14(@mantine/hooks@8.3.14(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@mantine/core@8.3.14(@mantine/hooks@8.3.15(react@19.2.4))(@types/react@19.2.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@floating-ui/react': 0.27.16(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@mantine/hooks': 8.3.14(react@19.2.4)
+      '@mantine/hooks': 8.3.15(react@19.2.4)
       clsx: 2.1.1
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -7260,7 +7260,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@8.3.14(react@19.2.4)':
+  '@mantine/hooks@8.3.15(react@19.2.4)':
     dependencies:
       react: 19.2.4
 

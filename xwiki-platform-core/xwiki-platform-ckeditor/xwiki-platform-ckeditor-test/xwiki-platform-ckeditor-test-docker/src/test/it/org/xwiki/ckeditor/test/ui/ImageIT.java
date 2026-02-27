@@ -48,7 +48,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -92,9 +91,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 class ImageIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+    void beforeAll(TestUtils setup) throws Exception {
         setup.loginAsSuperAdmin();
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
     }
     
     @BeforeEach

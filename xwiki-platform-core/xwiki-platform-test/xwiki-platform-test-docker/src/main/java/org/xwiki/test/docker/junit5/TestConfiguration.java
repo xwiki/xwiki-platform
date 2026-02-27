@@ -99,6 +99,10 @@ public class TestConfiguration
 
     private String blobStoreTag;
 
+    private boolean remoteSolr;
+
+    private XWikiInstances xwikiInstances;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -132,6 +136,8 @@ public class TestConfiguration
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.getBlobStore());
         mergeBlobStoreTag(testConfiguration.getBlobStoreTag());
+        mergeRemoteSolr(testConfiguration.isRemoteSolr());
+        mergeXWikiInstances(testConfiguration.getXWikiInstances());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -389,6 +395,22 @@ public class TestConfiguration
             }
         } else {
             this.blobStoreTag = blobStoreTag;
+        }
+    }
+
+    private void mergeRemoteSolr(boolean remoteSolr)
+    {
+        if (!isRemoteSolr() && remoteSolr) {
+            this.remoteSolr = true;
+        }
+    }
+
+    private void mergeXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        // Select the configuration with the biggest number of instances.
+        if (getXWikiInstances() == null
+            || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
+            setXWikiInstances(xwikiInstances);
         }
     }
 
@@ -900,5 +922,45 @@ public class TestConfiguration
     public void setBlobStoreTag(String blobStoreTag)
     {
         this.blobStoreTag = blobStoreTag;
+    }
+
+    /**
+     * @param remoteSolr true if a remote Solr instance should be used for the tests, instead of an embedded one
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public void setRemoteSolr(boolean remoteSolr)
+    {
+        this.remoteSolr = remoteSolr;
+    }
+
+    /**
+     * @return true if a remote Solr instance should be used for the tests, instead of an embedded one
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public boolean isRemoteSolr()
+    {
+        return this.remoteSolr;
+    }
+
+    /**
+     * @return the XWiki instances configuration
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public XWikiInstances getXWikiInstances()
+    {
+        return this.xwikiInstances;
+    }
+
+    /**
+     * @param xwikiInstances see {@link #getXWikiInstances()}
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public void setXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        this.xwikiInstances = xwikiInstances;
     }
 }

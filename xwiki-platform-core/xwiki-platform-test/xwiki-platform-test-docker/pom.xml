@@ -58,6 +58,11 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- PR Test checker -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

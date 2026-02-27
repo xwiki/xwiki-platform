@@ -19,7 +19,6 @@
  */
 package org.xwiki.flamingo.test.docker;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -61,23 +59,11 @@ class CompareIT
 
     private static final String IMAGE_SYNTAX = "[[image:%s]]";
 
-    private String getLocalAttachmentURL(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration, String attachmentName)
+    private String getLocalAttachmentURL(TestUtils setup, TestReference testReference, String attachmentName)
         throws URISyntaxException
     {
-        // If the Servlet Engine is standalone, then we need to replace the host and port in the attachment URL,
-        // otherwise we just return the attachment name.
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        if (servletEngine == ServletEngine.JETTY_STANDALONE) {
-            AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-            URI attachmentURL = new URI(setup.getURL(attachmentReference, "download", null));
-            // Replace host and port with host and port of the servlet engine as the outside port doesn't work from
-            // the inside.
-            return (new URI("http", null, servletEngine.getHostIP(), servletEngine.getPort(), attachmentURL.getPath(),
-                attachmentURL.getQuery(), attachmentURL.getFragment())).toString();
-        } else {
-            return attachmentName;
-        }
+        return setup
+            .toHttpClientUri(setup.getURL(new AttachmentReference(attachmentName, testReference), "download", null));
     }
 
     @Test
@@ -92,11 +78,11 @@ class CompareIT
         // for comparison when changing the URL to the second image.
         setup.attachFile(testReference, ATTACHMENT_NAME_2,
             getClass().getResourceAsStream("/AttachmentIT/image.gif"), false);
-        String url1 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_1);
+        String url1 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_1);
         ViewPage viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url1));
         String firstRevision = viewPage.getMetaDataValue("version");
         // Create a second revision with the new image.
-        String url2 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_2);
+        String url2 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_2);
         viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url2));
         String secondRevision = viewPage.getMetaDataValue("version");
 
@@ -110,7 +96,7 @@ class CompareIT
             getClass().getResourceAsStream("/AttachmentIT/SmallSizeAttachment.png"), false);
 
         // Create a third revision with the new image.
-        String url3 = getLocalAttachmentURL(setup, testReference, testConfiguration, ATTACHMENT_NAME_3);
+        String url3 = getLocalAttachmentURL(setup, testReference, ATTACHMENT_NAME_3);
         viewPage = setup.createPage(testReference, String.format(IMAGE_SYNTAX, url3));
         String thirdRevision = viewPage.getMetaDataValue("version");
 

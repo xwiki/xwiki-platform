@@ -21,10 +21,9 @@ package org.xwiki.officeimporter.test.ui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
@@ -83,14 +82,8 @@ class OfficeExporterIT
         throws IOException, URISyntaxException
     {
         setup.createPage(testReference, "content", "title");
-        String exportURL = setup.getURL(testReference, "export", "format=" + format);
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        // Replace the host and port to match the one allowing to access the servlet externally.
-        URI externalURI = new URIBuilder(exportURL)
-            .setHost(servletEngine.getIP())
-            .setPort(servletEngine.getPort())
-            .build();
-        try (InputStream inputStream = externalURI.toURL().openStream()) {
+        String exportURL = setup.toHttpClientUri(setup.getURL(testReference, "export", "format=" + format));
+        try (InputStream inputStream = new URL(exportURL).openStream()) {
             assertEquals(expectedTikaDetect, TikaUtils.detect(inputStream));
         }
     }

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ See the NOTICE file distributed with this work for additional
+  ~ information regarding copyright ownership.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="true">
+
+    <!-- This file is a copy of jobstatus.hbm.xml with the following modifications:
+         - For medium strings (i.e. when size > 255) the property type was changed to text,
+           as otherwise Hibernate uses VARCHAR, which are limited to 255 chars
+         - For large strings (i.e. when size > 32K) the property type was changed to materialized_clob,
+           as otherwise Hibernate uses VARCHAR, which are limited to 32K
+    -->
+
+    <class name="org.xwiki.job.store.internal.entity.JobStatusSummaryEntity" table="job_status_summary">
+        <composite-id>
+            <key-property name="nodeId" type="string">
+                <column name="XWJS_NODE_ID" length="63" not-null="true" index="JOB_STATUS_SUMMARY_NODE"/>
+            </key-property>
+            <key-property name="statusKey" type="string">
+                <column name="XWJS_STATUS_KEY" length="255" not-null="true" index="JOB_STATUS_SUMMARY_STATUS"/>
+            </key-property>
+        </composite-id>
+
+        <property name="fullJobId" type="materialized_clob" not-null="true">
+            <column name="XWJS_FULL_JOB_ID"/>
+        </property>
+
+        <property name="jobType" type="string">
+            <column name="XWJS_JOB_TYPE" length="255" index="JOB_STATUS_SUMMARY_JOB_TYPE"/>
+        </property>
+
+        <property name="state" type="string" not-null="true">
+            <column name="XWJS_STATE" length="32" index="JOB_STATUS_SUMMARY_STATE"/>
+        </property>
+
+        <property name="startDate" type="timestamp">
+            <column name="XWJS_START_DATE" index="JOB_STATUS_SUMMARY_START"/>
+        </property>
+
+        <property name="endDate" type="timestamp">
+            <column name="XWJS_END_DATE" index="JOB_STATUS_SUMMARY_END"/>
+        </property>
+
+        <property name="serialized" type="boolean">
+            <column name="XWJS_SERIALIZED" not-null="true"/>
+        </property>
+
+        <property name="isolated" type="boolean">
+            <column name="XWJS_ISOLATED" not-null="true"/>
+        </property>
+
+        <property name="cancelable" type="boolean">
+            <column name="XWJS_CANCELABLE" not-null="true"/>
+        </property>
+
+        <property name="canceled" type="boolean">
+            <column name="XWJS_CANCELED" not-null="true"/>
+        </property>
+
+        <property name="blobLocator" type="text" not-null="true">
+            <column name="XWJS_BLOB_LOCATOR"/>
+        </property>
+    </class>
+
+    <class name="org.xwiki.job.store.internal.entity.JobStatusLogEntryEntity" table="job_status_logs">
+        <composite-id>
+            <key-property name="nodeId" type="string">
+                <column name="XWJL_NODE_ID" length="63" not-null="true" index="JOB_STATUS_LOG_NODE"/>
+            </key-property>
+            <key-property name="statusKey" type="string">
+                <column name="XWJL_STATUS_KEY" length="255" not-null="true" index="JOB_STATUS_LOG_STATUS"/>
+            </key-property>
+            <key-property name="lineIndex" type="long">
+                <column name="XWJL_LINE_INDEX" not-null="true" index="JOB_STATUS_LOG_INDEX"/>
+            </key-property>
+        </composite-id>
+
+        <property name="level" type="integer">
+            <column name="XWJL_LEVEL" not-null="true" index="JOB_STATUS_LOG_LEVEL"/>
+        </property>
+
+        <property name="timeStamp" type="long">
+            <column name="XWJL_TIMESTAMP" not-null="true" index="JOB_STATUS_LOG_TS"/>
+        </property>
+
+        <property name="message" type="text">
+            <column name="XWJL_MESSAGE"/>
+        </property>
+
+        <property name="formattedMessage" type="text">
+            <column name="XWJL_FORMATTED_MESSAGE"/>
+        </property>
+
+        <property name="throwableType" type="text">
+            <column name="XWJL_THROWABLE_TYPE"/>
+        </property>
+
+        <property name="throwableMessage" type="text">
+            <column name="XWJL_THROWABLE_MESSAGE"/>
+        </property>
+
+        <property name="logSerialized" type="materialized_clob" not-null="true">
+            <column name="XWJL_LOG_SERIALIZED"/>
+        </property>
+    </class>
+
+</hibernate-mapping>

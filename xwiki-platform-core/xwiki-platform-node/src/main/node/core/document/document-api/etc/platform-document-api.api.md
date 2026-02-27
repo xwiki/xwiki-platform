@@ -30,6 +30,7 @@ export interface DocumentService {
     notifyDocumentChange(change: DocumentChange, page: DocumentReference): Promise<void>;
     refreshCurrentDocument(): Promise<void>;
     registerDocumentChangeListener(change: DocumentChange, listener: (page: DocumentReference) => Promise<void>): void;
+    removeDocumentChangeListener(change: DocumentChange, listener: (page: DocumentReference) => Promise<void>): void;
     setCurrentDocument(documentReference: string, action?: string, revision?: string): Promise<void>;
 }
 

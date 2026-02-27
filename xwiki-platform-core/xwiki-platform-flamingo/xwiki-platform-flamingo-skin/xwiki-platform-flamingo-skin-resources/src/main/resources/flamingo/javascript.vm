@@ -62,6 +62,9 @@
 ## using RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
 ##
 #set ($jqueryMigrateId = 'org.webjars.npm:jquery-migrate')
+## The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
+## specify the library version when computing the WebJar resource URL.
+#set ($jqueryUITouchPunchPath = "jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch${jsExtension}")
 #set ($requireConfig = {
   'packages': [
     {
@@ -82,6 +85,8 @@
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
+    'jquery-ui': "#removeJsSuffix($services.webjars.url('jquery-ui', ""jquery-ui${jsExtension}""))",
+    'jquery-ui-touch-punch': "#removeJsSuffix($services.webjars.url($jqueryUITouchPunchPath))",
     'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
     'moment-jdateformatparser': $services.webjars.url('org.webjars.npm:moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
@@ -102,6 +107,7 @@
   },
   'shim': {
     'bootstrap': ['jquery'],
+    'jquery-ui-touch-punch': ['jquery-ui'],
     'prototype': {
       'exports': '$'
     },
@@ -134,6 +140,7 @@
 #set ($requireConfig.map = {
   '*': {
     'jquery': $jQueryModuleId,
+    'jquery-ui': 'jquery-ui-touch-punch',
     'moment/moment': 'moment'
   },
   'jQueryNoConflict': {
@@ -141,6 +148,9 @@
   },
   'jquery-migrate': {
     'jquery': 'jQueryNoConflict'
+  },
+  'jquery-ui-touch-punch': {
+    'jquery-ui': 'jquery-ui'
   }
 })
 ## Extend the RequireJS configuration.

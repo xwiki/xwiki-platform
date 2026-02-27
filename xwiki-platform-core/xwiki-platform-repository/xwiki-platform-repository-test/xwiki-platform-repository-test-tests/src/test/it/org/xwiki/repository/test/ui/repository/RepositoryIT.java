@@ -198,9 +198,9 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // TODO: add XR UI to manipulate versions
         getRepositoryTestUtils().addVersionObject(this.baseExtension);
         getRepositoryTestUtils().addVersionObject(this.baseExtension, "10.0", getUtil().getAttachmentURL("Extension",
-            this.baseExtension.getName(), this.baseExtension.getFile().getName()));
+            this.baseExtension.getName(), this.baseExtension.getFile().getFile().getName()));
         getRepositoryTestUtils().addVersionObject(this.baseExtension, "2.0",
-            "attach:" + this.baseExtension.getFile().getName());
+            "attach:" + this.baseExtension.getFile().getFile().getName());
 
         // Add dependencies
         // TODO: add XR UI to manipulate dependencies

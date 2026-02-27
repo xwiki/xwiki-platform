@@ -40,28 +40,28 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Homepage Tour (by steps order)
-### Missing: tour.homepageTour.welcome.title=
-### Missing: tour.homepageTour.welcome.content=
-### Missing: tour.homepageTour.panels.title=
-### Missing: tour.homepageTour.panels.contentA=
-### Missing: tour.homepageTour.panels.contentB=
-### Missing: tour.homepageTour.breadcrumbs.title=
-### Missing: tour.homepageTour.breadcrumbs.contentA=
-### Missing: tour.homepageTour.breadcrumbs.contentB=
-### Missing: tour.homepageTour.pageContent.title=
-### Missing: tour.homepageTour.pageContent.contentA=
-### Missing: tour.homepageTour.pageContent.contentB=
-### Missing: tour.homepageTour.pageMenu.title=
-### Missing: tour.homepageTour.pageMenu.contentA=
-### Missing: tour.homepageTour.pageMenu.contentB=
-### Missing: tour.homepageTour.pageTabs.title=
-### Missing: tour.homepageTour.pageTabs.contentA=
-### Missing: tour.homepageTour.pageTabs.contentB=
-### Missing: tour.homepageTour.header.title=
-### Missing: tour.homepageTour.header.contentA=
-### Missing: tour.homepageTour.header.contentB=
-### Missing: tour.homepageTour.tourComplete.title=
-### Missing: tour.homepageTour.tourComplete.contentA=
-### Missing: tour.homepageTour.tourComplete.contentB=
+tour.homepageTour.welcome.title=Welcome to XWiki
+tour.homepageTour.welcome.content=In the next couple of minutes you will discover your wiki's interface and basic functionalities.
+tour.homepageTour.panels.title=Panels
+tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
+tour.homepageTour.panels.contentB=Administrators can customise them and decide which panels are shown.
+tour.homepageTour.breadcrumbs.title=Breadcrumbs
+tour.homepageTour.breadcrumbs.contentA=The breadcrumbs allow you to identify where your page is located and navigate the hierarchy.
+tour.homepageTour.breadcrumbs.contentB=The {0} button will always take you to the wiki''s home page.
+tour.homepageTour.pageContent.title=Page Content
+tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
+tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organise your knowledge.
+tour.homepageTour.pageMenu.title=Page Menu
+tour.homepageTour.pageMenu.contentA=This menu contains page-related actions. With the appropriate rights, you can edit, create, watch pages and more.
+tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Administer, Copy/Move/Rename/Delete, Export, Print, Annotate and Share.
+tour.homepageTour.pageTabs.title=Page Tabs
+tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
+tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
+tour.homepageTour.header.title=Header
+tour.homepageTour.header.contentA=You can Search for content, see your notifications or access your User Profile.
+tour.homepageTour.header.contentB=The {0} button opens a Drawer which contains wiki related actions like Administration and Indexes.
+tour.homepageTour.tourComplete.title=Tour Complete
+tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
+tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.
 </content>
 </xwikidoc>

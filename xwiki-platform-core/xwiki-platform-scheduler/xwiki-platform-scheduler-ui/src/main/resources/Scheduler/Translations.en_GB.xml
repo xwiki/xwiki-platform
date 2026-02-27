@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: scheduler.disabled=
-### Missing: scheduler.applicationsPanelEntryLabel=
+  <content>scheduler.disabled=The Scheduler is disabled in this instance. No job will be running.
+scheduler.applicationsPanelEntryLabel=Scheduler
 </content>
 </xwikidoc>

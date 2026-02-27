@@ -224,9 +224,10 @@ class ClassEditorIT
         ClassFieldEditPane field = editor.addField("Static List");
         field.openConfigPanel();
         field.setName("3times");
-        // Save the page and expect the error.
+        // Save the page and expect the error without leaving the editor page.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, invalidFieldNameErrorMessage);
+        editor.waitForNotificationErrorMessage(invalidFieldNameErrorMessage);
+        assertEquals("3times", field.getName());
 
         editor = goToEditor(testReference);
         field = editor.addField("User");
@@ -234,17 +235,19 @@ class ClassEditorIT
         // Unfortunately we don't allow Unicode letters because they are not fully supported in tag names.
         // See XWIKI-7306: The class editor doesn't validate properly the field names
         field.setName("\u021Bar\u0103");
-        // Save the page and expect the error.
+        // Save the page and expect the error without leaving the editor page.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, invalidFieldNameErrorMessage);
+        editor.waitForNotificationErrorMessage(invalidFieldNameErrorMessage);
+        assertEquals("\u021Bar\u0103", field.getName());
 
         editor = goToEditor(testReference);
         field = editor.addField("Group");
         field.openConfigPanel();
         field.setName("alice>bob");
-        // Save the page and expect the error.
+        // Save the page and expect the error without leaving the editor page.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, invalidFieldNameErrorMessage);
+        editor.waitForNotificationErrorMessage(invalidFieldNameErrorMessage);
+        assertEquals("alice>bob", field.getName());
     }
 
     /**
@@ -267,7 +270,7 @@ class ClassEditorIT
 
         // Save the page and expect the error.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, "The class has two fields with the same name: carol");
+        editor.waitForNotificationErrorMessage("The class has two fields with the same name: carol");
     }
 
     /**
@@ -299,7 +302,7 @@ class ClassEditorIT
 
         // Save the page and expect the error.
         editor.getSaveAndViewButton().click();
-        waitForPageSourceContains(setup, "The class has two fields with the same name: bob");
+        editor.waitForNotificationErrorMessage("The class has two fields with the same name: bob");
     }
 
     /**

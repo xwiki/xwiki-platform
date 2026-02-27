@@ -43,13 +43,13 @@ public class ApplicationEditPage extends InlinePage
      * The form used to edit the application class overwrites the save button because it needs to process the submitted
      * data. Otherwise the request is forwarded by the action filter to the save action.
      */
-    @FindBy(name = "xaction_save")
+    @FindBy(xpath = "//*[@data-submit-value='xaction_save' or @name='xaction_save']")
     private WebElement saveButton;
 
     /**
      * @see #saveButton
      */
-    @FindBy(name = "xaction_saveandcontinue")
+    @FindBy(xpath = "//*[@data-submit-value='xaction_saveandcontinue' or @name='xaction_saveandcontinue']")
     private WebElement saveAndContinueButton;
 
     /**
@@ -78,7 +78,10 @@ public class ApplicationEditPage extends InlinePage
         super();
 
         if (wait) {
-            By findBy = (waitOnXAction) ? By.name("xaction_save") : By.id("wizard-next");
+            // The save button either gets a data attribute to submit a custom value or is renamed to xaction_save.
+            By findBy = (waitOnXAction)
+                ? By.xpath("//*[@data-submit-value='xaction_save' or @name='xaction_save']")
+                : By.id("wizard-next");
             getDriver().waitUntilElementIsVisible(findBy);
         }
     }

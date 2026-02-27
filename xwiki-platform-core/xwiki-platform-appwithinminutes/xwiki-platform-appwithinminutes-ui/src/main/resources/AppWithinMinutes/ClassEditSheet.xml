@@ -1642,13 +1642,14 @@ return XWiki;
     // Remove the preview button.
     form.down("input[name='action_preview']").remove();
 
-    // Rename the save buttons.
-    form.down("input[name='action_save']").name = 'xaction_save';
-    form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
+    // Let actionButtons.js submit a custom value for the submit buttons to avoid triggering the standard save action
+    // on the server side.
+    form.down("input[name='action_save']").dataset.submitValue = 'xaction_save';
+    form.down("input[name='action_saveandcontinue']").dataset.submitValue = 'xaction_saveandcontinue';
 
-    // Allow core actionButtons.js to handle this as a non-custom form and to submit the name of the clicked button.
+    // actionButtons.js detects this as a custom form due to the submit URL that is not the standard one.
+    // Force the standard behavior by setting the customForm attribute to false.
     form.dataset.customForm = 'false';
-    form.dataset.submitButtonName = 'true';
 
     // Be prepared to enhance some of the field properties.
     new XWiki.FormFieldNameManager();

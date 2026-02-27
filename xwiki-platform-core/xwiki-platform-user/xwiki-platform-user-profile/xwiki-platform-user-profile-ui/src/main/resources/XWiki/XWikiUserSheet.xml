@@ -586,6 +586,40 @@ div.editProfileCategory {
   float: right;
 }
 
+/* Preferences */
+/* Shortcut preferences */
+span.xHint:has(+ ul.shortcut-list) {
+  margin-bottom: 0.8em; /* Approximately 10px with the 12px local font size. */
+}
+
+ul.shortcut-list {
+  list-style: none;
+  padding-left: unset;
+  &amp; &gt; li {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    justify-content: space-between;
+    align-items: center;
+    /* Keep the line large enough to fit an input in both view and edit mode. */
+    min-height: 2.7em; /* Approximately 38px with the 14px local font size. */
+    border-top: 1px dashed $theme.textPrimaryColor;
+    &amp;:first-child {
+      border-top: none;
+    }
+    
+    &amp; &gt; label {
+      flex-grow: 1;
+      .xHint {
+        display: inline;
+      }
+    }
+    &amp; &gt; input.shortcutPreference, &amp; &gt; span {
+      max-width: 50%;
+      width: 10em;
+    }
+  }
+}
 
 /* Watchlist */
 

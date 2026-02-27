@@ -40,6 +40,217 @@
   <object>
     <name>XWiki.XWikiUserPreferencesSheet</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>cbdc7bc6-a49e-41a3-9309-a7d270d217da</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>define('xwiki-profile-preferences', {
+  prefix: 'platform.core.profile.',
+  keys: [
+    'shortcut.notifications.update.successful',
+    'shortcut.notifications.update.failed',
+    'shortcut.notifications.reset.successful',
+    'shortcut.notifications.reset.failed'
+  ]
+});
+
+require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], function ($, xm, l10n) {
+  const SHORTCUT_XOBJ_ACTION = Object.freeze({
+    CREATE: 'create',
+    DELETE: 'delete',
+    UPDATE: 'update',
+    NONE: 'none'
+  });
+  /**
+   * Handle the shortcut preference modifications
+   */
+  $(document).off('input.shortcutPreference');
+  let updateShortcut = function (shortcutPreferenceInput) {
+    // Step 1: We retrieve information about the shortcut preference state.
+    let shortcutPreference = $(shortcutPreferenceInput);
+    let translateKey = shortcutPreference.attr("data-translate-key");
+    let newValue = shortcutPreference.val();
+    let oldValue = shortcutPreference.attr('value');
+    let defaultValue = shortcutPreference.attr("data-default-value");
+    let url = xm.restURL;
+    let oldItemNumber = shortcutPreference.attr("data-shortcut-pref-number");
+    // Step 2: We want to compute what is the XObject action we'll need to take when the form is submitted
+    let xObjectAction = SHORTCUT_XOBJ_ACTION.NONE;
+    // If the new value is the same as the one that is already here, we do not have to do any action on the XObject
+    if (newValue === oldValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.NONE; }
+    else {
+      // If it's equal to the default value from the translation 
+      // (the translation is different to the default value so there was a preference)
+      // Then we can remove the preference object. There's no need to store user preferences about this.
+      if (newValue === defaultValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.DELETE; }
+      else {
+        // The new value is different from both the old value and the translation value (default)
+        // If the old value is the same as the default value then it means there was no object, 
+        // and we should create one.
+        // If not, it means that the shortcut was already customized and we should just update the object.
+        if (defaultValue === oldValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.CREATE; }
+        else { xObjectAction = SHORTCUT_XOBJ_ACTION.UPDATE; }
+      }
+    }
+    // Step 3: We retrieve information about the current state of the form
+    // All the hidden inputs are stored as siblings of the main input.
+    let inputCreation = shortcutPreference.siblings('input[name=addedObjects]');
+    let inputDeletion = shortcutPreference.siblings('input[name=deletedObjects]');
+    let inputUpdate = shortcutPreference.siblings('input[name=addedObjects]');
+    // Step 4: We update the form so that it properly updates the state of the XObjects when submitted.
+    if (oldItemNumber == null) {
+      if (newValue !== defaultValue) {
+        // Create the new user preference
+        let creationUrl = url + "/objects";
+        let data = {
+          'className': 'XWiki.UserPreferenceShortcutsClass',
+          'property#translationKey': translateKey,
+          'property#value': newValue
+        };
+        $.post(creationUrl, data, function(newObject) {
+          shortcutPreference.attr("data-shortcut-pref-number", newObject.firstChild.getElementsByTagName("number")[0].textContent);
+        });
+      }
+    } else {
+      if (newValue == shortcutPreference.attr("data-default-value")) {
+        // Remove the existing preference, we don't want to keep it if the user is back to normal.
+        let destructionUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber;
+        $.ajax({url: destructionUrl,
+          type: "DELETE"
+        });
+        shortcutPreference.removeAttr("data-shortcut-pref-number");
+      } else {
+        // Update the existing preference
+        let updateUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber +"/properties/value";
+        let data = {
+          'property#value': newValue
+        };
+        Promise.resolve($.ajax({url: updateUrl,
+          type: "PUT",
+          data: data
+        })).then(() => {
+          editor.trigger('xwiki:document:saved');
+          notification.replace(new XWiki.widgets.Notification(
+            l10n['platform.core.profile.shortcut.notifications.update.successful'], 'done'));
+        }).catch(response => {
+          editor.trigger('xwiki:document:saveFailed');
+          notification.replace(new XWiki.widgets.Notification(
+            l10n['platform.core.profile.shortcut.notifications.update.successful'], 'error'));
+          $('#saveFailureReason').text(response.statusText);});
+      }
+    }
+  };
+  /**
+   * Handle the reset buttons for shortcut preferences.
+   */
+  $('.reset-shortcut-preference').on('click', function (event) {
+    const shortcutPrefInput = $(this).siblings('input');
+    const defaultValue = shortcutPrefInput.attr('data-default-value');
+    shortcutPrefInput.val(defaultValue).trigger("input");
+  });
+  
+  // Buffer system to avoid updating the state of the preferences at each small change.
+  var timeoutId = 0;
+  var lastInput = null;
+  $(document).on('input.shortcutPreference', '.shortcutPreference', function () {
+    // If we propose a new update for the same field quickly after it was already updated, 
+    // we cancel the previous update and start the timer for this new one.
+    if (timeoutId !== 0 &amp;&amp; $(this).get(0).id == lastInput) {
+      clearTimeout(timeoutId);
+    }
+    lastInput = $(this).get(0).id;
+    timeoutId = setTimeout(updateShortcut, 500, this);
+  });
+});</code>
+    </property>
+    <property>
+      <parse/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiUserPreferencesSheet</name>
+    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>d3b30f9d-f441-4a7f-aee6-5eca30094ca2</guid>
     <class>
@@ -247,6 +458,51 @@
   #end
 #end
 ###############################
+##   DISPLAY SHORTCUT PREFERENCE
+###############################
+#macro (displayShortcut $fieldName $label $translationKey)
+  #set ($escapedSelectId = $escapetool.xml("XWiki.UserPreferenceShortcutsClass_${fieldNumber}"))
+  #set ($escapedHintId = $escapedSelectId + "_hint")
+  #set ($defaultValue = $escapetool.xml($services.localization.render($translationKey)))
+  &lt;li&gt;
+    &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))
+      &lt;span id="$escapedHintId" class='xHint'&gt;##
+      $escapetool.xml($services.localization.render('userprofile.default')): $defaultValue##
+      &lt;/span&gt;
+    &lt;/label&gt;
+    #set ($shortcutPreference = '')
+    #set ($shortcutPreference = $doc.getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
+    #set ($value = $doc.getValue('value', $shortcutPreference))
+    #if ($isEdit)
+      &lt;input type="text" class="shortcutPreference" name="$escapedSelectId" id="$escapedSelectId" size="30"
+        data-translate-key="$translationKey"
+        data-default-value="$defaultValue"
+        #if ("$!shortcutPreference" != '')data-shortcut-pref-number='$shortcutPreference.getReference().getObjectNumber()'#end
+        #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
+          #set ($escapedHintId = $escapedSelectId + "_hint")
+          aria-describedby="$escapedHintId"
+        #end
+        #if ($value)
+          value="$escapetool.xml($value)"
+        #elseif ($defaultValue)
+          value="$defaultValue"
+        #end&gt;
+      &lt;button class="btn btn-default reset-shortcut-preference" type="button&gt;
+        $services.icon.renderHTML('repeat') ##
+        $escapetool.xml($services.localization.render('platform.core.profile.shortcut.button.reset'))##
+      &lt;/button&gt;
+    #else
+      &lt;span&gt;
+        #if("$!shortcutPreference" != '') $!value##
+        #if("$!value" == '')&lt;small&gt;($escapetool.xml($services.localization.render('platform.core.profile.shortcut.hint.unbound')))&lt;/small&gt;#end
+        #else $defaultValue ##
+          &lt;small&gt;($escapetool.xml($services.localization.render('userprofile.default')))&lt;/small&gt;##
+        #end&lt;/span&gt;
+    #end
+    #set ($fieldNumber = $fieldNumber + 1)##
+  &lt;/li&gt;
+#end
+###############################
 ##      DISPLAY FIELD
 ###############################
 #macro (displayField $fieldName $label $defaultValue)
@@ -332,8 +588,56 @@
         #end
         #displayField('extensionConflictSetup', 'platform.core.profile.extensionConflictSetup', $defaultValue)
       &lt;/dl&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences'))&lt;/h2&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.hint'))&lt;/span&gt;
+      #set($fieldNumber = 0)##
+      #if ($isAdvancedUser)
+        &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes'))&lt;/h3&gt;
+        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes.hint'))&lt;/span&gt;
+        &lt;ul class="shortcut-list"&gt;
+          #displayShortcut('shortcut_view_edit', 'platform.core.profile.shortcut.view.edit', 'core.shortcuts.view.edit')
+          #displayShortcut('shortcut_view_wiki', 'platform.core.profile.shortcut.view.wiki', 'core.shortcuts.view.wiki')
+          #displayShortcut('shortcut_view_wysiwyg', 'platform.core.profile.shortcut.view.wysiwyg', 'core.shortcuts.view.wysiwyg')
+          #displayShortcut('shortcut_view_inline', 'platform.core.profile.shortcut.view.inline', 'core.shortcuts.view.inline')
+          #displayShortcut('shortcut_view_rights', 'platform.core.profile.shortcut.view.rights', 'core.shortcuts.view.rights')
+          #displayShortcut('shortcut_view_objects', 'platform.core.profile.shortcut.view.objects', 'core.shortcuts.view.objects')
+          #displayShortcut('shortcut_view_class', 'platform.core.profile.shortcut.view.class', 'core.shortcuts.view.class')
+        &lt;/ul&gt;
+        &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos'))&lt;/h3&gt;
+        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos.hint'))&lt;/span&gt;
+        &lt;ul class="shortcut-list"&gt;
+          #displayShortcut('shortcut_view_comments', 'platform.core.profile.shortcut.view.comments', 'core.shortcuts.view.comments')
+          #displayShortcut('shortcut_view_annotations', 'platform.core.profile.shortcut.view.annotations', 'core.shortcuts.view.annotations')
+          #displayShortcut('shortcut_view_attachments', 'platform.core.profile.shortcut.view.attachments', 'core.shortcuts.view.attachments')
+          #displayShortcut('shortcut_view_history', 'platform.core.profile.shortcut.view.history', 'core.shortcuts.view.history')
+          #displayShortcut('shortcut_view_information', 'platform.core.profile.shortcut.view.information', 'core.shortcuts.view.information')
+          #displayShortcut('shortcut_view_code', 'platform.core.profile.shortcut.view.code', 'core.shortcuts.view.code')
+        &lt;/ul&gt;
+        &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions'))&lt;/h3&gt;
+        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions.hint'))&lt;/span&gt;
+        &lt;ul class="shortcut-list"&gt;
+          #displayShortcut('shortcut_view_delete', 'platform.core.profile.shortcut.view.delete', 'core.shortcuts.view.delete')
+          #displayShortcut('shortcut_view_rename', 'platform.core.profile.shortcut.view.rename', 'core.shortcuts.view.rename')
+        &lt;/ul&gt;
+      #end
+      &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editorActions'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editorActions.hint'))&lt;/span&gt;
+      &lt;ul class="shortcut-list"&gt;
+        #displayShortcut('shortcut_edit_preview', 'platform.core.profile.shortcut.edit.preview', 'core.shortcuts.edit.preview')
+        #displayShortcut('shortcut_edit_backtoedit', 'platform.core.profile.shortcut.edit.backtoedit', 'core.shortcuts.edit.backtoedit')
+        #displayShortcut('shortcut_edit_cancel', 'platform.core.profile.shortcut.edit.cancel', 'core.shortcuts.edit.cancel')
+        #displayShortcut('shortcut_edit_save', 'platform.core.profile.shortcut.edit.save', 'core.shortcuts.edit.save')
+        #displayShortcut('shortcut_edit_saveandview', 'platform.core.profile.shortcut.edit.saveandview', 'core.shortcuts.edit.saveandview')
+      &lt;/ul&gt;
+      &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts.hint'))&lt;/span&gt;
+      &lt;ul class="shortcut-list"&gt;
+        #displayShortcut('shortcut_developer_usertype', 'platform.core.profile.shortcut.dev.usertype', 'core.shortcuts.developer.user.type')
+        #displayShortcut('shortcut_developer_display_hidden_docs', 'platform.core.profile.shortcut.dev.hiddendocs', 'core.shortcuts.developer.user.displayHiddenDocs')
+      &lt;/ul&gt;
     &lt;/div&gt;
   &lt;/div&gt;
+  #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserPreferencesSheet'))##
   #set ($isMyProfile = $xwiki.getDocument($xcontext.user).prefixedFullName == $doc.prefixedFullName)
   #if (($isMyProfile || $hasAdmin) &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.getObject('XWiki.LDAPProfileClass'))
     &lt;div class="half column"&gt;

@@ -137,7 +137,6 @@
     #end
   #end
   #set($order = "$!request.sort")
-  #set($discard = $services.query.hql.checkOrderBySafe($NULL, $order))
   #if ($order == 'doc.location')
     #set ($order = 'doc.fullName')
   #elseif ($order == 'email' &amp;&amp; $services.mail.general.shouldObfuscate())

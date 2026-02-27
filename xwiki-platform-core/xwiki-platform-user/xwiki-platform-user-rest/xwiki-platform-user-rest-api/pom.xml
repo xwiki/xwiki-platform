@@ -20,34 +20,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rest</artifactId>
+    <artifactId>xwiki-platform-user-rest</artifactId>
     <version>18.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-rest-model</artifactId>
-  <name>XWiki Platform - REST - Model</name>
-  <description>The (JAXB) model for XML resource representations served by the REST module.</description>
+  <artifactId>xwiki-platform-user-rest-api</artifactId>
+  <name>XWiki Platform - User - REST - API</name>
+  <packaging>jar</packaging>
+  <description>The API of the User REST services.</description>
   <properties>
-    <!--
-      The jacoco instruction ratio precision is higher here because the jaxb2 plugin generates classes
-      that are not excluded in the analysis.
-    -->
-    <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
-    </properties>
+    <xwiki.extension.name>User REST Services API</xwiki.extension.name>
+  </properties>
   <dependencies>
-    <!-- Test dependencies. -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -55,8 +45,29 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-stability</artifactId>
+      <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- We reuse the LinkCollection type from xwiki.rest.model.xsd  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-model</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -65,7 +76,16 @@
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
-          <generatePackage>org.xwiki.rest.model.jaxb</generatePackage>
+          <generatePackage>org.xwiki.user.rest.model.jaxb</generatePackage>
+          <!-- Make sure we don't regenerate / duplicate the xwiki-platform-rest-model classes. -->
+          <useDependenciesAsEpisodes>true</useDependenciesAsEpisodes>
+          <!-- Use a catalog to specify the path to the xwiki.rest.model.xsd -->
+          <!-- See also https://github.com/highsource/maven-jaxb2-plugin/wiki/Modular-Schema-Compilation -->
+          <catalog>src/main/resources/catalog.cat</catalog>
+          <!-- We use a custom package-info.java to set our own namespace prefixes. -->
+          <args>
+            <arg>-npa</arg>
+          </args>
         </configuration>
         <executions>
           <execution>
@@ -84,9 +104,7 @@
             <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
             <id>default</id>
             <configuration>
-              <excludes>
-                org/xwiki/rest/model/jaxb/*.java
-              </excludes>
+              <excludes>org/xwiki/user/rest/model/jaxb/*.java</excludes>
             </configuration>
           </execution>
         </executions>

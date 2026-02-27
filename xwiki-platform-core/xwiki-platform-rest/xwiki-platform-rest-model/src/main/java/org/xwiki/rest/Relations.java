@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * <p> This class contains the constants defining the relation types that can be specified for links in the
  * representations. <p>
@@ -176,6 +178,13 @@ public final class Relations
      * Relation for links pointing to the REST client information.
      */
     public static final String CLIENT = "http://www.xwiki.org/rel/client";
+
+    /**
+     * Relation for links pointing to the user.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String USER = "http://www.xwiki.org/rel/user";
 
     /**
      * Avoid instantiation.

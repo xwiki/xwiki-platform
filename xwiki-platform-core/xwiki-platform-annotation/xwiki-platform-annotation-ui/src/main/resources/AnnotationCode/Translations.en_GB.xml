@@ -39,7 +39,7 @@
   <content>annotations.title=Annotate
 ### Missing: annotations.menu.loading=Loading annotation settings
 ### Missing: annotations.menu.loaderror=Failed:
-### Missing: annotations.tab.info.noannotations=No annotations on this page
+annotations.tab.info.noannotations=No annotations on this page
 ### Missing: annotations.settings.display=Show annotations
 ### Missing: annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 ### Missing: annotations.settings.error.notarget=No page specified to get annotations settings for.

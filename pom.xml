@@ -145,17 +145,6 @@
   <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>
     <dependencies>
-      <!-- Standard dependencies used in several modules -->
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>mchange-commons-java</artifactId>
-        <version>0.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <version>0.12.0</version>
-      </dependency>
       <!-- Hibernate -->
       <dependency>
         <groupId>org.hibernate</groupId>

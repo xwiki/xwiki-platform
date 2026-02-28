@@ -265,6 +265,56 @@ function escapeHtml(str: string): string {
 }
 
 /**
+ * Find an item inside an array and return its index along the value itself
+ *
+ * @param array - The array to search in
+ * @param predicate - The predicate to find the value
+ *
+ * @returns - The found value and its index, or `null` if no value was found
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+function findWithIndex<T>(
+  array: T[],
+  predicate: (value: T) => boolean,
+): [T, number] | null {
+  for (let i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      return [array[i], i];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Find an item inside an array and return its index along the value itself, with a type predicate
+ *
+ * @param array - The array to search in
+ * @param predicate - The predicate to find the value and assert the value's type
+ *
+ * @returns - The found value and its index, or `null` if no value was found
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+function findWithIndexTypePredicate<T, U extends T>(
+  array: T[],
+  predicate: (value: T) => value is U,
+): [U, number] | null {
+  for (let i = 0; i < array.length; i++) {
+    const value = array[i];
+
+    if (predicate(value)) {
+      return [value, i];
+    }
+  }
+
+  return null;
+}
+
+/**
  * Generic tree structure type.
  * @since 18.0.0RC1
  * @beta
@@ -278,6 +328,8 @@ export {
   assertUnreachable,
   escapeHtml,
   filterMap,
+  findWithIndex,
+  findWithIndexTypePredicate,
   objectEntries,
   produceHtmlEl,
   provideTypeInference,

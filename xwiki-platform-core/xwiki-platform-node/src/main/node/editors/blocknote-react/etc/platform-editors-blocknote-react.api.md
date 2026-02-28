@@ -227,6 +227,16 @@ default: "default";
 };
 }, "table">;
 }>, InlineContentSchemaFromSpecs<    {
+subscript: InlineContentSpec<    {
+readonly type: "subscript";
+readonly content: "styled";
+readonly propSchema: {};
+}>;
+superscript: InlineContentSpec<    {
+readonly type: "superscript";
+readonly content: "styled";
+readonly propSchema: {};
+}>;
 text: {
 config: "text";
 implementation: any;
@@ -333,7 +343,7 @@ export function createCustomInlineContentSpec<const I extends CustomInlineConten
         aliases?: string[];
         group: string;
         icon: ReactNode;
-        default: () => PartialInlineContent<Record<I["type"], I>, S>;
+        default: () => Exclude<PartialInlineContent<Record<I["type"], I>, S>, string>[number];
     };
     customToolbar: (() => ReactNode) | null;
 }): {
@@ -700,7 +710,7 @@ export type EditorStyleSchema = EditorSchema extends BlockNoteSchema<infer _, in
 export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta
-export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
+export function extractMacroRawContent(content: InlineContentType[]): string;
 
 // @beta
 export type ImageEditionOverrideFn = (image: BlockOfType<"image">["props"], update: (updateResult: ImageUpdateResult) => void) => void;

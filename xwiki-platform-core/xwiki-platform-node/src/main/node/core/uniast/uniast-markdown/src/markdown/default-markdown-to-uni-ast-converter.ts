@@ -28,6 +28,7 @@ import {
 import {
   assertInArray,
   assertUnreachable,
+  findWithIndexTypePredicate,
   tryFalliblePromiseOrError,
 } from "@xwiki/platform-fn-utils";
 import { macrosServiceName } from "@xwiki/platform-macros-service";
@@ -52,7 +53,12 @@ import type {
   TextStyles,
   UniAst,
 } from "@xwiki/platform-uniast-api";
-import type { Image as MdImage, PhrasingContent, RootContent } from "mdast";
+import type {
+  Html,
+  Image as MdImage,
+  PhrasingContent,
+  RootContent,
+} from "mdast";
 
 /**
  * @since 18.0.0RC1
@@ -106,7 +112,7 @@ export class DefaultMarkdownToUniAstConverter
   private async convertBlock(block: RootContent): Promise<Block> {
     switch (block.type) {
       case "paragraph": {
-        const content = await this.collectInlineContent(block.children, {});
+        const content = await this.convertInlineContents(block.children, {});
 
         // Paragraphs only made of a single block macro are actually block macros
         if (
@@ -135,7 +141,7 @@ export class DefaultMarkdownToUniAstConverter
             [1, 2, 3, 4, 5, 6] as const,
             "Invalid heading depth in markdown parser",
           ),
-          content: await this.collectInlineContent(block.children, {}),
+          content: await this.convertInlineContents(block.children, {}),
           styles: {},
         };
 
@@ -180,7 +186,7 @@ export class DefaultMarkdownToUniAstConverter
           headers?.children.map(
             async (cell): Promise<TableColumn> => ({
               headerCell: {
-                content: await this.collectInlineContent(cell.children, {}),
+                content: await this.convertInlineContents(cell.children, {}),
                 styles: {},
               },
             }),
@@ -190,7 +196,7 @@ export class DefaultMarkdownToUniAstConverter
           rows.map(async (row) => {
             const map = row.children.map(
               async (cell): Promise<TableCell> => ({
-                content: await this.collectInlineContent(cell.children, {}),
+                content: await this.convertInlineContents(cell.children, {}),
                 styles: {},
               }),
             );
@@ -243,7 +249,142 @@ export class DefaultMarkdownToUniAstConverter
     }
   }
 
-  private async convertInline(
+  private async convertInlineContents(
+    children: PhrasingContent[],
+    styles: TextStyles = {},
+  ): Promise<InlineContent[]> {
+    const withProcessedHtml = await this._processHtmlInInlineContents(
+      children,
+      styles,
+    );
+
+    if (withProcessedHtml !== null) {
+      return withProcessedHtml;
+    }
+
+    return (
+      await Promise.all(
+        children.map((item) => this._convertInlineContent(item, styles)),
+      )
+    ).flat();
+  }
+
+  // eslint-disable-next-line max-statements
+  private async _processHtmlInInlineContents(
+    children: PhrasingContent[],
+    styles: TextStyles,
+  ): Promise<InlineContent[] | null> {
+    const htmlWithIdx = findWithIndexTypePredicate(
+      children,
+      (child) => child.type === "html",
+    );
+
+    if (!htmlWithIdx) {
+      return null;
+    }
+
+    const [html, openingIdx] = htmlWithIdx;
+
+    const tagMatch = html.value.match(/^<([a-z]+)>$/);
+
+    if (!tagMatch) {
+      throw new Error(`Found invalid HTML tag: "${html}"`);
+    }
+
+    const tag = tagMatch[1];
+
+    // NOTE: this is not a state machine, so with content like `<element><element></element></element>`
+    // it will select the wrong closing tag
+    const closing = findWithIndexTypePredicate(
+      children.slice(openingIdx + 1),
+      (child): child is Html =>
+        child.type === "html" && child.value === `</${tag}>`,
+    );
+
+    if (!closing) {
+      throw new Error(`Missing closing HTML tag for: "${tag}"`);
+    }
+
+    const closingIdx = closing[1] + openingIdx + 1;
+
+    return [
+      // Process elements before the HTML tag
+      ...(await this.convertInlineContents(children.slice(0, openingIdx))),
+
+      // Process the HTML element and its content
+      await this._processHtmlElement(
+        tag,
+        children.slice(openingIdx + 1, closingIdx),
+        styles,
+      ),
+
+      // Process elements after the HTML tag (which may very well contain another HTML element)
+      ...(await this.convertInlineContents(children.slice(closingIdx + 1))),
+    ];
+  }
+
+  // eslint-disable-next-line max-statements
+  private async _processHtmlElement(
+    tag: string,
+    inlineContents: PhrasingContent[],
+    styles: TextStyles,
+  ): Promise<InlineContent> {
+    switch (tag) {
+      case "sub": {
+        const content = await this.convertInlineContents(
+          inlineContents,
+          styles,
+        );
+
+        // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+        if (content.length !== 1) {
+          throw new Error(
+            "Expected precisely one inline content for <sub> element",
+          );
+        }
+
+        if (content[0].type !== "text") {
+          throw new Error("Only plain text is supported inside <sub> tags");
+        }
+
+        return {
+          type: "subscript",
+          content: content[0].content,
+          styles,
+        };
+      }
+
+      case "sup": {
+        const content = await this.convertInlineContents(
+          inlineContents,
+          styles,
+        );
+
+        // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+        if (content.length !== 1) {
+          throw new Error(
+            "Expected precisely one inline content for <sup> element",
+          );
+        }
+
+        if (content[0].type !== "text") {
+          throw new Error("Only plain text is supported inside <sup> tags");
+        }
+
+        return {
+          type: "superscript",
+          content: content[0].content,
+          styles,
+        };
+      }
+
+      default:
+        throw new Error(`Unrecognized HTML tag: "${tag}"`);
+    }
+  }
+
+  // NOTE: should not be used directly, use `convertInlineContents` instead
+  private async _convertInlineContent(
     inline: PhrasingContent,
     styles: TextStyles,
   ): Promise<InlineContent[]> {
@@ -257,19 +398,19 @@ export class DefaultMarkdownToUniAstConverter
         ];
 
       case "strong":
-        return this.collectInlineContent(inline.children, {
+        return this.convertInlineContents(inline.children, {
           ...styles,
           bold: true,
         });
 
       case "emphasis":
-        return this.collectInlineContent(inline.children, {
+        return this.convertInlineContents(inline.children, {
           ...styles,
           italic: true,
         });
 
       case "delete":
-        return this.collectInlineContent(inline.children, {
+        return this.convertInlineContents(inline.children, {
           ...styles,
           strikethrough: true,
         });
@@ -296,8 +437,11 @@ export class DefaultMarkdownToUniAstConverter
       case "linkReference":
       case "imageReference":
       case "break":
-      case "html":
         throw new Error("TODO: handle inlines of type " + inline.type);
+
+      case "html":
+        console.log(inline);
+        throw new Error("TODO");
 
       case "link": {
         return await this.convertLink(inline, styles);
@@ -335,7 +479,7 @@ export class DefaultMarkdownToUniAstConverter
     } else {
       target = { type: "external", url: inline.url };
     }
-    const label = await this.collectInlineContent(inline.children, styles);
+    const label = await this.convertInlineContents(inline.children, styles);
     return [
       {
         type: "link",
@@ -555,16 +699,5 @@ export class DefaultMarkdownToUniAstConverter
 
   private supportFlexmark(): boolean {
     return this.parserConfigurationResolver.get().supportFlexmarkInternalLinks;
-  }
-
-  private async collectInlineContent(
-    children: PhrasingContent[],
-    styles: TextStyles = {},
-  ): Promise<InlineContent[]> {
-    return (
-      await Promise.all(
-        children.map((item) => this.convertInline(item, styles)),
-      )
-    ).flat();
   }
 }

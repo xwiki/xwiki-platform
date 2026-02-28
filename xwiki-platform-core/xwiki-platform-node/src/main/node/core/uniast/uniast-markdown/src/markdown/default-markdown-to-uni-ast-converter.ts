@@ -47,6 +47,7 @@ import type {
   Image,
   InlineContent,
   LinkTarget,
+  ListItem,
   TableCell,
   TableColumn,
   TextStyles,
@@ -152,15 +153,24 @@ export class DefaultMarkdownToUniAstConverter
         // TODO: "token.loose" property
         return {
           type: "list",
+          listType: block.ordered
+            ? { type: "ordered", firstIndex: block.start ?? null }
+            : block.children.some(
+                  (child) =>
+                    child.checked !== undefined && child.checked !== null,
+                )
+              ? { type: "checkable" }
+              : { type: "unordered" },
           items: await Promise.all(
-            block.children.map(async (item, i) => ({
-              number: block.ordered ? (block.start ?? 1) + i : undefined,
-              checked: item.checked ?? undefined,
-              content: await Promise.all(
-                item.children.map((item) => this.convertBlock(item)),
-              ),
-              styles: {},
-            })),
+            block.children.map(
+              async (item): Promise<ListItem> => ({
+                content: await Promise.all(
+                  item.children.map((item) => this.convertBlock(item)),
+                ),
+                checked: item.checked ?? undefined,
+                styles: {},
+              }),
+            ),
           ),
           styles: {},
         };

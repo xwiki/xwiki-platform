@@ -38,7 +38,7 @@ type MacroBlock =
     }
   | {
       type: "list";
-      numbered?: boolean;
+      listType: MacroListType;
       items: MacroListItem[];
       styles: MacroBlockStyles;
     }
@@ -88,12 +88,24 @@ type MacroBlockStyles = {
 type MacroAlignment = "left" | "center" | "right" | "justify";
 
 /**
+ * Type of a `MacroBlock` list
+ *
+ * @since 18.1.0RC1
+ * @beta
+ */
+type MacroListType =
+  | { type: "unordered" }
+  | { type: "ordered"; firstIndex: number | null }
+  | { type: "checkable" };
+
+/**
  * Item that's part of a `MacroBlock` list
  *
  * @since 18.0.0RC1
  * @beta
  */
 type MacroListItem = {
+  /** Is the item checked? (only applicable for lists with the `checkable` type) */
   checked?: boolean;
   content: MacroInlineContent[];
   styles: MacroBlockStyles;
@@ -216,6 +228,7 @@ export type {
   MacroLink,
   MacroLinkTarget,
   MacroListItem,
+  MacroListType,
   MacroTableCell,
   MacroTableColumn,
   MacroText,

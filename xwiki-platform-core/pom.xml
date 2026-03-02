@@ -163,10 +163,6 @@
                   <ignore>true</ignore>
                   <code>java.field.removedWithConstant</code>
                   <old>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_CRYPT_ALGORITHM</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
                   <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getCryptAlgorithm()</old>
                 </item>
                 <item>
@@ -183,6 +179,23 @@
                   <ignore>true</ignore>
                   <code>java.field.removedWithConstant</code>
                   <old>field com.xpn.xwiki.objects.meta.PasswordMetaClass.ENCRYPTED</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>The removed methods were not implemented nor used. As for setxWikiClass the
+                implementation was expecting already a PropertyMetaClass and not using it would cause
+                errors.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.objects.classes.PropertyClass::initLazyCollections()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean com.xpn.xwiki.objects.classes.PropertyClass::isValidColumnTypes(org.hibernate.mapping.Property)</old>
                 </item>
               </differences>
             </revapi.differences>

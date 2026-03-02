@@ -35,4 +35,10 @@ class AllIT
     class NestedIconThemesRestIT extends IconThemesRestIT
     {
     }
+    
+    @Nested
+    @DisplayName("Icon Themes Admin UI tests")
+    class NestedIconThemesAdminIT extends IconThemesAdminIT
+    {
+    }
 }

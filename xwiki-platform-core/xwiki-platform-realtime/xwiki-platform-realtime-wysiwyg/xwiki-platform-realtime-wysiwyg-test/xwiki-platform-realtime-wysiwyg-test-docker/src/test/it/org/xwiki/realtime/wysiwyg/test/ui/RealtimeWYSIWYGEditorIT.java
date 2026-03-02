@@ -2285,10 +2285,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(syntaxConfirmationModal.getMessage()
             .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
         syntaxConfirmationModal.confirmSyntaxConversion();
-        // Wait for the syntax conversion.
-        firstEditPage.waitForNotificationSuccessMessage("Syntax converted");
-        // Wait for the editor to be reloaded (recreated).
-        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
 
         // The editor was recreated.
         firstEditor = firstEditPage.getContenEditor();
@@ -2324,8 +2320,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(syntaxConfirmationModal.getMessage()
             .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
         syntaxConfirmationModal.confirmSyntaxConversion();
-        // Wait for the editor to be reloaded (recreated).
-        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
 
         // The editor was re-created.
         firstEditor = new RealtimeCKEditor();

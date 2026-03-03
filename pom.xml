@@ -316,6 +316,12 @@
         <version>${tika.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.junrar</groupId>
+        <artifactId>junrar</artifactId>
+        <version>7.5.8</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>2.1.0</version>

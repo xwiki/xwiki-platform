@@ -63,7 +63,7 @@
 (% style="color:blue" %)
 = titolo =
 )))
-|Titoli con sintassi XWiki|1.1.1 Titolo con *grassetto*|(((=== Titolo con **grassetto** ===)))
+|Titoli con sintassi XWiki|1.1 Titolo con *grassetto*|(((== Titolo con **grassetto** ==)))
 
 === 2.0 Headings ===
 
@@ -87,5 +87,5 @@
 (% style="color:blue" %)
 = titolo =
 )))
-|Titoli con sintassi XWiki|{{{=== Titolo con **grassetto** ===}}}|(((=== Titolo con **grassetto** ===)))</content>
+|Titoli con sintassi XWiki|{{{== Titolo con **grassetto** ==}}}|(((== Titolo con **grassetto** ==)))</content>
 </xwikidoc>

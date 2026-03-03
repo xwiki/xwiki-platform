@@ -29,7 +29,6 @@ import type { BtnProps } from "./XBtn";
 import type { CardProps } from "./XCard";
 import type { CheckboxProps } from "./XCheckbox";
 import type { DialogProps } from "./XDialog";
-import type { DividerProps } from "./XDivider";
 import type { FileInputModel, FileInputProps } from "./XFileInput";
 import type { FormProps } from "./XForm";
 import type { LoadProps } from "./XLoad";
@@ -47,11 +46,13 @@ import type {
   ComponentOptionsMixin,
   ComputedOptions,
   DefineComponent,
+  DialogHTMLAttributes,
   FormHTMLAttributes,
   HTMLAttributes,
   ImgHTMLAttributes,
   InputHTMLAttributes,
   MethodOptions,
+  SelectHTMLAttributes,
 } from "vue";
 
 /**
@@ -78,21 +79,21 @@ type AbstractElements = {
   XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
   XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
   XCard: DefineComponent<CardProps & HTMLAttributes>;
-  XCheckbox: DefineComponent<CheckboxProps & HTMLAttributes>;
-  XDialog: DefineComponent<DialogProps & HTMLAttributes>;
-  XDivider: DefineComponent<DividerProps & HTMLAttributes>;
+  XCheckbox: DefineComponent<CheckboxProps & InputHTMLAttributes>;
+  XDialog: DefineComponent<DialogProps & DialogHTMLAttributes>;
+  XDivider: DefineComponent<HTMLAttributes>;
   XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
   XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-  XImg: DefineComponent<HTMLAttributes>;
+  XImg: DefineComponent<ImgHTMLAttributes>;
   XLoad: DefineComponent<LoadProps & HTMLAttributes>;
   XMenu: DefineComponent<MenuProps & HTMLAttributes>;
   XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
   XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
-  XSelect: DefineComponent<SelectProps & HTMLAttributes>;
+  XSelect: DefineComponent<SelectProps & SelectHTMLAttributes>;
   XTab: DefineComponent<TabProps & HTMLAttributes>;
-  XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
+  XTabGroup: DefineComponent<TabGroupProps & HTMLAttributes>;
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
-  XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+  XTextField: DefineComponent<TextFieldProps & InputHTMLAttributes>;
   XTree: DefineComponent<
     // We use `DisplayableTreeNode & any` instead of just `any` to keep the
     // properties of DisplayableTreeNode mandatory.
@@ -116,7 +117,6 @@ export type {
   CheckboxProps,
   DialogProps,
   DisplayableTreeNode,
-  DividerProps,
   FileInputModel,
   FileInputProps,
   FormProps,

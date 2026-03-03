@@ -8,11 +8,13 @@ import { ButtonHTMLAttributes } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComputedOptions } from 'vue';
 import { DefineComponent } from 'vue';
+import { DialogHTMLAttributes } from 'vue';
 import { FormHTMLAttributes } from 'vue';
 import { HTMLAttributes } from 'vue';
 import { ImgHTMLAttributes } from 'vue';
 import { InputHTMLAttributes } from 'vue';
 import { MethodOptions } from 'vue';
+import { SelectHTMLAttributes } from 'vue';
 import { TreeNode } from '@xwiki/platform-fn-utils';
 
 // @beta
@@ -24,21 +26,21 @@ export type AbstractElements = {
     XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
     XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
     XCard: DefineComponent<CardProps & HTMLAttributes>;
-    XCheckbox: DefineComponent<CheckboxProps & HTMLAttributes>;
-    XDialog: DefineComponent<DialogProps & HTMLAttributes>;
-    XDivider: DefineComponent<DividerProps & HTMLAttributes>;
+    XCheckbox: DefineComponent<CheckboxProps & InputHTMLAttributes>;
+    XDialog: DefineComponent<DialogProps & DialogHTMLAttributes>;
+    XDivider: DefineComponent<HTMLAttributes>;
     XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
     XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-    XImg: DefineComponent<HTMLAttributes>;
+    XImg: DefineComponent<ImgHTMLAttributes>;
     XLoad: DefineComponent<LoadProps & HTMLAttributes>;
     XMenu: DefineComponent<MenuProps & HTMLAttributes>;
     XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
     XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
-    XSelect: DefineComponent<SelectProps & HTMLAttributes>;
+    XSelect: DefineComponent<SelectProps & SelectHTMLAttributes>;
     XTab: DefineComponent<TabProps & HTMLAttributes>;
-    XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
+    XTabGroup: DefineComponent<TabGroupProps & HTMLAttributes>;
     XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
-    XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+    XTextField: DefineComponent<TextFieldProps & InputHTMLAttributes>;
     XTree: DefineComponent<TreeProps<DisplayableTreeNode & any> & HTMLAttributes>;
 };
 
@@ -116,9 +118,6 @@ export type DisplayableTreeNode = TreeNode<{
     url?: string;
     activatable?: boolean;
 }>;
-
-// @beta (undocumented)
-export type DividerProps = unknown;
 
 // @beta (undocumented)
 export type FileInputModel = File | File[] | null | undefined;

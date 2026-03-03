@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -74,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -102,6 +106,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -116,51 +122,24 @@
       </use>
     </class>
     <property>
-      <cache>long</cache>
+      <cache>forbid</cache>
     </property>
     <property>
-      <code>##----------------------------------
-## Manage translations
-##----------------------------------
-#**
- * Used to display a rendered translation with proper escapes.
- *#
-#macro(tr $key)$escapetool.javascript($escapetool.xml($services.localization.render($key)))#end
-//----------------------------------
-// RequireJS configuration
-//----------------------------------
-require.config({
-  paths: {
-    #if ("$!request.minify" == 'false')
-      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.js', {'wiki':$xcontext.database})"
-    #else
-      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.min.js', {'wiki':$xcontext.database})"
-    #end
-  },
-  shim: {
-    'bootstrap-tour': {
-      deps: ['bootstrap', 'jquery'],
-      exports : 'Tour'
-    }
-  }
-});
+      <code>function loadCss(href) {
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    //link.href = href;
+    //link.href = "$services.webjars.url('org.webjars.npm:driver.js', 'dist/driver.css')";
+    document.getElementsByTagName("head")[0].appendChild(link);
+}
+
 //----------------------------------
 // Display a tour if needed
 //----------------------------------
-require(['jquery', 'xwiki-meta'], function ($, xm) {
+require(['jquery', 'xwiki-meta', 'guided-tour-utils'], function ($, xm, utils) {
   'use strict';
-
-  /**
-   * Escape strings so they respect the Tour API constraints.
-   */
-  var escapeTourName = function (tourName) {
-    // The Tour API says tour name must contain only alphanumerics, underscores and hyphens.
-    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to 
-    // avoid collisions).
-    return tourName.replace(/[^a-zA-Z0-9\-]/g, function(character) {
-      return '_'+character.charCodeAt(0)+'_';
-    });
-  };
+  // TODO: Check for unused translation strings at the end of development.
 
   /**
    * Add a resume button to start the tour again when it has been closed
@@ -177,157 +156,34 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       .appendTo(buttonContainer);
 
     if (showPopover) {
-      buttonContainer.addClass('hint-opened');
+      buttonContainer.addClass('opened');
       button.removeAttr('hidden');
       popover.attr('open','open');
-    } else {
-      buttonContainer.addClass('closed');
     }
 
     button.on('click', function() {
       if (showPopover) {
         popover.removeAttr('open');
         button.attr('hidden', true);
+        buttonContainer.removeClass('opened');
       }
-
-      if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
+      console.info('baba', tour, window.localStorage.getItem(tour.getConfig().name + '_current_step'), tour.getConfig().steps.length)
+      //debugger;
+      // The name property is custom from the XWiki tour source.
+      if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
         // Make sure we can redirect again to the current step.
-        window.localStorage.removeItem(tour._options.name + '_redirect_to');
+        window.localStorage.removeItem(tour.getConfig().name + '_redirect_to');
         // We don't rely on the force parameter because it is lost on redirect. Instead, we just remove the flag that
         // marks the tour as finished.
-        window.localStorage.removeItem(tour._options.name + '_end');
-        tour.start(true);
-      } else {
-        tour.restart();
+        window.localStorage.removeItem(tour.getConfig().name + '_end');
+        window.localStorage.setItem(tour.getConfig().name + '_current_step', 1);
+      }
+      if (!(window.localStorage.getItem(tour.getConfig().name + '_end') === 'yes')) {
+        // Should probably just straigth up monkey patch the .drive function to handle persistance too, since it seems to be the common entry point for all driver.js functions.
+        tour.drive(window.localStorage.getItem(tour.getConfig().name + '_current_step') - 1);
       }
       button.attr('hidden', true);
-      buttonContainer.removeClass('hint-opened');
-      buttonContainer.removeClass('hint-closed');
-    });
-  }
-
-  /**
-   * The template to display a step.
-   */
-  var getTemplate = function (index, step) {
-    var idPrefix = 'bootstrap_tour';
-    var template = '&lt;div class="popover tour" style="min-width: 300px;"&gt;\n'
-                 + ' &lt;a class="btn btn-xs btn-default" href="#" id="'+idPrefix+'_close" aria-label="#tr("tour.popover.quit")" title="#tr("tour.popover.quit")"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
-                 + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
-                 + '  &lt;h2 class="popover-title"&gt;&lt;/h2&gt;\n'
-                 + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
-                 + '  &lt;div class="popover-navigation"&gt;\n'
-                 + '    &lt;div class="col-xs-6 text-left"&gt;\n';
-    if (step.prev &gt; -1) {
-      template  += '      &lt;a class="btn btn-default btn-sm" href="#" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
-    }
-    template    += '    &lt;/div&gt;\n'
-                 + '    &lt;div class="col-xs-6 text-right"&gt;\n';
-    if (step.next &gt; -1) {
-      template  += '      &lt;a class="btn btn-primary btn-sm" href="#" id="'+idPrefix+'_next"&gt;#tr("tour.popover.next")&lt;/a&gt;\n';
-    } else {
-      template  += '      &lt;a class="btn btn-success btn-sm" href="#" id="'+idPrefix+'_end"&gt;#tr("tour.popover.end")&lt;/a&gt;\n'
-    }
-    template    += '    &lt;/div&gt;\n'
-                 + '  &lt;/div&gt;'
-                 + '&lt;/div&gt;';
-    return template;
-  }
-
-  /**
-   * Associate the template buttons to their actions on the tour
-   */
-  var onShown = function (tour) {
-      var idPrefix = 'bootstrap_tour';
-      var closeButtonSelector = '#' + idPrefix + '_close';
-      var endButtonSelector = '#' + idPrefix + '_end';
-      var prevButtonSelector = '#' + idPrefix + '_prev';
-      var nextButtonSelector = '#' + idPrefix + '_next';
-
-    $(closeButtonSelector)
-      .on('click', function (event) {
-        tour.end();
-        event.preventDefault();
-      })
-      .on('keypress', function (event) {
-        if (event.which === 32 || event.which === 13) {
-          tour.end();
-        }
-        event.stopImmediatePropagation();
-        event.preventDefault();
-      })
-      .on('focusout', function (event) {
-        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.contains(event.relatedTarget)) {
-          $(nextButtonSelector + ', ' + endButtonSelector).focus();
-        }
-      });
-
-    $(endButtonSelector)
-      .on('click', function (event) {
-        tour.end();
-        event.preventDefault();
-      })
-      .on('keypress', function (event) {
-        // Activate the anchor/button when space or enter are pressed down
-        if (event.which === 32 || event.which === 13) {
-          tour.end();
-        }
-        event.stopImmediatePropagation();
-        event.preventDefault();
-      });
-
-    $(prevButtonSelector)
-      .on('click', function (event) {
-        tour.prev();
-        event.preventDefault();
-      })
-      .on('keypress', function (event) {
-        // Activate the anchor/button when space or enter are pressed down
-        if (event.which === 32 || event.which === 13) {
-          tour.prev();
-        }
-        event.stopImmediatePropagation();
-        event.preventDefault();
-      })
-      .on('focusout', function (event) {
-        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
-          $(nextButtonSelector + ', ' + endButtonSelector).focus();
-        }
-      });
-
-    $(nextButtonSelector)
-      .on('click', function (event) {
-        tour.next();
-        event.preventDefault();
-      })
-      .on('keypress', function (event) {
-        // Activate the anchor/button when space or enter are pressed down
-        if (event.which === 32 || event.which === 13) {
-          tour.next();
-        }
-        event.stopImmediatePropagation();
-        event.preventDefault();
-      });
-
-    // Wrap around in tab order when the popover is opened, and focus the 'Next' button when the tour step is opened.
-    $(nextButtonSelector + ', ' + endButtonSelector)
-      .on('focusout', function (event) {
-        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
-          $(closeButtonSelector).focus();
-        }
-      })
-      .focus();
-
-    // Avoid having the close button on top of the title
-    $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
-    $('.tour').on('keydown', function (event) {
-      // Exit the tour if the escape key is pressed down.
-      if (event.which === 27) {
-        tour.end();
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        $('.tour').off('keydown');
-      }
+      buttonContainer.removeClass('opened');
     });
   }
 
@@ -336,23 +192,169 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    */
   var createTour = function (jsonData) {
     // Add stylesheet only when needed
-    var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css', {'wiki':$xcontext.database})";
-    $('&lt;link/&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
+    loadCss();
+    let tourName = utils.escapeTourName('tour_' + jsonData.name);
+    console.debug('tourInProgress: ', window.guidedTourInProgress, tourName);
+    //debugger;
+    if (window.guidedTourInProgress) {
+      console.debug(`Another Tour already in progress. Don't start ${tourName}`);
+      return;
+    }
+    if (window.localStorage.getItem(tourName + '_current_step') &gt;= jsonData.steps.length) {
+      window.localStorage.setItem(tourName + '_end', 'yes');
+      window.guidedTourInProgress = false;
+      console.debug(`Fixed tour done status for ${tourName}. (had step ${window.localStorage.getItem(tourName + '_current_step')} &gt;= ${jsonData.steps.length})`)
+      return;
+    }
 
     // Require 'bootstrap-tour' only when needed
-    require(['bootstrap-tour'], function(Tour) {
+    require(['guided-tour-driverjs-patch'], function(driver) {
+      //const driver = window.driver.js.driver;
+      if (window.guidedTourInProgress) {
+        console.debug(`Another Tour already in progress. Don't start ${tourName}`);
+        return;
+      }
+      //console.debug(driver);
+      //debugger;
 
       // Create the tour
-      var tourName = escapeTourName('tour_' + jsonData.name);
-      var tour     = new Tour({
+      let tour     = driver({
         name    : tourName,
         storage : window.localStorage,
-        onEnd   : function() {
+      nextBtnText: 'Next &gt;',
+      prevBtnText: '&lt; Previous',
+      showProgress: true,
+        overlayOpacity: 0.3,
+        //overlayClickBehavior: () =&gt; {},
+        onNextClick: (highlightedElement, step, options) =&gt; {
+          console.debug(1, highlightedElement, step, options)
+          let nextStep = options.config.steps.filter((el) =&gt; {return el.order == step.order + 1});
+          if (nextStep.length == 0) {
+            console.debug('No next step. We\'re probably in the last step attempting to go next.');
+            tour.moveNext();
+          } else {
+            nextStep = nextStep[0];
+            if (step.path == nextStep.path) {
+              const activeIndex = tour.getActiveIndex();
+              utils.waitForElement(nextStep.element).then((element) =&gt; {
+                if (activeIndex == tour.getActiveIndex()) {
+                  // debugger;
+                  tour.moveNext();
+                } else {
+                  console.debug(`Tried to move from ${activeIndex} to next , but the step is actually now ${tour.getActiveIndex()}`)
+                }
+              }).catch(() =&gt; {
+                console.error("Idk what to do. Skip the step? FIXME")
+              });
+            } else {
+              console.debug('Attempted to go to next step, but that one is on another page.');
+              // TODO: Maybe add a redirect here.
+            }
+          }
+        },
+        onPrevClick: (highlightedElement, step, options) =&gt; {
+          console.debug(2, highlightedElement, step, options)
+          let previousStep = options.config.steps.filter((el) =&gt; {return el.order == step.order - 1});
+          if (previousStep.length == 0) {
+            console.debug('No previous step. We\'re probably in the first step attempting to go back.');
+            tour.movePrevious();
+          } else {
+            previousStep = previousStep[0];
+            if (step.path == previousStep.path) {
+              tour.movePrevious();
+            } else {
+              console.debug('Attempted to go to prev step, but that one is on another page.');
+              // TODO: Maybe add a redirect here.
+            }
+          }
+        },
+      onPopoverRender: (popDOM, options) =&gt; {
+        const stepCount = options.config.steps.length;
+        const activeIndex = options.state.activeIndex + 1;
+        const activeStep = options.state.activeStep;
+        const elem = activeStep.element;
+        if (activeStep.reflex) {
+          $(activeStep.element).on('click', (event) =&gt; {
+            console.debug(event);
+            if (event.target.tagName == 'INPUT' &amp;&amp; event.target.type == 'text') {
+              // Special case for text inputs.
+              // Right now, the text input awaits for 5s before continuing, to allow the user to type stuff.
+              // TODO: Maybe add a 'match text' setting for going next.
+              const msTimeout = 5000;
+              new Promise(resolve =&gt; setTimeout(resolve, msTimeout)).then(() =&gt; {
+                console.debug('sloip awoked');
+                // Increment the local storage step. (For cases when clicking the element leads to a redirect.)
+              //debugger;
+                window.localStorage.setItem(tour.getConfig().name + '_current_step', 1 + activeIndex);
+                if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
+                  window.localStorage.setItem(tour.getConfig().name + '_end', 'yes');
+                  window.guidedTourInProgress = false;
+                }
+                // The localStorage item should theoretically be set to the same value in the moveNext(), so no harm done
+                // Fire onNext ?
+                document.fire('arrowRightPress')
+                if (activeIndex != options.state.activeIndex) {
+                  tour.moveNext();
+                }
+              })
+            } else {
+              // Increment the local storage step. (For cases when clicking the element leads to a redirect.)
+              //debugger;
+              window.localStorage.setItem(tour.getConfig().name + '_current_step', 1 + activeIndex);
+              if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
+                window.localStorage.setItem(tour.getConfig().name + '_end', 'yes');
+                window.guidedTourInProgress = false;
+              }
+              console.info(tour)
+              document.fire('arrowRightPress')
+              tour.moveNext();
+              /* The localStorage item should theoretically be set to the same value in the moveNext(), so no harm done
+              new Promise(resolve =&gt; setTimeout(resolve, 1500)).then(() =&gt; {
+                // Wait a bit to see if the clicked element was actually a redirect.
+                if (!beforeUnloadFired) {
+                  tour.moveNext();
+                }
+              });*/
+            }
+          });
+        }
+
+        console.info(popDOM, options, window.localStorage.getItem(tour.getConfig().name + '_current_step'));
+        window.localStorage.setItem(tour.getConfig().name + '_current_step', activeIndex); // This should be config.activeIndex instead.
+        popDOM.progress.innerHTML = '⬤ '.repeat(activeIndex) + '◯ '.repeat(stepCount - activeIndex);
+        popDOM.progress.style = 'display: flex; justify-content: center;';
+        popDOM.footer.className = '';
+        popDOM.footer.innerHTML = '';
+        const customSkipAll = new Element('a');
+        $(customSkipAll).on('click', () =&gt; {
+          window.localStorage.setItem(tour.getConfig().name + '_end', 'yes'); // Maybe add a special 'skipped' value to differentiate.
+          window.guidedTourInProgress = false;
+          tour.destroy();
+        });
+        customSkipAll.innerHTML = 'Skip All';
+        customSkipAll.style.cursor = 'pointer';
+        popDOM.footer.appendChild(customSkipAll);
+        if (!activeStep.reflex) {
+          // FIXME: I don't understand, reflex is supposed to nudge you to do the action; but it should also give you a way to bypass a step if it breaks.
+          // So what to do? Hiding the buttons looks closer to what the mockups show, and you can still use the arrow keys to navigate the steps to get over broken steps.
+          popDOM.footer.appendChild(popDOM.footerButtons);
+        }
+        popDOM.nextButton.className = 'driver-popover-next-btn btn btn-primary btn-sm';
+        popDOM.previousButton.className = 'driver-popover-prev-btn btn btn-sm';
+        popDOM.wrapper.innerHTML = '';
+        $(popDOM.wrapper).append([popDOM.closeButton, popDOM.arrow, popDOM.progress, popDOM.title, popDOM.description, popDOM.footer]);
+      },
+        onDestroyed : function() {
+          if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
+            window.localStorage.setItem(tour.getConfig().name + '_end', 'yes');
+            window.guidedTourInProgress = false;
+          }
+          window.guidedTourInProgress = false;
           let buttonContainer = $('#tourResumeContainer');
           if (buttonContainer.length === 0) {
             createResumeButton(tour, true);
           } else {
-            buttonContainer.addClass('hint-opened');
+            buttonContainer.addClass('opened');
             let button = $('#tourResume');
             button.removeAttr('hidden');
             // Show the popover
@@ -360,23 +362,16 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
             popover.attr('open','open');
             // Hide it after 7 seconds
             setTimeout(function() {
-              buttonContainer.removeClass('hint-opened');
-              // Completely hide it after the transition
-              setTimeout(() => buttonContainer.addClass('hint-closed'), 200);
+              buttonContainer.removeClass('opened');
               popover.removeAttr('open');
             }, 7000);
           }
-        },
-        onShown : onShown,
-        orphan  : false,
-        container: "#contentcontainer",
-        template: getTemplate
+        }
       });
-
-      // Create the steps
-      for (var i = 0; i &lt; jsonData.steps.length; i++) {
-        tour.addStep(jsonData.steps[i]);
-      }
+      console.info(jsonData)
+      tour.setSteps(jsonData.steps);
+      console.info(jsonData.steps, window.localStorage.getItem(tour.getConfig().name + '_current_step'));
+      console.info(tour);
 
       // Look if the tour should be started regardless of its status on the local storage
       var getQueryStringParameterByName = function (name) {
@@ -384,21 +379,35 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         return match &amp;&amp; decodeURIComponent(match[1].replace(/\+/g, ' '));
       }
       var forceStart = getQueryStringParameterByName('startTour') == 'true';
-
       var tourEnded = window.localStorage.getItem(tourName + '_end') === 'yes';
+
       // Initialize the current step index from local storage.
-      tour.setCurrentStep();
-      var currentStep = tour.getStep(tour.getCurrentStep() || 0);
-      var tourNeedsRedirect = tour._isRedirect(currentStep.host, currentStep.path, document.location);
-      var tourAutoStart = !tourEnded &amp;&amp; !tourNeedsRedirect;
-
-      // Launch the tour.
-      if (forceStart) {
-        tour.restart();
-      } else if (tourAutoStart) {
-        tour.start();
+      var currentStep = tour.getActiveStep();
+      var tourAutoStart = !tourEnded; // &amp;&amp; !tourNeedsRedirect
+      if (window.localStorage.getItem(tour.getConfig().name + '_current_step') === null) {
+        // Set the current step if the tour hasn't ran.
+        window.localStorage.setItem(tour.getConfig().name + '_current_step', 1);
       }
-
+      if (forceStart) {
+        // Just start at the first step, man. (I didn't test that this is the behavior on the old Tour Extension too)
+        if (!window.guidedTourInProgress) {
+          window.guidedTourInProgress = true;
+          tour.drive(0);
+        }
+      } else if (tourAutoStart) {
+        if (!(window.localStorage.getItem(tour.getConfig().name + '_end') === 'yes')) {
+          // Should probably just straigth up monkey patch the .drive function to handle persistance too, since it seems to be the common entry point for all driver.js functions.
+          let stepIndex = window.localStorage.getItem(tour.getConfig().name + '_current_step') - 1;
+          console.info(tour, stepIndex);
+          console.info("I want " + tour.getConfig().steps[stepIndex].path + ", got " + window.location.pathname)
+          if (tour.getConfig().steps[stepIndex].path == window.location.pathname &amp;&amp; !window.guidedTourInProgress) {
+            window.guidedTourInProgress = true;
+            tour.drive(stepIndex);
+          }
+        } else {
+            window.guidedTourInProgress = false;
+        }
+      }
       // Create a resume button if the tour has already been closed by the user in the past.
       if (!tourAutoStart) {
         createResumeButton(tour, false);
@@ -412,13 +421,13 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    * everywhere.
    */
   $(function() {
-
+window.guidedTourInProgress = false;
     /**
      * The tour is not adapted for little screen sizes like mobile phones have.
      * The value 768 is taken from bootstrap in order to be consistent with their media queries.
      */
     if ($(window).innerWidth() &lt;= 768) {
-      return;
+      // return; // This is so annoying when debugging.
     }
 
     $.getJSON(new XWiki.Document('TourJson', 'TourCode').getURL('get'), {
@@ -428,25 +437,863 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     }).done(function(json) {
       for (var i = 0; i &lt; json.tours.length; ++i) {
         var tour = json.tours[i];
+        let tourName = utils.escapeTourName('tour_' + tour.name);
+        tour.steps = tour.steps.map(step =&gt; {
+          step['popover'] = {title: step['title'], description: step['content']};
+          if (step['element'] == '') {
+            if (false == step['backdrop']) {
+              step['element'] = 'body'; // FIXME: This is NOT FULL PROOF, this should be changed (eg. I want to highlight a random element without a backdrop).
+              step['popover']['side'] = 'over';
+            } else {
+              delete step.element;
+            }
+          }
+          return step;
+        });
         if (tour.steps.length &gt; 0) {
           createTour(tour);
         }
       }
+      window.guidedTours = json;
+      let createTourWrapper = function(event) {
+        const tourId = event.currentTarget.dataset['id'];
+        console.debug(json)
+        console.debug(event, json.tours, 'at', tourId);
+        let tour = json.tours.filter(el =&gt; el.name == tourId);
+        console.debug(tour.length &gt; 0 &amp;&amp; tour[0].steps.length &gt; 0)
+        if (tour.length &gt; 0 &amp;&amp; tour[0].steps.length &gt; 0) {
+          tour = tour[0];
+          // Reset the tour progress to restart it.
+          window.localStorage.setItem(utils.escapeTourName('tour_' + tour.name) + '_current_step', 1);
+          window.localStorage.removeItem(utils.escapeTourName('tour_' + tour.name) + '_end');
+          createTour(tour);
+        } else {
+          // TODO: Add translation string.
+          new XWiki.widgets.Notification(`Couldn't find tour ${tourId}. I think it wasn't fetched...`, 'error');
+        }
+      }
+      $('.guided-tour-floater').on('click', '.tour-task', createTourWrapper);
     });
   });
 });</code>
     </property>
     <property>
-      <name>Definition of a Bootstrap Tour module</name>
+      <name>Definition of a Driver.js Tour module</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>always</use>
     </property>
   </object>
   <object>
+    <name>TourCode.TourJS</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0d083a0b-089c-46c0-8c32-db352503d6ef</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>define('guided-tour-translation-keys', {
+  prefix: 'guidedtour.',
+  keys: [
+    'buttons.skipAll',
+    'buttons.next',
+    'buttons.previous',
+    'buttons.endTour',
+    'floater.title',
+    'floater.usefulLinks', // TODO: Maybe it is a json object, and parse it in js?
+  ],
+});
+
+define('guided-tour-defs-params', [], function () {
+  return {
+    storage: window.localStorage,
+  }
+});
+
+define('guided-tour-utils', [], function() {
+  /**
+   * Escape strings so they respect the Bootstrap Tour API constraints.
+   * Note: This transformation is not needed anymore, but is kept for backwards compatibility with the bootstrap tour.
+   */
+  var escapeTourName = function (tourName) {
+    // The Tour API says tour name must contain only alphanumerics, underscores and hyphens.
+    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to
+    // avoid collisions).
+    return tourName.replace(/[^a-zA-Z0-9\-]/g, function(character) {
+      return '_'+character.charCodeAt(0)+'_';
+    });
+  };
+
+  /**
+   * Some sort of easier API to update the localStorage keys?
+   * TODO
+   */
+  
+  /**
+   * Load the tours on the client, fetching them if needed.
+   * @return: TODO: For now, it returns a Promise.
+   */
+  function getTourData() {
+    if (true) { // FIXME: Placeholder for checking cache/localStorage for the data. Otherwise, remove for the final release.
+      return fetch(new XWiki.Document(XWiki.Model.resolve('TourCode.TourRESTSource', XWiki.EntityType.DOCUMENT)).getURL('view')).then(t =&gt; t.json()).then((data) =&gt; {
+        data = {'tours': data};
+        let groups = {};
+        for (q in data['tours']) {
+          data['tours'][q]['steps'] = data['tours'][q]['steps'].map((step) =&gt; {if (step.reflex) {step.showButtons = [];} return step;});
+          let gid = data['tours'][q]['groupId'];
+          if (!(gid in groups)) {
+            groups[gid] = {'displayTitle': data['tours'][q]['groupTitle'], 'tasks': []};
+          }
+          groups[gid]['tasks'].push({ 'id': q, 'title': data['tours'][q]['title'], 'raw': data['tours'][q], 'done': Boolean(window.localStorage.getItem('tour_95_' + escapeTourName(q) + '_end')) });
+        }
+        console.log(groups)
+        const completeness = Object.entries(groups).reduce((acc, el) =&gt; acc.concat(el[1]['tasks']), []).reduce((acc, el) =&gt; acc + Number(el['done']), 0);
+        const completenessTotal = Object.entries(groups).reduce((acc, el) =&gt; acc.concat(el[1]['tasks']), []).length;
+        document.querySelector('.guided-tour-floater').querySelector('.completeness-progress').style.width = `${(completeness/completenessTotal) * 100}%`;
+        data['groups'] = groups;
+        data['tasks'] = Object.entries(groups).reduce((acc, el) =&gt; acc.concat(el[1]['tasks']), []);
+        data['nrDoneTasks'] = completeness;
+        return data;
+      });
+    }
+  }
+
+  /**
+   * For use in {waitForElement} below.
+   */
+  function isElementVisible(element) {
+    let style = window.getComputedStyle(element);
+
+    if (style.display == 'none') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Wait until an element is visible on the page.
+   * @param selector: css selector for the element to wait for (should be compatible with document.querySelector)
+   * @param probeInterval: time (in ms) to wait after a failed check for the specified element
+   * @param maxIntervals: how many probe intervals to wait until rejecting
+   * @return: a promise which succeeds if the element is found within the time limit, and fails otherwise
+   */
+  var waitForElement = function(selector, probeInterval=500, maxIntervals=6) {
+    // TODO: Could maybe use MutationObservers here?
+    return new Promise(async (resolve, reject) =&gt; {
+      console.debug(`waiting for ${selector}...`)
+      for (let i = 0; i &lt; maxIntervals; i += 1) {
+        let queriedElement = document.querySelector(selector);
+        if (queriedElement &amp;&amp; isElementVisible(queriedElement)) {
+          return resolve(queriedElement);
+        }
+        console.debug(`(${i}/${interval}) waiting for ${nextStep.element}...`);
+        await new Promise((resolve) =&gt; setTimeout(resolve, probeInterval));
+      }
+      console.debug(`Failed to find element &lt;${selector}&gt; in the page after waiting ${probeInterval * maxIntervals} (${probeInterval} * ${maxIntervals}) ms.`);
+      return reject(selector);
+    });
+  };
+
+  return {
+    escapeTourName: escapeTourName,
+    waitForElement: waitForElement,
+    getTourData: getTourData,
+  };
+});</code>
+    </property>
+    <property>
+      <name>Utils</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>3</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>729d2259-87f5-42e2-a464-cab3417e33af</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>define('guided-tour-driverjs-patch', ['driverjs'], function(driverjs) {
+  var driver = function (config) {
+    console.info('Called custom driver function');
+    var tour = window.driver.js.driver(config);
+
+    // Add persistence using localStorage, plus some other checks.
+    const originalDrive = tour.drive;
+    console.info('gaga', originalDrive);
+    tour.drive = function (stepIndex) {
+      // TODO: Check precondition for next step;
+      // TODO: Check if the next step is on the right page (to account for href redirects, etc);
+      // TODO: Wait for next step element to appear;
+      // TODO: Set the right localStorage stuff;
+      console.info('custom drive() here:', tour, stepIndex, this);
+      originalDrive(stepIndex);
+      /**if (!(window.localStorage.getItem(tour.getConfig().name + '_end') === 'yes')) {
+        let localStorageStepIndex = window.localStorage.getItem(tour.getConfig().name + '_current_step') - 1;
+        console.info(tour, localStorageStepIndex);
+        console.info("I want " + tour.getConfig().steps[localStorageStepIndex].path + ", got " + window.location.pathname)
+        if (tour.getConfig().steps[localStorageStepIndex].path == window.location.pathname &amp;&amp; !window.guidedTourInProgress) {
+          window.guidedTourInProgress = true;
+          originalDrive(stepIndex);
+        }
+      } else {
+        window.guidedTourInProgress = false;
+      }**/
+    };
+
+    return tour;
+  };
+  return driver;
+});</code>
+    </property>
+    <property>
+      <name>Driver.js patch</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>4</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a0e0a350-f231-4c7b-babb-9928be5822e2</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>/**
+ * TODO: Make an API in JS which is easy to work with? Idk.. might not be worth it.
+ */</code>
+    </property>
+    <property>
+      <name>Tour code</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>5</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>c0dcf9ca-0cb1-4d9b-bfec-49f72ef66231</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>define('guided-tour-floater', ['jquery', 'guided-tour-utils'], function($, utils) {
+  const guidedTourFloaterTemplate = `&lt;div class="guided-tour-floater draggable"&gt;
+    &lt;div class="header"&gt;
+      &lt;div class="top-bar"&gt;
+        &lt;span class="icon fa fa-compass"&gt;&lt;/span&gt;
+        &lt;div class="title"&gt;Guided Tours&lt;/div&gt;
+        &lt;div class="right-group"&gt;
+          &lt;button id="floater-options"&gt;&lt;span class="fa fa-cog"&gt;&lt;/span&gt;&lt;/button&gt;
+          &lt;button id="floater-close"&gt;&lt;i class="fa-solid fa-x"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="completeness"&gt;
+        &lt;div class="completeness-progress"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="guides-content"&gt;
+      &lt;div class="guides-container"&gt;
+        &lt;!-- FIXME: There should be a better grouping style here, groups shouldn't be sections. --&gt;
+      &lt;/div&gt;
+      &lt;section class="useful-link"&gt;Useful link 1&lt;/section&gt;
+      &lt;section class="useful-link"&gt;Useful link 2&lt;/section&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;`;
+
+  // Create floater. Bind Events.
+  $(guidedTourFloaterTemplate).appendTo($(document.body));
+
+  // Helper to bind click events, TODO: could be deleted.
+  function bindFloaterClickEvent(selector, callback) {
+    $('.guided-tour-floater ' + selector).on('click', (event) =&gt; {
+      callback(event);
+    });
+  };
+
+  bindFloaterClickEvent('.top-bar', (event) =&gt; {
+    window.localStorage.setItem('TourFloaterCollapsed', document.querySelector('.guided-tour-floater').classList.toggle('collapsed'));
+  });
+
+  bindFloaterClickEvent('#floater-close', (event) =&gt; {
+    if (event.target.closest('.guided-tour-floater').classList.contains('collapsed')) {
+      event.target.closest('.guided-tour-floater').remove();
+      // window.localStorage.setItem('TourFloaterCollapsed', 'hidden') // Commented to not disable the floater completely, permanently.
+      event.stopPropagation();
+      // TODO: Or just hide it, and set some cookie/option to not load the javascript code at all the next time.
+    }
+  });
+
+  bindFloaterClickEvent('#floater-options', (event) =&gt; {
+    event.stopPropagation();
+    console.info('Opened settings menu');
+  });
+
+  // Load localStorage state.
+  if (window.localStorage.getItem('TourFloaterCollapsed') == 'true') {
+    document.querySelector('.guided-tour-floater').classList.add('collapsed');
+  }
+  if (window.localStorage.getItem('guided-tour-floater-position-x')) {
+    // FIXME: Could be XSS i think, if someone edits this key. But that's how the right side panel works too.
+    // FIXME: Clamp the allowed values, so the floater is always visible on the screen. Maybe set the value as percentage of screen width? In the dragging functions I mean.
+    document.querySelector('.guided-tour-floater').style.left = window.localStorage.getItem('guided-tour-floater-position-x');
+  }
+
+  // Definitions.
+  /*
+   * Function to set up a draggable element, for the floater.
+   * Taken from https://www.w3schools.com/howto/howto_js_draggable.asp
+   */
+  function dragElement(elmnt) {
+    console.debug(elmnt)
+    if (!elmnt.classList.contains('draggable')) {
+      return;
+    }
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      document.body.style.setProperty('cursor', 'grabbing', 'important');
+      elmnt.classList.add('dragging');
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      //elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; // Commented so the drag only goes side-to-side, not up-down.
+      // TODO: Make sure the floater doesn't end up outside the window post-window-resize.
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement(e) {
+      // Stop moving when mouse button is released:
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      document.onmouseup = null;
+      document.onmousemove = null;
+      document.body.style.cursor = "";
+      elmnt.classList.remove('dragging');
+      window.localStorage.setItem('guided-tour-floater-position-x', elmnt.style.left);
+    }
+  }
+
+  utils.getTourData().then((data) =&gt; {
+    console.info(data);
+    const groups = data['groups'];
+    dragElement(document.querySelector('.draggable'));
+    for (group in groups) {
+      let groupEl = document.createElement('section');
+      groupEl.setAttribute('data-gid', group);
+      groupEl.classList.add('tour-section');
+      if (window.localStorage.getItem('tour_95_' + utils.escapeTourName(groupEl['dataset'].gid) + '_TourFloaterTourCollapsed') == 'true') {
+        groupEl.classList.add('collapsed');
+      }
+      console.debug(groups[group])
+      // FIXME: Add HTML escapes (maybe use purify?)
+      groupEl.innerHTML = '&lt;div class="tour-header"&gt;&lt;strong&gt;&lt;div class="chevron"&gt;&amp;gt;&lt;/div&gt;' + groups[group]['displayTitle'] + '&lt;/strong&gt;&lt;/div&gt;&lt;div class="tour-content"&gt;&lt;/div&gt;';
+      // Chevron collapse section.
+      groupEl.getElementsByClassName('tour-header')[0].onclick = (event) =&gt; {
+        const contentElement = event.target.closest('.tour-section');
+        window.localStorage.setItem('tour_95_' + utils.escapeTourName(contentElement['dataset'].gid) + '_TourFloaterTourCollapsed', contentElement.classList.toggle('collapsed'));
+      };
+      // TODO: Replace divs with actual ARIA/WCAG stuff, ul, etc
+      groups[group]['tasks'].forEach(task =&gt; {
+        if (!task.raw.isActive || task.raw.isHidden) {
+          return;
+        }
+        let taskEl = document.createElement('div');
+        taskEl.innerHTML = task['title'];
+        taskEl.setAttribute('data-id', task['id']);
+        taskEl.className = 'tour-task';
+        if (task['done']) {
+          taskEl.classList.add('task-done')
+        }
+        groupEl.querySelector('.tour-content').appendChild(taskEl);
+      });
+      if (groupEl.querySelector('.tour-content').childElementCount &gt; 0) {
+        document.querySelector('.guides-container').appendChild(groupEl);
+      }
+    }
+  });
+});</code>
+    </property>
+    <property>
+      <name>Floater code</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>6</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b17dc737-b7d1-4364-a364-3369e8f24902</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>require(['guided-tour-driverjs-patch', 'guided-tour-floater'], function(driver) {
+  console.info('Main loaded initialized')
+  //driver().drive();
+});</code>
+    </property>
+    <property>
+      <name>Initialization</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -458,25 +1305,31 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -486,13 +1339,15 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -521,25 +1376,712 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>TourCode.TourJS</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
     <property>
-      <cache>long</cache>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>/** Driver.js **/
+
+.driver-overlay {
+  pointer-events: none;
+}
+
+.driver-active:has(.driver-overlay) * {
+  pointer-events: auto;
+}
+
+.driver-overlay.hideoy {
+  opacity: 0%;
+  transition: opacity animate-fade-in 200ms ease-in-out;
+}
+
+.driver-active .driver-overlay {
+  pointer-events: none;
+}
+
+.driver-active .driver-active-element,
+.driver-active .driver-active-element *,
+.driver-popover,
+.driver-popover * {
+  pointer-events: auto;
+}
+
+@keyframes animate-fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.driver-fade .driver-overlay {
+  animation: animate-fade-in 200ms ease-in-out;
+}
+
+.driver-fade .driver-popover {
+  animation: animate-fade-in 200ms;
+}
+
+/* Popover styles */
+.driver-popover {
+  all: unset;
+  box-sizing: border-box;
+  color: #2d2d2d;
+  margin: 0;
+  padding: 15px;
+  border-radius: 5px;
+  min-width: 250px;
+  max-width: 300px;
+  box-shadow: 0 1px 10px #0006;
+  z-index: 1000000000;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: #fff;
+}
+
+.driver-popover-title {
+  font: 19px / normal sans-serif;
+  font-weight: 700;
+  display: block;
+  position: relative;
+  line-height: 1.5;
+  zoom: 1;
+  margin: 0;
+}
+
+.driver-popover-close-btn {
+  all: unset;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  color: #d2d2d2;
+  z-index: 1;
+  text-align: center;
+  transition: color;
+  transition-duration: 200ms;
+}
+
+.driver-popover-close-btn:hover,
+.driver-popover-close-btn:focus {
+  color: #2d2d2d;
+}
+
+.driver-popover-title[style*="block"] + .driver-popover-description {
+  margin-top: 5px;
+}
+
+.driver-popover-description {
+  margin-bottom: 0;
+  font: 14px / normal sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  zoom: 1;
+}
+
+.driver-popover-footer {
+  margin-top: 15px;
+  text-align: right;
+  zoom: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.driver-popover-progress-text {
+  font-size: 13px;
+  font-weight: 400;
+  color: #727272;
+  zoom: 1;
+}
+
+.driver-popover-footer button {
+  all: unset;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 3px 7px;
+  text-decoration: none;
+  text-shadow: 1px 1px 0 #fff;
+  background-color: #ffffff;
+  color: #2d2d2d;
+  font: 12px / normal sans-serif;
+  cursor: pointer;
+  outline: 0;
+  zoom: 1;
+  line-height: 1.3;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.driver-popover-footer .driver-popover-btn-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Disable the scrolling of parent element if it has an active element*/
+:not(body):has(&gt; .driver-active-element:not(body)) {
+  overflow: hidden !important;
+}
+
+.driver-no-interaction, .driver-no-interaction * {
+  pointer-events: none !important;
+}
+
+.driver-popover-footer button:hover,
+.driver-popover-footer button:focus {
+  background-color: #f7f7f7;
+}
+
+.driver-popover-navigation-btns {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.driver-popover-navigation-btns button + button {
+  margin-left: 4px;
+}
+
+.driver-popover-arrow {
+  content: "";
+  position: absolute;
+  border: 5px solid #fff;
+}
+
+.driver-popover-arrow-side-over {
+  display: none;
+}
+
+/** Popover Arrow Sides **/
+.driver-popover-arrow-side-left {
+  left: 100%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+}
+
+.driver-popover-arrow-side-right {
+  right: 100%;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+}
+
+.driver-popover-arrow-side-top {
+  top: 100%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+.driver-popover-arrow-side-bottom {
+  bottom: 100%;
+  border-left-color: transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.driver-popover-arrow-side-center {
+  display: none;
+}
+
+/* Left/Start + Right/Start */
+.driver-popover-arrow-side-left.driver-popover-arrow-align-start,
+.driver-popover-arrow-side-right.driver-popover-arrow-align-start {
+  top: 15px;
+}
+
+/* Top/Start + Bottom/Start */
+.driver-popover-arrow-side-top.driver-popover-arrow-align-start,
+.driver-popover-arrow-side-bottom.driver-popover-arrow-align-start {
+  left: 15px;
+}
+
+/* End/Left + End/Right */
+.driver-popover-arrow-align-end.driver-popover-arrow-side-left,
+.driver-popover-arrow-align-end.driver-popover-arrow-side-right {
+  bottom: 15px;
+}
+
+/* Top/End + Bottom/End */
+.driver-popover-arrow-side-top.driver-popover-arrow-align-end,
+.driver-popover-arrow-side-bottom.driver-popover-arrow-align-end {
+  right: 15px;
+}
+
+/* Left/Center + Right/Center */
+.driver-popover-arrow-side-left.driver-popover-arrow-align-center,
+.driver-popover-arrow-side-right.driver-popover-arrow-align-center {
+  top: 50%;
+  margin-top: -5px;
+}
+
+/* Top/Center + Bottom/Center */
+.driver-popover-arrow-side-top.driver-popover-arrow-align-center,
+.driver-popover-arrow-side-bottom.driver-popover-arrow-align-center {
+  left: 50%;
+  margin-left: -5px;
+}
+
+/* No arrow */
+.driver-popover-arrow-none {
+  display: none;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Driver.js styles</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>3d089013-1a79-493d-996e-ba7b79503b8a</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>.guided-tour-floater {
+  z-index: 999;
+  position: fixed;
+  bottom: 100px;
+  right: 0px;
+  box-shadow: 0px 0px 12px 0px #00000033;
+  background-color: white;
+  width: fit-content;
+  overflow: hidden;
+  display: inline-block;
+  border-start-start-radius: 8px;
+  user-select: none;
+}
+
+.guided-tour-floater.collapsed .top-bar {
+  padding: 8px;
+}
+
+.guided-tour-floater.collapsed .icon {
+  width: 0;
+}
+
+.guided-tour-floater .tour-section.collapsed .tour-content {
+  height: 0;
+}
+
+.guided-tour-floater.collapsed .guides-content {
+  width: 0;
+  height: 0;
+}
+
+.guided-tour-floater.dragging * {
+  pointer-events: none;
+}
+
+.guided-tour-floater.collapsed:not(.dragging) .header {
+  cursor: pointer;
+}
+
+.guided-tour-floater.collapsed .header {
+  padding: 0;
+}
+
+.guided-tour-floater.collapsed .right-group button:first-child {
+  display: none;
+}
+
+.guided-tour-floater.collapsed .completeness {
+  margin: 0;
+  height: 4px;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.guided-tour-floater .header {
+  display: inline-block;
+  user-select: none;
+  padding: 14px 16px 14px 16px;
+}
+
+.guided-tour-floater .top-bar {
+  display: flex;
+  cursor: pointer;
+}
+
+.guided-tour-floater .icon {
+  align-self: flex-start;
+  margin-right: 0.5em;
+  overflow: hidden;
+  width: 30px;
+}
+
+.guided-tour-floater .title {
+  align-self: flex-start;
+  width: 100%;
+  font-weight: bold;
+}
+
+.guided-tour-floater * {
+  transition: height 0.45s cubic-bezier(.25, 1, .25, 1), width 0.45s ease-in-out 0s;
+}
+
+.guided-tour-floater .right-group {
+  align-self: flex-end;
+  white-space: nowrap;
+  margin-left: 0.5em;
+}
+
+.guided-tour-floater .guides-content {
+  transition: height 0.45s cubic-bezier(.25, 1, .25, 1), width 0.45s ease-in-out 0s;
+  display: flex;
+  height: 400px;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.guided-tour-floater .guides-container {
+  overflow-x: scroll;
+  padding: 0px 16px 14px 16px;
+  height: 100%;
+}
+
+.guided-tour-floater h2 {
+  margin: 0em;
+  padding-bottom: 0.5em;
+}
+
+/* .guided-tour-floater section::after {
+content: "";
+display: block;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+Adjust color and thickness as needed
+padding: 0.5em;
+margin: 0.5em;
+} */
+
+.guided-tour-floater .useful-link {
+  padding: 14px 16px 14px 16px;
+  border-color: #ddddddFF;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.guided-tour-floater .tour-task {
+  /* Use subgrid for this */
+  border-radius: 0.65em;
+  transition: background-color 0.1s ease;
+  padding: 0.5em;
+  cursor: pointer;
+}
+.guided-tour-floater .tour-task.task-done {
+  text-decoration: line-through;
+}
+
+.guided-tour-floater .tour-header {
+  /* Use subgrid for this */
+  cursor: pointer;
+  border-radius: 0.65em;
+  transition: background-color 0.1s ease;
+  padding: 0.5em;
+}
+
+.guided-tour-floater .chevron {
+  cursor: pointer;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  rotate: 90deg;
+}
+
+.guided-tour-floater .tour-section.collapsed .chevron {
+  rotate: 0deg;
+}
+
+.guided-tour-floater .tour-header:hover {
+  background: #f2f2f2FF 100%;
+  /* Display restart button. */
+}
+
+.guided-tour-floater .tour-task:hover {
+  background: #f2f2f2FF 100%;
+  /* Display restart button. */
+}
+
+.guided-tour-floater .completeness {
+  margin: 16px 0 16px 0;
+  height: 9px;
+  position: relative;
+  width: 100%;
+  background: #f2f2f2FF;
+  border-start-start-radius: 18px;
+  border-start-end-radius: 18px;
+  border-end-start-radius: 18px;
+  border-end-end-radius: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.guided-tour-floater.collapsed .completeness-progress {
+  height: 4px;
+}
+.guided-tour-floater .completeness-progress {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 9px;
+  background: #7698ffFF;
+}
+
+.guided-tour-floater .tour-content {
+  overflow: hidden;
+  transition: height 1s cubic-bezier(.25, 1, .25, 1);
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Guided Tour Floater styles</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>2</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>997413c2-4a90-4764-bb59-260fedf04ab5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
     </property>
     <property>
       <code>#tourResumeContainer {
@@ -564,42 +2106,39 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   &amp; &gt; .popover-content {
     visibility: hidden;
     opacity: 0;
-    /* Using an actual 0s here gets minified to 0, which is incorrect CSS. */
-    transition: opacity .2s ease-in-out, visibility .001s .2s; 
+    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
     position: relative;
     max-width: 276px;
     padding: 1px;
     line-break: auto;
     text-align: left;
     padding: 0.5em;
-    background-color: var(--dropdown-bg);
-    border: solid .2em var(--dropdown-border);
+    background-color: @dropdown-bg;
+    border: solid 0.2em @dropdown-border;
     border-radius: 1em 1em 0 1em;
     width: 100%;
 
     &amp;::after {
       position: absolute;
+      right: 0em;
       content: '';
-      right: .1em;
       bottom: -1em;
-      height: 2.1em;
-      width: 2.1em;
-      background-color: var(--dropdown-bg);
-      border: solid .2em var(--dropdown-border);
-      transform: rotate(45deg);
-      clip-path: polygon(100% 100%, 0 100%, 100% 0);
+      width: 0;
+      height: 0;
+      border-left: 1em solid transparent;
+      border-right: 1em solid transparent;
+      border-top: 1em solid @dropdown-bg;
+      clear: both;
     }
   }
 }
 
-#tourResumeContainer.hint-opened &gt; .popover-content {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* The transition is finished*/
-#tourResumeContainer.hint-closed &gt; .popover-content {
-  display: none;
+#tourResumeContainer.opened {
+  &amp; &gt; .popover-content {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
 }
 
 @media print {
@@ -614,35 +2153,164 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   right: 5px;
 }
 
-/* Prevent the user from interacting with the highlighted UI elements. */
-#contentcontainer:has(.popover[class*="tour-"])::before {
-  background: transparent;
-  z-index: 1101;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  content: "";
-}
-
 .popover[class*="tour-"] .popover-navigation:not(.row) {
   padding-right: 0;
   padding-left: 0;
-}
-</code>
+}</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
-      <name/>
+      <name>Old styles (for the 'resume tour' popup, which is not ported yet)</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>38925c11-43ec-470d-8817-d6c93033ee4b</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>new.tour.app</name>
+    </property>
+    <property>
+      <parameters>id=driverjs
+path=$services.webjars.url('org.webjars.npm:driver.js', "dist/driver.js.iife.js")</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

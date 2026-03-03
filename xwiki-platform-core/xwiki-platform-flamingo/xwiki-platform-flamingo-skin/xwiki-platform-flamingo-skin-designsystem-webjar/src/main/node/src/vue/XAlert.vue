@@ -51,6 +51,7 @@ onMounted(() => {
   const html = value.getHTML();
 
   // TODO: see how to make this non-interactive to let users click on buttons.
+  // eslint-disable-next-line no-undef
   const notif = new XWiki.widgets.Notification(html, getVariant());
 
   if (flatCorners) {

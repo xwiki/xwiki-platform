@@ -32,7 +32,6 @@ import type { DialogProps } from "./XDialog";
 import type { DividerProps } from "./XDivider";
 import type { FileInputModel, FileInputProps } from "./XFileInput";
 import type { FormProps } from "./XForm";
-import type { ImgProps } from "./XImg";
 import type { LoadProps } from "./XLoad";
 import type { MenuProps } from "./XMenu";
 import type { MenuItemProps } from "./XMenuItem";
@@ -84,7 +83,7 @@ type AbstractElements = {
   XDivider: DefineComponent<DividerProps & HTMLAttributes>;
   XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
   XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-  XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
+  XImg: DefineComponent<HTMLAttributes>;
   XLoad: DefineComponent<LoadProps & HTMLAttributes>;
   XMenu: DefineComponent<MenuProps & HTMLAttributes>;
   XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
@@ -121,7 +120,6 @@ export type {
   FileInputModel,
   FileInputProps,
   FormProps,
-  ImgProps,
   LoadProps,
   MenuItemProps,
   MenuLabelProps,

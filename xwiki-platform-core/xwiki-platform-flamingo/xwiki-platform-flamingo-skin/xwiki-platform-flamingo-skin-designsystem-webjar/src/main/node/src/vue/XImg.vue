@@ -17,12 +17,6 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts">
-import type { ImgProps } from "@xwiki/platform-dsapi";
-
-defineProps<ImgProps>();
-</script>
-
 <template>
   <!-- The rest of the attributes will be added by inheritance-->
   <img />

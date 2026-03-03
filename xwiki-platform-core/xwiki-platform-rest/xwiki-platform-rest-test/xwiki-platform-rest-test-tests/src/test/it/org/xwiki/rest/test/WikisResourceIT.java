@@ -154,11 +154,11 @@ public class WikisResourceIT extends AbstractHttpIT
         setSearchSource(sourceHint);
 
         try {
-            this.testUtils.rest().delete(reference);
-            this.testUtils.rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
+            getUtil().rest().delete(reference);
+            getUtil().rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
             List<String> nonTerminalSpaces = List.of(this.spaces.get(0), this.pageName);
             DocumentReference nonTerminalReference = new DocumentReference(this.wikiName, nonTerminalSpaces, "WebHome");
-            this.testUtils.rest().delete(nonTerminalReference);
+            getUtil().rest().delete(nonTerminalReference);
 
             this.solrUtils.waitEmptyQueue();
 
@@ -173,7 +173,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
             // Create a non-terminal page with the same "name" but this time as last space.
             String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
-            this.testUtils.rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
+            getUtil().rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
 
             this.solrUtils.waitEmptyQueue();
 
@@ -212,7 +212,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private void resetSearchSource(String sourceHint) throws Exception
     {
-        Assert.assertEquals(sourceHint, this.testUtils.executeWikiPlain("""
+        Assert.assertEquals(sourceHint, getUtil().executeWikiPlain("""
             {{groovy}}
             System.clearProperty("xconf.xwikiproperties.rest.keywordSearchSource")
             {{/groovy}}
@@ -221,7 +221,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private void setSearchSource(String sourceHint) throws Exception
     {
-        Assert.assertEquals("", this.testUtils.executeWikiPlain("""
+        Assert.assertEquals("", getUtil().executeWikiPlain("""
             {{groovy}}
             System.setProperty("xconf.xwikiproperties.rest.keywordSearchSource", "%s")
             {{/groovy}}
@@ -250,8 +250,8 @@ public class WikisResourceIT extends AbstractHttpIT
             String nestedPageName = this.pageName + "PageName";
             DocumentReference nestedDocumentReference =
                 new DocumentReference(this.wikiName, nestedSpace, nestedPageName);
-            this.testUtils.rest().delete(nestedDocumentReference);
-            this.testUtils.rest().savePage(nestedDocumentReference, "content" + this.pageName, "title" + this.pageName);
+            getUtil().rest().delete(nestedDocumentReference);
+            getUtil().rest().savePage(nestedDocumentReference, "content" + this.pageName, "title" + this.pageName);
 
             this.solrUtils.waitEmptyQueue();
 
@@ -354,8 +354,8 @@ public class WikisResourceIT extends AbstractHttpIT
     public void testPages() throws Exception
     {
         // Create a clean test page.
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
 
         // Get all pages
         GetMethod getMethod = executeGet(String.format("%s", buildURI(WikiPagesResource.class, getWiki())));
@@ -398,8 +398,8 @@ public class WikisResourceIT extends AbstractHttpIT
     @Test
     public void testAttachments() throws Exception
     {
-        this.testUtils.rest().delete(reference);
-        this.testUtils.rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
+        getUtil().rest().delete(reference);
+        getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
             new ReaderInputStream(new StringReader("attachment content"), StandardCharsets.UTF_8), true);
 
         // Verify there are attachments in the whole wiki
@@ -458,8 +458,8 @@ public class WikisResourceIT extends AbstractHttpIT
     @Test
     public void testHQLQuerySearch() throws Exception
     {
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
 
         GetMethod getMethod = executeGet(URIUtil
             .encodeQuery(String.format("%s?q=where doc.name='" + this.pageName + "' order by doc.space desc&type=hql",
@@ -508,8 +508,8 @@ public class WikisResourceIT extends AbstractHttpIT
     @Test
     public void testSolrSearch() throws Exception
     {
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
 
         this.solrUtils.waitEmptyQueue();
 
@@ -527,8 +527,8 @@ public class WikisResourceIT extends AbstractHttpIT
     @Test
     public void testGlobalSearch() throws Exception
     {
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
 
         // Wait for the Solr queue to be empty
         this.solrUtils.waitEmptyQueue();
@@ -536,7 +536,7 @@ public class WikisResourceIT extends AbstractHttpIT
         String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
         // Even if the Solr queue appear to be empty we also make sure to wait for the number of results we expect, in
         // case there is some race condition on server side
-        SearchResults searchResults = this.testUtils.getDriver().waitUntilCondition(d -> search(1, query));
+        SearchResults searchResults = getUtil().getDriver().waitUntilCondition(d -> search(1, query));
 
         Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
     }
@@ -545,12 +545,12 @@ public class WikisResourceIT extends AbstractHttpIT
     public void testAttachmentsNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 attachments exist
-        this.testUtils.rest().delete(this.reference);
+        getUtil().rest().delete(this.reference);
 
         try {
-            this.testUtils.rest().attachFile(new AttachmentReference(getTestClassName() + "1.txt", this.reference),
+            getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + "1.txt", this.reference),
                 new ByteArrayInputStream("attachment content 1".getBytes(StandardCharsets.UTF_8)), true);
-            this.testUtils.rest().attachFile(new AttachmentReference(getTestClassName() + "2.txt", this.reference),
+            getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + "2.txt", this.reference),
                 new ByteArrayInputStream("attachment content 2".getBytes(StandardCharsets.UTF_8)), true);
 
             // Test: number=-1 should return error
@@ -584,7 +584,7 @@ public class WikisResourceIT extends AbstractHttpIT
             Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up attachments
-            this.testUtils.rest().delete(this.reference);
+            getUtil().rest().delete(this.reference);
         }
     }
 
@@ -595,10 +595,10 @@ public class WikisResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "1");
         DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "2");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "content1", "title1");
-            this.testUtils.rest().savePage(ref2, "content2", "title2");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
@@ -631,8 +631,8 @@ public class WikisResourceIT extends AbstractHttpIT
             Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
         } finally {
             // Clean up pages
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 
@@ -643,10 +643,10 @@ public class WikisResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(this.wikiName, List.of("ChildSpace1"), "WebHome");
         DocumentReference ref2 = new DocumentReference(this.wikiName, List.of("ChildSpace2"), "WebHome");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "content1", "title1");
-            this.testUtils.rest().savePage(ref2, "content2", "title2");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
 
             // Test: limit=-1 should return error.
             GetMethod getMethod = executeGet("%s?limit=-1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
@@ -673,8 +673,8 @@ public class WikisResourceIT extends AbstractHttpIT
             Assert.assertEquals("ChildSpace2.WebHome", pages.getPageSummaries().get(0).getFullName());
         } finally {
             // Clean up pages
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 
@@ -685,10 +685,10 @@ public class WikisResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "A");
         DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "B");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "searchcontent", "searchtitleA");
-            this.testUtils.rest().savePage(ref2, "searchcontent", "searchtitleB");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "searchcontent", "searchtitleA");
+            getUtil().rest().savePage(ref2, "searchcontent", "searchtitleB");
 
             this.solrUtils.waitEmptyQueue();
 
@@ -721,8 +721,8 @@ public class WikisResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, results.getSearchResults().size());
             Assert.assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 
@@ -733,10 +733,10 @@ public class WikisResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "Q1");
         DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "Q2");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "querycontent", "querytitle1");
-            this.testUtils.rest().savePage(ref2, "querycontent", "querytitle2");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "querycontent", "querytitle1");
+            getUtil().rest().savePage(ref2, "querycontent", "querytitle2");
 
             this.solrUtils.waitEmptyQueue();
 
@@ -769,8 +769,8 @@ public class WikisResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, results.getSearchResults().size());
             Assert.assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 }

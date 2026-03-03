@@ -46,7 +46,10 @@ import org.testcontainers.utility.DockerLoggerFactory;
 import org.testcontainers.utility.ResourceReaper;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.test.junit5.ExtensionTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.ui.PersistentTestContext;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.LogContainerCmd;
@@ -358,24 +361,71 @@ public final class DockerTestUtils
 
     /**
      * @param context the context where to find the store
-     * @return the XWiki URL
-     * @since 14.5
+     * @param xwikiExecutor the current {@link XWikiExecutor}
+     * @since 18.1.0RC1
+     * @since 17.10.4
      */
-    public static String getXWikiURL(ExtensionContext context)
+    public static void addXWikiExecutor(ExtensionContext context, XWikiExecutor xwikiExecutor)
     {
-        ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        return store.get(String.class, String.class);
+        List<XWikiExecutor> executors = getXWikiExecutors(context);
+
+        if (executors == null) {
+            executors = new ArrayList<>();
+            ExtensionContext.Store store = DockerTestUtils.getStore(context);
+            store.put(XWikiExecutor.class, executors);
+        }
+
+        executors.add(xwikiExecutor);
     }
 
     /**
      * @param context the context where to find the store
-     * @param xwikiURL the XWiki URL
-     * @since 14.5
+     * @return the executors
+     * @since 18.2.0RC1
+     * @since 17.10.4
      */
-    public static void setXWikiURL(ExtensionContext context, String xwikiURL)
+    public static List<XWikiExecutor> getXWikiExecutors(ExtensionContext context)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        store.put(String.class, xwikiURL);
+        return store.get(XWikiExecutor.class, List.class);
+    }
+
+    /**
+     * @param index the index of the {@link XWikiExecutor}
+     * @param context the context where to find the store
+     * @return the requested {@link XWikiExecutor}
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public static XWikiExecutor getXWikiExecutor(int index, ExtensionContext context)
+    {
+        return getXWikiExecutors(context).get(index);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the current {@link XWikiExecutor}
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public static XWikiExecutor getCurrentXWikiExecutor(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        int index = store.getOrDefault("executor.current", Integer.class, 0);
+
+        return getXWikiExecutor(index, context);
+    }
+
+    /**
+     * @param index the index of the {@link XWikiExecutor} to set as current
+     * @param context the context where to find the store
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public static void setCurrentXWikiExecutor(int index, ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        store.put("executor.current", index);
     }
 
     /**
@@ -417,6 +467,39 @@ public final class DockerTestUtils
         }
 
         return componentManager;
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the component manager
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static ExtensionTestUtils getExtensionTestUtils(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+
+        ExtensionTestUtils extensionUtils = store.get(ExtensionTestUtils.class, ExtensionTestUtils.class);
+
+        if (extensionUtils == null) {
+            extensionUtils = new ExtensionTestUtils(getPersistentTestContext(context).getUtil());
+            store.put(ExtensionTestUtils.class, extensionUtils);
+        }
+
+        return extensionUtils;
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the component manager
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static PersistentTestContext getPersistentTestContext(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+
+        return store.get(PersistentTestContext.class, PersistentTestContext.class);
     }
 
     /**

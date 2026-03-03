@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @version $Id$
  */
-@UITest
+@UITest(debug = true)
 class WikisIT
 {
     @ParameterizedTest

@@ -145,17 +145,6 @@
   <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>
     <dependencies>
-      <!-- Standard dependencies used in several modules -->
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>mchange-commons-java</artifactId>
-        <version>0.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <version>0.12.0</version>
-      </dependency>
       <!-- Hibernate -->
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -321,6 +310,12 @@
         <version>${tika.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.junrar</groupId>
+        <artifactId>junrar</artifactId>
+        <version>7.5.8</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>2.1.0</version>
@@ -365,7 +360,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.14.1</version>
+        <version>1.14.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>

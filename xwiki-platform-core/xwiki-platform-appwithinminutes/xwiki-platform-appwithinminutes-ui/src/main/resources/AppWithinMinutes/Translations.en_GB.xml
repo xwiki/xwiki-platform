@@ -61,7 +61,7 @@ appWithinMinutes.wizardStep.structure.title=Structure your data
 ### Missing: appWithinMinutes.wizardStep.entries.name=Entries
 ### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
 ### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
-### Missing: appWithinMinutes.wizardStep.presentation.name=Presentation
+appWithinMinutes.wizardStep.presentation.name=Presentation
 ### Missing: appWithinMinutes.wizardStep.presentation.title=Customize your application home page
 ### Missing: appWithinMinutes.wizardStep.presentation.description=Customize the application home page
 ### Missing: platform.appwithinminutes.wizardStepNextButtonLabel=Next Step
@@ -71,11 +71,11 @@ appWithinMinutes.wizardStep.structure.title=Structure your data
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
 ### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
 ### Missing: platform.appwithinminutes.wizardStepHelpTitle=Steps
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
 
 ### Wizard Step 1: Application Name
 ### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
 ### Missing: appWithinMinutes.createApp.parent.label=Parent
 ### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
 ### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
@@ -158,7 +158,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to creat
 ### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
 
 ### Wizard Step 3: Application Presentation
-### Missing: platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
 ### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
 ### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=Tip
 ### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
@@ -176,7 +176,7 @@ platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of th
 ### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application data was last edited
 ### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation Date
 ### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application data was created
-### Missing: platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
+platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 ### Missing: platform.appwithinminutes.liveTableEditorActionsColumnDescription=A list of actions that can be performed on the application data, such as edit and delete
 ### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Attachments
 ### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
@@ -214,7 +214,7 @@ platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of th
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
@@ -253,9 +253,9 @@ platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was spe
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Structure
 #@deprecated appWithinMinutes.wizardStep.structure.title
-### Missing: platform.appwithinminutes.wizardStep2Title=Structure your data
+platform.appwithinminutes.wizardStep2Title=Structure your data
 #@deprecated appWithinMinutes.wizardStep.structure.description
-### Missing: platform.appwithinminutes.wizardStep2Description=Describe the application data
+platform.appwithinminutes.wizardStep2Description=Describe the application data
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 ### Missing: platform.appwithinminutes.wizardStep3Name=Presentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title
@@ -265,7 +265,7 @@ platform.appwithinminutes.wizardStep2Name=Structure
 
 ### Since 11.0
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
-### Missing: appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
 </content>
 </xwikidoc>

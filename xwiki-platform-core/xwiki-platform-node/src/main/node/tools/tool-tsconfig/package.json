@@ -17,7 +17,7 @@
     "typescript": "5.x"
   },
   "devDependencies": {
-    "@xwiki/platform-tool-tsconfig": "workspace:*"
+    "typescript": "catalog:"
   },
   "files": [
     "*.json"

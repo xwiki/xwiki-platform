@@ -17,16 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($iconNames = ['search'])
-#set ($icons = {})
-#foreach ($name in $iconNames)
-#set ($discard = $icons.put($name, $services.icon.renderHTML($name)))
-#end
-#[[*/
-// Start JavaScript-only code.
-(function(icons) {
-  "use strict";
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
 
   // jsTree uses the underscore notation for its API, instead of camel case.
@@ -45,11 +35,39 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
 
   // We want to still activate the links with a click even after they are selected from the finder.
   $.jstree.defaults.core.allow_reselect = true;
-
+  
+  // TODO: Should be moved to a common place (see XWIKI-19320).
+  function getIcon(iconName) {
+    let icon;
+    if (iconName !== undefined) {
+      const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(
+          XWiki.currentWiki)}/iconThemes/icons?name=${iconName}`;
+      let response = window.fetch(iconURL, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      response = response.then(response => response.json());
+      icon = response.then(response => response.icons[0]);
+    }
+    return icon;
+  }
+  
   var createSuggestInput = function(options) {
     let container = document.createElement('div');
     container.classList.add('xtree-finder-container');
-    container.update(icons.search);
+    getIcon('search').then(data => {
+      let isImage = data.iconSetType==='IMAGE';
+      let iconNature = isImage? 'img':'span';
+      let icon = document.createElement(iconNature);
+      if(isImage) {
+        icon.setAttribute('src', data.url);
+        icon.setAttribute('alt', '');
+        icon.setAttribute('data-xwiki-lightbox', 'false');
+      }
+      if(data.cssClass) icon.setAttribute('class', data.cssClass);
+      container.prepend(icon);
+    });
     let input = document.createElement('input');
     input.type = 'text';
     input.className = 'xtree-finder';
@@ -132,5 +150,3 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     };
   };
 });
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons]));

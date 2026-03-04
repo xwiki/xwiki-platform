@@ -21,54 +21,60 @@ package org.xwiki.url.internal.standard;
 
 import java.net.URL;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link PathWikiReferenceExtractor}.
+ * Unit tests for {@link DomainWikiReferenceExtractor}.
  *
  * @version $Id$
  * @since 6.3M1
  */
-public class DomainWikiReferenceExtractorTest
+@ComponentTest
+class DomainWikiReferenceExtractorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DomainWikiReferenceExtractor> mocker =
-        new MockitoComponentMockingRule<>(DomainWikiReferenceExtractor.class);
+    @InjectMockComponents
+    private DomainWikiReferenceExtractor extractor;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private StandardURLConfiguration configuration;
+
+    @BeforeEach
+    void setUp()
     {
-        this.wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorForFullDomain() throws Exception
+    void extractWhenNoWikiDescriptorForFullDomain() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "xwiki");
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorForFullDomainButDescriptorForSubdomain() throws Exception
+    void extractWhenNoWikiDescriptorForFullDomainButDescriptorForSubdomain() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
-        WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getByAlias("wiki.server.com")).thenReturn(null);
         when(wikiDescriptorManager.getById("wiki")).thenReturn(new WikiDescriptor("dummy", "dummy"));
 
@@ -76,56 +82,54 @@ public class DomainWikiReferenceExtractorTest
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorButStartsWithWWW() throws Exception
+    void extractWhenNoWikiDescriptorButStartsWithWWW() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
         testAndAssert("http://www.wiki.com/xwiki/bin/view/Main/WebHome", "xwiki");
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorButStartsWithLocalhost() throws Exception
+    void extractWhenNoWikiDescriptorButStartsWithLocalhost() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
         testAndAssert("http://localhost/xwiki/bin/view/Main/WebHome", "xwiki");
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorButStartsWithIP() throws Exception
+    void extractWhenNoWikiDescriptorButStartsWithIP() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
         testAndAssert("http://192.168.0.10/xwiki/bin/view/Main/WebHome", "xwiki");
     }
 
     @Test
-    public void extractWhenWikiDescriptor() throws Exception
+    void extractWhenWikiDescriptor() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
-        WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByAlias("wiki.server.com")).thenReturn(new WikiDescriptor("wikiid", "wiki"));
+        when(this.wikiDescriptorManager.getByAlias("wiki.server.com")).thenReturn(new WikiDescriptor("wikiid", "wiki"));
 
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "wikiid");
     }
 
     @Test
-    public void extractWhenNoWikiDescriptorAndDisplayErrorWhenWikiNotFound() throws Exception
+    void extractWhenNoWikiDescriptorAndDisplayErrorWhenWikiNotFound() throws Exception
     {
         setUpConfiguration(WikiNotFoundBehavior.DISPLAY_ERROR);
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "wiki");
     }
 
     @Test
-    public void extractWhenNoAliasAndUnderscoreInDomainName() throws Exception
+    void extractWhenNoAliasAndUnderscoreInDomainName() throws Exception
     {
         // Simulate a configured Execution Context
-        Execution execution = mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(new ExecutionContext());
+        when(this.execution.getContext()).thenReturn(new ExecutionContext());
 
         testAndAssert("http://some_domain.server.com/xwiki/bin/view/Main/WebHome", "some_domain");
     }
 
     @Test
-    public void extractWhenNoExecutionContext() throws Exception
+    void extractWhenNoExecutionContext() throws Exception
     {
         testAndAssert("http://domain.server.com/xwiki/bin/view/Main/WebHome", "domain");
 
@@ -138,19 +142,17 @@ public class DomainWikiReferenceExtractorTest
         ExtendedURL url = new ExtendedURL(new URL(urlToTest), "xwiki");
         // Remove the resource type (i.e. the first segment) since this is what is expected by the extractor
         url.getSegments().remove(0);
-        WikiReference wikiReference = this.mocker.getComponentUnderTest().extract(url);
+        WikiReference wikiReference = this.extractor.extract(url);
         assertEquals(new WikiReference(expectedWikiId), wikiReference);
     }
 
-    private void setUpConfiguration(WikiNotFoundBehavior wikiNotFoundBehavior) throws Exception
+    private void setUpConfiguration(WikiNotFoundBehavior wikiNotFoundBehavior)
     {
         // Simulate a configured Execution Context
-        Execution execution = mocker.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty("xwikicontext", true);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
 
-        StandardURLConfiguration urlConfiguration = mocker.getInstance(StandardURLConfiguration.class);
-        when(urlConfiguration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);
+        when(this.configuration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);
     }
 }

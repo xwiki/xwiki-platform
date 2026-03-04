@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -422,8 +423,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         } else if (property.getValue() instanceof String propertyValue) {
             result = propertyValue;
         // We never want to perform a DB query to compute a diff, so we rely on the actual text value of the object.
-        } else if (property instanceof DBStringListProperty dbStringListProperty) {
-            result = dbStringListProperty.getTextValue();
+        } else if (property instanceof ListProperty listProperty && propertyClass instanceof DBListClass) {
+            result = listProperty.getTextValue();
         } else {
             result = propertyClass.displayView(propertyName, object, context);
         }

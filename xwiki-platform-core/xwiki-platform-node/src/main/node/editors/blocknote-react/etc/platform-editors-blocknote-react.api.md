@@ -299,7 +299,7 @@ readonly propSchema: "string";
 // Warning: (ae-internal-missing-underscore) The name "createCustomBlockSpec" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">({ config, implementation, slashMenu, customToolbar, }: {
+export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">(input: {
     config: BlockConfig<Name, Props, InlineType>;
     implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
     slashMenu: false | {
@@ -325,7 +325,7 @@ export function createCustomBlockSpec<const Name extends string, const Props ext
 // Warning: (ae-internal-missing-underscore) The name "createCustomInlineContentSpec" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>({ config, implementation, slashMenu, customToolbar, }: {
+export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>(input: {
     config: I;
     implementation: ReactInlineContentImplementation<I, S>;
     slashMenu: false | {

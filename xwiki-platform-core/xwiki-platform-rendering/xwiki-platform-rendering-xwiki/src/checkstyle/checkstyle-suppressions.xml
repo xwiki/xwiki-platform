@@ -26,4 +26,5 @@
 
 <suppressions>
   <suppress checks="FanOutComplexity" files="XWikiWikiModel.java"/>
+  <suppress checks="FanOutComplexity" files="RenderingScriptService.java"/>
 </suppressions>

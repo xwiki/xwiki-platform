@@ -202,11 +202,11 @@ $(function () {
     $(sectionHTML).appendTo('#qunit-fixture')
 
     var scrollspyHTML = '<div id="content" style="height: 200px; overflow-y: auto;">'
-        + '<div id="spacer" style="height: 100px;"/>'
-        + '<div id="one" style="height: 100px;"/>'
-        + '<div id="two" style="height: 100px;"/>'
-        + '<div id="three" style="height: 100px;"/>'
-        + '<div id="spacer" style="height: 100px;"/>'
+        + '<div id="spacer" style="height: 100px;"></div>'
+        + '<div id="one" style="height: 100px;"></div>'
+        + '<div id="two" style="height: 100px;"></div>'
+        + '<div id="three" style="height: 100px;"></div>'
+        + '<div id="spacer" style="height: 100px;"></div>'
         + '</div>'
     var $scrollspy = $(scrollspyHTML).appendTo('#qunit-fixture')
 

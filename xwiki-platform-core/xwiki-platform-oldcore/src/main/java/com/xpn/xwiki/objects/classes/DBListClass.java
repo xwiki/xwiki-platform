@@ -120,9 +120,11 @@ public class DBListClass extends ListClass
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
             if (getOwnerDocument() == null && !loadOwnerDocument()) {
-                LOGGER.error("Cannot load the owner document of [{}] with reference [{}]. Falling back on empty "
-                        + "database list values.",
-                    this, getDocumentReference());
+                String objectIdentifier = (this.getObject() != null) ?
+                    getLocalEntityReferenceSerializer().serialize(this.getObject().getReference()) : "";
+                LOGGER.warn("Cannot load the owner document of property [{}] from object [{}] and from doc with "
+                        + "reference [{}]. Falling back on empty database list values.",
+                    this.getName(), objectIdentifier, getDocumentReference());
                 list = new ArrayList<>();
             } else {
                 try {

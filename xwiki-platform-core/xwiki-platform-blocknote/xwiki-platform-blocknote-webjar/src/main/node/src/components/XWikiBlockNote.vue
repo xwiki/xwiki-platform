@@ -26,7 +26,7 @@
         :editor-props
         :editor-content
         :container
-        :macros="false"
+        :macros
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
@@ -69,23 +69,23 @@
 
 <script setup lang="ts">
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
-import {
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "@xwiki/platform-uniast-markdown";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
+import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import type {
-  MarkdownToUniAstConverter,
-  UniAstToMarkdownConverter,
-} from "@xwiki/platform-uniast-markdown";
+  MacroWithUnknownParamsType,
+  UnknownMacroParamsType,
+} from "@xwiki/platform-macros-api";
+import type { UniAst } from "@xwiki/platform-uniast-api";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
+const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
+  name: "XWiki",
+});
 
 //
 // Props
@@ -95,7 +95,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "markdown/1.2",
+  inputSyntax = "uniast/1.0",
   outputSyntax = "xwiki/2.1",
 } = defineProps<{
   // The key used to submit the edited content.
@@ -123,17 +123,10 @@ const {
 const value = ref(initialValue);
 const dirty = ref(false);
 
-const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
-  markdownToUniAstConverterName,
-);
-const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
-  uniAstToMarkdownConverterName,
-);
-
 const editorContent = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = await markdownToUniAst.parseMarkdown(initialValue);
+  editorContent.value = uniAstProcessor.load(initialValue);
 });
 
 const editorProps = shallowRef<
@@ -147,6 +140,27 @@ const editorProps = shallowRef<
   theme: "light",
   lang: getLanguage(),
 });
+
+const macros = {
+  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+  ctx: {
+    openParamsEditor: (
+      macro: MacroWithUnknownParamsType,
+      params: UnknownMacroParamsType,
+      update: (newProps: UnknownMacroParamsType) => void,
+    ) => {
+      // TODO: Open the macro modal.
+      console.debug(
+        "Open macro editor for macro",
+        macro,
+        "with params",
+        params,
+        "and update callback",
+        update,
+      );
+    },
+  },
+};
 
 //
 // Computed
@@ -171,10 +185,7 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = await uniAstToMarkdown.toMarkdown(editorContent as UniAst);
-  if (newValue instanceof Error) {
-    throw newValue;
-  }
+  const newValue = uniAstProcessor.save(editorContent);
 
   value.value = newValue;
   dirty.value = false;

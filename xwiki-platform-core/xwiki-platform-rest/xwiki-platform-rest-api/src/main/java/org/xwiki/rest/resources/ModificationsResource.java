@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.History;
 @Path("/wikis/{wikiName}/modifications")
 public interface ModificationsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET History getModifications(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

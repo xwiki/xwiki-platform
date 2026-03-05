@@ -102,10 +102,10 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
         List<DistributionStep> steps = createSteps();
 
         if (getRequest().isInteractive()) {
-            // Add Welcome step
+            // Add the Welcome step.
             try {
-                DistributionStep welcomeStep = this.componentManager
-                    .<DistributionStep>getInstance(DistributionStep.class, WelcomeDistributionStep.ID);
+                DistributionStep welcomeStep =
+                    this.componentManager.getInstance(DistributionStep.class, WelcomeDistributionStep.ID);
                 welcomeStep.setState(State.COMPLETED);
 
                 steps.add(0, welcomeStep);
@@ -113,10 +113,10 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                 this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
             }
 
-            // Add Report step
+            // Add the Report step.
             try {
-                DistributionStep welcomeStep = this.componentManager
-                    .<DistributionStep>getInstance(DistributionStep.class, ReportDistributionStep.ID);
+                DistributionStep welcomeStep =
+                    this.componentManager.getInstance(DistributionStep.class, ReportDistributionStep.ID);
                 welcomeStep.setState(State.COMPLETED);
 
                 steps.add(welcomeStep);
@@ -197,10 +197,10 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
                 DistributionStep step = steps.get(index);
 
-                // Prepare step
+                // Prepare the step
                 step.prepare();
 
-                // Execute step
+                // Execute the step
                 if (step.getState() == null) {
                     if (getRequest().isInteractive()) {
                         DistributionQuestion question = new DistributionQuestion(step);
@@ -215,6 +215,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                                     for (; index < steps.size(); ++index) {
                                         steps.get(index).setState(DistributionStep.State.CANCELED);
                                     }
+                                    break;
                                 case SKIP:
                                     index = steps.size() - 1;
                                     break;
@@ -252,8 +253,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
         signalReady();
 
-        // After finishing the main wiki distribution job, trigger non-interactive wiki distribution jobs (subwikis
-        // extensions very often depends on extensions installed in the context of the main wiki)
+        // After finishing the main wiki distribution job, trigger non-interactive wiki distribution jobs (subwiki
+        // extensions very often depend on extensions installed in the context of the main wiki)
         WikiDescriptorManager wikis = this.wikiDescriptorManagerProvider.get();
         if (!this.distributionConfiguration.isInteractiveDistributionWizardEnabledForWiki()
             && wikis.isMainWiki(getWiki())) {
@@ -292,8 +293,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                     }
                 } catch (InterruptedException e) {
                     // Sonar is not a fan of InterruptedException catching, and apparently throwing it
-                    // through a RuntimeException is not enough for it (but unfortunately we cannot
-                    // really throw much else in a Runnable)
+                    // through a RuntimeException is not enough for it (but unfortunately, we cannot
+                    // really throw something other than a Runnable)
                     Thread.currentThread().interrupt();
 
                     throw new RuntimeException(e);

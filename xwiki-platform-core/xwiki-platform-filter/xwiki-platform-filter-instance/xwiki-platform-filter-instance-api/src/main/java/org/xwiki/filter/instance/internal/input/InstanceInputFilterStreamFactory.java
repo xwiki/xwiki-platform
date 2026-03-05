@@ -104,7 +104,7 @@ public class InstanceInputFilterStreamFactory extends
             throw new FilterException("Failed to get registered instance of InstanceInputEventGenerator components", e);
         }
 
-        Set<Class< ? >> filters = new HashSet<Class< ? >>();
+        Set<Class< ? >> filters = new HashSet<>();
         filters.addAll(super.getFilterInterfaces());
         for (InstanceInputEventGenerator generator : eventGenerators) {
             filters.addAll(generator.getFilterInterfaces());

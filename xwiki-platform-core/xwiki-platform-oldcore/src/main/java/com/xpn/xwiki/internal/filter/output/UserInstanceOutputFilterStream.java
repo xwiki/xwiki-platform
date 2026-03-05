@@ -192,7 +192,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
             throw new FilterException("Failed to get an XWikiDocument for user name [" + name + "]", e);
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         // First name
         if (parameters.containsKey(PARAMETER_FIRSTNAME)) {
@@ -289,7 +289,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     public void beginGroupContainer(String name, FilterEventParameters parameters) throws FilterException
     {
         // Init members
-        this.members = new ArrayList<String>();
+        this.members = new ArrayList<>();
     }
 
     private void addMember(String member, XWikiDocument groupDocument, BaseClass groupClass, XWikiContext xcontext)

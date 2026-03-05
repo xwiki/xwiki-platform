@@ -118,7 +118,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 extensions.getExtensionVersionSummaries().clear();
             } else {
                 List<ExtensionVersionSummary> limited =
-                    new ArrayList<ExtensionVersionSummary>(extensions.getExtensionVersionSummaries());
+                    new ArrayList<>(extensions.getExtensionVersionSummaries());
                 extensions.getExtensionVersionSummaries().clear();
                 extensions.withExtensionVersionSummaries(limited.subList(offset < 0 ? 0 : offset,
                     number < 0 ? extensions.getExtensionVersionSummaries().size() : offset + number));

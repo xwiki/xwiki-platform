@@ -50,7 +50,7 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
   const selected = editor.getSelectedText();
 
   return (
-    <Components.Generic.Popover.Root opened={opened}>
+    <Components.Generic.Popover.Root open={opened}>
       <Components.Generic.Popover.Trigger>
         {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}

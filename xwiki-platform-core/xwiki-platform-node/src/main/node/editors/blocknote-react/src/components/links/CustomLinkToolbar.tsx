@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { LinkEditor } from "./LinkEditor";
-import { useComponentsContext } from "@blocknote/react";
+import { LinkToolbarExtension } from "@blocknote/core/extensions";
+import { useComponentsContext, useExtension } from "@blocknote/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -41,11 +42,13 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
+  const { editLink, deleteLink } = useExtension(LinkToolbarExtension);
+
   const [showLinkEditor, setShowLinkEditor] = useState(false);
 
   return (
     <>
-      <Components.Generic.Popover.Root opened={showLinkEditor}>
+      <Components.Generic.Popover.Root open={showLinkEditor}>
         <Components.Generic.Popover.Trigger>
           {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}
@@ -67,7 +70,7 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
               title: linkToolbarProps.text,
             }}
             updateLink={({ url, title }) =>
-              linkToolbarProps.editLink(url, title)
+              editLink(url, title, linkToolbarProps.range.from)
             }
           />
         </Components.Generic.Popover.Content>
@@ -84,7 +87,7 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
         className="bn-button"
         label={t("blocknote.linkToolbar.buttons.delete")}
         icon={<RiDeleteBin6Line />}
-        onClick={() => linkToolbarProps.deleteLink()}
+        onClick={() => deleteLink(linkToolbarProps.range.from)}
       />
     </>
   );

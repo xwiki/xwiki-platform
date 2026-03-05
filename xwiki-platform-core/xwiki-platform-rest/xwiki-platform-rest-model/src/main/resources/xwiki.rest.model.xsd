@@ -143,6 +143,7 @@
           <element name="objects" type="xwiki:Objects" minOccurs="0" maxOccurs="1"></element>
           <element name="attachments" type="xwiki:Attachments" minOccurs="0" maxOccurs="1"></element>
           <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
+          <element name="right" type="xwiki:Right" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -650,5 +651,13 @@
     <sequence>
       <element name="item" type="xwiki:HierarchyItem" minOccurs="0" maxOccurs="unbounded"></element>
     </sequence>
+  </complexType>
+
+  <complexType name="Right">
+    <simpleContent>
+      <extension base="boolean">
+        <attribute name="name" type="string"></attribute>
+      </extension>
+    </simpleContent>
   </complexType>
 </schema>

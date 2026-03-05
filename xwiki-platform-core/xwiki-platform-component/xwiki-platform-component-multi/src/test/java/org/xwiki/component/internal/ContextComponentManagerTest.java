@@ -90,10 +90,10 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         super.setUp();
 
         // Enabled component registration events
-        StackingComponentEventManager eventManager = new StackingComponentEventManager();
+        QueueComponentEventManager eventManager = new QueueComponentEventManager();
         eventManager
             .setObservationManager(getComponentManager().<ObservationManager>getInstance(ObservationManager.class));
-        eventManager.shouldStack(false);
+        eventManager.shouldQueue(false);
         getComponentManager().setComponentEventManager(eventManager);
     }
 

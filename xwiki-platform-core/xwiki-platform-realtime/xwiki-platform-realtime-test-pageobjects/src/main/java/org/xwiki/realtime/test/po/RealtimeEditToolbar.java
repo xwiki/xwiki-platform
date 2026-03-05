@@ -41,6 +41,9 @@ public class RealtimeEditToolbar extends BaseElement
 
     private static final By SAVE_STATUS = By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-save-status");
 
+    private static final By SUMMARIZE_AND_DONE_ACTION =
+        By.cssSelector(".realtime-edit-toolbar-left .realtime-action-summarize");
+
     private static final String VALUE = "value";
 
     /**
@@ -125,8 +128,20 @@ public class RealtimeEditToolbar extends BaseElement
     public SummaryModal clickSummarizeAndDone()
     {
         openDoneDropdown();
-        getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-summarize")).click();
+        getDriver().findElement(SUMMARIZE_AND_DONE_ACTION).click();
         return new SummaryModal();
+    }
+
+    /**
+     * @return {@code true} if the "Summarize &amp; Done" action is available, {@code false} otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean hasSummarizeAndDoneAction()
+    {
+        return !getDriver().findElementsWithoutWaiting(SUMMARIZE_AND_DONE_ACTION).isEmpty();
     }
 
     /**

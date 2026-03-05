@@ -117,7 +117,7 @@ public class Util
 
     public List<String> getAllMatches(String content, String spattern, int group) throws MalformedPatternException
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         PatternMatcherInput input = new PatternMatcherInput(content);
         Pattern pattern = patterns.addPattern(spattern);
         while (this.matcher.contains(input, pattern)) {
@@ -132,10 +132,10 @@ public class Util
     public List<String> getUniqueMatches(String content, String spattern, int group) throws MalformedPatternException
     {
         // Remove duplicate entries
-        Set<String> uniqueMatches = new HashSet<String>();
+        Set<String> uniqueMatches = new HashSet<>();
         uniqueMatches.addAll(getAllMatches(content, spattern, group));
 
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = new ArrayList<>();
         matches.addAll(uniqueMatches);
 
         return matches;
@@ -171,7 +171,7 @@ public class Util
      */
     public static Hashtable<String, String> keyValueToHashtable(String mapString) throws IOException
     {
-        Hashtable<String, String> result = new Hashtable<String, String>();
+        Hashtable<String, String> result = new Hashtable<>();
         StreamTokenizer st = new StreamTokenizer(new BufferedReader(new StringReader(mapString)));
         st.resetSyntax();
         st.quoteChar('"');
@@ -203,7 +203,7 @@ public class Util
 
     public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)
     {
-        Map<String, T> result = new HashMap<String, T>();
+        Map<String, T> result = new HashMap<>();
         for (String name : map.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
@@ -225,7 +225,7 @@ public class Util
 
     public Vector<String> split(String pattern, String text)
     {
-        Vector<String> results = new Vector<String>();
+        Vector<String> results = new Vector<>();
         getP5util().split(results, pattern, text);
 
         return results;

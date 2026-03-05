@@ -45,6 +45,9 @@ import org.xwiki.filter.xar.internal.XARFilterUtils;
 public class XARInputFilterStreamFactory
     extends AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>
 {
+    /**
+     * Default constructor.
+     */
     public XARInputFilterStreamFactory()
     {
         super(FilterStreamType.XWIKI_XAR_CURRENT);

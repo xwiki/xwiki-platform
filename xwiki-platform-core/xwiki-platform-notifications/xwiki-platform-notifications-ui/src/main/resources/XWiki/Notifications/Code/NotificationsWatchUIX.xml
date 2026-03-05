@@ -574,9 +574,9 @@
 #set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
 {{html clean='false'}}
 &lt;li class="btn-group" id="watchButton"&gt;
-  &lt;a href="#" role="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
+  &lt;button type="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
     &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
-  &lt;/a&gt;
+  &lt;/button&gt;
 &lt;/li&gt;
 {{/html}}
 #define ($notificationsWatchModal)

@@ -63,6 +63,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
@@ -805,6 +806,53 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
+    }
+
+    @Test
+    @Order(9)
+    void savingChecksRights(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        // Login as U1 who doesn't have script right.
+        testUtils.login("U1", "U1");
+
+        testUtils.rest().savePage(testReference, """
+                {{velocity}}
+                Test script.
+                {{/velocity}}
+                
+                {{liveData id="test" properties="doc.location,levels" source="liveTable"
+                  sourceParameters="className=XWiki.XWikiRights"/}}
+                """, "");
+        // Grant an explicit edit right to get the page listed in the Live Data.
+        testUtils.setRights(testReference, null, "XWiki.U1", "edit", true);
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        // Ensure that the Velocity macro failed to execute because the user doesn't have script right.
+        assertTrue(viewPage.hasRenderingError());
+        String velocityError = "Failed to execute the [velocity] macro.";
+        assertThat(viewPage.getContent(), containsString(velocityError));
+
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        tableLayout.filterColumn("doc.location",
+            testUtils.serializeReference(testReference.getLocalDocumentReference().getParent()));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("Levels", "edit");
+
+        // Edit the Levels column.
+        tableLayout.editCell("Levels", 1, "levels", "script");
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        // The edit should have failed because the user doesn't have script right.
+        tableLayout.assertRow("Levels", "edit");
+
+        // Reload the page.
+        testUtils.getDriver().navigate().refresh();
+        viewPage = new ViewPage();
+        // Assert that the Velocity macro still fails because the user still doesn't have script right.
+        assertTrue(viewPage.hasRenderingError());
+        assertThat(viewPage.getContent(), containsString(velocityError));
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

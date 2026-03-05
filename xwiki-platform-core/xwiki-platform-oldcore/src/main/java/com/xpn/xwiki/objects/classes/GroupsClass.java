@@ -102,7 +102,7 @@ public class GroupsClass extends ListClass
     @Override
     public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return new HashMap<String, ListItem>();
+        return new HashMap<>();
     }
 
     /**
@@ -206,7 +206,7 @@ public class GroupsClass extends ListClass
         List<String> selectlist;
 
         if (property == null) {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
         } else {
             selectlist = getListFromString((String) property.getValue());
         }

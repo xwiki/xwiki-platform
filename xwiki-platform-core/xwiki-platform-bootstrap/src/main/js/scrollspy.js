@@ -47,12 +47,14 @@
     this.targets      = []
     this.scrollHeight = this.getScrollHeight()
 
-    if (!$.isWindow(this.$scrollElement[0])) {
+    const scrollElement = this.$scrollElement[0];
+    const scrollElementIsNotWindow = scrollElement && scrollElement !== scrollElement.window;
+    if (scrollElementIsNotWindow) {
       offsetMethod = 'position'
       offsetBase   = this.$scrollElement.scrollTop()
     }
 
-    this.$body
+    Array.from(this.$body
       .find(this.selector)
       .map(function () {
         var $el   = $(this)
@@ -63,11 +65,11 @@
           && $href.length
           && $href.is(':visible')
           && [[$href[offsetMethod]().top + offsetBase, href]]) || null
-      })
+      }))
       .sort(function (a, b) { return a[0] - b[0] })
-      .each(function () {
-        that.offsets.push(this[0])
-        that.targets.push(this[1])
+      .forEach(function (item) {
+        that.offsets.push(item[0])
+        that.targets.push(item[1])
       })
   }
 

@@ -85,6 +85,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private RSSFeedRenderer rssFeedRenderer;
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response getNotifications(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -135,6 +136,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return validateAndGetLimit(NumberUtils.toInt(maxCount, defaultMaxCount));
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -176,6 +178,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response getNotificationsCount(String useUserPreferences, String userId, String pages, String spaces,
         String wikis, String users, String maxCount, String displayOwnEvents, String displayMinorEvents,
         String displaySystemEvents, String displayReadEvents, String displayReadStatus, String tags, String currentWiki,
@@ -207,6 +210,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate, String blackList,
         String pages, String spaces, String wikis, String users, String maxCount, String displayOwnEvents,
         String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
@@ -230,6 +234,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response postNotifications(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String count, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -241,6 +246,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,

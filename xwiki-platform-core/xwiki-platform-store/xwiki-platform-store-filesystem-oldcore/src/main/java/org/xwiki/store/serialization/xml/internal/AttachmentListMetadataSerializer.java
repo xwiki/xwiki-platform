@@ -107,7 +107,7 @@ public class AttachmentListMetadataSerializer
             throw new IOException("Cannot parse this attachment archive metadata, it was saved with a "
                 + "different serializer.");
         }
-        final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>(docel.elements().size());
+        final List<XWikiAttachment> attachments = new ArrayList<>(docel.elements().size());
         for (Element attach : docel.elements()) {
             attachments.add(this.attachSerializer.parse(attach));
         }

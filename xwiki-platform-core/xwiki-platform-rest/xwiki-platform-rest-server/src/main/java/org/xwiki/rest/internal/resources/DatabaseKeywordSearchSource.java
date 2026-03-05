@@ -467,7 +467,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
 
         try (Formatter f = new Formatter()) {
             if (keywords == null) {
-                return new ArrayList<SearchResult>();
+                return new ArrayList<>();
             }
 
             QueryManager finalQueryManager = this.queryManager;

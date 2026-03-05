@@ -104,7 +104,7 @@ class ChromeManagerManagerTest
     private List<String> getChromeParams()
     {
         return List.of("--remote-allow-origins=http://localhost:" + this.configuration.getChromeRemoteDebuggingPort(),
-            "--disable-dev-shm-usage");
+            "--disable-dev-shm-usage", "--disable-component-update");
     }
 
     private void mockNetwork(String networkIdOrName)

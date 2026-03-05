@@ -17,29 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Logic } from "@/services/logic.js";
-
-/**
- * Map the element to its data object
- * So that each instance of the livedata on the page handle there own data
- */
-const instancesMap = new WeakMap();
+import {XWikiLivedata} from "@xwiki/platform-livedata-ui";
+import {XWikiLiveDataSource, buildTranslations} from "@xwiki/platform-livedata-xwiki"
+import {createApp} from "vue";
+import Vue3TouchEvents from "vue3-touch-events";
+import {createI18n} from "vue-i18n";
 
 /**
  * The init function of the logic script
  * For each livedata element on the page, returns its corresponding data / API
  * If the data does not exist yet, create it from the element
  * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
+ * @param $ a jquery instance
  */
-const init = function(element, $) {
+function init(element, $) {
 
-  if (!instancesMap.has(element)) {
-    // create a new logic object associated to the element
-    const logic = new Logic(element, $);
-    instancesMap.set(element, logic);
-  }
+  const locale = document.documentElement.getAttribute("lang");
+  const i18n = createI18n({ legacy: false, locale });
 
-  return instancesMap.get(element);
-};
+  const data = element.dataset.config
+  element.removeAttribute("data-config")
+  const contentTrusted = element.getAttribute("data-config-content-trusted") === "true";
+
+  // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
+  const placeholderElement = document.createElement("div");
+  element.appendChild(placeholderElement);
+
+  createApp(XWikiLivedata, {
+    data,
+    liveDataSource: new XWikiLiveDataSource($),
+    contentTrusted,
+    resolveTranslations: buildTranslations(locale, i18n),
+  })
+    .mixin({
+      mounted() {
+        element.classList.remove("loading");
+      },
+    })
+    .provide("jQuery", $)
+    .use(i18n)
+    .use(Vue3TouchEvents)
+    .mount(element)
+}
 
 export { init };

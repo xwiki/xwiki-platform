@@ -63,6 +63,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  */
 @Component
 @Singleton
+// Fan out of 22 on a max of 20
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**
@@ -83,7 +85,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {
-        List<WikiDocument> result = new ArrayList<WikiDocument>();
+        List<WikiDocument> result = new ArrayList<>();
         // Add the rootDoc into the result
         result.add(rootDoc);
         // Recursively split the root document.

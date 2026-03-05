@@ -52,9 +52,9 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 @Component
 @Singleton
-public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachment>
+public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachmentInputSource>
 {
-    public static class AbstractContent extends AbstractInputStreamInputSource
+    public static class AbstractContentInputSource extends AbstractInputStreamInputSource
     {
         public DeferredFileOutputStream content;
 
@@ -82,7 +82,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
-    public static class WikiAttachmentRevision extends AbstractContent
+    public static class WikiAttachmentRevisionInputSource extends AbstractContentInputSource
     {
         public String version;
 
@@ -103,7 +103,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
-    public static class WikiAttachment extends AbstractContent
+    public static class WikiAttachmentInputSource extends AbstractContentInputSource
     {
         public String name;
 
@@ -111,7 +111,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public List<WikiAttachmentRevision> revisions = new ArrayList<>();
+        public List<WikiAttachmentRevisionInputSource> revisions = new ArrayList<>();
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
@@ -130,7 +130,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         if (!this.revisions.isEmpty()) {
                             proxyFilter.beginWikiAttachmentRevisions(FilterEventParameters.EMPTY);
 
-                            for (WikiAttachmentRevision revision : this.revisions) {
+                            for (WikiAttachmentRevisionInputSource revision : this.revisions) {
                                 revision.send(proxyFilter);
                             }
 
@@ -166,10 +166,10 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
     private Environment environment;
 
     @Override
-    public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties)
+    public WikiAttachmentInputSource read(XMLStreamReader xmlReader, XARInputProperties properties)
         throws XMLStreamException, FilterException
     {
-        WikiAttachment wikiAttachment = new WikiAttachment();
+        WikiAttachmentInputSource wikiAttachment = new WikiAttachmentInputSource();
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
@@ -204,7 +204,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         return wikiAttachment;
     }
 
-    private void readRevisions(XMLStreamReader xmlReader, XARInputProperties properties, WikiAttachment wikiAttachment)
+    private void readRevisions(XMLStreamReader xmlReader, XARInputProperties properties, WikiAttachmentInputSource wikiAttachment)
         throws XMLStreamException, FilterException
     {
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
@@ -216,10 +216,10 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
-    private WikiAttachmentRevision readRevision(XMLStreamReader xmlReader, XARInputProperties properties)
+    private WikiAttachmentRevisionInputSource readRevision(XMLStreamReader xmlReader, XARInputProperties properties)
         throws XMLStreamException, FilterException
     {
-        WikiAttachmentRevision wikiAttachmentRevision = new WikiAttachmentRevision();
+        WikiAttachmentRevisionInputSource wikiAttachmentRevision = new WikiAttachmentRevisionInputSource();
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
@@ -247,7 +247,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         return wikiAttachmentRevision;
     }
 
-    private void readContent(XMLStreamReader xmlReader, AbstractContent content)
+    private void readContent(XMLStreamReader xmlReader, AbstractContentInputSource content)
         throws XMLStreamException, FilterException
     {
         // We copy the attachment content to use it later. We can't directly send it as a stream because XAR

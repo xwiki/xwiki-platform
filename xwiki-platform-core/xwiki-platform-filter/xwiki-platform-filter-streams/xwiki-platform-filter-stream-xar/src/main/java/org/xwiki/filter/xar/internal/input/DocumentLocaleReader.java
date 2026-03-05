@@ -47,7 +47,7 @@ import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARDocumentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.XARObjectModel;
-import org.xwiki.filter.xar.internal.input.AttachmentReader.WikiAttachment;
+import org.xwiki.filter.xar.internal.input.AttachmentReader.WikiAttachmentInputSource;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.filter.xar.internal.input.WikiObjectReader.WikiObject;
 import org.xwiki.filter.xml.internal.input.XMLInputFilterStreamUtils;
@@ -86,7 +86,7 @@ public class DocumentLocaleReader extends AbstractReader
     private XARXMLReader<ClassPropertyReader.WikiClassProperty> classPropertyReader;
 
     @Inject
-    private XARXMLReader<AttachmentReader.WikiAttachment> attachmentReader;
+    private XARXMLReader<WikiAttachmentInputSource> attachmentReader;
 
     private XARInputProperties properties;
 
@@ -124,7 +124,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private Queue<WikiObject> currentObjects = new LinkedList<>();
 
-    private Queue<WikiAttachment> currentAttachments = new LinkedList<>();
+    private Queue<WikiAttachmentInputSource> currentAttachments = new LinkedList<>();
 
     public void setProperties(XARInputProperties properties)
     {
@@ -565,12 +565,12 @@ public class DocumentLocaleReader extends AbstractReader
             sendBeginWikiDocumentRevision(proxyFilter, false);
         }
 
-        WikiAttachment wikiAttachment = this.attachmentReader.read(xmlReader, this.properties);
+        WikiAttachmentInputSource wikiAttachmentSource = this.attachmentReader.read(xmlReader, this.properties);
 
         if (this.currentSourceType != SourceType.DOCUMENT || this.sentBeginWikiDocumentRevision) {
-            wikiAttachment.send(proxyFilter);
+            wikiAttachmentSource.send(proxyFilter);
         } else {
-            this.currentAttachments.offer(wikiAttachment);
+            this.currentAttachments.offer(wikiAttachmentSource);
         }
     }
 

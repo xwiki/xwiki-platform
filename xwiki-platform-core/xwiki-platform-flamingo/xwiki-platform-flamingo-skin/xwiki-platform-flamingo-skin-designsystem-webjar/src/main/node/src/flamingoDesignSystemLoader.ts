@@ -78,6 +78,5 @@ export class FlamingoDesignSystemLoader implements DesignSystemLoader {
       "XTextField",
       () => import("./vue/XTextField.vue"),
     );
-    registerAsyncComponent(app, "XTree", () => import("./vue/XTree.vue"));
   }
 }

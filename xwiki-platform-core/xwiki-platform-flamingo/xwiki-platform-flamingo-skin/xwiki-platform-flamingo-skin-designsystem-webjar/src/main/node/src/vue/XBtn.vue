@@ -21,10 +21,9 @@
 import { computed } from "vue";
 import type { BtnProps } from "@xwiki/platform-dsapi";
 const { size, variant, pill } = defineProps<BtnProps>();
-// TODO: implement emit
 defineEmits(["click"]);
 
-if (pill) {
+if (pill !== undefined) {
   console.warn("Pill parameter is unsupported");
 }
 

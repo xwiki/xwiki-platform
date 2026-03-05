@@ -46,6 +46,7 @@
     "@types/sinon": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "jquery": "catalog:",
     "sinon": "catalog:",

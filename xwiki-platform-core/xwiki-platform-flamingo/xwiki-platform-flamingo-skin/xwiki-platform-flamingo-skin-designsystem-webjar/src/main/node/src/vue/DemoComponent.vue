@@ -17,10 +17,28 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import XAlert from "./XAlert.vue";
+
+const actions = [
+  {
+    name: "A1",
+    callback: () => {
+      console.log("ok");
+    },
+  },
+];
+</script>
 
 <template>
-  <div>TODO</div>
+  <div>
+    <x-alert type="info">This is an alert</x-alert>
+    <x-alert type="info" flat-corners>This is an alert</x-alert>
+    <x-alert type="warning" title="This is a title">This is an alert</x-alert>
+    <x-alert type="warning" :actions><br />This is an alert</x-alert>
+    <x-alert type="warning" closable><br />Close me</x-alert>
+    <div class="box warningmessage">ABCD</div>
+  </div>
 </template>
 
 <style scoped></style>

@@ -62,6 +62,7 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "typescript": "catalog:",

@@ -42,6 +42,7 @@
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

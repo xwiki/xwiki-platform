@@ -18,52 +18,70 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import xBtn from "./XBtn.vue";
-import { onMounted, useTemplateRef } from "vue";
+import { computed, onMounted, useTemplateRef } from "vue";
 import type { AlertProps } from "@xwiki/platform-dsapi";
-
-type NotificationType = "done" | "error" | "warning" | "info";
 
 const { type, closable, title, description, flatCorners } =
   defineProps<AlertProps>();
 
-if (closable !== undefined) {
-  console.warn("XAlert closable is not supported.");
-}
+// eslint-disable-next-line no-undef
+const jQuery: Promise<JQuery> = new Promise((resolve) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
+  require(["jquery"], ($: JQuery) => resolve($));
+});
 
-function getVariant(): NotificationType {
+const root = useTemplateRef("root");
+
+onMounted(async () => {
+  if (closable) {
+    const $ = await jQuery;
+    console.log($);
+    const value = root.value;
+    console.log(value);
+    const $1 = $(value);
+    console.log($1, $1.alert);
+    $1.alert();
+  }
+});
+
+const boxclass = computed(() => {
   switch (type) {
     case "success":
-      return "done";
-    case "warning":
-      return "warning";
+      return ["successmessage"];
     case "error":
-      return "error";
+      return ["errormessage"];
+    case "warning":
+      return ["warningmessage"];
     case "info":
-      return "info";
-  }
-}
-
-const alertContent = useTemplateRef("alertContent");
-
-onMounted(() => {
-  const value = alertContent.value!;
-  const html = value.getHTML();
-
-  // TODO: see how to make this non-interactive to let users click on buttons.
-  // eslint-disable-next-line no-undef
-  const notif = new XWiki.widgets.Notification(html, getVariant());
-
-  if (flatCorners) {
-    notif.element.children[0].style.setProperty("border-radius", 0);
+      return ["infomessage"];
+    default:
+      return [];
   }
 });
 </script>
 
 <template>
-  <div v-show="false" ref="alertContent">
+  <div
+    ref="root"
+    :class="[
+      'box',
+      ...boxclass,
+      flatCorners ? $style.flatCorners : '',
+      closable ? 'alert-dismissible' : '',
+    ]"
+    role="alert"
+  >
+    <button
+      type="button"
+      class="close"
+      data-dismiss="alert"
+      aria-label="Close"
+      v-if="closable"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
     <strong v-if="title">{{ title }}</strong>
-    <br v-if="title" />
+    <br v-if="title && description" />
     {{ description }}
     <x-btn
       v-for="action of actions"
@@ -76,9 +94,13 @@ onMounted(() => {
     </x-btn>
     <br v-if="details && actions" />
     <small v-if="details">{{ details }}</small>
-    <br />
+    <br v-if="details" />
     <slot />
   </div>
 </template>
 
-<style scoped></style>
+<style module>
+.flatCorners {
+  border-radius: initial;
+}
+</style>

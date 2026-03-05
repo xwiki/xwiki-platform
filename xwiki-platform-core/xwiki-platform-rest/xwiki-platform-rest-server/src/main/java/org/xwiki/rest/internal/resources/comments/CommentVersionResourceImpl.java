@@ -44,6 +44,8 @@ import com.xpn.xwiki.api.Document;
 public class CommentVersionResourceImpl extends XWikiResource implements CommentVersionResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Comment getCommentVersion(String wikiName, String spaceName, String pageName, String version, Integer id,
             Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
     {

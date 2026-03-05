@@ -58,8 +58,6 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
     {
         public DeferredFileOutputStream content;
 
-        public FilterEventParameters parameters = new FilterEventParameters();
-
         @Override
         protected InputStream openStream() throws IOException
         {
@@ -110,6 +108,8 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         public String name;
 
         public Long size;
+
+        public FilterEventParameters parameters = new FilterEventParameters();
 
         public List<WikiAttachmentRevision> revisions = new ArrayList<>();
 

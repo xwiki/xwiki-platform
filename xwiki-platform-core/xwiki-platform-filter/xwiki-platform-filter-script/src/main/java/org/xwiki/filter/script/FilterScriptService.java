@@ -180,7 +180,7 @@ public class FilterScriptService extends AbstractFilterScriptService
             List<ComponentDescriptor<FilterStreamFactory>> descriptors =
                 this.componentManagerProvider.get().<FilterStreamFactory>getComponentDescriptorList(factoryType);
 
-            List<FilterStreamType> types = new ArrayList<FilterStreamType>(descriptors.size());
+            List<FilterStreamType> types = new ArrayList<>(descriptors.size());
             for (ComponentDescriptor<FilterStreamFactory> descriptor : descriptors) {
                 types.add(FilterStreamType.unserialize(descriptor.getRoleHint()));
             }

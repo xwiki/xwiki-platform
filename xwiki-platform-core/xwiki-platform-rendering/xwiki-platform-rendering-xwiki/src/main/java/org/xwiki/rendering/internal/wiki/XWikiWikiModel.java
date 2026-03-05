@@ -335,7 +335,7 @@ public class XWikiWikiModel implements WikiModel
         String width = StringUtils.removeEnd(getImageDimension(WIDTH, imageParameters), PIXELS);
         String height = StringUtils.removeEnd(getImageDimension(HEIGHT, imageParameters), PIXELS);
         boolean useHeight = StringUtils.isNotEmpty(height) && StringUtils.isNumeric(height);
-        Map<String, Object> queryString = new LinkedHashMap<String, Object>();
+        Map<String, Object> queryString = new LinkedHashMap<>();
         if (StringUtils.isEmpty(width) || !StringUtils.isNumeric(width)) {
             // Width is unspecified or is not measured in pixels.
             if (useHeight) {
@@ -369,7 +369,7 @@ public class XWikiWikiModel implements WikiModel
 
     private String extendQueryString(String queryString, Map<String, Object> parameters)
     {
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>(URLEncodedUtils.parse(queryString, UTF8, '&'));
+        List<NameValuePair> pairs = new ArrayList<>(URLEncodedUtils.parse(queryString, UTF8, '&'));
         // Exclude the parameters that are already on the query string.
         for (NameValuePair pair : pairs) {
             parameters.remove(pair.getName());

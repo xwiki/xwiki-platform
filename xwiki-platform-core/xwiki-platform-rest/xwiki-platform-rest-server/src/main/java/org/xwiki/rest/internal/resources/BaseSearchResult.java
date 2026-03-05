@@ -78,7 +78,7 @@ public class BaseSearchResult extends XWikiResource
                     searchSource.search(query, wikiName, wikis, hasProgrammingRights, orderField, order,
                         distinct, number, start, withPrettyNames, className, uriInfo);
             } else {
-                result = new ArrayList<SearchResult>();
+                result = new ArrayList<>();
             }
 
             return result;
@@ -96,7 +96,7 @@ public class BaseSearchResult extends XWikiResource
      */
     protected List<KeywordSearchScope> parseSearchScopeStrings(List<String> searchScopeStrings)
     {
-        List<KeywordSearchScope> searchScopes = new ArrayList<KeywordSearchScope>();
+        List<KeywordSearchScope> searchScopes = new ArrayList<>();
         for (String searchScopeString : searchScopeStrings) {
             if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {
                 try {

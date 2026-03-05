@@ -87,7 +87,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
                     return isEmptyLineParagraph(element);
                 }
             });
-        List<Node> sequences = new ArrayList<Node>();
+        List<Node> sequences = new ArrayList<>();
         for (Element emptyLineParagraph : emptyLineParagraphs) {
             Node prev = emptyLineParagraph.getPreviousSibling();
             // Skip garbage.

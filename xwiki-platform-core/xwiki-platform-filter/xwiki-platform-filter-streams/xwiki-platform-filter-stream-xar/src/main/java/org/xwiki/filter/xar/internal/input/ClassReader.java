@@ -53,7 +53,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public Map<String, WikiClassProperty> properties = new LinkedHashMap<String, WikiClassProperty>();
+        public Map<String, WikiClassProperty> properties = new LinkedHashMap<>();
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {

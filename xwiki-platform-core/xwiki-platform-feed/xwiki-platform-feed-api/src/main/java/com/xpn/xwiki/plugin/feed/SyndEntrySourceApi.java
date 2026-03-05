@@ -68,7 +68,7 @@ public class SyndEntrySourceApi extends Api
      */
     public boolean source(SyndEntry entry, Object obj)
     {
-        return this.source(entry, obj, new HashMap<String, Object>());
+        return this.source(entry, obj, new HashMap<>());
     }
 
     /**
@@ -92,6 +92,6 @@ public class SyndEntrySourceApi extends Api
      */
     public SyndEntry source(Object obj)
     {
-        return this.source(obj, new HashMap<String, Object>());
+        return this.source(obj, new HashMap<>());
     }
 }

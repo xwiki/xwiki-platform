@@ -75,8 +75,8 @@ public class DocumentQueryHelper
         throws QueryException
     {
         String fromClause = "";
-        List<String> finalConstraints = new ArrayList<String>();
-        Map<String, Object> finalParameters = new HashMap<String, Object>();
+        List<String> finalConstraints = new ArrayList<>();
+        Map<String, Object> finalParameters = new HashMap<>();
         String xclass = (String) config.get("filterByClass");
         if (!StringUtils.isEmpty(xclass)) {
             fromClause = ", BaseObject as obj";
@@ -116,7 +116,7 @@ public class DocumentQueryHelper
     {
         query.setOffset(offset);
         query.setLimit(limit);
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> documentReferences = new ArrayList<>();
         for (Object result : query.execute()) {
             documentReferences.add(this.explicitDocumentReferenceResolver.resolve((String) result, parentReference));
         }

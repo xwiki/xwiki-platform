@@ -217,7 +217,7 @@ public class EditForm extends XWikiForm
     {
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = getRequest().getParameterMap();
-        Map<String, String[]> result = new HashMap<String, String[]>();
+        Map<String, String[]> result = new HashMap<>();
         for (String name : allParameters.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);

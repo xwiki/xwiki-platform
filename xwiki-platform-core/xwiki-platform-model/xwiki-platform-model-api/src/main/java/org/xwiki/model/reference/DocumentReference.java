@@ -311,7 +311,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     @Transient
     public List<SpaceReference> getSpaceReferences()
     {
-        List<SpaceReference> references = new ArrayList<SpaceReference>();
+        List<SpaceReference> references = new ArrayList<>();
 
         EntityReference reference = this;
         while (reference != null) {

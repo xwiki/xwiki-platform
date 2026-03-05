@@ -322,7 +322,7 @@ public class HttpServletRequestStub implements HttpServletRequest
             this.headers = new LinkedHashMap<>();
         }
 
-        this.headers.put("x-forwarded-host", new Vector<String>(Arrays.asList(host)));
+        this.headers.put("x-forwarded-host", new Vector<>(Arrays.asList(host)));
     }
 
     public void setScheme(String scheme)

@@ -77,7 +77,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * and the top of the stack is the last opened
      * <code>{@link Element}</code>.
      */
-    protected Stack<Element> parent = new Stack<Element>();
+    protected Stack<Element> parent = new Stack<>();
 
     /**
      * Current <code>{@link OutputStream}</code> of this writer.

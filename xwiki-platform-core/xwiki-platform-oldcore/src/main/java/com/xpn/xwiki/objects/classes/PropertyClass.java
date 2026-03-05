@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
@@ -59,6 +58,7 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
@@ -84,18 +84,40 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
 
+    private static final String NAME = "name";
+    private static final String VALUE = "value";
+    private static final String CUSTOM_DISPLAY = "customDisplay";
+    private static final String PRETTY_NAME = "prettyName";
+    private static final String HINT = "hint";
+    private static final String NUMBER = "number";
+    private static final String TOOLTIP = "tooltip";
+    private static final String CLASS_SUFFIX = "Class";
+    private static final String UNMODIFIABLE = "unmodifiable";
+    private static final String DISABLED = "disabled";
+    private static final String VALIDATION_REGEXP = "validationRegExp";
+    private static final String VALIDATION_MESSAGE = "validationMessage";
+
+    protected String cachedCustomDisplayer;
+
     private BaseClass xclass;
 
     private long id;
 
     private PropertyMetaClass pMetaClass;
 
-    protected String cachedCustomDisplayer;
-
+    /**
+     * Default empty constructor.
+     */
     public PropertyClass()
     {
     }
 
+    /**
+     * Default constructor.
+     * @param name the name of the property.
+     * @param prettyname its prettyname.
+     * @param xWikiClass the meta class to be used.
+     */
     public PropertyClass(String name, String prettyname, PropertyMetaClass xWikiClass)
     {
         setName(name);
@@ -117,6 +139,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return getxWikiClass();
     }
 
+    /**
+     * @return the used metaclass.
+     */
     public BaseClass getxWikiClass()
     {
         if (this.pMetaClass == null) {
@@ -126,9 +151,22 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return this.pMetaClass;
     }
 
+    /**
+     * @param xWikiClass the metaclass to be used.
+     * @deprecated Use the properly typed method {@link #setxWikiClass(PropertyMetaClass)}.
+     */
+    @Deprecated(since = "18.2.0RC1")
     public void setxWikiClass(BaseClass xWikiClass)
     {
-        this.pMetaClass = (PropertyMetaClass) xWikiClass;
+        setxWikiClass((PropertyMetaClass) xWikiClass);
+    }
+
+    /**
+     * @param xWikiClass the metaclass to be used.
+     */
+    public void setxWikiClass(PropertyMetaClass xWikiClass)
+    {
+        this.pMetaClass = xWikiClass;
     }
 
     @Override
@@ -196,6 +234,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return null;
     }
 
+    /**
+     * Retrieve the text of the given element and use it to create a new property.
+     * @param ppcel the element for which to use the text value to create a property
+     * @return a new property with the value set
+     * @see #fromString(String)
+     * @throws XWikiException in case of problem to parse the value
+     */
     public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         String value = ppcel.getText();
@@ -248,6 +293,15 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         buffer.append(input.toString());
     }
 
+    /**
+     * Display a hidden input for the given property of the given object and returns it in a string.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string to display the hidden input.
+     * @see #displayHidden(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
@@ -255,11 +309,28 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return buffer.toString();
     }
 
+    /**
+     * Display a hidden input for the given property of the given object and returns it in a string.
+     * @param name the name of the property to display
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string to display the hidden input.
+     * @see #displayHidden(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, BaseCollection object, XWikiContext context)
     {
         return displayHidden(name, "", object, context);
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string containing the display view.
+     * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayView(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
@@ -267,11 +338,28 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return buffer.toString();
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string containing the display view.
+     * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayView(String name, BaseCollection object, XWikiContext context)
     {
         return displayView(name, "", object, context);
     }
 
+    /**
+     * Display an edit input of the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string containing the input.
+     * @see #displayEdit(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
@@ -279,23 +367,45 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return buffer.toString();
     }
 
+    /**
+     * Display an edit input of the given property.
+     * @param name the name of the property to display
+     * @param object the object where to find the property to display
+     * @param context the wiki context to use for computing the values
+     * @return a string containing the input.
+     * @see #displayEdit(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, BaseCollection object, XWikiContext context)
     {
         return displayEdit(name, "", object, context);
     }
 
+    /**
+     * @param context the current context
+     * @return {@code true} if there's a custom displayer.
+     */
     public boolean isCustomDisplayed(XWikiContext context)
     {
         return (StringUtils.isNotEmpty(getCachedDefaultCustomDisplayer(context)));
     }
 
+    /**
+     * Use the custom displayer and output it in the given buffer.
+     * @param buffer the buffer where to output the result.
+     * @param fieldName the name of the field to output.
+     * @param prefix the prefix to use for the field name.
+     * @param type the type of script
+     * @param object the object the property belongs to
+     * @param context the current context
+     * @throws XWikiException in case of problem when calling the displayer
+     */
     public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
         final XWikiContext context) throws XWikiException
     {
         String content = "";
         try {
             ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
-            scontext.setAttribute("name", fieldName, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute(NAME, fieldName, ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
             // The PropertyClass instance can be used to access meta properties in the custom displayer (e.g.
             // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
@@ -313,11 +423,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
-                scontext.setAttribute("value", prop.getValue(), ScriptContext.ENGINE_SCOPE);
+                scontext.setAttribute(VALUE, prop.getValue(), ScriptContext.ENGINE_SCOPE);
             } else {
                 // The $value property can exist in the velocity context, we overwrite it to make sure we don't get a
                 // wrong value in the displayer when the property does not exist yet.
-                scontext.setAttribute("value", null, ScriptContext.ENGINE_SCOPE);
+                scontext.setAttribute(VALUE, null, ScriptContext.ENGINE_SCOPE);
             }
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
@@ -423,7 +533,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public String getName()
     {
-        return getStringValue("name");
+        return getStringValue(NAME);
     }
 
     @Override
@@ -435,31 +545,47 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             throw new IllegalArgumentException("A property name cannot be null or empty");
         }
 
-        setStringValue("name", name);
+        setStringValue(NAME, name);
         this.referenceCache = null;
     }
 
+    /**
+     * @return the custom display script.
+     */
     public String getCustomDisplay()
     {
-        return getStringValue("customDisplay");
+        return getStringValue(CUSTOM_DISPLAY);
     }
 
+    /**
+     * @param value the custom display script.
+     */
     public void setCustomDisplay(String value)
     {
-        setLargeStringValue("customDisplay", value);
+        setLargeStringValue(CUSTOM_DISPLAY, value);
     }
 
     @Override
     public String getPrettyName()
     {
-        return getStringValue("prettyName");
+        return getStringValue(PRETTY_NAME);
     }
 
+    /**
+     * @param context the current context
+     * @return the translated pretty name.
+     * @deprecated Use {@link #getTranslatedPrettyName(XWikiContext)}.
+     */
+    @Deprecated(since = "18.2.0RC1")
     public String getPrettyName(XWikiContext context)
     {
         return getTranslatedPrettyName(context);
     }
 
+    /**
+     * @param context the current context
+     * @return the translated pretty name.
+     */
     public String getTranslatedPrettyName(XWikiContext context)
     {
         String msgName = getFieldFullName();
@@ -477,7 +603,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void setPrettyName(String prettyName)
     {
-        setStringValue("prettyName", prettyName);
+        setStringValue(PRETTY_NAME, prettyName);
     }
 
     /**
@@ -505,50 +631,56 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     public String getHint()
     {
-        return getLocalizedPropertyValue("hint");
+        return getLocalizedPropertyValue(HINT);
     }
 
     /**
-     * Set the text displayed in the object editor to help the user filling some content.
+     * @param hint the text displayed in the object editor to help the user filling some content.
      * 
      * @since 9.11RC1
      */
     public void setHint(String hint)
     {
-        setLargeStringValue("hint", hint);
-    }
-
-    public String getTooltip()
-    {
-        return getLargeStringValue("tooltip");
+        setLargeStringValue(HINT, hint);
     }
 
     /**
-     * Gets international tooltip
+     * @return the tooltip of the property.
+     */
+    public String getTooltip()
+    {
+        return getLargeStringValue(TOOLTIP);
+    }
+
+    /**
+     * Gets translated tooltip.
      *
-     * @param context
-     * @return
+     * @param context the current context
+     * @return the translated tooltip.
      */
     public String getTooltip(XWikiContext context)
     {
-        return getLocalizedPropertyValue("tooltip");
+        return getLocalizedPropertyValue(TOOLTIP);
     }
 
+    /**
+     * @param tooltip the tooltip of the property.
+     */
     public void setTooltip(String tooltip)
     {
-        setLargeStringValue("tooltip", tooltip);
+        setLargeStringValue(TOOLTIP, tooltip);
     }
 
     @Override
     public int getNumber()
     {
-        return getIntValue("number");
+        return getIntValue(NUMBER);
     }
 
     @Override
     public void setNumber(int number)
     {
-        setIntValue("number", number);
+        setIntValue(NUMBER, number);
     }
 
     /**
@@ -565,7 +697,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
         // (without the package). Subclasses can overwrite this method to use a different hint format.
-        return StringUtils.removeEnd(getClass().getSimpleName(), "Class");
+        return StringUtils.removeEnd(getClass().getSimpleName(), CLASS_SUFFIX);
     }
 
     /**
@@ -632,7 +764,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         }
         Element el = new DOMElement("classType");
         String classType = getClassType();
-        if (this.getClass().getSimpleName().equals(classType + "Class")) {
+        if (this.getClass().getSimpleName().equals(classType + CLASS_SUFFIX)) {
             // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
             // (to allow XClasses created with the current version of XWiki to be imported in an older version).
             classType = this.getClass().getName();
@@ -654,21 +786,23 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return toString();
     }
 
-    public void initLazyCollections()
-    {
-    }
-
+    /**
+     * @return {@code true} if the property cannot be modified.
+     */
     public boolean isUnmodifiable()
     {
-        return (getIntValue("unmodifiable") == 1);
+        return (getIntValue(UNMODIFIABLE) == 1);
     }
 
+    /**
+     * @param unmodifiable {@code true} if the property cannot be modified.
+     */
     public void setUnmodifiable(boolean unmodifiable)
     {
         if (unmodifiable) {
-            setIntValue("unmodifiable", 1);
+            setIntValue(UNMODIFIABLE, 1);
         } else {
-            setIntValue("unmodifiable", 0);
+            setIntValue(UNMODIFIABLE, 0);
         }
     }
 
@@ -682,7 +816,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     public boolean isDisabled()
     {
-        return (getIntValue("disabled", 0) == 1);
+        return (getIntValue(DISABLED, 0) == 1);
     }
 
     /**
@@ -696,20 +830,21 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setDisabled(boolean disabled)
     {
         if (disabled) {
-            setIntValue("disabled", 1);
+            setIntValue(DISABLED, 1);
         } else {
-            setIntValue("disabled", 0);
+            setIntValue(DISABLED, 0);
         }
     }
 
+    /**
+     * Creates a property and set its value based on the given array.
+     * @param strings the array to use for setting the property value
+     * @return a new property with its value set.
+     * @throws XWikiException in case of problem for setting its value.
+     */
     public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         return fromString(strings[0]);
-    }
-
-    public boolean isValidColumnTypes(Property hibprop)
-    {
-        return true;
     }
 
     @Override
@@ -730,26 +865,44 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return new BaseProperty();
     }
 
+    /**
+     * @param validationRegExp the regular expression used to validate the value.
+     */
     public void setValidationRegExp(String validationRegExp)
     {
-        setStringValue("validationRegExp", validationRegExp);
+        setStringValue(VALIDATION_REGEXP, validationRegExp);
     }
 
+    /**
+     * @return the regular expression used to validate the value.
+     */
     public String getValidationRegExp()
     {
-        return getStringValue("validationRegExp");
+        return getStringValue(VALIDATION_REGEXP);
     }
 
+    /**
+     * @return the message to display when validating the value.
+     */
     public String getValidationMessage()
     {
-        return getStringValue("validationMessage");
+        return getStringValue(VALIDATION_MESSAGE);
     }
 
+    /**
+     * @param validationMessage the message to display when validating the value.
+     */
     public void setValidationMessage(String validationMessage)
     {
-        setStringValue("validationMessage", validationMessage);
+        setStringValue(VALIDATION_MESSAGE, validationMessage);
     }
 
+    /**
+     * Validate the given property and set values in context depending on the result.
+     * @param property the property to validate
+     * @param context the context used to set the result
+     * @return {@code true} if the property is valid.
+     */
     public boolean validateProperty(BaseProperty property, XWikiContext context)
     {
         String regexp = getValidationRegExp();
@@ -850,10 +1003,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         LOGGER.debug("Looking up default custom displayer for property class name [{}]", propertyClassName);
 
+        String xwikiSpace = "XWiki";
         try {
             // First look into the current wiki
             String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
-            DocumentReference reference = new DocumentReference(context.getWikiId(), "XWiki", pageName);
+            DocumentReference reference = new DocumentReference(context.getWikiId(), xwikiSpace, pageName);
             if (context.getWiki().exists(reference, context)) {
                 LOGGER.debug("Found default custom displayer for property class name in local wiki: [{}]", pageName);
                 return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;
@@ -861,7 +1015,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             // Look in the main wiki
             if (!context.isMainWiki()) {
-                reference = new DocumentReference(context.getMainXWiki(), "XWiki", pageName);
+                reference = new DocumentReference(context.getMainXWiki(), xwikiSpace, pageName);
                 if (context.getWiki().exists(reference, context)) {
                     LOGGER.debug("Found default custom displayer for property class name in main wiki: [{}]", pageName);
                     return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + context.getMainXWiki() + ":XWiki." + pageName;
@@ -893,7 +1047,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     private String getTypeName()
     {
-        return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), "Class").toLowerCase();
+        return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), CLASS_SUFFIX).toLowerCase();
     }
 
     /**
@@ -906,6 +1060,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
      * @param mergeResult the merge report
+     * @param <T> the type of the property
      * @since 6.2M1
      */
     public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,

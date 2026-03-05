@@ -79,7 +79,7 @@ catalog:
   eslint-plugin-import: 2.32.0
   eslint-plugin-prettier: 5.5.5
   eslint-plugin-promise: 7.2.1
-  eslint-plugin-tsdoc: 0.5.0
+  eslint-plugin-tsdoc: 0.5.2
   eslint-plugin-vue: 10.8.0
   eventemitter3: 5.0.4
   flush-promises: 1.0.2

@@ -187,9 +187,8 @@
               </differences>
             </revapi.differences>
             <revapi.differences>
-              <justification>The removed methods were not implemented nor used. As for setxWikiClass the
-                implementation was expecting already a PropertyMetaClass and not using it would cause
-                errors.</justification>
+              <justification>The removed methods were not implemented nor used. Change voted in the
+                forum.</justification>
               <differences>
                 <item>
                   <ignore>true</ignore>

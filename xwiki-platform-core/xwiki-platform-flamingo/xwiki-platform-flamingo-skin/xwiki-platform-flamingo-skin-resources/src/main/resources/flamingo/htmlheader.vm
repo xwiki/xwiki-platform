@@ -61,7 +61,7 @@
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
 ## This user-advanced attribute can be used for styles or frontend scripts to act differently based on the type of user. 
-## @since 18.1.0RC1
+## @since 18.2.0RC1
 #addMetaAttribute($metaAttributes, 'user-advanced', $isAdvancedUser)
 #addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
 

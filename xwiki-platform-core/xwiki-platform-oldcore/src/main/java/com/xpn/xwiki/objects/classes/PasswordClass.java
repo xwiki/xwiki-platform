@@ -50,11 +50,7 @@ public class PasswordClass extends StringClass
 
     protected static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
 
-    protected static final String DEFAULT_CRYPT_ALGORITHM = "AES";
-
     protected static final String HASH_IDENTIFIER = "hash";
-
-    protected static final String CRYPT_IDENTIFIER = "crypt";
 
     protected static final String SEPARATOR = ":";
 
@@ -77,8 +73,7 @@ public class PasswordClass extends StringClass
             return null;
         }
         BaseProperty property = newProperty();
-        if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)
-            || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
+        if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             property.setValue(value);
         } else {
             property.setValue(getProcessedPassword(value));
@@ -162,18 +157,6 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * @return The encryption algorithm configured for this XProperty.
-     */
-    public String getCryptAlgorithm()
-    {
-        BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
-        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().equals("")) {
-            return alg.getValue().toString();
-        }
-        return DEFAULT_CRYPT_ALGORITHM;
-    }
-
-    /**
      * @param password
      * @return The algorithm used for the given password.
      */
@@ -219,8 +202,6 @@ public class PasswordClass extends StringClass
             if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
                 result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
                         getSaltFromPassword(storedPassword));
-            } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
-                result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
             }
         }
         return result;
@@ -232,21 +213,8 @@ public class PasswordClass extends StringClass
         String result = password;
         if (storageType.equals(PasswordMetaClass.HASH)) {
             result = getPasswordHash(result);
-        } else if (storageType.equals(PasswordMetaClass.ENCRYPTED)) {
-            result = getPasswordCrypt(result);
         }
         return result;
-    }
-
-    public String getPasswordCrypt(String password)
-    {
-        return getPasswordCrypt(password, getCryptAlgorithm());
-    }
-
-    public String getPasswordCrypt(String password, String algorithmName)
-    {
-        // TODO Write me!
-        return password;
     }
 
     /**

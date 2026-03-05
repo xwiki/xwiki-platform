@@ -92,7 +92,6 @@ ul.commentreplies {
 /* We assume that the caret icon is the first child of the button.*/
 .commenttools .thread-toggle> *:first-child {
   transition: transform 200ms ease-in-out;
-  transform-origin: center left;
 }
 
 .commenttools .thread-toggle[aria-expanded="true"] > *:first-child {
@@ -107,6 +106,12 @@ ul.commentreplies {
 #AddComment fieldset {
   padding-left: 60px;
 }
+
+.commentthread {
+  /* Disable the default bootstrap toggle transition, because it messes with tests...*/
+  transition: none;
+}
+
 .commentthread #AddComment fieldset {
   padding-left: 35px;
 }

@@ -106,7 +106,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     @Override
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
-        List<WikiComponent> components = new ArrayList<WikiComponent>();
+        List<WikiComponent> components = new ArrayList<>();
 
         if (!this.componentBridge.hasProgrammingRights(reference)) {
             throw new WikiComponentException("Registering wiki components requires programming rights");
@@ -128,7 +128,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             new DefaultWikiComponentInvocationHandler(rawComponent, this.authorExecutor, this.contextComponentManager);
 
         // Prepare a list containing the interfaces the component implements
-        List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();
+        List<Class<?>> implementedInterfaces = new ArrayList<>();
         // Add the main role
         Class<?> roleTypeClass = ReflectionUtils.getTypeClass(rawComponent.getRoleType());
         // Add the component role

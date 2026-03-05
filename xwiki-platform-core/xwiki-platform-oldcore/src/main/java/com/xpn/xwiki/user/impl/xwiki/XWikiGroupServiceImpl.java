@@ -357,7 +357,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     @Deprecated
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         try {
             if (group == null) {
@@ -603,7 +603,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         List<?> groups = null;
 
         if (context.getWiki().getHibernateStore() != null) {
-            List<Object> parameterValues = new ArrayList<Object>();
+            List<Object> parameterValues = new ArrayList<>();
             String where = createMatchUserOrGroupWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails) {
@@ -651,7 +651,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
         throws XWikiException
     {
-        List<Object> parameterValues = new ArrayList<Object>();
+        List<Object> parameterValues = new ArrayList<>();
         String where = createMatchUserOrGroupWhereClause(user, matchFields, null, parameterValues);
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
@@ -757,7 +757,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             Collection<DocumentReference> groupReferences =
                 getAllGroupsReferencesForMember(memberReference, nb, start, context);
 
-            groupNames = new ArrayList<String>(groupReferences.size());
+            groupNames = new ArrayList<>(groupReferences.size());
             for (DocumentReference groupReference : groupReferences) {
                 groupNames.add(this.localWikiEntityReferenceSerializer.serialize(groupReference));
             }
@@ -802,7 +802,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
 
-        groupReferences = new HashSet<DocumentReference>(groupNames.size());
+        groupReferences = new HashSet<>(groupNames.size());
         for (String groupName : groupNames) {
             groupReferences.add(this.currentMixedDocumentReferenceResolver.resolve(groupName));
         }

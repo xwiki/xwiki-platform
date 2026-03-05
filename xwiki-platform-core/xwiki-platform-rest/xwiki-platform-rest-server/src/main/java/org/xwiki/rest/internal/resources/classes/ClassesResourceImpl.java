@@ -71,7 +71,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
             List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
 
-            RangeIterable<String> ri = new RangeIterable<String>(classNames, start, limit);
+            RangeIterable<String> ri = new RangeIterable<>(classNames, start, limit);
 
             Classes classes = objectFactory.createClasses();
 

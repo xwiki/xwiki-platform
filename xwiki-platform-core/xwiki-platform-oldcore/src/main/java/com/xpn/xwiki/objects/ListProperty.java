@@ -178,7 +178,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected void cloneInternal(BaseProperty clone)
     {
         ListProperty property = (ListProperty) clone;
-        property.actualList = new ArrayList<String>();
+        property.actualList = new ArrayList<>();
         for (String entry : getList()) {
             property.actualList.add(entry);
         }

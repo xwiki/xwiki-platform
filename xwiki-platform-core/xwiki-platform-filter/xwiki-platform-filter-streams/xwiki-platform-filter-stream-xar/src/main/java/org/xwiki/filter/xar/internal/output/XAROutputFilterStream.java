@@ -743,7 +743,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                     (String) parameters.get(WikiObjectFilter.PARAMETER_GUID));
             }
 
-            this.currentObjectProperties = new HashMap<String, String>();
+            this.currentObjectProperties = new HashMap<>();
         } catch (Exception e) {
             throw new FilterException(
                 String.format("Failed to write begin xobject [%s] from document [%s] with version [%s]", name,

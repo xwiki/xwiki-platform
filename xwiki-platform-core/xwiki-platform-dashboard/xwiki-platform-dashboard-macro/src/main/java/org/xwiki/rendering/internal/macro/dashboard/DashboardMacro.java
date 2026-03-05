@@ -271,7 +271,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
      */
     protected void includeResources(boolean editMode)
     {
-        Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
+        Map<String, Object> fxParamsForceSkinAction = new HashMap<>();
         fxParamsForceSkinAction.put("forceSkinAction", true);
         this.ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         // include the js resources, for editing, in edit mode only

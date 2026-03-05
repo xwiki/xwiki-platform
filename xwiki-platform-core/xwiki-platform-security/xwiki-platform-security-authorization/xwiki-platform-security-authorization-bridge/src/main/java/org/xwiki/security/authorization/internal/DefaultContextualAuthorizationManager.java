@@ -59,8 +59,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Rights to be checked for the content author instead of the current user.
      */
-    private static final Set<Right> CONTENT_AUTHOR_RIGHTS =
-        new HashSet<Right>(Arrays.asList(Right.SCRIPT, Right.PROGRAM));
+    private static final Set<Right> CONTENT_AUTHOR_RIGHTS = new HashSet<>(Arrays.asList(Right.SCRIPT, Right.PROGRAM));
 
     @Inject
     private AuthorizationManager authorizationManager;

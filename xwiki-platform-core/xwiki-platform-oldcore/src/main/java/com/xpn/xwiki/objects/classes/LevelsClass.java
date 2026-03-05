@@ -77,7 +77,7 @@ public class LevelsClass extends ListClass
             list = context.getWiki().getRightService().listAllLevels(context);
         } catch (XWikiException e) {
             // TODO add log exception
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
         }
 
         XWikiRequest req = context.getRequest();
@@ -94,7 +94,7 @@ public class LevelsClass extends ListClass
     @Override
     public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return new HashMap<String, ListItem>();
+        return new HashMap<>();
     }
 
     @Override

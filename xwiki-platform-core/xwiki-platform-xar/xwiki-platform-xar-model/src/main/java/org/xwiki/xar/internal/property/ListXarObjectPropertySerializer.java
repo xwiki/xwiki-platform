@@ -72,7 +72,7 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
 
     private List<String> readList(XMLStreamReader reader) throws XMLStreamException
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         for (; reader.getEventType() == XMLStreamConstants.START_ELEMENT; reader.nextTag()) {
             reader.require(XMLStreamConstants.START_ELEMENT, null, ELEMENT_VALUE);

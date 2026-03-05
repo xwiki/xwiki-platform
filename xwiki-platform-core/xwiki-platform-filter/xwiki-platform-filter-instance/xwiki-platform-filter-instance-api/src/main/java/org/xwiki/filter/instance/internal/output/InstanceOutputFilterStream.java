@@ -37,6 +37,7 @@ import org.xwiki.filter.instance.internal.InstanceUtils;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.instance.output.OutputInstanceFilterStreamFactory;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.OutputFilterStream;
 
 /**
  * @version $Id$
@@ -70,7 +71,13 @@ public class InstanceOutputFilterStream extends AbstractBeanOutputFilterStream<I
         Object[] filters = new Object[factories.size()];
         int i = 0;
         for (OutputInstanceFilterStreamFactory factory : factories) {
-            filters[i++] = factory.createOutputFilterStream(properties).getFilter();
+            try (OutputFilterStream stream = factory.createOutputFilterStream(properties)) {
+                filters[i++] = stream.getFilter();
+            } catch (IOException e) {
+                throw new FilterException(
+                    "Failed to create an output filter stream with factory [%s] and properties [%s]".formatted(factory,
+                        properties), e);
+            }
         }
 
         this.filter = this.filterManager.createCompositeFilter(filters);

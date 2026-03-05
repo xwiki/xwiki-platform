@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,13 +65,23 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             return new Base64InputStream(this.content.toInputStream());
         }
 
-        public void dispose()
+        @Override
+        public void close() throws IOException
         {
+            // Close the stream
+            try  {
+                super.close();
+            } catch (IOException e) {
+                // Ignore exception since we want to delete the temporary file even if we can't close the stream
+            }
+
+            // Make sure to delete the temporary file if the content is not in memory
             if (this.content != null) {
                 File contentFile = this.content.getFile();
                 if (contentFile != null && contentFile.exists()) {
-                    contentFile.delete();
+                    Files.delete(contentFile.toPath());
                 }
+                this.content = null;
             }
         }
     }
@@ -91,7 +102,11 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                 proxyFilter.beginWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
                 proxyFilter.endWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
             } finally {
-                dispose();
+                try {
+                    close();
+                } catch (IOException e) {
+                    throw new FilterException(e);
+                }
             }
         }
     }
@@ -131,8 +146,10 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         proxyFilter.endWikiDocumentAttachment(this.name, this, this.size, this.parameters);
                     }
                 } finally {
-                    if (this.content.isInMemory()) {
-                        this.content.getFile().delete();
+                    try {
+                        close();
+                    } catch (IOException e) {
+                        throw new FilterException(e);
                     }
                 }
             } else {
@@ -143,11 +160,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         @Override
         protected void finalize() throws Throwable
         {
-            // Make sure to get rid of the file (if any)
-            if (this.content != null && !this.content.isInMemory() && this.content.getFile() != null
-                && this.content.getFile().exists()) {
-                this.content.getFile().delete();
-            }
+            close();
 
             super.finalize();
         }

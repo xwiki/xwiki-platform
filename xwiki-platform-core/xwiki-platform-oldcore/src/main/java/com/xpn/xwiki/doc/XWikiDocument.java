@@ -989,7 +989,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()

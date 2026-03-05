@@ -181,11 +181,11 @@ class UserClassFieldIT
         assertEquals(singletonList("XWiki.Admin"), userPicker.getValues());
     }
 
-    /*
-    Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
-    behaviour of the query itself: since we don't save the application, the query is performed on the
-    AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
-    multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
+    /**
+     * Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
+     * behaviour of the query itself: since we don't save the application, the query is performed on the
+     * AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
+     * multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
      */
     @Test
     @Order(3)
@@ -200,7 +200,7 @@ class UserClassFieldIT
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        userPicker.sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.clear().sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
@@ -211,12 +211,12 @@ class UserClassFieldIT
         selectedUsers.get(0).delete();
 
         // Select another user.
-        userPicker.sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
+        userPicker.clear().sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(0), ADMIN_NAME, "Admin", ADMIN_AVATAR);
-        assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        assertEquals(asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValues());
+        assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
+        assertUserSuggestion(selectedUsers.get(1), ADMIN_NAME, "Admin", ADMIN_AVATAR);
+        assertEquals(asList("XWiki.Enygma2002", "XWiki.Admin"), userPicker.getValues());
 
         // Clear the list of selected users.
         userPicker.clearSelectedSuggestions();
@@ -265,7 +265,7 @@ class UserClassFieldIT
         suggestions.get(0).select();
 
         // We should be able to input free text also.
-        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
+        userPicker.clear().sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 

@@ -96,8 +96,8 @@
     </dependency>
     <!-- Used by the suggest filter. -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tom-select</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

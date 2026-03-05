@@ -38,9 +38,6 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #if ($type == 'edit' || $type == 'search')
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-    {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/xwiki.selectize.js', true))
   #set ($options = [])
   #set ($xwikiUsersClass = $xwiki.getDocument('XWiki.XWikiUsers').xWikiClass)

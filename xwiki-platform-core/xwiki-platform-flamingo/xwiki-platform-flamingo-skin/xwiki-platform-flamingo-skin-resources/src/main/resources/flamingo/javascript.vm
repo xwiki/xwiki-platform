@@ -91,7 +91,7 @@
     'moment-jdateformatparser': $services.webjars.url('org.webjars.npm:moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
-    'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
+    'tom-select': "#removeJsSuffix($services.webjars.url('org.webjars.npm:tom-select', ""dist/js/tom-select.complete${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
     'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
@@ -112,7 +112,6 @@
       'exports': '$'
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
-    'selectize': ['jquery'],
     'xwiki-document-lock': {
       'exports': 'XWiki.DocumentLock'
     },
@@ -121,7 +120,14 @@
     }
   },
   'bundles': {},
-  'config': {}
+  'config': {
+    'xwiki-selectize': {
+      'css': [
+        $services.webjars.url('org.webjars.npm:tom-select', 'dist/css/tom-select.bootstrap4.min.css'),
+        $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css')
+      ]
+    }
+  }
 })
 #set ($jQueryModuleId = 'jQueryNoConflict')
 #if ($services.extension.installed.getInstalledExtension($jqueryMigrateId, "wiki:$xcontext.database"))

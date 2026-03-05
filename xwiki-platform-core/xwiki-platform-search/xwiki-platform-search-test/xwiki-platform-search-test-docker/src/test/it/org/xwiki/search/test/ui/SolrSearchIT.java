@@ -232,7 +232,7 @@ class SolrSearchIT
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
         searchAdminPage.getSearchExclusionsField().sendKeys("Two").waitForSuggestions().selectByVisibleText("Two")
-            .sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
+            .clear().sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
         searchAdminPage.clickSave();
 
         // Check the search results after configuring search exclusions.

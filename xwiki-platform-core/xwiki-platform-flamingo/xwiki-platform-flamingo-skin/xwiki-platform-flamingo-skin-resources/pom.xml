@@ -176,8 +176,8 @@
     </dependency>
     <dependency>
       <!-- Used by the Database List, List of Users, List of Groups and Page property displayers and filters. -->
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tom-select</artifactId>
     </dependency>
     <!-- Refactoring -->
     <dependency>

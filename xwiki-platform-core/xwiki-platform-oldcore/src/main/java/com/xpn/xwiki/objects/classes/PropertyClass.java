@@ -153,6 +153,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     /**
      * @param xWikiClass the metaclass to be used.
+     * @deprecated Use the properly typed method {@link #setxWikiClass(PropertyMetaClass)}.
+     */
+    @Deprecated(since = "18.2.0RC1")
+    public void setxWikiClass(BaseClass xWikiClass)
+    {
+        setxWikiClass((PropertyMetaClass) xWikiClass);
+    }
+
+    /**
+     * @param xWikiClass the metaclass to be used.
      */
     public void setxWikiClass(PropertyMetaClass xWikiClass)
     {

@@ -163,6 +163,10 @@
                   <ignore>true</ignore>
                   <code>java.field.removedWithConstant</code>
                   <old>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_CRYPT_ALGORITHM</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
                   <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getCryptAlgorithm()</old>
                 </item>
                 <item>

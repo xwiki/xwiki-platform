@@ -63,6 +63,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  */
 @Component
 @Singleton
+// Fan out of 22 on a max of 20
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**

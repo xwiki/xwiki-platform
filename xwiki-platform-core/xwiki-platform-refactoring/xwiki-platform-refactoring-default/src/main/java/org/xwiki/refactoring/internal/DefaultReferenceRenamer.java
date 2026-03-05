@@ -64,6 +64,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultReferenceRenamer implements ReferenceRenamer
 {
     private static final List<BlockMatcher> DEFAULT_BLOCK_MATCHERS = Arrays.asList(

@@ -27,10 +27,6 @@
 <suppressions>
   <!-- Many resources need methods with a lot of parameters to bind path and query parameters -->
   <suppress checks="ParameterNumber" files=".*\.java"/>
-  <!-- @Path annotations have very long URI templates in some object-related resources -->
-  <suppress checks="LineLength" files="ObjectPropertyAtPageVersionResource.java"/>
-  <suppress checks="LineLength" files="ObjectPropertiesAtPageVersionResource.java"/>
-  <suppress checks="LineLength" files="ObjectPropertyResource.java"/>
 
   <!-- FIXME: Write Javadoc describing the REST API parameters -->
   <suppress checks="JavadocType" files=".*\.java"/>

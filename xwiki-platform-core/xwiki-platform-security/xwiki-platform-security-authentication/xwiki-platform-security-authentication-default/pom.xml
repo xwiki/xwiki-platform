@@ -30,7 +30,6 @@
   <name>XWiki Platform - Security - Authentication - Default</name>
   <description>Default implementation of the Authentication API</description>
   <properties>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authentication API Implementation</xwiki.extension.name>

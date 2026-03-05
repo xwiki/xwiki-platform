@@ -36,6 +36,7 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
  * @version $Id$
  * @since 2.0M2
  */
+@SuppressWarnings("checkstyle:FinalClass")
 public class WikiMacroDescriptor implements MacroDescriptor
 {
     /**

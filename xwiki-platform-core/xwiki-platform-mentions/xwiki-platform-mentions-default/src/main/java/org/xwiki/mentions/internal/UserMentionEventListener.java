@@ -71,6 +71,7 @@ import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
 @Component
 @Named(UserMentionEventListener.TYPE)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class UserMentionEventListener implements EventListener
 {
     /**

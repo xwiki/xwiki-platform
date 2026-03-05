@@ -244,6 +244,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param impliedByRights Rights that imply the new right we are adding.
      * @since 12.6
      */
+    // Error because of the usage of 8 parameters in private constructor. This is not easy to improve to avoid
+    // duplicated code
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly, Set<Right> impliedByRights)

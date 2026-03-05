@@ -32,6 +32,8 @@ import org.xwiki.rest.model.jaxb.Properties;
 /**
  * @version $Id$
  */
+// @Path annotations have very long URI templates in some object-related resources
+@SuppressWarnings("checkstyle:LineLength")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}/properties")
 public interface ObjectPropertiesAtPageVersionResource
 {

@@ -72,6 +72,8 @@ import org.xwiki.security.internal.GroupSecurityEntry;
  */
 @Component
 @Singleton
+// Small Fan-Out complexity issue (23 against a max of 20) but it would need a big refactor to be fixed.
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultSecurityCache implements SecurityCache, Initializable
 {
     /** Default capacity for security cache. */

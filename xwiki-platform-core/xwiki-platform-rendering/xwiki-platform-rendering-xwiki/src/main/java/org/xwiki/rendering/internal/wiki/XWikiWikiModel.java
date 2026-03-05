@@ -69,6 +69,7 @@ import com.steadystate.css.parser.SACParserCSS3;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class XWikiWikiModel implements WikiModel
 {
     /**

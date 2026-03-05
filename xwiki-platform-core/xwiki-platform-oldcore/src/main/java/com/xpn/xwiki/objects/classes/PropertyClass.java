@@ -24,6 +24,7 @@ import java.util.Iterator;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
@@ -697,7 +698,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
         // (without the package). Subclasses can overwrite this method to use a different hint format.
-        return StringUtils.removeEnd(getClass().getSimpleName(), CLASS_SUFFIX);
+        return Strings.CS.removeEnd(getClass().getSimpleName(), CLASS_SUFFIX);
     }
 
     /**

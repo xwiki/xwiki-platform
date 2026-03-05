@@ -1053,7 +1053,7 @@ public class XWikiAttachment implements Cloneable
      */
     public List<Version> getVersionList() throws XWikiException
     {
-        final List<Version> list = new ArrayList<Version>();
+        final List<Version> list = new ArrayList<>();
         final String currentVersion = this.version.toString();
         Version v = new Version("1.1");
         for (;;) {

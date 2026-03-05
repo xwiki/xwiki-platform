@@ -70,7 +70,7 @@ public class StaticListClass extends ListClass
         }
 
         Map<String, ListItem> valuesMap = getMap(context);
-        List<ListItem> values = new ArrayList<ListItem>(valuesMap.size());
+        List<ListItem> values = new ArrayList<>(valuesMap.size());
         values.addAll(valuesMap.values());
 
         if ("id".equals(sort)) {
@@ -79,7 +79,7 @@ public class StaticListClass extends ListClass
             Collections.sort(values, ListItem.VALUE_COMPARATOR);
         }
 
-        List<String> result = new ArrayList<String>(values.size());
+        List<String> result = new ArrayList<>(values.size());
         for (ListItem value : values) {
             result.add(value.getId());
         }

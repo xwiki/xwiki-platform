@@ -189,7 +189,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         try {
             String initialDb = !xcontext.getWikiId().equals("") ? xcontext.getWikiId() : xcontext.getMainXWiki();
 
-            List<String> wikiServers = new ArrayList<String>();
+            List<String> wikiServers = new ArrayList<>();
             try {
                 wikiServers = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
             } catch (Exception e) {

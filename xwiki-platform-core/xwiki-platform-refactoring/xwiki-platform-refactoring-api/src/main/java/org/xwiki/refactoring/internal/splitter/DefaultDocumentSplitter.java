@@ -85,7 +85,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {
-        List<WikiDocument> result = new ArrayList<WikiDocument>();
+        List<WikiDocument> result = new ArrayList<>();
         // Add the rootDoc into the result
         result.add(rootDoc);
         // Recursively split the root document.

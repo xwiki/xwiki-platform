@@ -164,7 +164,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
         } else {
             final List<String> wikis;
             try {
-                wikis = new ArrayList<String>(this.wikiDescriptorManager.getAllIds());
+                wikis = new ArrayList<>(this.wikiDescriptorManager.getAllIds());
             } catch (WikiManagerException e) {
                 throw new SolrIndexerException("Failed to get the list of available wikis.", e);
             }

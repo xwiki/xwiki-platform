@@ -108,7 +108,7 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
     {
         methodContext.put(OUTPUT_KEY, new WikiMethodOutputHandler());
 
-        Map<Integer, Object> inputs = new HashMap<Integer, Object>();
+        Map<Integer, Object> inputs = new HashMap<>();
         if (args != null && args.length > 0) {
             // Start with "0" as first input key.
             for (int i = 0; i < args.length; i++) {

@@ -56,7 +56,7 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        private List<WikiObjectProperty> properties = new ArrayList<WikiObjectProperty>();
+        private List<WikiObjectProperty> properties = new ArrayList<>();
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {

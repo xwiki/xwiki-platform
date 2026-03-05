@@ -122,9 +122,9 @@ public class DocumentLocaleReader extends AbstractReader
 
     private WikiClass currentClass = new WikiClass();
 
-    private Queue<WikiObject> currentObjects = new LinkedList<WikiObject>();
+    private Queue<WikiObject> currentObjects = new LinkedList<>();
 
-    private Queue<WikiAttachment> currentAttachments = new LinkedList<WikiAttachment>();
+    private Queue<WikiAttachment> currentAttachments = new LinkedList<>();
 
     public void setProperties(XARInputProperties properties)
     {

@@ -36,26 +36,44 @@ import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
  * @version $Id$
  * @since 9.0RC1
  */
-public class AbstractWikiObjectPropertyReader extends AbstractReader
+public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
 {
     @Inject
     private XarObjectPropertySerializerManager propertySerializerManager;
 
-    public class WikiObjectProperty
+    /**
+     * Class holding information about wiki object property.
+     */
+    public static class WikiObjectProperty
     {
+        /**
+         * The name of the object property.
+         */
         public String name;
 
+        /**
+         * The value of the property.
+         */
         public Object value;
 
+        /**
+         * The parameter of the property.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
+        /**
+         * Send events related to the object property to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             proxyFilter.onWikiObjectProperty(this.name, this.value, this.parameters);
         }
     }
 
-    public WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
+    protected WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
         WikiClass wikiClass) throws XMLStreamException, FilterException
     {
         xmlReader.nextTag();

@@ -54,8 +54,14 @@ import org.xwiki.xml.stax.StAXUtils;
 @Singleton
 public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachmentInputSource>
 {
-    public static class AbstractContentInputSource extends AbstractInputStreamInputSource
+    /**
+     * Represents an abstract attachment content, be it an attachment or an attachment revision.
+     */
+    private abstract static class AbstractContentInputSource extends AbstractInputStreamInputSource
     {
+        /**
+         * The actual content.
+         */
         public DeferredFileOutputStream content;
 
         @Override
@@ -71,6 +77,9 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             return new Base64InputStream(stream);
         }
 
+        /**
+         * To be called for cleaning up the file.
+         */
         public void dispose()
         {
             if (this.content != null) {
@@ -82,14 +91,32 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
+    /**
+     * Hold information about an attachment revision.
+     */
     public static class WikiAttachmentRevisionInputSource extends AbstractContentInputSource
     {
+        /**
+         * The version of the revision.
+         */
         public String version;
 
+        /**
+         * The size of the attachment.
+         */
         public Long size;
 
+        /**
+         * The parameters of the content.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
+        /**
+         * Send events related to the attachment revision to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             InputSource inputSource = this.content != null ? this : null;
@@ -103,16 +130,37 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
+    /**
+     * Hold information about an attachment.
+     */
     public static class WikiAttachmentInputSource extends AbstractContentInputSource
     {
+        /**
+         * The name of the attachment.
+         */
         public String name;
 
+        /**
+         * The size of the attachment.
+         */
         public Long size;
 
+        /**
+         * The parameters of the content.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
+        /**
+         * The revisions of the attachment.
+         */
         public List<WikiAttachmentRevisionInputSource> revisions = new ArrayList<>();
 
+        /**
+         * Send events related to the attachment to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             if (this.content != null) {
@@ -149,6 +197,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             }
         }
 
+        @SuppressWarnings("checkstyle:NoFinalizer")
         @Override
         protected void finalize() throws Throwable
         {

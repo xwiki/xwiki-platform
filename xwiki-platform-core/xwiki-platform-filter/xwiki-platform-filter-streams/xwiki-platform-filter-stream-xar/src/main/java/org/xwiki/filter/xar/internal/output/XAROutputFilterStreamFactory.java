@@ -45,6 +45,9 @@ import org.xwiki.filter.xar.output.XAROutputProperties;
 @Singleton
 public class XAROutputFilterStreamFactory extends AbstractBeanOutputFilterStreamFactory<XAROutputProperties, XARFilter>
 {
+    /**
+     * Default constructor.
+     */
     public XAROutputFilterStreamFactory()
     {
         super(FilterStreamType.XWIKI_XAR_CURRENT);

@@ -205,7 +205,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
                 Strings.CS.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
             if (!StringUtils.isEmpty(parameters)) {
                 String queryParamDelimiter =
-                    StringUtils.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
+                    Strings.CS.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
                         : QUERY_PARAMETER_DELIMITER;
                 url.append(queryParamDelimiter).append(parameters);
             }

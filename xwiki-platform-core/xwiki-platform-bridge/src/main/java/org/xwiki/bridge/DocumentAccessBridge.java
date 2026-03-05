@@ -645,8 +645,8 @@ public interface DocumentAccessBridge
     default String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
         boolean isFullURL)
     {
-        return getDocumentURL(entityReference.extractReference(EntityType.DOCUMENT), action, queryString, anchor,
-            isFullURL);
+        return getDocumentURL(new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT)), action,
+            queryString, anchor, isFullURL);
     }
 
     /**

@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -252,7 +252,7 @@ public class PinnedChildPagesManager
 
         boolean isTerminal = parentReference instanceof SpaceReference && !pinnedChildPage.endsWith(NESTED_PAGE_MARKER);
         String childPageName =
-            URLDecoder.decode(StringUtils.removeEnd(pinnedChildPage, NESTED_PAGE_MARKER), StandardCharsets.UTF_8);
+            URLDecoder.decode(Strings.CS.removeEnd(pinnedChildPage, NESTED_PAGE_MARKER), StandardCharsets.UTF_8);
         if (isTerminal) {
             return new DocumentReference(childPageName, (SpaceReference) parentReference);
         } else {

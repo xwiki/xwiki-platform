@@ -72,6 +72,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -2763,7 +2764,7 @@ public class XWiki implements EventListener
         if (StringUtils.endsWithAny(fileName, ".js", ".css")) {
             String extension = StringUtils.substringAfterLast(fileName, '.');
             String shortFileName = StringUtils.substringBeforeLast(fileName, ".");
-            if (StringUtils.endsWith(shortFileName, ".min")) {
+            if (Strings.CS.endsWith(shortFileName, ".min")) {
                 shortFileName = StringUtils.substringBeforeLast(shortFileName, ".");
             }
             String fileNameSource = String.format("%s.%s", shortFileName, extension);

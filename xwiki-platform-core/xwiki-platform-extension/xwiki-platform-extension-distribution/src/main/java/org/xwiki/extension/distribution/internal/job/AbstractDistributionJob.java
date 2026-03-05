@@ -215,6 +215,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                                     for (; index < steps.size(); ++index) {
                                         steps.get(index).setState(DistributionStep.State.CANCELED);
                                     }
+                                    break;
                                 case SKIP:
                                     index = steps.size() - 1;
                                     break;

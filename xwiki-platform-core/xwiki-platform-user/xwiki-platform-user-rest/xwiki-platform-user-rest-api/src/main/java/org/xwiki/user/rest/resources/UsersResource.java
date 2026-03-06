@@ -40,7 +40,7 @@ import org.xwiki.user.rest.model.jaxb.Users;
 public interface UsersResource
 {
     /**
-     * Return the list of users on the wiki {wikiName}.
+     * Return the list of users on the wiki {wikiName} for which the logged-in user has read access.
      *
      * @param wikiName the wiki from which to list the users
      * @param start a list offset

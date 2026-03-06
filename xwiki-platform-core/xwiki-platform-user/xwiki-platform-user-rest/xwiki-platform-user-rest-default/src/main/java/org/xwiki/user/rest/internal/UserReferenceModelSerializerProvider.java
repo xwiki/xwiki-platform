@@ -19,10 +19,6 @@
  */
 package org.xwiki.user.rest.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -30,7 +26,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.rest.UserReferenceModelSerializer;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 /**
  * Provider for instances of {@link UserReferenceModelSerializer}, based on the current user store.

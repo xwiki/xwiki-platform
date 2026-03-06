@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User REST Services - Default Implementation</xwiki.extension.name>
+    <!-- REST API endpoints need to be installed in root scope. -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
 
   <dependencies>

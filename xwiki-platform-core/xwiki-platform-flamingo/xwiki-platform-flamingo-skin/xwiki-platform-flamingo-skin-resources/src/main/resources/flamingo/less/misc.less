@@ -494,14 +494,31 @@ a.html-diff-context-toggle {
   padding: (@line-height-computed / 2);
 }
 
-// Tree Webjar (XWIKI-15089) ---------------------------------------------------
-.skin-flamingo .jstree-xwiki .jstree-clicked {
-  background-color: @nav-link-hover-bg; /* $theme.highlightColor */
-  border-radius: @border-radius-small;
-}
+// Tree Webjar ---------------------------------------------------
+.skin-flamingo .jstree-xwiki {
+  & .jstree-anchor {
+    border-width: 2px; /* We want to add this border consistently to avoid flickers when interacting. */ 
+    line-height: 20px; /* Without this line height change from 24px, the border missaligns the text and the icon ocl. */
+    border-radius: @border-radius-small;
+    border-style: solid;
+    box-shadow: none;
+    border-color: transparent;
+    transition: border-color ease-in-out .15s;
+  }
 
-.skin-flamingo .jstree-xwiki .jstree-anchor:hover {
-  border-radius: @border-radius-small;
+  & .jstree-clicked {
+    background-color: @btn-default-bg;
+    border-color: @btn-default-border;
+    color: @btn-default-color;
+  }
+
+  & .jstree-hovered {
+    /* The default link colors should look good on the generic background. */
+    background-color: transparent;
+    border-color: @link-hover-color;
+    color: @link-hover-color;
+  }
+
 }
 
 .previewdiff-diff-options {

@@ -370,7 +370,7 @@ public class TestUtils
             this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
             this.httpClient.getParams().setAuthenticationPreemptive(true);
         } else {
-            this.httpClient.getState().clearCredentials();
+            this.httpClient.getState().clear();
             this.httpClient.getParams().setAuthenticationPreemptive(false);
         }
 
@@ -1707,6 +1707,7 @@ public class TestUtils
     public void forceGuestUser()
     {
         setSession(null);
+        setDefaultCredentials(null);
     }
 
     public void addObject(String space, String page, String className, Object... properties)

@@ -104,7 +104,7 @@ catalog:
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.17
+  publint: 0.3.18
   react: 19.2.4
   react-dom: 19.2.4
   react-i18next: 16.5.4

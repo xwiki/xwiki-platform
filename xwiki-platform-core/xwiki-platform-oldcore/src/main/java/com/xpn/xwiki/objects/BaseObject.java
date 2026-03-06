@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -376,7 +377,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public List<ObjectDiff> getDiff(Object oldEntity, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseObject oldObject = (BaseObject) oldEntity;
         // Iterate over the new properties first, to handle changed and added objects
         for (String propertyName : this.getPropertyList()) {
@@ -399,7 +400,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         BaseClass oldPropertyXClass = oldObject.getSourceXClassOrFallback(context);
         PropertyClass oldpclass =
             (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
-
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
         if (newProperty == null) {
             // The property exists in the old object, but not in the new one
             if ((oldProperty != null) && (!oldProperty.toText().isEmpty())) {
@@ -408,7 +415,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                 String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
                 difflist.add(
                     new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
-                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, ""));
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
+                        isSensitive));
             }
         }
     }
@@ -422,8 +430,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         } else if (property.getValue() instanceof String propertyValue) {
             result = propertyValue;
         // We never want to perform a DB query to compute a diff, so we rely on the actual text value of the object.
-        } else if (property instanceof DBStringListProperty dbStringListProperty) {
-            result = dbStringListProperty.getTextValue();
+        } else if (property instanceof ListProperty listProperty && propertyClass instanceof DBListClass) {
+            result = listProperty.getTextValue();
         } else {
             result = propertyClass.displayView(propertyName, object, context);
         }
@@ -441,6 +449,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
         PropertyClass newpclass =
             (PropertyClass) ((oldPropertyXClass == null) ? null : newPropertyXClass.getField(propertyName));
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
         if (oldProperty == null) {
             String propertyType;
             String newPropertyValue;
@@ -455,7 +470,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                         this);
                 }
                 difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
-                    ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
+                    ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                    isSensitive));
             }
         } else if (newProperty == null || !oldProperty.toText().equals(newProperty.toText())) {
             // The property exists in both objects and is different
@@ -466,7 +482,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName, oldObject);
             difflist.add(
                 new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
-                    propertyName, newPropertyType, oldPropertyValue, newPropertyValue));
+                    propertyName, newPropertyType, oldPropertyValue, newPropertyValue,
+                    isSensitive));
         }
     }
 

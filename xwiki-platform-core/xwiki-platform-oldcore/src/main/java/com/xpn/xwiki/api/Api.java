@@ -201,7 +201,7 @@ public class Api
      */
     protected List<Document> convert(List<XWikiDocument> xdocList)
     {
-        List<Document> docList = new ArrayList<Document>();
+        List<Document> docList = new ArrayList<>();
         for (XWikiDocument xdoc : xdocList) {
             docList.add(xdoc.newDocument(this.context));
         }
@@ -274,7 +274,7 @@ public class Api
      */
     protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)
     {
-        List<Attachment> outList = new ArrayList<Attachment>(xattaches.size());
+        List<Attachment> outList = new ArrayList<>(xattaches.size());
         for (XWikiAttachment xattach : xattaches) {
             outList.add(convert(xattach));
         }

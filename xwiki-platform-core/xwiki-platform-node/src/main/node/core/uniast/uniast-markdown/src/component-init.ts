@@ -22,10 +22,9 @@ import { DefaultUniAstToMarkdownConverter } from "./markdown/default-uni-ast-to-
 import { ParserConfigurationResolver } from "./markdown/internal-links/parser/parser-configuration-resolver";
 import { InternalLinksSerializerResolver } from "./markdown/internal-links/serializer/internal-links-serializer-resolver";
 import type { MarkdownParserConfiguration } from "./markdown/internal-links/parser/markdown-parser-configuration";
-import type { InternalLinksSerializer } from "./markdown/internal-links/serializer/internal-links-serializer";
 import type { MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
 import type { UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
-import type { Container, Factory, Newable, ResolutionContext } from "inversify";
+import type { Container, Factory } from "inversify";
 
 /**
  * @since 18.0.0RC1
@@ -63,16 +62,6 @@ class ComponentInit {
     container
       .bind<InternalLinksSerializerResolver>("InternalLinksSerializerResolver")
       .to(InternalLinksSerializerResolver);
-    // Factories for the officially supported backends are registered statically
-    // But nothing prevents factories for other backends to be registered at
-    // initialization time.
-    // The main side effect of regisering those factories is a few kb of
-    // initialization code being bundled for nothing (i.e., for the backends
-    // that are not going to be used).
-    this.initXWikiFactory(container);
-    this.initNextcloudFactory(container);
-    this.initGitHubFactory(container);
-    this.initFileSystemFactory(container);
 
     container
       .bind<ParserConfigurationResolver>("ParserConfigurationResolver")
@@ -92,104 +81,6 @@ class ComponentInit {
         };
       })
       .whenNamed("XWiki");
-  }
-
-  private initXWikiFactory(container: Container) {
-    const name = "XWiki";
-    container
-      .bind<Factory<Promise<InternalLinksSerializer>>>(
-        "Factory<InternalLinksSerializer>",
-      )
-      .toFactory((context) => {
-        return async () => {
-          const component = (
-            await import(
-              "./markdown/internal-links/serializer/xwiki-internal-link-serializer"
-            )
-          ).XWikiInternalLinkSerializer;
-          return this.bindAndLoad(container, name, component, context);
-        };
-      })
-      .whenNamed(name);
-  }
-  private initNextcloudFactory(container: Container) {
-    const name = "Nextcloud";
-    container
-      .bind<Factory<Promise<InternalLinksSerializer>>>(
-        "Factory<InternalLinksSerializer>",
-      )
-      .toFactory((context) => {
-        return async () => {
-          const component = (
-            await import(
-              "./markdown/internal-links/serializer/nextcloud-internal-link-serializer"
-            )
-          ).NextcloudInternalLinkSerializer;
-          return this.bindAndLoad(container, name, component, context);
-        };
-      })
-      .whenNamed(name);
-  }
-  private initGitHubFactory(container: Container) {
-    const name = "GitHub";
-    container
-      .bind<Factory<Promise<InternalLinksSerializer>>>(
-        "Factory<InternalLinksSerializer>",
-      )
-      .toFactory((context) => {
-        return async () => {
-          const component = (
-            await import(
-              "./markdown/internal-links/serializer/github-internal-link-serializer"
-            )
-          ).GitHubInternalLinkSerializer;
-          return this.bindAndLoad(container, name, component, context);
-        };
-      })
-      .whenNamed(name);
-  }
-  private initFileSystemFactory(container: Container) {
-    const name = "FileSystem";
-    container
-      .bind<Factory<Promise<InternalLinksSerializer>>>(
-        "Factory<InternalLinksSerializer>",
-      )
-      .toFactory((context) => {
-        return async () => {
-          const component = (
-            await import(
-              "./markdown/internal-links/serializer/filesystem-internal-link-serializer"
-            )
-          ).FilesystemInternalLinkSerializer;
-          return this.bindAndLoad(container, name, component, context);
-        };
-      })
-      .whenNamed(name);
-  }
-
-  /**
-   * Registed the component in the container on demand.
-   *
-   * @param container - the container
-   * @param name - the name of the component interface
-   * @param component - the actual component to register
-   * @param context - the context
-   */
-  private bindAndLoad<T extends InternalLinksSerializer>(
-    container: Container,
-    name: string,
-    component: Newable<T>,
-    context: ResolutionContext,
-  ) {
-    if (!container.isBound("InternalLinksSerializer", { name: name })) {
-      container
-        .bind<InternalLinksSerializer>("InternalLinksSerializer")
-        .to(component)
-        .whenNamed(name);
-    }
-    return context.get<InternalLinksSerializer>("InternalLinksSerializer", {
-      name: name,
-    });
   }
 }
 

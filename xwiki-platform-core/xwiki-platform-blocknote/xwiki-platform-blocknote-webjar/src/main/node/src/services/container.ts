@@ -22,6 +22,8 @@ import { XWikiAuthenticationManager } from "./authentication/XWikiAuthentication
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
+import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
+import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
@@ -36,10 +38,11 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
+import { DefaultUniAstIterator } from "./uniast/DefaultUniAstIterator";
+import { XWikiUniAstProcessor } from "./uniast/XWikiUniAstProcessor";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
-import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/platform-uniast-markdown";
 import { Container, injectable } from "inversify";
 
 const container: Container = new Container();
@@ -74,8 +77,12 @@ XWikiDesignSystemLoader.bind(container);
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
-new UniastMarkdownComponentList(container);
 new MacroServiceComponentList(container);
+
+DefaultUniAstIterator.bind(container);
+XWikiUniAstProcessor.bind(container);
+XWikiMacroBlock.bind(container);
+XWikiInlineMacro.bind(container);
 
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
 @injectable()

@@ -65,7 +65,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             List<BaseObject> objectList = getBaseObjects(doc.getDocumentReference());
 
-            RangeIterable<BaseObject> ri = new RangeIterable<BaseObject>(objectList, start, number);
+            RangeIterable<BaseObject> ri = new RangeIterable<>(objectList, start, number);
 
             for (BaseObject object : ri) {
                 /* By deleting objects, some of them might become null, so we must check for this */

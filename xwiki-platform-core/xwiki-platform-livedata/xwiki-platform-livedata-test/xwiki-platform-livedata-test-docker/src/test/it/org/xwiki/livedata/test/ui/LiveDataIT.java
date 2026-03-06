@@ -63,6 +63,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
@@ -135,6 +136,9 @@ class LiveDataIT
     private static final String FALSE = "False";
 
     private static final String TRUE = "True";
+
+    private static final Map<String, Object> PICK_FROM_SUGGESTIONS =
+        Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true);
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
@@ -237,7 +241,7 @@ class LiveDataIT
         tableLayout.waitUntilReady();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
-        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY);
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         // Reload to test if the empty filter is displayed again.
         testUtils.getDriver().navigate().refresh();
         tableLayout.waitUntilReady();
@@ -334,7 +338,7 @@ class LiveDataIT
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
 
-        suggestInputElement.clear().hideSuggestions();
+        suggestInputElement.clearSelectedSuggestions().hideSuggestions();
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
@@ -403,7 +407,7 @@ class LiveDataIT
     void asyncAction(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.loginAsSuperAdmin();
-        testUtils.deletePage(testReference.getLastSpaceReference(), true);
+        testUtils.deletePage(testReference.getLastSpaceReference());
 
         List<String> properties = List.of(NAME_COLUMN, ACTIONS_COLUMN);
         createClassNameLiveDataPage(testUtils, testReference, properties, """
@@ -473,20 +477,17 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(3);
 
         // Filter by Option1 should return only Doc1.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("myList", "Option1 Option2");
         // Filter by Option3 should return only Doc2.
-        tableLayout.filterColumn("myList", "Option3", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option3", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("myList", "Option3");
         // Filter by (empty) should return only Doc3.
         // Note: we must explicitly use the suggestion as otherwise this would be treated as a text filter as it would
         // select the typed value and not the suggestion that contains the special treatment of this filter.
-        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
     }
@@ -541,28 +542,24 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(4);
 
         // Filter by Option1 should return Doc1 and Doc4.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(2);
         tableLayout.assertRow("myList", "Option1 Option2");
         tableLayout.assertRow("doc.name", "Doc4");
 
         // Filter by Option3 should return Doc2 and Doc4.
-        tableLayout.filterColumn("myList", "Option3", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option3", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(2);
         tableLayout.assertRow("myList", "Option3");
         tableLayout.assertRow("doc.name", "Doc4");
 
         // Filter by (empty) should return only Doc3.
-        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
 
         // Filter by Option100 should return only Doc4.
-        tableLayout.filterColumn("myList", "Option100", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option100", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc4");
     }
@@ -627,8 +624,7 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(3);
 
         // Filter by Option1 should return only Doc1.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc1");
 
@@ -707,8 +703,7 @@ class LiveDataIT
         suggestInputElement.click().waitForNonTypedSuggestions();
         assertTrue(suggestInputElement.getSuggestions().stream().anyMatch(s -> s.getLabel().equals(CHOICE_A)));
         // Filter by Choice A should return only Lynda.
-        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
@@ -793,7 +788,7 @@ class LiveDataIT
 
         // Remove the required rights filter to edit the value (the edit action of the page object doesn't like when
         // the row disappears after an edit).
-        new SuggestInputElement(tableLayout.getFilter(ENFORCE_REQUIRED_RIGHTS_COLUMN)).clear().hideSuggestions();
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, null, true);
         tableLayout.waitUntilRowCountEqualsTo(1);
 
         // Edit the enforceRequiredRights column.
@@ -805,6 +800,53 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(DOC_TITLE_COLUMN, testPageTitle);
         tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
+    }
+
+    @Test
+    @Order(9)
+    void savingChecksRights(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        // Login as U1 who doesn't have script right.
+        testUtils.login("U1", "U1");
+
+        testUtils.rest().savePage(testReference, """
+                {{velocity}}
+                Test script.
+                {{/velocity}}
+                
+                {{liveData id="test" properties="doc.location,levels" source="liveTable"
+                  sourceParameters="className=XWiki.XWikiRights"/}}
+                """, "");
+        // Grant an explicit edit right to get the page listed in the Live Data.
+        testUtils.setRights(testReference, null, "XWiki.U1", "edit", true);
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        // Ensure that the Velocity macro failed to execute because the user doesn't have script right.
+        assertTrue(viewPage.hasRenderingError());
+        String velocityError = "Failed to execute the [velocity] macro.";
+        assertThat(viewPage.getContent(), containsString(velocityError));
+
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        tableLayout.filterColumn("doc.location",
+            testUtils.serializeReference(testReference.getLocalDocumentReference().getParent()));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("Levels", "edit");
+
+        // Edit the Levels column.
+        tableLayout.editCell("Levels", 1, "levels", "script");
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        // The edit should have failed because the user doesn't have script right.
+        tableLayout.assertRow("Levels", "edit");
+
+        // Reload the page.
+        testUtils.getDriver().navigate().refresh();
+        viewPage = new ViewPage();
+        // Assert that the Velocity macro still fails because the user still doesn't have script right.
+        assertTrue(viewPage.hasRenderingError());
+        assertThat(viewPage.getContent(), containsString(velocityError));
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

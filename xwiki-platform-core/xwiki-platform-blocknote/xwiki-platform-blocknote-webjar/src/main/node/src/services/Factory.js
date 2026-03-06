@@ -90,8 +90,8 @@ export class Factory {
    */
   get syntax() {
     return {
-      type: "markdown",
-      version: "1.2",
+      type: "uniast",
+      version: "1.0",
     };
   }
 }

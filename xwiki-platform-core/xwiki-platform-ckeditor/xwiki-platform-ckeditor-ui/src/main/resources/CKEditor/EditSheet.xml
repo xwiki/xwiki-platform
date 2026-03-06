@@ -267,7 +267,7 @@ define('xwiki-ckeditor', [
   // We have to overwrite both appendChild and insertBefore because depending on the presence of the BASE element
   // RequireJS uses one or the other.
   ckeditor.on('instanceReady', ({editor}) =&gt; {
-    if (editor.document.$ !== document) {
+    if (editor.mode === 'wysiwyg' &amp;&amp; editor.document.$ !== document) {
       // This editor instance is using a separate DOM document for editing which means it's a standalone editor.
       const initialHead = editor.document.$.head;
       const originalAppendChild = initialHead.appendChild;
@@ -585,10 +585,6 @@ body &gt; .modal-backdrop {
 /* The modal can be nested inside the body while the backdrop is always a direct child of body. */
 body .modal {
   z-index: 10050;
-}
-/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
-body &gt; .selectize-dropdown {
-  z-index: 10051;
 }
 
 /**

@@ -54,6 +54,8 @@ public class PageChildrenResourceImpl extends AbstractPagesResource implements P
     private QueryFilter documentFilter;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Pages getPageChildren(String wikiName, String spaceName, String pageName, Integer start, Integer number,
         Boolean withPrettyNames, String hierarchy, String search) throws XWikiRestException
     {

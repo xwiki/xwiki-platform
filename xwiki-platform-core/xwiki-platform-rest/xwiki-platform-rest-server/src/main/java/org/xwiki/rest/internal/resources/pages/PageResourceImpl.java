@@ -49,6 +49,8 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<String> checkRights
     ) throws XWikiRestException

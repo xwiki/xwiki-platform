@@ -186,7 +186,7 @@ public class DisplayScriptService implements ScriptService
         String renderedContent =
             this.renderingCache.getRenderedContent(document.getDocumentReference(), content, context);
         if (renderedContent == null) {
-            Map<String, Object> actualParameters = new HashMap<String, Object>(parameters);
+            Map<String, Object> actualParameters = new HashMap<>(parameters);
             DocumentDisplayerParameters displayerParameters =
                 (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
             if (displayerParameters == null) {
@@ -223,7 +223,7 @@ public class DisplayScriptService implements ScriptService
      */
     public String title(Document document, Map<String, Object> parameters)
     {
-        Map<String, Object> actualParameters = new HashMap<String, Object>(parameters);
+        Map<String, Object> actualParameters = new HashMap<>(parameters);
         DocumentDisplayerParameters displayerParameters =
             (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
         if (displayerParameters == null) {

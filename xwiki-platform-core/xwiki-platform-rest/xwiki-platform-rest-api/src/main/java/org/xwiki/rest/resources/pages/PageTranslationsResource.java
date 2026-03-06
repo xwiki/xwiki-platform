@@ -33,6 +33,8 @@ import org.xwiki.rest.model.jaxb.Translations;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations")
 public interface PageTranslationsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Translations getTranslations(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

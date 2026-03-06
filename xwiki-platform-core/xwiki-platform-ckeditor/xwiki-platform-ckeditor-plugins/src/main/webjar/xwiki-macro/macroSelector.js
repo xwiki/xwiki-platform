@@ -76,7 +76,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'macroService'
           'data-extensionId': macro.extensionId,
           'data-extensionVersion': macro.extensionVersion,
           'data-extensionName': macro.extensionName,
-          'data-extensionInstallAllowed': macro.extensionInstallAllowed
+          'data-extensionInstallAllowed':
+            `${macro.extensionInstallAllowed === true || macro.extensionInstallAllowed === 'true'}`
         });
       }
       macro.categories.forEach(function (category) {
@@ -147,7 +148,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'macroService'
 
   filterMacros = function() {
     var text = $(this).find('.macro-textFilter').val().toLowerCase();
-    var selectedCategories = $(this).find('.macro-categories-field.selectized')[0].selectize.items;
+    var selectedCategories = $(this).find('.macro-categories-field.tomselected')[0].selectize.items;
 
     var macroSelector = $(this).closest('.macro-selector');
     macroSelector.find('.macro-list').scrollTop(0).children().each(function () {

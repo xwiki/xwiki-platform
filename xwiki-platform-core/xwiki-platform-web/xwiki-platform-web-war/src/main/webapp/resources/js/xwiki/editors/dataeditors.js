@@ -18,18 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'jquery-ui': $services.webjars.url('jquery-ui', "jquery-ui#if ($services.debug.minify).min#{end}.js")
-})
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
 
-(function(icons, paths) {
+(function(icons) {
   "use strict";
-  require.config({
-    paths
-  });
   define('dataeditors-translations', {
     prefix: 'core.editors.',
     keys: [
@@ -812,4 +806,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $paths]));
+}).apply(']]#', $jsontool.serialize([$icons]));

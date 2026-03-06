@@ -22,7 +22,7 @@ package org.xwiki.appwithinminutes.test.ui;
 import java.time.Duration;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -434,7 +434,7 @@ class ClassEditorIT
     {
         XWikiWebDriver driver = setup.getDriver();
         new WebDriverWait(driver, Duration.ofSeconds(driver.getTimeout()))
-            .until(d -> StringUtils.contains(driver.getPageSource(), text));
+            .until(d -> Strings.CS.contains(driver.getPageSource(), text));
     }
 
     private ApplicationClassEditPage goToEditor(TestReference testReference)

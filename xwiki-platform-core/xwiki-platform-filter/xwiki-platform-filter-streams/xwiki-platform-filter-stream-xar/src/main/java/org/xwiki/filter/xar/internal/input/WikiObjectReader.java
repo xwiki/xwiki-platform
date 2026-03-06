@@ -50,14 +50,32 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
     @Inject
     private XARXMLReader<ClassReader.WikiClass> classReader;
 
+    /**
+     * Class holding information about xwiki objects.
+     */
     public static class WikiObject
     {
+        /**
+         * The xclass the object is type of.
+         */
         public WikiClass wikiClass;
 
+        /**
+         * The parameters of the xobject.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        private List<WikiObjectProperty> properties = new ArrayList<WikiObjectProperty>();
+        /**
+         * The properties of the xobjects.
+         */
+        private List<WikiObjectProperty> properties = new ArrayList<>();
 
+        /**
+         * Send events related to the xobject to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             String name = null;

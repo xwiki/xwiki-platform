@@ -24,6 +24,14 @@ div.suggestItems .hide-button {
   .text-muted-smaller;
 }
 
+/* The modal-backdrop is added at the end of the BODY when a Bootstrap modal is opened. Anything added after it (as a
+  following sibling) must be the result of the user interaction with the modal. The default absolute position of the
+  search suggest dropdown doesn't work well with the fixed position of the modal, when the search suggest input is used
+  on a modal. */
+.modal-backdrop ~ div.suggestItems {
+  position: fixed;
+}
+
 // Labels =====================================================================
 
 .language {

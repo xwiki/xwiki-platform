@@ -39,6 +39,8 @@ import org.xwiki.rest.model.jaxb.PropertyValues;
 @Path("/wikis/{wikiName}/classes/{className}/properties/{propertyName}/values")
 public interface ClassPropertyValuesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET
     PropertyValues getClassPropertyValues(
         @PathParam("wikiName") String wikiName,

@@ -38,6 +38,8 @@ import org.xwiki.rest.model.jaxb.Objects;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects")
 public interface ObjectsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Objects getObjects(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +49,8 @@ public interface ObjectsResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @POST Response addObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

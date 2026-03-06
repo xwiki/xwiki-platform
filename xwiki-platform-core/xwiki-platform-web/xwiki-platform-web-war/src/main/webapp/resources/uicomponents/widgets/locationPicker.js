@@ -22,7 +22,8 @@
   'entitynamevalidation.nametransformation.error',
   'core.validation.valid.message',
   'core.validation.required.message',
-  'core.validation.required.message.terminal'
+  'core.validation.required.message.terminal',
+  'core.validation.spacevalidation.message.invalidreference'
 ])
 #set ($l10n = {})
 #foreach ($key in $l10nKeys)
@@ -397,6 +398,17 @@ require(['jquery'], function($) {
         insertAfterWhatNode: isSimpleUser ? breadcrumbContainer[0] : spaceReferenceInput[0]
       });
       spaceValidator.displayMessageWhenEmpty = true;
+      let dotRegex = /(^\.)|(\.$)|(\.\.+)/
+      spaceValidator.add(Validate.Custom, {
+        failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
+        against: function(value) {
+          if (typeof value === 'string') {
+            return value.strip().search(dotRegex) === -1;
+          } else {
+            return true;
+          }
+        }
+      });
       return spaceValidator;
     } else {
       return null;

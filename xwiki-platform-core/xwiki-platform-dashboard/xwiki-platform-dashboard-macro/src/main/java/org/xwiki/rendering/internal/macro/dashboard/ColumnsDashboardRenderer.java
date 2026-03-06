@@ -138,8 +138,8 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
         MacroTransformationContext context) throws MacroExecutionException
     {
         // transform the passed gagdets in a list of column gadgets
-        List<ColumnGadget> columnGadgets = new ArrayList<ColumnGadget>();
-        List<Gadget> invalidGadgets = new ArrayList<Gadget>();
+        List<ColumnGadget> columnGadgets = new ArrayList<>();
+        List<Gadget> invalidGadgets = new ArrayList<>();
         for (Gadget gadget : gadgets) {
             ColumnGadget cGadget = new ColumnGadget(gadget);
             if (cGadget.getColumn() != null && cGadget.getIndex() != null) {
@@ -173,7 +173,7 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
         }
 
         // create the list of gadget containers
-        List<Block> gadgetContainers = new ArrayList<Block>();
+        List<Block> gadgetContainers = new ArrayList<>();
         for (int i = 0; i < columns; i++) {
             GroupBlock gContainer = new GroupBlock();
             gContainer.setParameter(CLASS, DashboardMacro.GADGET_CONTAINER);

@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
@@ -71,6 +72,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -869,7 +871,7 @@ public class XWiki implements EventListener
 
     private String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**
@@ -1532,7 +1534,7 @@ public class XWiki implements EventListener
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
 
         try {
-            return new ArrayList<String>(descriptorManager.getAllIds());
+            return new ArrayList<>(descriptorManager.getAllIds());
         } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to get the list of wikis", e);
@@ -2762,7 +2764,7 @@ public class XWiki implements EventListener
         if (StringUtils.endsWithAny(fileName, ".js", ".css")) {
             String extension = StringUtils.substringAfterLast(fileName, '.');
             String shortFileName = StringUtils.substringBeforeLast(fileName, ".");
-            if (StringUtils.endsWith(shortFileName, ".min")) {
+            if (Strings.CS.endsWith(shortFileName, ".min")) {
                 shortFileName = StringUtils.substringBeforeLast(shortFileName, ".");
             }
             String fileNameSource = String.format("%s.%s", shortFileName, extension);
@@ -3221,7 +3223,7 @@ public class XWiki implements EventListener
     @Deprecated(since = "17.0.0RC1")
     private List<String> getAcceptedLanguages(XWikiRequest request)
     {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Enumeration<Locale> e = request.getLocales();
         while (e.hasMoreElements()) {
             String language = e.nextElement().getLanguage().toLowerCase();
@@ -3281,7 +3283,7 @@ public class XWiki implements EventListener
     {
         String[] languages = StringUtils.split(xcontext.getWiki().getXWikiPreference("languages", xcontext), ", |");
 
-        List<Locale> locales = new ArrayList<Locale>(languages.length);
+        List<Locale> locales = new ArrayList<>(languages.length);
 
         for (String language : languages) {
             if (StringUtils.isNotBlank(language)) {
@@ -4007,7 +4009,7 @@ public class XWiki implements EventListener
      */
     public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException
     {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("active", "1");
         map.put("first_name", xwikiname);
 
@@ -4446,7 +4448,7 @@ public class XWiki implements EventListener
                     @SuppressWarnings("unchecked")
                     Set<String> includedDocs = (Set<String>) context.get("included_docs");
                     if (includedDocs == null) {
-                        includedDocs = new HashSet<String>();
+                        includedDocs = new HashSet<>();
                         context.put("included_docs", includedDocs);
                     }
 
@@ -6219,7 +6221,7 @@ public class XWiki implements EventListener
     {
         // We currently hardcode the rules
         // We will put them in the preferences soon
-        Map<String, SearchEngineRule> map = new HashMap<String, SearchEngineRule>();
+        Map<String, SearchEngineRule> map = new HashMap<>();
         map.put("Google", new SearchEngineRule("google.", "s/(^|.*&)q=(.*?)(&.*|$)/$2/"));
         map.put("MSN", new SearchEngineRule("search.msn.", "s/(^|.*&)q=(.*?)(&.*|$)/$2/"));
         map.put("Yahoo", new SearchEngineRule("search.yahoo.", "s/(^|.*&)p=(.*?)(&.*|$)/$2/"));
@@ -7981,7 +7983,7 @@ public class XWiki implements EventListener
             String filename = (String) results.get(i)[0];
             String docFullName = (String) results.get(i)[1];
             if (!filenamesByDocFullName.containsKey(docFullName)) {
-                filenamesByDocFullName.put(docFullName, new ArrayList<String>());
+                filenamesByDocFullName.put(docFullName, new ArrayList<>());
             }
             filenamesByDocFullName.get(docFullName).add(filename);
         }

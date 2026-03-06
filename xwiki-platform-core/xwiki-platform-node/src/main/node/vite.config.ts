@@ -28,12 +28,12 @@ import { fileURLToPath } from "node:url";
 import type { UserConfig } from "vite";
 
 function pathsComputation(path: string) {
-    const dir = dirname(fileURLToPath(path));
-    const packageDirName = basename(dir);
-    const pkg = JSON.parse(
-        readFileSync(resolve(dir, "package.json"), { encoding: "utf-8" }),
-    );
-    return { packageDirName, pkg };
+  const dir = dirname(fileURLToPath(path));
+  const packageDirName = basename(dir);
+  const pkg = JSON.parse(
+    readFileSync(resolve(dir, "package.json"), { encoding: "utf-8" }),
+  );
+  return { packageDirName, pkg };
 }
 
 /**
@@ -43,71 +43,71 @@ function pathsComputation(path: string) {
  * @param entryRoot - an optional parameter in case the entry point is not the default src/index.ts
  */
 function generateConfig(
-    path: string,
-    distPath: string = "dist",
-    entryRoot: string = "./src/",
+  path: string,
+  distPath: string = "dist",
+  entryRoot: string = "./src/",
 ): UserConfig {
-    const { packageDirName, pkg } = pathsComputation(path);
+  const { packageDirName, pkg } = pathsComputation(path);
 
-    const libFileName = (format: string) => `index.${format}.js`;
+  const libFileName = (format: string) => `index.${format}.js`;
 
-    return defineConfig({
-        build: {
-            sourcemap: true,
-            lib: {
-                entry: `${entryRoot}/index.ts`,
-                name: `cristal_${packageDirName}`,
-                fileName: libFileName,
-            },
-            rollupOptions: {
-                external: [
-                    ...Object.keys(pkg.dependencies || {}),
-                    ...Object.keys(pkg.peerDependencies || {}),
-                ],
-            },
-        },
-        plugins: [
-            dts({
-                insertTypesEntry: true,
-                entryRoot,
-                afterBuild: () => {
-                    // publint suggests having a specific extensions for the exported types for each kind of module system
-                    // (esm/cjs). The goal is to make sure packages are supported by all consumers.
-                    const originTypeFile = `${distPath}/index.d.ts`;
-                    // First check if the module is producing types.
-                    if (existsSync(originTypeFile)) {
-                        copyFileSync(originTypeFile, `${distPath}/index.d.cts`);
-                    }
-                },
-            }),
+  return defineConfig({
+    build: {
+      sourcemap: true,
+      lib: {
+        entry: `${entryRoot}/index.ts`,
+        name: `cristal_${packageDirName}`,
+        fileName: libFileName,
+      },
+      rollupOptions: {
+        external: [
+          ...Object.keys(pkg.dependencies || {}),
+          ...Object.keys(pkg.peerDependencies || {}),
         ],
-    });
+      },
+    },
+    plugins: [
+      dts({
+        insertTypesEntry: true,
+        entryRoot,
+        afterBuild: () => {
+          // publint suggests having a specific extensions for the exported types for each kind of module
+          // system (esm/cjs). The goal is to make sure packages are supported by all consumers.
+          const originTypeFile = `${distPath}/index.d.ts`;
+          // First check if the module is producing types.
+          if (existsSync(originTypeFile)) {
+            copyFileSync(originTypeFile, `${distPath}/index.d.cts`);
+          }
+        },
+      }),
+    ],
+  });
 }
 
 function generateConfigVue(path: string): Record<string, any> {
-    return mergeConfig(
-        generateConfig(path),
-        defineConfig({
-            build: {
-                cssCodeSplit: true,
-                rollupOptions: {
-                    // external: Object.keys(pkg.dependencies || {}),
-                    output: {
-                        globals: {
-                            vue: "Vue",
-                        },
-                    },
-                },
+  return mergeConfig(
+    generateConfig(path),
+    defineConfig({
+      build: {
+        cssCodeSplit: true,
+        rollupOptions: {
+          // external: Object.keys(pkg.dependencies || {}),
+          output: {
+            globals: {
+              vue: "Vue",
             },
-            plugins: [
-                vue(),
-                // This plugin is useful to make the CSS of a given module loaded by the
-                // module itself, allowing CSS to be loaded even when Cristal is
-                // imported in an external project.
-                cssInjectedByJsPlugin(),
-            ],
-        }),
-    );
+          },
+        },
+      },
+      plugins: [
+        vue(),
+        // This plugin is useful to make the CSS of a given module loaded by the
+        // module itself, allowing CSS to be loaded even when Cristal is
+        // imported in an external project.
+        cssInjectedByJsPlugin(),
+      ],
+    }),
+  );
 }
 
 export { generateConfig, generateConfigVue };

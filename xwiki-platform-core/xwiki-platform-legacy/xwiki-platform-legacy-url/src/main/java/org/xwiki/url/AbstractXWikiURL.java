@@ -41,7 +41,7 @@ public abstract class AbstractXWikiURL implements XWikiURL
     /**
      * @see #getParameters()
      */
-    private Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
+    private Map<String, List<String>> parameters = new LinkedHashMap<>();
 
     public AbstractXWikiURL(XWikiURLType type)
     {
@@ -64,7 +64,7 @@ public abstract class AbstractXWikiURL implements XWikiURL
     {
         List<String> list = this.parameters.get(name);
         if (list == null) {
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
         }
         if (value != null) {
             list.add(value);

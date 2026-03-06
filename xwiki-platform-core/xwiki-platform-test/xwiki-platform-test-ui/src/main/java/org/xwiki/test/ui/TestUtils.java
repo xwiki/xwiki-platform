@@ -2106,8 +2106,8 @@ public class TestUtils
 
         // import file
         executeGet(
-            getBaseBinURL() + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
-                + escapeURL(file.getName()),
+            getURL("XWiki", "Import", "import",
+                "historyStrategy=add&importAsBackup=true&ajax&action=import&name=" + escapeURL(file.getName())),
             Status.OK.getStatusCode());
     }
 

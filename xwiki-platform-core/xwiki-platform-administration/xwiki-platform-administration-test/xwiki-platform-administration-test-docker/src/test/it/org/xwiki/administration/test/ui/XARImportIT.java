@@ -258,4 +258,21 @@ class XARImportIT
 
         assertEquals("superadmin", history.getCurrentAuthor());
     }
+
+    @Test
+    void testImportWithInvalidCSRFToken(TestUtils setup, TestConfiguration testConfiguration)
+    {
+        File file = getFileToUpload(testConfiguration, PACKAGE_WITHOUT_HISTORY);
+
+        this.sectionPage.attachPackage(file);
+        this.sectionPage.selectPackage(PACKAGE_WITHOUT_HISTORY);
+
+        // Corrupt the CSRF token to trigger a CSRF validation failure.
+        setup.getDriver().executeJavascript("document.documentElement.dataset.xwikiFormToken = 'invalid'");
+
+        String errorMessage = this.sectionPage.importPackageWithExpectedError();
+
+        assertTrue(errorMessage.contains("CSRF validation failed"),
+            "Expected CSRF error, got: " + errorMessage);
+    }
 }

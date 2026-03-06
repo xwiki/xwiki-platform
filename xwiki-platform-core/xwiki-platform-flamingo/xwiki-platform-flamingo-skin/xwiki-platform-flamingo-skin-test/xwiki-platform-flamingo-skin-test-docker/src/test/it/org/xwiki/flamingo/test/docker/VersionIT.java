@@ -1103,10 +1103,9 @@ class VersionIT
 
     @Test
     @Order(12)
-    void diffAfterXClassChange(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void diffAfterXClassChange(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
-        testUtils.setServletEngine(testConfiguration.getServletEngine());
         String className = "XClassTest";
         DocumentReference xclassReference = new DocumentReference(className, testReference.getLastSpaceReference());
         ViewPage classPage = testUtils.createPage(xclassReference, "");

@@ -71,7 +71,18 @@ class WikisIT
     @Test
     void testImportXAR(TestUtils setup) throws Exception
     {
-        // FIXME: check if that works....
+        // Try with superadmin
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
+            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
+            try {
+                assertEquals(HttpStatus.SC_OK, post.getStatusCode());
+            } finally {
+                post.releaseConnection();
+            }
+        }
+
         // Try as guest
         setup.setDefaultCredentials(null);
 
@@ -79,18 +90,6 @@ class WikisIT
             PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
             try {
                 assertEquals(HttpStatus.SC_UNAUTHORIZED, post.getStatusCode());
-            } finally {
-                post.releaseConnection();
-            }
-        }
-
-        // Switch to superadmin
-        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
-
-        try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
-            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
-            try {
-                assertEquals(HttpStatus.SC_OK, post.getStatusCode());
             } finally {
                 post.releaseConnection();
             }

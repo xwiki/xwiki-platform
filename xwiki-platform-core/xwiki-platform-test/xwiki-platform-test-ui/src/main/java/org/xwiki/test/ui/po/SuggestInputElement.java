@@ -316,14 +316,21 @@ public class SuggestInputElement extends BaseElement
     @SuppressWarnings("null")
     private By optionByValue(String value, Boolean selected)
     {
-        String selectedConstraint = "";
-        if (selected != null) {
-            selectedConstraint = selected ? " and contains(@class, 'active')" : " and not(contains(@class, 'active'))";
-        }
         return By.xpath(String.format(
             "//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option')%s and @data-value = '%s']",
-            selectedConstraint, StringUtils.defaultString(value)));
+            getSelectedConstraint(selected), StringUtils.defaultString(value)));
+    }
+
+    private String getSelectedConstraint(Boolean selected)
+    {
+        if (selected == null) {
+            return "";
+        } else if (selected) {
+            return " and contains(@class, 'active')";
+        } else {
+            return " and not(contains(@class, 'active'))";
+        }
     }
 
     /**
@@ -333,10 +340,19 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
-        getDriver().findElement(By.xpath("//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
-            + "//*[contains(@class, 'xwiki-selectize-option-label') and . = '" + text + "']")).click();
+        getDriver().findElement(optionByLabel(text, null)).click();
 
         return this;
+    }
+
+    @SuppressWarnings("null")
+    private By optionByLabel(String value, Boolean selected)
+    {
+        return By.xpath(String.format(
+            "//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
+                + "//*[contains(@class, 'xwiki-selectize-option')%s]"
+                + "/*[contains(@class, 'xwiki-selectize-option-label') and . = '%s']",
+            getSelectedConstraint(selected), StringUtils.defaultString(value)));
     }
 
     /**
@@ -353,7 +369,9 @@ public class SuggestInputElement extends BaseElement
             By.xpath("//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'create') and contains(@class, 'active')]/em[. = '" + typedText + "']"),
             // Existing option with the same value as the typed text.
-            optionByValue(typedText, true)}, false);
+            optionByValue(typedText, true),
+            // Existing option with the same label as the typed text.
+            optionByLabel(typedText, true)}, false);
 
         // Pick the selected option.
         textInput.sendKeys(Keys.ENTER);

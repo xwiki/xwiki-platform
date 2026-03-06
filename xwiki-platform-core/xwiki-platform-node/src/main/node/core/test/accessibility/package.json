@@ -1,13 +1,12 @@
 {
-  "private": true,
-  "name": "@xwiki/platform-ds-flamingo",
-  "version": "0.0.0",
+  "name": "@xwiki/platform-test-accessibility",
+  "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/flamingo",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -16,17 +15,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.es.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.umd.js"
-      }
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
     }
   },
-  "main": "./dist/index.es.js",
+  "main": "./src/index.ts",
   "files": [
     "dist",
     "src",
@@ -40,36 +33,39 @@
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "test:unit": "vitest --run --passWithNoTests",
+    "test": "vitest --run",
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-dsapi": "workspace:*"
-  },
-  "peerDependencies": {
-    "inversify": "7.x",
-    "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "@vue/test-utils": "catalog:",
+    "axe-core": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "@types/jquery": "catalog:",
-    "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-test-accessibility": "workspace:*",
-    "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
-    "axe-core": "catalog:",
     "eslint": "catalog:",
-    "happy-dom": "catalog:",
-    "inversify": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:",
-    "vitest-axe": "catalog:",
-    "vue": "catalog:"
+    "vite": "catalog:"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
   }
 }

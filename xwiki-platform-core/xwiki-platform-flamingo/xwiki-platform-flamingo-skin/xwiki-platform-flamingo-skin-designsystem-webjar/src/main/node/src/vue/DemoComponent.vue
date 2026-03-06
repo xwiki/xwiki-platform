@@ -32,12 +32,22 @@ const actions = [
 
 <template>
   <div>
-    <x-alert type="info">This is an alert</x-alert>
-    <x-alert type="info" flat-corners>This is an alert</x-alert>
-    <x-alert type="warning" title="This is a title">This is an alert</x-alert>
-    <x-alert type="warning" :actions><br />This is an alert</x-alert>
-    <x-alert type="warning" closable><br />Close me</x-alert>
-    <div class="box warningmessage">ABCD</div>
+    <!--    <x-alert type="info">This is an alert</x-alert>-->
+    <!--    <x-alert type="info" flat-corners>This is an alert</x-alert>-->
+    <!--    <x-alert type="warning" title="This is a title">This is an alert</x-alert>-->
+    <!--    <x-alert type="warning" :actions><br />This is an alert</x-alert>-->
+    <x-alert type="warning" closable>
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+      Lorem Ipsum has been the industry's standard dummy text ever since the
+      1500s, when an unknown printer took a galley of type and scrambled it to
+      make a type specimen book. It has survived not only five centuries, but
+      also the leap into electronic typesetting, remaining essentially
+      unchanged. It was popularised in the 1960s with the release of Letraset
+      sheets containing Lorem Ipsum passages, and more recently with desktop
+      publishing software like Aldus PageMaker including versions of Lorem
+      Ipsum.
+    </x-alert>
+    <!--    <div class="box warningmessage">ABCD</div>-->
   </div>
 </template>
 

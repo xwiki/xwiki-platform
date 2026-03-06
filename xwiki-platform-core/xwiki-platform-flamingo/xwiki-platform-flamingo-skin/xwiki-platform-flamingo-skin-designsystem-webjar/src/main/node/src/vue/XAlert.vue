@@ -18,31 +18,14 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed, onMounted, useTemplateRef } from "vue";
+import XBtn from "./XBtn.vue";
+import { computed, ref } from "vue";
 import type { AlertProps } from "@xwiki/platform-dsapi";
+
+const isClosed = ref(false);
 
 const { type, closable, title, description, flatCorners } =
   defineProps<AlertProps>();
-
-// eslint-disable-next-line no-undef
-const jQuery: Promise<JQuery> = new Promise((resolve) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
-  require(["jquery"], ($: JQuery) => resolve($));
-});
-
-const root = useTemplateRef("root");
-
-onMounted(async () => {
-  if (closable) {
-    const $ = await jQuery;
-    console.log($);
-    const value = root.value;
-    console.log(value);
-    const $1 = $(value);
-    console.log($1, $1.alert);
-    $1.alert();
-  }
-});
 
 const boxclass = computed(() => {
   switch (type) {
@@ -58,25 +41,32 @@ const boxclass = computed(() => {
       return [];
   }
 });
+
+function close() {
+  isClosed.value = true;
+}
 </script>
 
 <template>
   <div
+    v-if="!isClosed"
     ref="root"
     :class="[
       'box',
       ...boxclass,
       flatCorners ? $style.flatCorners : '',
-      closable ? 'alert-dismissible' : '',
+      closable ? 'alert-dismissible fade in' : '',
     ]"
     role="alert"
   >
+    <!-- TODO: localize the aria-label once a translation API is available, see XWIKI-24046 -->
     <button
+      v-if="closable"
       type="button"
       class="close"
       data-dismiss="alert"
       aria-label="Close"
-      v-if="closable"
+      @click="close"
     >
       <span aria-hidden="true">&times;</span>
     </button>
@@ -102,5 +92,10 @@ const boxclass = computed(() => {
 <style module>
 .flatCorners {
   border-radius: initial;
+}
+</style>
+<style scoped>
+.close {
+  margin-right: 0.25em;
 }
 </style>

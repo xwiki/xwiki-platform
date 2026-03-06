@@ -23,6 +23,7 @@ import {
   shallowMountHelper,
 } from "@xwiki/platform-test-accessibility";
 import { describe, expect, vi } from "vitest";
+import type { AvatarProps } from "@xwiki/platform-dsapi";
 
 function initMount() {
   vi.stubGlobal("XWiki", {
@@ -32,13 +33,13 @@ function initMount() {
 }
 
 const accessibilityMount = initMount();
-describe("XAlert", () => {
+describe("XAvatar", () => {
   runTest(
     "render with minimal configuration",
     accessibilityMount({
       props: {
         name: "UserName",
-      },
+      } satisfies AvatarProps,
     }),
     (wrapper) => {
       const img = wrapper.find("img");
@@ -57,10 +58,9 @@ describe("XAlert", () => {
       props: {
         name: "UserName",
         size: "42px",
-      },
+      } satisfies AvatarProps,
     }),
     (wrapper) => {
-      console.log(wrapper.html());
       const img = wrapper.find("img");
       expect(img.classes()).toEqual(["avatar"]);
       expect(img.attributes("src")).toEqual(

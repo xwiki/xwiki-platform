@@ -25,7 +25,7 @@ const { title } = defineProps<CardProps>();
 
 <template>
   <div class="gadget">
-    <h2 class="gadget-title">{{ title }}</h2>
+    <h2 v-if="title" class="gadget-title">{{ title }}</h2>
     <div class="gadget-content"><slot></slot></div>
   </div>
 </template>

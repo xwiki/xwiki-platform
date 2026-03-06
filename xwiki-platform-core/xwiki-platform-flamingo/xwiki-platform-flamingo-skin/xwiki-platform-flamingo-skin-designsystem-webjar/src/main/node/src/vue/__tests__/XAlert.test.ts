@@ -24,6 +24,7 @@ import {
   shallowMountHelper,
 } from "@xwiki/platform-test-accessibility";
 import { describe, expect } from "vitest";
+import type { AlertProps } from "@xwiki/platform-dsapi";
 
 const accessibilityMount = shallowMountHelper(XAlert);
 describe("XAlert", () => {
@@ -32,7 +33,7 @@ describe("XAlert", () => {
     accessibilityMount({
       props: {
         type: "info",
-      },
+      } satisfies AlertProps,
       slots: {
         default: "Some Text",
       },
@@ -50,7 +51,7 @@ describe("XAlert", () => {
       props: {
         type: "error",
         title: "The Title",
-      },
+      } satisfies AlertProps,
     }),
     (wrapper) => {
       expect(wrapper.find("div").classes()).toEqual(["box", "errormessage"]);
@@ -65,7 +66,7 @@ describe("XAlert", () => {
       props: {
         type: "warning",
         closable: true,
-      },
+      } satisfies AlertProps,
     }),
 
     (wrapper) => {
@@ -94,7 +95,7 @@ describe("XAlert", () => {
             },
           },
         ],
-      },
+      } satisfies AlertProps,
     }),
     async (wrapper) => {
       actionCalled = false;

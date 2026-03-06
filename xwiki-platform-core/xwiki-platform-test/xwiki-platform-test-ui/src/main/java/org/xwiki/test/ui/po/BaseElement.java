@@ -37,6 +37,21 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class BaseElement
 {
+    /**
+     * The name of the "value" attribute which is used by input elements to store their value.
+     */
+    public static final String ATTRIBUTE_VALUE = "value";
+
+    /**
+     * The name of the "id" attribute.
+     */
+    public static final String ATTRIBUTE_ID = "id";
+
+    /**
+     * The name of the "class" attribute which is used by elements to store their CSS classes.
+     */
+    public static final String ATTRIBUTE_CLASS = "class";
+
     private static PersistentTestContext context;
 
     /** Used so that AllTests can set the persistent test context. */

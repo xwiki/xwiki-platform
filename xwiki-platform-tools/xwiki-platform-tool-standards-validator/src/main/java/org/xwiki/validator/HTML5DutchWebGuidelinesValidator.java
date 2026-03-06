@@ -90,6 +90,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     }
 
     @Override
+    @SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS", "checkstyle:MethodLength"})
     protected void validate(Document document)
     {
         // RPD 1

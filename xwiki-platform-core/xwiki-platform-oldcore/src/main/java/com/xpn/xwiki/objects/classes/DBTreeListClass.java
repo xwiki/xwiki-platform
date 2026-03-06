@@ -116,7 +116,7 @@ public class DBTreeListClass extends DBListClass
     public Map<String, List<ListItem>> getTreeMap(XWikiContext context)
     {
         List<ListItem> list = getDBList(context);
-        Map<String, List<ListItem>> map = new HashMap<String, List<ListItem>>();
+        Map<String, List<ListItem>> map = new HashMap<>();
         if ((list == null) || (list.size() == 0)) {
             return map;
         }
@@ -148,7 +148,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = getCachedDBTreeList(context);
         if (list == null) {
-            list = new ArrayList<ListItem>();
+            list = new ArrayList<>();
             addToTreeList(list, treemap, map, "", context);
             setCachedDBTreeList(list, context);
         }
@@ -173,7 +173,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = map.get(key);
         if (list == null) {
-            list = new ArrayList<ListItem>();
+            list = new ArrayList<>();
             map.put(key, list);
         }
         list.add(item);
@@ -186,11 +186,11 @@ public class DBTreeListClass extends DBListClass
         List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
         } else if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
         }
         String result = displayFlatView(selectlist, context);
@@ -226,10 +226,10 @@ public class DBTreeListClass extends DBListClass
         Map<String, ListItem> map = getMap(context);
         Map<String, List<ListItem>> treemap = getTreeMap(context);
         List<ListItem> fullTreeList = getTreeList(treemap, map, context);
-        List<List<ListItem>> resList = new ArrayList<List<ListItem>>(selectlist.size());
+        List<List<ListItem>> resList = new ArrayList<>(selectlist.size());
 
         for (String item : selectlist) {
-            List<ListItem> itemPath = getItemPath(item, fullTreeList, new ArrayList<ListItem>());
+            List<ListItem> itemPath = getItemPath(item, fullTreeList, new ArrayList<>());
             mergeItems(itemPath, resList);
         }
 
@@ -349,11 +349,11 @@ public class DBTreeListClass extends DBListClass
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
         } else if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
@@ -457,8 +457,8 @@ public class DBTreeListClass extends DBListClass
                 // Build the query in this variable.
                 StringBuffer select = new StringBuffer("select distinct ");
                 // These will hold the components of the from and where parts of the query.
-                ArrayList<String> fromStatements = new ArrayList<String>();
-                ArrayList<String> whereStatements = new ArrayList<String>();
+                ArrayList<String> fromStatements = new ArrayList<>();
+                ArrayList<String> whereStatements = new ArrayList<>();
 
                 // Add the document to the query only if it is needed.
                 if (usesDoc) {

@@ -47,7 +47,7 @@ public class DefaultLocalizedTranslationBundle implements LocalizedTranslationBu
     /**
      * The translations.
      */
-    private Map<String, Translation> translations = new HashMap<String, Translation>();
+    private Map<String, Translation> translations = new HashMap<>();
 
     /**
      * @param bundle the {@link TranslationBundle} containing this {@link LocalizedTranslationBundle}

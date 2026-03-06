@@ -32,8 +32,9 @@ import org.xwiki.xar.internal.model.XarObjectModel;
  */
 public class XARObjectModel extends XarObjectModel
 {
-    // Utils
-
+    /**
+     * The list of parameters to be used when reading an object.
+     */
     public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()
     {
         {

@@ -72,7 +72,7 @@ class TableIT extends AbstractCKEditorIT
         textArea.sendKeys("one", Keys.ENTER, "two");
 
         // Insert a row after the current one.
-        textArea.sendKeys("/table_row_after");
+        textArea.sendKeys(" /table_row_after");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/table_row_after", "Insert Row After");
         // We click instead of pressing Enter to be sure the fake selection is not lost.

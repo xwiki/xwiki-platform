@@ -26,9 +26,13 @@ import javax.ws.rs.PathParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Tags;
 
+//FIXME: Write Javadoc describing the REST API parameters
+@SuppressWarnings("checkstyle:MissingJavadocType")
 @Path("/wikis/{wikiName}/tags")
 public interface TagsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Tags getTags(
             @PathParam("wikiName") String wikiName
     ) throws XWikiRestException;

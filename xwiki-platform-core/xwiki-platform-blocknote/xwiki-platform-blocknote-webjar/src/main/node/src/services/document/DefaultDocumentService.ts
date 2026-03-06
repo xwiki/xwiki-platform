@@ -118,4 +118,9 @@ export class DefaultDocumentService implements DocumentService {
     // TODO
     throw new Error("Method not implemented.");
   }
+
+  removeDocumentChangeListener(): void {
+    // TODO implement along with registerDocumentChangeListener
+    throw new Error("Method not implemented.");
+  }
 }

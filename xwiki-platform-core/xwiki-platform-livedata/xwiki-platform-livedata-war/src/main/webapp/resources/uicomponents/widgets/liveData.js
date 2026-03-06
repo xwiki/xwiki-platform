@@ -31,11 +31,7 @@
       'variables.less', {'evaluate': true}),
     'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'reactive.less', {'evaluate': true}),
-    'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
-    'selectize': [
-      $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-      $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true)
-    ]
+    'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')
   },
   'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry),
   'contextPath': $request.contextPath
@@ -50,18 +46,14 @@
     map: {
       "*": {
         "xwiki-livedata": "xwiki-livedata-with-css",
-        daterangepicker: "daterangepicker-with-css",
-        "xwiki-selectize": "xwiki-selectize-with-css",
+        daterangepicker: "daterangepicker-with-css"
       },
       "xwiki-livedata-with-css": {
         "xwiki-livedata": "xwiki-livedata",
       },
       "daterangepicker-with-css": {
         daterangepicker: "daterangepicker",
-      },
-      "xwiki-selectize-with-css": {
-        "xwiki-selectize": "xwiki-selectize",
-      },
+      }
     },
     config: {
       "xwiki-livedata-source": {
@@ -95,12 +87,6 @@
   define("daterangepicker-with-css", ["loadCSS", "daterangepicker"], function(loadCSS) {
     // Load the CSS for the date range picker.
     loadCSS(paths.css.dateRangePicker);
-    return arguments[1];
-  });
-
-  define("xwiki-selectize-with-css", ["loadCSS", "xwiki-selectize"], function(loadCSS) {
-    // Load the CSS for the suggest picker.
-    loadCSS(paths.css.selectize);
     return arguments[1];
   });
 

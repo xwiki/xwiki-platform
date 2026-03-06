@@ -377,7 +377,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public List<ObjectDiff> getDiff(Object oldEntity, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseObject oldObject = (BaseObject) oldEntity;
         // Iterate over the new properties first, to handle changed and added objects
         for (String propertyName : this.getPropertyList()) {

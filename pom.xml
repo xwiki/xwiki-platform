@@ -354,7 +354,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>3.7.1</version>
+        <version>4.0.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -430,16 +430,10 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>selectize.js</artifactId>
-        <version>0.13.3</version>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>tom-select</artifactId>
+        <version>2.5.2</version>
         <scope>runtime</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Apache POI -->

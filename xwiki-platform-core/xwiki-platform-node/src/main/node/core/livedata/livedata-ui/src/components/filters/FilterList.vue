@@ -232,7 +232,7 @@ export default {
 </template>
 
 <style>
-.livedata-filter.filter-list .selectize-input {
+.livedata-filter.filter-list .ts-control {
   height: 100%;
   vertical-align: middle;
 }

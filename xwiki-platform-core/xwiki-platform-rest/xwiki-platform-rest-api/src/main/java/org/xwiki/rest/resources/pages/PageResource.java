@@ -40,6 +40,9 @@ import org.xwiki.rest.model.jaxb.Page;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}")
 public interface PageResource
 {
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @GET Page getPage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,
@@ -51,6 +54,8 @@ public interface PageResource
             @QueryParam("checkRight") List<String> checkRights
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @PUT Response putPage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,
@@ -59,6 +64,8 @@ public interface PageResource
             Page page
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @DELETE void deletePage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,

@@ -72,6 +72,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 @Component(roles = UserEventDispatcher.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class UserEventDispatcher
 {
     private static final long BATCH_SIZE = 100;

@@ -145,7 +145,7 @@ public class DefaultAnnotationService implements AnnotationService
     public Collection<Annotation> getValidAnnotations(String target) throws AnnotationServiceException
     {
         try {
-            List<Annotation> result = new ArrayList<Annotation>();
+            List<Annotation> result = new ArrayList<>();
             for (Annotation it : ioService.getAnnotations(target)) {
                 if (it.getState() == AnnotationState.SAFE || it.getState() == AnnotationState.UPDATED) {
                     result.add(it);

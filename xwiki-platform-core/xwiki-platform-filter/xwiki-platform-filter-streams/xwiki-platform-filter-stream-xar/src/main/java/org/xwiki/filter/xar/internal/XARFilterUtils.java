@@ -33,16 +33,31 @@ public final class XARFilterUtils
      */
     public static class EventParameter
     {
+        /**
+         * The name of the event parameter.
+         */
         public String name;
 
+        /**
+         * The type of the event parameter.
+         */
         public Class<?> type;
 
+        /**
+         * Default constructor.
+         * @param name the name of the event parameter.
+         * @param type the type of the event parameter.
+         */
         public EventParameter(String name, Class<?> type)
         {
             this.name = name;
             this.type = type;
         }
 
+        /**
+         * Default constructor where the event parameter is of type {@link String}.
+         * @param name the name of the event parameter.
+         */
         public EventParameter(String name)
         {
             this(name, String.class);
@@ -92,4 +107,8 @@ public final class XARFilterUtils
      */
     @Deprecated
     public static final String ROLEHINT = ROLEHINT_11;
+
+    private XARFilterUtils()
+    {
+    }
 }

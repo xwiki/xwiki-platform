@@ -90,7 +90,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * List of properties (eg XClass properties, XObject properties, etc).
      */
-    protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
+    protected Map<String, Object> fields = new LinkedHashMap<>();
 
     protected List<Object> fieldsToRemove = new ArrayList<>();
 
@@ -478,9 +478,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
-            return new HashSet<Object>();
+            return new HashSet<>();
         } else {
-            return new HashSet<Object>((Collection<?>) prop.getValue());
+            return new HashSet<>((Collection<?>) prop.getValue());
         }
     }
 
@@ -682,7 +682,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseCollection oldCollection = (BaseCollection) oldObject;
         // Iterate over the new properties first, to handle changed and added objects
         for (Object key : this.getFields().keySet()) {
@@ -820,7 +820,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         for (String name : this.fields.keySet()) {
             BaseProperty property = (BaseProperty) get(name);
             map.put(name, property.getCustomMappingValue());
@@ -944,7 +944,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         if (clean) {
             // Delete fields that don't exist anymore
-            List<String> fieldsToDelete = new ArrayList<String>(this.fields.size());
+            List<String> fieldsToDelete = new ArrayList<>(this.fields.size());
             for (String key : this.fields.keySet()) {
                 if (newCollection.safeget(key) == null) {
                     fieldsToDelete.add(key);

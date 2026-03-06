@@ -280,7 +280,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale)
         throws XWikiException, SolrIndexerException
     {
-        Set<Locale> locales = new HashSet<Locale>();
+        Set<Locale> locales = new HashSet<>();
 
         String entityLocaleString = entityLocale != null ? entityLocale.toString() : null;
 

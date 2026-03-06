@@ -162,7 +162,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
      */
     private ComponentDescriptor<TranslationBundle> createComponentDescriptor(URL jarURL)
     {
-        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
+        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<>();
 
         descriptor.setImplementation(JARFileTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);

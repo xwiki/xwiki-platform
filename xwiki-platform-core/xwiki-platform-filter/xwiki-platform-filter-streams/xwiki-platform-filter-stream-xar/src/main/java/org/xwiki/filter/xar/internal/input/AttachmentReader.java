@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -102,11 +103,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                 proxyFilter.beginWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
                 proxyFilter.endWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
             } finally {
-                try {
-                    close();
-                } catch (IOException e) {
-                    throw new FilterException(e);
-                }
+                IOUtils.closeQuietly(this);
             }
         }
     }
@@ -146,11 +143,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         proxyFilter.endWikiDocumentAttachment(this.name, this, this.size, this.parameters);
                     }
                 } finally {
-                    try {
-                        close();
-                    } catch (IOException e) {
-                        throw new FilterException(e);
-                    }
+                    IOUtils.closeQuietly(this);
                 }
             } else {
                 proxyFilter.onWikiAttachment(this.name, null, this.size, this.parameters);

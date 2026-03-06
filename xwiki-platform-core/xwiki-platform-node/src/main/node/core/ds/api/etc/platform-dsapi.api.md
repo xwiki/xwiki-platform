@@ -29,7 +29,7 @@ export type AbstractElements = {
     XDivider: DefineComponent<DividerProps & HTMLAttributes>;
     XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
     XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-    XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
+    XImg: DefineComponent<HTMLAttributes>;
     XLoad: DefineComponent<LoadProps & HTMLAttributes>;
     XMenu: DefineComponent<MenuProps & HTMLAttributes>;
     XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
@@ -104,9 +104,9 @@ export type CheckboxProps = {
 
 // @beta (undocumented)
 export type DialogProps = {
-    width?: "auto";
+    title: string;
+    width?: string | number | undefined;
     modelValue?: boolean;
-    logo?: string;
 };
 
 // @beta
@@ -133,9 +133,6 @@ export type FileInputProps = {
 export type FormProps = {
     onFormSubmit?: () => void;
 };
-
-// @beta (undocumented)
-export type ImgProps = unknown;
 
 // @beta (undocumented)
 export type LoadProps = unknown;

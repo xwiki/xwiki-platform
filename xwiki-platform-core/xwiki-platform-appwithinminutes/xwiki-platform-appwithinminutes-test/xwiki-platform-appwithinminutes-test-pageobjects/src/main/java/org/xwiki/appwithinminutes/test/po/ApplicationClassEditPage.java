@@ -69,7 +69,13 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      */
     public ApplicationTemplateProviderEditPage clickNextStep()
     {
+        // Saving is asynchronous, so we need to wait for the page to be reloaded explicitly.
+        getDriver().addPageNotYetReloadedMarker();
+
         nextStepButton.click();
+
+        getDriver().waitUntilPageIsReloaded();
+
         return new ApplicationTemplateProviderEditPage();
     }
 

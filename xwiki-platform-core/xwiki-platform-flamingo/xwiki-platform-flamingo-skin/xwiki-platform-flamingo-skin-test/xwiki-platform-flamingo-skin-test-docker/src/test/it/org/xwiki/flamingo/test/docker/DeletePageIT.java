@@ -56,6 +56,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static java.util.Map.entry;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -651,8 +652,7 @@ class DeletePageIT
         setup.addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
 
         // switch the wiki to multilingual
-        setup.setWikiPreference("multilingual", "true");
-        setup.setWikiPreference("languages", "en,fr");
+        setup.setWikiPreferences(Map.ofEntries(entry("multilingual", "true"), entry("languages", "en,fr")));
 
         DocumentReference frenchXClassTranslation = new DocumentReference(classReference, Locale.FRENCH);
         setup.createPage(frenchXClassTranslation, "French XClass page content", classPageName);

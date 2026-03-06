@@ -340,46 +340,60 @@ var XWiki = (function(XWiki){
             }
 
             // Create form and submit ajax request.
-            var parameters = {};
+            const body = new URLSearchParams();
 
-            parameters["action"] = "import";
-            parameters["name"] = this.name;
+            body.append("action", "import");
+            body.append("name", this.name);
+            body.append("form_token", document.documentElement.dataset.xwikiFormToken);
 
-            parameters["historyStrategy"] = $('packageDescription').down("input[type=radio][value='add']").checked ? "add" :
-                                            ($('packageDescription').down("input[type=radio][value='replace']").checked ? "replace" : "reset");
-            if (XWiki.hasBackupPackImportRights) {
-                parameters["importAsBackup"] = $('packageDescription').down("input[type=checkbox][name='importAsBackup']").checked ? "true" : "false";
+            const packageDescription = $('packageDescription');
+            if (packageDescription.down("input[type=radio][value='add']").checked) {
+              body.append("historyStrategy", "add");
+            } else if (packageDescription.down("input[type=radio][value='replace']").checked) {
+              body.append("historyStrategy", "replace");
+            } else {
+              body.append("historyStrategy", "reset");
             }
-            parameters["ajax"] = "1";
 
-            var pages = [];
+            if (XWiki.hasBackupPackImportRights) {
+              body.append("importAsBackup", packageDescription
+                .down("input[type=checkbox][name='importAsBackup']").checked ? "true" : "false");
+            }
+            body.append("ajax", "1");
 
-            selectedNodes.each(function(node) {
-              var expectedName = node.data.reference + ":" + node.data.locale
-              pages.push( expectedName );
-              parameters["language_" + expectedName] = node.data.locale;
+            selectedNodes.forEach(function(node) {
+              const expectedName = node.data.reference + ":" + node.data.locale;
+              body.append("pages", expectedName);
+              body.append("language_" + expectedName, node.data.locale);
             });
-
-            parameters["pages"] = pages;
 
             this.node.update();
             this.node.addClassName("loading");
             this.node.setStyle("min-height:200px");
 
             // Make sure the request goes through the Import action, where the actual import takes place.
-            new Ajax.Request(XWiki.currentDocument.getURL('import', Object.toQueryString(window.location.href.parseQuery())), {
-              method:'post',
-              parameters: parameters,
-              onSuccess: function(transport) {
-                 $('packagecontainer').removeClassName("loading");
-                 $('packagecontainer').update(transport.responseText);
-              },
-              onFailure: function(transport) {
-                   var errorMessage = "Failed to import documents. Reason: " +
-                     (transport.statusText || "Server not responding");
-                   $('packagecontainer').removeClassName("loading");
-                   $('packagecontainer').update( new Element("div", {'class':'errormessage'}).update(errorMessage) );
+            const packageContainer = this.node;
+            fetch(XWiki.currentDocument.getURL('import', Object.toQueryString(window.location.href.parseQuery())), {
+              method: 'POST',
+              body: body
+            }).then(async function(response) {
+              const text = await response.text();
+              packageContainer.removeClassName("loading");
+              if (response.ok) {
+                packageContainer.update(text);
+              } else {
+                const contentType = response.headers.get('Content-Type') || '';
+                const reason = contentType.startsWith('text/plain') && text ? text
+                  : (response.statusText || "Server not responding");
+                const errorDiv = new Element("div", {'class': 'errormessage'});
+                errorDiv.textContent = "Failed to import documents. Reason: " + reason;
+                packageContainer.update(errorDiv);
               }
+            }).catch(function() {
+              packageContainer.removeClassName("loading");
+              const errorDiv = new Element("div", {'class': 'errormessage'});
+              errorDiv.textContent = "Failed to import documents. Reason: Server not responding";
+              packageContainer.update(errorDiv);
             });
         },
 

@@ -120,6 +120,21 @@ public class ImportAdministrationSectionPage extends ViewPage
             "//div[@id='packagecontainer']/div[contains(@class, 'infomessage')]"));
     }
 
+    /**
+     * Click the import button and wait for an error message to appear.
+     *
+     * @return the text of the error message
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public String importPackageWithExpectedError()
+    {
+        this.importPackageLink.click();
+        By errorLocator = By.cssSelector("#packagecontainer div.errormessage");
+        getDriver().waitUntilElementIsVisible(errorLocator);
+        return getDriver().findElement(errorLocator).getText();
+    }
+
     public ViewPage clickImportedPage(String pageName)
     {
         getDriver().waitUntilElementIsVisible(By.linkText(pageName));

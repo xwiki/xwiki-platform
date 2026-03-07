@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
-  'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
   // jshint camelcase:false
@@ -36,9 +35,40 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
 
   // We want to still activate the links with a click even after they are selected from the finder.
   $.jstree.defaults.core.allow_reselect = true;
-
+  
+  // TODO: Should be moved to a common place (see XWIKI-19320).
+  function getIcon(iconName) {
+    let icon;
+    if (iconName !== undefined) {
+      const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(
+          XWiki.currentWiki)}/iconThemes/icons?name=${iconName}`;
+      let response = window.fetch(iconURL, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      response = response.then(response => response.json());
+      icon = response.then(response => response.icons[0]);
+    }
+    return icon;
+  }
+  
   var createSuggestInput = function(options) {
-    var input = document.createElement('input');
+    let container = document.createElement('div');
+    container.classList.add('xtree-finder-container');
+    getIcon('search').then(data => {
+      let isImage = data.iconSetType==='IMAGE';
+      let iconNature = isImage? 'img':'span';
+      let icon = document.createElement(iconNature);
+      if(isImage) {
+        icon.setAttribute('src', data.url);
+        icon.setAttribute('alt', '');
+        icon.setAttribute('data-xwiki-lightbox', 'false');
+      }
+      if(data.cssClass) icon.setAttribute('class', data.cssClass);
+      container.prepend(icon);
+    });
+    let input = document.createElement('input');
     input.type = 'text';
     input.className = 'xtree-finder';
     input.placeholder = options.finder.placeholder;
@@ -61,8 +91,8 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       timeout: 0,
       varname: 'query'
     });
-
-    return input;
+    container.appendChild(input);
+    return container;
   };
 
   var findNode = function(event, data) {

@@ -30,9 +30,7 @@ import type { TableCell } from "@blocknote/core";
 import type {
   BlockType,
   EditorInlineContentSchema,
-  EditorLink,
   EditorStyleSchema,
-  EditorStyledText,
   InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
@@ -90,14 +88,24 @@ export class UniAstToBlockNoteConverter {
           },
         };
 
-      case "quote":
+      case "quote": {
+        if (block.content.length < 1 || block.content[0].type !== "paragraph") {
+          throw new Error("Expected a paragraph to begin quote block");
+        }
+
         return {
           type: "quote",
           id: genId(),
-          children: [],
-          content: this.convertCustomBlockContent(block.content),
+          children: block.content
+            .slice(1)
+            .map((block) => this.convertBlock(block))
+            .flat(),
+          content: block.content[0].content.map((item) =>
+            this.convertInlineContent(item),
+          ),
           props: this.convertBlockStyles(block.styles),
         };
+      }
 
       case "code":
         return {
@@ -214,16 +222,6 @@ export class UniAstToBlockNoteConverter {
         rowspan: cell.rowSpan,
       },
     };
-  }
-
-  private convertCustomBlockContent(
-    content: Block[],
-  ): Array<EditorStyledText | EditorLink> {
-    if (content.length > 1 || content[0].type !== "paragraph") {
-      throw new Error("Expected a single paragraph inside custom block");
-    }
-
-    return content[0].content.map((item) => this.convertInlineContent(item));
   }
 
   private convertBlockStyles(styles: BlockStyles) {

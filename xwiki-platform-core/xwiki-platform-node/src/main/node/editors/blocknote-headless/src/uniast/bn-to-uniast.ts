@@ -237,11 +237,9 @@ export class BlockNoteToUniAstConverter {
         };
 
       case "quote":
-        dontExpectChildren();
-
         return {
           type: "quote",
-          content: [
+          content: provideTypeInference<Block[]>([
             {
               type: "paragraph",
               content: block.content.map((item) =>
@@ -249,7 +247,7 @@ export class BlockNoteToUniAstConverter {
               ),
               styles: {},
             },
-          ],
+          ]).concat(this.convertBlocks(block.children)),
           styles: this.convertBlockStyles(block.props),
         };
 

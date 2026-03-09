@@ -20,7 +20,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>TODO</div>
+  <li class="dropdown-header"><slot></slot></li>
 </template>
 
 <style scoped></style>

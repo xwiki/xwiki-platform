@@ -18,12 +18,41 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import XDialog from "./XDialog.vue";
+import XBtn from "./XBtn.vue";
+import XMenu from "./XMenu.vue";
+import XMenuItem from "./XMenuItem.vue";
+import XMenuLabel from "./XMenuLabel.vue";
 </script>
 
 <template>
   <div>
-    <x-dialog title="Hello World" :model-value="true">Some text</x-dialog>
+    <h1>Menus</h1>
+    <x-menu>
+      <template #activator>
+        <x-btn data-toggle="dropdown" variant="primary">menu button</x-btn>
+      </template>
+      <x-menu-label>menu label</x-menu-label>
+      <x-menu-item><span tabindex="-1">menu content</span></x-menu-item>
+    </x-menu>
+    <x-menu :disabled="true">
+      <template #activator>
+        <x-btn variant="primary" :disabled="true">menu button</x-btn>
+      </template>
+      <x-menu-item><span tabindex="-1">menu content</span></x-menu-item>
+    </x-menu>
+    <div>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+      volutpat pulvinar odio sit amet bibendum. Mauris leo erat, convallis eu
+      velit nec, laoreet suscipit mi. Fusce tempor sed justo vel tincidunt.
+      Phasellus faucibus ex enim, at pellentesque felis facilisis ac. Duis vel
+      velit metus. Morbi placerat quam ut aliquam rhoncus. Nunc sed fermentum
+      magna. Vivamus cursus velit suscipit tortor malesuada mollis. Vivamus
+      purus mi, maximus et mattis non, rhoncus et felis. Ut sodales, orci non
+      dignissim sollicitudin, sem nisl vehicula ex, vel tincidunt ante magna sit
+      amet ex. Nullam lacinia sapien vel tellus scelerisque, eu dapibus lorem
+      convallis. Maecenas porttitor ex molestie ipsum dignissim fringilla. Lorem
+      ipsum dolor sit amet, consectetur adipiscing elit.
+    </div>
   </div>
 </template>
 

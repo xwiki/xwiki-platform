@@ -18,37 +18,47 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { useId } from "vue";
+import { defineSlots, onMounted, useId, useTemplateRef } from "vue";
 
 const rootId = useId();
+
+// eslint-disable-next-line no-undef
+const jQuery: Promise<JQuery> = new Promise((resolve) => {
+  // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
+  require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
+});
+
+const toggle = useTemplateRef("toggle");
+
+onMounted(async () => {
+  const $ = await jQuery;
+  const $1 = $(toggle.value);
+  $1.children[0].dropdown();
+});
+
+async function initDropdown(element) {
+  const $ = await jQuery;
+  $(element).dropdown();
+}
 </script>
 
 <template>
   <div class="dropdown">
-    <button
+    <div
       :id="rootId"
-      type="button"
+      ref="toggle"
+      role="button"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
     >
-      <slot name="activator" />
-    </button>
+      <slot name="activator" :init-dropdown="initDropdown"></slot>
+    </div>
     <ul class="dropdown-menu" :aria-labelledby="rootId">
-      ...
+      <slot></slot>
     </ul>
   </div>
-  <sl-dropdown hoist stay-open-on-select>
-    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
-    Disabling it for now as I did not find an elegant solution to declare this property. -->
-    <!--eslint-disable-next-line vue/no-deprecated-slot-attribute -->
-    <span slot="trigger">
-      <slot name="activator" />
-    </span>
-    <sl-menu>
-      <slot name="default" />
-    </sl-menu>
-  </sl-dropdown>
 </template>
 
 <style scoped></style>

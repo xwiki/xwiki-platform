@@ -410,29 +410,34 @@ var XWiki = (function(XWiki){
          */
         createPackageHeader:function(infos)
         {
+            function makeValueSpan(className, text) {
+                var span = new Element("span", {'class': className});
+                span.textContent = text;
+                return span;
+            }
             var packageInfos = new Element("div", {'class':'packageinfos'});
             packageInfos.insert(  new Element("div")
                      .insert( new Element("span", {'class':'label'}).update(translations["package"]) )
-                     .insert( new Element("span", {'class':'filename'}).update(this.name) )  );
+                     .insert( makeValueSpan('filename', this.name) )  );
             if( infos.name !== "") {
               packageInfos.insert(  new Element("div")
                                       .insert( new Element("span", {'class':'label'}).update(translations["description"]) )
-                                      .insert( new Element("span", {'class':'name'}).update(infos.name) )  );
+                                      .insert( makeValueSpan('name', infos.name) )  );
             }
             if (infos.version !== "") {
               packageInfos.insert(  new Element("div")
                                       .insert( new Element("span", {'class':'label'}).update(translations["version"]) )
-                                      .insert( new Element("span", {'class':'version'}).update(infos.version) )  );
+                                      .insert( makeValueSpan('version', infos.version) )  );
             }
             if (infos.author !== "") {
               packageInfos.insert(  new Element("div")
                                       .insert( new Element("span", {'class':'label'}).update(translations["author"]) )
-                                      .insert( new Element("span", {'class':'author'}).update(infos.author) )  );
+                                      .insert( makeValueSpan('author', infos.author) )  );
             }
             if (infos.licence !== "") {
               packageInfos.insert(  new Element("div")
                                       .insert( new Element("span", {'class':'label'}).update(translations["licence"]) )
-                                      .insert( new Element("span", {'class':'licence'}).update(infos.licence) )  );
+                                      .insert( makeValueSpan('licence', infos.licence) )  );
             }
             return packageInfos;
         },
@@ -458,7 +463,8 @@ var XWiki = (function(XWiki){
                     '"icon":"fa fa-folder-o",' +
                     '"iconOpened":"fa fa-folder-open-o"'
                   +'}'
-              }).update(spaceNode.reference.name);
+              });
+            spaceItem.textContent = spaceNode.reference.name;
 
             var list = new Element("ul");
 
@@ -500,7 +506,8 @@ var XWiki = (function(XWiki){
                   '{'+
                     '"icon":"fa fa-file-o"'
                   +'}'
-              }).update(displayName);
+              });
+              pageItem.textContent = displayName;
 
               list.insert(pageItem);
           });

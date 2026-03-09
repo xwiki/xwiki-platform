@@ -24,19 +24,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution-debian</artifactId>
+    <artifactId>xwiki-platform-distribution-debian-tomcat11</artifactId>
     <version>17.10.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
-  <name>XWiki Platform - Distribution - Debian - Tomcat</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Debian - Tomcat</description>
-  <modules>
-    <module>xwiki-platform-distribution-debian-tomcat10</module>
-    <module>xwiki-platform-distribution-debian-tomcat11</module>
-  </modules>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
+  <artifactId>xwiki-platform-distribution-debian-tomcat11-pgsql</artifactId>
+  <name>XWiki Platform - Distribution - Debian - Tomcat ${debian.tomcat.version} - Postgres SQL</name>
+  <packaging>deb</packaging>
+  <description>XWiki Tomcat${debian.tomcat.version}/PostgreSQL</description>
+  <properties>
+    <debian.package>xwiki-tomcat${debian.tomcat.version}-pgsql</debian.package>
+  </properties>
 </project>

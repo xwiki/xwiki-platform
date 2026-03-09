@@ -48,6 +48,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>

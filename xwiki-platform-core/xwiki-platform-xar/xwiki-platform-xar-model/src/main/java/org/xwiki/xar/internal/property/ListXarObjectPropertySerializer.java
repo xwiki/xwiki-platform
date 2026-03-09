@@ -37,7 +37,16 @@ import org.xwiki.xar.internal.XarObjectPropertySerializer;
  * @version $Id$
  * @since 5.4M1
  */
-@Component(hints = {"StaticList", "DBList", "DBTreeList", "Page" })
+@Component(hints = {
+    // Class Types
+    "StaticList",
+    "DBList",
+    "DBTreeList",
+    "Page",
+    // Property types
+    "DBStringList",
+    "StringList"
+})
 @Singleton
 public class ListXarObjectPropertySerializer implements XarObjectPropertySerializer
 {

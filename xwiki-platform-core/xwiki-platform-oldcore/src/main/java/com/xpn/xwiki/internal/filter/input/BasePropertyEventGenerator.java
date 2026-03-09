@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.instance.internal.input.AbstractBeanEntityEventGenerator;
 
@@ -44,8 +45,9 @@ public class BasePropertyEventGenerator
         DocumentInstanceInputProperties properties) throws FilterException
     {
         // * WikiObjectProperty
-
-        propertyFilter.onWikiObjectProperty(xclassProperty.getName(), xclassProperty.getValue(),
-            FilterEventParameters.EMPTY);
+        FilterEventParameters filterEventParameters = new FilterEventParameters();
+        filterEventParameters.put(WikiObjectPropertyFilter.PARAMETER_OBJECTPROPERTY_TYPE,
+            xclassProperty.getPropertyType());
+        propertyFilter.onWikiObjectProperty(xclassProperty.getName(), xclassProperty.getValue(), filterEventParameters);
     }
 }

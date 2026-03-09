@@ -32,6 +32,7 @@ import javax.inject.Named;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -70,6 +71,7 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @since 6.2M1
  */
 @Component(hints = {
+    XARFilterUtils.ROLEHINT_17,
     XARFilterUtils.ROLEHINT_16,
     XARFilterUtils.ROLEHINT_15,
     XARFilterUtils.ROLEHINT_14,
@@ -736,12 +738,25 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
         try {
             this.writer.writeStartElement(XARObjectPropertyModel.ELEMENT_PROPERTY);
+            Object objectPropertyType = parameters.get(WikiObjectPropertyFilter.PARAMETER_OBJECTPROPERTY_TYPE);
+            boolean objectPropertyTypeExists = false;
+            if (objectPropertyType instanceof String stringObjectPropertyType
+                && StringUtils.isNotBlank(stringObjectPropertyType)) {
+                this.writer.writeAttribute(XARObjectPropertyModel.ATTRIBUTE_TYPE, stringObjectPropertyType);
+                objectPropertyTypeExists = true;
+            }
 
             this.writer.writeStartElement(name);
 
             String type = (String) parameters.get(WikiObjectPropertyFilter.PARAMETER_TYPE);
             if (type == null && this.currentObjectProperties != null) {
                 type = this.currentObjectProperties.get(name);
+            }
+
+            // we want to ensure to get the serializer based on the property type attribute when available if the
+            // field doesn't exist anymore so that the serialization still can be used.
+            if (type == null && objectPropertyTypeExists) {
+                type = (String) objectPropertyType;
             }
 
             try {

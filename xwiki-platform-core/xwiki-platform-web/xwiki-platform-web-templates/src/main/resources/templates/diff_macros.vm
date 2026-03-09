@@ -138,7 +138,7 @@
     #end
   #end
   #set ($obfuscate = $NULL)
-  #if ($diff.propType == 'Password' || ($diff.propType == 'Email' && $diff.className == 'XWiki.XWikiUsers'))
+  #if ($diff.sensitive)
     #set ($obfuscate = 'web.history.changes.privateInformation')
   #end
   #if (!$fieldName)

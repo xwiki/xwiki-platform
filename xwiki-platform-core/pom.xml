@@ -203,7 +203,19 @@
               </differences>
             </revapi.differences>
             
-
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.nowFinal</code>
+                  <old>field com.xpn.xwiki.objects.classes.PasswordClass.LOGGER</old>
+                  <new>field com.xpn.xwiki.objects.classes.PasswordClass.LOGGER</new>
+                  <justification>The field value should never be replaced and should have been final
+                    from sthe start.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
             
           </analysisConfiguration>
         </configuration>

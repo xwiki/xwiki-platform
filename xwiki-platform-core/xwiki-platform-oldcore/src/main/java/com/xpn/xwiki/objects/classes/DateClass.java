@@ -30,6 +30,7 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 import com.xpn.xwiki.XWikiException;
@@ -45,6 +46,13 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DateClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Date";
+
     private static final long serialVersionUID = 1L;
 
     /** Logging helper object. */
@@ -82,7 +90,7 @@ public class DateClass extends PropertyClass
      */
     public DateClass(PropertyMetaClass metaClass)
     {
-        super("date", "Date", metaClass);
+        super("date", PROPERTY_TYPE, metaClass);
 
         setSize(20);
         setDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -201,6 +209,12 @@ public class DateClass extends PropertyClass
         BaseProperty property = new DateProperty();
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     /**

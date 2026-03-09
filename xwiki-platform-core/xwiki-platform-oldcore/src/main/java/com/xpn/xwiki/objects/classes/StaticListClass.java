@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +37,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StaticListClass extends ListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "StaticList";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "staticlist";
@@ -146,5 +154,11 @@ public class StaticListClass extends ListClass
             hidden.setDisabled(isDisabled());
             buffer.append(hidden);
         }
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

@@ -234,8 +234,8 @@
             </resource>
             <!-- Include version.properties file -->
             <resource>
-              <directory>${basedir}/src/main/webInfResources</directory>
-              <targetPath>WEB-INF</targetPath>
+              <directory>${basedir}/src/main/filteredResources</directory>
+              <targetPath></targetPath>
               <filtering>true</filtering>
             </resource>
           </webResources>

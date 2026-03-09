@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
+  'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
   // jshint camelcase:false
@@ -37,7 +38,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   $.jstree.defaults.core.allow_reselect = true;
   
   // TODO: Should be moved to a common place (see XWIKI-19320).
-  function getIcon(iconName) {
+  async function getIcon(iconName) {
     let icon;
     if (iconName !== undefined) {
       const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(
@@ -47,8 +48,8 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
           'Accept': 'application/json'
         }
       });
-      response = response.then(response => response.json());
-      icon = response.then(response => response.icons[0]);
+      const json = await response.json();
+      icon = json.icons[0];
     }
     return icon;
   }
@@ -57,7 +58,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     let container = document.createElement('div');
     container.classList.add('xtree-finder-container');
     getIcon('search').then(data => {
-      let isImage = data.iconSetType==='IMAGE';
+      const isImage = data.iconSetType === 'IMAGE';
       let iconNature = isImage? 'img':'span';
       let icon = document.createElement(iconNature);
       if(isImage) {

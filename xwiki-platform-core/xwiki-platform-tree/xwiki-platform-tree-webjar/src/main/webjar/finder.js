@@ -43,7 +43,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     if (iconName !== undefined) {
       const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(
           XWiki.currentWiki)}/iconThemes/icons?name=${iconName}`;
-      let response = window.fetch(iconURL, {
+      const response = await fetch(iconURL, {
         headers: {
           'Accept': 'application/json'
         }

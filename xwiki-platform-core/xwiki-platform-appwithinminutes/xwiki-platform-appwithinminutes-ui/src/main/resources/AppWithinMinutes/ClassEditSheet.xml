@@ -726,7 +726,7 @@ $xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString))
   #updateAndSaveSheet
   #updateAndSaveTranslations
   #if ($action == 'save')
-    #if ("$!request.ajax" == 'true')
+    #if ($request.getHeader('X-Requested-With') == 'XMLHttpRequest')
       ## When saving through AJAX, don't redirect and don't render an error page. Let the client-side handle both.
       #if ($errorMessage)
         $response.setStatus(400)

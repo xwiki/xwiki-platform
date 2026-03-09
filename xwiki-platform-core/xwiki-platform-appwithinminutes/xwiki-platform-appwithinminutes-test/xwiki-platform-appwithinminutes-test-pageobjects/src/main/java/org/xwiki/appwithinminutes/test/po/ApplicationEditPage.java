@@ -43,7 +43,7 @@ public class ApplicationEditPage extends InlinePage
      * The form used to edit the application class overwrites the save button because it needs to process the submitted
      * data. Otherwise the request is forwarded by the action filter to the save action.
      */
-    @FindBy(xpath = "//*[@data-submit-value='xaction_save' or @name='xaction_save']")
+    @FindBy(css = "[data-submit-value=xaction_save], [name=xaction_save]")
     private WebElement saveButton;
 
     /**

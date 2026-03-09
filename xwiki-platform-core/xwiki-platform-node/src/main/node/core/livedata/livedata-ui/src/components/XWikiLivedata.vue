@@ -69,8 +69,6 @@ const logic = new LiveDataLogic(
   resolveTranslations,
 );
 
-// eslint is unable to resolved jquery's type, but TypeScript does.
-// eslint-disable-next-line no-undef
 const jQuery: JQueryStatic = inject("jQuery")!;
 
 provide<Logic>("logic", logic);

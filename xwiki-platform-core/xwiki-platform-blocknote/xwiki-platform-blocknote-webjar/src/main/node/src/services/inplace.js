@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // The Inplace edit mode is looking for a RequireJS module named "xwiki-<editorId>-inline".
-// eslint-disable-next-line no-undef
 define("xwiki-blocknote-inline", [
   "jquery",
   "xwiki-blocknote",
@@ -43,7 +42,7 @@ define("xwiki-blocknote-inline", [
       inputSyntax: `${BlockNote.syntax.type}/${BlockNote.syntax.version}`,
       outputSyntax: config.document.syntax,
       startupFocus: config.startupFocus,
-      // eslint-disable-next-line no-undef
+
       sourceDocumentReference: XWiki.Model.serialize(
         config.document.documentReference,
       ),

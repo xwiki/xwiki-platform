@@ -33,6 +33,8 @@ import org.xwiki.test.ui.po.InlinePage;
  */
 public class ApplicationEditPage extends InlinePage
 {
+    private static final String SAVE_BUTTON_SELECTORS = "[data-submit-value=xaction_save], [name=xaction_save]";
+
     @FindBy(id = "wizard-next")
     protected WebElement nextStepButton;
 
@@ -43,13 +45,13 @@ public class ApplicationEditPage extends InlinePage
      * The form used to edit the application class overwrites the save button because it needs to process the submitted
      * data. Otherwise the request is forwarded by the action filter to the save action.
      */
-    @FindBy(css = "[data-submit-value=xaction_save], [name=xaction_save]")
+    @FindBy(css = SAVE_BUTTON_SELECTORS)
     private WebElement saveButton;
 
     /**
      * @see #saveButton
      */
-    @FindBy(xpath = "//*[@data-submit-value='xaction_saveandcontinue' or @name='xaction_saveandcontinue']")
+    @FindBy(css = "[data-submit-value=xaction_saveandcontinue], [name=xaction_saveandcontinue]")
     private WebElement saveAndContinueButton;
 
     /**
@@ -79,9 +81,7 @@ public class ApplicationEditPage extends InlinePage
 
         if (wait) {
             // The save button either gets a data attribute to submit a custom value or is renamed to xaction_save.
-            By findBy = (waitOnXAction)
-                ? By.xpath("//*[@data-submit-value='xaction_save' or @name='xaction_save']")
-                : By.id("wizard-next");
+            By findBy = (waitOnXAction) ? By.cssSelector(SAVE_BUTTON_SELECTORS) : By.id("wizard-next");
             getDriver().waitUntilElementIsVisible(findBy);
         }
     }

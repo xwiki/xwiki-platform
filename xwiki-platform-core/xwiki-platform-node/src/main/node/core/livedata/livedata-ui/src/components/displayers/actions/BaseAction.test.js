@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,29 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { config, mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
 import BaseAction from "./BaseAction.vue";
-import sinon from "sinon";
+import { config, mount } from "@vue/test-utils";
 import _ from "lodash-es";
+import { fake } from "sinon";
+import { describe, expect, it } from "vitest";
 
 config.global.mocks = {
-  $t: tKey => tKey,
+  $t: (tKey) => tKey,
 };
 
 function initWrapper(options) {
-  return mount(BaseAction, _.merge({
-    props: {
-      titleTranslationKey: "title.translation.key",
-      closePopover: () => {
+  return mount(
+    BaseAction,
+    _.merge(
+      {
+        props: {
+          titleTranslationKey: "title.translation.key",
+          closePopover: () => {},
+        },
+        global: {
+          mocks: {
+            $t: (key) => key,
+          },
+        },
       },
-    },
-    global: {
-      mocks: {
-        $t: (key) => key,
-      },
-    },
-  }, options));
+      options,
+    ),
+  );
 }
 
 describe("BaseAction.vue", () => {
@@ -76,7 +81,7 @@ describe("BaseAction.vue", () => {
   });
 
   it("Handler is called on click", async () => {
-    const mockFn = sinon.fake();
+    const mockFn = fake();
 
     const wrapper = initWrapper({
       props: {

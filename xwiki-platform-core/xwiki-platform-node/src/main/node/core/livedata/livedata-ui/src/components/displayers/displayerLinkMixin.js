@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -31,10 +31,12 @@ export default {
       // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#properties
       // See
       // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#interactive_content
-      const interactiveContent = "a, button, details, embed, iframe, keygen, label, select, textarea, audio[controls],"
-        + "img[usemap], input, menu[type=toolbar], object[usemap], video[controls]";
-      [...container.querySelectorAll(interactiveContent)].forEach(
-        node => node.parentNode.removeChild(node));
+      const interactiveContent =
+        "a, button, details, embed, iframe, keygen, label, select, textarea, audio[controls]," +
+        "img[usemap], input, menu[type=toolbar], object[usemap], video[controls]";
+      [...container.querySelectorAll(interactiveContent)].forEach((node) =>
+        node.parentNode.removeChild(node),
+      );
       return container.innerHTML.trim();
     },
   },

@@ -25,7 +25,7 @@
 <!--
   Context configuration file for the XWiki Web App
 
-  This file is used only for Tomcat 10 deployment of XWiki via debian packages.
+  This file is used only for Tomcat 11 deployment of XWiki via debian packages.
   It is equivalent to, and needs to be kept up to date with traditional
   deployment file:
   xwiki-platform/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/META-INF/context.xml

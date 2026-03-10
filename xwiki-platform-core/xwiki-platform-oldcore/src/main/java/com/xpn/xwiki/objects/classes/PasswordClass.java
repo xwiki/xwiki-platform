@@ -370,4 +370,10 @@ public class PasswordClass extends StringClass
     {
         return PROPERTY_TYPE;
     }
+
+    @Override
+    public Object getObfuscatedValue(Object value)
+    {
+        return FORM_PASSWORD_PLACEHODLER;
+    }
 }

@@ -80,17 +80,17 @@ public class Property extends Element
     }
 
     /**
+     * Returns the {@link BaseProperty#getObfuscatedValue()} or {@link BaseProperty#getValue()} if the user has
+     * programming rights.
      * @return the actual value of the property, as a String, Number or List.
      */
     public java.lang.Object getValue()
     {
-        // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
-        // API level, so that java code using core classes will still have access, regardless or rights.
-        if (isSensitive() && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-            return null;
+        if (getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+            return getProperty().getValue();
+        } else {
+            return getBaseProperty().getObfuscatedValue();
         }
-
-        return getBaseProperty().getValue();
     }
 
     /**

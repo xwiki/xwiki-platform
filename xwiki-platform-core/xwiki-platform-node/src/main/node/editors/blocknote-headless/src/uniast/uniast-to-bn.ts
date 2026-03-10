@@ -89,6 +89,7 @@ export class UniAstToBlockNoteConverter {
         };
 
       case "quote": {
+        // Quotes must start with actual text (a paragraph)
         if (block.content.length < 1 || block.content[0].type !== "paragraph") {
           throw new Error("Expected a paragraph to begin quote block");
         }
@@ -96,13 +97,15 @@ export class UniAstToBlockNoteConverter {
         return {
           type: "quote",
           id: genId(),
+          // First paragraph is the base content of the quote
+          content: block.content[0].content.map((item) =>
+            this.convertInlineContent(item),
+          ),
+          // Rest is the following children
           children: block.content
             .slice(1)
             .map((block) => this.convertBlock(block))
             .flat(),
-          content: block.content[0].content.map((item) =>
-            this.convertInlineContent(item),
-          ),
           props: this.convertBlockStyles(block.styles),
         };
       }

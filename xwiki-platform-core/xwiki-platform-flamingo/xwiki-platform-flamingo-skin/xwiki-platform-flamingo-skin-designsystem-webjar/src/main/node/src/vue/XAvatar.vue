@@ -21,6 +21,7 @@
 import { computed } from "vue";
 import type { AvatarProps } from "@xwiki/platform-dsapi";
 const { name, image, size } = defineProps<AvatarProps>();
+import "../types";
 
 const classes = computed(() => {
   const defaultClasses = ["avatar"];

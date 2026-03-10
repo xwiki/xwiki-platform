@@ -21,16 +21,13 @@
 import { onMounted, ref, useTemplateRef, watchEffect } from "vue";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 import type { Ref } from "vue";
-// Preemptively import XBtn to make sure it is available during onMounted. Otherwise, they can be rendered with a delay
-// since DS components are loaded lazily, and that breaks the modal initialization.
-import "./XBtn.vue";
 
 const { width, title } = defineProps<DialogProps>();
 
-const jQuery: Promise<JQuery> = new Promise((resolve) => {
+const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
   // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
+  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
 });
 
 const root = useTemplateRef("root");
@@ -40,6 +37,7 @@ const modal: Ref = ref(undefined);
 onMounted(async () => {
   const $ = await jQuery;
   const modalElement = $(root.value!);
+  // @ts-expect-error - bootstrap modal not typed on JQuery
   modal.value = modalElement.modal({ show: false });
   modalElement.on("show.bs.modal", () => {
     open.value = true;

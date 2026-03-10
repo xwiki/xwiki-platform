@@ -26,19 +26,19 @@ import "./XTabPanel.vue";
 
 const tabs = useTemplateRef("tabs");
 
-const jQuery: Promise<JQuery> = new Promise((resolve) => {
+const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
   // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
+  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
 });
 
 onMounted(async () => {
   const $ = await jQuery;
-  const tabsElement = $(tabs.value);
+  const tabsElement = $(tabs.value!);
   if (tabsElement.find('[role="presentation"].active').length == 0) {
     // If not tab is active, show the first one
     const find = tabsElement.find("a:first");
-    console.log("find", find);
+    // @ts-expect-error - bootstrap tab not typed on JQuery
     find.tab("show");
   }
 });

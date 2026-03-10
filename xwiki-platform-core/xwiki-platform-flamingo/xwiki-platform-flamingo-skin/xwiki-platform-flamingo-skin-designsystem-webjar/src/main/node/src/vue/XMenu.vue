@@ -27,7 +27,8 @@ defineSlots<{ default(): void }>();
 const dropdownContext = inject(dropdownKey);
 
 // Renders the div with the open class only if we are not in a dropdown
-const WrapIf = (props, { slots }) =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const WrapIf = (props: unknown, { slots }: { slots: any }) =>
   dropdownContext?.inDropdown !== true
     ? h("div", { class: "open" }, slots.default())
     : h(Fragment, slots.default());

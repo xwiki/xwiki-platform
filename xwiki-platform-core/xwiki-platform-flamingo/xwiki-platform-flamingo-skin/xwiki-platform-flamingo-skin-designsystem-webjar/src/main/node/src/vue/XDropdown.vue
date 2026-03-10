@@ -34,15 +34,16 @@ const toggle = useTemplateRef("toggle");
 defineProps<DropdownProps>();
 defineSlots<{ default(): void; activator(): void }>();
 
-const jQuery: Promise<JQuery> = new Promise((resolve) => {
+const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
   // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
+  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
 });
 
 onMounted(async () => {
   const $ = await jQuery;
-  $(toggle.value).dropdown();
+  // @ts-expect-error - bootstrap dropdown not typed on JQuery
+  $(toggle.value!).dropdown();
 });
 </script>
 

@@ -22,6 +22,7 @@ import XBtn from "./XBtn.vue";
 import { dropdownKey } from "./inject/keys";
 import { onMounted, provide, useId, useTemplateRef } from "vue";
 import type { DropdownProps } from "@xwiki/platform-dsapi";
+import "../data-attributes";
 
 const rootId = useId();
 

@@ -59,23 +59,23 @@
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>3.2.3</tika.version>
-    <pdfbox.version>3.0.6</pdfbox.version>
+    <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.6</jetty.server.version>
+    <jetty.server.version>12.1.7</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.2.10.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.152.0</metaeffekt.version>
+    <metaeffekt.version>0.153.1</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.4</zookeeper.version>
+    <zookeeper.version>3.9.5</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
 
     <!-- The default Tomcat cache size  -->
@@ -127,7 +127,7 @@
     <pgsql.version>42.7.10</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.20.0.0</oracle.version>
+    <oracle.version>21.21.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
@@ -345,7 +345,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>

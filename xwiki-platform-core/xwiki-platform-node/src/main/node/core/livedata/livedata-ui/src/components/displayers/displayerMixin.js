@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -27,7 +27,6 @@ import DOMPurify from "dompurify";
  * It should be included in every custom displayer component
  */
 export default {
-
   inject: ["logic"],
 
   directives: {
@@ -109,12 +108,13 @@ export default {
     /**
      * Generic save operation.
      *
-     * @param value of a value is provided, it is used for saving the property, otherwise
-     *   `this.editedValue` is used
+     * @param value - of a value is provided, it is used for saving the property, otherwise `this.editedValue` is used
      */
     genericSave(value) {
       const savedValue = value || this.editedValue;
-      this.logic.getEditBus().save(this.entry, this.propertyId, { [this.propertyId]: savedValue });
+      this.logic
+        .getEditBus()
+        .save(this.entry, this.propertyId, { [this.propertyId]: savedValue });
     },
     sanitizeHtml(value) {
       if (!this.logic.isContentTrusted()) {
@@ -128,10 +128,13 @@ export default {
     sanitizeUrl(url, subtitute) {
       // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see
       // XWIKI-20249).
-      if (this.logic.isContentTrusted() || DOMPurify.isValidAttribute("a", "href", url)) {
+      if (
+        this.logic.isContentTrusted() ||
+        DOMPurify.isValidAttribute("a", "href", url)
+      ) {
         return url;
       } else {
-        return (subtitute || "#");
+        return subtitute || "#";
       }
     },
   },
@@ -143,7 +146,7 @@ export default {
   },
 
   watch: {
-    isView: function(newIsView) {
+    isView: function (newIsView) {
       if (newIsView) {
         // When we switch back to view mode, the edited value is reset.
         this.editedValue = undefined;

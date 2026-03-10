@@ -33,5 +33,6 @@
   <description>XWiki Platform - Distribution - Debian - Tomcat</description>
   <modules>
     <module>xwiki-platform-distribution-debian-tomcat10</module>
+    <module>xwiki-platform-distribution-debian-tomcat11</module>
   </modules>
 </project>

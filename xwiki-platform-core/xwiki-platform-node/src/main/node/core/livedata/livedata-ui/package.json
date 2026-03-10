@@ -38,7 +38,7 @@
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue,js}\" --max-warnings=0",
     "test": "vitest --run"
   },
   "types": "./dist/index.d.ts",

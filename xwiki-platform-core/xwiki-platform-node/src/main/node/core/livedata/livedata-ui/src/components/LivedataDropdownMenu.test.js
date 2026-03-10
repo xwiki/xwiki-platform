@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { mount } from "@vue/test-utils";
 import LivedataDropdownMenu from "./LivedataDropdownMenu.vue";
+import { mount } from "@vue/test-utils";
+import { spy } from "sinon";
 import { describe, expect, it } from "vitest";
-import sinon from "sinon";
 import { ref } from "vue";
 
 /**
@@ -36,7 +36,7 @@ function initWrapper() {
     contextPath: "",
   };
 
-  const changeLayout = sinon.spy();
+  const changeLayout = spy();
   const wrapper = mount(LivedataDropdownMenu, {
     global: {
       provide: {
@@ -117,6 +117,8 @@ describe("LivedataDropdownMenu.vue", () => {
 
   it("Is not expanded by default", () => {
     const { wrapper } = initWrapper();
-    expect(wrapper.find("[data-toggle=\"dropdown\"]").attributes("aria-expanded")).toBe("false");
+    expect(
+      wrapper.find('[data-toggle="dropdown"]').attributes("aria-expanded"),
+    ).toBe("false");
   });
 });

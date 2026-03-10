@@ -3,7 +3,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "isolatedDeclarations": false,
-    "types": ["@xwiki/platform-dsapi", "dom"]
+    "types": ["@xwiki/platform-dsapi", "dom"],
+    "noEmit": true
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [
@@ -12,6 +13,7 @@
   "exclude": [
     "**/*.spec.ts",
     "**/*.test.ts",
-    "*.config.*"
-  ]
+    "*.config.*",
+    "**/__tests__/*"
+  ],
 }

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "isolatedDeclarations": false,
+    "noEmit": true
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [

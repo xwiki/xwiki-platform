@@ -27,10 +27,9 @@ import "./XBtn.vue";
 
 const { width, title } = defineProps<DialogProps>();
 
-// eslint-disable-next-line no-undef
 const jQuery: Promise<JQuery> = new Promise((resolve) => {
   // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
 });
 

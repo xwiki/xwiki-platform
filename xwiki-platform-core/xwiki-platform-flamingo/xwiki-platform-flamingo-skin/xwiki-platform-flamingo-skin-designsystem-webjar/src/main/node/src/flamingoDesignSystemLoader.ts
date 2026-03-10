@@ -44,6 +44,11 @@ export class FlamingoDesignSystemLoader implements DesignSystemLoader {
     registerAsyncComponent(app, "XDivider", () => import("./vue/XDivider.vue"));
     registerAsyncComponent(
       app,
+      "XDropdown",
+      () => import("./vue/XDropdown.vue"),
+    );
+    registerAsyncComponent(
+      app,
       "XFileInput",
       () => import("./vue/XFileInput.vue"),
     );

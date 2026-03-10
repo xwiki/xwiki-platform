@@ -37,7 +37,7 @@
   "scripts": {
     "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
-    "build": "vite build",
+    "build": "vite build --debug",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test:unit": "vitest --run --passWithNoTests",

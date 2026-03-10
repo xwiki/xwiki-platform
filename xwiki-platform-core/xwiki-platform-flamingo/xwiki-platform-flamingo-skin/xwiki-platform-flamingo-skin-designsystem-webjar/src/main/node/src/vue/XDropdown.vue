@@ -18,13 +18,21 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from "vue";
-// Preemptively import XTab and XTabPanel to make sure they are available during onMounted. Otherwise, they can be
-// rendered with a delay since DS components are loaded lazily, and that breaks the modal initialization.
-import "./XTab.vue";
-import "./XTabPanel.vue";
+import XBtn from "./XBtn.vue";
+import { dropdownKey } from "./inject/keys";
+import { onMounted, provide, useId, useTemplateRef } from "vue";
+import type { DropdownProps } from "@xwiki/platform-dsapi";
 
-const tabs = useTemplateRef("tabs");
+const rootId = useId();
+
+// Define a context to let children know they are in a dropdown. This is useful for the menu element that needs to
+// behave differently when in a dropdown.
+provide(dropdownKey, { inDropdown: true, activatorId: rootId });
+
+const toggle = useTemplateRef("toggle");
+
+defineProps<DropdownProps>();
+defineSlots<{ default(): void; activator(): void }>();
 
 const jQuery: Promise<JQuery> = new Promise((resolve) => {
   // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
@@ -34,27 +42,26 @@ const jQuery: Promise<JQuery> = new Promise((resolve) => {
 
 onMounted(async () => {
   const $ = await jQuery;
-  const tabsElement = $(tabs.value);
-  if (tabsElement.find('[role="presentation"].active').length == 0) {
-    // If not tab is active, show the first one
-    const find = tabsElement.find("a:first");
-    console.log("find", find);
-    find.tab("show");
-  }
+  $(toggle.value).dropdown();
 });
 </script>
 
 <template>
-  <div>
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist" ref="tabs">
-      <slot name="tabs"></slot>
-    </ul>
-
-    <!-- Tab panes -->
-    <div class="tab-content">
-      <slot name="panels"></slot>
-    </div>
+  <div class="dropdown">
+    <x-btn
+      :disabled="disabled"
+      :id="rootId"
+      ref="toggle"
+      class="dropdown-toggle"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+      v-bind="btnProps"
+    >
+      <slot name="activator"></slot>
+      &nbsp;<span class="caret"></span>
+    </x-btn>
+    <slot v-if="!disabled"></slot>
   </div>
 </template>
 

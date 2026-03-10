@@ -17,45 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import XBtn from "../XBtn.vue";
 import XMenu from "../XMenu.vue";
-import XMenuItem from "../XMenuItem.vue";
-import XMenuLabel from "../XMenuLabel.vue";
 import {
   runTest,
   shallowMountHelper,
 } from "@xwiki/platform-test-accessibility";
-import { describe } from "vitest";
-import Module from "module";
+import { describe, expect } from "vitest";
 
-function getAccessibilityMount() {
-  // Override require used globally but resolved to node's required by default.
-  Module.prototype.require = () => {};
-  return shallowMountHelper(XMenu, {
-    global: {
-      stubs: {
-        // Use the real implementation instead of stubvs for XMenuItem and XMenuLabel
-        XMenuItem,
-        XMenuLabel,
-        XBtn,
-      },
+const getAccessibilityMount = shallowMountHelper(XMenu, {
+  global: {
+    stubs: {
+      "wrap-if": false,
+      "x-menu-label": false,
+      "x-menu-item": false,
     },
-  });
-}
-
-const accessibilityMount = getAccessibilityMount();
+  },
+});
 describe("XMenu", () => {
   runTest(
     "render no props",
-    accessibilityMount({
+    getAccessibilityMount({
       slots: {
-        activator: `<x-btn variant="primary">menu button</x-btn>`,
         default: `<x-menu-label>menu label</x-menu-label>
       <x-menu-item>menu content</x-menu-item>`,
       },
     }),
     (wrapper) => {
-      console.log(wrapper.html());
+      expect(wrapper.find("div").classes()).toContain("open");
+      expect(wrapper.find("div > ul").classes()).toContain("dropdown-menu");
     },
   );
 });

@@ -36,8 +36,6 @@ const src = computed(() => {
   if (image) {
     return image;
   } else {
-    // XWiki is untype and glovally defined
-    // eslint-disable-next-line no-undef
     return `${XWiki.contextPath}/bin/skin/resources/icons/xwiki/noavatar.png`;
   }
 });

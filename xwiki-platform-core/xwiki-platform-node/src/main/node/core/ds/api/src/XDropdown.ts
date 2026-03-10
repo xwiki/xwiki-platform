@@ -17,6 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import ComponentInit from "./componentsInit";
 
-export { ComponentInit };
+import type { BtnProps } from "./XBtn";
+
+/**
+ * @since 18.2.0RC1
+ * @beta
+ */
+type DropdownProps = {
+  disabled?: boolean;
+  btnProps?: BtnProps;
+};
+
+export type { DropdownProps };

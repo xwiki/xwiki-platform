@@ -20,7 +20,7 @@ export { it as test }
 export function runTest(name: string, wrapper: VueWrapper, assertions: (wrapper: VueWrapper) => Promise<void> | void): void;
 
 // @public
-export function shallowMountHelper(component: Component, baseConfig?: Record<string, unknown>): (config?: Record<string, unknown>) => VueWrapper;
+export function mountHelpers(component: Component, baseConfig?: Record<string, unknown>): (config?: Record<string, unknown>) => VueWrapper;
 
 // (No @packageDocumentation comment for this package)
 

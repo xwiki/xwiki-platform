@@ -18,47 +18,41 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { defineSlots, onMounted, useId, useTemplateRef } from "vue";
+import { dropdownKey } from "./inject/keys";
+import { Fragment, h, inject } from "vue";
 
-const rootId = useId();
+defineSlots<{ default(): void }>();
 
-// eslint-disable-next-line no-undef
-const jQuery: Promise<JQuery> = new Promise((resolve) => {
-  // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
-  require(["jquery", "bootstrap"], ($: JQuery) => resolve($));
-});
+// Retrieve the eventual parent dropdown context as we need to display the menu differently if it is in a dropdown.
+const dropdownContext = inject(dropdownKey);
 
-const toggle = useTemplateRef("toggle");
-
-onMounted(async () => {
-  const $ = await jQuery;
-  const $1 = $(toggle.value);
-  $1.children[0].dropdown();
-});
-
-async function initDropdown(element) {
-  const $ = await jQuery;
-  $(element).dropdown();
-}
+// Renders the div with the open class only if we are not in a dropdown
+const WrapIf = (props, { slots }) =>
+  dropdownContext?.inDropdown !== true
+    ? h("div", { class: "open" }, slots.default())
+    : h(Fragment, slots.default());
 </script>
 
 <template>
-  <div class="dropdown">
-    <div
-      :id="rootId"
-      ref="toggle"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
+  <WrapIf :class="dropdownContext?.inDropdown !== true ? $style['open'] : ''">
+    <ul
+      :class="[
+        'dropdown-menu',
+        dropdownContext?.inDropdown !== true ? $style['dropdown-menu'] : '',
+      ]"
+      :aria-labelledby="dropdownContext?.activatorId"
     >
-      <slot name="activator" :init-dropdown="initDropdown"></slot>
-    </div>
-    <ul class="dropdown-menu" :aria-labelledby="rootId">
       <slot></slot>
     </ul>
-  </div>
+  </WrapIf>
 </template>
 
-<style scoped></style>
+<style module>
+.open .dropdown-menu {
+  display: inline-block;
+}
+.dropdown-menu {
+  float: initial;
+  position: initial;
+}
+</style>

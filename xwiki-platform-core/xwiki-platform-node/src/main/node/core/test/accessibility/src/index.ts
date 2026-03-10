@@ -19,7 +19,7 @@
  */
 import { assertAxe } from "./assert-axe";
 import { it, test } from "./axe-test";
+import { mountHelper, shallowMountHelper } from "./mount-helpers";
 import { runTest } from "./run-test";
-import { shallowMountHelper } from "./shallow-mount-helper";
 
-export { assertAxe, it, runTest, shallowMountHelper, test };
+export { assertAxe, it, mountHelper, runTest, shallowMountHelper, test };

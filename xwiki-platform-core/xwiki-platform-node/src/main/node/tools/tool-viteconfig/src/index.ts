@@ -128,8 +128,9 @@ function generateConfig(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateConfigVue(path: string): Record<string, any> {
+  const baseConfig = generateConfig(path);
   return mergeConfig(
-    generateConfig(path),
+    baseConfig,
     defineConfig({
       build: {
         cssCodeSplit: true,
@@ -143,6 +144,7 @@ function generateConfigVue(path: string): Record<string, any> {
         },
       },
       plugins: [
+        ...(baseConfig.plugins ?? []),
         vue(),
         // This plugin is useful to make the CSS of a given module loaded by the
         // module itself, allowing CSS to be loaded even when Cristal is

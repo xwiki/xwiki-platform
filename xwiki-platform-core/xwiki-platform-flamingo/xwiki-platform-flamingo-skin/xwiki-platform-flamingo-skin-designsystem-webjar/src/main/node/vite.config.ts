@@ -26,7 +26,7 @@ const defaults = generateConfigVue(import.meta.url);
 // Exclude @xwiki/platform-api from external dependencies because it is currently not distributed as a webjar.
 // TODO: See XWIKI-XYZ
 // We proceed by mutation of the default configuration because the merge strategy of vite does not propose a
-// substractive operation (i.e., it's only possible to add new externals, but not to remove them).
+// subtractive operation (i.e., it's only possible to add new externals, but not to remove them).
 defaults.build.rollupOptions.external =
   defaults.build.rollupOptions.external.filter(
     (it) => it !== "@xwiki/platform-api",

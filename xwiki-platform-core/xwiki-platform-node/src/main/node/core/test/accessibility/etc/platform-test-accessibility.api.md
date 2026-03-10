@@ -17,10 +17,13 @@ export { it }
 export { it as test }
 
 // @public
+export function mountHelper(component: Component, baseConfig?: Record<string, unknown>): (config?: Record<string, unknown>) => VueWrapper;
+
+// @public
 export function runTest(name: string, wrapper: VueWrapper, assertions: (wrapper: VueWrapper) => Promise<void> | void): void;
 
 // @public
-export function mountHelpers(component: Component, baseConfig?: Record<string, unknown>): (config?: Record<string, unknown>) => VueWrapper;
+export function shallowMountHelper(component: Component, baseConfig?: Record<string, unknown>): (config?: Record<string, unknown>) => VueWrapper;
 
 // (No @packageDocumentation comment for this package)
 

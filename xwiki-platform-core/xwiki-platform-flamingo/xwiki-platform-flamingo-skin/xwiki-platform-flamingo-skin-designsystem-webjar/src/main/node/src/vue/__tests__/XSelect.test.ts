@@ -26,7 +26,7 @@ import { describe, expect } from "vitest";
 import type { SelectProps } from "@xwiki/platform-dsapi";
 
 const accessibilityMount = shallowMountHelper(XSelect);
-describe("XFileInput", () => {
+describe("XSelect", () => {
   runTest(
     "render minimal props",
     accessibilityMount({

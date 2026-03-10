@@ -26,7 +26,7 @@ import { describe, expect } from "vitest";
 import type { FormProps } from "@xwiki/platform-dsapi";
 
 const accessibilityMount = shallowMountHelper(XForm);
-describe("XFileInput", () => {
+describe("XForm", () => {
   let submited = false;
   runTest(
     "render minimal props",

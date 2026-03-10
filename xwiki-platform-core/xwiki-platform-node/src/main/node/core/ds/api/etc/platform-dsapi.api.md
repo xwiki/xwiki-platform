@@ -29,11 +29,12 @@ export type AbstractElements = {
     XCheckbox: DefineComponent<CheckboxProps & InputHTMLAttributes>;
     XDialog: DefineComponent<DialogProps & DialogHTMLAttributes>;
     XDivider: DefineComponent<HTMLAttributes>;
+    XDropdown: DefineComponent<DropdownProps & HTMLAttributes>;
     XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
     XForm: DefineComponent<FormProps & FormHTMLAttributes>;
     XImg: DefineComponent<ImgHTMLAttributes>;
     XLoad: DefineComponent<LoadProps & HTMLAttributes>;
-    XMenu: DefineComponent<MenuProps & HTMLAttributes>;
+    XMenu: DefineComponent<HTMLAttributes>;
     XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
     XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
     XSelect: DefineComponent<SelectProps & SelectHTMLAttributes>;
@@ -120,6 +121,12 @@ export type DisplayableTreeNode = TreeNode<{
 }>;
 
 // @beta (undocumented)
+export type DropdownProps = {
+    disabled?: boolean;
+    btnProps?: BtnProps;
+};
+
+// @beta (undocumented)
 export type FileInputModel = File | File[] | null | undefined;
 
 // @beta
@@ -144,11 +151,6 @@ export type MenuItemProps = {
 
 // @beta (undocumented)
 export type MenuLabelProps = unknown;
-
-// @beta (undocumented)
-export type MenuProps = {
-    disabled?: boolean;
-};
 
 // @beta
 export type SelectProps = {

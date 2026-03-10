@@ -165,18 +165,31 @@ type InlineContent =
   | ({ type: "text" } & Text)
   | ({ type: "image" } & Image)
   | ({ type: "link" } & Link)
+  /**
+   * @since 18.0.0RC1
+   * @beta
+   */
   | {
-      /**
-       * @since 18.0.0RC1
-       * @beta
-       */
       type: "inlineMacro";
-
-      /**
-       * @since 18.0.0RC1
-       * @beta
-       */
       call: MacroInvocation;
+    }
+  /**
+   * @since 18.0.0RC1
+   * @beta
+   */
+  | {
+      type: "subscript";
+      content: string;
+      styles: TextStyles;
+    }
+  /**
+   * @since 18.0.0RC1
+   * @beta
+   */
+  | {
+      type: "superscript";
+      content: string;
+      styles: TextStyles;
     };
 
 /**

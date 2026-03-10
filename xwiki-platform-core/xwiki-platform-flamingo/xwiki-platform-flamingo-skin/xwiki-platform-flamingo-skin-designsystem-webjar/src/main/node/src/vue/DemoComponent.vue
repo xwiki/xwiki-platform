@@ -26,6 +26,16 @@ import XMenuLabel from "./XMenuLabel.vue";
 
 <template>
   <div>
+    <div>
+      a
+      <ul class="dropdown-menu open" aria-labelledby="dropdownMenu1">
+        <li><a href="#">Action</a></li>
+        <li><a href="#">Another action</a></li>
+        <li><a href="#">Something else here</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#">Separated link</a></li>
+      </ul>
+    </div>
     <h1>Menus</h1>
     <x-menu>
       <template #activator>

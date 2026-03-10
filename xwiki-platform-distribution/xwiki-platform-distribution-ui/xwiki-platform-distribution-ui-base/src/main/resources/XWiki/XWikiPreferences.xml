@@ -53,7 +53,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>accessibility</name>
-      <number>11</number>
+      <number>12</number>
       <prettyName>Enable extra accessibility features</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -64,7 +64,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>admin_email</name>
-      <number>19</number>
+      <number>21</number>
       <picker>0</picker>
       <prettyName>Admin eMail</prettyName>
       <size>30</size>
@@ -81,7 +81,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>authenticate_edit</name>
-      <number>4</number>
+      <number>5</number>
       <prettyName>Authenticated Edit</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -96,7 +96,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>authenticate_view</name>
-      <number>5</number>
+      <number>6</number>
       <prettyName>Authenticated View</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -111,7 +111,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>backlinks</name>
-      <number>40</number>
+      <number>42</number>
       <prettyName>Activate the backlinks</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -128,7 +128,7 @@
       <idField/>
       <multiSelect>0</multiSelect>
       <name>colorTheme</name>
-      <number>7</number>
+      <number>8</number>
       <picker>0</picker>
       <prettyName>Color theme</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -152,7 +152,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>comment_anonymous</name>
-      <number>33</number>
+      <number>35</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -176,7 +176,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>comment_registered</name>
-      <number>34</number>
+      <number>36</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -197,9 +197,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>confirmation_email_content</name>
-      <number>26</number>
+      <number>28</number>
       <picker>0</picker>
       <prettyName>Confirmation eMail Content</prettyName>
+      <restricted>0</restricted>
       <rows>10</rows>
       <size>72</size>
       <tooltip/>
@@ -224,7 +225,7 @@
 {{/velocity}}</customDisplay>
       <disabled>0</disabled>
       <name>core.defaultDocumentSyntax</name>
-      <number>37</number>
+      <number>39</number>
       <picker>0</picker>
       <prettyName>Default document syntax</prettyName>
       <size>60</size>
@@ -237,7 +238,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>dateformat</name>
-      <number>17</number>
+      <number>19</number>
       <picker>0</picker>
       <prettyName>Date Format</prettyName>
       <size>30</size>
@@ -271,7 +272,7 @@
       <idField/>
       <multiSelect>0</multiSelect>
       <name>documentBundles</name>
-      <number>48</number>
+      <number>50</number>
       <picker>1</picker>
       <prettyName>Internationalization Document Bundles</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -295,7 +296,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>edit_anonymous</name>
-      <number>31</number>
+      <number>33</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -319,7 +320,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>edit_registered</name>
-      <number>32</number>
+      <number>34</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -341,7 +342,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>editcomment</name>
-      <number>74</number>
+      <number>76</number>
       <prettyName>Enable version summary</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -355,7 +356,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>editcomment_mandatory</name>
-      <number>75</number>
+      <number>77</number>
       <prettyName>Make version summary mandatory</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -371,7 +372,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>editor</name>
-      <number>12</number>
+      <number>13</number>
       <picker>1</picker>
       <prettyName>Default Editor</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -393,7 +394,7 @@
       <displayFormType>select</displayFormType>
       <displayType>select</displayType>
       <name>guest_comment_requires_captcha</name>
-      <number>36</number>
+      <number>38</number>
       <prettyName>Enable CAPTCHA in comments for unregistered users</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -406,7 +407,7 @@
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>iconTheme</name>
-      <number>8</number>
+      <number>9</number>
       <prettyName>Icon theme</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
@@ -421,9 +422,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>invitation_email_content</name>
-      <number>27</number>
+      <number>29</number>
       <picker>0</picker>
       <prettyName>Invitation eMail Content</prettyName>
+      <restricted>0</restricted>
       <rows>10</rows>
       <size>72</size>
       <tooltip/>
@@ -438,9 +440,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>javamail_extra_props</name>
-      <number>24</number>
+      <number>26</number>
       <picker>0</picker>
       <prettyName>Additional JavaMail properties</prettyName>
+      <restricted>0</restricted>
       <rows>6</rows>
       <size>60</size>
       <unmodifiable>0</unmodifiable>
@@ -452,7 +455,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>languages</name>
-      <number>47</number>
+      <number>49</number>
       <picker>0</picker>
       <prettyName>Supported languages</prettyName>
       <size>30</size>
@@ -469,7 +472,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap</name>
-      <number>50</number>
+      <number>52</number>
       <prettyName>Ldap</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -480,7 +483,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_UID_attr</name>
-      <number>59</number>
+      <number>61</number>
       <picker>0</picker>
       <prettyName>Ldap UID attribute name</prettyName>
       <size>60</size>
@@ -493,7 +496,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_base_DN</name>
-      <number>58</number>
+      <number>60</number>
       <picker>0</picker>
       <prettyName>Ldap base DN</prettyName>
       <size>60</size>
@@ -506,7 +509,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_bind_DN</name>
-      <number>53</number>
+      <number>55</number>
       <picker>0</picker>
       <prettyName>Ldap login matching</prettyName>
       <size>60</size>
@@ -518,7 +521,7 @@
     <ldap_bind_pass>
       <disabled>0</disabled>
       <name>ldap_bind_pass</name>
-      <number>54</number>
+      <number>56</number>
       <prettyName>Ldap password matching</prettyName>
       <size>60</size>
       <storageType>Clear</storageType>
@@ -529,7 +532,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_exclude_group</name>
-      <number>57</number>
+      <number>59</number>
       <picker>0</picker>
       <prettyName>Ldap group to exclude</prettyName>
       <size>60</size>
@@ -544,9 +547,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>ldap_fields_mapping</name>
-      <number>60</number>
+      <number>62</number>
       <picker>0</picker>
       <prettyName>Ldap user fields mapping</prettyName>
+      <restricted>0</restricted>
       <rows>1</rows>
       <size>60</size>
       <unmodifiable>0</unmodifiable>
@@ -560,9 +564,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>ldap_group_mapping</name>
-      <number>65</number>
+      <number>67</number>
       <picker>0</picker>
       <prettyName>Ldap groups mapping</prettyName>
+      <restricted>0</restricted>
       <rows>5</rows>
       <size>60</size>
       <unmodifiable>0</unmodifiable>
@@ -574,7 +579,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_groupcache_expiration</name>
-      <number>66</number>
+      <number>68</number>
       <picker>0</picker>
       <prettyName>LDAP groups members cache</prettyName>
       <size>60</size>
@@ -592,7 +597,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>ldap_mode_group_sync</name>
-      <number>67</number>
+      <number>69</number>
       <picker>0</picker>
       <prettyName>LDAP groups sync mode</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -610,7 +615,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_photo_attachment_name</name>
-      <number>63</number>
+      <number>65</number>
       <picker>0</picker>
       <prettyName>Attachment name to save LDAP photo</prettyName>
       <size>30</size>
@@ -623,7 +628,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_photo_attribute</name>
-      <number>64</number>
+      <number>66</number>
       <picker>0</picker>
       <prettyName>Ldap photo attribute name</prettyName>
       <size>60</size>
@@ -636,7 +641,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_port</name>
-      <number>52</number>
+      <number>54</number>
       <picker>0</picker>
       <prettyName>Ldap server port</prettyName>
       <size>60</size>
@@ -649,7 +654,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_server</name>
-      <number>51</number>
+      <number>53</number>
       <picker>0</picker>
       <prettyName>Ldap server adress</prettyName>
       <size>60</size>
@@ -665,7 +670,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_trylocal</name>
-      <number>68</number>
+      <number>70</number>
       <prettyName>Try local login</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -679,7 +684,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_update_photo</name>
-      <number>62</number>
+      <number>64</number>
       <prettyName>Update user photo from LDAP</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -693,7 +698,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_update_user</name>
-      <number>61</number>
+      <number>63</number>
       <prettyName>Update user from LDAP</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -704,7 +709,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>ldap_user_group</name>
-      <number>56</number>
+      <number>58</number>
       <picker>0</picker>
       <prettyName>Ldap group filter</prettyName>
       <size>60</size>
@@ -720,7 +725,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>ldap_validate_password</name>
-      <number>55</number>
+      <number>57</number>
       <prettyName>Validate Ldap user/password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -731,7 +736,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>leftPanels</name>
-      <number>41</number>
+      <number>43</number>
       <picker>0</picker>
       <prettyName>Panels displayed on the left</prettyName>
       <size>60</size>
@@ -749,7 +754,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>leftPanelsWidth</name>
-      <number>45</number>
+      <number>47</number>
       <prettyName>Width of the left panel column</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
@@ -765,9 +770,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>meta</name>
-      <number>16</number>
+      <number>18</number>
       <picker>0</picker>
       <prettyName>HTTP Meta Info</prettyName>
+      <restricted>0</restricted>
       <rows>8</rows>
       <size>60</size>
       <tooltip/>
@@ -783,7 +789,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>minoredit</name>
-      <number>76</number>
+      <number>78</number>
       <prettyName>Enable minor edits</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -807,12 +813,12 @@
     </multilingual>
     <obfuscateEmailAddresses>
       <customDisplay/>
-      <defaultValue>0</defaultValue>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>obfuscateEmailAddresses</name>
-      <number>28</number>
+      <number>30</number>
       <prettyName>Obfuscate Email Addresses</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -855,7 +861,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>registration_anonymous</name>
-      <number>29</number>
+      <number>31</number>
       <picker>1</picker>
       <prettyName>Anonymous</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -879,7 +885,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>registration_registered</name>
-      <number>30</number>
+      <number>32</number>
       <picker>1</picker>
       <prettyName>Registered</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -898,7 +904,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>rightPanels</name>
-      <number>42</number>
+      <number>44</number>
       <picker>0</picker>
       <prettyName>Panels displayed on the right</prettyName>
       <size>60</size>
@@ -916,7 +922,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>rightPanelsWidth</name>
-      <number>46</number>
+      <number>48</number>
       <prettyName>Width of the right panel column</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
@@ -933,7 +939,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showLeftPanels</name>
-      <number>43</number>
+      <number>45</number>
       <prettyName>Display the left panel column</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -948,7 +954,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showRightPanels</name>
-      <number>44</number>
+      <number>46</number>
       <prettyName>Display the right panel column</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -963,7 +969,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showannotations</name>
-      <number>69</number>
+      <number>71</number>
       <prettyName>Show document annotations</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -977,7 +983,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showattachments</name>
-      <number>71</number>
+      <number>73</number>
       <prettyName>Show document attachments</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -991,7 +997,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showcomments</name>
-      <number>70</number>
+      <number>72</number>
       <prettyName>Show document comments</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1005,7 +1011,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showhistory</name>
-      <number>72</number>
+      <number>74</number>
       <prettyName>Show document history</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1019,7 +1025,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>showinformation</name>
-      <number>73</number>
+      <number>75</number>
       <prettyName>Show document information</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -1037,7 +1043,7 @@
       <idField/>
       <multiSelect>0</multiSelect>
       <name>skin</name>
-      <number>6</number>
+      <number>7</number>
       <picker>1</picker>
       <prettyName>Skin</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -1056,7 +1062,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_port</name>
-      <number>21</number>
+      <number>23</number>
       <picker>0</picker>
       <prettyName>SMTP Port</prettyName>
       <size>5</size>
@@ -1069,7 +1075,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_server</name>
-      <number>20</number>
+      <number>22</number>
       <picker>0</picker>
       <prettyName>SMTP Server</prettyName>
       <size>30</size>
@@ -1085,7 +1091,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>smtp_server_password</name>
-      <number>23</number>
+      <number>25</number>
       <picker>0</picker>
       <prettyName>Server password (optional)</prettyName>
       <size>30</size>
@@ -1099,7 +1105,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>smtp_server_username</name>
-      <number>22</number>
+      <number>24</number>
       <picker>0</picker>
       <prettyName>Server username (optional)</prettyName>
       <size>30</size>
@@ -1112,7 +1118,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>stylesheet</name>
-      <number>9</number>
+      <number>10</number>
       <picker>0</picker>
       <prettyName>Default Stylesheet</prettyName>
       <size>30</size>
@@ -1126,7 +1132,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>stylesheets</name>
-      <number>10</number>
+      <number>11</number>
       <picker>0</picker>
       <prettyName>Alternative Stylesheet</prettyName>
       <size>60</size>
@@ -1143,7 +1149,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>tags</name>
-      <number>39</number>
+      <number>41</number>
       <prettyName>Activate the tagging</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -1154,7 +1160,7 @@
     <timezone>
       <disabled>0</disabled>
       <name>timezone</name>
-      <number>49</number>
+      <number>51</number>
       <prettyName>Time Zone</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
@@ -1164,7 +1170,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>title</name>
-      <number>14</number>
+      <number>16</number>
       <picker>0</picker>
       <prettyName>Title</prettyName>
       <size>30</size>
@@ -1183,7 +1189,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>underline</name>
-      <number>12</number>
+      <number>14</number>
       <picker>1</picker>
       <prettyName>Underline links</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -1202,7 +1208,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>upload_maxsize</name>
-      <number>35</number>
+      <number>37</number>
       <numberType>long</numberType>
       <prettyName>Maximum Upload Size</prettyName>
       <size>5</size>
@@ -1218,7 +1224,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>use_email_verification</name>
-      <number>18</number>
+      <number>20</number>
       <prettyName>Use eMail Verification</prettyName>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
@@ -1232,9 +1238,10 @@
       <disabled>0</disabled>
       <editor>PureText</editor>
       <name>validation_email_content</name>
-      <number>25</number>
+      <number>27</number>
       <picker>0</picker>
       <prettyName>Validation eMail Content</prettyName>
+      <restricted>0</restricted>
       <rows>10</rows>
       <size>72</size>
       <tooltip/>
@@ -1247,7 +1254,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>version</name>
-      <number>15</number>
+      <number>17</number>
       <picker>0</picker>
       <prettyName>Version</prettyName>
       <size>30</size>
@@ -1261,7 +1268,7 @@
       <customDisplay/>
       <disabled>0</disabled>
       <name>webcopyright</name>
-      <number>13</number>
+      <number>15</number>
       <picker>0</picker>
       <prettyName>Copyright</prettyName>
       <size>30</size>
@@ -1278,7 +1285,7 @@
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <name>xwiki.title.mandatory</name>
-      <number>38</number>
+      <number>40</number>
       <prettyName>Make document title field mandatory</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

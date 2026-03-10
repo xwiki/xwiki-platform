@@ -19,15 +19,15 @@
  */
 import "vue";
 
-import "vue";
-
 declare module "vue" {
   interface HTMLAttributes {
-    [key: `data-${string}`]: string | number | boolean | undefined;
+    // [key: `data-${string}`]: string | number | boolean | undefined;
   }
 
   interface ComponentCustomProps {
-    [key: `data-${string}`]: unknown;
-    [key: `data${string}`]: unknown;
+    // [key: `data-${string}`]: unknown;
+    // [key: `data${string}`]: unknown;
+    // [key: `aria-${string}`]: unknown;
+    // [key: `aria${string}`]: unknown;
   }
 }

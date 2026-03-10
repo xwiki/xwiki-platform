@@ -65,7 +65,6 @@ catalog:
   '@vitest/eslint-plugin': 1.6.9
   '@vue/eslint-config-prettier': 10.2.0
   '@vue/eslint-config-typescript': 14.7.0
-  '@vue/runtime-dom': 3.5.30
   '@vue/test-utils': 2.4.6
   '@vue/tsconfig': 0.8.1
   axe-core: 4.11.1

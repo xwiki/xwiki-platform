@@ -32,5 +32,9 @@
   },
   "vueCompilerOptions": {
     "strictTemplates": true
+  },
+  "vueCompilerOptions": {
+    "strictTemplates": false
   }
+
 }

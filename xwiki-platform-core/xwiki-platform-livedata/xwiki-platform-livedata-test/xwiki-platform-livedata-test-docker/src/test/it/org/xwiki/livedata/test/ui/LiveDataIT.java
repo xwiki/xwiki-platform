@@ -140,14 +140,13 @@ class LiveDataIT
         TestLocalReference testLocalReference) throws Exception
     {
         testUtils.setCurrentWiki(wikiReference.getName());
-
+        // Login as super admin because guest user cannot remove pages.
+        testUtils.loginAsSuperAdmin();
         DocumentReference testReference = new DocumentReference(testLocalReference, wikiReference);
 
         // Make sure an icon theme is configured.
         testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
 
-        // Login as super admin because guest user cannot remove pages.
-        testUtils.loginAsSuperAdmin();
         testUtils.createUser("U1", "U1", null);
         testUtils.createUser("U2", "U2", null);
         // Wipes the test space.
@@ -334,13 +333,17 @@ class LiveDataIT
 
         // Switch to another language to assert that the text is still correctly translated.
         try {
+            String currentUrl = testUtils.getDriver().getCurrentUrl();
+            testUtils.loginAsSuperAdmin();
             testUtils.setWikiPreference("default_language", "fr");
-            testUtils.getDriver().navigate().refresh();
+            testUtils.gotoPage(currentUrl);
+            liveDataElement = new LiveDataElement("test");
             liveDataElement.waitUntilReady();
-            assertEquals(List.of(
-                    "(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne fonctionnera pas normalement pour ces pages."),
+            assertEquals(List.of("(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne "
+                    + "fonctionnera pas normalement pour ces pages."),
                 liveDataElement.getFootnotesText());
         } finally {
+            testUtils.loginAsSuperAdmin();
             testUtils.setWikiPreference("default_language", "en");
         }
     }

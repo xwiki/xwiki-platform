@@ -37,6 +37,7 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <!-- TODO: Move to a shared location as part of XWIKI-24047. -->
     <xwiki.extension.javascript.modules.importmap>{
         "inversify": "org.webjars.npm:inversify/lib/esm/index.js",
         "@inversifyjs/common": "org.webjars.npm:inversifyjs__common/lib/esm/index.js",

@@ -3,7 +3,11 @@
     "rootDir": "src",
     "outDir": "dist",
     "isolatedDeclarations": false,
-    "types": ["@xwiki/platform-dsapi", "jquery", "requirejs"],
+    "types": [
+      "@xwiki/platform-dsapi",
+      "jquery",
+      "requirejs"
+    ],
     "noEmit": true,
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
     // Specified here to keep it out of the root directory.
@@ -18,5 +22,5 @@
     "**/*.test.ts",
     "*.config.*",
     "**/__tests__/*"
-  ],
+  ]
 }

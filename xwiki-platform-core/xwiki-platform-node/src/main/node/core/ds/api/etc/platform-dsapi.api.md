@@ -91,7 +91,6 @@ export type BtnProps = {
     variant?: "default" | "primary" | "success" | "neutral" | "warning" | "danger" | "text";
     size?: "small";
     pill?: boolean;
-    disabled?: boolean;
 };
 
 // @beta (undocumented)

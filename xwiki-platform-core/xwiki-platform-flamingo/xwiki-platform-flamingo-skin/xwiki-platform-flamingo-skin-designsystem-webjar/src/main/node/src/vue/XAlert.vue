@@ -50,12 +50,11 @@ function close() {
 <template>
   <div
     v-if="!isClosed"
-    ref="root"
     :class="[
       'box',
       ...boxclass,
       flatCorners ? $style.flatCorners : '',
-      closable ? 'alert-dismissible fade in' : '',
+      ...(closable ? ['alert-dismissible', 'fade', 'in'] : []),
     ]"
     role="alert"
   >

@@ -18,14 +18,21 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { computed } from "vue";
 import type { BreadcrumbProps } from "@xwiki/platform-dsapi";
 
 const { items } = defineProps<BreadcrumbProps>();
+
+const size = computed(() => items.length);
 </script>
 
 <template>
   <ol class="breadcrumb">
-    <li v-for="({ url, label }, index) in items" :key="index">
+    <li
+      v-for="({ url, label }, index) in items"
+      :key="`${url}-${label}`"
+      :class="index === size - 1 ? ['active'] : []"
+    >
       <a :href="url" v-if="url">{{ label }}</a>
       <template v-else>{{ label }}</template>
     </li>

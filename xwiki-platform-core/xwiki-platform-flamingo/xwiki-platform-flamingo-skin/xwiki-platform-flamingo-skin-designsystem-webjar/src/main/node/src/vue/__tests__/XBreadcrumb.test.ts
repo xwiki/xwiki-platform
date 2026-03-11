@@ -44,7 +44,7 @@ describe("XBreadcrumb", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toBe(`<ol class="breadcrumb">
-  <li>l1</li>
+  <li class="active">l1</li>
 </ol>`);
     },
   );
@@ -63,7 +63,7 @@ describe("XBreadcrumb", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toBe(`<ol class="breadcrumb">
-  <li><a href="https://test.com">l1</a></li>
+  <li class="active"><a href="https://test.com">l1</a></li>
 </ol>`);
     },
   );
@@ -84,8 +84,8 @@ describe("XBreadcrumb", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toBe(`<ol class="breadcrumb">
-  <li>l1</li>
-  <li>l2</li>
+  <li class="">l1</li>
+  <li class="active">l2</li>
 </ol>`);
     },
   );

@@ -59,6 +59,8 @@ class XWikiPreferencesPageTest extends PageTest
     private static final DocumentReference XWIKI_PREFERENCES =
         new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
 
+    private static final String ABSENT = "<absent>";
+
     /**
      * Verifies that the mandatory document initializer does not make any changes to
      * {@code XWiki.XWikiPreferences} when loaded from the XAR. This ensures that the XAR is at least as
@@ -207,8 +209,8 @@ class XWikiPreferencesPageTest extends PageTest
         allKeys.addAll(initFields.keySet());
         allKeys.addAll(xmlFields.keySet());
         for (String key : allKeys) {
-            String initVal = initFields.getOrDefault(key, "<absent>");
-            String xmlVal = xmlFields.getOrDefault(key, "<absent>");
+            String initVal = initFields.getOrDefault(key, ABSENT);
+            String xmlVal = xmlFields.getOrDefault(key, ABSENT);
             if (!initVal.equals(xmlVal)) {
                 sb.append(String.format("  - %s.%s: [%s] -> [%s]%n", propName, key, initVal, xmlVal));
             }
@@ -228,8 +230,8 @@ class XWikiPreferencesPageTest extends PageTest
         allKeys.addAll(beforeFields.keySet());
         allKeys.addAll(afterFields.keySet());
         for (String key : allKeys) {
-            String beforeVal = beforeFields.getOrDefault(key, "<absent>");
-            String afterVal = afterFields.getOrDefault(key, "<absent>");
+            String beforeVal = beforeFields.getOrDefault(key, ABSENT);
+            String afterVal = afterFields.getOrDefault(key, ABSENT);
             if (!beforeVal.equals(afterVal)) {
                 sb.append(String.format("    - %s: [%s] -> [%s]%n", key, beforeVal, afterVal));
             }

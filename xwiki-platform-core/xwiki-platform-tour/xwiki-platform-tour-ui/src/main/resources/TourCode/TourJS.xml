@@ -39,9 +39,9 @@
   <content/>
   <object>
     <name>TourCode.TourJS</name>
-    <number>0</number>
+    <number>1</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>b31091c4-0138-41e8-b366-bbc7ca201b61</guid>
+    <guid>8a2f9b13-9e08-4acf-a1a0-afeadde38bbb</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -140,52 +140,7 @@
 require(['jquery', 'xwiki-meta', 'guided-tour-utils'], function ($, xm, utils) {
   'use strict';
   // TODO: Check for unused translation strings at the end of development.
-
-  /**
-   * Add a resume button to start the tour again when it has been closed
-   */
-  var createResumeButton = function (tour, showPopover) {
-    // Create a container when the button will be displayed. This container will also contains the "popover", so the "popover" stay near the button when the page is resized.
-    // (see http://getbootstrap.com/javascript/#popovers-options 'container')
-    var buttonContainer = $('&lt;div id="tourResumeContainer"&gt;&lt;/div&gt;').appendTo($(document.body));
-    // Create the popover
-    var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
-    // Create the button that will start the tour again
-    const button = $('&lt;button id=\'tourResume\' class=\'btn btn-default btn-xs\'&gt;&lt;/button&gt;')
-      .html("$escapetool.javascript($services.icon.renderHTML('info')) #tr('tour.popover.show')")
-      .appendTo(buttonContainer);
-
-    if (showPopover) {
-      buttonContainer.addClass('opened');
-      button.removeAttr('hidden');
-      popover.attr('open','open');
-    }
-
-    button.on('click', function() {
-      if (showPopover) {
-        popover.removeAttr('open');
-        button.attr('hidden', true);
-        buttonContainer.removeClass('opened');
-      }
-      console.info('baba', tour, window.localStorage.getItem(tour.getConfig().name + '_current_step'), tour.getConfig().steps.length)
-      //debugger;
-      // The name property is custom from the XWiki tour source.
-      if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
-        // Make sure we can redirect again to the current step.
-        window.localStorage.removeItem(tour.getConfig().name + '_redirect_to');
-        // We don't rely on the force parameter because it is lost on redirect. Instead, we just remove the flag that
-        // marks the tour as finished.
-        window.localStorage.removeItem(tour.getConfig().name + '_end');
-        window.localStorage.setItem(tour.getConfig().name + '_current_step', 1);
-      }
-      if (!(window.localStorage.getItem(tour.getConfig().name + '_end') === 'yes')) {
-        // Should probably just straigth up monkey patch the .drive function to handle persistance too, since it seems to be the common entry point for all driver.js functions.
-        tour.drive(window.localStorage.getItem(tour.getConfig().name + '_current_step') - 1);
-      }
-      button.attr('hidden', true);
-      buttonContainer.removeClass('opened');
-    });
-  }
+  // TODO: Make use of _redirect_to localStorage key somewhere in the code.
 
   /**
    * Create a tour from a JSON file
@@ -350,22 +305,6 @@ require(['jquery', 'xwiki-meta', 'guided-tour-utils'], function ($, xm, utils) {
             window.guidedTourInProgress = false;
           }
           window.guidedTourInProgress = false;
-          let buttonContainer = $('#tourResumeContainer');
-          if (buttonContainer.length === 0) {
-            createResumeButton(tour, true);
-          } else {
-            buttonContainer.addClass('opened');
-            let button = $('#tourResume');
-            button.removeAttr('hidden');
-            // Show the popover
-            let popover = buttonContainer.find('.popover-content').first();
-            popover.attr('open','open');
-            // Hide it after 7 seconds
-            setTimeout(function() {
-              buttonContainer.removeClass('opened');
-              popover.removeAttr('open');
-            }, 7000);
-          }
         }
       });
       console.info(jsonData)
@@ -407,10 +346,6 @@ require(['jquery', 'xwiki-meta', 'guided-tour-utils'], function ($, xm, utils) {
         } else {
             window.guidedTourInProgress = false;
         }
-      }
-      // Create a resume button if the tour has already been closed by the user in the past.
-      if (!tourAutoStart) {
-        createResumeButton(tour, false);
       }
     });
   };
@@ -611,7 +546,7 @@ define('guided-tour-utils', [], function() {
    * Some sort of easier API to update the localStorage keys?
    * TODO
    */
-  
+
   /**
    * Load the tours on the client, fetching them if needed.
    * @return: TODO: For now, it returns a Promise.
@@ -1139,7 +1074,8 @@ define('guided-tour-utils', [], function() {
   utils.getTourData().then((data) =&gt; {
     console.info(data);
     const groups = data['groups'];
-    dragElement(document.querySelector('.draggable'));
+    // TODO: Maybe re-enable this and improve the functionality.
+    // dragElement(document.querySelector('.draggable'));
     for (group in groups) {
       let groupEl = document.createElement('section');
       groupEl.setAttribute('data-gid', group);
@@ -1149,7 +1085,7 @@ define('guided-tour-utils', [], function() {
       }
       console.debug(groups[group])
       // FIXME: Add HTML escapes (maybe use purify?)
-      groupEl.innerHTML = '&lt;div class="tour-header"&gt;&lt;strong&gt;&lt;div class="chevron"&gt;&amp;gt;&lt;/div&gt;' + groups[group]['displayTitle'] + '&lt;/strong&gt;&lt;/div&gt;&lt;div class="tour-content"&gt;&lt;/div&gt;';
+      groupEl.innerHTML = '&lt;div class="tour-header"&gt;&lt;i class="fa-solid fa-chevron-right chevron"&gt;&lt;/i&gt;' + groups[group]['displayTitle'] + '&lt;/div&gt;&lt;div class="tour-content"&gt;&lt;/div&gt;';
       // Chevron collapse section.
       groupEl.getElementsByClassName('tour-header')[0].onclick = (event) =&gt; {
         const contentElement = event.target.closest('.tour-section');
@@ -1161,7 +1097,7 @@ define('guided-tour-utils', [], function() {
           return;
         }
         let taskEl = document.createElement('div');
-        taskEl.innerHTML = task['title'];
+        taskEl.innerHTML = '&lt;button class="pre-btn"&gt;&lt;i class="fa fa-arrow-right"&gt;&lt;/i&gt;&lt;/button&gt;' + task['title'] + '&lt;button class="post-btn"&gt;&lt;i class="fa fa-rotate-right"&gt;&lt;/i&gt;&lt;/button&gt;';
         taskEl.setAttribute('data-id', task['id']);
         taskEl.className = 'tour-task';
         if (task['done']) {
@@ -1772,7 +1708,7 @@ define('guided-tour-utils', [], function() {
       <code>.guided-tour-floater {
   z-index: 999;
   position: fixed;
-  bottom: 100px;
+  bottom: 0px;
   right: 0px;
   box-shadow: 0px 0px 12px 0px #00000033;
   background-color: white;
@@ -1792,12 +1728,12 @@ define('guided-tour-utils', [], function() {
 }
 
 .guided-tour-floater .tour-section.collapsed .tour-content {
-  height: 0;
+  max-height: 0;
 }
 
 .guided-tour-floater.collapsed .guides-content {
   width: 0;
-  height: 0;
+  max-height: 0;
 }
 
 .guided-tour-floater.dragging * {
@@ -1831,6 +1767,10 @@ define('guided-tour-utils', [], function() {
   padding: 14px 16px 14px 16px;
 }
 
+.tour-header {
+  font-weight: bold;
+}
+
 .guided-tour-floater .top-bar {
   display: flex;
   cursor: pointer;
@@ -1850,7 +1790,7 @@ define('guided-tour-utils', [], function() {
 }
 
 .guided-tour-floater * {
-  transition: height 0.45s cubic-bezier(.25, 1, .25, 1), width 0.45s ease-in-out 0s;
+  transition: max-height 0.45s cubic-bezier(.25, 1, .25, 1); /*, width 0.45s ease-in-out 0s*/
 }
 
 .guided-tour-floater .right-group {
@@ -1860,9 +1800,8 @@ define('guided-tour-utils', [], function() {
 }
 
 .guided-tour-floater .guides-content {
-  transition: height 0.45s cubic-bezier(.25, 1, .25, 1), width 0.45s ease-in-out 0s;
   display: flex;
-  height: 400px;
+  max-height: 400px;
   flex-direction: column;
   overflow: hidden;
 }
@@ -1914,16 +1853,16 @@ margin: 0.5em;
   padding: 0.5em;
 }
 
-.guided-tour-floater .chevron {
+.guided-tour-floater .tour-section .chevron {
   cursor: pointer;
   display: inline-block;
   height: 16px;
   width: 16px;
-  rotate: 90deg;
+  rotate: 0deg;
 }
 
-.guided-tour-floater .tour-section.collapsed .chevron {
-  rotate: 0deg;
+.guided-tour-floater .tour-section:not(.collapsed) .chevron {
+  rotate: 90deg;
 }
 
 .guided-tour-floater .tour-header:hover {
@@ -1962,7 +1901,7 @@ margin: 0.5em;
 
 .guided-tour-floater .tour-content {
   overflow: hidden;
-  transition: height 1s cubic-bezier(.25, 1, .25, 1);
+  max-height: 300px;
 }</code>
     </property>
     <property>
@@ -1982,7 +1921,7 @@ margin: 0.5em;
     <name>TourCode.TourJS</name>
     <number>2</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>997413c2-4a90-4764-bb59-260fedf04ab5</guid>
+    <guid>038f76b5-0187-43a5-8880-e09b31d224e1</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -2084,88 +2023,64 @@ margin: 0.5em;
       <cache>forbid</cache>
     </property>
     <property>
-      <code>#tourResumeContainer {
+      <code>/* ===== TOUR HEADER ===== */
+.tour-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  align-content: stretch;
-  gap: 1em;
-
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: 2000;
-
-  &amp; &gt; #tourResume {
-    width: fit-content;
-    &amp;[hidden] {
-      display: none;
-    }
-  }
-
-  &amp; &gt; .popover-content {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
-    position: relative;
-    max-width: 276px;
-    padding: 1px;
-    line-break: auto;
-    text-align: left;
-    padding: 0.5em;
-    background-color: @dropdown-bg;
-    border: solid 0.2em @dropdown-border;
-    border-radius: 1em 1em 0 1em;
-    width: 100%;
-
-    &amp;::after {
-      position: absolute;
-      right: 0em;
-      content: '';
-      bottom: -1em;
-      width: 0;
-      height: 0;
-      border-left: 1em solid transparent;
-      border-right: 1em solid transparent;
-      border-top: 1em solid @dropdown-bg;
-      clear: both;
-    }
-  }
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
 }
 
-#tourResumeContainer.opened {
-  &amp; &gt; .popover-content {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.2s ease-in-out;
-  }
+.tour-header .chevron {
+  width: 20px;           /* fixed column */
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
-@media print {
-  #tourResumeContainer {
-    display: none;
-  }
+/* ===== TOUR TASKS ===== */
+.tour-task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
 }
 
-#bootstrap_tour_close {
-  position: absolute;
-  top: 3px;
-  right: 5px;
+
+.tour-task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.popover[class*="tour-"] .popover-navigation:not(.row) {
-  padding-right: 0;
-  padding-left: 0;
+.pre-btn,
+.post-btn {
+  width: 20px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.post-btn {
+  margin-left: auto;
+}
+
+.tour-task:hover .pre-btn,
+.tour-task:hover .post-btn {
+  opacity: 1;
 }</code>
     </property>
     <property>
-      <contentType>LESS</contentType>
+      <contentType>CSS</contentType>
     </property>
     <property>
-      <name>Old styles (for the 'resume tour' popup, which is not ported yet)</name>
+      <name>test</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>always</use>

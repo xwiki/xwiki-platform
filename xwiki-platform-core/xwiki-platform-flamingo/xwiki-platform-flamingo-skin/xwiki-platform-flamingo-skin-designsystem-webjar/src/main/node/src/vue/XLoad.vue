@@ -19,8 +19,9 @@
 -->
 <script setup lang="ts"></script>
 
+<!-- eslint-disable-next-line vue/valid-template-root-->
 <template>
-  <div class="loading"></div>
+  <!-- Every required element is loaded from the context. -->
 </template>
 
 <style scoped></style>

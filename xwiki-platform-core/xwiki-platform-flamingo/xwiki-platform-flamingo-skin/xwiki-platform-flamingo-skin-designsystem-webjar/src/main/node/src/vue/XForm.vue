@@ -18,13 +18,22 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { useTemplateRef } from "vue";
 import type { FormProps } from "@xwiki/platform-dsapi";
 
-const { onFormSubmit } = defineProps<FormProps>();
+defineProps<FormProps>();
+const form = useTemplateRef<HTMLFormElement>("form");
+const emits = defineEmits(["formSubmit"]);
+
+function submit() {
+  if (form.value?.checkValidity()) {
+    emits("formSubmit");
+  }
+}
 </script>
 
 <template>
-  <form class="xform" @submit.prevent="onFormSubmit">
+  <form class="xform" @submit.prevent="submit" ref="form">
     <slot></slot>
   </form>
 </template>

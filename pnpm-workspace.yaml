@@ -55,14 +55,14 @@ catalog:
   "@eslint/js": 9.39.2
   "@mantine/core": 8.3.14
   "@mantine/hooks": 8.3.14
-  "@microsoft/api-extractor": 7.57.4
+  "@microsoft/api-extractor": 7.57.7
   "@playwright/experimental-ct-react": 1.58.2
   "@tsconfig/node24": 24.0.4
   "@types/jquery": 3.5.33
   "@types/jsdom": 28.0.0
   "@types/lodash-es": 4.17.12
   "@types/mdast": 4.0.4
-  "@types/node": 24.10.13
+  "@types/node": 24.12.0
   "@types/react": 19.2.7
   "@types/react-dom": 19.2.3
   "@types/requirejs": 2.1.37
@@ -103,12 +103,12 @@ catalog:
   micromark-extension-gfm-table: 2.1.1
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-run-all2: 8.0.4
-  nx: 22.5.2
+  nx: 22.5.4
   pinia: 3.0.4
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.17
+  publint: 0.3.18
   react: 19.2.4
   react-dom: 19.2.4
   react-i18next: 16.5.4
@@ -124,11 +124,11 @@ catalog:
   unified: 11.0.5
   utility-types: 3.11.0
   vite: 7.3.1
-  vite-plugin-css-injected-by-js: 3.5.2
+  vite-plugin-css-injected-by-js: 4.0.1
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
   vitest-mock-extended: 3.1.0
-  vue: 3.5.29
+  vue: 3.5.30
   vue-eslint-parser: 10.4.0
   vue-i18n: 11.2.8
   vue-router: 5.0.3

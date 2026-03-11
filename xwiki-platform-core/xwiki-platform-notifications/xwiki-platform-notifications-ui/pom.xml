@@ -88,6 +88,10 @@
       <artifactId>bootstrap-switch</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>

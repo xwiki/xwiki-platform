@@ -49,6 +49,7 @@
   },
   "peerDependencies": {
     "inversify": "7.x",
+    "jquery": "4.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
@@ -66,6 +67,7 @@
     "eslint": "catalog:",
     "happy-dom": "catalog:",
     "inversify": "catalog:",
+    "jquery": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

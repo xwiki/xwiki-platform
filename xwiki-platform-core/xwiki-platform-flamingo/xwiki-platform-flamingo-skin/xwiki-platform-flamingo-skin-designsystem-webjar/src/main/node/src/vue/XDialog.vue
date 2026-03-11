@@ -30,15 +30,16 @@ const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
   require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
 });
 
+defineSlots<{ default(): void; activator(): void }>();
 const root = useTemplateRef("root");
-const open = defineModel<boolean>();
+const open = defineModel<boolean>({ default: false });
 
 const modal: Ref = ref(undefined);
 onMounted(async () => {
   const $ = await jQuery;
   const modalElement = $(root.value!);
   // @ts-expect-error - bootstrap modal not typed on JQuery
-  modal.value = modalElement.modal({ show: false });
+  modal.value = modalElement.modal({ show: open.value });
   modalElement.on("show.bs.modal", () => {
     open.value = true;
   });

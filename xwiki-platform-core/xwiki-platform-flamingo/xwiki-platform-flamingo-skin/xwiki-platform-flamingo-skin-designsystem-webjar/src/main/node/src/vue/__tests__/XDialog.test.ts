@@ -18,25 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import XDialog from "../XDialog.vue";
-import {
-  runTest,
-  shallowMountHelper,
-} from "@xwiki/platform-test-accessibility";
+import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
 import { describe, expect } from "vitest";
-import { Teleport } from "vue";
 import Module from "module";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 
 function getAccessibilityMount() {
   // Override require used globally but resolved to node's required by default.
   Module.prototype.require = () => {};
-  return shallowMountHelper(XDialog, {
-    global: {
-      stubs: {
-        Teleport: Teleport,
-      },
-    },
-  });
+  return mountHelper(XDialog);
 }
 
 const accessibilityMount = getAccessibilityMount();
@@ -51,19 +41,10 @@ describe("XDialog", () => {
         default: "Some Text",
       },
     }),
-    (wrapper) => {
-      expect(wrapper.html())
-        .toEqual(`<div data-v-f91168ea="" class="modal fade" tabindex="-1" role="dialog">
-  <div data-v-f91168ea="" class="modal-dialog" role="document">
-    <div data-v-f91168ea="" class="modal-content">
-      <div data-v-f91168ea="" class="modal-header"><button data-v-f91168ea="" type="button" class="close" data-dismiss="modal" aria-label="Close"><span data-v-f91168ea="" aria-hidden="true">×</span></button>
-        <h4 data-v-f91168ea="" class="modal-title">Dialog Title</h4>
-      </div>
-      <div data-v-f91168ea="" class="modal-body">Some Text</div>
-      <!--v-if-->
-    </div>
-  </div>
-</div>`);
+    async () => {
+      expect(document.body.innerHTML).toEqual(
+        `<div data-v-app=""><span data-v-f91168ea=""></span><!--teleport start--><!--teleport end--></div><div data-v-f91168ea="" class="modal fade" tabindex="-1" role="dialog"><div data-v-f91168ea="" class="modal-dialog" role="document"><div data-v-f91168ea="" class="modal-content"><div data-v-f91168ea="" class="modal-header"><button data-v-f91168ea="" type="button" class="close" data-dismiss="modal" aria-label="Close"><span data-v-f91168ea="" aria-hidden="true">×</span></button><h4 data-v-f91168ea="" class="modal-title">Dialog Title</h4></div><div data-v-f91168ea="" class="modal-body">Some Text</div><!--v-if--></div></div></div>`,
+      );
     },
   );
 });

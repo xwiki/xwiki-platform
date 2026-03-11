@@ -60,5 +60,10 @@
       <artifactId>reflect-metadata</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

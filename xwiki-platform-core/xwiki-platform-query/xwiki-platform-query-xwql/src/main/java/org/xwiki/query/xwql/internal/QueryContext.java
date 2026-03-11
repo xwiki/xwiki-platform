@@ -45,12 +45,12 @@ public class QueryContext
     /**
      * Map from document alias to its description.
      */
-    private Map<String, DocumentInfo> documents = new HashMap<String, DocumentInfo>();
+    private Map<String, DocumentInfo> documents = new HashMap<>();
 
     /**
      * Map from object alias to its description.
      */
-    private Map<String, ObjectInfo> objects = new HashMap<String, ObjectInfo>();
+    private Map<String, ObjectInfo> objects = new HashMap<>();
 
     private AliasGenerator aliasGenerator = new AliasGenerator();
 
@@ -80,7 +80,7 @@ public class QueryContext
          * Map from unnamed object's class name to description. unnamed object is object declaration in where clause:
          * "where doc.object('Class').prop=1"
          */
-        public Map<String, ObjectInfo> unnamedObjects = new HashMap<String, ObjectInfo>();
+        public Map<String, ObjectInfo> unnamedObjects = new HashMap<>();
     }
 
     public class ObjectInfo
@@ -96,7 +96,7 @@ public class QueryContext
         /**
          * Properties appeared in query
          */
-        public Map<String, PropertyInfo> properties = new LinkedHashMap<String, PropertyInfo>();
+        public Map<String, PropertyInfo> properties = new LinkedHashMap<>();
 
         public ObjectInfo(String docAlias, String className, String objAlias)
         {
@@ -141,7 +141,7 @@ public class QueryContext
             this.object = object;
         }
 
-        public List<PPath> locations = new ArrayList<PPath>();
+        public List<PPath> locations = new ArrayList<>();
 
         public String getType() throws Exception
         {
@@ -169,7 +169,7 @@ public class QueryContext
     /**
      * Map from tree node to object it represent.
      */
-    private Map<PXObjectDecl, ObjectInfo> nodeToObject = new HashMap<PXObjectDecl, ObjectInfo>();
+    private Map<PXObjectDecl, ObjectInfo> nodeToObject = new HashMap<>();
 
     public ObjectInfo addObject(String docAlias, String className, String objAlias, PXObjectDecl node)
     {
@@ -217,7 +217,7 @@ public class QueryContext
      */
     public Collection<ObjectInfo> getObjects()
     {
-        List<ObjectInfo> res = new ArrayList<ObjectInfo>();
+        List<ObjectInfo> res = new ArrayList<>();
         res.addAll(objects.values());
         for (DocumentInfo di : documents.values()) {
             res.addAll(di.unnamedObjects.values());

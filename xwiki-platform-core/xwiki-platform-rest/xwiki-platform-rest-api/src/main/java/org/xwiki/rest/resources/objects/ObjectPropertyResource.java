@@ -34,9 +34,13 @@ import org.xwiki.rest.model.jaxb.Property;
 /**
  * @version $Id$
  */
+// @Path annotations have very long URI templates in some object-related resources
+@SuppressWarnings("checkstyle:LineLength")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}/properties/{propertyName}")
 public interface ObjectPropertyResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Property getObjectProperty(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +51,9 @@ public interface ObjectPropertyResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @PUT Response updateObjectProperty(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

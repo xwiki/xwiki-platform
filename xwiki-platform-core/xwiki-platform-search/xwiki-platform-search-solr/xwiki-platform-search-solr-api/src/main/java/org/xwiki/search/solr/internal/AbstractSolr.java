@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -237,7 +238,7 @@ public abstract class AbstractSolr implements Solr, Disposable
 
     protected String toXWikiCoreName(String solrCoreName)
     {
-        return StringUtils.removeEnd(solrCoreName, getSolrCoreSuffix());
+        return Strings.CS.removeEnd(solrCoreName, getSolrCoreSuffix());
     }
 
     /**

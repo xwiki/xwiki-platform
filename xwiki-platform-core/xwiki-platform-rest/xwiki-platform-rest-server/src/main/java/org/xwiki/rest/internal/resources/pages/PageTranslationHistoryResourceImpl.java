@@ -57,6 +57,8 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {

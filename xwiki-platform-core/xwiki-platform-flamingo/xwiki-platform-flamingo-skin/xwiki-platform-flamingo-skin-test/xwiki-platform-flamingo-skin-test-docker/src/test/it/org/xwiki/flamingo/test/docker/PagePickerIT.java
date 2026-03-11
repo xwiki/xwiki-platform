@@ -64,9 +64,6 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
-
         pagePicker.sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions().selectByVisibleText(pageName);
         pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions()
             .selectByVisibleText(pageName);
@@ -124,9 +121,6 @@ class PagePickerIT
 
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
-
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
 
         List<SuggestInputElement.SuggestionElement> suggestions =
             pagePicker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions();

@@ -1396,6 +1396,51 @@ describe("MarkdownToUniAstConverter", () => {
       },
     });
   });
+
+  test("parse nested blocks", async () => {
+    await testTwoWayConversion({
+      startingFrom: "> A\n> > B",
+      convertsBackTo: "> A\n> > B",
+      withUniAst: {
+        blocks: [
+          {
+            content: [
+              {
+                content: [
+                  {
+                    content: "A",
+                    styles: {},
+                    type: "text",
+                  },
+                ],
+                styles: {},
+                type: "paragraph",
+              },
+              {
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "B",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                ],
+                styles: {},
+                type: "quote",
+              },
+            ],
+            styles: {},
+            type: "quote",
+          },
+        ],
+      },
+    });
+  });
 });
 
 const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {

@@ -22,7 +22,6 @@ import "./services/inplace";
 
 const factory = new Factory();
 
-// eslint-disable-next-line no-undef
 define("xwiki-blocknote", [], () => factory);
 
 function init(event, data) {

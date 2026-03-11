@@ -30,5 +30,7 @@ import org.xwiki.rest.model.jaxb.Syntaxes;
 @Path("/syntaxes")
 public interface SyntaxesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Syntaxes getSyntaxes();
 }

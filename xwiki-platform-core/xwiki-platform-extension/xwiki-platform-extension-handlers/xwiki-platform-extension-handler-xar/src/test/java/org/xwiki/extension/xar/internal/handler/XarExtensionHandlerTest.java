@@ -1236,16 +1236,17 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnWikiWithOnlyAdminRight() throws Throwable
     {
-        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        BaseObject object = new BaseObject();
-        object.setXClassReference(new DocumentReference("wiki", "space", "class"));
-        existingDocument.addXObject(object);
-        existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
-        this.oldcore.getSpyXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
+        assertTrue(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext()).isNew());
 
         // install
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        // validate
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext()).isNew());
     }
 
     @Test

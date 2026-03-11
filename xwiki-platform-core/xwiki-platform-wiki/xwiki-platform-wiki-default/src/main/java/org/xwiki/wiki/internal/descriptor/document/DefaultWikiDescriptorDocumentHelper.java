@@ -151,7 +151,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     {
         WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
 
-        List<XWikiDocument> result = new ArrayList<XWikiDocument>();
+        List<XWikiDocument> result = new ArrayList<>();
         
         List<String> documentNames = getAllXWikiServerClassDocumentNames();
         if (documentNames != null) {

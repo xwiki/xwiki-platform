@@ -37,6 +37,10 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>{
+      "@xwiki/platform-livedata-componentstore": "org.xwiki.platform:xwiki-platform-livedata-node-componentstore/index.es.js",
+      "@xwiki/platform-livedata-ui": "org.xwiki.platform:xwiki-platform-livedata-node-ui/index.es.js"
+    }</xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
@@ -47,6 +51,18 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-componentstore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-ui</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

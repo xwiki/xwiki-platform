@@ -318,7 +318,7 @@ public class WikiManagerScriptService implements ScriptService
             wikis = wikiDescriptorManager.getAll();
         } catch (WikiManagerException e) {
             error(e);
-            wikis = new ArrayList<WikiDescriptor>();
+            wikis = new ArrayList<>();
         }
 
         return wikis;
@@ -337,7 +337,7 @@ public class WikiManagerScriptService implements ScriptService
             wikis = wikiDescriptorManager.getAllIds();
         } catch (WikiManagerException e) {
             error(e);
-            wikis = new ArrayList<String>();
+            wikis = new ArrayList<>();
         }
 
         return wikis;

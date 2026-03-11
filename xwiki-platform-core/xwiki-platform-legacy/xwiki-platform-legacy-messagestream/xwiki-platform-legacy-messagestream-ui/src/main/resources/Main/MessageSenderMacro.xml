@@ -146,13 +146,13 @@ XWiki.MessageStream = Class.create({
         messageTargetContainer.removeClassName('hidden');
         fields.forEach(function(field) {
           field.enable();
-          field.hasClassName('selectized') &amp;&amp; field.selectize.enable();
+          field.hasClassName('tomselected') &amp;&amp; field.selectize.enable();
         });
       } else {
         messageTargetContainer.addClassName('hidden');
         fields.forEach(function(field) {
           field.disable();
-          field.hasClassName('selectized') &amp;&amp; field.selectize.disable();
+          field.hasClassName('tomselected') &amp;&amp; field.selectize.disable();
         });
       }
     });

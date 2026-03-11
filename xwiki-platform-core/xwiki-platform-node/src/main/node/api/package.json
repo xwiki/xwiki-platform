@@ -46,11 +46,12 @@
     "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x",
-    "vue-router": "4.x"
+    "vue-router": "5.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

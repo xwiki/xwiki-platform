@@ -76,22 +76,6 @@
 ## }
 ## ================================================================
 #macro (getMacroList $syntaxId)
-
-  ## Loads the css resources to display the macros list
-  ## TODO: Refactor once we add support for loading css files from javascript without velocity.
-  #if ($xcontext.action == 'get')
-    #template('display_macros.vm')
-    #initRequiredSkinExtensions()
-  #end
-
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-    {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-
-  #if ($xcontext.action == 'get')
-    #sendRequiredSkinExtensions()
-  #end
-
   #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
   #set ($macroDescriptors = $services.rendering.getMacroDescriptors($syntax))
   #set ($data = {})

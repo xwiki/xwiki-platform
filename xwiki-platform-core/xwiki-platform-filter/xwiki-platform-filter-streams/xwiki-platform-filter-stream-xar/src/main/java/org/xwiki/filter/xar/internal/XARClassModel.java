@@ -32,8 +32,9 @@ import org.xwiki.xar.internal.model.XarClassModel;
  */
 public class XARClassModel extends XarClassModel
 {
-    // Utils
-
+    /**
+     * Parameters to be used when reading a class.
+     */
     public static final Map<String, EventParameter> CLASS_PARAMETERS = new HashMap<String, EventParameter>()
     {
         {

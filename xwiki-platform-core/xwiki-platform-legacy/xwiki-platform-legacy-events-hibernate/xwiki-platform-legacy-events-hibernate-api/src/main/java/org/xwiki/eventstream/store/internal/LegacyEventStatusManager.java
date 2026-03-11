@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
@@ -130,8 +130,8 @@ public class LegacyEventStatusManager implements EventStatusManager
     private boolean isPresent(Event event, String entityId, List<EventStatus> list)
     {
         for (EventStatus status : list) {
-            if (StringUtils.equals(status.getEvent().getId(), event.getId())
-                && StringUtils.equals(status.getEntityId(), entityId)) {
+            if (Strings.CS.equals(status.getEvent().getId(), event.getId())
+                && Strings.CS.equals(status.getEntityId(), entityId)) {
                 return true;
             }
         }

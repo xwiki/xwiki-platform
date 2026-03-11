@@ -86,9 +86,6 @@
           &lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
-          #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'), 
-            {'type': 'text/css', 'rel': 'stylesheet'}))
-          #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
           #set ($discard = $xwiki.ssx.use('CKEditor.ImageEditorService'))
           &lt;select id="imageStyles"&gt;&lt;/select&gt;
         &lt;/dd&gt;

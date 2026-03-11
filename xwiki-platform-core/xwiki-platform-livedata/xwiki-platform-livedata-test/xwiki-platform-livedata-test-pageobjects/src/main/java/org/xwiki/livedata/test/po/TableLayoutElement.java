@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.hamcrest.Description;
@@ -40,6 +41,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,6 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
-import org.xwiki.text.StringUtils;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -72,8 +73,6 @@ public class TableLayoutElement extends BaseElement
     public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
 
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
-
-    private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     private final LiveDataElement liveData;
 
@@ -532,28 +531,29 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
-    private static void filterListColumn(String content, Map<String, Object> options, WebElement filterElement)
+    private void filterListColumn(String content, Map<String, Object> options, WebElement filterElement)
     {
-        if (filterElement.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
-            SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
-            // Wait for the suggestions on selectize fields only if this is explicitly asked.
-            suggestInputElement.clearSelectedSuggestions().sendKeys(content);
-            if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
-                suggestInputElement.waitForSuggestions().selectByVisibleText(content);
-            } else {
-                suggestInputElement.selectTypedText();
-            }
+        SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
+        // Wait for the suggestions on selectize fields only if this is explicitly asked.
+        suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+        if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+            suggestInputElement.waitForSuggestions().selectByVisibleText(content);
         } else {
-            new Select(filterElement).selectByVisibleText(content);
+            suggestInputElement.selectTypedText();
         }
     }
 
     private static void filterBooleanColumn(String content, WebElement filterElement)
     {
         SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
-        suggestInputElement.clear().sendKeys(content);
-        suggestInputElement.waitForNonTypedSuggestions();
-        suggestInputElement.selectByVisibleText(content);
+        if (StringUtils.isEmpty(content)) {
+            // Clear the boolean filter.
+            suggestInputElement.clearSelectedSuggestions().hideSuggestions();
+        } else {
+            suggestInputElement.clear().sendKeys(content);
+            suggestInputElement.waitForNonTypedSuggestions();
+            suggestInputElement.selectByVisibleText(content);
+        }
     }
 
     private static void filterTextColumn(String content, WebElement filterElement)
@@ -622,18 +622,18 @@ public class TableLayoutElement extends BaseElement
         List<String> classes = Arrays.asList(getClasses(element));
         List<String> ret;
         if (classes.contains("filter-list")) {
-            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+            if (StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).contains("tomselected")) {
                 ret = new SuggestInputElement(element)
                     .getSelectedSuggestions()
                     .stream()
                     .map(SuggestInputElement.SuggestionElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
             } else {
                 ret = new Select(element)
                     .getAllSelectedOptions()
                     .stream()
                     .map(WebElement::getText)
-                    .collect(Collectors.toList());
+                    .toList();
             }
         } else if (classes.contains("filter-text")) {
             ret = singletonList(element.getText());
@@ -963,7 +963,7 @@ public class TableLayoutElement extends BaseElement
         return getRoot().findElements(By.cssSelector(".column-name .property-name"))
             .stream()
             .map(WebElement::getText)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private WebElement getRoot()
@@ -1050,11 +1050,12 @@ public class TableLayoutElement extends BaseElement
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
         }
 
-        // Waits for the field to disappear.
-        getDriver().waitUntilCondition(input -> {
-            // The edited field is not displayed anymore.
-            return element.findElements(selector).isEmpty();
-        });
+        // Wait for...
+        getDriver().waitUntilCondition(ExpectedConditions.or(
+            // ...either the cell to become stale (which can happen if the new value doesn't match the current filters)
+            ExpectedConditions.stalenessOf(element),
+            // ...or the edit field to disappear.
+            ExpectedConditions.not(ExpectedConditions.presenceOfNestedElementLocatedBy(element, selector))));
 
         // Wait for reload after saving.
         if (save) {
@@ -1064,7 +1065,7 @@ public class TableLayoutElement extends BaseElement
 
     private String[] getClasses(WebElement element)
     {
-        return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
+        return StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).split("\\s+");
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)
@@ -1084,7 +1085,7 @@ public class TableLayoutElement extends BaseElement
         URIBuilder uriBuilder = new URIBuilder(initialUri);
         List<NameValuePair> cleanedUpParams = uriBuilder.getQueryParams().stream()
             .filter(it -> !Objects.equals(it.getName(), "form_token"))
-            .collect(Collectors.toList());
+            .toList();
         uriBuilder.setParameters(cleanedUpParams);
         URI uri;
         try {

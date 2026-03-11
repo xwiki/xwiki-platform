@@ -187,7 +187,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         datasetBuilder.setNumberOfRows(endRow - startRow + 1);
 
         if (startColumn > 0) {
-            Set<String> rowKeySet = new HashSet<String>();
+            Set<String> rowKeySet = new HashSet<>();
             for (int i = startRow; i <= endRow; i++) {
                 TableRowBlock tableRow = (TableRowBlock) tableBlock.getChildren().get(i);
                 String key = cellContentAsString((TableCellBlock) tableRow.getChildren().get(startColumn - 1));

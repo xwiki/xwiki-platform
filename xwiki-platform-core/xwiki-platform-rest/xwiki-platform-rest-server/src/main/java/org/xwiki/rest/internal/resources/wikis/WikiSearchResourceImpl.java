@@ -45,6 +45,8 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
     private KeywordSearchSource keywordSearchSource;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public SearchResults search(String wikiName, String keywords, List<String> searchScopeStrings, Integer number,
         Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
             throws XWikiRestException

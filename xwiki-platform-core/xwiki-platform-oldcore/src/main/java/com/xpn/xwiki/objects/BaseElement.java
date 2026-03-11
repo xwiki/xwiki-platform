@@ -291,7 +291,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**

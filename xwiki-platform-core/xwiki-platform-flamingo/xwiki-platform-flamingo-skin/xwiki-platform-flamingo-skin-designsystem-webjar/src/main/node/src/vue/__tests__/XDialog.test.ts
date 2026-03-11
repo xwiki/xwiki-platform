@@ -23,13 +23,20 @@ import {
   shallowMountHelper,
 } from "@xwiki/platform-test-accessibility";
 import { describe, expect } from "vitest";
+import { Teleport } from "vue";
 import Module from "module";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 
 function getAccessibilityMount() {
   // Override require used globally but resolved to node's required by default.
   Module.prototype.require = () => {};
-  return shallowMountHelper(XDialog);
+  return shallowMountHelper(XDialog, {
+    global: {
+      stubs: {
+        Teleport: Teleport,
+      },
+    },
+  });
 }
 
 const accessibilityMount = getAccessibilityMount();

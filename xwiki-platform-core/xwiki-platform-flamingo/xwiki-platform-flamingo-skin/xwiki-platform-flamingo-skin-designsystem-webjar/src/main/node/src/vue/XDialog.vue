@@ -54,32 +54,41 @@ watchEffect(() => {
     modal.value.modal("hide");
   }
 });
+
+function click() {
+  open.value = true;
+}
 </script>
 
 <template>
-  <div class="modal fade" tabindex="-1" role="dialog" ref="root">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">{{ title }}</h4>
-        </div>
-        <div class="modal-body">
-          <slot></slot>
-        </div>
-        <div class="modal-footer" v-if="$slots.footer">
-          <slot name="footer"></slot>
+  <span @click="click">
+    <slot name="activator" />
+  </span>
+  <teleport to="body">
+    <div class="modal fade" tabindex="-1" role="dialog" ref="root">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">{{ title }}</h4>
+          </div>
+          <div class="modal-body">
+            <slot></slot>
+          </div>
+          <div class="modal-footer" v-if="$slots.footer">
+            <slot name="footer"></slot>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <style scoped>

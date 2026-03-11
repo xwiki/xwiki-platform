@@ -43,6 +43,8 @@ defineOptions({
       <span class="xHint" v-if="help">{{ help }}</span>
     </dt>
     <dd>
+      <!-- Optional default slot to display some content before the input field -->
+      <slot></slot>
       <input :id="textId" type="text" v-model="model" v-bind="$attrs" />
     </dd>
   </dl>

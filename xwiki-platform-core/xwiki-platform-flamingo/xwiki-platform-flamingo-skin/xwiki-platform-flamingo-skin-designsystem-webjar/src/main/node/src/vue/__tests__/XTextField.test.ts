@@ -39,7 +39,31 @@ describe("XTextField", () => {
   <dt><label for="v-0">Select Label</label>
     <!--v-if-->
   </dt>
-  <dd><input id="v-0" type="text"></dd>
+  <dd>
+    <!-- Optional default slot to display some content before the input field --><input id="v-0" type="text">
+  </dd>
+</dl>`);
+    },
+  );
+
+  runTest(
+    "render with default slot",
+    accessibilityMount({
+      props: {
+        label: "Select Label",
+      } satisfies TextFieldProps,
+      slots: {
+        default: "Some Text before the field",
+      },
+    }),
+    (wrapper) => {
+      expect(wrapper.html()).toEqual(`<dl>
+  <dt><label for="v-0">Select Label</label>
+    <!--v-if-->
+  </dt>
+  <dd>
+    <!-- Optional default slot to display some content before the input field -->Some Text before the field<input id="v-0" type="text">
+  </dd>
 </dl>`);
     },
   );

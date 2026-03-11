@@ -61,9 +61,16 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <button :class="classes" @click="$emit('click')">
+  <button
+    :class="[...classes, pill ? $style.pill : '']"
+    @click="$emit('click')"
+  >
     <slot />
   </button>
 </template>
 
-<style scoped></style>
+<style module>
+.pill {
+  border-radius: 99999px;
+}
+</style>

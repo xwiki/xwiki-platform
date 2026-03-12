@@ -54,7 +54,7 @@ define('entityResourcePicker', [
       return selectedNodes.length > 0;
     };
 
-    modal.on('shown.bs.modal', function(event) {
+    modal.off('shown.bs.modal.treePicker').on('shown.bs.modal.treePicker', function(event) {
       // Open to the specified node only once. Preserve the tree state otherwise.
       var openToNodeId = handler.openToNodeId;
       if (typeof openToNodeId === 'string' && openToNodeId !== modal.data('openTo')) {
@@ -124,14 +124,14 @@ define('entityResourcePicker', [
       }
     });
 
-    modal.on('hide.bs.modal', function() {
+    modal.off('hide.bs.modal.treePicker').on('hide.bs.modal.treePicker', function() {
       const tree = $.jstree.reference(treeElement);
       // The dropdown used to display the tree finder suggestions is attached to the BODY element, so outside the modal.
       // This means we need to clear the suggestions manually when the modal is closed.
       tree?.clearFinderSuggestions?.();
     });
 
-    selectButton.on('click', function() {
+    selectButton.off('click.treePicker').on('click.treePicker', function() {
       modal.modal('hide');
       var tree = $.jstree.reference(treeElement);
       // jshint camelcase:false

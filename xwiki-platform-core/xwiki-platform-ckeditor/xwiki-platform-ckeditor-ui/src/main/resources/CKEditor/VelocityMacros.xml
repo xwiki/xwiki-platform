@@ -124,8 +124,6 @@
     'xwiki-version': $services.extension.core.getCoreExtension(
       'org.xwiki.platform:xwiki-platform-tree-webjar').version.value,
     'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff',
-      "wiki:$xcontext.database").version.value,
-    'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
       "wiki:$xcontext.database").version.value
   }))
   #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-plugins' 'webjar.bundle.min.css' true)

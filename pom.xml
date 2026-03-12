@@ -397,12 +397,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>bootstrap-3-typeahead</artifactId>
-        <version>4.0.2</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>

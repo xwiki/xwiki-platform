@@ -94,22 +94,19 @@ class LinkIT extends AbstractCKEditorIT
 
         edit(setup, testReference, false);
 
-        String spaceName = testReference.getLastSpaceReference().getParent().getName();
-        editor.getToolBar().insertOrEditLink()
-            .setResourceValue("subPage")
-            .selectPageItem(String.format("%s / insertLinks", spaceName), "subPage")
-            .submit();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        linkDialog.getResourceSuggestInput().click().waitForSuggestions().sendKeys("subPage").waitForSuggestions()
+            .selectByVisibleText("subPage");
+        linkDialog.submit();
 
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
 
-        editor.getToolBar().insertOrEditLink()
-            .setResourceType("attach")
-            .setResourceValue("text")
-            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), attachmentName)
-            .submit();
+        linkDialog = editor.getToolBar().insertOrEditLink().setResourceType("attach");
+        linkDialog.getResourceSuggestInput().sendKeys("text").waitForSuggestions().selectByVisibleText(attachmentName);
+        linkDialog.submit();
 
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@text.txt]]");
+        assertSourceEquals("[[subPage>>doc:subPage]]\n\n[[text.txt>>attach:subPage@text.txt]]");
     }
 
     @Test
@@ -140,18 +137,18 @@ class LinkIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         editor.getToolBar()
             .insertOrEditLink()
-            .setResourceValue("Foo.Bar.Buz.Test")
+            .setResourceReference("Foo.Bar.Buz.Test")
             .createLinkOfNewPage(true)
             .submit();
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
         editor.getToolBar()
             .insertOrEditLink()
-            .setResourceValue("Fa.Fi.Foo")
+            .setResourceReference("Fa.Fi.Foo")
             .createLinkOfNewPage(false)
             .submit();
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
-        LinkPickerModal linkPickerModal = linkDialog.openDocumentPicker();
+        LinkPickerModal linkPickerModal = linkDialog.openLinkPickerModal();
         LinkTreeElement tree = linkPickerModal.getTree();
         tree.waitForIt();
         assertTrue(tree.hasNewPageCreation(testReference));
@@ -165,10 +162,10 @@ class LinkIT extends AbstractCKEditorIT
         linkDialog.submit();
         // Verify that the content matches what we did using CKEditor.
         assertSourceEquals("""
-            [[type the link label>>doc:Foo.Bar.Buz.Test]]
+            [[Test>>doc:Foo.Bar.Buz.Test]]
 
-            [[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]
+            [[Fa.Fi.Foo>>doc:.Fa\\.Fi\\.Foo.WebHome]]
 
-            [[type the link label>>doc:.SubPage.Another.WebHome]]""");
+            [[Another>>doc:.SubPage.Another.WebHome]]""");
     }
 }

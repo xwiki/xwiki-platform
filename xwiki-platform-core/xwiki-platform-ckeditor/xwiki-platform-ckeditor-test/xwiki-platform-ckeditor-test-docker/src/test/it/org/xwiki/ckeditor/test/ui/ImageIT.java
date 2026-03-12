@@ -439,11 +439,14 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened.
+        linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions();
+        linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+        assertEquals("[[~[~[image:image.gif~]~]>>]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -471,7 +474,7 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
+        editor.getToolBar().insertOrEditLink().setResourceReference("Main.WebHome").createLinkOfNewPage(true).submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
@@ -495,10 +498,10 @@ class ImageIT extends AbstractCKEditorIT
 
         // Verify that the link is still set.
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
-        LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
-        assertEquals("doc", linkSelectorModal.getSelectedResourceType());
-        assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
-        linkSelectorModal.cancel();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        assertEquals(List.of("xwiki:Main.WebHome"),
+            linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions().getValues());
+        linkDialog.cancel();
 
         // Change the caption to ensure that saving again works.
         editor.executeOnEditedContent(

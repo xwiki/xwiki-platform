@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.filter.output;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +49,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterStream<PropertyClass>
 {
     @Inject
-    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject

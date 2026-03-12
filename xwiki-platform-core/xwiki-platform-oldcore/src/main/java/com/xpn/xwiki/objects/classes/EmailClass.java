@@ -19,6 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.mail.EmailAddressObfuscator;
 import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.stability.Unstable;
 
@@ -46,6 +52,8 @@ public class EmailClass extends StringClass
      * Constant defining the field name.
      **/
     protected static final String XCLASSNAME = "email";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailClass.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -89,5 +97,26 @@ public class EmailClass extends StringClass
     public String getPropertyType()
     {
         return PROPERTY_TYPE;
+    }
+
+    /**
+     * Use {@link EmailAddressObfuscator} to obfuscate email addresses.
+     * If the value cannot be properly parsed, then this returns {@code null}.
+     *
+     * @param value the value to be obfuscated
+     * @return the output of {@link EmailAddressObfuscator#obfuscate(InternetAddress)} or {@code null} if the given
+     * value cannot be parsed to an email address.
+     */
+    @Override
+    public Object getObfuscatedValue(Object value)
+    {
+        EmailAddressObfuscator emailAddressObfuscator = Utils.getComponent(EmailAddressObfuscator.class);
+        try {
+            InternetAddress address = InternetAddress.parse(String.valueOf(value))[0];
+            return emailAddressObfuscator.obfuscate(address);
+        } catch (AddressException e) {
+            LOGGER.debug("Invalid email address value when trying to obfuscate [{}] falling back on null.", value);
+            return null;
+        }
     }
 }

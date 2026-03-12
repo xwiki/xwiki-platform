@@ -629,6 +629,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Needed for bootstrap-switch since it's not compatible with jquery 4 -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>jquery-migrate</artifactId>
+        <version>4.0.2</version>
+      </dependency>
       <!--Used by oldcore + querymanager -->
       <dependency>
         <groupId>com.github.jsqlparser</groupId>

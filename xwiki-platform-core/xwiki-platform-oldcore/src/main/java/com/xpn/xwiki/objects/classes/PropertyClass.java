@@ -1072,4 +1072,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         currentProperty.merge(previousProperty, newProperty, configuration, context, mergeResult);
     }
+
+    /**
+     * Compute and return an obfuscated value. By default, this method always returns {@code null} as it's the better
+     * obfuscation possible. Now inherited classes can override this to use their own obfuscation mechanism.
+     * @param value the value to be obfuscated.
+     * @return the obfuscated value, which can be {@code null}.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public Object getObfuscatedValue(Object value)
+    {
+        return null;
+    }
 }

@@ -534,7 +534,6 @@ return XWiki;
     </property>
     <property>
       <parameters>id=wikis
-name=$services.localization.render('platform.wiki.menu.userwikis')
 icon=list
 # isActive: The current wiki is the main wiki.
 isActive=#if($xcontext.isMainWiki())true#{else}false#end

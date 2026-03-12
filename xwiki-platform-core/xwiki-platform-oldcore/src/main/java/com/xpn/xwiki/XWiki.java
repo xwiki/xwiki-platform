@@ -3838,9 +3838,7 @@ public class XWiki implements EventListener
             XWikiRequest request = context.getRequest();
             // Get the user document
             String username = convertUsername(request.getParameter("xwikiname"), context);
-            if (username.indexOf('.') == -1) {
-                username = "XWiki." + username;
-            }
+            username = com.xpn.xwiki.api.Util.getStandardUsername(username, false);
             XWikiDocument userDocument = getDocument(username, context);
 
             // Avoid modifying the cached document
@@ -3905,18 +3903,19 @@ public class XWiki implements EventListener
             String parent = request.getParameter("parent");
             String validkey = null;
 
-            // Validate the values.
             if (XWikiRightService.SUPERADMIN_USER.equalsIgnoreCase(xwikiname)) {
                 return -8;
             }
+            String defaultValidationRegex = "/^[a-zA-Z0-9_]+$/";
             try {
-                if (!context.getUtil().match(getConfiguration().getProperty("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"),
-                    xwikiname)) {
+                String usernameValidationRegex =
+                    getConfiguration().getProperty("xwiki.validusername", defaultValidationRegex);
+                if (!context.getUtil().match(usernameValidationRegex, xwikiname)) {
                     return -4;
                 }
             } catch (RuntimeException ex) {
                 LOGGER.warn("Invalid regular expression for xwiki.validusername", ex);
-                if (!context.getUtil().match("/^[a-zA-Z0-9_]+$/", xwikiname)) {
+                if (!context.getUtil().match(defaultValidationRegex, xwikiname)) {
                     return -4;
                 }
             }

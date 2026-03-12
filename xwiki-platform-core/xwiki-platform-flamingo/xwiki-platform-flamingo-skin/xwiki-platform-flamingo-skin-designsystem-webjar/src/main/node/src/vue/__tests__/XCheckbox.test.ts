@@ -39,10 +39,10 @@ describe("XCheckbox", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Checkbox Label</label>
+  <dt><input id="v-0" type="checkbox"><label for="v-0">Checkbox Label</label>
     <!--v-if-->
   </dt>
-  <dd><input id="v-0" type="checkbox"></dd>
+  <dd></dd>
 </dl>`);
     },
   );
@@ -60,7 +60,7 @@ describe("XCheckbox", () => {
     }),
     (wrapper) => {
       expect(wrapper.find("dt").html()).toEqual(
-        `<dt><label for="v-0">Checkbox Label</label><span class="xHint">Hint text</span></dt>`,
+        `<dt><input id="v-0" type="checkbox"><label for="v-0">Checkbox Label</label><span class="xHint">Hint text</span></dt>`,
       );
     },
   );

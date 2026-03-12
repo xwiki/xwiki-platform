@@ -39,12 +39,15 @@ defineOptions({
 <template>
   <dl>
     <dt>
-      <label :for="checkboxId">{{ label }}</label>
+      <input
+        :id="checkboxId"
+        type="checkbox"
+        v-model="model"
+        v-bind="$attrs"
+      /><label :for="checkboxId">{{ label }}</label>
       <span class="xHint" v-if="help">{{ help }}</span>
     </dt>
-    <dd>
-      <input :id="checkboxId" type="checkbox" v-model="model" v-bind="$attrs" />
-    </dd>
+    <dd></dd>
   </dl>
 </template>
 

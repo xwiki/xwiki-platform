@@ -23,7 +23,7 @@ import type { TextFieldProps } from "@xwiki/platform-dsapi";
 
 const { label, help } = defineProps<TextFieldProps>();
 
-const model = defineModel<boolean>();
+const model = defineModel<string>();
 
 const textId = useId();
 

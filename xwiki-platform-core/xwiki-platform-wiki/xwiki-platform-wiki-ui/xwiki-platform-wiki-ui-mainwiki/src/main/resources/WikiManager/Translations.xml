@@ -140,6 +140,7 @@ platform.wiki.users.join.request.send.label=Send Request
 platform.wiki.users.join.request.cancel.label=Back
 
 ## User profile
+platform.core.profile.category.wikis=Wikis
 platform.wiki.users.profile.joinedwikis.label=Joined wikis
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
@@ -158,7 +159,7 @@ platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''
 platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
 rendering.macro.wikis.name=Wikis
 rendering.macro.wikis.description=List all wikis
-
+    
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Workspaces (Legacy)
 rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.

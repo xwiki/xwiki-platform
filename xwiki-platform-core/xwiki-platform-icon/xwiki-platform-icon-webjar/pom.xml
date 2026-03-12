@@ -24,30 +24,33 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-icon</artifactId>
     <version>18.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-icon</artifactId>
-  <name>XWiki Platform - Icon - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Icon - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-icon-api</module>
-    <module>xwiki-platform-icon-default</module>
-    <module>xwiki-platform-icon-macro</module>
-    <module>xwiki-platform-icon-rest</module>
-    <module>xwiki-platform-icon-script</module>
-    <module>xwiki-platform-icon-ui</module>
-    <module>xwiki-platform-icon-webjar</module>
-    <!-- Icon Themes -->
-    <module>xwiki-platform-icon-fontawesome</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-icon-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <packaging>webjar</packaging>
+  <artifactId>xwiki-platform-icon-webjar</artifactId>
+  <name>XWiki Platform - Icon - WebJar</name>
+  <description>A JavaScript API to load icons from the XWiki icon theme.</description>
+  <properties>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
+  </properties>
+  <dependencies>
+    <!-- We need the REST api to fetch the icons from the configured icon theme. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-icon-rest-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We define a RequireJS loader plugin. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+  </dependencies>
 </project>

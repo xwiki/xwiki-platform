@@ -508,10 +508,10 @@
 
 #macro (displaySearchResult_attachment $searchResult)
   &lt;h2 class="search-result-title"&gt;
-    $services.icon.renderHTML('attach')
     #set ($attachmentURL = $xwiki.getURL($searchResultReference))
     #set ($downloadHint = $services.localization.render('core.viewers.attachments.download'))
     &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;
+      $services.icon.renderHTML('attach')
       $escapetool.xml($searchResultReference.name)
     &lt;/a&gt;
     #set ($attachmentHistoryURL = $xwiki.getURL($searchResultReference, 'viewattachrev', $NULL))
@@ -553,8 +553,7 @@
     #set ($titleURL = $xwiki.getURL($searchResultReference, 'view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
-    $services.icon.renderHTML('file-white')
-    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResult.title_)&lt;/a&gt;
+    &lt;a href="$titleURL"&gt;$services.icon.renderHTML('file-white') $escapetool.xml($searchResult.title_)&lt;/a&gt;
     #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;

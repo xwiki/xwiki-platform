@@ -73,7 +73,6 @@
 ## Menus
 platform.wiki.menu.wikiindex=Wiki Index
 platform.wiki.menu.deletewiki=Delete wiki
-platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
 platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
@@ -141,6 +140,7 @@ platform.wiki.users.join.request.send.label=Send Request
 platform.wiki.users.join.request.cancel.label=Back
 
 ## User profile
+platform.core.profile.category.wikis=Wikis
 platform.wiki.users.profile.joinedwikis.label=Joined wikis
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
@@ -305,6 +305,11 @@ platform.wiki.delete.confirmation.no=No, take me back!
 ## until 18.0.0RC1
 #######################################
 platform.wiki.browse=Browse Wikis
+
+#######################################
+## until 18.2.0RC1
+#######################################
+platform.wiki.menu.userwikis=Wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

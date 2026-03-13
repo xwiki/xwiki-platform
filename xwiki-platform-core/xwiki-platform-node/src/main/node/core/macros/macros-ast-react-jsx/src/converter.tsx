@@ -182,18 +182,25 @@ export class MacrosAstToReactJsxConverter {
         );
 
       case "list":
-        const ListTag = block.numbered ? "ol" : "ul";
+        const ListTag = block.listType.type === "ordered" ? "ol" : "ul";
+
+        const domProps =
+          block.listType.type === "ordered" &&
+          block.listType.firstIndex !== null
+            ? { start: block.listType.firstIndex }
+            : {};
 
         return (
-          <ListTag {...this.convertBlockStyles(block.styles)}>
+          <ListTag {...this.convertBlockStyles(block.styles)} {...domProps}>
             {block.items.map((item, i) => {
               const childKey = `${key}.${i}`;
 
               return (
                 <li key={childKey}>
-                  {item.checked !== undefined && (
-                    <input type="checkbox" checked={item.checked} readOnly />
-                  )}
+                  {block.listType.type === "checkable" &&
+                    item.checked !== undefined && (
+                      <input type="checkbox" checked={item.checked} readOnly />
+                    )}
                   {this.convertInlineContents(
                     item.content,
                     editableZoneRef,

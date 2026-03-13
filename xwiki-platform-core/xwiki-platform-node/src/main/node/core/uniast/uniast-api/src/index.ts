@@ -26,6 +26,7 @@ export type {
   Link,
   LinkTarget,
   ListItem,
+  ListType,
   MacroInvocation,
   TableCell,
   TableColumn,

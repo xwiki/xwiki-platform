@@ -273,6 +273,7 @@ export type {
   MacroLink,
   MacroLinkTarget,
   MacroListItem,
+  MacroListType,
   MacroTableCell,
   MacroTableColumn,
   MacroText,

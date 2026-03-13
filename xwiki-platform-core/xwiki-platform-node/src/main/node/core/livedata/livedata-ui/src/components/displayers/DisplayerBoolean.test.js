@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,12 +20,12 @@
 
 import DisplayerBoolean from "./DisplayerBoolean.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import { afterEach, describe, expect, it } from "vitest";
 import { config } from "@vue/test-utils";
-import sinon from "sinon";
+import { restore } from "sinon";
+import { afterEach, describe, expect, it } from "vitest";
 
 config.global.mocks = {
-  $t: key => {
+  $t: (key) => {
     const map = {
       "livedata.displayer.boolean.true": "True",
       "livedata.displayer.boolean.false": "False",
@@ -36,19 +36,21 @@ config.global.mocks = {
 };
 
 function defaultTranslationsMock(key, translationMap = {}) {
-  const map = Object.assign({
-    "livedata.displayer.boolean.true": "True",
-    "livedata.displayer.boolean.false": "False",
-  }, translationMap);
+  const map = Object.assign(
+    {
+      "livedata.displayer.boolean.true": "True",
+      "livedata.displayer.boolean.false": "False",
+    },
+    translationMap,
+  );
 
   return map[key] || "unexpected key";
 }
 
 describe("DisplayerBoolean.vue", () => {
-
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders a true entry in view mode", () => {
@@ -81,11 +83,13 @@ describe("DisplayerBoolean.vue", () => {
     const checkbox = wrapper.find("input");
 
     expect(checkbox.element.checked).toBe(true);
-    expect(checkbox.element).toBe(document.activeElement)
+    expect(checkbox.element).toBe(document.activeElement);
   });
 
   it("Renders a false entry in edit mode", async () => {
-    const wrapper = initWrapper(DisplayerBoolean, { props: { entry: { color: false } } });
+    const wrapper = initWrapper(DisplayerBoolean, {
+      props: { entry: { color: false } },
+    });
 
     await wrapper.setProps({ isView: false });
 
@@ -113,11 +117,12 @@ describe("DisplayerBoolean.vue", () => {
 
     await wrapper.find(".edit > div").trigger("keydown.enter");
 
-    expect(values).toMatchObject([{
-      color: {
-        color: false,
+    expect(values).toMatchObject([
+      {
+        color: {
+          color: false,
+        },
       },
-    }]);
+    ]);
   });
-
 });

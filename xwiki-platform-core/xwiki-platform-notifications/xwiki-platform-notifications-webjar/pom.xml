@@ -76,5 +76,10 @@
       <artifactId>bootstrap-switch</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

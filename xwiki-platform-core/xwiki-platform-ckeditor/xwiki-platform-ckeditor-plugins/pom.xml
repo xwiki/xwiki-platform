@@ -72,10 +72,11 @@
       <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature.. -->
       <optional>true</optional>
     </dependency>
-    <!-- This is used by the resource suggest picker on the link modal. -->
+    <!-- Used to load icons for the resource picker. -->
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>bootstrap-3-typeahead</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- This is used to preserve the selection when switching between WYSIWYG and Source modes. -->

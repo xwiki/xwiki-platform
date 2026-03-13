@@ -40,6 +40,9 @@
   "dependencies": {
     "@xwiki/platform-livedata-api": "workspace:*"
   },
+  "peerDependencies": {
+    "jquery": "4.x"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/jquery": "catalog:",

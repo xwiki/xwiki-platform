@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -125,6 +126,19 @@ public class SuggestInputElement extends BaseElement
     private final WebElement originalInput;
 
     private WebElement container;
+
+    /**
+     * Checks if the suggest input widget is available on the given element.
+     * 
+     * @param executor the JavaScript executor used to check if the suggest input widget is available
+     * @param targetElement the element on which to check if the suggest input widget is available
+     * @return {@code true} if the suggest input widget is available on the given element, {@code false} otherwise
+     * @since 18.2.0RC1
+     */
+    public static boolean isAvailable(JavascriptExecutor executor, WebElement targetElement)
+    {
+        return Boolean.TRUE.equals(executor.executeScript("return !!arguments[0].selectize", targetElement));
+    }
 
     public SuggestInputElement(WebElement originalInput)
     {

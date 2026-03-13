@@ -13,13 +13,13 @@
     "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
+  "files": [
+    "*.json"
+  ],
   "peerDependencies": {
     "typescript": "5.x"
   },
   "devDependencies": {
     "typescript": "catalog:"
-  },
-  "files": [
-    "*.json"
-  ]
+  }
 }

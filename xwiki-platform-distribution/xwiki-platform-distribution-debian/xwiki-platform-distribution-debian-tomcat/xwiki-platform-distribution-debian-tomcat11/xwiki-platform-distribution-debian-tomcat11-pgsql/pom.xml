@@ -20,19 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!--
-  Used only when deploying XWiki in Tomcat.
-
-  Prevent JAR scanning and disable JSP support. This is done to increase Tomcat startup to the maximum. Note that we keep
-  WebSocket support enabled because it is needed by the real-time editing.
-  See https://wiki.apache.org/tomcat/HowTo/FasterStartUp &
-  https://tcollignon.github.io/2016/02/09/Accelerate-tomcat-78-start-up.html
--->
-<Context containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
-  <JarScanner>
-    <JarScanFilter defaultTldScan="false"/>
-  </JarScanner>
-  <!-- We need to set the resource cache size since the default (10K) is too small for loading all XWiki resources at
-       once -->
-  <Resources cacheMaxSize="100176" />
-</Context>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution-debian-tomcat11</artifactId>
+    <version>18.2.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-debian-tomcat11-pgsql</artifactId>
+  <name>XWiki Platform - Distribution - Debian - Tomcat ${debian.tomcat.version} - Postgres SQL</name>
+  <packaging>deb</packaging>
+  <description>XWiki Tomcat${debian.tomcat.version}/PostgreSQL</description>
+  <properties>
+    <debian.package>xwiki-tomcat${debian.tomcat.version}-pgsql</debian.package>
+  </properties>
+</project>

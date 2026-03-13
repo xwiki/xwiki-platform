@@ -51,7 +51,6 @@ import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

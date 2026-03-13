@@ -24,39 +24,36 @@ define('resourcePickerTranslationKeys', [], [
 ]);
 
 define('resourcePicker', [
-  'jquery', 'resource', 'l10n!resourcePicker', 'bootstrap3-typeahead'
+  'jquery', 'resource', 'l10n!resourcePicker', 'xwiki-selectize'
 ], function($, $resource, translations) {
   'use strict';
 
-  var resourcePickerTemplate =
-    '<div class="resourcePicker">' +
-      '<div class="input-group">' +
-        '<input type="text" class="resourceReference" />' +
-        '<div class="input-group-btn">'+
-          '<button type="button" class="resourceType btn btn-default">' +
-            '<span class="icon">' +
-          '</button>' +
-          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
-            '<span class="sr-only"></span>' +
-            '<span class="caret"></span>' +
-          '</button>' +
-          '<ul class="resourceTypes dropdown-menu dropdown-menu-right"></ul>' +
-        '</div>' +
-      '</div>' +
-      '<div class="resourceDisplay"></div>' +
-    '</div>';
+  const resourcePickerTemplate = `
+    <div class="resourcePicker">
+      <div class="input-group">
+        <input type="text" class="resourceReference" />
+        <div class="input-group-btn">
+          <button type="button" class="resourceType btn btn-default">
+            <span class="icon">
+          </button>
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="sr-only"></span>
+            <span class="caret"></span>
+          </button>
+          <ul class="resourceTypes dropdown-menu dropdown-menu-right"></ul>
+        </div>
+      </div>
+    </div>`;
 
-  var createResourcePicker = function(element, options) {
-    options = options || {};
-
-    var resourcePicker = $(resourcePickerTemplate);
+  function createResourcePicker(input, options = {}) {
+    const resourcePicker = $(resourcePickerTemplate);
     resourcePicker.find('button.dropdown-toggle').attr('title', translations.get('dropdown.toggle.title'));
     resourcePicker.find('button.dropdown-toggle .sr-only').text(translations.get('dropdown.toggle.title'));
     resourcePicker.data("options", options);
-    element.on('selectResource', onSelectResource).hide().after(resourcePicker);
+    input.on('selectResource', onSelectResource).hide().after(resourcePicker);
 
     // Compute the list of supported resource types.
-    var resourceTypes = $(element).attr('data-resourceTypes') || options.resourceTypes || [];
+    let resourceTypes = $(input).attr('data-resourceTypes') || options.resourceTypes || [];
     if (typeof resourceTypes === 'string') {
       resourceTypes = resourceTypes.split(/\s*,\s*/);
     }
@@ -65,99 +62,86 @@ define('resourcePicker', [
     if (resourceTypes.length === 0) {
       resourcePicker.find('.input-group').attr('class', 'input-wrapper').children('.input-group-btn').hide();
     } else if (resourceTypes.length === 1) {
-      var resourceTypeButton = resourcePicker.find('.resourceType');
+      const resourceTypeButton = resourcePicker.find('.resourceType');
       // Move the resource type button at the end in order to have round borders, and hide the resource type drop down.
       resourceTypeButton.appendTo(resourceTypeButton.parent()).prevAll().hide();
     }
 
     // Populate the Resource Type drop down.
-    resourceTypes.forEach(addResourceType, resourcePicker);
+    resourceTypes.forEach(resourceType => addResourceType(resourcePicker, resourceType));
 
-    addResourcePickerBehaviour(resourcePicker);
+    addResourcePickerBehaviour(input, resourcePicker);
 
     // Initialize the resource selection.
-    element.trigger('selectResource');
+    if (input.val() || options.preselectCurrentResource) {
+      input.trigger('selectResource', getResource(resourcePicker));
+    } else {
+      // Prepare the picker for selecting resources of the first available type.
+      selectResourceType(resourcePicker, resourceTypes.length > 0 ? resourceTypes[0] : 'unknown');
+    }
 
     return resourcePicker;
-  };
+  }
 
-  var addResourceType = function(resourceTypeId) {
-    var resourceType = $resource.types[resourceTypeId] || {
+  function addResourceType(resourcePicker ,resourceTypeId) {
+    const resourceType = $resource.types[resourceTypeId] || {
       label: resourceTypeId,
-      icon: 'glyphicon glyphicon-question-sign'
+      icon: $resource.types.unknown.icon,
     };
     // There is at least one resource type. Make sure it's visible.
-    this.find('.input-wrapper').attr('class', 'input-group').children('.input-group-btn').show();
-    var resourceTypeList = this.find('.resourceTypes');
+    resourcePicker.find('.input-wrapper').attr('class', 'input-group').children('.input-group-btn').show();
+    const resourceTypeList = resourcePicker.find('.resourceTypes');
     if (resourceTypeList.children().length === 1) {
       // There are multiple resource types. We need to show the resource type list.
-      var resourceTypeButton = resourceTypeList.next('.resourceType');
+      const resourceTypeButton = resourceTypeList.next('.resourceType');
       resourceTypeButton.prependTo(resourceTypeButton.parent()).nextAll().show();
     }
-    var resourceTypeElement = $('<li><a href="#"><span class="icon"></span></a></li>');
+    const resourceTypeElement = $('<li><a href="#"><span class="icon"></span></a></li>');
     resourceTypeElement.appendTo(resourceTypeList).find('a').attr({
       'data-id': resourceTypeId,
       'data-placeholder': resourceType.placeholder
-    }).children('.icon').addClass(resourceType.icon)
-      .after(document.createTextNode(' ' + resourceType.label));
-  };
+    }).children('.icon').after(document.createTextNode(' ' + resourceType.label))
+      .replaceWith(resourceType.icon.render());
+  }
 
-  var addResourcePickerBehaviour = function(resourcePicker) {
+  function addResourcePickerBehaviour(input, resourcePicker) {
     // Resource type behaviour.
     resourcePicker.on('click', '.resourceTypes a', maybeChangeResourceType)
-      .on('changeResourceType', clearOrRestoreSelectedReference)
-      .on('changeResourceType', updateResourceSuggester);
+      .on('changeResourceType', (event, data) => updateResourceSuggester(resourcePicker, data))
+      .on('keydown', stopPropagationWhenUsingSuggest);
 
     // Dedicated resource pickers.
-    var resourceTypeButton = resourcePicker.find('button.resourceType');
-    resourceTypeButton.on('click', openPicker);
+    const resourceTypeButton = resourcePicker.find('button.resourceType');
+    resourceTypeButton.on('click', () => openPicker(resourceTypeButton));
 
-    var resourceDisplay = resourcePicker.find('.resourceDisplay');
-    var resourceReferenceInput = resourcePicker.find('input.resourceReference');
-    resourceDisplay.on('click', '.remove', function(event) {
-      resourceDisplay.addClass('hidden').empty();
-      resourceReferenceInput.change();
+    // Update the picker value when the resource reference input value changes.
+    const resourceReferenceInput = resourcePicker.find('input.resourceReference');
+    resourceReferenceInput.on('change', () => {
+      input.val(resourceTypeButton.val() + ':' + resourceReferenceInput.val());
     });
-    resourceDisplay.on('click', 'a', function(event) {
-      // Prevent the users from leaving the edit mode by mistake.
-      event.preventDefault();
-    });
-    resourceReferenceInput.on('change', function(event) {
-      // Update the original resource reference input if there's no resource displayed.
-      if (resourceDisplay.hasClass('hidden')) {
-        // We don't fire the selectResource event because we don't need to update the resource picker display.
-        resourcePicker.prev('input').val(resourceTypeButton.val() + ':' + resourceReferenceInput.val());
-      }
-    });
-    // Note that we don't register the event listener directly on the text input because all the keydown event listeners
-    // are being removed when we destroy the typeahead (suggest). The good part is that we don't have to test if the
-    // list of suggestions is visible because there is another listener below that does this and stops the event
-    // propagation.
-    resourcePicker.on('keydown', 'input.resourceReference', function(event) {
-      // Trigger the change event when pressing the Enter key in order to update the original resource reference input,
-      // because the Enter key is often used as a shortcut for submitting the typed value.
-      if (event.which === 13) {
-        $(event.target).change();
-      }
-    });
-    // Make sure the original resource reference input is updated before its value is retrieved.
-    resourcePicker.prev('input').on('beforeGetValue', function() {
-      resourceReferenceInput.change();
-    });
-  };
+  }
 
-  var maybeChangeResourceType = function(event) {
+  function stopPropagationWhenUsingSuggest(event) {
+    if (event.which === 13 /* Enter */) {
+      if ($(event.target).closest('.resourcePicker').find('input.resourceReference').data('selectize')) {
+        // Stop the event propagation if the key is handled by the suggester: enter key is used to select a suggestion.
+        event.stopPropagation();
+      }
+    }
+  }
+
+  function maybeChangeResourceType(event) {
     event.preventDefault();
-    var selectedResourceType = $(this);
-    var resourcePicker = selectedResourceType.closest('.resourcePicker');
-    var resourceTypeButton = resourcePicker.find('button.resourceType');
-    var oldValue = resourceTypeButton.val();
-    var newValue = selectedResourceType.attr('data-id');
+    const selectedResourceType = $(event.target).closest('a');
+    const resourcePicker = selectedResourceType.closest('.resourcePicker');
+    const resourceTypeButton = resourcePicker.find('button.resourceType');
+    const oldValue = resourceTypeButton.val();
+    const newValue = selectedResourceType.attr('data-id');
     if (newValue === oldValue) {
       return;
     }
     resourceTypeButton.val(newValue);
-    var disabled = typeof $resource.pickers[newValue] !== 'function';
+    const disabled = typeof $resource.pickers[newValue] !== 'function';
     resourceTypeButton.prop('disabled', disabled);
     if (disabled) {
       resourceTypeButton.attr('title', selectedResourceType.text().trim());
@@ -166,18 +150,14 @@ define('resourcePicker', [
     } else {
       resourceTypeButton.attr('title', translations.get(newValue + '.hint'));
     }
-    resourceTypeButton.find('.icon').attr('class', selectedResourceType.find('.icon').attr('class'));
+    resourceTypeButton.find('.icon').replaceWith(selectedResourceType.find('.icon').clone());
     resourcePicker.find('.resourceReference').attr('placeholder', selectedResourceType.attr('data-placeholder'));
-    resourcePicker.trigger('changeResourceType', {
-      oldValue: oldValue,
-      newValue: newValue
-    });
-  };
+    resourcePicker.trigger('changeResourceType', {oldValue, newValue});
+  }
 
-  var openPicker = function(event) {
-    var resourceTypeButton = $(this);
-    var resourcePicker = resourceTypeButton.closest('.resourcePicker');
-    var resourceReference = getResourceReference(resourcePicker.prev('input'));
+  function openPicker(resourceTypeButton) {
+    const resourcePicker = resourceTypeButton.closest('.resourcePicker');
+    let resourceReference = getResource(resourcePicker).reference;
     // Use the selected resource if it matches the currently selected resource type, otherwise use the resource
     // reference typed in the resource picker input.
     if (resourceReference.type !== resourceTypeButton.val()) {
@@ -186,31 +166,38 @@ define('resourcePicker', [
         reference: resourcePicker.find('input.resourceReference').val()
       };
     }
-    var base = (resourcePicker.data("options") || {}).base;
-    $resource.pickers[resourceReference.type](resourceReference, base)
-      .done(selectResource.bind(resourcePicker));
-  };
+    $resource.pickers[resourceReference.type](resourceReference, getBaseEntityReference(resourcePicker))
+      .done(resource => selectResource(resourcePicker, resource));
+  }
 
-  var selectResource = function(resource) {
-    // Update the original resource reference input and also the resource picker display because the resource was
-    // selected from outside (e.g. from a dedicated picker or from a list of suggestions).
-    this.prev('input').val(resource.reference.type + ':' + resource.reference.reference)
-      .trigger('selectResource', resource);
-  };
+  function getBaseEntityReference(resourcePicker) {
+    return resourcePicker.data('options')?.base;
+  }
 
-  var onSelectResource = function(event, resource) {
-    resource = resource || {
-      reference: getResourceReference($(event.target))
-    };
-    var resourcePicker = $(event.target).nextAll('div.resourcePicker').first();
+  function selectResource(resourcePicker, resource) {
+    // Update the original resource reference input which is used to get the resource picker value.
+    const input = resourcePicker.prev('input');
+    if (resource) {
+      // The given resource was selected from a dedicated picker or from a list of suggestions.
+      const value = resource.reference.type + ':' + resource.reference.reference;
+      input.val(value).trigger('selectResource', resource);
+    } else {
+      // The resource selection was cleared. No resource is selected.
+      input.val('');
+    }
+  }
+
+  function onSelectResource(event, resource) {
+    const resourcePicker = $(event.target).nextAll('div.resourcePicker').first();
     selectResourceType(resourcePicker, resource.reference.type);
-    selectResourceReference(resourcePicker, resource.reference);
-  };
+    selectResourceReference(resourcePicker, resource);
+  }
 
-  var getResourceReference = function(input) {
-    var resourceReference = input.val();
-    var separatorIndex = resourceReference.indexOf(':');
-    var resourceType = resourceReference.substr(0, separatorIndex);
+  function getResource(resourcePicker) {
+    const input = resourcePicker.prev('input');
+    let resourceReference = input.val();
+    const separatorIndex = resourceReference.indexOf(':');
+    let resourceType = resourceReference.substr(0, separatorIndex);
     resourceReference = resourceReference.substr(separatorIndex + 1);
     if (resourceType.length === 0) {
       if (resourceReference.length === 0) {
@@ -219,128 +206,149 @@ define('resourcePicker', [
       }
       resourceType = resourceType || 'unknown';
     }
-    return {
-      type: resourceType,
-      reference: resourceReference,
-      // Don't display any reference if the text input is empty.
-      isNew: separatorIndex < 0 && resourceReference.length === 0
+    return  {
+      reference: {
+        type: resourceType,
+        reference: resourceReference
+      }
     };
-  };
+  }
 
-  var selectResourceType = function(resourcePicker, resourceTypeId) {
-    var resourceTypeButton = resourcePicker.find('.resourceType');
+  function selectResourceType(resourcePicker, resourceTypeId) {
+    const resourceTypeButton = resourcePicker.find('.resourceType');
     if (resourceTypeId === resourceTypeButton.val()) {
       // The specified resource type is already selected.
       return;
     }
-    var resourceTypeAnchor = resourcePicker.find('a').filter(function() {
+    let resourceTypeAnchor = resourcePicker.find('a').filter(function() {
       return $(this).attr('data-id') === resourceTypeId;
     });
     if (resourceTypeAnchor.length === 0) {
       // Unsupported resource type. We need to add it to the list before selecting it.
-      addResourceType.call(resourcePicker, resourceTypeId);
+      addResourceType(resourcePicker, resourceTypeId);
       resourceTypeAnchor = resourcePicker.find('a').filter(function() {
         return $(this).attr('data-id') === resourceTypeId;
       });
     }
     resourceTypeAnchor.click();
-  };
+  }
 
-  var selectResourceReference = function(resourcePicker, resourceReference) {
-    var resourceReferenceInput = resourcePicker.find('.resourceReference');
-    var resourceDisplayContainer = resourcePicker.find('.resourceDisplay');
-    var displayer = $resource.displayers[resourceReference.type];
-    if (typeof displayer === 'function' && !resourceReference.isNew && (resourceReference.reference.length > 0 ||
-        $resource.types[resourceReference.type].allowEmptyReference)) {
-      resourceReferenceInput.val('');
-      resourceDisplayContainer.empty().addClass('loading').removeClass('hidden');
-      displayer(resourceReference).done(function(resourceDisplay) {
-        // Empty the container before appending the resource display because we don't cancel the previous (unfinished)
-        // display requests. The displayer could handle this itself but we would need to pass additional information
-        // (something to identify the resource picker that made the display request).
-        resourceDisplayContainer.empty().removeClass('loading').attr({
-          'data-resourceType': resourceReference.type,
-          'data-resourceReference': resourceReference.reference
-        }).append(resourceDisplay).removeClass('hidden');
-      }).fail(function() {
-        resourceReferenceInput.val(resourceReference.reference);
-        resourceDisplayContainer.addClass('hidden');
-      });
-    } else {
-      resourceDisplayContainer.addClass('hidden').empty();
-      resourceReferenceInput.val(resourceReference.reference);
-    }
-  };
+  function selectResourceReference(resourcePicker, resource) {
+    const resourceReferenceInput = resourcePicker.find('input.resourceReference');
+    const oldValue = resourceReferenceInput.val();
+    let newValue = resource.reference.reference;
 
-  var clearOrRestoreSelectedReference = function(event, data) {
-    var resourcePicker = $(this);
-    var resourceDisplayContainer = resourcePicker.find('.resourceDisplay');
-    if (resourceDisplayContainer.attr('data-resourceType') === data.newValue &&
-        !resourceDisplayContainer.is(':empty')) {
-      // Restore the selected resource.
-      resourceDisplayContainer.removeClass('hidden');
-      resourcePicker.prev('input').val(resourceDisplayContainer.attr('data-resourceType') + ':' +
-        resourceDisplayContainer.attr('data-resourceReference'));
-    } else {
-      // Clear the selected resource.
-      // Hide the resource display but keep its content because we want to restore it later.
-      resourceDisplayContainer.addClass('hidden');
-      // Update the hidden reference input based on what is available on the resource picker input.
-      resourcePicker.find('input.resourceReference').change();
-    }
-  };
+    const resourceTypeDefinition = $resource.types[resource.reference.type];
+    const suggester = $resource.suggesters[resource.reference.type];
+    if (suggester && (newValue || resourceTypeDefinition.allowEmptyReference)) {
+      // When the resource is changed outside of the resource suggester, we need to make sure the resource suggester can
+      // select the new resource. The resource suggester is configured to accept only known values, that either
+      // correspond to existing resources or that obey the name strategy.
+      resource = suggester.resolve(resource, getBaseEntityReference(resourcePicker));
+      newValue = resource.value;
 
-  var updateResourceSuggester = function(event, data) {
-    var resourcePicker = $(this);
-    var resourceReferenceInput = resourcePicker.find('input.resourceReference');
-    resourceReferenceInput.typeahead('destroy');
-    var suggester = $resource.suggesters[data.newValue];
-    if (suggester) {
-      var base = (resourcePicker.data("options") || {}).base;
-      resourceReferenceInput.on('keydown', stopPropagationIfShowingSuggestions).typeahead({
-        afterSelect: selectResource.bind(resourcePicker),
-        delay: 500,
-        showHintOnFocus: true,
-        displayText: function(resource) {
-          // HACK: The string returned by this function is passed to the highlighter where we need to access all the
-          // resource properties in order to be able to display the resource suggestion.
-          // jshint -W053
-          var reference = new String(resource.reference.reference);
-          reference.__resource = resource;
-          return reference;
-        },
-        highlighter: !suggester.display || function(resourceReference) {
-          return suggester.display(resourceReference.__resource);
-        },
-        matcher: function(resource) {
-          // By default, we assume the suggestions are already filtered.
-          return true;
-        },
-        minLength: 0,
-        sorter: function(resources) {
-          // By default, we assume the suggestions are already sorted.
-          return resources;
-        },
-        source: function(resourceReference, callback) {
-          suggester.retrieve({
-            type: data.newValue,
-            reference: resourceReference
-          }, base).done(callback);
-        }
-      });
-    } else {
-      resourceReferenceInput.off('keydown', stopPropagationIfShowingSuggestions);
+      // Make sure the selected resource has a corresponding option, so that it can be selected by Tom Select. We need
+      // to do this because we disable the user provided (custom) values.
+      const tomSelect = resourceReferenceInput.data('selectize');
+      if (tomSelect && !tomSelect.options.hasOwnProperty(newValue)) {
+        tomSelect.addOption(resource);
+      }
     }
-  };
 
-  var stopPropagationIfShowingSuggestions = function(event) {
-    if ((event.which === 27 /* ESC */ || event.which === 13 /* Enter */) &&
-        $(this).next('.dropdown-menu').filter(':visible').length > 0) {
-      // Stop the event propagation if the key is handled by the suggester.
-      // Enter key is used to select a suggestion. Escape key is used to hide the suggestions.
-      event.stopPropagation();
+    if (oldValue !== newValue) {
+      resourceReferenceInput.val(newValue).change();
     }
-  };
+  }
+
+  function saveAndRestoreSelectedReference(resourcePicker, data) {
+    const resourceReferenceInput = resourcePicker.find('input.resourceReference');
+    const selectedResourceByType = resourcePicker.data('selectedResourceByType') || {};
+    resourcePicker.data('selectedResourceByType', selectedResourceByType);
+
+    // Save the currently selected resource reference.
+    const oldResourceType = data.oldValue;
+    selectedResourceByType[oldResourceType] = resourceReferenceInput.val();
+
+    // Restore the previously selected resource reference.
+    const newResourceType = data.newValue;
+    resourceReferenceInput.val(selectedResourceByType[newResourceType] || '').change();
+  }
+
+  function updateResourceSuggester(resourcePicker, data) {
+    // First, destroy the suggester corresponding to the previous resource type.
+    const resourceReferenceInput = resourcePicker.find('input.resourceReference');
+    resourceReferenceInput.data('selectize')?.destroy();
+
+    // Restore the previously selected reference for the new resource type only after the suggester corresponding to the
+    // previous resource type is destroyed, so it doesn't react to the reference change.
+    saveAndRestoreSelectedReference(resourcePicker, data);
+
+    const suggester = $resource.suggesters[data.newValue];
+    if (!suggester) {
+      return;
+    }
+
+    // Then, initialize the suggester corresponding to the new resource type.
+    resourceReferenceInput.xwikiSelectize({
+      // Single selection.
+      maxItems: 1,
+      // Use a dedicated search field to avoid matching 'WebHome' for document resources.
+      searchField: ['searchValue', 'label', 'hint'],
+      shouldLoad: () => true,
+      load: (resourceReference, callback) => {
+        suggester.retrieve({
+          type: data.newValue,
+          reference: resourceReference
+        }, getBaseEntityReference(resourcePicker)).then(callback).catch((error) => {
+          console.error("Failed to retrieve resource suggestions:", error);
+          callback([]);
+        });
+      },
+      loadSelected: function(resourceReference, callback) {
+        suggester.retrieveSelected({
+          type: data.newValue,
+          reference: resourceReference
+        }, getBaseEntityReference(resourcePicker)).then(suggestions => {
+          for (let suggestion of suggestions) {
+            // Double check that the suggested resource is still selected.
+            if (this.items.includes(suggestion.value)) {
+              // Update the resource picker value. This ensures that the picker returns a relative reference. We do this
+              // here because the change event (see below) is not triggered for the initial selection (so neither when
+              // the suggest input is re-initialized after the resource type is changed).
+              selectResource(resourcePicker, suggestion);
+            }
+          }
+          callback(suggestions);
+        }).catch((error) => {
+          console.error("Failed to retrieve the selected resource:", error);
+          callback([]);
+        });
+      }
+    });
+
+    const tomSelect = resourceReferenceInput.data('selectize');
+    tomSelect.on('change', () => {
+      const selectedResource = tomSelect.items.length > 0 ? tomSelect.options[tomSelect.items[0]] : null;
+      selectResource(resourcePicker, selectedResource);
+    });
+
+    // Remove the create entity suggestions when the user types a new query, if they are not selected.
+    tomSelect.on('type', () => {
+      tomSelect.clearOptions(option => !option.toCreate);
+    });
+
+    // For create entity suggestions, we show the "Create ..." label inside the dropdown, and the future resource name
+    // after the suggestion is selected.
+    const originalRenderItem = tomSelect.settings.render.item;
+    tomSelect.settings.render.item = function(option, ...args) {
+      const item = originalRenderItem.call(this, option, ...args);
+      if (option?.labelWhenSelected) {
+        // Show a different label after the suggestion is selected.
+        item.find('.xwiki-selectize-option-label').text(option.labelWhenSelected);
+      }
+      return item;
+    };
+  }
 
   $.fn.resourcePicker = function(options) {
     return this.each(function() {
@@ -354,6 +362,5 @@ define('resourcePicker', [
 define('resourcePicker.bundle', [
   'resourcePicker',
   'entityResourcePicker',
-  'entityResourceSuggester',
-  'entityResourceDisplayer'
+  'entityResourceSuggester'
 ], function() {});

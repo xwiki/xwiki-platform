@@ -35,9 +35,10 @@
     <module>xwiki-platform-icon-api</module>
     <module>xwiki-platform-icon-default</module>
     <module>xwiki-platform-icon-macro</module>
+    <module>xwiki-platform-icon-rest</module>
     <module>xwiki-platform-icon-script</module>
     <module>xwiki-platform-icon-ui</module>
-    <module>xwiki-platform-icon-rest</module>
+    <module>xwiki-platform-icon-webjar</module>
     <!-- Icon Themes -->
     <module>xwiki-platform-icon-fontawesome</module>
   </modules>

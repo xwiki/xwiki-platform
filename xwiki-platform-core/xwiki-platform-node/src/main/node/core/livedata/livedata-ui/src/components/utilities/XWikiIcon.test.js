@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,17 +20,23 @@
 
 import XWikiIcon from "./XWikiIcon.vue";
 import { mount } from "@vue/test-utils";
-import _ from "lodash-es";
 import flushPromises from "flush-promises";
+import _ from "lodash-es";
+import { fake } from "sinon";
 import { beforeEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 function initWrapper(params = {}) {
-  return mount(XWikiIcon, _.merge({
-    propsData: {
-      iconDescriptor: {},
-    },
-  }, params));
+  return mount(
+    XWikiIcon,
+    _.merge(
+      {
+        propsData: {
+          iconDescriptor: {},
+        },
+      },
+      params,
+    ),
+  );
 }
 
 /**
@@ -41,25 +47,27 @@ function mockIconsFetch() {
     return Promise.resolve({
       json: () => {
         return Promise.resolve({
-          icons: [{
-            cssClass: cssClass,
-          }],
+          icons: [
+            {
+              cssClass: cssClass,
+            },
+          ],
         });
       },
     });
   }
 
   const cssClassesMap = {
-    "add": "fa fa-plus",
-    "remove": "fa fa-minus",
+    add: "fa fa-plus",
+    remove: "fa fa-minus",
   };
   // window.fetch = sinon.fake()
-  window.fetch = sinon.fake((async (query) => {
+  window.fetch = fake(async (query) => {
     // Extract the name parameter from the query and return the corresponding css classes.
     const nameParameter = query.match(/.+name=(.+)$/)[1];
     const cssClasses = cssClassesMap[nameParameter];
     return initPromise(cssClasses);
-  }));
+  });
 
   //   jest.fn((query) => {
   //   // Extract the name parameter from the query and return the corresponding css classes.
@@ -70,7 +78,6 @@ function mockIconsFetch() {
 }
 
 describe("XWikiIcon.vue", () => {
-
   beforeEach(() => {
     // Defines the name of the current wiki in the XWiki global object. Needed to resolve the REST
     // URI to call to retrieve the metadata of the icon.

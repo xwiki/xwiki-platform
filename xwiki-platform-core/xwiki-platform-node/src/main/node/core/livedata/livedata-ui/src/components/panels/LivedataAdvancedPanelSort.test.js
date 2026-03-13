@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -25,13 +25,11 @@ import { describe, expect, it } from "vitest";
 /**
  * Vue Component initializer for LiveDataAdvancedPanelSort component.
  *
- * @param provide (optional) an object that is merged on top of the default provide parameter.
- * @returns {*} a wrapper for the LiveDataAdvancedPanelSort component
+ * @param provide - (optional) an object that is merged on top of the default provide parameter.
+ * @returns a wrapper for the LiveDataAdvancedPanelSort component
  */
 function initWrapper({ provide } = {}) {
-
   return mount(LivedataAdvancedPanelSort, {
-
     props: {
       panel: {
         id: "sortPanel",
@@ -41,25 +39,28 @@ function initWrapper({ provide } = {}) {
       },
     },
     global: {
-      provide: _.merge({
-        logic: {
-          openedPanels: ["sortPanel"],
-          uniqueArrayHas(uniqueArray, item) {
-            return uniqueArray.includes(item);
-          },
-          getUnsortedProperties() {
-            return [];
-          },
-          getSortableProperties() {
-            return ["id"];
-          },
-          data: {
-            query: {
-              sort: [],
+      provide: _.merge(
+        {
+          logic: {
+            openedPanels: ["sortPanel"],
+            uniqueArrayHas(uniqueArray, item) {
+              return uniqueArray.includes(item);
+            },
+            getUnsortedProperties() {
+              return [];
+            },
+            getSortableProperties() {
+              return ["id"];
+            },
+            data: {
+              query: {
+                sort: [],
+              },
             },
           },
         },
-      }, provide),
+        provide,
+      ),
       stubs: {
         XWikiIcon: {
           props: {
@@ -71,7 +72,6 @@ function initWrapper({ provide } = {}) {
       mocks: {
         $t: (key) => key,
       },
-
     },
   });
 }
@@ -79,14 +79,20 @@ function initWrapper({ provide } = {}) {
 describe("LivedataAdvancedPanelSort.vue", () => {
   it("Displays the title and the icon", async () => {
     const wrapper = initWrapper();
-    expect(wrapper.find(".panel-heading .title").text()).toBe("table_sort Sort");
+    expect(wrapper.find(".panel-heading .title").text()).toBe(
+      "table_sort Sort",
+    );
     expect(wrapper.find("i").text()).toBe("table_sort");
   });
 
   it("Displays no message when sortable properties exist", async () => {
     const wrapper = initWrapper();
-    expect(wrapper.find(".text-muted").text()).toBe("livedata.panel.sort.noneSortable");
-    expect(wrapper.find(".text-muted").attributes("style")).toBe("display: none;");
+    expect(wrapper.find(".text-muted").text()).toBe(
+      "livedata.panel.sort.noneSortable",
+    );
+    expect(wrapper.find(".text-muted").attributes("style")).toBe(
+      "display: none;",
+    );
   });
 
   it("Displays a message when no sortable properties exist", async () => {

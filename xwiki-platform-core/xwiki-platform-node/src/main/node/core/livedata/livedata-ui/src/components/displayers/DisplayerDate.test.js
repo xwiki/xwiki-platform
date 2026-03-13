@@ -21,7 +21,7 @@
 import DisplayerDate from "./DisplayerDate.vue";
 import { initWrapper } from "./displayerTestsHelper";
 import flushPromises from "flush-promises";
-import sinon from "sinon";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../services/require.js", function () {
@@ -41,7 +41,7 @@ vi.mock("../../services/require.js", function () {
 describe("DisplayerDate.vue", () => {
   afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", async () => {

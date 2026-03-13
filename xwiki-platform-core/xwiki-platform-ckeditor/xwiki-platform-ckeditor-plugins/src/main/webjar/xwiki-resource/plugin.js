@@ -140,7 +140,7 @@
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');
-          var resourceReferenceInput = this.getElement().findOne('input.resourceReference');
+          var resourceReferenceInput = this.getElement().findOne('.ts-control > input');
           var tabIndex = this.tabIndex;
           [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
@@ -155,9 +155,12 @@
               dialog._.currentFocusIndex = this._focusable.focusIndex;
             });
           }, this.getDialog());
-          // Fix reference input id.
-          var id = CKEDITOR.tools.getNextId();
-          resourceReferenceInput.setAttribute('id', id);
+          // Fix the binding between the label and the input.
+          let id = resourceReferenceInput.getAttribute('id');
+          if (!id) {
+            id = CKEDITOR.tools.getNextId();
+            resourceReferenceInput.setAttribute('id', id);
+          }
           this.getElement().findOne('label').setAttribute('for', id);
         },
         validate: function() {
@@ -209,9 +212,6 @@
         },
         getValue: function() {
           var resourcePickerInput = this.getResourcePickerInput();
-          // Make sure the resource picker has updated the resource picker input. This is needed in Internet Explorer
-          // where the dialog buttons are not selectable and so the change event is not fired before the click event.
-          $(resourcePickerInput.$).trigger('beforeGetValue');
           var serializedResourceReference = resourcePickerInput.getValue();
           var separatorIndex = serializedResourceReference.indexOf(':');
           var resourceReference = {
@@ -223,19 +223,15 @@
             // Preserve the typed field if the resource type and reference have not changed.
             resourceReference.typed = this.selectedResource.reference.typed;
           }
-          if (this.selectedResource.reference.isInitialValue ||
-              this.selectedResource.reference.reference !== resourceReference.reference) {
-            resourceReference.notSelected = true;
-          }
+          resourceReference.notSelected = !this.selectedResource ||
+            this.selectedResource.reference.reference !== resourceReference.reference;
           return resourceReference;
         },
         setValue: function(resourceReference) {
           // Reset the resource picker if no resource reference is provided.
           resourceReference = resourceReference || {
             type: this.resourceTypes[0],
-            reference: '',
-            // Make sure the picker doesn't try to resolve the empty reference.
-            isNew: true
+            reference: ''
           };
           var serializedResourceReference = (resourceReference.type || '') + ':' + (resourceReference.reference || '');
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {

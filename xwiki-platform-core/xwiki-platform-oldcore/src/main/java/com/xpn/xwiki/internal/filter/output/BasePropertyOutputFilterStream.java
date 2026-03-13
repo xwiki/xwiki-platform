@@ -36,7 +36,6 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Provider;
 
 /**
@@ -48,7 +47,6 @@ import jakarta.inject.Provider;
 public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterStream<BaseProperty>
 {
     @Inject
-    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     private BaseClass currentXClass;

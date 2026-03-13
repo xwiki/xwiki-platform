@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -133,11 +134,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                 proxyFilter.beginWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
                 proxyFilter.endWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
             } finally {
-                try {
-                    close();
-                } catch (IOException e) {
-                    throw new FilterException(e);
-                }
+                IOUtils.closeQuietly(this);
             }
         }
     }
@@ -200,11 +197,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         proxyFilter.endWikiDocumentAttachment(this.name, this, this.size, this.parameters);
                     }
                 } finally {
-                    try {
-                        close();
-                    } catch (IOException e) {
-                        throw new FilterException(e);
-                    }
+                    IOUtils.closeQuietly(this);
                 }
             } else {
                 proxyFilter.onWikiAttachment(this.name, null, this.size, this.parameters);
@@ -230,37 +223,42 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
     {
         WikiAttachmentInputSource wikiAttachmentSource = new WikiAttachmentInputSource();
 
-        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-            String elementName = xmlReader.getLocalName();
+        try {
+            for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+                String elementName = xmlReader.getLocalName();
 
-            EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
 
-            if (parameter != null) {
-                Object wsValue = convert(parameter.type, xmlReader.getElementText());
-                if (wsValue != null) {
-                    wikiAttachmentSource.parameters.put(parameter.name, wsValue);
-                }
-            } else {
-                if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
-                    wikiAttachmentSource.name = xmlReader.getElementText();
-                } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
-                    wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
-                } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
-                    readContent(xmlReader, wikiAttachmentSource);
-                } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
-                    // Skip revisions if history is disabled
-                    if (properties.isWithHistory()) {
-                        readRevisions(xmlReader, wikiAttachmentSource);
-                    } else {
-                        StAXUtils.skipElement(xmlReader);
+                if (parameter != null) {
+                    Object wsValue = convert(parameter.type, xmlReader.getElementText());
+                    if (wsValue != null) {
+                        wikiAttachmentSource.parameters.put(parameter.name, wsValue);
                     }
                 } else {
-                    unknownElement(xmlReader);
+                    if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
+                        wikiAttachmentSource.name = xmlReader.getElementText();
+                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+                        wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
+                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+                        readContent(xmlReader, wikiAttachmentSource);
+                    } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
+                        // Skip revisions if history is disabled
+                        if (properties.isWithHistory()) {
+                            readRevisions(xmlReader, wikiAttachmentSource);
+                        } else {
+                            StAXUtils.skipElement(xmlReader);
+                        }
+                    } else {
+                        unknownElement(xmlReader);
+                    }
                 }
             }
-        }
 
-        return wikiAttachmentSource;
+            return wikiAttachmentSource;
+        } catch (Exception e) {
+            IOUtils.closeQuietly(wikiAttachmentSource);
+            throw e;
+        }
     }
 
     private void readRevisions(XMLStreamReader xmlReader, WikiAttachmentInputSource wikiAttachment)
@@ -279,31 +277,35 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         throws XMLStreamException, FilterException
     {
         WikiAttachmentRevisionInputSource wikiAttachmentRevisionSource = new WikiAttachmentRevisionInputSource();
+        try {
+            for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+                String elementName = xmlReader.getLocalName();
 
-        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-            String elementName = xmlReader.getLocalName();
+                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
 
-            EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
-
-            if (parameter != null) {
-                Object wsValue = convert(parameter.type, xmlReader.getElementText());
-                if (wsValue != null) {
-                    wikiAttachmentRevisionSource.parameters.put(parameter.name, wsValue);
-                }
-            } else {
-                if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
-                    wikiAttachmentRevisionSource.version = xmlReader.getElementText();
-                } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
-                    wikiAttachmentRevisionSource.size = Long.valueOf(xmlReader.getElementText());
-                } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
-                    readContent(xmlReader, wikiAttachmentRevisionSource);
+                if (parameter != null) {
+                    Object wsValue = convert(parameter.type, xmlReader.getElementText());
+                    if (wsValue != null) {
+                        wikiAttachmentRevisionSource.parameters.put(parameter.name, wsValue);
+                    }
                 } else {
-                    unknownElement(xmlReader);
+                    if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+                        wikiAttachmentRevisionSource.version = xmlReader.getElementText();
+                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+                        wikiAttachmentRevisionSource.size = Long.valueOf(xmlReader.getElementText());
+                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+                        readContent(xmlReader, wikiAttachmentRevisionSource);
+                    } else {
+                        unknownElement(xmlReader);
+                    }
                 }
             }
-        }
 
-        return wikiAttachmentRevisionSource;
+            return wikiAttachmentRevisionSource;
+        } catch (Exception e) {
+            IOUtils.closeQuietly(wikiAttachmentRevisionSource);
+            throw e;
+        }
     }
 
     private void readContent(XMLStreamReader xmlReader, AbstractContentInputSource content)

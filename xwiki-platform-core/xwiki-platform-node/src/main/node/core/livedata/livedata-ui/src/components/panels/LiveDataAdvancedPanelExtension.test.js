@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,14 +19,14 @@
  */
 import LiveDataAdvancedPanelExtension from "./LiveDataAdvancedPanelExtension.vue";
 import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 /**
  * Vue Component initializer for LiveDataAdvancedPanelExtension component.
  *
- * @param container the container to use for the extension
- * @returns {*} a wrapper for the LiveDataAdvancedPanelExtension component
+ * @param container - the container to use for the extension
+ * @returns a wrapper for the LiveDataAdvancedPanelExtension component
  */
 function initWrapper({ container }) {
   global.XWiki = { contextPath: "http://localhost/" };

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { shallowMount } from "@vue/test-utils";
 import LivedataLayout from "./LivedataLayout.vue";
+import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 /**
  * Initialize a shallow LivedataLayout component.
  *
- * @param description the optional description of the Live Data
- * @returns {Wrapper<Vue>} the initialized shallow wrapper
+ * @param description - the optional description of the Live Data
+ * @returns the initialized shallow wrapper
  */
 function initWrapper(description) {
   return shallowMount(LivedataLayout, {
@@ -53,6 +53,8 @@ describe("LivedataLayout.vue", () => {
   it("With a description", () => {
     const description = "A description";
     const wrapper = initWrapper(description);
-    expect(wrapper.find(".livedata-layout-description").text()).toBe("A description");
+    expect(wrapper.find(".livedata-layout-description").text()).toBe(
+      "A description",
+    );
   });
 });

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,13 +20,13 @@
 
 import DisplayerDocTitle from "./DisplayerDocTitle.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 describe("DisplayerDocTitle.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode with doc.title_raw defined", () => {
@@ -48,7 +48,9 @@ describe("DisplayerDocTitle.vue", () => {
         isContentTrusted: () => true,
       },
     });
-    expect(wrapper.find("a").html()).toBe("<a href=\"entryLink\" class=\"\">Test <sup>1</sup></a>");
+    expect(wrapper.find("a").html()).toBe(
+      '<a href="entryLink" class="">Test <sup>1</sup></a>',
+    );
   });
 
   it("Renders an entry in view mode with doc.title_raw undefined", () => {
@@ -68,6 +70,8 @@ describe("DisplayerDocTitle.vue", () => {
         },
       },
     });
-    expect(wrapper.find("a").html()).toBe("<a href=\"entryLink\" class=\"\">Test</a>");
+    expect(wrapper.find("a").html()).toBe(
+      '<a href="entryLink" class="">Test</a>',
+    );
   });
 });

@@ -2,7 +2,6 @@ paths: {
   jquery: '/webjars/jquery.min',
 
   bootstrap: '/webjars/bootstrap',
-  'bootstrap3-typeahead': '/webjars/bootstrap3-typeahead.min',
 
   // Tree
   jsTree: '/webjars/jstree',
@@ -30,7 +29,6 @@ paths: {
   'resourcePicker.bundle': 'xwiki-resource/resourcePicker',
   entityResourcePicker: 'xwiki-resource/entityResourcePicker',
   entityResourceSuggester: 'xwiki-resource/entityResourceSuggester',
-  entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
   l10n: 'xwiki-localization/l10n',
   modal: 'xwiki-dialog/modal',
 

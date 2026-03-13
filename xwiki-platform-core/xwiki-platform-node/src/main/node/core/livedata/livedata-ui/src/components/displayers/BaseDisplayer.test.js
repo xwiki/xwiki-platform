@@ -19,13 +19,13 @@
  */
 import BaseDisplayer from "./BaseDisplayer.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import sinon from "sinon";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
 
 describe("BaseDisplayer.vue", () => {
   afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", () => {

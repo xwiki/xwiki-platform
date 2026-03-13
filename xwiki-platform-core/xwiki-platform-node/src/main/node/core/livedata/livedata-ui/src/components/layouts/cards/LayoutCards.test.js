@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { shallowMount } from "@vue/test-utils";
 import LayoutCards from "./LayoutCards.vue";
-import _ from "lodash-es";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
-import { nextTick } from "vue";
+import { shallowMount } from "@vue/test-utils";
+import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 /**
  * Vue Component initializer for LayoutCards component. Since this component creates a deep
@@ -49,31 +49,42 @@ import { describe, expect, it } from "vitest";
  * ```
  * The default option object is merged with the `option` parameter.
  *
- * @param options an optional option object use to customize the initialized component
- * @param afterEntryFetchWrapper wrapper for the afterEntryFetch event. The callback is stored in
+ * @param options - an optional option object use to customize the initialized component
+ * @param afterEntryFetchWrapper - wrapper for the afterEntryFetch event. The callback is stored in
  *   the callback field of the object passed in parameter
- * @returns {*} a shallow wrapper for the LayoutCards component
+ * @returns a shallow wrapper for the LayoutCards component
  */
 function initWrapper({ options, afterEntryFetchWrapper } = {}) {
-  return shallowMount(LayoutCards, _.merge({
-    global: {
-      provide: {
-        logic: {
-          canAddEntry: () => false, getEntryId: (e) => e.id, onEvent: (eventName, callback) => {
-            if (afterEntryFetchWrapper) {
-              afterEntryFetchWrapper.callback = callback;
-            }
-          }, data: {
-            data: {
-              entries: [],
+  return shallowMount(
+    LayoutCards,
+    _.merge(
+      {
+        global: {
+          provide: {
+            logic: {
+              canAddEntry: () => false,
+              getEntryId: (e) => e.id,
+              onEvent: (eventName, callback) => {
+                if (afterEntryFetchWrapper) {
+                  afterEntryFetchWrapper.callback = callback;
+                }
+              },
+              data: {
+                data: {
+                  entries: [],
+                },
+              },
             },
           },
+          mocks: {
+            $t: (key) => key,
+          },
+          renderStubDefaultSlot: true,
         },
-      }, mocks: {
-        $t: (key) => key,
-      }, renderStubDefaultSlot: true,
-    },
-  }, options));
+      },
+      options,
+    ),
+  );
 }
 
 describe("LayoutCards.vue", () => {
@@ -86,7 +97,9 @@ describe("LayoutCards.vue", () => {
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
     await nextTick();
-    expect(wrapper.find(".noentries-card").text()).toBe("livedata.bottombar.noEntries");
+    expect(wrapper.find(".noentries-card").text()).toBe(
+      "livedata.bottombar.noEntries",
+    );
   });
 
   it("Renders with some entries", async () => {
@@ -104,7 +117,8 @@ describe("LayoutCards.vue", () => {
             },
           },
         },
-      }, afterEntryFetchWrapper,
+      },
+      afterEntryFetchWrapper,
     });
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
@@ -112,7 +126,8 @@ describe("LayoutCards.vue", () => {
     const cards = wrapper.findAllComponents(LayoutCardsCard);
     expect(cards.length).toBe(1);
     expect(cards.at(0).props()).toStrictEqual({
-      entry: { id: 1 }, entryIdx: 0,
+      entry: { id: 1 },
+      entryIdx: 0,
     });
     expect(wrapper.find(".noentries-card").exists()).toBe(false);
   });

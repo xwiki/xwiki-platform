@@ -1,22 +1,18 @@
-#template('colorThemeInit.vm')
 #autosaveControl {
   display: inline;
   white-space: nowrap;
 }
-#autosaveControl input.autosave-frequency {
-  text-align: center;
-  width: 2em;
+
+#autosaveControl .interval {
+  display: none;
+  margin-left: 2em;
+  
+  & .autosave-interval {
+    width: 3em;
+    margin-left: 1em;
+  }
 }
 
-/** Override Toucan styles */
-#body #autosaveControl label {
-  display: inline;
-  margin: 0;
-}
-#body #autosaveControl label.frequency, #body #autosaveControl label.frequency span {
-  text-transform: none;
-  font-weight: 400;
-}
-#autosaveControl label.autosave {
-  font-weight: 400;
+#autosaveControl .autosave:has(input:checked) + .interval {
+  display: inline-block;
 }

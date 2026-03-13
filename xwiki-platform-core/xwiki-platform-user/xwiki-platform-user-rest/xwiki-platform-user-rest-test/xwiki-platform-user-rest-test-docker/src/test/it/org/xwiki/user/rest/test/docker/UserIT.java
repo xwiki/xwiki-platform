@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.WikiReference;
@@ -50,10 +51,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserIT
 {
     @Test
+    @Order(1)
     void testUnqualifiedUser(TestUtils setup) throws Exception
     {
         String user = "user";
         String password = "password";
+
         setup.createUser(user, password, null);
 
         GetMethod get = setup.rest().executeGet(UserResource.class, "xwiki", user);
@@ -78,10 +81,14 @@ class UserIT
         } finally {
             get.releaseConnection();
         }
+
+        // Cleaning.
+        setup.deletePage("XWiki", user);
     }
 
     @ParameterizedTest
     @WikisSource
+    @Order(2)
     void testQualifiedUser(WikiReference wikiReference, TestUtils setup) throws Exception
     {
         String wiki = wikiReference.getName();
@@ -119,5 +126,8 @@ class UserIT
         } finally {
             get.releaseConnection();
         }
+
+        // Cleaning.
+        setup.deletePage("XWiki", user);
     }
 }

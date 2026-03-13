@@ -34,6 +34,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.user.rest.model.jaxb.UserSummary;
@@ -57,7 +58,7 @@ class UsersIT
     void testListUsers(WikiReference wikiReference, TestUtils setup) throws Exception
     {
         String wiki = wikiReference.getName();
-        String[] users = new String[] {"user1", "user2", "user3", "user4"};
+        String[] users = new String[] {"user1", "user2", "user3", "user4", "hiddenUser"};
         String password = "password";
 
         boolean isSubWiki = !wiki.equals("xwiki");
@@ -65,6 +66,10 @@ class UsersIT
 
         // Using super admin to have advanced user mode enabled.
         setup.loginAsSuperAdmin();
+
+        for (String user : users) {
+            setup.createUser(user, password, null);
+        }
 
         // We enable local users for the subwiki.
         if (isSubWiki) {
@@ -74,20 +79,36 @@ class UsersIT
             ViewPage wikiUserConfiguration = setup.gotoPage(wikiUserConfigurationRef);
             ObjectEditPage wikiUserConfigurationObject = wikiUserConfiguration.editObjects();
             wikiUserConfigurationObject.addObject("WikiManager.WikiUserClass")
-                .setCheckBox(By.xpath("//input[@value = 'local_only']"), true);
+                .setCheckBox(By.xpath("//input[@value = 'local_and_global']"), true);
             wikiUserConfigurationObject.clickSaveAndContinue();
         }
 
-        for (String user : users) {
-            setup.createUser(user, password, null);
-        }
+        EditRightsPane hiddenUserRights = setup.gotoPage("XWiki", users[4]).editRights();
+        hiddenUserRights.switchToUsers();
+        // We remove view right, so we click twice.
+        hiddenUserRights.clickGuestRight(EditRightsPane.Right.VIEW);
+        hiddenUserRights.clickGuestRight(EditRightsPane.Right.VIEW);
 
-        GetMethod get = setup.rest().executeGet(UsersResource.class, wiki);
+        GetMethod getSuperAdmin = setup.rest().executeGet(UsersResource.class, wiki);
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getSuperAdmin.getStatusCode());
 
             JAXBContext userContext = JAXBContext.newInstance(Users.class);
-            Users parsedUsers = (Users) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            Users parsedUsersSuperAdmin =
+                (Users) userContext.createUnmarshaller().unmarshal(getSuperAdmin.getResponseBodyAsStream());
+
+            assertEquals(5, parsedUsersSuperAdmin.getUserSummaries().size());
+        } finally {
+            getSuperAdmin.releaseConnection();
+        }
+
+        setup.forceGuestUser();
+        GetMethod getGuest = setup.rest().executeGet(UsersResource.class, wiki);
+        try {
+            assertEquals(HttpStatus.SC_OK, getGuest.getStatusCode());
+
+            JAXBContext userContext = JAXBContext.newInstance(Users.class);
+            Users parsedUsers = (Users) userContext.createUnmarshaller().unmarshal(getGuest.getResponseBodyAsStream());
 
             assertEquals(4, parsedUsers.getUserSummaries().size());
             for (int i = 0; i < parsedUsers.getUserSummaries().size(); i++) {
@@ -111,9 +132,14 @@ class UsersIT
                     String.format("http://localhost:8080/xwiki/rest/wikis/%s/users/XWiki.%s", wiki, users[i]),
                     userLink.get().getHref());
             }
-
         } finally {
-            get.releaseConnection();
+            getGuest.releaseConnection();
+        }
+
+        // Cleaning.
+        setup.loginAsSuperAdmin();
+        for (String user : users) {
+            setup.deletePage("XWiki", user);
         }
     }
 }

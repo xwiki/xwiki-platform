@@ -666,12 +666,10 @@ span#avatarUpload {
 
 #user-menu-col .attachment-picker {
   .buttonwrapper {
-    .wikilink {
-      display: flex;
-      flex-flow: column;
-    }
+    display: flex;
+    flex-flow: column;
 
-    a.button {
+    .button {
       .btn;
       .btn-default;
       border-radius: 0 0 @border-radius-base @border-radius-base;

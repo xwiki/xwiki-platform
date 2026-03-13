@@ -39,10 +39,9 @@ import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
-import org.xwiki.user.rest.UserReferenceModelSerializer;
 import org.xwiki.user.rest.internal.AbstractUserReferenceModelSerializer;
+import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.User;
-import org.xwiki.user.rest.model.jaxb.UserPreferences;
 import org.xwiki.user.rest.model.jaxb.UserSummary;
 import org.xwiki.user.rest.resources.UserResource;
 
@@ -143,7 +142,7 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         throws XWikiException
     {
         if (userReference == GuestUserReference.INSTANCE) {
-            return guestToRestUser();
+            return guestToRestUser(preferences);
         }
 
         DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
@@ -190,28 +189,6 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         xcontext.setWikiId(oldWikiId);
 
         return user;
-    }
-
-    private UserPreferences toRestUserPreferences(UserProperties userProperties, XWikiContext xcontext)
-    {
-        UserPreferences userPreferences = this.userObjectFactory.createUserPreferences();
-        userPreferences.setDisplayHiddenDocuments(userProperties.displayHiddenDocuments());
-
-        String underlineProperty = "underline";
-        userPreferences.setUnderlineLinks(Objects.toString(userProperties.getProperty(underlineProperty),
-            xcontext.getWiki().getXWikiPreference(underlineProperty, xcontext)));
-
-        String timezoneProperty = "timezone";
-        userPreferences.setTimezone(Objects.toString(userProperties.getProperty(timezoneProperty),
-            xcontext.getWiki().getXWikiPreference(timezoneProperty, xcontext)));
-
-        String editorProperty = "editor";
-        userPreferences.setEditor(Objects.toString(userProperties.getProperty(editorProperty),
-            xcontext.getWiki().getXWikiPreference(editorProperty, xcontext)));
-
-        userPreferences.setAdvanced("Advanced".equals(userProperties.getProperty("usertype")));
-
-        return userPreferences;
     }
 
     @Override

@@ -23,7 +23,6 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -43,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CurrentUserIT
 {
     @Test
-    @Disabled
     void testUnauthenticatedUser(TestUtils setup) throws Exception
     {
         setup.forceGuestUser();

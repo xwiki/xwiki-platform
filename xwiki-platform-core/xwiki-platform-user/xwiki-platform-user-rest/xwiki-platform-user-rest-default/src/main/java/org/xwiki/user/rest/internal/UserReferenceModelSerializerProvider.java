@@ -24,7 +24,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.user.UserConfiguration;
-import org.xwiki.user.rest.UserReferenceModelSerializer;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

@@ -32,7 +32,7 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
-import org.xwiki.user.rest.UserReferenceModelSerializer;
+import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.resources.UserResource;
 

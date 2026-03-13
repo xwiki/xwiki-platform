@@ -30,9 +30,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.rest.UserReferenceModelSerializer;
+import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.Users;
 import org.xwiki.user.rest.resources.UsersResource;
 import org.xwiki.wiki.user.UserScope;
@@ -88,9 +90,7 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
                 UserReference userReference = this.userReferenceResolver.resolve(userId,
                     this.getXWikiContext().getWikiReference());
 
-                if (userReference.isGlobal() && wikiUserScope == UserScope.LOCAL_ONLY
-                    || !userReference.isGlobal() && wikiUserScope == UserScope.GLOBAL_ONLY)
-                {
+                if (this.isHidden(userReference, wikiUserScope)) {
                     return null;
                 } else {
                     try {
@@ -106,12 +106,22 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
             })
                 .filter(Objects::nonNull)
                 .skip(start)
-                .limit(number != null ? number : wikiMembers.size())
+                .limit(validateAndGetLimit(number))
                 .forEach(users.getUserSummaries()::add);
         } catch (WikiUserManagerException | RuntimeException e) {
             throw new XWikiRestException(e);
         }
 
         return users;
+    }
+
+    private boolean isHidden(UserReference userReference, UserScope userScope)
+    {
+        if (userReference == SuperAdminUserReference.INSTANCE || userReference == CurrentUserReference.INSTANCE) {
+            return true;
+        } else {
+            return userReference.isGlobal() && userScope == UserScope.LOCAL_ONLY
+                || !userReference.isGlobal() && userScope == UserScope.GLOBAL_ONLY;
+        }
     }
 }

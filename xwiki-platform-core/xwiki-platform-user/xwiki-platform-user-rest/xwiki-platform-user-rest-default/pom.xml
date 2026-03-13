@@ -36,6 +36,7 @@
     <xwiki.extension.name>User REST Services - Default Implementation</xwiki.extension.name>
     <!-- REST API endpoints need to be installed in root scope. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
 
   <dependencies>
@@ -58,6 +59,20 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-rest-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

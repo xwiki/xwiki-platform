@@ -40,4 +40,9 @@ public class AllIT
     class NestedUserIT extends UserIT
     {
     }
+
+    @Nested
+    class NestedUsersIT extends UsersIT
+    {
+    }
 }

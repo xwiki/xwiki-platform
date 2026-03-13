@@ -34,6 +34,7 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { WikiDisableSyntaxFeaturesConfig } from "@xwiki/platform-api";
 
 /**
  * Create the BlockNote editor's schema
@@ -44,7 +45,10 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * @since 18.0.0RC1
  * @beta
  */
-function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
+function createBlockNoteSchema(
+  macros: BlockNoteConcreteMacro[],
+  disableSyntaxFeatures: WikiDisableSyntaxFeaturesConfig,
+) {
   // Get rid of some block types
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
@@ -56,22 +60,34 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
     ),
   ];
 
-  const blockNoteSchema = BlockNoteSchema.create({
-    blockSpecs: {
-      ...remainingBlockSpecs,
+  const blockSpecs = {
+    ...remainingBlockSpecs,
 
-      // Macros
-      ...Object.fromEntries(
-        filterMap(macros, ({ macro, bnRendering }) =>
-          bnRendering.type === "block"
-            ? [
-                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
-                bnRendering.block.block(),
-              ]
-            : null,
-        ),
+    // Macros
+    ...Object.fromEntries(
+      filterMap(macros, ({ macro, bnRendering }) =>
+        bnRendering.type === "block"
+          ? [`${MACRO_NAME_PREFIX}${macro.infos.id}`, bnRendering.block.block()]
+          : null,
       ),
-    },
+    ),
+  };
+
+  // NOTE: the following statements remove the features specified when the the schema fn is called
+  //
+  // We explicitly use the `delete` operator which doesn't change the object's shape, as we want these items
+  // to still be available in the types if we need them and they are still present in the spec.
+  //
+  // Unfortunately, BlockNote has no concept of "optional" block or inline content (which would be very complex to do anyway),
+  // so we rely on this less-than-ideal solution that throws off typing.
+
+  if (disableSyntaxFeatures?.checkableListItems) {
+    // @ts-expect-error: see comment block above
+    delete blockSpecs.checkListItem;
+  }
+
+  const blockNoteSchema = BlockNoteSchema.create({
+    blockSpecs,
 
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,

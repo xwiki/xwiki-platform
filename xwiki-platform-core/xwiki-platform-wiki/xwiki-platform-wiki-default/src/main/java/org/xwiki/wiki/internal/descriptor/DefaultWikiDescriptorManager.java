@@ -31,6 +31,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -239,7 +240,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext != null ? xcontext.isMainWiki(wikiId) : true;
+        return xcontext != null ? xcontext.isMainWiki(wikiId) : Strings.CI.equals(wikiId, getMainWikiId());
     }
 
     @Override

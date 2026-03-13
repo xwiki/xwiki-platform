@@ -143,6 +143,7 @@ public class WCAGContext
      * Tags to take into account during axe-core validation.
      * All rules with at least one of those tags will be validated.
      */
+    // Note: this list needs to be in sync with the vitest configuration in @xwiki/platform-test-accessibility
     private static final List<String> VALIDATE_TAGS = Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa");
 
     /**

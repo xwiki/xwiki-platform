@@ -1,5 +1,6 @@
 packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-componentstore/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-ui/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
@@ -27,6 +28,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
@@ -63,6 +65,7 @@ catalog:
   "@types/node": 24.12.0
   "@types/react": 19.2.7
   "@types/react-dom": 19.2.3
+  "@types/requirejs": 2.1.37
   "@types/sinon": 21.0.0
   "@vitejs/plugin-react": 5.1.0
   "@vitejs/plugin-vue": 6.0.4
@@ -71,6 +74,7 @@ catalog:
   "@vue/eslint-config-typescript": 14.7.0
   "@vue/test-utils": 2.4.6
   "@vue/tsconfig": 0.8.1
+  axe-core: 4.11.1
   bootstrap-icons: 1.13.1
   dompurify: 3.3.2
   eslint: 9.39.3

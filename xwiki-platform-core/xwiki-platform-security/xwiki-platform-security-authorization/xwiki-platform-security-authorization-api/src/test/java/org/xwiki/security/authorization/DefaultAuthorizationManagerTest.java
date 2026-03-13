@@ -20,12 +20,23 @@
 package org.xwiki.security.authorization;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.user.internal.document.DocumentUserReference;
+
+import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.AuthorizationManager.SUPERADMIN_USER;
 
 /**
@@ -38,6 +49,13 @@ class DefaultAuthorizationManagerTest
 {
     @InjectMockComponents
     private DefaultAuthorizationManager defaultAuthorizationManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
+
+    @Captor
+    private ArgumentCaptor<DocumentUserReference> documentUserReferenceCaptor;
 
     @Test
     void isSuperAdminExpectTrue()
@@ -52,5 +70,27 @@ class DefaultAuthorizationManagerTest
     {
         assertFalse(
             this.defaultAuthorizationManager.isSuperAdmin(new DocumentReference("xwiki", "XWiki", "Admin")));
+    }
+
+    @Test
+    void hasAccessUserReference()
+    {
+        when(this.documentUserReferenceSerializer.serialize(this.documentUserReferenceCaptor.capture()))
+            .then((Answer<DocumentReference>)
+                invocationOnMock -> this.documentUserReferenceCaptor.getValue().getReference());
+
+        Right mockRight = mock(Right.class);
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user1");
+        DocumentReference targetReference = new DocumentReference("xwiki", "XWiki", "user2");
+
+        DefaultAuthorizationManager spyDefaultAuthorizationManager = spy(this.defaultAuthorizationManager);
+
+        when(spyDefaultAuthorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(false);
+        assertFalse(spyDefaultAuthorizationManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
+
+        when(spyDefaultAuthorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(true);
+        assertTrue(spyDefaultAuthorizationManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
     }
 }

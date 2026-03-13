@@ -190,11 +190,4 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
 
         return user;
     }
-
-    @Override
-    public boolean hasAccess(UserReference userReference)
-    {
-        DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-        return this.authorizationManagerProvider.get().hasAccess(Right.VIEW, documentUserReference.getReference());
-    }
 }

@@ -76,7 +76,7 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
                     "rest.exception.userResource.unsupportedStore")).build());
         }
 
-        DocumentReference userDocumentReference = this.xcontextProvider.get().getUserReference();
+        DocumentReference userDocumentReference = getXWikiContext().getUserReference();
         try {
             UserReference userReference = this.userReferenceResolver.resolve(userDocumentReference);
 

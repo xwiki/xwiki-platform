@@ -27,8 +27,11 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -54,10 +57,17 @@ public class UserResourceImpl extends XWikiResource implements UserResource
     private UserReferenceResolver<String> userReferenceResolver;
 
     @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentUserReferenceResolver;
+
+    @Inject
     private UserReferenceSerializer<String> stringUserReferenceSerializer;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
@@ -76,10 +86,13 @@ public class UserResourceImpl extends XWikiResource implements UserResource
         }
 
         try {
+            UserReference currentUserReference =
+                this.documentUserReferenceResolver.resolve(getXWikiContext().getUserReference());
+
             UserReference userReference = this.userReferenceResolver.resolve(userId,
                 this.getXWikiContext().getWikiReference());
 
-            if (!userReferenceModelSerializer.hasAccess(userReference)) {
+            if (!this.authorizationManager.hasAccess(Right.VIEW, currentUserReference, userReference)) {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 

@@ -28,8 +28,11 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
@@ -59,10 +62,17 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
     private WikiUserManager wikiUserManager;
 
     @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentUserReferenceResolver;
+
+    @Inject
+    private UserReferenceResolver<String> stringUserReferenceResolver;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
@@ -82,19 +92,22 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
         }
 
         try {
+            UserReference currentUserReference =
+                this.documentUserReferenceResolver.resolve(getXWikiContext().getUserReference());
+
             UserScope wikiUserScope = this.wikiUserManager.getUserScope(wikiName);
             Collection<String> wikiMembers = this.wikiUserManager.getMembers(wikiName);
 
             // We use streams to handle pagination.
             wikiMembers.stream().map(userId -> {
-                UserReference userReference = this.userReferenceResolver.resolve(userId,
-                    this.getXWikiContext().getWikiReference());
+                UserReference userReference = this.stringUserReferenceResolver.resolve(userId,
+                    getXWikiContext().getWikiReference());
 
                 if (this.isHidden(userReference, wikiUserScope)) {
                     return null;
                 } else {
                     try {
-                        if (userReferenceModelSerializer.hasAccess(userReference)) {
+                        if (this.authorizationManager.hasAccess(Right.VIEW, currentUserReference, userReference)) {
                             return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
                         } else {
                             return null;

@@ -77,7 +77,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -353,7 +352,6 @@ define('xwiki-ckeditor', [
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -491,7 +489,6 @@ define('xwiki-ckeditor', [
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -656,12 +653,6 @@ body[data-maximized] .xdialog-modal-container {
   cursor: default;
 }
 
-.resourcePicker .glyphicon {
-  font-family: 'Glyphicons Halflings';
-  line-height: 1;
-  position: relative;
-}
-
 .resourcePicker .caret {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
@@ -691,22 +682,6 @@ body[data-maximized] .xdialog-modal-container {
 /* Overwrite the CKEditor style reset. */
 .resourcePicker .dropdown-menu li * {
   cursor: pointer;
-}
-
-.resourcePicker .resource-hint.breadcrumb a,
-.resourcePicker .resource-hint.breadcrumb li.ellipsis {
-  font-size: smaller;
-}
-.resourcePicker .resource-hint.breadcrumb li.ellipsis {
-  color: inherit;
-}
-
-.resourcePicker .resourceDisplay {
-  box-sizing: border-box;
-}
-.resourcePicker .resourceDisplay.loading {
-  background-image: url(@xwiki-icon-spinner);
-  background-repeat: no-repeat;
 }
 
 td.cke_dialog_contents_body {
@@ -1120,7 +1095,139 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
       <contentType>LESS</contentType>
     </property>
     <property type="String">
-      <name/>
+      <name>LESS</name>
+    </property>
+    <property type="Integer">
+      <parse>0</parse>
+    </property>
+    <property type="String">
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>0b22dabb-07f8-440b-a29e-eecf6d1b3e24</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property type="String">
+      <cache>long</cache>
+    </property>
+    <property type="LargeString">
+      <code>/**
+ * Overwrite CKEditor's CSS reset in order to fix the icon theme
+ */
+/* Fixes for Font Awesome */
+.cke_reset_all .fa {
+  font-family: var(--fa-family ,var(--fa-style-family, "Font Awesome 7 Free"));
+  font-weight: var(--fa-style, 900);
+}
+/* The icons with '-o' suffix need to have a normal font-weight. */
+.cke_reset_all .fa.fa-file-o,
+.cke_reset_all .fa.fa-envelope-o {
+  font-weight: 400;
+}</code>
+    </property>
+    <property type="String">
+      <contentType>CSS</contentType>
+    </property>
+    <property type="String">
+      <name>CSS</name>
     </property>
     <property type="Integer">
       <parse>0</parse>
@@ -1189,7 +1296,6 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1220,7 +1326,6 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1331,7 +1436,6 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1362,7 +1466,6 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1473,7 +1576,6 @@ path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')<
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1504,7 +1606,6 @@ path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')<
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1615,7 +1716,6 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1646,7 +1746,6 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1758,7 +1857,6 @@ exports=CKEDITOR</parameters>
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1789,7 +1887,6 @@ exports=CKEDITOR</parameters>
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>

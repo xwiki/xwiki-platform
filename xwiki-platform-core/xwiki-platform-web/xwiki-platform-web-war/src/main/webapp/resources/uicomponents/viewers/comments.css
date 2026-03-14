@@ -10,9 +10,15 @@ ul.commentreplies, .reply {
   padding: 0;
   text-indent: 0;
 }
+ul.commentreplies {
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+}
 .reply {
   list-style-type: none;
   padding-left: 60px;
+  border-radius: var(--border-radius-base);
 }
 .reply form.reply {
   padding-left: 0;
@@ -25,7 +31,7 @@ ul.commentreplies, .reply {
   border: 0 none;   /* Overriding toucan */
   padding: 0 0 8px; /* Overriding toucan */
 }
-.xwikicomment:target {
+.reply:has(.xwikicomment:target) {
   background: $theme.highlightColor;
 }
 .commentavatar {
@@ -49,62 +55,63 @@ ul.commentreplies, .reply {
   max-height: 30px;
 }
 .commentheader {
-  border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.textSecondaryColor;
-  margin: 0;        /* Overriding toucan */
-  padding: 2px 0;   /* Overriding toucan */
+  color: var(--text-muted);
 }
-.commentheader:hover {
-  background-color: $theme.highlightColor;
-}
+
 .commentauthor {
-  font-size: 1em; /* Overriding toucan */
+  font-weight: var(--font-weight-semibold);
 }
 .commentdate {
   font-size: 80%;
 }
 .commentcontent {
-  border: none;       /* Overriding toucan */
-  margin: 0;
+  margin-top: 10px;
   padding: 0 36px 0 0;
   text-align: justify;
 }
-/* Comment "toolbox": delete, reply */
-.commenttools {
-  display: block;
-  float: right;
-  margin-top: -1.5em;
+
+.commenttools .btn {
+  border-color: transparent;
+  background-color: transparent;
 }
-.commenttool a {
-  background: transparent left top no-repeat;
-  display: block;
-  float: left;
-  height: 16px;
-  line-height: 30px;
-  margin: 0 0 0 4px;
-  overflow: hidden;
-  text-indent: 30px;
-  width: 16px;
+
+.commenttools .thread-toggle {
+  display: none;
 }
-.comment-permalink a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
+
+/* We offset the first action 'button' to the left so that its content is aligned to the comment text. */
+.commenttools > .thread-toggle,
+.xwikicomment:not(:has(+ .commentthread > *)) .commenttools  > .commentreply {
+  margin-left: -12px;
 }
-.commentdelete a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+
+/* If there's a thread, then we show its toggle. */
+.xwikicomment:has(+ .commentthread > *) .commenttools .thread-toggle {
+  display: unset;
 }
-.commentreply a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.png')");
+/* We assume that the caret icon is the first child of the button.*/
+.commenttools .thread-toggle> *:first-child {
+  transition: transform 200ms ease-in-out;
 }
-.commentedit a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
+
+.commenttools .thread-toggle[aria-expanded="true"] > *:first-child {
+  transform: rotateZ(90deg) ;
+}
+
+/* If we use a font icon theme, we recolor the  delete icon to put a little emphasize on danger here. */
+.commenttools .delete .fa {
+  color: var(--brand-danger);
 }
 /* Form */
-.skin-colibri #AddComment {
-  border-top: 1px solid $theme.borderColor;
-}
 #AddComment fieldset {
   padding-left: 60px;
 }
+
+.commentthread {
+  /* Disable the default bootstrap toggle transition, because it messes with tests...*/
+  transition: none;
+}
+
 .commentthread #AddComment fieldset {
   padding-left: 35px;
 }

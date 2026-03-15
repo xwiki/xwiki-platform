@@ -35,7 +35,7 @@
     "@xwiki/platform-uniast-markdown": "workspace:*"
   },
   "peerDependencies": {
-    "inversify": "7.x"
+    "inversify": "7.x || 8.x"
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",

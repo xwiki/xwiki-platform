@@ -1,0 +1,6 @@
+{
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "compilerOptions": {
+  },
+  "include": ["vite.config.ts"]
+}

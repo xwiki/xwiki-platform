@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "name": "xwiki-platform-localization",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint .",
+    "test:unit": "vitest --run --passWithNoTests",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@xwiki/platform-tool-tsconfig": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "3.x",
+    "vue-i18n": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/requirejs": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "eslint": "catalog:",
+    "npm-run-all": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

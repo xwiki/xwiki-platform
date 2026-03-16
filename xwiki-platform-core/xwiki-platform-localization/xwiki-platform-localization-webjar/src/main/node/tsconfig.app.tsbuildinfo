@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/api/index.ts","./src/consumer-requirejs/index.ts","./src/consumer-vue/index.ts","./src/impl-file/index.ts","./src/impl-rest/index.ts","./src/server/client.ts","./src/server/vue/RootComponent.vue","./src/server/vue/TranslatedElement.vue","./src/server/vue/TranslatedElement2.vue"],"version":"5.9.3"}

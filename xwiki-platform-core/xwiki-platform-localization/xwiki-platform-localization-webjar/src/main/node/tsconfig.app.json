@@ -1,0 +1,11 @@
+{
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "requirejs"
+    ],
+    // TODO: remove once the test content (e.g., Vue components) are removed from the code.
+    "isolatedDeclarations": false
+  },
+  "include": ["src/**/*"]
+}

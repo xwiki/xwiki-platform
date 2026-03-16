@@ -21,6 +21,7 @@ import {XWikiLivedata} from "@xwiki/platform-livedata-ui";
 import {XWikiLiveDataSource, initTranslationsBuilder} from "@xwiki/platform-livedata-xwiki"
 import {createApp} from "vue";
 import Vue3TouchEvents from "vue3-touch-events";
+import { createI18n } from "vue-i18n";
 // TODO: replace with client-side component resolution when XWIKI-24047 is done.
 // @ts-expect-error xwiki-platform-localization does not export types
 import { resolver } from "xwiki-platform-localization";

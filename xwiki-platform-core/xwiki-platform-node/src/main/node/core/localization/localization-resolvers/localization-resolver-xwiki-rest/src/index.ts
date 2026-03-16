@@ -29,10 +29,17 @@ import type {
  */
 export function translatorFactory(target: string): Translator {
   const cache = {};
-
+  // TODO: move inflight requests here, prevent calling twice the same query at the same time
+  // and remove from the consumer.
+  const inflightRequests = new Map<string, Promise<Translations>>();
   return {
     // eslint-disable-next-line max-statements
     async resolve(query): Promise<Translations> {
+      const queryKey = JSON.stringify(query);
+      if (inflightRequests.has(queryKey)) {
+        return inflightRequests.get(queryKey);
+      }
+
       const urlSearchParams = new URLSearchParams();
 
       const cacheKeys = Object.keys(cache);

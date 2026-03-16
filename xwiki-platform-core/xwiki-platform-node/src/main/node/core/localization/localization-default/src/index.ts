@@ -37,7 +37,6 @@ export function initialize(...translators: Translator[]): Resolver {
         : query.keys.map((key) => (query.prefix ?? "") + key);
 
       let resolved = {};
-      // TODO: find out how to handle cache (inside each translator)
       for (const translator of translators) {
         resolved = Object.assign(
           resolved,

@@ -7,13 +7,14 @@
 import { I18n } from 'vue-i18n';
 import { LiveDataSource } from '@xwiki/platform-livedata-api';
 import { Query } from '@xwiki/platform-livedata-api';
+import { Query as Query_2 } from '@xwiki/platform-localization-api';
+import { Resolver } from '@xwiki/platform-localization-api';
 import { Source } from '@xwiki/platform-livedata-api';
-import { TranslationQuery } from '@xwiki/platform-livedata-api';
-import { Translations } from '@xwiki/platform-livedata-api';
+import { Translations } from '@xwiki/platform-localization-api';
 import { Values } from '@xwiki/platform-livedata-api';
 
-// @beta
-export function buildTranslations(locale: string, i18n: I18n): (query: TranslationQuery) => Promise<Translations>;
+// @beta (undocumented)
+export function initTranslationsBuilder(resolver: Resolver): (local: string, i18n: I18n) => (query: Query_2) => Promise<Translations>;
 
 // @beta (undocumented)
 export class XWikiLiveDataSource implements LiveDataSource {

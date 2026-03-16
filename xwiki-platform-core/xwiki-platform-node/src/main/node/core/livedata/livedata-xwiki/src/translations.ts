@@ -24,6 +24,11 @@ import type {
 } from "@xwiki/platform-localization-api";
 import type { I18n } from "vue-i18n";
 
+/**
+ * @param resolver - the resolver to use when building the translation preloader
+ * @since 18.2.0RC1
+ * @beta
+ */
 function initTranslationsBuilder(
   resolver: Resolver,
 ): (local: string, i18n: I18n) => (query: Query) => Promise<Translations> {
@@ -31,8 +36,6 @@ function initTranslationsBuilder(
    * Build the translation resolver.
    * @param locale - the current locale
    * @param i18n - the i18n instance to populate
-   * @since 18.0.0RC1
-   * @beta
    */
   return function buildTranslations(locale: string, i18n: I18n) {
     return async function resolveTranslations(

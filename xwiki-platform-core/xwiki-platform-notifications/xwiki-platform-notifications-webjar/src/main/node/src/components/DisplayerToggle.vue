@@ -92,7 +92,8 @@ export default {
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
           require(["xwiki-bootstrap-switch"], () => {
-            this.jQuery(this.$refs.input).bootstrapSwitch({
+            const jQuery = this.jQuery;
+            jQuery(this.$refs.input).bootstrapSwitch({
               size: "mini",
               state: component.innerChecked,
               disabled: component.innerDisabled,
@@ -121,8 +122,8 @@ export default {
                     component.innerChecked = checked;
                     component.innerDisabled = disabled;
                     // The last parameter is skip, preventing to call onSwitchChange again.
-                    this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                    this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
+                    jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
+                    jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
                   },
                 });
               },

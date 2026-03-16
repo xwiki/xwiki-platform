@@ -139,6 +139,7 @@ administration.section.users.deleteUser.newAuthor.error=所选用户没有 {0} �
 administration.section.users.deleteUser.newAuthor.programming=编程
 administration.section.users.deleteUser.newAuthor.script=脚本
 admin.usersgroups.extensionrights=扩展权限
+### Missing: admin.usersgroups.pageextensionrights=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=从组中删除成员

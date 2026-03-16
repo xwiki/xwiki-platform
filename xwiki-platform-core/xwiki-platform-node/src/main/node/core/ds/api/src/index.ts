@@ -30,11 +30,11 @@ import type { CardProps } from "./XCard";
 import type { CheckboxProps } from "./XCheckbox";
 import type { DialogProps } from "./XDialog";
 import type { DividerProps } from "./XDivider";
+import type { DropdownProps } from "./XDropdown";
 import type { FileInputModel, FileInputProps } from "./XFileInput";
 import type { FormProps } from "./XForm";
 import type { ImgProps } from "./XImg";
 import type { LoadProps } from "./XLoad";
-import type { MenuProps } from "./XMenu";
 import type { MenuItemProps } from "./XMenuItem";
 import type { MenuLabelProps } from "./XMenuLabel";
 import type { SelectProps } from "./XSelect";
@@ -82,11 +82,12 @@ type AbstractElements = {
   XCheckbox: DefineComponent<CheckboxProps & HTMLAttributes>;
   XDialog: DefineComponent<DialogProps & HTMLAttributes>;
   XDivider: DefineComponent<DividerProps & HTMLAttributes>;
+  XDropdown: DefineComponent<DropdownProps & HTMLAttributes>;
   XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
   XForm: DefineComponent<FormProps & FormHTMLAttributes>;
   XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
   XLoad: DefineComponent<LoadProps & HTMLAttributes>;
-  XMenu: DefineComponent<MenuProps & HTMLAttributes>;
+  XMenu: DefineComponent<HTMLAttributes>;
   XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
   XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
   XSelect: DefineComponent<SelectProps & HTMLAttributes>;
@@ -118,6 +119,7 @@ export type {
   DialogProps,
   DisplayableTreeNode,
   DividerProps,
+  DropdownProps,
   FileInputModel,
   FileInputProps,
   FormProps,
@@ -125,7 +127,6 @@ export type {
   LoadProps,
   MenuItemProps,
   MenuLabelProps,
-  MenuProps,
   SelectProps,
   TabGroupProps,
   TabPanelProps,

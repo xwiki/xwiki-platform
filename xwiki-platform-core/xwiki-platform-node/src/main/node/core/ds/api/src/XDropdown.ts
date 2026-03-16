@@ -18,12 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { BtnProps } from "./XBtn";
+
 /**
- * @since 18.0.0RC1
+ * A dropdown if a foldable element that contain a button and a content that is toggled by the button (typically, a
+ * menu).
+ * @since 18.2.0RC1
  * @beta
  */
-type MenuProps = {
+type DropdownProps = {
   disabled?: boolean;
+  btnProps?: BtnProps;
 };
 
-export type { MenuProps };
+export type { DropdownProps };

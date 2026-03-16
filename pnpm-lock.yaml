@@ -57,6 +57,9 @@ catalogs:
     '@types/react-dom':
       specifier: 19.2.3
       version: 19.2.3
+    '@types/requirejs':
+      specifier: 2.1.37
+      version: 2.1.37
     '@types/sinon':
       specifier: 21.0.0
       version: 21.0.0
@@ -81,6 +84,9 @@ catalogs:
     '@vue/tsconfig':
       specifier: 0.8.1
       version: 0.8.1
+    axe-core:
+      specifier: 4.11.1
+      version: 4.11.1
     bootstrap-icons:
       specifier: 1.13.1
       version: 1.13.1
@@ -381,6 +387,76 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 28.1.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.30(typescript@5.9.3)
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.2.5(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/api
+      '@xwiki/platform-dsapi':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/core/ds/api
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.57.7(@types/node@24.12.0)
+      '@types/jquery':
+        specifier: 'catalog:'
+        version: 4.0.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.0
+      '@types/requirejs':
+        specifier: 'catalog:'
+        version: 2.1.37
+      '@vue/test-utils':
+        specifier: 'catalog:'
+        version: 2.4.6
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/dev/config
+      '@xwiki/platform-test-accessibility':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/core/test/accessibility
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-tsconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.3(jiti@2.6.1)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.7.0
+      inversify:
+        specifier: 'catalog:'
+        version: 7.11.0(reflect-metadata@0.2.2)
+      jquery:
+        specifier: 'catalog:'
+        version: 4.0.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1463,6 +1539,43 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility:
+    dependencies:
+      '@vue/test-utils':
+        specifier: 'catalog:'
+        version: 2.4.6
+      axe-core:
+        specifier: 'catalog:'
+        version: 4.11.1
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.30(typescript@5.9.3)
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.57.7(@types/node@24.12.0)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.3(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api:
     dependencies:
@@ -3168,6 +3281,9 @@ packages:
   '@types/react@19.2.7':
     resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
 
+  '@types/requirejs@2.1.37':
+    resolution: {integrity: sha512-jmFgr3mwN2NSmtRP6IpZ2nfRS7ufSXuDYQ6YyPFArN8x5dARQcD/DXzT0J6NYbvquVT4pg9K9HWdi6e6DZR9iQ==}
+
   '@types/sinon@21.0.0':
     resolution: {integrity: sha512-+oHKZ0lTI+WVLxx1IbJDNmReQaIsQJjN2e7UUrJHEeByG7bFeKJYsv1E75JxTQ9QKJDp21bAa/0W2Xo4srsDnw==}
 
@@ -3686,6 +3802,10 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
+  axe-core@4.11.1:
+    resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
+    engines: {node: '>=4'}
+
   axios@1.13.2:
     resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}
 
@@ -3946,10 +4066,6 @@ packages:
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
-
-  diff@8.0.2:
-    resolution: {integrity: sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg==}
-    engines: {node: '>=0.3.1'}
 
   diff@8.0.3:
     resolution: {integrity: sha512-qejHi7bcSD4hQAZE0tNAawRK1ZtafHDmMTMkrrIGgSLl7hTnQHmKCeB45xAcbfTqK2zowkM3j3bHt/4b/ARbYQ==}
@@ -7215,7 +7331,7 @@ snapshots:
       '@rushstack/rig-package': 0.7.2
       '@rushstack/terminal': 0.22.3(@types/node@24.12.0)
       '@rushstack/ts-command-line': 5.3.3(@types/node@24.12.0)
-      diff: 8.0.2
+      diff: 8.0.3
       lodash: 4.17.23
       minimatch: 10.2.3
       resolve: 1.22.11
@@ -7700,6 +7816,8 @@ snapshots:
   '@types/react@19.2.7':
     dependencies:
       csstype: 3.2.3
+
+  '@types/requirejs@2.1.37': {}
 
   '@types/sinon@21.0.0':
     dependencies:
@@ -8321,6 +8439,8 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.1.0
 
+  axe-core@4.11.1: {}
+
   axios@1.13.2:
     dependencies:
       follow-redirects: 1.15.11
@@ -8570,8 +8690,6 @@ snapshots:
   devlop@1.1.0:
     dependencies:
       dequal: 2.0.3
-
-  diff@8.0.2: {}
 
   diff@8.0.3: {}
 

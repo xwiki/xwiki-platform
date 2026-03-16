@@ -17,11 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { InjectionKey } from "vue";
 
-/**
- * @since 18.0.0RC1
- * @beta
- */
-type ImgProps = unknown;
-
-export type { ImgProps };
+// See https://vuejs.org/guide/typescript/composition-api.html#typing-provide-inject
+export const dropdownKey = Symbol() as InjectionKey<{
+  inDropdown: boolean;
+  activatorId: string;
+}>;

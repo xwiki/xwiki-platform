@@ -17,15 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import XForm from "../XForm.vue";
+import {
+  runTest,
+  shallowMountHelper,
+} from "@xwiki/platform-test-accessibility";
+import { describe, expect } from "vitest";
+import type { FormProps } from "@xwiki/platform-dsapi";
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
-
-export type { DialogProps };
+const accessibilityMount = shallowMountHelper(XForm);
+describe("XForm", () => {
+  let submited = false;
+  runTest(
+    "render minimal props",
+    accessibilityMount({
+      props: {
+        onFormSubmit: () => {
+          submited = true;
+        },
+      } satisfies FormProps,
+      slots: {
+        default: "Some Text",
+      },
+    }),
+    (wrapper) => {
+      expect(wrapper.html()).toEqual(`<form class="xform">Some Text</form>`);
+      expect(submited).toBeFalsy();
+      wrapper.find("form").trigger("submit");
+      expect(submited).toBeTruthy();
+    },
+  );
+});

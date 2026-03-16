@@ -18,14 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
+import localConfig from "./vite.config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { mergeConfig } from "vitest/config";
 
-export type { DialogProps };
+export default mergeConfig(defaultConfig, localConfig);

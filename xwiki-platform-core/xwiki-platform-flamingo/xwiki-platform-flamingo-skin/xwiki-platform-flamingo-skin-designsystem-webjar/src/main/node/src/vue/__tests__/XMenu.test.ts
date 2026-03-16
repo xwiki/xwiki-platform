@@ -17,15 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import XMenu from "../XMenu.vue";
+import {
+  runTest,
+  shallowMountHelper,
+} from "@xwiki/platform-test-accessibility";
+import { describe, expect } from "vitest";
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
-
-export type { DialogProps };
+const getAccessibilityMount = shallowMountHelper(XMenu, {
+  global: {
+    stubs: {
+      "wrap-if": false,
+      "x-menu-label": false,
+      "x-menu-item": false,
+    },
+  },
+});
+describe("XMenu", () => {
+  runTest(
+    "render no props",
+    getAccessibilityMount({
+      slots: {
+        default: `<x-menu-label>menu label</x-menu-label>
+      <x-menu-item>menu content</x-menu-item>`,
+      },
+    }),
+    (wrapper) => {
+      expect(wrapper.find("div").classes()).toContain("open");
+      expect(wrapper.find("div > ul").classes()).toContain("dropdown-menu");
+    },
+  );
+});

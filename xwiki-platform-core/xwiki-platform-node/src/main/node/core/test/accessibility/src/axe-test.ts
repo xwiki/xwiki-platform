@@ -17,15 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { assertAxe } from "./assert-axe";
+import { test } from "vitest";
+import type { AxeFeatures } from "./axe-features";
+import type { TestAPI } from "vitest";
 
 /**
+ * An extended test method with axe core accessibility test integrated.
  * @since 18.2.0RC1
- * @beta
+ * @public
  */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
+const it: TestAPI = test.extend<AxeFeatures>({
+  // Fixture 1: owns mounting and exposes the wrapper
+  wrapper: [
+    () => {
+      throw new Error(
+        "Override the wrapper fixture with the component under test",
+      );
+    },
+  ],
 
-export type { DialogProps };
+  // Fixture 2: depends on wrapper, runs axe after each test
+  axeCheck: [
+    async ({ wrapper }, use) => {
+      await use();
+
+      if (wrapper) {
+        await assertAxe(wrapper);
+        wrapper.unmount();
+      }
+    },
+    { auto: true },
+  ],
+});
+
+export { it, it as test };

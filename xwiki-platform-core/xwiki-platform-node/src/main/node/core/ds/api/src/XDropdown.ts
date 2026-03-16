@@ -21,8 +21,6 @@
 import type { BtnProps } from "./XBtn";
 
 /**
- * A dropdown if a foldable element that contain a button and a content that is toggled by the button (typically, a
- * menu).
  * @since 18.2.0RC1
  * @beta
  */

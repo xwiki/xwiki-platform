@@ -17,15 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { assertAxe } from "./assert-axe";
+import { it, test } from "./axe-test";
+import { mountHelper, shallowMountHelper } from "./mount-helpers";
+import { runTest } from "./run-test";
 
-/**
- * @since 18.2.0RC1
- * @beta
- */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
-
-export type { DialogProps };
+export { assertAxe, it, mountHelper, runTest, shallowMountHelper, test };

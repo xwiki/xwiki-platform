@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-dsapi",
+  "name": "@xwiki/platform-test-accessibility",
   "version": "18.2.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -15,17 +15,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.es.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.umd.js"
-      }
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
     }
   },
-  "main": "./dist/index.es.js",
+  "main": "./src/index.ts",
   "files": [
     "dist",
     "src",
@@ -44,11 +38,10 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-fn-utils": "workspace:*"
-  },
-  "peerDependencies": {
-    "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "@vue/test-utils": "catalog:",
+    "axe-core": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
@@ -56,10 +49,23 @@
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "happy-dom": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:",
-    "vue": "catalog:"
+    "vite": "catalog:"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
   }
 }

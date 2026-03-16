@@ -17,15 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { run } from "axe-core";
+import { expect } from "vitest";
+import type { VueWrapper } from "@vue/test-utils";
 
 /**
+ * Run an axe core check on the provided vue component wrapper and check for the absence of issues.
+ * @param wrapper - the vue wrapper to assert for accessibility
  * @since 18.2.0RC1
- * @beta
+ * @public
  */
-type DialogProps = {
-  title: string;
-  width?: string | number | undefined;
-  modelValue?: boolean;
-};
+async function assertAxe(wrapper: VueWrapper): Promise<void> {
+  const axeRun = await run(wrapper.element, {
+    runOnly: {
+      type: "tags",
+      // Note: this list needs to be in sync with org.xwiki.test.ui.WCAGContext.VALIDATE_TAGS
+      values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+    },
+  });
+  expect(axeRun.violations).toEqual([]);
+}
 
-export type { DialogProps };
+export { assertAxe };

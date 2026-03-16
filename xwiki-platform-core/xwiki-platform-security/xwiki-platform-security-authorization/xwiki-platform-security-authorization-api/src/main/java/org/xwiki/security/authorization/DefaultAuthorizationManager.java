@@ -41,10 +41,6 @@ import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceSerializer;
-
-import jakarta.inject.Named;
 
 /**
  * Default implementation of the {@link AuthorizationManager}.
@@ -95,10 +91,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
     @Inject
     private LoggerConfiguration loggerConfiguration;
-
-    @Inject
-    @Named("document")
-    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
@@ -254,20 +246,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             this.logger.warn(
                 "Right unregistration is disabled on purpose as it's creating cache problems right now. In "
                     + "case of a need to debug this call was triggered for right [{}].", right);
-        }
-    }
-
-    @Override
-    public boolean hasAccess(Right right, UserReference user, UserReference target)
-    {
-        try {
-            DocumentReference userReference = this.documentUserReferenceSerializer.serialize(user);
-            DocumentReference targetReference = this.documentUserReferenceSerializer.serialize(target);
-
-            return hasAccess(right, userReference, targetReference);
-        } catch (IllegalArgumentException e) {
-            this.logger.error("Access rights are not yet supported for non-document user resources.", e);
-            return false;
         }
     }
 

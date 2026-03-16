@@ -24,6 +24,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -115,5 +116,35 @@ class CurrentUserManagerTest
         when(this.userReferenceResolver.resolve(documentReference)).thenReturn(GuestUserReference.INSTANCE);
 
         assertFalse(this.manager.exists(CurrentUserReference.INSTANCE));
+    }
+
+    @Test
+    void hasAccessWhenCurrentUser()
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
+        when(xcontext.getUserReference()).thenReturn(documentReference);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+
+        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, true);
+        when(this.userReferenceResolver.resolve(documentReference)).thenReturn(documentUserReference);
+
+        DocumentUserReference targetUserReference = mock(DocumentUserReference.class);
+        this.manager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, targetUserReference);
+
+        verify(this.documentUserManager).hasAccess(Right.VIEW, documentUserReference, targetUserReference);
+    }
+
+    @Test
+    void hasAccessWhenNoCurrentUser()
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getUserReference()).thenReturn(null);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+
+        DocumentUserReference targetUserReference = mock(DocumentUserReference.class);
+        this.manager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, targetUserReference);
+
+        verify(this.documentUserManager).hasAccess(Right.VIEW, GuestUserReference.INSTANCE, targetUserReference);
     }
 }

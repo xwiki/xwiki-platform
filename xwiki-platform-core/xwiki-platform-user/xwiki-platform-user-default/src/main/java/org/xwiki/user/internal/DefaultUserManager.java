@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -91,5 +92,30 @@ public class DefaultUserManager implements UserManager
     public boolean hasUsers(WikiReference wiki) throws UserException
     {
         return this.documentUserManager.hasUsers(wiki);
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    {
+        boolean hasAccess;
+
+        // Handle special cases
+        UserReference normalizedUserReference = user;
+        if (normalizedUserReference == null) {
+            normalizedUserReference = CurrentUserReference.INSTANCE;
+        }
+
+        if (target == null || target == CurrentUserReference.INSTANCE
+            || target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE)
+        {
+            // The target is not an actual resource.
+            hasAccess = false;
+        } else if (normalizedUserReference == CurrentUserReference.INSTANCE) {
+            hasAccess = resolveUserManager(normalizedUserReference).hasAccess(right, normalizedUserReference, target);
+        } else {
+            // We know that "target" is an actual user resource, so we use it to resolve the manager.
+            hasAccess = resolveUserManager(target).hasAccess(right, normalizedUserReference, target);
+        }
+        return hasAccess;
     }
 }

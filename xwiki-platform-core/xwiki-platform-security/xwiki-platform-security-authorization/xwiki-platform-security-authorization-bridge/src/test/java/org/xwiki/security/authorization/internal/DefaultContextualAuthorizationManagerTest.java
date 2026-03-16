@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentMatchers;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -116,8 +115,7 @@ class DefaultContextualAuthorizationManagerTest
     @MethodSource("contentRightsSource")
     void contentAuthorRightPreAccess(Right right)
     {
-        when(this.authorizationManager.hasAccess(eq(right), ArgumentMatchers.<DocumentReference>any(), any()))
-            .thenReturn(true);
+        when(this.authorizationManager.hasAccess(eq(right), any(), any())).thenReturn(true);
 
         assertTrue(this.contextualAuthorizationManager.hasAccess(right));
 
@@ -146,8 +144,7 @@ class DefaultContextualAuthorizationManagerTest
     @MethodSource("contentRightsSource")
     void requiredRightsPreAccess(Right right) throws AuthorizationException
     {
-        when(this.authorizationManager.hasAccess(eq(right), ArgumentMatchers.<DocumentReference>any(), any()))
-            .thenReturn(true);
+        when(this.authorizationManager.hasAccess(eq(right), any(), any())).thenReturn(true);
 
         XWikiDocument contextDocument = mock();
         DocumentReference documentReference = mock();

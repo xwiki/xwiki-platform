@@ -28,13 +28,12 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
@@ -62,17 +61,13 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
     private WikiUserManager wikiUserManager;
 
     @Inject
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> documentUserReferenceResolver;
-
-    @Inject
     private UserReferenceResolver<String> stringUserReferenceResolver;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private UserManager userManager;
 
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
@@ -92,9 +87,6 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
         }
 
         try {
-            UserReference currentUserReference =
-                this.documentUserReferenceResolver.resolve(getXWikiContext().getUserReference());
-
             UserScope wikiUserScope = this.wikiUserManager.getUserScope(wikiName);
             Collection<String> wikiMembers = this.wikiUserManager.getMembers(wikiName);
 
@@ -107,7 +99,7 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
                     return null;
                 } else {
                     try {
-                        if (this.authorizationManager.hasAccess(Right.VIEW, currentUserReference, userReference)) {
+                        if (this.userManager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, userReference)) {
                             return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
                         } else {
                             return null;

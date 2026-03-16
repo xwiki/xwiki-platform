@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserException;
@@ -81,6 +83,34 @@ public class CurrentUserManager implements UserManager
             }
         }
         return exists;
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    {
+        boolean hasAccess;
+
+        // Note: the passed userReference is always CurrentUserReference.INSTANCE since this user manager is called
+        // only in this case. That's why it's not used.
+
+        if (target == null || target == CurrentUserReference.INSTANCE
+            || target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE)
+        {
+            // The target is not an actual resource.
+            hasAccess = false;
+        } else {
+            DocumentReference currentUserReference = getXWikiContext().getUserReference();
+            if (currentUserReference == null) {
+                // If there's no user in the context, then it means guest.
+                hasAccess = this.documentUserManager.hasAccess(right, GuestUserReference.INSTANCE, target);
+            } else {
+                // Resolve the current user reference into a real reference.
+                UserReference resolvedUserReference = this.userReferenceResolver.resolve(currentUserReference);
+                hasAccess = this.documentUserManager.hasAccess(right, resolvedUserReference, target);
+            }
+        }
+
+        return hasAccess;
     }
 
     private XWikiContext getXWikiContext()

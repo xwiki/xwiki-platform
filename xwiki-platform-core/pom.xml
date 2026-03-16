@@ -222,8 +222,8 @@
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
-                  <new>method boolean org.xwiki.security.authorization.AuthorizationManager::hasAccess(org.xwiki.security.authorization.Right, org.xwiki.user.UserReference, org.xwiki.user.UserReference)</new>
-                  <justification>Method requires to have proper right checks on user resources.</justification>
+                  <new>method boolean org.xwiki.user.UserManager::hasAccess(org.xwiki.security.authorization.Right, org.xwiki.user.UserReference, org.xwiki.user.UserReference)</new>
+                  <justification>Method required to have proper right checks on user resources.</justification>
                   <criticality>highlight</criticality>
                 </item>
               </differences>

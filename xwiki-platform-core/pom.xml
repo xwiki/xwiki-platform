@@ -216,7 +216,20 @@
                 </item>
               </differences>
             </revapi.differences>
-            
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.InlineAction</old>
+                  <new>class com.xpn.xwiki.web.InlineAction</new>
+                  <superClass>com.xpn.xwiki.web.EditAction</superClass>
+                  <justification>Not a breakage in our case (no final methods), also nobody should inherit from InlineAction.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

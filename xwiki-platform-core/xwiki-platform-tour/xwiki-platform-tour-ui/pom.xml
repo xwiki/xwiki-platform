@@ -69,6 +69,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- bootstrap tour uses deprecated jquery 3 API -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
+    </dependency>
     <!-- The app has been created by Application Within Minutes -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -35,30 +35,6 @@
   width: unset;
 }
 
-/* Styles for the loading state. */
-.ts-wrapper.input-active.loading .ts-control {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-  background-repeat: no-repeat;
-}
-/* Add enough padding to have room to display the spinning loader. That way, the Tom Select field do not have a brief
-  change of width during load. The second 'has-items' selector is required to override the Tom Select CSS. */
-.ts-wrapper.multi .ts-control,
-.ts-wrapper.multi.has-items .ts-control {
-  padding-right: 32px;
-}
-.ts-wrapper.multi.loading .ts-control,
-.ts-wrapper.multi.has-items.loading .ts-control {
-  background-position: center right 12px;
-}
-.ts-wrapper.single .ts-control,
-.ts-wrapper.single.input-active .ts-control {
-  padding-right: 55px;
-}
-.ts-wrapper.single.loading .ts-control,
-.ts-wrapper.single.input-active.loading .ts-control {
-  background-position: center right 36px;
-}
-
 /* Dropdown styles */
 .ts-dropdown.active {
   /* Override width 100% set by Tom Select, see XWIKI-19453. */
@@ -100,7 +76,7 @@ img.xwiki-selectize-option-icon {
   border-radius: 5px;
   max-height: 18px;
   max-width: 18px;
-  vertical-align: text-top;
+  vertical-align: sub;
 }
 a.xwiki-selectize-option-label {
   color: inherit;

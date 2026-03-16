@@ -29,129 +29,188 @@ define('entityResourceSuggester', [
 ], function($, $resource, translations) {
   'use strict';
 
-  var search = function(query, input, deferred, entityType, base) {  
-    $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
-      outputSyntax: 'plain',
-      language: $('html').attr('lang'),
-      query: query.join('\n'),
-      input: input,
-      nb: 8
-    }).done(function(response) {
-      let suggestions = [];
+  async function search(query, input, entityType, base, withCreateSuggestions) {
+    let suggestions = [];
+    try {
+      const response = await $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
+        outputSyntax: 'plain',
+        language: $('html').attr('lang'),
+        query: query.join('\n'),
+        input: input,
+        nb: 8
+      });
+
       if (response.documentElement) {
         let results = response.getElementsByTagName('rs');
         let containsExactMatch = false;
-        let inputReference = XWiki.Model.resolve(input, XWiki.EntityType.DOCUMENT);
+        let inputReference = XWiki.Model.resolve(input, entityType);
         let inputResourceReference = $resource.convertEntityReferenceToResourceReference(inputReference, base);
         for (let i = 0; i < results.length; i++) {
           let result = convertSearchResultToResource(results.item(i), entityType, base);
           containsExactMatch = isSameResource(result.reference, inputResourceReference);
           suggestions.push(result);
         }
-        if (!containsExactMatch) {
-          suggestCreateDocument(input, base, suggestions, deferred);
-        } else {
-          deferred.resolve(suggestions);
+        if (!containsExactMatch && withCreateSuggestions) {
+          suggestions = await suggestCreateDocument(input, base, suggestions);
         }
-      } else {
-        suggestCreateDocument(input, base, suggestions, deferred);
-        deferred.resolve(suggestions);
+      } else if (withCreateSuggestions) {
+        suggestions = await suggestCreateDocument(input, base, suggestions);
       }
-    }).fail(function() {
-      deferred.resolve([]);
-    });
-  };
+    } catch (error) {
+      console.error("Failed to get suggestions.", error);
+    }
 
-  let isSameResource = function (resource1, resource2) {
+    return adaptSuggestions(suggestions);
+  }
+
+  function isSameResource(resource1, resource2) {
     return JSON.stringify(resource1) === JSON.stringify(resource2);
-  };
+  }
 
-  var suggestCreateDocument = function(input, base, suggestions, deferred) {
-    $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
-      outputSyntax: 'plain',
-      input: input,
-      base: XWiki.Model.serialize(base),
-      action: 'suggest'
-    }).done(function(data) {
-      data.forEach(function (item) {
+  async function suggestCreateDocument(input, base, suggestions) {
+    try {
+      const data = await $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+        outputSyntax: 'plain',
+        input: input,
+        base: XWiki.Model.serialize(base),
+        action: 'suggest'
+      });
+      data.forEach(item => {
         if (item.type === 'exactMatch') {
           suggestions = handleExactMatch(item, base, suggestions);
         } else {
           suggestions.push(createDocumentFromLinkNameStrategyHelperResult(item, base));
         }
       });
-      deferred.resolve(suggestions);
-    }).fail(function(data) {
-      console.error("Error while loading creation link response", data);
-      deferred.resolve(suggestions);
-    });
-  };
+    } catch (error) {
+      console.error("Failed to get the page name strategy", error);
+    }
 
-  let handleExactMatch = function(item, base, suggestions) {
+    return suggestions;
+  }
+
+  function handleExactMatch(item, base, suggestions) {
     let entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
     let resourceReference = $resource.convertEntityReferenceToResourceReference(entityReference, base);
-    suggestions = suggestions.filter(element => !isSameResource(element.reference, resourceReference));
+    suggestions = suggestions.filter(suggestion => !isSameResource(suggestion.reference, resourceReference));
     suggestions.unshift(createDocumentFromLinkNameStrategyHelperResult(item, base));
     return suggestions;
-  };
+  }
 
-  var createDocumentFromLinkNameStrategyHelperResult = function (item, base) {
-    let entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
-    let title = item.title;
-    if (!title && item.type !== 'exactMatch') {
-      title = translations.get('create.' + item.type);
-    } else if (!title) {
-      title = (entityReference.name !== 'WebHome') ? entityReference.name : entityReference.parent.name;
+  function createDocumentFromLinkNameStrategyHelperResult(item, base) {
+    const entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
+    const entityName = getEntityName(entityReference);
+    let label = item.title;
+    if (!label && item.type !== 'exactMatch') {
+      label = translations.get('create.' + item.type);
+    } else if (!label) {
+      label = entityName;
     }
     return {
       reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
-      entityReference: entityReference,
-      title: title,
-      location: item.location
+      entityReference,
+      label,
+      toCreate: true,
+      // Use a different label when this resource to be created is selected.
+      labelWhenSelected: entityName,
+      hint: item.location,
     };
-  };
+  }
 
-  var convertSearchResultToResource = function(result, expectedEntityType, base) {
-    var entityReference, location, title = result.childNodes[0].nodeValue;
-    var entityType = result.getAttribute('type');
-    var serializedEntityReference = result.getAttribute('id');
-    entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
-    location = result.getAttribute('info');
+  function convertSearchResultToResource(result, expectedEntityType, base) {
+    const entityType = result.getAttribute('type');
+    const serializedEntityReference = result.getAttribute('id');
+    const entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
     return {
       reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
-      entityReference: entityReference,
-      title: title,
-      location: location
+      entityReference,
+      label: result.childNodes[0].nodeValue,
+      hint: result.getAttribute('info')
     };
-  };
+  }
 
-  var display = function(resource) {
-    var suggestion = $(
-      '<span class="resource-label"><span class="resource-icon"></span> </span>' +
-      '<span class="resource-hint"></span>'
-    );
-    suggestion.find('.resource-icon').addClass($resource.types[resource.reference.type].icon);
-    suggestion.first().append(document.createTextNode(resource.title)).next().html(resource.location);
-    // Remove the home icon from the resource location displayed as hint because it distracts the user and it is
-    // redundant. The home icon is useful to navigate to the home page but the resource suggestion hint is not used for
-    // navigation so the home icon is not needed. We know that every path starts from home.
-    suggestion.last().text(function(index, text) {
-      return text.substr(0, 3) === ' / ' ? text.substr(3) : text;
-    });
+  function resolve(resource, base) {
+    const resourceTypeDefinition = $resource.types[resource.reference.type];
+    if (resourceTypeDefinition.entityType && !resource.entityReference) {
+      resource.entityReference = $resource.convertResourceReferenceToEntityReference(resource.reference, base);
+    }
+    return adaptSuggestion(resource);
+  }
+
+  function adaptSuggestions(suggestions) {
+    return suggestions.map(adaptSuggestion);
+  }
+
+  function adaptSuggestion(suggestion) {
+    suggestion.value = XWiki.Model.serialize(suggestion.entityReference);
+    // Use a dedicated search field to avoid matching 'WebHome' for existing document resources.
+    suggestion.searchValue = suggestion.toCreate ? suggestion.value : getEntityName(suggestion.entityReference);
+    suggestion.icon = $resource.types[suggestion.reference.type]?.icon || $resource.types.unknown.icon;
+    suggestion.label = suggestion.label || suggestion.searchValue;
+    suggestion.hint = suggestion.hint || '';
+    // Remove the home icon from the location (breadcrumb) because it distracts the user (from the resource icon) and
+    // because it doesn't bring additional information to identify the resource. We all know that every path starts
+    // from home.
+    if (suggestion.hint.trim().startsWith('<')) {
+      const firstPathSeparatorIndex = suggestion.hint.indexOf(' / ');
+      if (firstPathSeparatorIndex >= 0) {
+        suggestion.hint = suggestion.hint.substring(firstPathSeparatorIndex + 3);
+      } else {
+        // Top level resource.
+        suggestion.hint = '';
+      }
+    }
     return suggestion;
-  };
+  }
 
-  var advancedSearchPattern = /[+\-!(){}\[\]\^"~*?:\\]+/;
+  function getEntityName(entityReference) {
+    let name = entityReference.name;
+    if (entityReference.name === 'WebHome' && entityReference.type === XWiki.EntityType.DOCUMENT) {
+      name = entityReference.parent.name;
+    }
+    return name;
+  }
+
+  function getEntityParent(entityReference) {
+    let parent = entityReference.parent;
+    if (entityReference.name === 'WebHome' && entityReference.type === XWiki.EntityType.DOCUMENT) {
+      parent = parent?.parent;
+    }
+    return parent;
+  }
+
+  async function retrieveSelected(resourceReference, base) {
+    const entityType = XWiki.EntityType.byName($resource.types[resourceReference.type].entityType);
+    const entityTypeName = XWiki.EntityType.getName(entityType);
+    const query = [
+      'q="__INPUT__"',
+      'qf=reference'
+    ];
+    let entityReference = `${entityTypeName}:${resourceReference.reference}`;
+    const suggestions = await search(query, entityReference, entityType, base, false);
+    if (!suggestions.length) {
+      entityReference = XWiki.Model.resolve(resourceReference.reference, entityType, base);
+      suggestions.push(adaptSuggestion({
+        reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
+        entityReference,
+        hint: getEntityParent(entityReference)?.relativeTo(base.extractReference(XWiki.EntityType.WIKI))
+          .getReversedReferenceChain().map(reference => reference.name).join(' / ')
+      }));
+    }
+    return suggestions;
+  }
+
+  const advancedSearchPattern = /[+\-!(){}[\]^"~*?:\\]+/;
 
   $resource.types.doc.placeholder = translations.get('doc.placeholder');
   $resource.suggesters.doc = {
     retrieve: function(resourceReference, base) {
-      var deferred = $.Deferred();
-      var query = [
+      const query = [
         'q=__INPUT__',
         'fq=type:DOCUMENT'
       ];
-      var input = resourceReference.reference.trim();
+      let input = resourceReference.reference.trim();
+      const withCreateSuggestions = input.length > 0;
       if (input) {
         query.push('qf=title^2 name');
         if (!advancedSearchPattern.test(input)) {
@@ -162,21 +221,20 @@ define('entityResourceSuggester', [
         input = '*:*';
         query.push('sort=date desc');
       }
-      search(query, input, deferred, XWiki.EntityType.DOCUMENT, base);
-      return deferred.promise();
+      return search(query, input, XWiki.EntityType.DOCUMENT, base, withCreateSuggestions);
     },
-    display: display
+    retrieveSelected,
+    resolve
   };
 
   $resource.types.attach.placeholder = translations.get('attach.placeholder');
   $resource.suggesters.attach = {
     retrieve: function(resourceReference, base) {
-      var deferred = $.Deferred();
-      var query = [
+      const query = [
         'q=__INPUT__',
         'fq=type:ATTACHMENT'
       ];
-      var input = resourceReference.reference.trim();
+      let input = resourceReference.reference.trim();
       if (input) {
         query.push('qf=filename');
         if (!advancedSearchPattern.test(input)) {
@@ -187,9 +245,9 @@ define('entityResourceSuggester', [
         input = '*:*';
         query.push('sort=attdate_sort desc');
       }
-      search(query, input, deferred, XWiki.EntityType.ATTACHMENT, base);
-      return deferred.promise();
+      return search(query, input, XWiki.EntityType.ATTACHMENT, base, false);
     },
-    display: display
+    retrieveSelected,
+    resolve
   };
 });

@@ -17,57 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-#template('colorThemeInit.vm')
+.resourcePicker {
+  .ts-wrapper.single .ts-control::after {
+    /* Hide Tom Select's dropdown caret, for single selection, because we already have a dropdown caret for selecting
+      the resource type. */
+    display: none;
+  }
 
-.resourcePicker .dropdown-menu > .active > a,
-.resourcePicker .dropdown-menu > .active > a:hover,
-.resourcePicker .dropdown-menu > .active > a:focus {
-  color: $theme.textColor;
-  background-color: $theme.highlightColor;
-}
+  .ts-control {
+    /* Restore the border removed by CKEditor dialog's CSS reset. */
+    border: 1px solid var(--input-border);
+    /* Match the height from Bootstrap 3. */
+    min-height: 32px;
+    /* Match the left & right padding from CKEditor dialog. */
+    padding: 0 6px;
+  }
 
-.resourcePicker .dropdown-menu .resource-label {
-  display: block;
-}
-.resourcePicker a.resource-label {
-  color: $theme.textColor;
-}
-.resourcePicker .resource-hint {
-  color: $theme.textSecondaryColor;
-  font-size: smaller;
-}
-.resourcePicker .resource-hint.breadcrumb {
-  background-color: transparent;
-  margin-bottom: 0;
-  padding: 0;
-}
-.resourcePicker .resource-hint.breadcrumb a {
-  color: $theme.textSecondaryColor;
-}
+  /* The dropdown caret is hidden (see above) so we don't need to leave space. */
+  .ts-control:not(.rtl) {
+    padding-right: 6px !important;
+  }
+  .ts-control.rtl {
+    padding-left: 6px !important;
+  }
 
-.resourcePicker .resourceDisplay {
-  background-color: $theme.backgroundSecondaryColor;
-  border-radius: 7px;
-  border: 1px solid $theme.borderColor;
-  margin: 6px 0;
-  padding: 6px 22px 6px 6px;
-  position: relative;
-}
-.resourcePicker .resourceDisplay.loading {
-  background-position: 6px center;
-  min-height: 28px;
-}
+  /* Restore the rounded border (there are some hidden elements before). */
+  > .input-group > .ts-wrapper > .ts-control {
+    border-bottom-left-radius: var(--border-radius-base) !important;
+    border-top-left-radius: var(--border-radius-base) !important;
+  }
 
-.resourcePicker .resourceDisplay .remove {
-  color: $theme.textSecondaryColor;
-  cursor: pointer;
-  font-size: 75%;
-  opacity: .3;
-  position: absolute;
-  right: 6px;
-  top: 6px;
-}
-.resourcePicker .resourceDisplay .remove:hover {
-  color: $theme.textColor;
-  opacity: 1;
+  img.icon {
+    /* Overcome CKEditor's CSS reset. */
+    vertical-align: middle;
+  }
 }

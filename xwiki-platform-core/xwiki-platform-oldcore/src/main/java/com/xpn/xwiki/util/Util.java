@@ -531,37 +531,17 @@ public class Util
 
     public static String getName(String name)
     {
-        int i0 = name.indexOf(":");
-        if (i0 != -1) {
-            name = name.substring(i0 + 1);
-            return name;
-        }
-
-        if (name.indexOf(".") != -1) {
-            return name;
-        } else {
-            return "XWiki." + name;
-        }
+        return com.xpn.xwiki.api.Util.getStandardUsername(name, false);
     }
 
     public static String getName(String name, XWikiContext context)
     {
-        String database = null;
         int i0 = name.indexOf(":");
         if (i0 != -1) {
-            database = name.substring(0, i0);
-            name = name.substring(i0 + 1);
+            String database = name.substring(0, i0);
             context.setWikiId(database);
-            return name;
         }
-
-        // This does not make sense
-        // context.setWikiId(context.getWiki().getDatabase());
-        if (name.indexOf(".") != -1) {
-            return name;
-        } else {
-            return "XWiki." + name;
-        }
+        return getName(name);
     }
 
     public static Cookie getCookie(String cookieName, XWikiContext context)

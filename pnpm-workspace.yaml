@@ -39,14 +39,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
-
-catalogMode: strict
-cleanupUnusedCatalogs: true
-ignoredBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-onlyBuiltDependencies:
-  - nx
 catalog:
   "@blocknote/core": 0.47.1
   "@blocknote/mantine": 0.47.1
@@ -83,11 +75,11 @@ catalog:
   eslint-plugin-import: 2.32.0
   eslint-plugin-prettier: 5.5.5
   eslint-plugin-promise: 7.2.1
-  eslint-plugin-tsdoc: 0.5.0
+  eslint-plugin-tsdoc: 0.5.2
   eslint-plugin-vue: 10.8.0
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
-  globals: 17.3.0
+  globals: 17.4.0
   happy-dom: 20.7.0
   i18next: 25.8.13
   inversify: 7.11.0
@@ -116,7 +108,7 @@ catalog:
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
   rimraf: 6.1.3
-  sinon: 21.0.1
+  sinon: 21.0.2
   tippy.js: 6.3.7
   typescript: 5.9.3
   typescript-eslint: 8.56.1
@@ -137,3 +129,11 @@ catalog:
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
   yjs: 13.6.29
+
+catalogMode: strict
+cleanupUnusedCatalogs: true
+ignoredBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+onlyBuiltDependencies:
+  - nx

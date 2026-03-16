@@ -72,6 +72,7 @@
     "reflect-metadata": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
+    "vitest-mock-extended": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:"
   },

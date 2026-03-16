@@ -41,6 +41,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.GroupsClass;
@@ -376,10 +377,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         String[] userarray = GroupsClass.getListFromString(users).toArray(new String[0]);
 
                         for (int ii = 0; ii < userarray.length; ii++) {
-                            String value = userarray[ii];
-                            if (value.indexOf(".") == -1) {
-                                userarray[ii] = "XWiki." + value;
-                            }
+                            userarray[ii] = com.xpn.xwiki.api.Util.getStandardUsername(userarray[ii], true);
                         }
 
                         if (LOGGER.isDebugEnabled()) {

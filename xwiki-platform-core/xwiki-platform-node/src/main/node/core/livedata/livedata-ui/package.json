@@ -44,6 +44,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-livedata-api": "workspace:*",
+    "@xwiki/platform-localization-api": "workspace:*",
     "dompurify": "catalog:",
     "eventemitter3": "catalog:",
     "lz-string": "catalog:",

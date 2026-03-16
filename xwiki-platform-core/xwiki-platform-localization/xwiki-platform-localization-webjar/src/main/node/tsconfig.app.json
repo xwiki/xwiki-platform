@@ -4,8 +4,7 @@
     "types": [
       "requirejs"
     ],
-    // TODO: remove once the test content (e.g., Vue components) are removed from the code.
-    "isolatedDeclarations": false
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
   },
   "include": ["src/**/*"]
 }

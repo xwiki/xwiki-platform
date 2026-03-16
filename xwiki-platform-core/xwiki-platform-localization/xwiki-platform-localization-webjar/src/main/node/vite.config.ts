@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,6 +25,7 @@ import type { UserConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// TODO: replace with shared configuration once https://github.com/xwiki/xwiki-platform/pull/5169/ is merged
 // https://vite.dev/config/
 const userConfig: UserConfig = defineConfig({
   build: {
@@ -36,19 +36,11 @@ const userConfig: UserConfig = defineConfig({
       formats: ["es"],
     },
     sourcemap: true,
-    rollupOptions: {
-      external: ["vue", "vue-i18n"],
-      output: {
-        globals: {
-          vue: "Vue",
-        },
-      },
-    },
+    rollupOptions: {},
   },
   define: {
     // define process to avoid runtime error with jquery
     "process.env": {},
   },
-  plugins: [vue()],
 });
 export default userConfig;

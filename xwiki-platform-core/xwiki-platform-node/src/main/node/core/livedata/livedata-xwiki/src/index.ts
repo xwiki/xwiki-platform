@@ -18,6 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { XWikiLiveDataSource } from "./XWikiLiveDataSource";
-import { buildTranslations } from "./translations";
+import { initTranslationsBuilder } from "./translations";
 
-export { XWikiLiveDataSource, buildTranslations };
+export { XWikiLiveDataSource, initTranslationsBuilder };

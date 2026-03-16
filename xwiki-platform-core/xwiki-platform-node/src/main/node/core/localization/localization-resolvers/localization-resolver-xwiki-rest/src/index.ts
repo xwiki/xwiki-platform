@@ -37,8 +37,14 @@ export function translatorFactory(target: string): Translator {
     async resolve(query): Promise<Translations> {
       const queryKey = JSON.stringify(query);
       if (inflightRequests.has(queryKey)) {
-        return inflightRequests.get(queryKey);
+        return inflightRequests.get(queryKey)!;
       }
+
+      let _resolve!: (translation: Translations) => void;
+      const promise = new Promise<Translations>((resolve) => {
+        _resolve = resolve;
+      });
+      inflightRequests.set(queryKey, promise);
 
       const urlSearchParams = new URLSearchParams();
 
@@ -96,8 +102,11 @@ export function translatorFactory(target: string): Translator {
           );
         }
       }
-      // TODO: is it better to filter to return only the requested keys
-      return cache;
+
+      _resolve(cache);
+      inflightRequests.delete(queryKey);
+
+      return promise;
     },
   };
 }

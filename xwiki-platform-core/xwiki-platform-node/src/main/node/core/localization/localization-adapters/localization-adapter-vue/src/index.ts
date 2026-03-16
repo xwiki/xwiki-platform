@@ -23,8 +23,6 @@ import type { Query, Resolver } from "@xwiki/platform-localization-api";
 import type { Ref } from "vue";
 import type { Composer } from "vue-i18n";
 
-const inflightRequests = new Map<string, Promise<void>>();
-
 /**
  * @param resolver - the resolve to use to load the translations.
  * @param query - the query to execute
@@ -45,20 +43,8 @@ export function useRemoteI18n(
 
   const isLoading = ref(false);
 
-  // eslint-disable-next-line max-statements
   async function load(lang: string) {
-    const queryKey = JSON.stringify(query);
     isLoading.value = true;
-    if (inflightRequests.has(queryKey)) {
-      // In case of identical query already performed, blocks until the query is done.
-      // Then continue, the resolve will use the cache to resolve the keys again.
-      await inflightRequests.get(queryKey);
-    }
-    let _resolve!: () => void;
-    const promise = new Promise<void>((resolve) => {
-      _resolve = resolve;
-    });
-    inflightRequests.set(queryKey, promise);
 
     try {
       const res = await resolver.resolve(query);
@@ -67,7 +53,6 @@ export function useRemoteI18n(
       console.error(e);
     } finally {
       isLoading.value = false;
-      _resolve();
     }
   }
 

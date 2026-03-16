@@ -51,20 +51,20 @@
       <!-- Panel header buttons -->
       <div class="actions">
         <!-- Collapse panel button -->
-        <span class="action collapse-button" @click="collapsed = !collapsed">
+        <button class="action collapse-button" @click="collapsed = !collapsed">
           <XWikiIcon
             v-if="!collapsed"
             :icon-descriptor="{ name: 'arrow_in' }"
           />
           <XWikiIcon v-else :icon-descriptor="{ name: 'arrow_out' }" />
-        </span>
+        </button>
         <!-- Close panel button -->
-        <span
+        <button
           class="action close-button"
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
           <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
-        </span>
+        </button>
       </div>
     </div>
 

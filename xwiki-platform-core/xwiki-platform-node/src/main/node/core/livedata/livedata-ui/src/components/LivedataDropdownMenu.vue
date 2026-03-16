@@ -31,16 +31,15 @@
   -->
   <div class="livedata-dropdown-menu btn-group">
     <!-- Drowpdown open / close button-->
-    <a
+    <button
       class="btn btn-default dropdown-toggle"
       :title="$t('livedata.dropdownMenu.title')"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
-      role="button"
     >
       <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
-    </a>
+    </button>
 
     <!-- Drowpdown body -->
     <ul class="dropdown-menu dropdown-menu-right">

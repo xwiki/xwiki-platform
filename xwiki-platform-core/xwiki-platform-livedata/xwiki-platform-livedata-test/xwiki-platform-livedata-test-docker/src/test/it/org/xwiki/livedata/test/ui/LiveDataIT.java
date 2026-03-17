@@ -303,10 +303,10 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
 
-        // Take the focus on the is active filter.
+        // Take the focus on the "Is active" filter.
         suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
         suggestInputElement.sendKeys(Boolean.TRUE.toString());
-        suggestInputElement.waitForNonTypedSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions(false);
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -328,7 +328,7 @@ class LiveDataIT
         suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
-        suggestInputElement.waitForNonTypedSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions(false);
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();

@@ -89,7 +89,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     {
         WebElement element = getDriver().findElement(By.id("newBacklinkTarget"));
         SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-        suggestInputElement.clearSelectedSuggestions().sendKeys(target).selectTypedText();
+        suggestInputElement.click().waitForSuggestions().clearSelectedSuggestions().sendKeys(target).selectTypedText();
     }
 
     /**

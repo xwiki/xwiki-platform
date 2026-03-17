@@ -18,18 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { initialize } from "@xwiki/platform-localization-default";
-import { translatorFactory as translatorFactoryDom } from "@xwiki/platform-localization-resolver-dom";
 import { translatorFactory as translatorFactoryXWikiRest } from "@xwiki/platform-localization-resolver-xwiki-rest";
 import type {
   Query,
   TranslationsWithMissed,
 } from "@xwiki/platform-localization-api";
 
-XWiki.localization = XWiki.localization ?? {};
+XWiki._localization = XWiki._localization ?? {};
 
-XWiki.localization.resolver = initialize(
-  // TODO: introduce a mechanism to initialize translations in a hidden div element.
-  translatorFactoryDom("translations"),
+XWiki._localization.resolver = initialize(
   translatorFactoryXWikiRest(
     `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
   ),
@@ -70,7 +67,7 @@ define("xwiki-l10n", ["module"], () => ({
       const resolvedKeys: string[] = Array.isArray(query)
         ? query
         : query.keys.map((k) => queryPrefix + k);
-      XWiki.localization?.resolver
+      XWiki._localization?.resolver
         ?.resolve(query)
         .then((resolvedTranslations: TranslationsWithMissed) => {
           const translations = resolvedTranslations.translations;

@@ -19,5 +19,5 @@
  */
 import type { Resolver } from "@xwiki/platform-localization-api";
 
-// TODO: Remove once a component manager module is implemented (see XWIKI-24047).
-export const resolver: Resolver | undefined = XWiki?.localization?.resolver;
+// Re-export the private global resolver as a module constant for ES modules.
+export const resolver: Resolver | undefined = XWiki?._localization?.resolver;

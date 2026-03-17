@@ -15,7 +15,6 @@
   "dependencies": {
     "@xwiki/platform-localization-api": "workspace:*",
     "@xwiki/platform-localization-default": "workspace:*",
-    "@xwiki/platform-localization-resolver-dom": "workspace:*",
     "@xwiki/platform-localization-resolver-xwiki-rest": "workspace:*"
   },
   "devDependencies": {

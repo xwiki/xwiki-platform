@@ -25,6 +25,7 @@ declare global {
   const XWiki: {
     contextPath: string;
     currentWiki: string;
-    localization?: { resolver?: Resolver };
+    // This method is internal and is not expected to be used by contrib extensions.
+    _localization?: { resolver?: Resolver };
   };
 }

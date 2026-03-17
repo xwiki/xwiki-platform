@@ -98,7 +98,8 @@ export default {
         this.$nextTick(() => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           require(["xwiki-bootstrap-switch"], () => {
-            this.jQuery(this.$refs.input).bootstrapSwitch({
+            const jQuery = this.jQuery;
+            jQuery(this.$refs.input).bootstrapSwitch({
               size: "mini",
               state: component.innerChecked,
               disabled: component.innerDisabled,
@@ -127,12 +128,12 @@ export default {
                     component.innerChecked = checked;
                     component.innerDisabled = disabled;
                     // The last parameter is skip, preventing to call onSwitchChange again.
-                    this.jQuery(component.$refs.input).bootstrapSwitch(
+                    jQuery(component.$refs.input).bootstrapSwitch(
                       "state",
                       checked,
                       true,
                     );
-                    this.jQuery(component.$refs.input).bootstrapSwitch(
+                    jQuery(component.$refs.input).bootstrapSwitch(
                       "disabled",
                       disabled,
                     );

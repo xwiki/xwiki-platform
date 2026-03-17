@@ -56,6 +56,7 @@
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "pinia": "catalog:",

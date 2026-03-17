@@ -535,12 +535,19 @@ public class TableLayoutElement extends BaseElement
     {
         SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
         // Wait for the suggestions on selectize fields only if this is explicitly asked.
-        suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+        suggestInputElement.click().waitForSuggestions().clearSelectedSuggestions().sendKeys(content);
         if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
             suggestInputElement.waitForSuggestions().selectByVisibleText(content);
         } else {
             suggestInputElement.selectTypedText();
         }
+        // Sometimes, when the suggest input is focused, we need to click twice to perform an action (e.g. sort on a
+        // given column, open the "More actions" dropdown menu). The first click moves the focus to the new target (i.e.
+        // document.activeElement is updated) but the action is not performed until the second click. We couldn't
+        // reproduce this outside tests, and it doesn't reproduce for any suggest input filter in tests either, so we
+        // don't know if this is a Tom Select bug or some issue in Selenium / WebDriver, or a mix of both. The
+        // workaround is to blur the suggest input after selecting a value.
+        getDriver().executeScript("document.activeElement?.blur()");
     }
 
     private static void filterBooleanColumn(String content, WebElement filterElement)
@@ -551,7 +558,8 @@ public class TableLayoutElement extends BaseElement
             suggestInputElement.clearSelectedSuggestions().hideSuggestions();
         } else {
             suggestInputElement.clear().sendKeys(content);
-            suggestInputElement.waitForNonTypedSuggestions();
+            // The boolean filter doesn't need a remote source, so we don't need to wait for suggestions to be fetched.
+            suggestInputElement.waitForNonTypedSuggestions(false);
             suggestInputElement.selectByVisibleText(content);
         }
     }

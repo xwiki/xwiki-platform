@@ -37,6 +37,7 @@ import org.xwiki.user.UserReferenceResolver;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -141,10 +142,41 @@ class CurrentUserManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getUserReference()).thenReturn(null);
         when(this.contextProvider.get()).thenReturn(xcontext);
+        when(this.userReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
 
         DocumentUserReference targetUserReference = mock(DocumentUserReference.class);
         this.manager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, targetUserReference);
 
         verify(this.documentUserManager).hasAccess(Right.VIEW, GuestUserReference.INSTANCE, targetUserReference);
+    }
+
+    @Test
+    void hasAccessWhenCurrentTarget()
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
+        when(xcontext.getUserReference()).thenReturn(documentReference);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+
+        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, true);
+        when(this.userReferenceResolver.resolve(documentReference)).thenReturn(documentUserReference);
+
+        DocumentUserReference userUserReference = mock(DocumentUserReference.class);
+        this.manager.hasAccess(Right.VIEW, userUserReference, CurrentUserReference.INSTANCE);
+
+        verify(this.documentUserManager).hasAccess(Right.VIEW, userUserReference, documentUserReference);
+    }
+
+    @Test
+    void hasAccessWhenNoCurrentTarget()
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getUserReference()).thenReturn(null);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        when(this.userReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
+
+        DocumentUserReference userUserReference = mock(DocumentUserReference.class);
+        assertTrue(this.manager.hasAccess(Right.VIEW, userUserReference, CurrentUserReference.INSTANCE));
+        assertFalse(this.manager.hasAccess(Right.EDIT, userUserReference, CurrentUserReference.INSTANCE));
     }
 }

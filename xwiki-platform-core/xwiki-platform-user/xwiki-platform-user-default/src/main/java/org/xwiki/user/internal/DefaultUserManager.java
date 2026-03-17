@@ -99,19 +99,24 @@ public class DefaultUserManager implements UserManager
     {
         boolean hasAccess;
 
-        // Handle special cases
+        // Handle special cases.
         UserReference normalizedUserReference = user;
         if (normalizedUserReference == null) {
             normalizedUserReference = CurrentUserReference.INSTANCE;
         }
+        UserReference normalizedTargetReference = target;
+        if (normalizedTargetReference == null) {
+            normalizedTargetReference = CurrentUserReference.INSTANCE;
+        }
 
-        if (target == null || target == CurrentUserReference.INSTANCE
-            || target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE)
+        if (target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE) {
+            // The target is not an actual resource, its metadata can only be read.
+            hasAccess = right == Right.VIEW;
+        } else if (normalizedUserReference == CurrentUserReference.INSTANCE
+            || normalizedTargetReference == CurrentUserReference.INSTANCE)
         {
-            // The target is not an actual resource.
-            hasAccess = false;
-        } else if (normalizedUserReference == CurrentUserReference.INSTANCE) {
-            hasAccess = resolveUserManager(normalizedUserReference).hasAccess(right, normalizedUserReference, target);
+            hasAccess = resolveUserManager(CurrentUserReference.INSTANCE)
+                .hasAccess(right, normalizedUserReference, normalizedTargetReference);
         } else {
             // We know that "target" is an actual user resource, so we use it to resolve the manager.
             hasAccess = resolveUserManager(target).hasAccess(right, normalizedUserReference, target);

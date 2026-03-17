@@ -146,14 +146,11 @@ class DefaultUserManagerTest
     @Test
     void hasAccessWhenNonResourceTarget()
     {
-        assertFalse(this.userManager.hasAccess(Right.VIEW, SuperAdminUserReference.INSTANCE,
+        assertTrue(this.userManager.hasAccess(Right.VIEW, mock(UserReference.class), SuperAdminUserReference.INSTANCE));
+        assertTrue(this.userManager.hasAccess(Right.VIEW, mock(UserReference.class), GuestUserReference.INSTANCE));
+        assertFalse(this.userManager.hasAccess(Right.EDIT, mock(UserReference.class),
             SuperAdminUserReference.INSTANCE));
-        assertFalse(this.userManager.hasAccess(Right.VIEW, SuperAdminUserReference.INSTANCE,
-            GuestUserReference.INSTANCE));
-        assertFalse(this.userManager.hasAccess(Right.VIEW, SuperAdminUserReference.INSTANCE,
-            CurrentUserReference.INSTANCE));
-        assertFalse(this.userManager.hasAccess(Right.VIEW, SuperAdminUserReference.INSTANCE,
-            null));
+        assertFalse(this.userManager.hasAccess(Right.EDIT, mock(UserReference.class), GuestUserReference.INSTANCE));
     }
 
     @Test

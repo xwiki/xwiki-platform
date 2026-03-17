@@ -90,24 +90,27 @@ public class CurrentUserManager implements UserManager
     {
         boolean hasAccess;
 
-        // Note: the passed userReference is always CurrentUserReference.INSTANCE since this user manager is called
-        // only in this case. That's why it's not used.
+        // Resolve the current user reference into a real reference.
+        UserReference currentUserReference =
+            this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
 
-        if (target == null || target == CurrentUserReference.INSTANCE
-            || target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE)
+        // Resolve CurrentUserReferences instance(s).
+        UserReference resolvedUserReference = user;
+        if (resolvedUserReference == CurrentUserReference.INSTANCE) {
+            resolvedUserReference = currentUserReference;
+        }
+        UserReference resolvedTargetReference = target;
+        if (resolvedTargetReference == CurrentUserReference.INSTANCE) {
+            resolvedTargetReference = currentUserReference;
+        }
+
+        if (resolvedTargetReference == GuestUserReference.INSTANCE
+            || resolvedTargetReference == SuperAdminUserReference.INSTANCE)
         {
-            // The target is not an actual resource.
-            hasAccess = false;
+            // The target is not an actual resource, its metadata can only be read.
+            hasAccess = right == Right.VIEW;
         } else {
-            DocumentReference currentUserReference = getXWikiContext().getUserReference();
-            if (currentUserReference == null) {
-                // If there's no user in the context, then it means guest.
-                hasAccess = this.documentUserManager.hasAccess(right, GuestUserReference.INSTANCE, target);
-            } else {
-                // Resolve the current user reference into a real reference.
-                UserReference resolvedUserReference = this.userReferenceResolver.resolve(currentUserReference);
-                hasAccess = this.documentUserManager.hasAccess(right, resolvedUserReference, target);
-            }
+            hasAccess = this.documentUserManager.hasAccess(right, resolvedUserReference, resolvedTargetReference);
         }
 
         return hasAccess;

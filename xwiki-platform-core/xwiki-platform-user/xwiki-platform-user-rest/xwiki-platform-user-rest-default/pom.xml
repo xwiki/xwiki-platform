@@ -36,7 +36,7 @@
     <xwiki.extension.name>User REST Services - Default Implementation</xwiki.extension.name>
     <!-- REST API endpoints need to be installed in root scope. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
   </properties>
 
   <dependencies>

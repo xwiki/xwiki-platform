@@ -21,13 +21,13 @@ package org.xwiki.user.rest.internal.resources;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Objects;
 
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.Right;
@@ -89,30 +89,26 @@ public class UsersResourceImpl extends XWikiResource implements UsersResource
         try {
             UserScope wikiUserScope = this.wikiUserManager.getUserScope(wikiName);
             Collection<String> wikiMembers = this.wikiUserManager.getMembers(wikiName);
+            WikiReference wikiReference = getXWikiContext().getWikiReference();
+
+            // Tuple definition for the stream.
+            record UserEntry(String userId, UserReference userReference) { }
 
             // We use streams to handle pagination.
-            wikiMembers.stream().map(userId -> {
-                UserReference userReference = this.stringUserReferenceResolver.resolve(userId,
-                    getXWikiContext().getWikiReference());
-
-                if (this.isHidden(userReference, wikiUserScope)) {
-                    return null;
-                } else {
+            wikiMembers.stream()
+                .map(userId -> new UserEntry(userId, this.stringUserReferenceResolver.resolve(userId, wikiReference)))
+                .filter(user -> !isHidden(user.userReference(), wikiUserScope)
+                    && this.userManager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, user.userReference()))
+                .skip(start)
+                .limit(validateAndGetLimit(number))
+                .map(user -> {
                     try {
-                        if (this.userManager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, userReference)) {
-                            return userReferenceModelSerializer.toRestUserSummary(baseUri, userId, userReference);
-                        } else {
-                            return null;
-                        }
+                        return userReferenceModelSerializer.toRestUserSummary(baseUri, user.userId(),
+                            user.userReference());
                     } catch (XWikiException e) {
                         throw new RuntimeException(e);
                     }
-                }
-            })
-                .filter(Objects::nonNull)
-                .skip(start)
-                .limit(validateAndGetLimit(number))
-                .forEach(users.getUserSummaries()::add);
+                }).forEach(users.getUserSummaries()::add);
         } catch (WikiUserManagerException | RuntimeException e) {
             throw new XWikiRestException(e);
         }

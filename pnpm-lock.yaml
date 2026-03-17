@@ -1429,6 +1429,9 @@ importers:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)

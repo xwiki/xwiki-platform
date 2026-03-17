@@ -24,30 +24,20 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-icon-rest</artifactId>
+    <artifactId>xwiki-platform-guidedtour-rest</artifactId>
     <version>18.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-icon-rest-api</artifactId>
-  <name>XWiki Platform - Icon - REST - API</name>
+  <artifactId>xwiki-platform-guidedtour-rest-api</artifactId>
+  <name>XWiki Platform - Guided Tour - REST - API</name>
   <packaging>jar</packaging>
-  <description>The API of the Icon REST services.</description>
+  <description>The API of the Guided Tour REST services.</description>
   <properties>
-    <xwiki.extension.name>Icon REST Services API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.name>Guided Tour REST Services API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-stability</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -56,7 +46,7 @@
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
-          <generatePackage>org.xwiki.guidedtour.rest.model.jaxb</generatePackage>
+          <generatePackage>org.xwiki.icon.rest.model.jaxb</generatePackage>
         </configuration>
         <executions>
           <execution>

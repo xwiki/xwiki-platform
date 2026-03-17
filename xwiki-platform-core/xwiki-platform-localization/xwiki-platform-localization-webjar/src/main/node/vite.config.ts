@@ -18,29 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { defineConfig } from "vite";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import type { UserConfig } from "vite";
+import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// TODO: replace with shared configuration once https://github.com/xwiki/xwiki-platform/pull/5169/ is merged
-// https://vite.dev/config/
-const userConfig: UserConfig = defineConfig({
-  build: {
-    outDir: "../../../target/node-dist",
-    lib: {
-      entry: resolve(__dirname, "src/index.ts"),
-      fileName: (format, entryName) => `${entryName}.${format}.js`,
-      formats: ["es"],
-    },
-    sourcemap: true,
-    rollupOptions: {},
-  },
-  define: {
-    // define process to avoid runtime error with jquery
-    "process.env": {},
-  },
-});
-export default userConfig;
+export default generateWebjarNodeConfig(import.meta.url, [
+  "@xwiki/platform-localization-default",
+  "@xwiki/platform-localization-resolver-dom",
+  "@xwiki/platform-localization-resolver-xwiki-rest",
+]);

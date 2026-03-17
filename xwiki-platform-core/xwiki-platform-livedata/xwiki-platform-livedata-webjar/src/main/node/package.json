@@ -24,7 +24,7 @@
     "jquery": "4.x",
     "vue": "3.x",
     "vue-i18n": "11.x",
-    "xwiki-platform-localization": "*"
+    "xwiki-platform-localization-webjar": "*"
   },
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
@@ -50,6 +50,6 @@
     "vitest": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:",
-    "xwiki-platform-localization": "workspace:*"
+    "xwiki-platform-localization-webjar": "workspace:*"
   }
 }

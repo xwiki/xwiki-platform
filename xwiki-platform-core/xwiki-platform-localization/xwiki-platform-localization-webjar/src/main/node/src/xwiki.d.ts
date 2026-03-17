@@ -17,12 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { Resolver } from "@xwiki/platform-localization-api";
 
-import { generateConfig } from "./vite.minified.config";
-import { mergeConfig } from "vite";
+export {};
 
-export default mergeConfig(generateConfig("js"), {
-  build: {
-    minify: false,
-  },
-});
+declare global {
+  const XWiki: {
+    contextPath: string;
+    currentWiki: string;
+    localization?: { resolver?: Resolver };
+  };
+}

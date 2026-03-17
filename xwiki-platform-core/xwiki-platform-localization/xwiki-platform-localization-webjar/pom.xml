@@ -35,7 +35,7 @@
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <xwiki.extension.javascript.modules.importmap>{
-      "xwiki-platform-localization": "org.xwiki.platform:xwiki-platform-localization-webjar/index.es.js"
+      "xwiki-platform-localization-webjar": "org.xwiki.platform:xwiki-platform-localization-webjar/index.min.js"
     }</xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>

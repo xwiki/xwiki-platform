@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;
@@ -68,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UsersGroupsRightsManagementIT
 {
     @BeforeEach
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
@@ -583,5 +584,141 @@ class UsersGroupsRightsManagementIT
         membersTable.filterColumn("Member", newGroupName);
         membersTable.assertRow("Member", newGroupName);
         editGroupModal.close();
+    }
+
+    /**
+     * Validate that extension rights can be set for a page and its children.
+     * <ul>
+     * <li>Verify the "Extension Rights: Page & Children" section appears in page administration.</li>
+     * <li>Verify the custom test extension right appears and can be set.</li>
+     * <li>Verify the right applies to both the page and its children.</li>
+     * </ul>
+     */
+    @Test
+    @Order(11)
+    void setExtensionRightsForPageAndChildren(TestUtils setup, TestReference testReference)
+    {
+        String testName = testReference.getLastSpaceReference().getName();
+        String userName = String.format("%s_TestUser", testName);
+
+        // Create a test user
+        setup.deletePage("XWiki", userName);
+        setup.createUser(userName, userName, "");
+
+        // Create a parent page and a child page
+        String verifyScript = "{{velocity}}"
+            + "#if($services.security.authorization.hasAccess('testextensionright'))"
+            + "ALLOWED"
+            + "#{else}"
+            + "DENIED"
+            + "#end"
+            + "{{/velocity}}";
+
+        DocumentReference parentRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.createPage(parentRef, verifyScript, "Parent Page");
+
+        DocumentReference childRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "ChildPage");
+        setup.createPage(childRef, verifyScript, "Child Page");
+
+        // Navigate to the parent page and open the "Extension Rights: Page & Children" page administration section
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(parentRef.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Extension Rights: Page & Children");
+
+        // Get the rights pane and switch to users
+        EditRightsPane editRightsPane = new EditRightsPane();
+        editRightsPane.switchToUsers();
+        editRightsPane.waitUntilPageIsReady();
+
+        // Verify the user exists in the rights table
+        assertTrue(editRightsPane.hasEntity(userName));
+
+        // Deny the custom test extension right to the user
+        editRightsPane.setRight(userName, "rightsmanager.testextensionright", EditRightsPane.State.DENY);
+
+        // Verify the right was set on the parent WebHome page for the test user
+        setup.login(userName, userName);
+        ViewPage vp = setup.gotoPage(parentRef);
+
+        // Verify the custom right is denied for both parent and child pages
+        // Since we set rights on page+children, the right should be denied on both pages
+        // The custom right is registered with AuthorizationManager so it should be checked
+
+        // Check on the parent page
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on parent page");
+
+        // Check on the child page - the right should also be denied since we set it on page+children
+        vp = setup.gotoPage(childRef);
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on child page");
+    }
+
+    /**
+     * Validate that extension rights can be set for a page only (not its children).
+     * <ul>
+     * <li>Verify the "Extension Rights: Page" section appears in page administration.</li>
+     * <li>Verify the custom test extension right appears and can be set.</li>
+     * <li>Verify the right applies only to the page, not its children.</li>
+     * </ul>
+     */
+    @Test
+    @Order(12)
+    void setExtensionRightsForPageOnly(TestUtils setup, TestReference testReference)
+    {
+        String testName = testReference.getLastSpaceReference().getName();
+        String userName = String.format("%s_TestUser", testName);
+
+        // Create a test user
+        setup.deletePage("XWiki", userName);
+        setup.createUser(userName, userName, "");
+
+        // Create a parent page and a child page
+        String verifyScript = "{{velocity}}"
+            + "#if($services.security.authorization.hasAccess('testextensionright'))"
+            + "ALLOWED"
+            + "#{else}"
+            + "DENIED"
+            + "#end"
+            + "{{/velocity}}";
+
+        DocumentReference parentRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.createPage(parentRef, verifyScript, "Parent Page");
+
+        DocumentReference childRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "ChildPage");
+        setup.createPage(childRef, verifyScript, "Child Page");
+
+        // Navigate to the parent page and open the "Extension Rights: Page" page administration section
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(parentRef.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Extension Rights: Page");
+
+        // Get the rights pane and switch to users
+        EditRightsPane editRightsPane = new EditRightsPane();
+        editRightsPane.switchToUsers();
+        editRightsPane.waitUntilPageIsReady();
+
+        // Verify the user exists in the rights table
+        assertTrue(editRightsPane.hasEntity(userName));
+
+        // Deny the custom test extension right to the user
+        editRightsPane.setRight(userName, "rightsmanager.testextensionright", EditRightsPane.State.DENY);
+
+        // Verify the right was set on the parent WebHome page for the test user
+        setup.login(userName, userName);
+        ViewPage vp = setup.gotoPage(parentRef);
+
+        // Verify the custom right is denied for the parent page only
+        // Since we set rights for page-only, the right should be denied on the parent but allowed on the child
+
+        // Check on the parent page - should be DENIED
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on parent page");
+
+        // Check on the child page - should be ALLOWED since we only set page-only rights
+        vp = setup.gotoPage(childRef);
+        assertTrue(vp.getContent().contains("ALLOWED"),
+            "Custom right should be allowed on child page when set as page-only on parent");
     }
 }

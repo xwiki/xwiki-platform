@@ -313,8 +313,6 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   displayMacroParameter = function(parameter, featureRadioButton) {
     let output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
-    output.find('.macro-parameter-name').attr('for', 'parameter-' + parameter.id);
-    output.find('.macro-parameter-name').text(parameter.name);
     if (parameter.mandatory) {
       output.find('.mandatory').text('(' + translations.get('required') + ')');
     } else if (parameter.deprecated) {
@@ -325,7 +323,8 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);
     output.toggleClass('hidden', !!parameter.hidden);
-    output.append(displayMacroParameterField(parameter, featureRadioButton));
+    output.append(displayMacroParameterField(parameter, featureRadioButton,
+      output.find('.macro-parameter-name')));
     return output;
   },
 
@@ -371,14 +370,14 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return [value, valueInputs];
   },
 
-  displayMacroParameterField = function(parameter, featureRadioButton) {
+  displayMacroParameterField = function(parameter, featureRadioButton, forLabel) {
     let field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
     // Look for input elements whose name matches the parameter id.
     let valueInputs = field.find(':input').filter(function() {
       return $(this).attr('name') === parameter.id;
     });
     // set the id of the input
-    valueInputs.first().attr('id', 'parameter-' + parameter.id);
+    handleMacroParameterFieldId(parameter, valueInputs.first(), forLabel);
 
     let value = parameter.defaultValue;
     if (parameter.hasOwnProperty('value')) {
@@ -401,6 +400,20 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     }
     valueInputs.val(value);
     return field;
+  },
+
+  handleMacroParameterFieldId = function (parameter, firstInput, forLabel) {
+    let computedId = 'parameter-' + parameter.id;
+    if (typeof firstInput.attr('id') === 'string' && firstInput.attr('id') !== computedId) {
+      console.warn("An id attribute [%s] has been found on parameter [%o] input [%o] it won't be replaced by the" +
+        " computed ID, but this might lead to some inconsistencies in the form.", firstInput.attr('id'), firstInput,
+        parameter);
+      computedId = firstInput.attr('id');
+    } else {
+      firstInput.attr('id', computedId);
+    }
+    forLabel.attr('for', computedId);
+    forLabel.text(parameter.name);
   };
 
   return {

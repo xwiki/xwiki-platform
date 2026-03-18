@@ -235,7 +235,7 @@
             <!-- Include version.properties file -->
             <resource>
               <directory>${basedir}/src/main/filteredResources</directory>
-              <targetPath></targetPath>
+              <targetPath />
               <filtering>true</filtering>
             </resource>
           </webResources>

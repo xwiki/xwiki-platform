@@ -60,9 +60,9 @@
             :icon-descriptor="{ name: 'arrow_in' }"
           />
           <XWikiIcon v-else :icon-descriptor="{ name: 'arrow_out' }" />
-          <span class="sr-only">
-            {{ $t("livedata.panel.heading.actions.collapse.hint") }}
-          </span>
+          <span class="sr-only">{{
+            $t("panel.heading.actions.collapse.hint")
+          }}</span>
         </button>
         <!-- Close panel button -->
         <button
@@ -70,9 +70,9 @@
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
           <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
-          <span class="sr-only">
-            {{ $t("livedata.panel.heading.actions.close.hint") }}
-          </span>
+          <span class="sr-only">{{
+            $t("panel.heading.actions.close.hint")
+          }}</span>
         </button>
       </div>
     </div>

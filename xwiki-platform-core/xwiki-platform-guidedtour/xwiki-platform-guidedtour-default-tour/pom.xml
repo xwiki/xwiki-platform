@@ -35,7 +35,6 @@
   <!-- Name to display by the Extension Manager -->
   <xwiki.extension.name>Guided Tour Application</xwiki.extension.name>
   <xwiki.extension.category>application</xwiki.extension.category>
-  <xwiki.extension.icon>heart</xwiki.extension.icon>
 </properties>
 <dependencies>
   <!-- Runtime dependencies. -->

@@ -56,7 +56,7 @@
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
-          <generatePackage>org.xwiki.guidedtour.rest.model.jaxb</generatePackage>
+          <generatePackage>org.xwiki.icon.rest.model.jaxb</generatePackage>
         </configuration>
         <executions>
           <execution>

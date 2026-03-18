@@ -30,7 +30,7 @@ import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
- * @since 15.9RC1
+ * @since 18.4.0RC1
  */
 public class StepEditModal extends EditPage
 {

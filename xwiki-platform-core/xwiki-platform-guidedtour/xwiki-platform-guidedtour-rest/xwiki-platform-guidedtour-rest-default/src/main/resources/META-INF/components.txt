@@ -1,1 +1,1 @@
-org.xwiki.guidedtour.internal.DefaultIconThemesResource
+org.xwiki.guidedtour.internal.DefaultGuidedTourResource

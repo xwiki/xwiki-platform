@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
  * Exposes the guided tours through REST.
  *
  * @version $Id$
- * @since 13.4RC1
+ * @since 18.4.0RC1
  */
 @Path("/guidedTour")
 public interface GuidedTourResource

@@ -30,7 +30,7 @@ import org.xwiki.rest.XWikiRestComponent;
  * Default implementation of {@link GuidedTourResource}.
  *
  * @version $Id$
- * @since 13.4RC1
+ * @since 18.4.0RC1
  */
 @Component
 @Named("org.xwiki.guidedtour.internal.DefaultGuidedTourResource")

@@ -25,7 +25,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
  * Test of {@link DefaultGuidedTourResource}.
  *
  * @version $Id$
- * @since 13.4RC1
+ * @since 18.4.0RC1
  */
 @ComponentTest
 class DefaultGuidedTourResourceTest

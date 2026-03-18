@@ -46,7 +46,7 @@
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
-          <generatePackage>org.xwiki.icon.rest.model.jaxb</generatePackage>
+          <generatePackage>org.xwiki.guidedtour.rest.model.jaxb</generatePackage>
         </configuration>
         <executions>
           <execution>
@@ -65,7 +65,7 @@
             <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
             <id>default</id>
             <configuration>
-              <excludes>org/xwiki/icon/rest/model/jaxb/*.java</excludes>
+              <excludes>org/xwiki/guidedtour/rest/model/jaxb/*.java</excludes>
             </configuration>
           </execution>
         </executions>

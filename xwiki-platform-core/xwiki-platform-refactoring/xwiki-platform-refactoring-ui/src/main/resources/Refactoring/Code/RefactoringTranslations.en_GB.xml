@@ -36,10 +36,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: refactoring.configuration.delete.heading=
-### Missing: admin.delete=
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=
-### Missing: refactoring.configuration.delete.emptySection=
+  <content>refactoring.configuration.delete.heading=Delete Properties
+admin.delete=Delete
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=Can skip the recycle bin
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=When set to Yes, allows advanced users to choose whether they want to send pages to the recycle bin or delete them permanently when deleting pages. When set to No, pages are always sent to the recycle bin if it is active, otherwise they are always permanently deleted. The default value is No.
+refactoring.configuration.delete.emptySection=Nothing to configure in this section.
 </content>
 </xwikidoc>

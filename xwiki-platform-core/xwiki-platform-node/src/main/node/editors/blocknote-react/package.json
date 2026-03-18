@@ -74,6 +74,7 @@
     "@vitejs/plugin-react": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",

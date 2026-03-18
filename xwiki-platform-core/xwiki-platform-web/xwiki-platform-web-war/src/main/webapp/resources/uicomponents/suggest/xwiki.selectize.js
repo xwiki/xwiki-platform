@@ -283,7 +283,10 @@ define('xwiki-selectize', [
     var selectize = input.selectize;
     var values = $(input).val() || [];
     if (typeof values === 'string') {
-      if (selectize.settings.maxItems === 1) {
+      // In order to distinguish between no value (i.e. no constraint) and empty value (i.e. a constraint), both
+      // represented by an empty string when the underlying field is a text input rather than a select, we make the
+      // convension that a string consisting only in the configured delimiter indicates that empty evalue is selected.
+      if (selectize.settings.maxItems === 1 && values !== selectize.settings.delimiter) {
         values = [values];
       } else {
         values = values.split(selectize.settings.delimiter);

@@ -56,9 +56,7 @@ public class PageClassFieldTest extends AbstractClassEditorTest
         getUtil().createPage(className, "pageclassfieldpage2", "Content", className + " Page 2");
         getUtil().createPage(Arrays.asList(className, "space"), "pageclassfieldtesthome", "Content",
             className + " TestHome");
-        getUtil().gotoPage(className, getTestMethodName(), "edit",
-            "editor=inline&template=AppWithinMinutes.ClassTemplate&title=" + getTestMethodName() + " Class");
-        editor = new ApplicationClassEditPage();
+        goToEditor();
     }
 
     @Test
@@ -149,9 +147,9 @@ public class PageClassFieldTest extends AbstractClassEditorTest
         pagePicker.sendKeys(className, " testhome").waitForSuggestions().sendKeys(Keys.ENTER);
         selectedPages = pagePicker.getSelectedSuggestions();
         assertEquals(2, selectedPages.size());
-        assertEquals(className + " TestHome", selectedPages.get(0).getLabel());
-        assertEquals(className + " Page 2", selectedPages.get(1).getLabel());
-        assertEquals(Arrays.asList(className + ".space.pageclassfieldtesthome", className + ".pageclassfieldpage2"),
+        assertEquals(className + " Page 2", selectedPages.get(0).getLabel());
+        assertEquals(className + " TestHome", selectedPages.get(1).getLabel());
+        assertEquals(Arrays.asList(className + ".pageclassfieldpage2", className + ".space.pageclassfieldtesthome"),
             pagePicker.getValues());
 
         // Clear the list of selected pages.

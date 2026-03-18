@@ -65,6 +65,7 @@
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-livedata-componentstore": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "flush-promises": "catalog:",
     "jquery": "catalog:",

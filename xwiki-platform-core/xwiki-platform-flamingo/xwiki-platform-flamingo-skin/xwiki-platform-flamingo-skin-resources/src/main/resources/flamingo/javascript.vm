@@ -131,7 +131,10 @@
   }
 })
 #set ($jQueryModuleId = 'jQueryNoConflict')
-#if ($services.extension.installed.getInstalledExtension($jqueryMigrateId, "wiki:$xcontext.database"))
+## Check if the jQuery Migrate module is provided as a core extension or is installed.
+#if ($services.extension.core.getCoreExtension($jqueryMigrateId) ||
+    $services.extension.installed.getInstalledExtension($jqueryMigrateId, "wiki:$xcontext.database"))
+  ## Load jQuery through jQuery Migrate in order to have the backwards compatibility layer.
   #set ($jQueryModuleId = 'jquery-migrate')
   ## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also
   ## uses RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this

@@ -39,6 +39,14 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+
+catalogMode: strict
+cleanupUnusedCatalogs: true
+ignoredBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+onlyBuiltDependencies:
+  - nx
 catalog:
   "@blocknote/core": 0.47.1
   "@blocknote/mantine": 0.47.1
@@ -57,6 +65,7 @@ catalog:
   "@types/node": 24.12.0
   "@types/react": 19.2.7
   "@types/react-dom": 19.2.3
+  "@types/requirejs": 2.1.37
   "@types/sinon": 21.0.0
   "@vitejs/plugin-react": 5.1.0
   "@vitejs/plugin-vue": 6.0.4
@@ -65,6 +74,7 @@ catalog:
   "@vue/eslint-config-typescript": 14.7.0
   "@vue/test-utils": 2.4.6
   "@vue/tsconfig": 0.8.1
+  axe-core: 4.11.1
   bootstrap-icons: 1.13.1
   dompurify: 3.3.2
   eslint: 9.39.3
@@ -127,11 +137,3 @@ catalog:
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
   yjs: 13.6.29
-
-catalogMode: strict
-cleanupUnusedCatalogs: true
-ignoredBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-onlyBuiltDependencies:
-  - nx

@@ -128,6 +128,13 @@ public class SuggestInputElement extends BaseElement
     private WebElement container;
 
     /**
+     * Whether to wait for remove suggestions to be fetched when the dropdown is opened. This is used by
+     * {@link #waitForSuggestions()} when the caller doesn't specify whether the suggestions are loaded from a remote
+     * source or not.
+     */
+    private boolean shouldWaitForRemoteSuggestions;
+
+    /**
      * Checks if the suggest input widget is available on the given element.
      * 
      * @param executor the JavaScript executor used to check if the suggest input widget is available
@@ -176,6 +183,7 @@ public class SuggestInputElement extends BaseElement
     public SuggestInputElement click()
     {
         getDriver().executeScript("arguments[0].selectize.focus()", this.originalInput);
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -193,6 +201,7 @@ public class SuggestInputElement extends BaseElement
             click();
         }
         textInput.clear();
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -210,6 +219,7 @@ public class SuggestInputElement extends BaseElement
         // (like the balloon context toolbar shown when hovering a live data cell, with the action to edit the cell).
         clear();
         sendKeys(Keys.BACK_SPACE.toString().repeat(getSelectedSuggestions().size()));
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -223,6 +233,7 @@ public class SuggestInputElement extends BaseElement
         if (keysToSend != null) {
             maybeInsertReloadMarker();
             getTextInput().sendKeys(keysToSend);
+            this.shouldWaitForRemoteSuggestions = true;
         }
         return this;
     }
@@ -245,11 +256,21 @@ public class SuggestInputElement extends BaseElement
      * are not re-rendered. As a consequence, if two different queries have the same results, the content of the
      * suggestions dropdown is identical. The workaround is to detect when the content of the dropdown is cleared and
      * reloaded (even if the new content is the same).
+     * 
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
      */
-    private void waitForDropdownReload()
+    private void waitForDropdownReload(boolean remote)
     {
-        getDriver().waitUntilCondition(ExpectedConditions
-            .numberOfElementsToBe(By.cssSelector(".ts-dropdown.active .xwiki-selectize-dropdown-reload-marker"), 0));
+        if (remote) {
+            // Wait for remote suggestions to be fetched.
+            getDriver().waitUntilCondition(driver -> isLoading());
+        } else {
+            // Wait for cached suggestions.
+            getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(
+                By.cssSelector(".ts-dropdown.active .xwiki-selectize-dropdown-reload-marker"), 0));
+        }
+        this.shouldWaitForRemoteSuggestions = false;
     }
 
     /**
@@ -259,7 +280,21 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestions()
     {
-        waitForDropdownReload();
+        return waitForSuggestions(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until the suggestions have been loaded.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.2.0RC1
+     */
+    public SuggestInputElement waitForSuggestions(boolean remote)
+    {
+        waitForDropdownReload(remote);
+        // Wait for suggestions to be displayed.
         getDriver().waitUntilCondition(
             driver -> !isLoading() && !driver.findElements(By.cssSelector(".ts-dropdown.active")).isEmpty());
         return this;
@@ -275,7 +310,20 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForNonTypedSuggestions()
     {
-        waitForDropdownReload();
+        return waitForNonTypedSuggestions(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until suggestions beyond the option to choose the typed text are displayed.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.2.0RC1
+     */
+    public SuggestInputElement waitForNonTypedSuggestions(boolean remote)
+    {
+        waitForDropdownReload(remote);
         getDriver().waitUntilCondition(driver -> !isLoading()
             && !driver.findElements(By.cssSelector(".ts-dropdown.active .xwiki-selectize-option")).isEmpty());
         return this;

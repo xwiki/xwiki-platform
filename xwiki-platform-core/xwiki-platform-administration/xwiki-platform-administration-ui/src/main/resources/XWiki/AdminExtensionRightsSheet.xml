@@ -38,6 +38,14 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
+{{info}}
+  #set($webHomeRef = $services.model.resolveDocument('WebHome'))
+  ## For the children link, we do not use 'viewer=children' because the WebHome might not exist and the viewer shows a
+  ## 404 error in that case. Instead, we use 'xpage=children' because it always works, and because children document
+  ## could exist even if the parent document does not.
+  $services.localization.render('admin.pageandchildrenrights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
+{{/info}}
+
 {{html}}
   &lt;form method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" class="xform"&gt;
     ############################################################################################

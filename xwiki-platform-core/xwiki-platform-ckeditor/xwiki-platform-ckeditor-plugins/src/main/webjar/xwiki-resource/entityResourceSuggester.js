@@ -151,7 +151,7 @@ define('entityResourceSuggester', [
     // Remove the home icon from the location (breadcrumb) because it distracts the user (from the resource icon) and
     // because it doesn't bring additional information to identify the resource. We all know that every path starts
     // from home.
-    if (suggestion.hint.trim().startsWith('<img ')) {
+    if (suggestion.hint.trim().startsWith('<')) {
       const firstPathSeparatorIndex = suggestion.hint.indexOf(' / ');
       if (firstPathSeparatorIndex >= 0) {
         suggestion.hint = suggestion.hint.substring(firstPathSeparatorIndex + 3);

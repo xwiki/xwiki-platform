@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * @since 18.0.0RC1
- * @beta
- */
-type ImgProps = unknown;
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
 
-export type { ImgProps };
+export default generateConfig(import.meta.url);

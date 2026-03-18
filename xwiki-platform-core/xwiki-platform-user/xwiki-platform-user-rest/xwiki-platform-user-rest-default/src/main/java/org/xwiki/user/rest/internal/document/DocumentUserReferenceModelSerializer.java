@@ -129,10 +129,10 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         String historyUri = Utils.createURI(baseUri, UserResource.class,
                 documentUserReference.getReference().getWikiReference().getName(), userId)
             .toString();
-        Link historyLink = this.xwikiObjectFactory.createLink();
-        historyLink.setHref(historyUri);
-        historyLink.setRel(Relations.USER);
-        userSummary.withLinks(historyLink);
+        Link userLink = this.xwikiObjectFactory.createLink();
+        userLink.setHref(historyUri);
+        userLink.setRel(Relations.USER);
+        userSummary.withLinks(userLink);
 
         return userSummary;
     }

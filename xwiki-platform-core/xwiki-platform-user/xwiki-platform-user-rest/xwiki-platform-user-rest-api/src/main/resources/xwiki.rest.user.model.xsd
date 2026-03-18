@@ -70,13 +70,5 @@
     </complexContent>
   </complexType>
 
-  <element name="users">
-    <complexType>
-      <sequence>
-        <element name="userSummary" type="user:UserSummary" minOccurs="0" maxOccurs="unbounded"></element>
-      </sequence>
-    </complexType>
-  </element>
-
   <element name="user" type="user:User"></element>
 </schema>

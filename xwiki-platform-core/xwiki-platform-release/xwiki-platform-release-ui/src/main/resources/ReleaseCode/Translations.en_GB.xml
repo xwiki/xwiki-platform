@@ -40,11 +40,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: release.livetable.version=
-### Missing: release.livetable.releaseManagers=
-### Missing: release.livetable.releaseDate=
-### Missing: release.livetable.releaseNotes=
-### Missing: release.applicationsPanelEntryLabel=
+  <content>release.livetable.version=Version
+release.livetable.releaseManagers=Release Managers
+release.livetable.releaseDate=Released on
+release.livetable.releaseNotes=Release Notes
+release.applicationsPanelEntryLabel=Release
 ### Missing: release.livetable.emptyvalue=
 </content>
 </xwikidoc>

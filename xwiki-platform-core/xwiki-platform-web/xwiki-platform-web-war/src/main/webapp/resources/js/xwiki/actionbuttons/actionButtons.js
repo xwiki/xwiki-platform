@@ -248,9 +248,9 @@ var XWiki = (function(XWiki) {
         this.form?.enable();
       }
     },
-    getFormData: function(action) {
+    getFormData: function(action, forceAction = false) {
       const formData = new FormData(this.form);
-      if (this.hasFormAction(action)) {
+      if (forceAction || this.hasFormAction(action)) {
         formData.set(action, '');
       }
       return new URLSearchParams(formData);
@@ -274,7 +274,11 @@ var XWiki = (function(XWiki) {
       this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1;
+      let isCustomForm = this.form.action.indexOf("/preview/") === -1 && this.form.action.indexOf("/save/") === -1;
+      const customFormAttribute = this.form.dataset.customForm;
+      if (customFormAttribute !== undefined) {
+        isCustomForm = customFormAttribute !== 'false';
+      }
       if (isCustomForm && !isContinue) {
         return;
       }
@@ -312,7 +316,13 @@ var XWiki = (function(XWiki) {
       if (isContinue) {
         submitValue = 'action_saveandcontinue';
       }
-      var formData = this.getFormData(submitValue);
+
+      // If the submit button has a custom value, use it instead of the default action.
+      const customSubmitValue = event.element()?.dataset?.submitValue;
+      if (customSubmitValue) {
+        submitValue = customSubmitValue;
+      }
+      const formData = this.getFormData(submitValue, !!customSubmitValue);
       if (isContinue) {
         formData.set('minorEdit', '1');
       }

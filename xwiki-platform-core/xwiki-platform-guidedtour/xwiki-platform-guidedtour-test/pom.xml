@@ -38,13 +38,13 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-tour-test-pageobjects</module>
+    <module>xwiki-platform-guidedtour-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
       <id>docker</id>
       <modules>
-        <module>xwiki-platform-tour-test-docker</module>
+        <module>xwiki-platform-guidedtour-test-docker</module>
       </modules>
     </profile>
   </profiles>

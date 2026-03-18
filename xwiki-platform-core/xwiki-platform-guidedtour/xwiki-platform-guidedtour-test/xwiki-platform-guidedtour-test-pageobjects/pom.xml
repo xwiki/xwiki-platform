@@ -27,7 +27,7 @@
     <artifactId>xwiki-platform-guidedtour-test</artifactId>
     <version>18.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tour-test-pageobjects</artifactId>
+  <artifactId>xwiki-platform-guidedtour-test-pageobjects</artifactId>
   <name>XWiki Platform - Guided Tour - Tests - Page Objects</name>
   <description>Page Objects for Guided Tour Application - Tests</description>
   <dependencies>

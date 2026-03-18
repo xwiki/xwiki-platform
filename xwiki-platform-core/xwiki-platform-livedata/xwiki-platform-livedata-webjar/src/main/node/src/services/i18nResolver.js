@@ -48,6 +48,8 @@ const config = {
     "action.columnName.sortable.hint",
     "action.columnName.default.hint",
     "action.resizeColumn.hint",
+    "panel.heading.actions.collapse.hint",
+    "panel.heading.actions.close.hint",
     "panel.filter.title",
     "panel.filter.noneFilterable",
     "panel.filter.addConstraint",

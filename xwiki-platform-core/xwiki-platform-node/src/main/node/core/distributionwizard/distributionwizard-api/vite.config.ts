@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfigVue } from "../../vite.config";
+import { generateConfigVue } from "../../../vite.config";
 
 const conf: Record<string, unknown> = generateConfigVue(import.meta.url);
 export default conf;

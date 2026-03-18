@@ -408,9 +408,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-distributionwizard/xwiki-platform-distributionwizard-webjar/src/main/node:
     dependencies:
-      '@xwiki/platform-distributionwizard':
+      '@xwiki/platform-distributionwizard-api':
         specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/distributionwizard
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/distributionwizard/distributionwizard-api
     devDependencies:
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
@@ -985,7 +985,7 @@ importers:
         specifier: 'catalog:'
         version: 4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
 
-  xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard:
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard/distributionwizard-api:
     dependencies:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*

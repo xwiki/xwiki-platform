@@ -17,10 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import App from "./vue/App.vue";
-import WizardBreadcrumb from "./vue/WizardBreadcrumb.vue";
-import WizardDialog from "./vue/WizardDialog.vue";
-import WizardStep from "./vue/WizardStep.vue";
 
-//createApp(App).mount("#distributionWizard");
-export { App, WizardBreadcrumb, WizardDialog, WizardStep };
+import { generateConfigVue } from "../../../vite.config";
+
+const conf: Record<string, unknown> = generateConfigVue(import.meta.url);
+export default conf;

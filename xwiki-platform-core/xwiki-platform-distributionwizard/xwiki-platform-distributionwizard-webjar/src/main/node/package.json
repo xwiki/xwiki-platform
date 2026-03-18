@@ -9,7 +9,7 @@
     "test:unit": "exit 0 ## no test need for this package"
   },
   "dependencies": {
-    "@xwiki/platform-distributionwizard": "workspace:*"
+    "@xwiki/platform-distributionwizard-api": "workspace:*"
   },
   "peerDependencies": {
     "vue": "3.x"

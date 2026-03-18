@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/platform-distributionwizard",
+  "name": "@xwiki/platform-distributionwizard-api",
   "version": "18.2.0-SNAPSHOT",
   "description": "Provide UI components for the Distribution Wizard.",
   "license": "LGPL 2.1",
@@ -7,7 +7,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard/distributionwizard-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

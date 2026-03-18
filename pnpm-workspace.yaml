@@ -14,7 +14,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api
-  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils

@@ -58,13 +58,12 @@ public interface UserManager
     }
 
     /**
-     * Checks if the user identified by {@code user} has the access identified by {@code right} on the other user
-     * identified by {@code target}.
+     * Checks whether {@code user} has {@code right} access on the data of {@code target}.
      *
-     * @param right the right to check
-     * @param user the user to check the right for
-     * @param target the target user on which to check the right
-     * @return {@code true} if the user has the specified right on the target user, {@code false} otherwise
+     * @param right the access right to check
+     * @param user the user whose access right is being checked
+     * @param target the user whose data is being accessed
+     * @return {@code true} if {@code user} has {@code right} access on {@code target}'s data, {@code false} otherwise
      * @since 18.2.0RC1
      */
     @Unstable

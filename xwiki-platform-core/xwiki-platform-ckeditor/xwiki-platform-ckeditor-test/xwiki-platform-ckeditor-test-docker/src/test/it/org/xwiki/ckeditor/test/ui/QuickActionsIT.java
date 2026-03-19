@@ -498,7 +498,7 @@ class QuickActionsIT extends AbstractCKEditorIT
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{code language=\"none\"}}{{/code}}");
+        assertSourceEquals("{{code}}{{/code}}");
     }
 
     @Test

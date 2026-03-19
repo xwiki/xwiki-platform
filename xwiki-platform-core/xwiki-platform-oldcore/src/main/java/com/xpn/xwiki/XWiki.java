@@ -6037,7 +6037,7 @@ public class XWiki implements EventListener
                         return getAuthServiceManager().getAuthService();
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Failed to get the configured AuthService, fallbacking on standard authenticator", e);
+                    LOGGER.error("Failed to get the configured AuthService, falling back on standard authenticator", e);
 
                     this.authService = new XWikiAuthServiceImpl();
 

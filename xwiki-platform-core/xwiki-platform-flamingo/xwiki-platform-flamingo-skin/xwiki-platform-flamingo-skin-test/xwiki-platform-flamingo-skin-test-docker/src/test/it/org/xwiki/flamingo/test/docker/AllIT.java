@@ -206,4 +206,9 @@ public class AllIT
     class NestedWebJarsIT extends WebJarsIT
     {
     }
+
+    @Nested
+    class NestedSkinActionIT extends SkinActionIT
+    {
+    }
 }

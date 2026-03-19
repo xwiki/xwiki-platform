@@ -911,7 +911,7 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement getDropDownButton()
     {
-        return getRoot().findElement(By.cssSelector("a.dropdown-toggle"));
+        return getRoot().findElement(By.cssSelector("button.dropdown-toggle"));
     }
 
     /**

@@ -37,7 +37,7 @@ import org.xwiki.url.URLConfiguration;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -89,9 +89,6 @@ class ClassLoaderSkinTest
     @Test
     void getLocalResourceWithBreakInAttempt()
     {
-        assertNull(this.skin.getLocalResource("../../notskin/a"));
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Direct access to skin file [notskin/a] refused. Possible break-in attempt!",
-            this.logCapture.getMessage(0));
+        assertThrows(IllegalArgumentException.class, () -> this.skin.getLocalResource("../../notskin/a"));
     }
 }

@@ -107,6 +107,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
@@ -350,6 +351,8 @@ public class XWiki implements EventListener
     private XWikiURLFactoryService urlFactoryService;
 
     private XWikiCriteriaService criteriaService;
+
+    private Environment environment;
 
     /** Lock object used for the lazy initialization of the authentication service. */
     private final Object AUTH_SERVICE_LOCK = new Object();
@@ -868,6 +871,16 @@ public class XWiki implements EventListener
         }
 
         return this.coreExtensions;
+    }
+
+
+    private Environment getEnvironment()
+    {
+        if (this.environment == null) {
+            this.environment = Utils.getComponent(Environment.class);
+        }
+
+        return this.environment;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1657,16 +1670,12 @@ public class XWiki implements EventListener
 
     public URL getResource(String s) throws MalformedURLException
     {
-        return getEngineContext().getResource(s);
+        return getEnvironment().getResource(s);
     }
 
     public InputStream getResourceAsStream(String s) throws MalformedURLException
     {
-        InputStream is = getEngineContext().getResourceAsStream(s);
-        if (is == null) {
-            is = getEngineContext().getResourceAsStream("/" + s);
-        }
-        return is;
+        return getEnvironment().getResourceAsStream(s);
     }
 
     public String getResourceContent(String name) throws IOException

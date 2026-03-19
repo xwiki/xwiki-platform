@@ -6,7 +6,7 @@
 
 // @beta
 export type Query = string[] | {
-    prefix: string | undefined;
+    prefix?: string | undefined;
     keys: string[];
 };
 

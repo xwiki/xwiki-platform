@@ -24,7 +24,7 @@ type Query =
   | string[]
   | {
       // the prefix can be undefined for legacy support
-      prefix: string | undefined;
+      prefix?: string | undefined;
       keys: string[];
     };
 

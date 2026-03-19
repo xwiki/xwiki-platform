@@ -24,7 +24,7 @@ const TARGET = "https://example.com/translations";
 
 function mockFetch(translations: { key: string; rawSource: string }[]) {
   return vi.fn().mockResolvedValue({
-    json: vi.fn().mockResolvedValue({ translations }),
+    json: () => ({ translations }),
   });
 }
 
@@ -56,20 +56,20 @@ describe("translatorFactory", () => {
     const translator = translatorFactory(TARGET);
     await translator.resolve({ prefix: "ns.", keys: ["hello"] });
 
-    const calledUrl = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(calledUrl).toContain("prefix=ns.");
-    expect(calledUrl).toContain("key=hello");
+    expect(fetch).toHaveBeenCalledWith(
+      "https://example.com/translations?prefix=ns.&key=hello",
+      expect.anything(),
+    );
   });
 
   it("caches resolved keys and skips fetch on second call", async () => {
-    const fetchMock = mockFetch([{ key: "a.key", rawSource: "Hello" }]);
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("fetch", mockFetch([{ key: "a.key", rawSource: "Hello" }]));
 
     const translator = translatorFactory(TARGET);
     await translator.resolve(["a.key"]);
     await translator.resolve(["a.key"]); // should hit cache
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("skips already-cached keys in a mixed query", async () => {
@@ -81,22 +81,23 @@ describe("translatorFactory", () => {
 
     // Second call: a.key cached, b.key is new
     fetchMock.mockResolvedValue({
-      json: vi.fn().mockResolvedValue({
+      json: () => ({
         translations: [{ key: "b.key", rawSource: "World" }],
       }),
     });
 
     const result = await translator.resolve(["a.key", "b.key"]);
 
-    const calledUrl = fetchMock.mock.calls[1][0] as string;
-    expect(calledUrl).not.toContain("a.key");
-    expect(calledUrl).toContain("b.key");
+    expect(fetch).toHaveBeenCalledWith(
+      "https://example.com/translations?key=a.key",
+      expect.anything(),
+    );
+
     expect(result).toMatchObject({ "a.key": "Hello", "b.key": "World" });
   });
 
   it("deduplicates inflight requests for the same query", async () => {
-    const fetchMock = mockFetch([{ key: "a.key", rawSource: "Hello" }]);
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("fetch", mockFetch([{ key: "a.key", rawSource: "Hello" }]));
 
     const translator = translatorFactory(TARGET);
     const [r1, r2] = await Promise.all([
@@ -104,7 +105,7 @@ describe("translatorFactory", () => {
       translator.resolve(["a.key"]),
     ]);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect(r1).toBe(r2); // same promise reference
   });
 
@@ -125,27 +126,29 @@ describe("translatorFactory", () => {
   });
 
   it("skips fetch entirely when all keys are cached (no 'key' param)", async () => {
-    const fetchMock = mockFetch([{ key: "a.key", rawSource: "Hello" }]);
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("fetch", mockFetch([{ key: "a.key", rawSource: "Hello" }]));
 
     const translator = translatorFactory(TARGET);
     await translator.resolve(["a.key"]);
-    fetchMock.mockClear();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
 
     await translator.resolve(["a.key"]);
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    // Still one time after the second call since already resolved.
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("handles object query without prefix", async () => {
-    const fetchMock = mockFetch([{ key: "hello", rawSource: "Hi" }]);
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("fetch", mockFetch([{ key: "hello", rawSource: "Hi" }]));
 
     const translator = translatorFactory(TARGET);
     const result = await translator.resolve({ keys: ["hello"] });
 
-    const calledUrl = fetchMock.mock.calls[0][0] as string;
-    expect(calledUrl).not.toContain("prefix");
+    expect(fetch).toHaveBeenCalledWith(
+      "https://example.com/translations?key=hello",
+      expect.anything(),
+    );
     expect(result).toMatchObject({ hello: "Hi" });
   });
 });

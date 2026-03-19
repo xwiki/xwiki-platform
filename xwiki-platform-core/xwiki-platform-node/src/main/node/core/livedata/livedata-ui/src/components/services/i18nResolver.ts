@@ -21,8 +21,7 @@
 import type { Query, Translations } from "@xwiki/platform-localization-api";
 
 /**
- * @param i18n - the i18n instance to initialize
- * @param locale - the locale to load
+ * @param resolveTranslations - takes a translation query and returns resolved translations
  * @returns continues once the translation values are fetched remotely
  */
 export async function i18nResolver(

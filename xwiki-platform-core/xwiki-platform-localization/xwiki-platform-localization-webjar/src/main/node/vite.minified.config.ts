@@ -41,7 +41,7 @@ export function generateConfig(suffix: string) {
         },
         lib: {
           fileName(_: unknown, entryName: string) {
-            // Preserve backward compatibility
+            // Preserve backward compatibility (l10n.min.js must exist and be umd compatible).
             return `${entryName}.${suffix}`;
           },
         },

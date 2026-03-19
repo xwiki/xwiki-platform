@@ -34,8 +34,7 @@ define('imageWizard', ['jquery', 'imageSelector', 'imageEditor'], function($, im
       .then(backToSelectionOrFinish);
   }
 
-  function selectAndEdit(params) {
-    params = params || {};
+  function selectAndEdit(params = {}) {
     if (params.newImage === undefined) {
       params.newImage = true;
     }
@@ -45,15 +44,6 @@ define('imageWizard', ['jquery', 'imageSelector', 'imageEditor'], function($, im
   }
 
   return function(params) {
-    if (CKEDITOR.currentInstance) {
-      params.currentDocument = CKEDITOR.currentInstance.config.sourceDocument.documentReference;
-    }
-
-    // Skip the wizard if setImageData is set.
-    if (params.setImageData) {
-      return $.Deferred().resolve(params.setImageData);
-    }
-
     if (params.isInsert === false) {
       return editOnly(params);
     } else {

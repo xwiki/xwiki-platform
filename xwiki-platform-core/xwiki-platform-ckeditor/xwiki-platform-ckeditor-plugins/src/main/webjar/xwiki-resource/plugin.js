@@ -36,6 +36,7 @@
       // normally bundled with the code of this plugin so there no need for additional HTTP request to bring the code.
       require(['resource', 'resourcePicker.bundle'], function () {
         $resource = arguments[0];
+        Object.assign(CKEDITOR.plugins.xwikiResource, $resource);
       });
     },
 

@@ -163,19 +163,23 @@ define('imageEditor', [
     }
 
     function addChangeImageButton(insertButton, modal) {
-      var selectImageButton = $('<button type="button" class="btn btn-default pull-left"></button>')
+      const selectImageButton = $('<button type="button" class="btn btn-default pull-left"></button>')
         .text(translations.get('modal.changeImage.button'))
         .prependTo(insertButton.parent());
       selectImageButton.on('click', function() {
-        var imageData = getFormData(modal);
-        var modalInput = modal.data('input');
+        const imageData = getFormData(modal);
+        const input = modal.data('input');
         // New image is set to true only of it is already explicitly set as such.
-        var newImage = modalInput.newImage === true;
+        const newImage = input.newImage === true;
         modal.data('output', {
           action: 'selectImage',
-          editor: modalInput.editor,
-          imageData: imageData,
-          newImage: newImage
+          captionAllowed: input.captionAllowed,
+          currentDocument: input.currentDocument,
+          getImageResourceURL: input.getImageResourceURL,
+          imageData,
+          isHTML5: input.isHTML5,
+          newImage,
+          upload: input.upload,
         }).modal('hide');
       });
     }
@@ -188,9 +192,9 @@ define('imageEditor', [
      * @returns {*} a promise containing the image object
      */
     function loadImage(modal) {
-      var img = new Image();
+      const img = new Image();
 
-      var promise = $.Deferred();
+      const promise = $.Deferred();
 
       img.onload = function () {
         promise.resolve(this);
@@ -199,8 +203,8 @@ define('imageEditor', [
       img.onerror = function () {
         promise.reject(this);
       };
-      
-      var data = modal.data('input');
+
+      const data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
       if(!data.imageData.resourceReference) {
         // In case of pasted image, the resource reference is undefined. We initialize it the first time the image
@@ -210,7 +214,7 @@ define('imageEditor', [
           'reference': data.imageData.src
         };
       }
-      img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
+      img.src = data.getImageResourceURL(data.imageData.resourceReference);
       return promise;
     }
 
@@ -385,17 +389,17 @@ define('imageEditor', [
      * @param modal the modal to keep consistent
      */
     function addToggleAlignmentTextWrap(modal) {
-      var alignmentRadios = modal.find('[name="alignment"]');
-      var textWrapCheckbox = modal.find('[name="textWrap"]');
-      var noneAlignment = modal.find('[name="alignment"][value="none"]');
+      const alignmentRadios = modal.find('[name="alignment"]');
+      const textWrapCheckbox = modal.find('[name="textWrap"]');
+      const noneAlignment = modal.find('[name="alignment"][value="none"]');
 
-      alignmentRadios.change(function () {
+      alignmentRadios.on('change', function() {
         if (this.value !== 'none') {
           textWrapCheckbox.prop("checked", false);
         }
       });
 
-      textWrapCheckbox.change(function () {
+      textWrapCheckbox.on('change', function() {
         if (this.checked) {
           noneAlignment.prop("checked", true);
         }
@@ -404,24 +408,18 @@ define('imageEditor', [
 
     function initializeCaption(modal) {
       const params = modal.data('input');
-      const editor = params.editor;
-      const feature = editor.widgets.registered.image.features.caption;
-      const captionsAllowed = editor.filter.checkFeature(feature);
       const captionDd = $('#imageCaptionActivation').parents('dd');
       const captionDt = captionDd.prev();
-      if(captionsAllowed) {
-        captionDd.removeClass('hidden');
-        captionDt.removeClass('hidden');
-      } else {
-        captionDd.addClass('hidden');
-        captionDt.addClass('hidden');
+      captionDd.toggleClass('hidden', !params.captionAllowed);
+      captionDt.toggleClass('hidden', !params.captionAllowed);
+      if (!params.captionAllowed) {
         modal.data('input').imageData.hasCaption = false;
       }
-    } 
+    }
 
-    // Fetch modal content from a remote template the first time the image dialog editor is opened.
+    // Fetch modal content from a remote template the first time the image editor modal is opened.
     function initialize(modal) {
-      var params = modal.data('input');
+      const params = modal.data('input');
 
       // Update the button label according to the image state (new or updated image).
       if (params.newImage) {
@@ -430,16 +428,18 @@ define('imageEditor', [
         modal.find('.modal-footer .btn-primary').text(translations.get('modal.updateButton'));
       }
       
-      if (!modal.data('initialized')) {
-        var url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageEditorService', XWiki.EntityType.DOCUMENT))
+      if (modal.data('initialized')) {
+        updateForm(modal);
+      } else {
+        const url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageEditorService', XWiki.EntityType.DOCUMENT))
           .getURL('get');
         $.get(url, $.param({
           language: $('html').attr('lang'),
-          isHTML5: params.editor.config.htmlSyntax === 'annotatedhtml/5.0'
+          isHTML5: params.isHTML5
         }))
           .done(function(html, textState, jqXHR) {
-            var imageEditor = $('.image-editor');
-            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
+            const imageEditor = $('.image-editor');
+            const requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
             $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
             imageEditor.html(html);
             // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
@@ -456,17 +456,15 @@ define('imageEditor', [
             new XWiki.widgets.Notification(translations.get('modal.initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);
         });
-      } else {
-        updateForm(modal);
       }
     }
 
     function getFormData(modal) {
-      var resourceReference = modal.data('input').imageData.resourceReference;
-      var width = $("#imageWidth").val();
-      var height = $("#imageHeight").val();
+      const resourceReference = modal.data('input').imageData.resourceReference;
+      const width = $("#imageWidth").val();
+      const height = $("#imageHeight").val();
       return {
-        resourceReference: resourceReference,
+        resourceReference,
         imageStyle: $('#imageStyles').val(),
         alignment: $('#advanced [name="alignment"]:checked').val(),
         border: $('#advanced [name="imageBorder"]').prop('checked'),
@@ -474,27 +472,14 @@ define('imageEditor', [
         alt: $('#altText').val(),
         hasCaption: !!$("#imageCaptionActivation").prop('checked'),
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
-        width: width,
-        height: height,
-        src: getImageResourceURL(resourceReference, modal.data('input').editor, {
-          "parameters[queryString]": $.param({
-            width: width,
-            height: height
-          })
+        width,
+        height,
+        src: modal.data('input').getImageResourceURL(resourceReference, {
+          "parameters[queryString]": $.param({width, height})
         }),
         // Pass the data back to the widget so that it is re-loaded in the same state during the editing session.
         isLocked: modal.data('input').imageData.isLocked
       };
-    }
-
-    function getImageResourceURL(resourceReference, editor, params) {
-      var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor);
-      // Only set the params for resource reference that can support it. Sending the custom params to external urls does
-      // not make sense as they are not able to interpret them.
-      if (resourceReference.type !== 'url') {
-        resourceURL = resourceURL + '&' + $.param(params || {});
-      }
-      return resourceURL;
     }
 
     function updateAdvancedFromStyle(imageStyle, modal) {

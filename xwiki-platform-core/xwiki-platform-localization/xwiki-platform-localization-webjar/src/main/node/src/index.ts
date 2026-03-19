@@ -17,11 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { RequireConfig } from "./l10n";
 import type { Resolver } from "@xwiki/platform-localization-api";
 
 /**
  * Re-export the private global resolver as a module constant for ES modules.
- * @since 18.3.0RC1
+ * Since 18.3.0RC1
  * @beta
  */
-export const resolver: Resolver | undefined = XWiki?._localization?.resolver;
+export const resolver: Promise<Resolver> = new Promise((resolve) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require(["module"], (module: RequireConfig) => {
+    resolve(module.config().resolver);
+  });
+});

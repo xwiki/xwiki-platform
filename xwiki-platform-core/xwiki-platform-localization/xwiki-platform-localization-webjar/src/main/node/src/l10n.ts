@@ -21,16 +21,25 @@ import { initialize } from "@xwiki/platform-localization-default";
 import { translatorFactory as translatorFactoryXWikiRest } from "@xwiki/platform-localization-resolver-xwiki-rest";
 import type {
   Query,
+  Resolver,
   TranslationsWithMissed,
 } from "@xwiki/platform-localization-api";
 
-XWiki._localization = XWiki._localization ?? {};
+export type RequireConfig = {
+  config: () => { resolver: Resolver };
+};
 
-XWiki._localization.resolver = initialize(
-  translatorFactoryXWikiRest(
-    `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
-  ),
-);
+require.config({
+  config: {
+    "xwiki-l10n": {
+      resolver: initialize(
+        translatorFactoryXWikiRest(
+          `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
+        ),
+      ),
+    },
+  },
+});
 
 function transformTranslation(
   value: string | null,
@@ -55,7 +64,7 @@ function transformTranslation(
   }
 }
 
-define("xwiki-l10n", ["module"], () => ({
+define("xwiki-l10n", ["module"], (module: RequireConfig) => ({
   load(
     name: string,
     parentRequire: (names: string[], callback: (specs: Query) => void) => void,
@@ -67,8 +76,9 @@ define("xwiki-l10n", ["module"], () => ({
       const resolvedKeys: string[] = Array.isArray(query)
         ? query
         : query.keys.map((k) => queryPrefix + k);
-      XWiki._localization?.resolver
-        ?.resolve(query)
+      module
+        .config()
+        .resolver.resolve(query)
         .then((resolvedTranslations: TranslationsWithMissed) => {
           const translations = resolvedTranslations.translations;
           onLoad({
@@ -90,6 +100,12 @@ define("xwiki-l10n", ["module"], () => ({
             }
             return acc;
           }, {});
+        })
+        .catch((err: unknown) => {
+          console.error(
+            `An issue occurred during the resolution of localization query ${query}`,
+            err,
+          );
         });
     });
   },

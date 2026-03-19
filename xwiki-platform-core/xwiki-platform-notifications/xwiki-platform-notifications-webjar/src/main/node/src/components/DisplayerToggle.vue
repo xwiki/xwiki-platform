@@ -78,14 +78,41 @@ export default {
     return {
       // When this value changes to true following the ready from XWikiIcon, the toggle is initialized.
       iconReady: false,
-      innerChecked: this.entry[`${this.propertyId}_checked`],
-      innerDisabled: this.entry[`${this.propertyId}_disabled`],
-      innerData: {
-        ...this.entry[`${this.propertyId}_data`],
-      },
     };
   },
+  computed: {
+    innerChecked: {
+      get() {
+        return this.entry[`${this.propertyId}_checked`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_checked`] = val;
+      },
+    },
+    innerDisabled: {
+      get() {
+        return this.entry[`${this.propertyId}_disabled`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_disabled`] = val;
+      },
+    },
+    innerData: {
+      get() {
+        return this.entry[`${this.propertyId}_data`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_data`] = val;
+      },
+    },
+  },
   watch: {
+    innerChecked(checked) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("state", checked, true);
+    },
+    innerDisabled(disabled) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("disabled", disabled);
+    },
     iconReady: function(val) {
       if (val) {
         const component = this;
@@ -118,12 +145,11 @@ export default {
                     checked = state,
                     disabled = disabledVal,
                   }) {
+                    // Writing to computed setters updates `entry` directly —
+                    // the innerChecked/innerDisabled watchers then sync bootstrapSwitch.
                     component.innerData = data;
                     component.innerChecked = checked;
                     component.innerDisabled = disabled;
-                    // The last parameter is skip, preventing to call onSwitchChange again.
-                    jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                    jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
                   },
                 });
               },

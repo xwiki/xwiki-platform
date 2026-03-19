@@ -94,7 +94,7 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
   });
 
   // Mocks $t
-  global.$.fn.$t = stub();
+  global.$.fn.$t = sinon.stub();
   global.$.fn.$t.resolves({
     show: () => {},
   });

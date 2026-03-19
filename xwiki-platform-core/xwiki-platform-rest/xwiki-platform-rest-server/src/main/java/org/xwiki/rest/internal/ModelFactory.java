@@ -759,11 +759,12 @@ public class ModelFactory
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
     {
         return this.toRestPage(baseUri, self, doc, useVersion, withPrettyNames, withObjects, withXClass,
-            withAttachments, List.of());
+            withAttachments, List.of(), List.of());
     }
 
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
-        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights) throws XWikiException
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights,
+        List<String> supportedSyntaxes) throws XWikiException
     {
         Page page = this.objectFactory.createPage();
         toRestPageSummary(page, baseUri, doc, useVersion, withPrettyNames);
@@ -867,6 +868,11 @@ public class ModelFactory
             right.setValue(this.authorizationManagerProvider.get().hasAccess(checkRight,
                 doc.getDocumentReference()));
             page.withRights(right);
+        }
+
+        // Add html rendering if needed
+        if (!supportedSyntaxes.isEmpty() && !supportedSyntaxes.contains(page.getSyntax())) {
+            page.setRenderedContent(doc.displayDocument());
         }
 
         return page;

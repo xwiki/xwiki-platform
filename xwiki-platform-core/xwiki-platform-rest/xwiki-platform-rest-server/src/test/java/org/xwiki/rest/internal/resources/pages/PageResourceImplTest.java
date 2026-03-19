@@ -149,11 +149,12 @@ class PageResourceImplTest
         when(this.contextualAuthorizationManager.hasAccess(Right.COMMENT, testPageRef)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, testPageRef)).thenReturn(false);
 
-        Page page = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false, List.of());
+        Page page = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false, List.of(),
+            List.of());
         assertEquals(List.of(), page.getRights());
 
         Page pageWithRights = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false,
-            List.of("edit", "comment", "delete"));
+            List.of("edit", "comment", "delete"), List.of());
         List<org.xwiki.rest.model.jaxb.Right> rights = pageWithRights.getRights();
         assertEquals("edit", rights.get(0).getName());
         assertFalse(rights.get(0).isValue());
@@ -163,6 +164,6 @@ class PageResourceImplTest
         assertFalse(rights.get(2).isValue());
 
         assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
-            false, false, false, List.of("unknownRight")));
+            false, false, false, List.of("unknownRight"), List.of()));
     }
 }

@@ -51,7 +51,8 @@ public interface PageResource
             @QueryParam("objects") @DefaultValue("false") Boolean withObjects,
             @QueryParam("class") @DefaultValue("false") Boolean withClass,
             @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments,
-            @QueryParam("checkRight") List<String> checkRights
+            @QueryParam("checkRight") List<String> checkRights,
+            @QueryParam("supportedSyntax") List<String> supportedSyntaxes
     ) throws XWikiRestException;
 
     // FIXME: Write Javadoc describing the REST API parameters

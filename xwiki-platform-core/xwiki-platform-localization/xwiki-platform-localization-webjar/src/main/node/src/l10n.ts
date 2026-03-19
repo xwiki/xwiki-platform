@@ -21,25 +21,8 @@ import { initialize } from "@xwiki/platform-localization-default";
 import { translatorFactory as translatorFactoryXWikiRest } from "@xwiki/platform-localization-resolver-xwiki-rest";
 import type {
   Query,
-  Resolver,
   TranslationsWithMissed,
 } from "@xwiki/platform-localization-api";
-
-export type RequireConfig = {
-  config: () => { resolver: Resolver };
-};
-
-require.config({
-  config: {
-    "xwiki-l10n": {
-      resolver: initialize(
-        translatorFactoryXWikiRest(
-          `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
-        ),
-      ),
-    },
-  },
-});
 
 function transformTranslation(
   value: string | null,
@@ -64,49 +47,59 @@ function transformTranslation(
   }
 }
 
-define("xwiki-l10n", ["module"], (module: RequireConfig) => ({
-  load(
-    name: string,
-    parentRequire: (names: string[], callback: (specs: Query) => void) => void,
-    onLoad: (callback: unknown) => void,
-  ) {
-    parentRequire([name], (query: Query) => {
-      const queryPrefix: string =
-        (Array.isArray(query) ? undefined : query.prefix) ?? "";
-      const resolvedKeys: string[] = Array.isArray(query)
-        ? query
-        : query.keys.map((k) => queryPrefix + k);
-      module
-        .config()
-        .resolver.resolve(query)
-        .then((resolvedTranslations: TranslationsWithMissed) => {
-          const translations = resolvedTranslations.translations;
-          onLoad({
-            ...translations,
-            get(key: string, ...args: string[]): string | null {
-              return transformTranslation(
-                translations[queryPrefix + key] ?? null,
-                ...args,
-              );
-            },
+define("xwiki-l10n", [], () => {
+  const resolver = initialize(
+    translatorFactoryXWikiRest(
+      `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
+    ),
+  );
+  return {
+    _resolver: resolver,
+    load(
+      name: string,
+      parentRequire: (
+        names: string[],
+        callback: (specs: Query) => void,
+      ) => void,
+      onLoad: (callback: unknown) => void,
+    ) {
+      parentRequire([name], (query: Query) => {
+        const queryPrefix: string =
+          (Array.isArray(query) ? undefined : query.prefix) ?? "";
+        const resolvedKeys: string[] = Array.isArray(query)
+          ? query
+          : query.keys.map((k) => queryPrefix + k);
+        resolver
+          .resolve(query)
+          .then((resolvedTranslations: TranslationsWithMissed) => {
+            const translations = resolvedTranslations.translations;
+            onLoad({
+              ...translations,
+              get(key: string, ...args: string[]): string | null {
+                return transformTranslation(
+                  translations[queryPrefix + key] ?? null,
+                  ...args,
+                );
+              },
+            });
+            // Remove the prefix when returning the translations for the current query.
+            return Object.entries(translations).reduce<{
+              [key: string]: string;
+            }>((acc, [k, v]) => {
+              // We only return the keys from the query.
+              if (resolvedKeys.includes(k)) {
+                acc[k.substring(queryPrefix.length)] = v;
+              }
+              return acc;
+            }, {});
+          })
+          .catch((err: unknown) => {
+            console.error(
+              `An issue occurred during the resolution of localization query ${query}`,
+              err,
+            );
           });
-          // Remove the prefix when returning the translations for the current query.
-          return Object.entries(translations).reduce<{
-            [key: string]: string;
-          }>((acc, [k, v]) => {
-            // We only return the keys from the query.
-            if (resolvedKeys.includes(k)) {
-              acc[k.substring(queryPrefix.length)] = v;
-            }
-            return acc;
-          }, {});
-        })
-        .catch((err: unknown) => {
-          console.error(
-            `An issue occurred during the resolution of localization query ${query}`,
-            err,
-          );
-        });
-    });
-  },
-}));
+      });
+    },
+  };
+});

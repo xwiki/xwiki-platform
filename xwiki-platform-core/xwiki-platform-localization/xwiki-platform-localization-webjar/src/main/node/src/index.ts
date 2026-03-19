@@ -19,5 +19,9 @@
  */
 import type { Resolver } from "@xwiki/platform-localization-api";
 
-// Re-export the private global resolver as a module constant for ES modules.
+/**
+ * Re-export the private global resolver as a module constant for ES modules.
+ * @since 18.3.0RC1
+ * @beta
+ */
 export const resolver: Resolver | undefined = XWiki?._localization?.resolver;

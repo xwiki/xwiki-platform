@@ -24,7 +24,7 @@ import type {
 
 /**
  * @param id - the id of the hidden element containing the json of the translations
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 export function translatorFactory(id: string): Translator {

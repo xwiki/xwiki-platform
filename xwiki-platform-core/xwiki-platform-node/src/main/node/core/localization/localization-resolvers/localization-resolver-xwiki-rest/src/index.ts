@@ -24,7 +24,7 @@ import type {
 
 /**
  * @param target - the url of the rest endpoint to use to resolve translation
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 export function translatorFactory(target: string): Translator {

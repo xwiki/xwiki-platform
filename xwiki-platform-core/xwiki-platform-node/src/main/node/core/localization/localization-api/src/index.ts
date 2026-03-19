@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 type Query =
@@ -31,7 +31,7 @@ type Query =
 /**
  * A translator, take a query and returns a translation. Translators are expected to be chained, the next translations
  * received a query where keys resolved by the previous translator are removed.
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 type Translator = {
@@ -41,14 +41,14 @@ type Translator = {
 /**
  * A resolve translation, in the form of a map with the translation keys are keys and their associated translations
  * as values.
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 type Translations = { [key: string]: string };
 
 /**
  * An object holding the translations but also the requested keys that failed to be resolved.
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 type TranslationsWithMissed = {
@@ -58,7 +58,7 @@ type TranslationsWithMissed = {
 
 /**
  * The results of a full translation resolution. Including missed translations.
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 type Resolver = {

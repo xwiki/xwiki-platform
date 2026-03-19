@@ -26,7 +26,7 @@ import type {
 
 /**
  * @param translators - the list of translators to combine to build a full resolver.
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 export function initialize(...translators: Translator[]): Resolver {

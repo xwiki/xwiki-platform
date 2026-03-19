@@ -26,7 +26,7 @@ import type { Composer } from "vue-i18n";
 /**
  * @param resolver - the resolve to use to load the translations.
  * @param query - the query to execute
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 export function useRemoteI18n(

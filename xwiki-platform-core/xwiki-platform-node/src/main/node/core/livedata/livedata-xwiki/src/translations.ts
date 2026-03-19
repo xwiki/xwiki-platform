@@ -26,7 +26,7 @@ import type { I18n } from "vue-i18n";
 
 /**
  * @param resolver - the resolver to use when building the translation preloader
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  * @beta
  */
 function initTranslationsBuilder(

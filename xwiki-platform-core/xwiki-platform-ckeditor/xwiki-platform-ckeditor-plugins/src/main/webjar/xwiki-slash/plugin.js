@@ -878,10 +878,7 @@
           command: {
             name: 'xwiki-macro',
             data: {
-              name: 'code',
-              parameters: {
-                language: 'none'
-              },
+              name: 'code'
             }
           }
         },

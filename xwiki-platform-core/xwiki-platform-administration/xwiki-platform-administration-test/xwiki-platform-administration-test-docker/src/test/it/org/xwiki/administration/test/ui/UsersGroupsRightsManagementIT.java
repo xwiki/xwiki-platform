@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;

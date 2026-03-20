@@ -873,15 +873,17 @@ public class ModelFactory
         // Add html rendering if needed
         if (!supportedSyntaxes.isEmpty() && !supportedSyntaxes.contains(page.getSyntax())) {
             XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(doc.getDocumentReference(), xcontext);
-
-            // Set the right document for rendering.
             XWikiDocument oldDoc = xcontext.getDoc();
-            xcontext.setDoc(xwikiDocument);
 
-            page.setRenderedContent(doc.displayDocument());
+            try {
+                // Set the right document for rendering.
+                xcontext.setDoc(xwikiDocument);
 
-            // Reset context.
-            xcontext.setDoc(oldDoc);
+                page.setRenderedContent(doc.displayDocument());
+            } finally {
+                // Reset context.
+                xcontext.setDoc(oldDoc);
+            }
         }
 
         return page;

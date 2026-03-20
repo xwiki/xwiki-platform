@@ -75,6 +75,15 @@ function initWrapper({ provide } = {}) {
           template: "<i>{{ iconDescriptor.name }}</i>",
         },
       },
+      mocks: {
+        $t: (key) => {
+          const map = {
+            "livedata.panel.heading.actions.collapse.hint": "Collapse",
+            "livedata.panel.heading.actions.close.hint": "Close",
+          };
+          return map[key] || "unexpected key";
+        },
+      },
     },
   });
 }

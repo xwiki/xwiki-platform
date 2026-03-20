@@ -40,6 +40,15 @@ function initWrapper({ container }) {
           },
         },
       },
+      mocks: {
+        $t: (key) => {
+          const map = {
+            "livedata.panel.heading.actions.collapse.hint": "Collapse",
+            "livedata.panel.heading.actions.close.hint": "Close",
+          };
+          return map[key] || "unexpected key";
+        },
+      },
     },
     props: {
       panel: {
@@ -61,7 +70,7 @@ describe("LiveDataAdvancedPanelExtension.vue", () => {
 
   it("Displays the given container", async () => {
     const wrapper = initWrapper({ container });
-    expect(wrapper.find(".panel-heading").text()).toBe("Test Panel");
+    expect(wrapper.find(".panel-heading .title").text()).toBe("Test Panel");
     expect(wrapper.find(".extension-body > *").element).toBe(container);
   });
 

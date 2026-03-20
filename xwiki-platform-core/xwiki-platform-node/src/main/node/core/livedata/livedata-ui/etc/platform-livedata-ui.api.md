@@ -14,8 +14,8 @@ import { LiveDataSource } from '@xwiki/platform-livedata-api';
 import { loadById } from './services/require.js';
 import { populateStore } from './components/populateStore.js';
 import { PublicProps } from 'vue';
-import { TranslationQuery } from '@xwiki/platform-livedata-api';
-import { Translations } from '@xwiki/platform-livedata-api';
+import { Query } from '@xwiki/platform-localization-api';
+import { Translations } from '@xwiki/platform-localization-api';
 import { default as XWikiIcon } from './components/utilities/XWikiIcon.vue';
 
 export { BaseDisplayer }

@@ -172,17 +172,6 @@ export type Source = {
 };
 
 // @beta
-export type TranslationQuery = {
-    prefix: string;
-    keys: string[];
-};
-
-// @beta
-export type Translations = {
-    [p: string]: string;
-};
-
-// @beta
 export type Values = {
     [key: string]: string;
 };

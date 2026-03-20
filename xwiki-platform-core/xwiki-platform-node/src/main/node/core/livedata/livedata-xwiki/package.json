@@ -38,7 +38,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-livedata-api": "workspace:*"
+    "@xwiki/platform-livedata-api": "workspace:*",
+    "@xwiki/platform-localization-api": "workspace:*"
   },
   "peerDependencies": {
     "jquery": "4.x"

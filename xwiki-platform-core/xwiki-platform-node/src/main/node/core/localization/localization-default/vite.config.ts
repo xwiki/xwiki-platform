@@ -18,12 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// TODO: move to a dedicated module (see XWIKI-24006)
-/**
- * The translations result. It's a map of translation keys as keys, and their translation values in the requested locale
- * as values.
- * @since 18.2.0RC1
- * @beta
- */
-type Translations = { [p: string]: string };
-export type { Translations };
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
+
+export default generateConfig(import.meta.url);

@@ -758,4 +758,47 @@ public class PageResourceIT extends AbstractHttpIT
             this.testUtils.rest().delete(this.reference);
         }
     }
+
+    @Test
+    public void testGETRenderedContent() throws Exception
+    {
+        long time = System.currentTimeMillis();
+        final String title = String.format("Title (%s)", UUID.randomUUID());
+        final String content = String.format("Here is an attachment: image:Attachment.png (%d)", time);
+        final String renderedContent = String.format("<p>Here is an attachment: <img "
+            + "src=\"http://localhost:8080/xwiki/bin/download/PageResourceIT/testGETRenderedContent/Attachment.png\" "
+            + "class=\"wikimodel-freestanding wikigeneratedid\" id=\"IAttachment.png\" alt=\"Attachment.png\""
+            + "/>&nbsp;(%d)</p>", time);
+        final String comment = String.format("Updated title and content (%d)", System.currentTimeMillis());
+
+        Page originalPage = getFirstPage();
+
+        Page newPage = this.objectFactory.createPage();
+        newPage.setTitle(title);
+        newPage.setContent(content);
+        newPage.setComment(comment);
+
+        Link link = getFirstLinkByRelation(originalPage, Relations.SELF);
+        Assert.assertNotNull(link);
+
+        // PUT
+        PutMethod putMethod = executePutXml(link.getHref(), newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+
+        Assert.assertEquals(title, modifiedPage.getTitle());
+        Assert.assertEquals(content, modifiedPage.getContent());
+        Assert.assertEquals(comment, modifiedPage.getComment());
+
+        // GET
+        GetMethod getMethod = executeGet(link.getHref() + "?supportedSyntax=markdown/1.2");
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        Assert.assertEquals(title, modifiedPage.getTitle());
+        Assert.assertEquals(content, modifiedPage.getContent());
+        Assert.assertEquals(renderedContent, modifiedPage.getRenderedContent());
+        Assert.assertEquals(comment, modifiedPage.getComment());
+    }
 }

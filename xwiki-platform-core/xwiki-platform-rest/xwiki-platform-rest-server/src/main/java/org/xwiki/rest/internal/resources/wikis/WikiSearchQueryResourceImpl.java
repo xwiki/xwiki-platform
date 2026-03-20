@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.wikis;
 
 import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
@@ -56,6 +57,8 @@ public class WikiSearchQueryResourceImpl extends BaseSearchResult implements Wik
                     withPrettyNames, className));
 
             return searchResults;
+        } catch (WebApplicationException e) {
+            throw e;
         } catch (Exception e) {
             throw new XWikiRestException(e);
         }

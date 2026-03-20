@@ -458,51 +458,66 @@ public class WikisResourceIT extends AbstractHttpIT
     @Test
     public void testHQLQuerySearch() throws Exception
     {
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        setAllowedQueryTypes("solr,hql");
+        try {
+            this.testUtils.rest().delete(this.reference);
+            this.testUtils.rest().savePage(this.reference);
 
-        GetMethod getMethod = executeGet(URIUtil
-            .encodeQuery(String.format("%s?q=where doc.name='" + this.pageName + "' order by doc.space desc&type=hql",
-                buildURI(WikiSearchQueryResource.class, getWiki()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            GetMethod getMethod = executeGet(URIUtil
+                .encodeQuery(String.format("%s?q=where doc.name='" + this.pageName + "' order by doc.space desc&type=hql",
+                    buildURI(WikiSearchQueryResource.class, getWiki()))));
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        int resultSize = searchResults.getSearchResults().size();
-        Assert.assertEquals(1, resultSize);
-        Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+            int resultSize = searchResults.getSearchResults().size();
+            Assert.assertEquals(1, resultSize);
+            Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+        } finally {
+            resetAllowedQueryTypes();
+        }
     }
 
     @Test
     public void testHQLQuerySearchWithClassnameAuthenticated() throws Exception
     {
-        GetMethod getMethod = executeGet(
-            URIUtil.encodeQuery(String.format(
-                "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
-                buildURI(WikiSearchQueryResource.class, getWiki()))),
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        setAllowedQueryTypes("solr,hql");
+        try {
+            GetMethod getMethod = executeGet(
+                URIUtil.encodeQuery(String.format(
+                    "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
+                    buildURI(WikiSearchQueryResource.class, getWiki()))),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        int resultSize = searchResults.getSearchResults().size();
-        Assert.assertEquals(1, resultSize);
-        assertNotNull(searchResults.getSearchResults().get(0).getObject());
+            int resultSize = searchResults.getSearchResults().size();
+            Assert.assertEquals(1, resultSize);
+            assertNotNull(searchResults.getSearchResults().get(0).getObject());
+        } finally {
+            resetAllowedQueryTypes();
+        }
     }
 
     @Test
     public void testHQLQuerySearchWithClassnameNotAuthenticated() throws Exception
     {
-        GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format(
-            "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
-            buildURI(WikiSearchQueryResource.class, getWiki()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        setAllowedQueryTypes("solr,hql");
+        try {
+            GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format(
+                "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
+                buildURI(WikiSearchQueryResource.class, getWiki()))));
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        int resultSize = searchResults.getSearchResults().size();
-        Assert.assertEquals(1, resultSize);
-        assertNull(searchResults.getSearchResults().get(0).getObject());
+            int resultSize = searchResults.getSearchResults().size();
+            Assert.assertEquals(1, resultSize);
+            assertNull(searchResults.getSearchResults().get(0).getObject());
+        } finally {
+            resetAllowedQueryTypes();
+        }
     }
 
     @Test
@@ -772,5 +787,55 @@ public class WikisResourceIT extends AbstractHttpIT
             this.testUtils.rest().delete(ref1);
             this.testUtils.rest().delete(ref2);
         }
+    }
+
+    @Test
+    public void testForbiddenQueryType() throws Exception
+    {
+        // By default, only "solr" is allowed; "hql" and "xwql" are forbidden.
+        GetMethod getMethod = executeGet(
+            "%s?q=somequery&type=hql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        Assert.assertEquals(400, getMethod.getStatusCode());
+        Assert.assertEquals("Query type [hql] is not allowed. Allowed query types are: [solr].",
+            getMethod.getResponseBodyAsString());
+
+        getMethod = executeGet(
+            "%s?q=somequery&type=xwql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        Assert.assertEquals(400, getMethod.getStatusCode());
+        Assert.assertEquals("Query type [xwql] is not allowed. Allowed query types are: [solr].",
+            getMethod.getResponseBodyAsString());
+
+        // "solr" is allowed by default (no pages needed, just check the status is not 400).
+        getMethod = executeGet(
+            "%s?q=somequery&type=solr".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        Assert.assertNotEquals(400, getMethod.getStatusCode());
+
+        // After allowing "hql" via configuration, it should succeed.
+        setAllowedQueryTypes("solr,hql");
+        try {
+            getMethod = executeGet(URIUtil.encodeQuery(
+                "%s?q=where 1=0&type=hql".formatted(buildURI(WikiSearchQueryResource.class, getWiki()))));
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        } finally {
+            resetAllowedQueryTypes();
+        }
+    }
+
+    private void setAllowedQueryTypes(String allowedQueryTypes) throws Exception
+    {
+        Assert.assertEquals("", this.testUtils.executeWikiPlain("""
+            {{groovy}}
+            System.setProperty("xconf.xwikiproperties.rest.allowedQueryTypes", "%s")
+            {{/groovy}}
+            """.formatted(allowedQueryTypes), Syntax.XWIKI_2_1).trim());
+    }
+
+    private void resetAllowedQueryTypes() throws Exception
+    {
+        this.testUtils.executeWikiPlain("""
+            {{groovy}}
+            System.clearProperty("xconf.xwikiproperties.rest.allowedQueryTypes")
+            {{/groovy}}
+            """, Syntax.XWIKI_2_1);
     }
 }

@@ -279,8 +279,8 @@ export default {
 };
 </script>
 
-<style scoped>
-.filter-date {
+<style>
+.livedata-filter .filter-date {
   width: 100%;
   height: 100%;
 }

@@ -14,7 +14,7 @@ import { Translations } from '@xwiki/platform-localization-api';
 import { Values } from '@xwiki/platform-livedata-api';
 
 // @beta (undocumented)
-export function initTranslationsBuilder(resolver: Promise<Resolver>): (local: string, i18n: I18n) => (query: Query_2) => Promise<Translations>;
+export function initTranslationsBuilder(resolver: Resolver): (local: string, i18n: I18n) => (query: Query_2) => Promise<Translations>;
 
 // @beta (undocumented)
 export class XWikiLiveDataSource implements LiveDataSource {

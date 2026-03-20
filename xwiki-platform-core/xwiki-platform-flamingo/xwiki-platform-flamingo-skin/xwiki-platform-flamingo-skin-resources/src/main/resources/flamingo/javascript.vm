@@ -38,7 +38,7 @@
 ## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
 <script src="$escapetool.xml($services.webjars.url('prototype', 'prototype.js'))"></script>
 <script type="module"
-        src="$services.webjars.url('org.xwiki.platform:xwiki-platform-localizaiton-webjar', 'l10n.es.js')"></script>
+        src="$services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', 'l10n.es.js')"></script>
 ##
 ## Define the global require.js configuration
 ##

@@ -141,7 +141,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .livedata-filter,
 .livedata-filter-loader {
   display: inline-block;

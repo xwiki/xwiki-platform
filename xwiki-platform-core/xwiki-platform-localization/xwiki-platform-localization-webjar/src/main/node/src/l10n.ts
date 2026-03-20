@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { initialize } from "@xwiki/platform-localization-default";
-import { translatorFactory as translatorFactoryXWikiRest } from "@xwiki/platform-localization-resolver-xwiki-rest";
+
+import { resolver } from "./index";
 import type {
   Query,
   TranslationsWithMissed,
@@ -47,14 +47,8 @@ function transformTranslation(
   }
 }
 
-define("xwiki-l10n", [], () => {
-  const resolver = initialize(
-    translatorFactoryXWikiRest(
-      `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
-    ),
-  );
+define("xwiki-l10n", () => {
   return {
-    _resolver: resolver,
     load(
       name: string,
       parentRequire: (

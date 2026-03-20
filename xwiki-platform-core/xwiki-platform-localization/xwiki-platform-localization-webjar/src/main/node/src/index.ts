@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { initialize } from "@xwiki/platform-localization-default";
+import { translatorFactory as translatorFactoryXWikiRest } from "@xwiki/platform-localization-resolver-xwiki-rest";
 import type { Resolver } from "@xwiki/platform-localization-api";
 
 /**
@@ -24,9 +26,8 @@ import type { Resolver } from "@xwiki/platform-localization-api";
  * Since 18.3.0RC1
  * @beta
  */
-export const resolver: Promise<Resolver> = new Promise((resolve) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["xwiki-l10n"], ({ _resolver }: { _resolver: Resolver }) => {
-    resolve(_resolver);
-  });
-});
+export const resolver: Resolver = initialize(
+  translatorFactoryXWikiRest(
+    `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`,
+  ),
+);

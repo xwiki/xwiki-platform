@@ -18,11 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfig } from "./vite.minified.config";
+import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
 import { mergeConfig } from "vite";
+import { resolve } from "node:path";
 
-export default mergeConfig(generateConfig("js"), {
-  build: {
-    minify: false,
+export default mergeConfig(
+  generateWebjarNodeConfig(import.meta.url, [
+    "@xwiki/platform-localization-default",
+    "@xwiki/platform-localization-resolver-dom",
+    "@xwiki/platform-localization-resolver-xwiki-rest",
+  ]),
+  {
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, "src/index.ts"),
+          l10n: resolve(__dirname, "src/l10n.ts"),
+        },
+      },
+    },
   },
-});
+);

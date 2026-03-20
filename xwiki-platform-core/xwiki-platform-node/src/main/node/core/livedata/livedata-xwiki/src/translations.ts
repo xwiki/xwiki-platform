@@ -30,7 +30,7 @@ import type { I18n } from "vue-i18n";
  * @beta
  */
 function initTranslationsBuilder(
-  resolver: Promise<Resolver>,
+  resolver: Resolver,
 ): (local: string, i18n: I18n) => (query: Query) => Promise<Translations> {
   /**
    * Build the translation resolver.
@@ -41,7 +41,7 @@ function initTranslationsBuilder(
     return async function resolveTranslations(
       query: Query,
     ): Promise<Translations> {
-      const translations = (await (await resolver).resolve(query)).translations;
+      const translations = (await resolver.resolve(query)).translations;
       i18n.global.setLocaleMessage(locale, translations);
       return translations;
     };

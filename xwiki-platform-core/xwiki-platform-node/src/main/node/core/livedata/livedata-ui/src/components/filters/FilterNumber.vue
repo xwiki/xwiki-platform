@@ -48,8 +48,8 @@ export default {
 };
 </script>
 
-<style>
-.livedata-filter .filter-number {
+<style scoped>
+.filter-number {
   border: none;
   text-align: right;
 }

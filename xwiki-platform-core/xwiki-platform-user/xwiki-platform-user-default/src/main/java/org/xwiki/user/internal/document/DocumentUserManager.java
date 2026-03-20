@@ -19,10 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,9 +27,12 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -40,6 +40,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -70,6 +74,13 @@ public class DocumentUserManager implements UserManager
 
     @Inject
     private UserCache userCache;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     @Override
     public boolean exists(UserReference userReference) throws UserException
@@ -130,5 +141,14 @@ public class DocumentUserManager implements UserManager
         } catch (QueryException e) {
             throw new UserException("Failed to query users", e);
         }
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    {
+        DocumentReference userReference = this.documentUserReferenceSerializer.serialize(user);
+        DocumentReference targetReference = this.documentUserReferenceSerializer.serialize(target);
+
+        return this.authorizationManager.hasAccess(right, userReference, targetReference);
     }
 }

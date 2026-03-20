@@ -21,6 +21,7 @@ package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -55,4 +56,16 @@ public interface UserManager
     {
         return false;
     }
+
+    /**
+     * Checks whether {@code user} has {@code right} access on the data of {@code target}.
+     *
+     * @param right the access right to check
+     * @param user the user whose access right is being checked
+     * @param target the user whose data is being accessed
+     * @return {@code true} if {@code user} has {@code right} access on {@code target}'s data, {@code false} otherwise
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    boolean hasAccess(Right right, UserReference user, UserReference target);
 }

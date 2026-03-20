@@ -1679,4 +1679,19 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Default is 10 seconds.
 # diff.xml.dataURI.httpTimeout = 10
 
+#-------------------------------------------------------------------------------------
+# REST API
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.2.0, 17.10.5]
+#-# The list of query types allowed in REST API search queries (the "type" parameter).
+#-# Supported values: solr, hql, xwql
+#-# By default only "solr" is allowed. Enabling "hql" or "xwql" allows running arbitrary database queries via the
+#-# REST API, which can disclose sensitive information even to guest users and can produce expensive queries,
+#-# impacting the availability of the instance.
+#-# Set this to a comma-separated list of allowed types, e.g. "solr,hql" to also allow HQL queries.
+#-#
+#-# Default is "solr".
+# rest.allowedQueryTypes=solr
+
 $!xwikiPropertiesAdditionalProperties

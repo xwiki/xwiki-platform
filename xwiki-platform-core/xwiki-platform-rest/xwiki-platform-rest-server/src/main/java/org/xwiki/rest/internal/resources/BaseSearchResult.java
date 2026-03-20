@@ -30,9 +30,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -72,6 +75,10 @@ public class BaseSearchResult extends XWikiResource
     protected static final String QUERY_TEMPLATE_INFO =
         "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
+    private static final String ALLOWED_QUERY_TYPES_PROPERTY = "rest.allowedQueryTypes";
+
+    private static final List<String> DEFAULT_ALLOWED_QUERY_TYPES = List.of("solr");
+
     protected enum SearchScope
     {
         SPACES,
@@ -80,6 +87,10 @@ public class BaseSearchResult extends XWikiResource
         TITLE,
         OBJECTS
     }
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
@@ -602,16 +613,18 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Search for query using xwql, hql, lucene. Limit the search only to Pages. Search for keyword
-     * 
+     * Search for query using xwql, hql, solr. Limit the search only to Pages. Search for keyword
+     *
      * @param query the query to be executed
-     * @param queryTypeString can be "xwql", "hql" or "lucene".
+     * @param queryTypeString can be "xwql", "hql" or "solr".
      * @param orderField the field to be used to order the results.
      * @param order "asc" or "desc"
      * @param number number of results to be returned
      * @param start 0-based start offset.
-     * @return a list of {@link SearchResult} objects containing the found items, or an empty list if the specified
-     *         query type string doesn't represent a supported query type.
+     * @return a list of {@link SearchResult} objects containing the found items, or an empty list if no query type is
+     *         specified.
+     * @throws WebApplicationException with status 400 if the specified query type is not allowed according to the
+     *         {@code rest.allowedQueryTypes} configuration property
      */
     protected List<SearchResult> searchQuery(String query, String queryTypeString, String wikiName, String wikis,
         boolean hasProgrammingRights, String orderField, String order, boolean distinct, int number, int start,
@@ -628,8 +641,20 @@ public class BaseSearchResult extends XWikiResource
             List<SearchResult> result;
 
             if (queryTypeString != null) {
+                String normalizedQueryType = queryTypeString.toLowerCase();
+                List<String> allowedQueryTypes =
+                    this.configurationSource.getProperty(ALLOWED_QUERY_TYPES_PROPERTY, DEFAULT_ALLOWED_QUERY_TYPES);
+                if (!allowedQueryTypes.contains(normalizedQueryType)) {
+                    throw new WebApplicationException(
+                        Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Query type [%s] is not allowed. Allowed query types are: %s."
+                                .formatted(normalizedQueryType, allowedQueryTypes))
+                            .type("text/plain")
+                            .build());
+                }
+
                 SearchSource searchSource =
-                    this.componentManager.getInstance(SearchSource.class, queryTypeString.toLowerCase());
+                    this.componentManager.getInstance(SearchSource.class, normalizedQueryType);
 
                 result =
                     searchSource.search(query, wikiName, wikis, hasProgrammingRights, orderField, order,

@@ -45,6 +45,9 @@
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <xwikiPropertiesAdditionalProperties>\
+      test.prchecker.excludePattern=.*:Test\.Execute\..*
+    </xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -71,6 +74,20 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- For dynamic execution of Groovy code in tests. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- For displaying errors in tests (only needed in failure cases). -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-box</artifactId>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->

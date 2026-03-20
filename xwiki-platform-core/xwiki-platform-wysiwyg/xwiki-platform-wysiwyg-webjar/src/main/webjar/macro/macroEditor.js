@@ -147,9 +147,9 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       let parametersMap = macroParameterTree.parametersMap;
       output.append(macroParameterTree.mandatoryNodes.map(key => {
         let node = parametersMap[key];
-        return displayMacroParameterTreeNode(parametersMap, node, null);
+        return displayMacroParameterTreeNode(parametersMap, node, null, radioToCheck);
       }));
-      output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
+      output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes, radioToCheck));
     }
     // if there's only optional nodes and all nodes belongs to the same group, we don't display the tabs.
     // (note that optionalNodes contains always GROUP:defaultOptionalNodes, any other value means there's another
@@ -165,10 +165,10 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     return output.children();
   },
 
-  displayMacroParameterTreeNode = function(parametersMap, node, featureRadioButton) {
+  displayMacroParameterTreeNode = function(parametersMap, node, featureRadioButton, radioToCheck) {
     switch (node.type) {
-      case 'GROUP': return displayGroup(parametersMap, node);
-      case 'PARAMETER': return displayMacroParameter(node, featureRadioButton);
+      case 'GROUP': return displayGroup(parametersMap, node, radioToCheck);
+      case 'PARAMETER': return displayMacroParameter(node, featureRadioButton, radioToCheck);
     }
   },
 
@@ -184,7 +184,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
         </div>
       </div>`,
 
-  displayOptionalNodes = function(parametersMap, optionalNodeList) {
+  displayOptionalNodes = function(parametersMap, optionalNodeList, radioToCheck) {
     let output = $(macroParameterGroupOptionalsTemplate);
     let tabs = output.find('ul[role="tablist"]');
     let tabTemplate = tabs.children().remove();
@@ -196,7 +196,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       let tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
       // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
       tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.hidden);
-      fillNodeTab(parametersMap, childNode, tab.children().first(), tabPanel);
+      fillNodeTab(parametersMap, childNode, tab.children().first(), tabPanel, radioToCheck);
     });
     // Activate the first visible tab.
     let activeTab = tabs.children().not('.hidden').first();
@@ -216,7 +216,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       <div class="panel-body"></div>
     </div>`,
 
-  displayGroup = function (parametersMap, groupNode) {
+  displayGroup = function (parametersMap, groupNode, radioToCheck) {
     let isFeature = groupNode.featureOnly;
     let name = (isFeature) ? groupNode.featureName : groupNode.name;
     let output = $(macroFeatureContainerTemplate);
@@ -232,7 +232,8 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     let useRadioButtons = isFeature && !groupNode.singleParam;
     output.find('.panel-body').append(
         groupNode.children.map(nodeKey =>
-            createGroupNodeValue(parametersMap, nodeKey, groupNode.id, useRadioButtons, groupNode.mandatory)
+            createGroupNodeValue(parametersMap, nodeKey, groupNode.id, useRadioButtons, groupNode.mandatory,
+              radioToCheck)
     ));
     return output;
   },
@@ -243,10 +244,11 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
         <input type="radio" class="feature-radio" />
         <label class="feature-choice-name"></label>
       </div>
-      <div class="feature-choice-body"></div>
+      <fieldset class="feature-choice-body"></fieldset>
     </div>`,
 
-  createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory) {
+    // jshint maxparams:false
+    createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory, radioToCheck) {
     let paramNode = parametersMap[nodeKey];
     let radioName = 'feature-radio-' + featureName;
     let radioId = radioName + '-' + paramNode.id;
@@ -261,6 +263,16 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     nodeOutput.find('.feature-choice-name').attr('for', radioId);
     nodeOutput.find('.feature-choice-name').text(translations.get('selectFeature', paramNode.name));
 
+    if (isFeature && !hidden) {
+      nodeOutput.find('.feature-radio').on('change', function() {
+        let currentFeatureParameter = $(this).parents('.feature-parameter').first();
+        currentFeatureParameter.find('.feature-choice-body').prop('disabled', false);
+        currentFeatureParameter.siblings('.feature-parameter').each((index, element) => {
+          $(element).find('.feature-choice-body').prop('disabled', true);
+        });
+      });
+    }
+
     if (isFeature && isMandatory && !hidden) {
       nodeOutput.find('.feature-radio').on('change', function() {
         $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
@@ -271,7 +283,8 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     }
     nodeOutput
         .find('.feature-choice-body')
-        .append(displayMacroParameterTreeNode(parametersMap, paramNode, nodeOutput.find('.feature-radio')));
+        .append(displayMacroParameterTreeNode(parametersMap, paramNode, nodeOutput.find('.feature-radio'),
+          radioToCheck));
 
     if (isFeature) {
       nodeOutput.find('.feature-choice-body').addClass('with-choice');
@@ -280,7 +293,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
   },
 
   // The given node can be a group or a parameter.
-  fillNodeTab = function(parametersMap, node, tab, tabPanel) {
+  fillNodeTab = function(parametersMap, node, tab, tabPanel, radioToCheck) {
     const id = 'macroParameterTreeNode-' + node.id;
     tab.attr({
       'href': '#' + id,
@@ -293,7 +306,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       tabOutput = displayGroup(parametersMap, node);
     } else {
       tabOutput = childNodes.map(nodeKey =>
-          displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey], null));
+          displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey], null, radioToCheck));
     }
 
     tabPanel
@@ -314,7 +327,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       <div class="macro-parameter-description"></div>
     </div>`,
 
-  displayMacroParameter = function(parameter, featureRadioButton) {
+  displayMacroParameter = function(parameter, featureRadioButton, radioToCheck) {
     let output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
     if (parameter.mandatory) {
@@ -328,7 +341,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     output.toggleClass('mandatory', !!parameter.mandatory);
     output.toggleClass('hidden', !!parameter.hidden);
     output.append(displayMacroParameterField(parameter, featureRadioButton,
-      output.find('.macro-parameter-name')));
+      output.find('.macro-parameter-name'), radioToCheck));
     return output;
   },
 
@@ -374,7 +387,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     return [value, valueInputs];
   },
 
-  displayMacroParameterField = function(parameter, featureRadioButton, forLabel) {
+  displayMacroParameterField = function(parameter, featureRadioButton, forLabel, radioToCheck) {
     let field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
     // Look for input elements whose name matches the parameter id.
     let valueInputs = field.find(':input').filter(function() {
@@ -387,7 +400,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     if (parameter.hasOwnProperty('value')) {
       value = parameter.value;
       if (featureRadioButton) {
-        featureRadioButton.attr('checked', 'checked');
+        radioToCheck.push(featureRadioButton);
       }
     }
 
@@ -459,6 +472,12 @@ define('xwiki-wysiwyg-macro-editor', [
     macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer.display(macroDescriptor));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+
+    // check the radio buttons of the features
+    for (let radioButton of radioToCheck) {
+      radioButton.prop('checked', true);
+      radioButton.trigger('change');
+    }
   },
 
   maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData, macroParameters,

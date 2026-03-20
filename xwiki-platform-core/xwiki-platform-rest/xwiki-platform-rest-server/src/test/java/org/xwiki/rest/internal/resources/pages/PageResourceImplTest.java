@@ -60,6 +60,7 @@ import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -126,24 +127,7 @@ class PageResourceImplTest
         String spaceName = "TestSpace";
         String pageName = "TestPage";
 
-        XWikiDocument testPageMock = mock(XWikiDocument.class);
-        DocumentReference testPageRef = new DocumentReference(wikiName, spaceName, pageName);
-        Document testPageDoc = mock(Document.class);
-        when(this.xwiki.getDocument(testPageRef, this.context)).thenReturn(testPageMock);
-        when(testPageMock.getDocumentReference()).thenReturn(testPageRef);
-        when(testPageMock.newDocument(this.context)).thenReturn(testPageDoc);
-        when(testPageDoc.getDocumentReference()).thenReturn(testPageRef);
-        when(testPageDoc.getLocale()).thenReturn(Locale.ROOT);
-        when(testPageDoc.getRealLocale()).thenReturn(Locale.ROOT);
-        when(testPageDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
-        when(testPageDoc.getWiki()).thenReturn(wikiName);
-        when(testPageDoc.getComments()).thenReturn(new Vector<>());
-        when(testPageDoc.getAttachmentList()).thenReturn(new Vector<>());
-        when(testPageDoc.getxWikiObjects()).thenReturn(Map.of());
-        when(testPageDoc.getRCSVersion()).thenReturn(new Version(1, 0));
-        when(testPageDoc.getCreationDate()).thenReturn(new Date(0));
-        when(testPageDoc.getContentUpdateDate()).thenReturn(new Date(0));
-        when(testPageDoc.getAuthors()).thenReturn(mock(DocumentAuthors.class));
+        DocumentReference testPageRef = initTestPage(wikiName, spaceName, pageName);
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, testPageRef)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, testPageRef)).thenReturn(false);
         when(this.contextualAuthorizationManager.hasAccess(Right.COMMENT, testPageRef)).thenReturn(true);
@@ -165,5 +149,59 @@ class PageResourceImplTest
 
         assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
             false, false, false, List.of("unknownRight"), List.of()));
+    }
+
+    @Test
+    void testSupportedSyntaxes() throws XWikiRestException, XWikiException
+    {
+        String wikiName = "testWiki";
+        String spaceName = "TestSpace";
+        String pageName = "TestPage";
+
+        DocumentReference testPageRef = initTestPage(wikiName, spaceName, pageName);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, testPageRef)).thenReturn(true);
+
+        Page pageWithoutSupportedSyntaxes = this.pageResource.getPage(wikiName, spaceName, pageName, false, false,
+            false, false, List.of(), List.of());
+        assertEquals("XWiki content.", pageWithoutSupportedSyntaxes.getContent());
+        assertNull(pageWithoutSupportedSyntaxes.getRenderedContent());
+
+        Page pageWithoutRendering = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false,
+            false, List.of(), List.of("xwiki/2.1"));
+        assertEquals("XWiki content.", pageWithoutRendering.getContent());
+        assertNull(pageWithoutRendering.getRenderedContent());
+
+        Page pageWithRendering = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false,
+            false, List.of(), List.of("markdown/1.2"));
+        assertEquals("XWiki content.", pageWithRendering.getContent());
+        assertEquals("Rendered content.", pageWithRendering.getRenderedContent());
+    }
+
+    private DocumentReference initTestPage(String wikiName, String spaceName, String pageName) throws XWikiException
+    {
+        XWikiDocument testPageMock = mock(XWikiDocument.class);
+        DocumentReference testPageRef = new DocumentReference(wikiName, spaceName, pageName);
+        Document testPageDoc = mock(Document.class);
+        when(this.xwiki.getDocument(testPageRef, this.context)).thenReturn(testPageMock);
+
+        when(testPageMock.getDocumentReference()).thenReturn(testPageRef);
+        when(testPageMock.newDocument(this.context)).thenReturn(testPageDoc);
+
+        when(testPageDoc.getDocumentReference()).thenReturn(testPageRef);
+        when(testPageDoc.getLocale()).thenReturn(Locale.ROOT);
+        when(testPageDoc.getRealLocale()).thenReturn(Locale.ROOT);
+        when(testPageDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(testPageDoc.getWiki()).thenReturn(wikiName);
+        when(testPageDoc.getComments()).thenReturn(new Vector<>());
+        when(testPageDoc.getAttachmentList()).thenReturn(new Vector<>());
+        when(testPageDoc.getxWikiObjects()).thenReturn(Map.of());
+        when(testPageDoc.getRCSVersion()).thenReturn(new Version(1, 0));
+        when(testPageDoc.getCreationDate()).thenReturn(new Date(0));
+        when(testPageDoc.getContentUpdateDate()).thenReturn(new Date(0));
+        when(testPageDoc.getAuthors()).thenReturn(mock(DocumentAuthors.class));
+        when(testPageDoc.getContent()).thenReturn("XWiki content.");
+        when(testPageDoc.displayDocument()).thenReturn("Rendered content.");
+
+        return testPageRef;
     }
 }

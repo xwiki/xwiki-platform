@@ -259,7 +259,8 @@
             </revapi.differences>
             <revapi.differences>
               <justification>
-                Change in generated class of the REST model to add the renderedContent property .
+                Change in generated class of the REST model to add the optional renderedContent property. It is null by
+                default and does not impact existing usages of the generated class.
               </justification>
               <criticality>allowed</criticality>
               <differences>

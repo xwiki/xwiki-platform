@@ -605,7 +605,7 @@ define('guided-tour-utils', [], function() {
         if (queriedElement &amp;&amp; isElementVisible(queriedElement)) {
           return resolve(queriedElement);
         }
-        console.debug(`(${i}/${interval}) waiting for ${nextStep.element}...`);
+        console.debug(`(${i}/${maxIntervals}) waiting for ${selector}...`);
         await new Promise((resolve) =&gt; setTimeout(resolve, probeInterval));
       }
       console.debug(`Failed to find element &lt;${selector}&gt; in the page after waiting ${probeInterval * maxIntervals} (${probeInterval} * ${maxIntervals}) ms.`);

@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,14 +31,20 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
-import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.filter.output.DefaultFileOutputTarget;
 import org.xwiki.filter.output.OutputFilterStream;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
@@ -70,6 +79,12 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ExportAction extends XWikiAction
 {
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private Environment environment;
+
     /**
      * Define the different format supported by the export.
      */
@@ -314,9 +329,13 @@ public class ExportAction extends XWikiAction
                     xarProperties.setOptimized(optimized);
                 }
 
-                XWikiResponse response = context.getResponse();
+                // Write the XAR to a temporary file so that XARWikiWriter creates a file-backed (seekable)
+                // ZipArchiveOutputStream. This is required for Zip64 support (archives or entries >4 GB) and also
+                // enables setting a Content-Length header on the response.
+                File xarTempFile = new File(this.environment.getTemporaryDirectory(),
+                    "xar-export-%s.xar".formatted(RandomStringUtils.secure().nextAlphanumeric(8)));
 
-                xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+                xarProperties.setTarget(new DefaultFileOutputTarget(xarTempFile));
                 xarProperties.setPackageName(name);
                 if (description != null) {
                     xarProperties.setPackageDescription(description);
@@ -333,23 +352,7 @@ public class ExportAction extends XWikiAction
                 xarProperties.setPackageBackupPack(backup);
                 xarProperties.setPreserveVersion(backup || history);
 
-                BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
-                    .getComponent((Type) OutputFilterStreamFactory.class,
-                        FilterStreamType.XWIKI_XAR_CURRENT.serialize());
-
-                try (OutputFilterStream outputFilterStream
-                         = xarFilterStreamFactory.createOutputFilterStream(xarProperties))
-                {
-                    // Export
-                    response.setContentType("application/zip");
-                    response.addHeader("Content-disposition",
-                        "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
-
-                    inputFilterStream.read(outputFilterStream.getFilter());
-                }
-
-                // Flush
-                response.getOutputStream().flush();
+                performXARExport(context, xarProperties, inputFilterStream, xarTempFile);
             }
 
             // Indicate that we are done with the response so no need to add anything
@@ -403,6 +406,40 @@ public class ExportAction extends XWikiAction
         }
 
         return null;
+    }
+
+    private void performXARExport(XWikiContext context, XAROutputProperties xarProperties,
+        InputFilterStream inputFilterStream, File xarTempFile) throws IOException, FilterException
+    {
+        try {
+            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
+                .getComponent((Type) OutputFilterStreamFactory.class,
+                    FilterStreamType.XWIKI_XAR_CURRENT.serialize());
+
+            try (OutputFilterStream outputFilterStream
+                     = xarFilterStreamFactory.createOutputFilterStream(xarProperties))
+            {
+                inputFilterStream.read(outputFilterStream.getFilter());
+            }
+
+            // Stream the temporary XAR file to the response.
+            XWikiResponse response = context.getResponse();
+            response.setContentType("application/zip");
+            response.addHeader("Content-disposition",
+                "attachment; filename=" + Util.encodeURI(xarProperties.getPackageName(), context) + ".xar");
+            response.setContentLengthLong(xarTempFile.length());
+
+            try (InputStream in = Files.newInputStream(xarTempFile.toPath())) {
+                in.transferTo(response.getOutputStream());
+            }
+            response.getOutputStream().flush();
+        } finally {
+            try {
+                FileUtils.delete(xarTempFile);
+            } catch (IOException e) {
+                this.logger.warn("Failed to delete temporary XAR export file [{}]", xarTempFile, e);
+            }
+        }
     }
 
     private DocumentSelectionResolver getDocumentSelectionResover()

@@ -33,11 +33,14 @@ import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStream;
 import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.FileOutputTarget;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.filter.output.OutputTarget;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
@@ -78,7 +81,8 @@ class ExportActionTest
     @Mock
     BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory;
 
-    private ExportAction action = new ExportAction();
+    @InjectMockComponents
+    private ExportAction action;
 
     @Mock
     private XWikiRequest request;
@@ -100,8 +104,17 @@ class ExportActionTest
         when(this.inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
         this.oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
             FilterStreamType.XWIKI_XAR_CURRENT.serialize(), this.xarFilterStreamFactory);
+
+        // The XAR export writes to a temporary directory: create the expected .xar file so that streaming succeeds.
         when(this.xarFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class)))
-            .thenReturn(mock(BeanOutputFilterStream.class));
+            .thenAnswer(invocation -> {
+                XAROutputProperties props = invocation.getArgument(0);
+                OutputTarget target = props.getTarget();
+                if (target instanceof FileOutputTarget fileTarget && !fileTarget.getFile().isDirectory()) {
+                    fileTarget.getFile().createNewFile();
+                }
+                return mock(BeanOutputFilterStream.class);
+            });
     }
 
     @Test

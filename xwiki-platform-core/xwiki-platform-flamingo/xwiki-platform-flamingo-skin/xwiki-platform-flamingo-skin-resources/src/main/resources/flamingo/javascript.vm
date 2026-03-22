@@ -104,6 +104,7 @@
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js'),
+    'xwiki-suggestAttachments-bundle': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js'),
     'xwiki-tree-finder': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""finder${jsExtension}""))",
     'xwiki-tree': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""tree${jsExtension}""))"
   },
@@ -121,7 +122,16 @@
       'exports': 'XWiki'
     }
   },
-  'bundles': {},
+  'bundles': {
+    'xwiki-suggestAttachments-bundle': [
+      'xwiki-attachments-store',
+      'xwiki-attachments-filter',
+      'xwiki-file-picker',
+      'xwiki-suggestAttachments-messages',
+      'xwiki-suggestAttachments',
+      'xwiki-attachmentResourcePicker'
+    ]
+  },
   'config': {
     'xwiki-selectize': {
       'css': [

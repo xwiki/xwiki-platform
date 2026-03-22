@@ -20,8 +20,7 @@
 /*!
 #set ($paths = {
   'css': {
-    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins',
-      'xwiki-macro/macroWizard.min.css', {'evaluate': true})
+    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-wysiwyg-webjar', 'webjar.bundle.min.css')
   }
 })
 #set ($l10nKeys = [
@@ -68,7 +67,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
 
   var getMacroWizard = function(ckeditor) {
     return new Promise((resolve, reject) => {
-      require(['macroWizard'], function(macroWizard) {
+      require(['xwiki-wysiwyg-macro-wizard'], function(macroWizard) {
         resolve({ckeditor, macroWizard});
       });
     });

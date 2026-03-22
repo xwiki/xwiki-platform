@@ -22,7 +22,7 @@
   const $ = jQuery;
 
   function disableResizer(widget) {
-    require(['imageStyleClient'], function (imageStyleClient) {
+    require(['xwiki-wysiwyg-image-style-client'], function (imageStyleClient) {
       widget.resizer.removeClass('hidden');
       var styleId = widget.data.imageStyle;
       if (styleId) {
@@ -100,7 +100,7 @@
     if (setImageData) {
       updateImage(setImageData);
     } else {
-      require(['imageWizard'], function(imageWizard) {
+      require(['xwiki-wysiwyg-image-wizard'], function(imageWizard) {
         imageWizard({
           captionAllowed: editor.filter.checkFeature(editor.widgets.registered.image.features.caption),
           currentDocument: editor.config.sourceDocument.documentReference,
@@ -194,7 +194,7 @@
           '</div>' +
           '</li>',
         feed: function (opts, callback) {
-          require(['attachmentService'], function (attachmentService) {
+          require(['xwiki-wysiwyg-attachment-service'], function (attachmentService) {
 
 
             const attachmentToItem = function (attachment) {
@@ -330,14 +330,7 @@
           }
 
           if (item.id === "_uploadImage") {
-            // Reuse attachment suggest code to show the file picker. Provides the xwiki-file-picker module.
-            const requiredSkinExtensions = `<script src=` +
-              `'${XWiki.contextPath}/${XWiki.servletpath}` +
-              `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
-              `defer='defer'></script>`;
-            $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-
-            require(['attachmentService', 'xwiki-file-picker'], (attachmentService, filePicker) => {
+            require(['xwiki-wysiwyg-attachment-service', 'xwiki-file-picker'], (attachmentService, filePicker) => {
               // Open the file picker.
               filePicker.pickLocalFiles({
                 accept: "image/*",

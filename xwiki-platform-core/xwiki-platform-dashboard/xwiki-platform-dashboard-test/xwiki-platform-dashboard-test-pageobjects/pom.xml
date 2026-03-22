@@ -38,7 +38,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

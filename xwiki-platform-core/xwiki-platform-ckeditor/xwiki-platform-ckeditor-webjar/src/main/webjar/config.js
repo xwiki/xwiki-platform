@@ -87,7 +87,7 @@ CKEDITOR.editorConfig = function(config) {
     // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,
-    // This is used in CKEditor.FileUploader so we must keep them in sync.
+    // This is used in XWiki.WYSIWYG.FileUploader so we must keep them in sync.
     fileTools_defaultFileName: '__fileCreatedFromDataURI__', // jshint ignore:line
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,

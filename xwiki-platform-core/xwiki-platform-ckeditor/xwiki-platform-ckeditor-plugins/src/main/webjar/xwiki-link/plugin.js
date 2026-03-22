@@ -123,7 +123,7 @@
           // We use the source document to compute the feed URL because we want the suggested link references to be
           // relative to the edited document (we want the editor to output relative references as much as possible).
           $.getJSON(editor.config.sourceDocument.getURL('get', $.param({
-            sheet: 'CKEditor.LinkSuggestions',
+            sheet: 'XWiki.WYSIWYG.LinkSuggestions',
             outputSyntax: 'plain',
             language: XWiki.locale,
             input: opts.query
@@ -163,14 +163,6 @@
         outputTemplate: function (item) {
           // Upload a new attachment.
           if (item.id === "_uploadAttachment") {
-
-            // Reuse attachment suggest code to show the file picker. Provides the xwiki-file-picker module.
-            const requiredSkinExtensions = `<script src=` +
-              `'${XWiki.contextPath}/${XWiki.servletpath}` +
-              `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
-              `defer='defer'></script>`;
-            $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-
             require(['xwiki-file-picker'], function(filePicker) {
               // Open the file picker
               filePicker.pickLocalFiles({

@@ -21,6 +21,7 @@ package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 /**
  * Represents the CKEditor balloon tool bar that provides context actions for the selected element.

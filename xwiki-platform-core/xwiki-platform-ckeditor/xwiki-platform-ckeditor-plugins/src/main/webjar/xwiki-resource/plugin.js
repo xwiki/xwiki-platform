@@ -34,7 +34,7 @@
       // Note that $resource may be initialized after its first use, but the chances are very low because $resource is
       // used in a dialog (e.g. insert link) that is opened after the editor is ready, and the resource picker code is
       // normally bundled with the code of this plugin so there no need for additional HTTP request to bring the code.
-      require(['resource', 'resourcePicker.bundle'], function () {
+      require(['xwiki-wysiwyg-resource', 'xwiki-wysiwyg-resource-picker-bundle'], function () {
         $resource = arguments[0];
         Object.assign(CKEDITOR.plugins.xwikiResource, $resource);
       });
@@ -46,7 +46,7 @@
         // We use the source document to compute the resource dispatcher URL because the resource reference can be
         // relative and thus it needs to be resolved relative to the edited document.
         dispatcher: editor.config.sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.ResourceDispatcher',
+          sheet: 'XWiki.WYSIWYG.ResourceDispatcher',
           outputSyntax: 'plain',
           language: editor.getContentLocale()
         }))
@@ -200,7 +200,9 @@
           }
         },
         validateAsync(resourceReference) {
-          return $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+          const serviceReference = XWiki.Model.resolve('XWiki.WYSIWYG.LinkNameStrategyHelper',
+            XWiki.EntityType.DOCUMENT, XWiki.currentDocument.documentReference);
+          return $.post(new XWiki.Document(serviceReference).getURL('get'), {
             outputSyntax: 'plain',
             input: resourceReference.reference,
             action: 'validate'

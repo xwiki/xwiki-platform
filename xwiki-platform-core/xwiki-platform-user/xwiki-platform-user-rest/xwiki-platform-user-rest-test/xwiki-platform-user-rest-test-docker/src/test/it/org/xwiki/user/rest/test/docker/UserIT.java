@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,6 +51,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class UserIT
 {
+    private String baseURL;
+
+    @BeforeAll
+    public void setup(TestUtils setup)
+    {
+        // Create a base URL without any `/rest` suffix.
+        this.baseURL = setup.rest().getBaseURL().replaceAll("/(?:rest)?$", "");
+    }
+
     @Test
     @Order(1)
     void testUnqualifiedUser(TestUtils setup) throws Exception
@@ -70,13 +80,15 @@ class UserIT
             assertEquals("xwiki:XWiki.user", parsedUser.getId());
             assertEquals("user", parsedUser.getDisplayName());
             assertTrue(parsedUser.getAvatarUrl().startsWith(
-                "http://localhost:8080/xwiki/resources/icons/xwiki/noavatar.png"));
-            assertTrue(parsedUser.isGlobal());
+                    String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
+                String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
+                    this.baseURL, parsedUser.getAvatarUrl()));
+            assertTrue(parsedUser.isGlobal(), "User should be global.");
 
             Optional<Link> pageLink =
                 parsedUser.getLinks().stream().filter(l -> l.getRel().equals(Relations.PAGE)).findFirst();
-            assertTrue(pageLink.isPresent());
-            assertEquals("http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/user",
+            assertTrue(pageLink.isPresent(), "Response should contain a link to the page resource.");
+            assertEquals(String.format("%s/wikis/xwiki/spaces/XWiki/pages/user", setup.rest().getBaseURL()),
                 pageLink.get().getHref());
         } finally {
             get.releaseConnection();
@@ -110,18 +122,20 @@ class UserIT
             assertEquals(qualifiedUser, parsedUser.getId());
             assertEquals(user, parsedUser.getDisplayName());
             assertTrue(parsedUser.getAvatarUrl().startsWith(
-                "http://localhost:8080/xwiki/resources/icons/xwiki/noavatar.png"));
+                    String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
+                String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
+                    this.baseURL, parsedUser.getAvatarUrl()));
 
             if (wiki.equals("xwiki")) {
-                assertTrue(parsedUser.isGlobal());
+                assertTrue(parsedUser.isGlobal(), "User should be global.");
             } else {
-                assertFalse(parsedUser.isGlobal());
+                assertFalse(parsedUser.isGlobal(), "User should be local.");
             }
 
             Optional<Link> pageLink =
                 parsedUser.getLinks().stream().filter(l -> l.getRel().equals(Relations.PAGE)).findFirst();
-            assertTrue(pageLink.isPresent());
-            assertEquals("http://localhost:8080/xwiki/rest/wikis/" + wiki + "/spaces/XWiki/pages/localuser",
+            assertTrue(pageLink.isPresent(), "Response should contain a link to the page resource.");
+            assertEquals(String.format("%s/wikis/%s/spaces/XWiki/pages/localuser", setup.rest().getBaseURL(), wiki),
                 pageLink.get().getHref());
         } finally {
             get.releaseConnection();

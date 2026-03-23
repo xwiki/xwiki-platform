@@ -23,6 +23,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
@@ -42,6 +43,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class CurrentUserIT
 {
+    private String baseURL;
+
+    @BeforeAll
+    public void setup(TestUtils setup)
+    {
+        // Create a base URL without any `/rest` suffix.
+        this.baseURL = setup.rest().getBaseURL().replaceAll("/(?:rest)?$", "");
+    }
+
     @Test
     @Order(1)
     void testUnauthenticatedUser(TestUtils setup) throws Exception
@@ -58,8 +68,10 @@ class CurrentUserIT
             assertEquals("XWiki.XWikiGuest", parsedUser.getId());
             assertEquals("Guest", parsedUser.getDisplayName());
             assertTrue(parsedUser.getAvatarUrl().startsWith(
-                "http://localhost:8080/xwiki/resources/icons/xwiki/noavatar.png"));
-            assertTrue(parsedUser.isGlobal());
+                    String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
+                String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
+                    this.baseURL, parsedUser.getAvatarUrl()));
+            assertTrue(parsedUser.isGlobal(), "User should be global.");
         } finally {
             get.releaseConnection();
         }
@@ -85,8 +97,10 @@ class CurrentUserIT
             assertEquals("xwiki:XWiki.user", parsedUser.getId());
             assertEquals("user", parsedUser.getDisplayName());
             assertTrue(parsedUser.getAvatarUrl().startsWith(
-                "http://localhost:8080/xwiki/resources/icons/xwiki/noavatar.png"));
-            assertTrue(parsedUser.isGlobal());
+                    String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
+                String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
+                    this.baseURL, parsedUser.getAvatarUrl()));
+            assertTrue(parsedUser.isGlobal(), "User should be global.");
         } finally {
             get.releaseConnection();
         }

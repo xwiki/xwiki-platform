@@ -1,0 +1,296 @@
+:root {
+    --cr-sizes-max-page-width: calc(var(--max-screen-size) * 1px); /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
+    --cr-sizes-main-sidebar-width: var(--panel-column-left-width);; /*The default width of the main sidebar*/
+    --cr-sizes-main-sidebar-min-width: 0; /*The minimum width of the main sidebar*/
+    --cr-base-font-size: var(--font-size-base);
+    --cr-base-text-color: var(--text-color);
+    --cr-base-link-color: var(--link-color);
+    --cr-base-visited-link-color: var(--link-color);
+    --cr-mute-text-color: var(--text-muted);
+
+    /*
+     * Typography
+     */
+
+    /* Fonts */
+    --cr-font-mono: var(--font-family-monospace);
+    --cr-font-sans: var(--font-family-sans-serif);
+    --cr-font-serif: var(--font-family-serif);
+
+    /* Font sizes */
+    --cr-font-size-2x-small: calc(var(--cr-base-font-size) * 0.625);
+    --cr-font-size-x-small: calc(var(--cr-base-font-size) * 0.75);
+    --cr-font-size-small: calc(var(--cr-base-font-size) * 0.875);
+    --cr-font-size-medium: var(--cr-base-font-size);
+    --cr-font-size-large: calc(var(--cr-base-font-size) * 1.25);
+    --cr-font-size-x-large: calc(var(--cr-base-font-size) * 1.5);
+    --cr-font-size-2x-large: calc(var(--cr-base-font-size) * 2.25);
+    --cr-font-size-3x-large: calc(var(--cr-base-font-size) * 3);
+    --cr-font-size-4x-large: calc(var(--cr-base-font-size) * 4.5);
+
+    /* Font weights */
+    --cr-font-weight-light: cal(var(--font-weight-regular) - 100); /* deriving it because we currently don't define it*/
+    --cr-font-weight-normal: var(--font-weight-regular);
+    --cr-font-weight-semibold: var(--font-weight-semibold);
+    --cr-font-weight-bold: var(--font-weight-bold);
+
+    /* Letter spacings - arbitrary values because bootstrap and flamingo does not define them. */
+    --cr-letter-spacing-denser:  -0.05em;
+    --cr-letter-spacing-dense:   -0.025em;
+    --cr-letter-spacing-normal:   0;
+    --cr-letter-spacing-loose:    0.05em;
+    --cr-letter-spacing-looser:   0.1em;
+
+    /* Line heights - arbitrary values because bootstrap and flamingo does not define them. */
+    --cr-line-height-denser:  1;
+    --cr-line-height-dense:   1.25;
+    --cr-line-height-normal:  1.42857143;
+    --cr-line-height-loose:   1.6;
+    --cr-line-height-looser:  2;
+
+    /* Focus rings */
+    /*--cr-focus-ring-color: var(--sl-color-primary-600);*/
+    /*--cr-focus-ring-style: solid;*/
+    /*--cr-focus-ring-width: 3px;*/
+    /*--cr-focus-ring: var(--sl-focus-ring-style) var(--sl-focus-ring-width) var(--sl-focus-ring-color);*/
+    /*--cr-focus-ring-offset: 1px;*/
+
+    /*Colors*/
+
+    /*
+       * Theme Tokens
+       */
+
+    /* Primary */
+    --brand-primary: #2f70a7;
+    --cr-color-primary-50: var(--sl-color-sky-50);
+    --cr-color-primary-100: var(--sl-color-sky-100);
+    --cr-color-primary-200: var(--sl-color-sky-200);
+    --cr-color-primary-300: var(--sl-color-sky-300);
+    --cr-color-primary-400: var(--sl-color-sky-400);
+    --cr-color-primary-500: var(--sl-color-sky-500);
+    --cr-color-primary-600: var(--sl-color-sky-600);
+    --cr-color-primary-700: var(--sl-color-sky-700);
+    --cr-color-primary-800: var(--sl-color-sky-800);
+    --cr-color-primary-900: var(--sl-color-sky-900);
+    --cr-color-primary-950: var(--sl-color-sky-950);
+
+    /* Success */
+    --cr-color-success-50: var(--sl-color-green-50);
+    --cr-color-success-100: var(--sl-color-green-100);
+    --cr-color-success-200: var(--sl-color-green-200);
+    --cr-color-success-300: var(--sl-color-green-300);
+    --cr-color-success-400: var(--sl-color-green-400);
+    --cr-color-success-500: var(--sl-color-green-500);
+    --cr-color-success-600: var(--sl-color-green-600);
+    --cr-color-success-700: var(--sl-color-green-700);
+    --cr-color-success-800: var(--sl-color-green-800);
+    --cr-color-success-900: var(--sl-color-green-900);
+    --cr-color-success-950: var(--sl-color-green-950);
+
+    /* Warning */
+    --cr-color-warning-50: var(--sl-color-amber-50);
+    --cr-color-warning-100: var(--sl-color-amber-100);
+    --cr-color-warning-200: var(--sl-color-amber-200);
+    --cr-color-warning-300: var(--sl-color-amber-300);
+    --cr-color-warning-400: var(--sl-color-amber-400);
+    --cr-color-warning-500: var(--sl-color-amber-500);
+    --cr-color-warning-600: var(--sl-color-amber-600);
+    --cr-color-warning-700: var(--sl-color-amber-700);
+    --cr-color-warning-800: var(--sl-color-amber-800);
+    --cr-color-warning-900: var(--sl-color-amber-900);
+    --cr-color-warning-950: var(--sl-color-amber-950);
+
+    /* Danger */
+    --cr-color-danger-50: var(--sl-color-red-50);
+    --cr-color-danger-100: var(--sl-color-red-100);
+    --cr-color-danger-200: var(--sl-color-red-200);
+    --cr-color-danger-300: var(--sl-color-red-300);
+    --cr-color-danger-400: var(--sl-color-red-400);
+    --cr-color-danger-500: var(--sl-color-red-500);
+    --cr-color-danger-600: var(--sl-color-red-600);
+    --cr-color-danger-700: var(--sl-color-red-700);
+    --cr-color-danger-800: var(--sl-color-red-800);
+    --cr-color-danger-900: var(--sl-color-red-900);
+    --cr-color-danger-950: var(--sl-color-red-950);
+
+    /* Neutral */
+    --cr-color-neutral-50: var(--sl-color-gray-50);
+    --cr-color-neutral-100: var(--sl-color-gray-100);
+    --cr-color-neutral-200: var(--sl-color-gray-200);
+    --cr-color-neutral-300: var(--sl-color-gray-300);
+    --cr-color-neutral-400: var(--sl-color-gray-400);
+    --cr-color-neutral-500: var(--sl-color-gray-500);
+    --cr-color-neutral-600: var(--sl-color-gray-600);
+    --cr-color-neutral-700: var(--sl-color-gray-700);
+    --cr-color-neutral-800: var(--sl-color-gray-800);
+    --cr-color-neutral-900: var(--sl-color-gray-900);
+    --cr-color-neutral-950: var(--sl-color-gray-950);
+
+    /*
+     * Border radii
+     */
+
+    --cr-border-radius-small: 0.1875rem; /* 3px */
+    --cr-border-radius-medium: 0.25rem; /* 4px */
+    --cr-border-radius-large: 0.5rem; /* 8px */
+    --cr-border-radius-x-large: 1rem; /* 16px */
+
+    --cr-border-radius-circle: 50%;
+    --cr-border-radius-pill: 9999px;
+
+    /*
+     * Elevations
+     */
+
+    --cr-shadow-x-small: var(--sl-shadow-x-small);
+    --cr-shadow-small: var(--sl-shadow-small);
+    --cr-shadow-medium: var(--sl-shadow-medium);
+    --cr-shadow-large: var(--sl-shadow-large);
+    --cr-shadow-x-large: var(--sl-shadow-x-large);
+
+    /*
+     * Spacings
+     */
+
+
+    --cr-spacing-3x-small: var(--sl-spacing-3x-small);
+    --cr-spacing-2x-small: var(--sl-spacing-2x-small);
+    --cr-spacing-x-small: var(--sl-spacing-x-small);
+    --cr-spacing-small: var(--sl-spacing-small);
+    --cr-spacing-medium: var(--sl-spacing-medium);
+    --cr-spacing-large: var(--sl-spacing-large);
+    --cr-spacing-x-large: var(--sl-spacing-x-large);
+    --cr-spacing-2x-large: var(--sl-spacing-2x-large);
+    --cr-spacing-3x-large: var(--sl-spacing-3x-large);
+    --cr-spacing-4x-large: var(--sl-spacing-4x-large);
+
+    /*
+       * Transitions
+       */
+
+    --cr-transition-x-slow: var(--sl-transition-x-slow);
+    --cr-transition-slow: var(--sl-transition-slow);
+    --cr-transition-medium: var(--sl-transition-medium);
+    --cr-transition-fast: var(--sl-transition-fast);
+    --cr-transition-x-fast: var(--sl-transition-x-fast);
+
+    /*
+     * Forms
+     */
+
+    /* Buttons */
+    --cr-button-font-size-small: var(--sl-button-font-size-small);
+    --cr-button-font-size-medium: var(--sl-button-font-size-medium);
+    --cr-button-font-size-large: var(--sl-button-font-size-large);
+
+    /* Inputs */
+    --cr-input-height-small: var(--sl-input-height-small);
+    --cr-input-height-medium: var(--sl-input-height-medium);
+    --cr-input-height-large: var(--sl-input-height-large);
+
+    --cr-input-background-color: var(--sl-input-background-color);
+    --cr-input-background-color-hover: var(--sl-input-background-color-hover);
+    --cr-input-background-color-focus: var(--sl-input-background-color-focus);
+    --cr-input-background-color-disabled: var(--sl-input-background-color-disabled);
+    --cr-input-border-color: var(--sl-input-border-color);
+    --cr-input-border-color-hover: var(--sl-input-border-color-hover);
+    --cr-input-border-color-focus: var(--sl-input-border-color-focus);
+    --cr-input-border-color-disabled: var(--sl-input-border-color-disabled);
+    --cr-input-border-width: var(--sl-input-border-width);
+    --cr-input-required-content: var(--sl-input-required-content);
+    --cr-input-required-content-offset: var(--sl-input-required-content-offset);
+    --cr-input-required-content-color: var(--sl-input-required-content-color);
+
+    --cr-input-border-radius-small: var(--sl-input-border-radius-small);
+    --cr-input-border-radius-medium: var(--sl-input-border-radius-medium);
+    --cr-input-border-radius-large: var(--sl-input-border-radius-large);
+
+    --cr-input-font-family: var(--sl-input-font-family);
+    --cr-input-font-weight: var(--sl-input-font-weight);
+    --cr-input-font-size-small: var(--sl-input-font-size-small);
+    --cr-input-font-size-medium: var(--sl-input-font-size-medium);
+    --cr-input-font-size-large: var(--sl-input-font-size-large);
+    --cr-input-letter-spacing: var(--sl-input-letter-spacing);
+
+    --cr-input-color: var(--sl-input-color);
+    --cr-input-color-hover: var(--sl-input-color-hover);
+    --cr-input-color-focus: var(--sl-input-color-focus);
+    --cr-input-color-disabled: var(--sl-input-color-disabled);
+    --cr-input-icon-color: var(--sl-input-icon-color);
+    --cr-input-icon-color-hover: var(--sl-input-icon-color-hover);
+    --cr-input-icon-color-focus: var(--sl-input-icon-color-focus);
+    --cr-input-placeholder-color: var(--sl-input-placeholder-color);
+    --cr-input-placeholder-color-disabled: var(--sl-input-placeholder-color-disabled);
+    --cr-input-spacing-small: var(--sl-input-spacing-small);
+    --cr-input-spacing-medium: var(--sl-input-spacing-medium);
+    --cr-input-spacing-large: var(--sl-input-spacing-large);
+
+    --cr-input-focus-ring-color: var(--sl-input-focus-ring-color);
+    --cr-input-focus-ring-offset: var(--sl-input-focus-ring-offset);
+
+    --cr-input-filled-background-color: var(--sl-input-filled-background-color);
+    --cr-input-filled-background-color-hover: var(--sl-input-filled-background-color-hover);
+    --cr-input-filled-background-color-focus: var(--sl-input-filled-background-color-focus);
+    --cr-input-filled-background-color-disabled: var(--sl-input-filled-background-color-disabled);
+    --cr-input-filled-color: var(--sl-input-filled-color);
+    --cr-input-filled-color-hover: var(--sl-input-filled-color-hover);
+    --cr-input-filled-color-focus: var(--sl-input-filled-color-focus);
+    --cr-input-filled-color-disabled: var(--sl-input-filled-color-disabled);
+
+    /* Labels */
+    --cr-input-label-font-size-small: var(--sl-input-label-font-size-small);
+    --cr-input-label-font-size-medium: var(--sl-input-label-font-size-medium);
+    --cr-input-label-font-size-large: var(--sl-input-label-font-size-large);
+    --cr-input-label-color: var(--sl-input-label-color);
+
+    /* Help text */
+    --cr-input-help-text-font-size-small: var(--sl-input-help-text-font-size-small);
+    --cr-input-help-text-font-size-medium: var(--sl-input-help-text-font-size-medium);
+    --cr-input-help-text-font-size-large: var(--sl-input-help-text-font-size-large);
+    --cr-input-help-text-color: var(--sl-input-help-text-color);
+
+    /* Toggles (checkboxes, radios, switches) */
+    --cr-toggle-size-small: var(--sl-toggle-size-small);
+    --cr-toggle-size-medium: var(--sl-toggle-size-medium);
+    --cr-toggle-size-large: var(--sl-toggle-size-large);
+
+    /*
+     * Overlays
+     */
+
+    --cr-overlay-background-color: var(--sl-overlay-background-color);
+
+    /*
+     * Panels
+     */
+
+    --cr-panel-background-color: var(--sl-panel-background-color);
+    --cr-panel-border-color: var(--sl-panel-border-color);
+    --cr-panel-border-width: var(--sl-panel-border-width);
+
+    /*
+     * Tooltips
+     */
+
+    --cr-tooltip-border-radius: var(--sl-tooltip-border-radius);
+    --cr-tooltip-background-color: var(--sl-tooltip-background-color);
+    --cr-tooltip-color: var(--sl-tooltip-color);
+    --cr-tooltip-font-family: var(--sl-tooltip-font-family);
+    --cr-tooltip-font-weight: var(--sl-tooltip-font-weight);
+    --cr-tooltip-font-size: var(--sl-tooltip-font-size);
+    --cr-tooltip-line-height: var(--sl-tooltip-line-height);
+    --cr-tooltip-padding: var(--sl-tooltip-padding);
+    --cr-tooltip-arrow-size: var(--sl-tooltip-arrow-size);
+
+    /*
+     * Z-indexes
+     */
+
+    --cr-z-index-drawer: var(--sl-z-index-drawer);
+    --cr-z-index-dialog: var(--sl-z-index-dialog);
+    --cr-z-index-dropdown: var(--sl-z-index-dropdown);
+    --cr-z-index-toast: var(--sl-z-index-toast);
+    --cr-z-index-tooltip: var(--sl-z-index-tooltip);
+
+}

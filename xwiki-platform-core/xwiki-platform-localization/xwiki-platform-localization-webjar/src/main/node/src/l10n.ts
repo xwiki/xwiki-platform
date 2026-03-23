@@ -19,45 +19,27 @@
  */
 
 import { resolver } from "./index";
+import { transformTranslation } from "./internal/transformTranslation";
 import type {
   Query,
   TranslationsWithMissed,
 } from "@xwiki/platform-localization-api";
 
-function transformTranslation(
-  value: string | null,
-  ...args: unknown[]
-): string | null {
-  if (typeof value === "string") {
-    let transformedKey = value;
-    // If there's an argument, ensure to unescape doubled single quotes.
-    if (args.length > 0) {
-      transformedKey = transformedKey.replaceAll("''", "'");
-    }
-    // Naive implementation for message parameter substitution that suits our current needs.
-    for (let i = 0; i < args.length; i++) {
-      transformedKey = transformedKey.replace(
-        new RegExp(`\\{${i}\\}`, "g"),
-        `${args[i]}`,
-      );
-    }
-    return transformedKey;
-  } else {
-    return value;
-  }
-}
+/**
+ * The expected signature of the define callback with a load as it is missing from the requirejs type definitions.
+ */
+export type DefineWithLoad = () => {
+  load: (
+    name: string,
+    parentRequire: (names: string[], callback: (specs: Query) => void) => void,
+    onLoad: (callback: unknown) => void,
+  ) => void;
+};
 
-define("xwiki-l10n", () => {
+define("xwiki-l10n", (() => {
   return {
-    load(
-      name: string,
-      parentRequire: (
-        names: string[],
-        callback: (specs: Query) => void,
-      ) => void,
-      onLoad: (callback: unknown) => void,
-    ) {
-      parentRequire([name], (query: Query) => {
+    load(name, parentRequire, onLoad) {
+      parentRequire([name], (query) => {
         const queryPrefix: string =
           (Array.isArray(query) ? undefined : query.prefix) ?? "";
         const resolvedKeys: string[] = Array.isArray(query)
@@ -67,17 +49,8 @@ define("xwiki-l10n", () => {
           .resolve(query)
           .then((resolvedTranslations: TranslationsWithMissed) => {
             const translations = resolvedTranslations.translations;
-            onLoad({
-              ...translations,
-              get(key: string, ...args: string[]): string | null {
-                return transformTranslation(
-                  translations[queryPrefix + key] ?? null,
-                  ...args,
-                );
-              },
-            });
             // Remove the prefix when returning the translations for the current query.
-            return Object.entries(translations).reduce<{
+            const normalizedTranslations = Object.entries(translations).reduce<{
               [key: string]: string;
             }>((acc, [k, v]) => {
               // We only return the keys from the query.
@@ -86,6 +59,17 @@ define("xwiki-l10n", () => {
               }
               return acc;
             }, {});
+            onLoad({
+              ...normalizedTranslations,
+              get(key: string, ...args: string[]): string | null {
+                return transformTranslation(
+                  normalizedTranslations[key] ?? null,
+                  ...args,
+                );
+              },
+            });
+
+            return normalizedTranslations;
           })
           .catch((err: unknown) => {
             console.error(
@@ -96,4 +80,4 @@ define("xwiki-l10n", () => {
       });
     },
   };
-});
+}) satisfies DefineWithLoad);

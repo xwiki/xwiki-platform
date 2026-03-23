@@ -33,6 +33,7 @@
   <description>The API of the User REST services.</description>
   <properties>
     <xwiki.extension.name>User REST Services API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

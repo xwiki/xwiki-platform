@@ -58,7 +58,7 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>3.2.3</tika.version>
+    <tika.version>3.3.0</tika.version>
     <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>

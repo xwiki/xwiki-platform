@@ -29,7 +29,8 @@ $response.setContentType("text/xml")
 #set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
 #set($classDocument = $xwiki.getDocument($classname))
-#set($p = $classDocument.getxWikiClass().get($fieldname).getPropertyClass())
+#set($field = $classDocument.getxWikiClass().get($fieldname))
+#set($p = $field.getPropertyClass())
 #set($hibquery = "$!p.getSql()")
 ##
 ## Determine what was the input. If the property accepts multiple values and has separators, then
@@ -127,7 +128,7 @@ $response.setContentType("text/xml")
     #end
     </results>
   ######################### StringProperty query
-  #elseif($p && ($p.getClassType() != "Email" || !$services.mail.general.shouldObfuscate()) && $p.getClassType() != "Password")
+  #elseif($p && !$field.isSensitive())
     #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = :classname and obj.name <> :templatename and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())

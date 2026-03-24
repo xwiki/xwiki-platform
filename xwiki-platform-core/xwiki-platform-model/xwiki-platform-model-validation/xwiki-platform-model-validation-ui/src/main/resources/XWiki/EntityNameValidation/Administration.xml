@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Administration" locale="">
+<xwikidoc version="1.6" reference="XWiki.EntityNameValidation.Administration" locale="">
   <web>XWiki.EntityNameValidation</web>
   <name>Administration</name>
   <language/>
@@ -41,10 +41,11 @@
 #set ($manager = $services.modelvalidation.manager)
 #set ($config = $services.modelvalidation.configuration)
 #set ($replaceCharacterConfig = $services.modelvalidation.replaceCharacterEntityNameValidationConfiguration)
+#set ($slugConfig = $services.modelvalidation.slugEntityNameValidationConfiguration)
 #set ($configurationPage = $xwiki.getDocument($configurationPageReference))
 #if ($configurationPage.isNew() || !$configurationPage.getObject('XWiki.EntityNameValidation.ConfigurationClass'))
-    #set($configObject = $configurationPage.newObject('XWiki.EntityNameValidation.ConfigurationClass'))
-    #set($discard = $configurationPage.save())
+  #set($configObject = $configurationPage.newObject('XWiki.EntityNameValidation.ConfigurationClass'))
+  #set($discard = $configurationPage.save())
 #end
 
 #macro (createReplacementCharacterModal)
@@ -169,8 +170,44 @@
        &lt;/select&gt;
      &lt;/dd&gt;
   &lt;/dl&gt;
+  &lt;div id="slug-options" class="hidden"&gt;
+    &lt;h2&gt;$services.localization.render('entitynamevalidation.slug.configuration')&lt;/h2&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="XWiki.EntityNameValidation.ConfigurationClass_0_slug.lowercase"&gt;$services.localization.render('entitynamevalidation.slug.lowercase.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$services.localization.render('entitynamevalidation.slug.lowercase.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+         &lt;select name="XWiki.EntityNameValidation.ConfigurationClass_0_slug.lowercase" id="XWiki.EntityNameValidation.ConfigurationClass_0_slug.lowercase"&gt;
+           &lt;option value="0" #if($configurationPage.getValue('slug.lowercase') == 0)selected="selected"#end&gt;$services.localization.render('disabled')&lt;/option&gt;
+           &lt;option value="1" #if($configurationPage.getValue('slug.lowercase') == 1)selected="selected"#end&gt;$services.localization.render('enabled')&lt;/option&gt;
+         &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="XWiki.EntityNameValidation.ConfigurationClass_0_slug.dotsBetweenDigits"&gt;$services.localization.render('entitynamevalidation.slug.dotsBetweenDigits.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$services.localization.render('entitynamevalidation.slug.dotsBetweenDigits.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+         &lt;select name="XWiki.EntityNameValidation.ConfigurationClass_0_slug.dotsBetweenDigits" id="XWiki.EntityNameValidation.ConfigurationClass_0_slug.dotsBetweenDigits"&gt;
+           &lt;option value="0" #if($configurationPage.getValue('slug.dotsBetweenDigits') == 0)selected="selected"#end&gt;$services.localization.render('disabled')&lt;/option&gt;
+           &lt;option value="1" #if($configurationPage.getValue('slug.dotsBetweenDigits') == 1)selected="selected"#end&gt;$services.localization.render('enabled')&lt;/option&gt;
+         &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords"&gt;$services.localization.render('entitynamevalidation.slug.forbiddenWords.label')&lt;/label&gt;
+        &lt;span class='xHint'&gt;$services.localization.render('entitynamevalidation.slug.forbiddenWords.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;textarea data-syntax="plain/1.0" id="XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords" name="XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords" cols="60" rows="8" data-restricted="false"&gt;$!configurationPage.getValue('slug.forbiddenWords')&lt;/textarea&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
   &lt;div id="character-replacement-options" class="hidden"&gt;
-    &lt;h3&gt;$services.localization.render('entitynamevalidation.replacementCharacter.configuration')&lt;/h3&gt;
+    &lt;h2&gt;$services.localization.render('entitynamevalidation.replacementCharacter.configuration')&lt;/h2&gt;
     #set($ltOptions = {
        "rowCount": 10,
        "resultPage": "XWiki.EntityNameValidation.AdministrationJSON",
@@ -523,6 +560,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -617,6 +655,14 @@
     createCharacterButton.prop("disabled", true);
   };
 
+  var showSlugConfiguration = function () {
+    $('#slug-options').removeClass('hidden');
+  };
+
+  var hideSlugConfiguration = function () {
+    $('#slug-options').addClass('hidden');
+  };
+
   var showReplaceCharacterConfiguration = function () {
     $('#character-replacement-options').removeClass('hidden');
     $('#addNewCharacter').removeClass('hidden');
@@ -682,9 +728,11 @@
   var initialize = function () {
     var select = $('#XWiki\\.EntityNameValidation\\.ConfigurationClass_0_currentStrategy');
     if (select.val() == "ReplaceCharacterEntityNameValidation") {
+      hideSlugConfiguration()
       showReplaceCharacterConfiguration();
     } else {
       hideReplaceCharacterConfiguration();
+      showSlugConfiguration();
     }
     select.on('change', initialize);
 

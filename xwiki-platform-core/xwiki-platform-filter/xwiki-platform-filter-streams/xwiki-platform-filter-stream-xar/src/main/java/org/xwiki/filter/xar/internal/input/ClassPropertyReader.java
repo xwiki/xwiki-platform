@@ -40,16 +40,37 @@ import org.xwiki.filter.xar.internal.XARClassPropertyModel;
 @Singleton
 public class ClassPropertyReader extends AbstractReader implements XARXMLReader<ClassPropertyReader.WikiClassProperty>
 {
+    /**
+     * Class holding information about xclass property.
+     */
     public static class WikiClassProperty
     {
+        /**
+         * The name of the property.
+         */
         public String name;
 
+        /**
+         * The type of the properties.
+         */
         public String type;
 
+        /**
+         * The parameters to be sent.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
+        /**
+         * The fields of the property.
+         */
         public Map<String, String> fields = new LinkedHashMap<>();
 
+        /**
+         * Send events related to the xclass property to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             proxyFilter.beginWikiClassProperty(this.name, this.type, this.parameters);

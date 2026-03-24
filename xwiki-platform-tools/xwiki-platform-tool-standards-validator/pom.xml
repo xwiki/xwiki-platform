@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>18.0.0-SNAPSHOT</version>
+    <version>18.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>25.12.22</version>
+      <version>26.3.10</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
@@ -68,6 +68,10 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
     </dependency>
@@ -79,22 +83,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <failsOnError>true</failsOnError>
-              <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

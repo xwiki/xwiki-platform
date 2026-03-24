@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>18.0.0-SNAPSHOT</version>
+    <version>18.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-docker</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Docker Tests</name>
@@ -67,6 +67,22 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to execute tests on subwikis -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Nedded for computing diff in notification emails -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -92,6 +108,11 @@
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -129,11 +150,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- A wrapper to javax.mail much easier to use -->
+    <!-- A wrapper to jakarta.mail much easier to use -->
     <dependency>
       <groupId>org.simplejavamail</groupId>
       <artifactId>simple-java-mail</artifactId>
-      <version>6.7.6</version>
+      <version>8.12.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

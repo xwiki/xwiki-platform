@@ -59,6 +59,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultEmailTemplateRenderer implements EmailTemplateRenderer
 {
     private static final String EVENT_BINDING_NAME = "event";

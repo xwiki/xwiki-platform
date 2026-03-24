@@ -30,36 +30,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Session;
-import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.BlobStoreManager;
 import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
+import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
+import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment.AttachmentContainer;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.web.Utils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for FilesystemAttachmentStore.
@@ -67,7 +80,14 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @since 3.0M2
  */
-public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentStoreTest
+@ComponentTest
+@ComponentList({
+    FilesystemStoreTools.class,
+    DummyLockProvider.class,
+    AttachmentListMetadataSerializer.class,
+    AttachmentMetadataSerializer.class
+})
+class FilesystemAttachmentStoreTest
 {
     private static final String HELLO = "Hello World";
 
@@ -75,35 +95,41 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
     private static final InputStream HELLO_STREAM;
 
-    private XWikiContext mockContext;
+    @XWikiTempDir
+    private File tmpDir;
 
-    private XWikiAttachment mockAttach;
-
-    private AttachmentReference mockAttachReference;
-
+    @InjectMockComponents
     private FilesystemAttachmentStore attachStore;
 
-    private FilesystemStoreTools fileTools;
+    @MockComponent
+    private BlobStoreManager blobStoreManager;
 
+    @MockComponent
     private AttachmentVersioningStore mockAttachVersionStore;
 
+    @Mock
+    private XWikiAttachment mockAttach;
+
+    @Mock
     private XWikiAttachmentArchive mockArchive;
 
-    private XWikiHibernateStore mockHibernate;
-
+    @Mock
     private Session mockHibernateSession;
 
+    @Mock
+    private XWikiHibernateStore mockHibernate;
+
+    @Mock
+    private XWikiContext mockContext;
+
+    private AttachmentReference mockAttachReference;
+    private FilesystemStoreTools fileTools;
     private XWikiDocument doc;
 
     /**
      * The file which will hold content for this attachment.
      */
     private Blob storeFile;
-
-    /**
-     * The dir in /tmp/ which we use as our sandbox.
-     */
-    private File storageLocation;
 
     static {
         try {
@@ -114,244 +140,140 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         }
     }
 
-    @Before
-    @Override
-    public void setUp() throws Exception
+    @BeforeComponent
+    void beforeComponent() throws BlobStoreException
     {
-        super.setUp();
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        FileSystemBlobStoreProperties fileSystemBlobStoreProperties = new FileSystemBlobStoreProperties();
+        fileSystemBlobStoreProperties.setRootDirectory(this.tmpDir.toPath());
+        BlobStore blobStore = new FileSystemBlobStore("store/file", fileSystemBlobStoreProperties);
+        when(blobStoreManager.getBlobStore("store/file")).thenReturn(blobStore);
+    }
 
-        Utils.setComponentManager(this.getComponentManager());
-
-        this.mockContext = getMockery().mock(XWikiContext.class);
-        final XWiki mockXWiki = getMockery().mock(XWiki.class);
-        this.mockHibernate = getMockery().mock(XWikiHibernateStore.class);
-        final XWikiAttachmentContent mockDirtyContent = getMockery().mock(XWikiAttachmentContent.class);
-        this.mockAttachVersionStore = getMockery().mock(AttachmentVersioningStore.class);
-        this.mockArchive = getMockery().mock(XWikiAttachmentArchive.class);
-        this.mockHibernateSession = getMockery().mock(Session.class);
+    @BeforeEach
+    void setUp(MockitoComponentManager componentManager) throws Exception
+    {
+        this.fileTools = componentManager.getInstance(FilesystemStoreTools.class);
         this.doc = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
-
         this.mockAttachReference = new AttachmentReference("file.name", doc.getDocumentReference());
-        this.mockAttach = getMockery().mock(XWikiAttachment.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockContext).getWiki();
-                will(returnValue(mockXWiki));
+        XWiki xWiki = mock(XWiki.class);
+        when(this.mockContext.getWiki()).thenReturn(xWiki);
+        when(xWiki.getStore()).thenReturn(this.mockHibernate);
+        when(xWiki.getHibernateStore()).thenReturn(this.mockHibernate);
+        when(xWiki.getDefaultAttachmentArchiveStore()).thenReturn(this.mockAttachVersionStore);
 
-                allowing(mockXWiki).getStore();
-                will(returnValue(mockHibernate));
-                allowing(mockXWiki).getHibernateStore();
-                will(returnValue(mockHibernate));
-                allowing(mockHibernate).checkHibernate(mockContext);
-                allowing(mockHibernate).beginTransaction(mockContext);
+        when(this.mockHibernate.getSession(this.mockContext)).thenReturn(this.mockHibernateSession);
 
-                allowing(mockHibernate).getSession(mockContext);
-                will(returnValue(mockHibernateSession));
+        when(this.mockAttach.getContentInputStream(this.mockContext)).thenReturn(HELLO_STREAM);
+        when(this.mockAttach.getDoc()).thenReturn(this.doc);
+        when(this.mockAttach.getFilename()).thenReturn(mockAttachReference.getName());
+        when(this.mockAttach.getReference()).thenReturn(mockAttachReference);
+        when(this.mockAttach.getAttachment_archive()).thenReturn(this.mockArchive);
+        when(this.mockAttach.getArchiveStore()).thenReturn("file");
 
-                allowing(mockXWiki).getDefaultAttachmentArchiveStore();
-                will(returnValue(mockAttachVersionStore));
-
-                allowing(mockAttach).getContentInputStream(mockContext);
-                will(returnValue(HELLO_STREAM));
-                allowing(mockAttach).setDoc(doc);
-                allowing(mockAttach).getDoc();
-                will(returnValue(doc));
-                allowing(mockAttach).getFilename();
-                will(returnValue(mockAttachReference.getName()));
-                allowing(mockAttach).getReference();
-                will(returnValue(mockAttachReference));
-                allowing(mockAttach).updateContentArchive(mockContext);
-                allowing(mockAttach).getAttachment_archive();
-                will(returnValue(mockArchive));
-                allowing(mockAttach).isArchiveStoreSet();
-                will(returnValue(false));
-                allowing(mockAttach).getArchiveStore();
-                will(returnValue("file"));
-                allowing(mockAttach).getAttachment_content();
-                will(returnValue(mockDirtyContent));
-                allowing(mockAttach).isContentStoreSet();
-                will(returnValue(false));
-                allowing(mockAttach).getContentStore();
-                will(returnValue("file"));
-                allowing(mockAttach).isContentDirty();
-                will(returnValue(true));
-                allowing(mockDirtyContent).isContentDirty();
-                will(returnValue(true));
-                allowing(mockAttach).setAttachmentContainer(with(any(AttachmentContainer.class)));
-            }
-        });
-
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        this.storageLocation = new File(tmpDir, "test-storage-location");
-
-        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
-        properties.setRootDirectory(this.storageLocation.toPath());
-        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", properties);
-
-        this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
-
-        this.attachStore = new FilesystemAttachmentStore();
-        FieldUtils.writeField(this.attachStore, "fileTools", this.fileTools, true);
+        XWikiAttachmentContent attachmentContent = mock(XWikiAttachmentContent.class);
+        when(this.mockAttach.getAttachment_content()).thenReturn(attachmentContent);
+        when(this.mockAttach.isContentDirty()).thenReturn(true);
+        when(attachmentContent.isContentDirty()).thenReturn(true);
 
         this.storeFile = this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         HELLO_STREAM.reset();
     }
 
-    @After
-    @Override
-    public void tearDown() throws IOException
-    {
-        resursiveDelete(this.storageLocation);
-    }
-
     @Test
-    public void saveContentTest() throws Exception
+    void saveContentTest() throws Exception
     {
         final Blob storeFile =
             this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
-        Assert.assertFalse(this.storeFile.exists());
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                // Make sure an archive is saved
-                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
-            }
-        });
+        assertFalse(this.storeFile.exists());
 
         this.attachStore.saveAttachmentContent(this.mockAttach, false, this.mockContext, false);
 
-        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
-        Assert.assertEquals("The attachment file contained the wrong content", HELLO,
-            IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8));
+        assertTrue(this.storeFile.exists(), "The attachment file was not created.");
+        assertEquals(HELLO, IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8),
+            "The attachment file contained the wrong content");
+        verify(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
     }
 
     @Test
-    public void saveTwoOfSameAttachmentInOneTransactionTest() throws Exception
+    void saveTwoOfSameAttachmentInOneTransactionTest() throws Exception
     {
         final Blob storeFile =
             this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
-        Assert.assertFalse(this.storeFile.exists());
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                // Make sure an archive is saved (twice)
-                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
-                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
-            }
-        });
+        assertFalse(this.storeFile.exists());
 
         final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
         attachments.add(this.mockAttach);
         attachments.add(this.mockAttach);
         this.attachStore.saveAttachmentsContent(attachments, this.doc, false, this.mockContext, false);
 
-        Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
-        Assert.assertEquals("The attachment file contained the wrong content", HELLO,
-            IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8));
+        assertTrue(this.storeFile.exists(), "The attachment file was not created.");
+        assertEquals(HELLO, IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8),
+            "The attachment file contained the wrong content");
+        verify(mockAttachVersionStore, times(2)).saveArchive(mockArchive, mockContext, false);
     }
 
     @Test
-    public void loadContentTest() throws Exception
+    void loadContentTest() throws Exception
     {
+        doAnswer(invocationOnMock -> {
+            FilesystemAttachmentContent content = invocationOnMock.getArgument(0);
+            try {
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                IOUtils.copy(content.getContentInputStream(), baos);
+
+                final String output = baos.toString("UTF-8");
+
+                assertEquals(HELLO.length(), content.getLongSize());
+                assertEquals(HELLO.length(), content.getSize());
+                assertEquals(HELLO, output, "Not the same attachment content.");
+                return null;
+            } catch (IOException e) {
+                throw new RuntimeException("Exception getting attachment content.", e);
+            }
+        }).when(this.mockAttach).setAttachment_content(any(FilesystemAttachmentContent.class));
         this.storeFile.writeFromStream(HELLO_STREAM);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockAttach).setAttachment_content(with(any(FilesystemAttachmentContent.class)));
-                will(new CustomAction("Check to make sure the attachment content is correct.")
-                {
-                    @Override
-                    public Object invoke(final Invocation invoc)
-                    {
-                        final FilesystemAttachmentContent content = (FilesystemAttachmentContent) invoc.getParameter(0);
-
-                        try {
-                            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            IOUtils.copy(content.getContentInputStream(), baos);
-
-                            final String output = new String(baos.toByteArray(), "UTF-8");
-
-                            Assert.assertEquals(HELLO.length(), content.getLongSize());
-                            Assert.assertEquals(HELLO.length(), content.getSize());
-                            Assert.assertEquals("Not the same attachment content.", HELLO, output);
-                            return null;
-                        } catch (IOException e) {
-                            throw new RuntimeException("Exception getting attachment content.", e);
-                        }
-                    }
-                });
-                oneOf(mockAttach).setContentStore("file");
-            }
-        });
-
         this.attachStore.loadAttachmentContent(this.mockAttach, this.mockContext, false);
+
+        verify(mockAttach).setAttachment_content(any(FilesystemAttachmentContent.class));
+        verify(mockAttach).setContentStore("file");
     }
 
     @Test
-    public void deleteAttachmentTest() throws Exception
+    void deleteAttachmentTest() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
-                exactly(2).of(mockHibernateSession).delete(with(any(Object.class)));
-            }
-        });
         this.createFile();
 
         this.attachStore.deleteXWikiAttachment(this.mockAttach, false, this.mockContext, false);
-
-        Assert.assertFalse("The attachment file was not deleted.", this.storeFile.exists());
+        assertFalse(this.storeFile.exists(), "The attachment file was not deleted.");
+        verify(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
+        verify(mockHibernateSession, times(2)).delete(any());
     }
 
     @Test
-    public void documentUpdateOnDeleteTest() throws Exception
+    void documentUpdateOnDeleteTest() throws Exception
     {
+        doAnswer(invocationOnMock -> {
+            XWikiDocument doc = invocationOnMock.getArgument(0);
+            assertTrue(doc.getAttachmentList().isEmpty(), "Attachment was not removed from the list.");
+            return null;
+        }).when(this.mockHibernate).saveXWikiDoc(doc, mockContext, false);
         final List<XWikiAttachment> attachList = new ArrayList<XWikiAttachment>();
         attachList.add(this.mockAttach);
         this.doc.setAttachmentList(attachList);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
-                exactly(2).of(mockHibernateSession).delete(with(any(Object.class)));
-                oneOf(mockHibernate).saveXWikiDoc(doc, mockContext, false);
-                will(new CustomAction("Make sure the attachment has been removed from the list.")
-                {
-                    public Object invoke(final Invocation invoc)
-                    {
-                        final XWikiDocument document = (XWikiDocument) invoc.getParameter(0);
-                        Assert.assertTrue("Attachment was not removed from the list.",
-                            document.getAttachmentList().size() == 0);
-                        return null;
-                    }
-                });
-            }
-        });
         this.createFile();
 
         this.attachStore.deleteXWikiAttachment(this.mockAttach, true, this.mockContext, false);
+        verify(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
+        verify(mockHibernateSession, times(2)).delete(any());
+        verify(mockHibernate).saveXWikiDoc(doc, mockContext, false);
     }
 
     @Test
-    public void documentUpdateOnSaveTest() throws Exception
+    void documentUpdateOnSaveTest() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockHibernate).saveXWikiDoc(doc, mockContext, false);
-                oneOf(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
-
-            }
-        });
-
         this.attachStore.saveAttachmentContent(this.mockAttach, true, this.mockContext, false);
+        verify(this.mockHibernate).saveXWikiDoc(doc, mockContext, false);
+        verify(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
     }
 
     /* -------------------- Helpers -------------------- */
@@ -359,20 +281,6 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     private void createFile() throws BlobStoreException
     {
         this.storeFile.writeFromStream(HELLO_STREAM);
-        Assert.assertTrue("The attachment file not created for the test.", this.storeFile.exists());
-    }
-
-    private static void resursiveDelete(final File toDelete) throws IOException
-    {
-        if (toDelete == null || !toDelete.exists()) {
-            return;
-        }
-        if (toDelete.isDirectory()) {
-            final File[] children = toDelete.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                resursiveDelete(children[i]);
-            }
-        }
-        toDelete.delete();
+        assertTrue(this.storeFile.exists(), "The attachment file not created for the test.");
     }
 }

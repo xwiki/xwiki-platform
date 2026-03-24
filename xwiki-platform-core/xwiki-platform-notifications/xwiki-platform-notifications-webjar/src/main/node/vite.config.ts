@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,41 +18,45 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { fileURLToPath, URL } from 'node:url'
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
+import { dirname, resolve } from "node:path";
+import { URL, fileURLToPath } from "node:url";
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { dirname, resolve } from 'node:path'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    outDir: '../../../target/node-dist',
+    outDir: "../../../target/node-dist",
     lib: {
-      entry: resolve(__dirname, 'src/main.js'),
+      entry: resolve(__dirname, "src/main.js"),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
-      formats: ['es']
+      formats: ["es"],
     },
     sourcemap: true,
     rollupOptions: {
-      external: ['jquery', 'xwiki-livedata', 'vue'],
+      external: [
+        "jquery",
+        "@xwiki/platform-livedata-ui",
+        "vue",
+        "@xwiki/platform-livedata-componentstore",
+      ],
       output: {
         globals: {
-          vue: 'Vue'
-        }
-      }
+          vue: "Vue",
+        },
+      },
     },
   },
   define: {
     // define process to avoid runtime error with jquery
-    'process.env': {}
+    "process.env": {},
   },
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-})
+});

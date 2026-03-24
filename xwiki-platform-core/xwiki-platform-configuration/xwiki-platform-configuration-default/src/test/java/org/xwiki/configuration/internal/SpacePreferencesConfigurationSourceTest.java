@@ -96,7 +96,7 @@ class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfig
         setStringProperty(SPACE_DOCUMENT, "key", "value");
         setStringProperty(SPACE_DOCUMENT, "prefixkey", "value2");
 
-        assertEquals(List.of("prefixkey", "key"), this.source.getKeys());
+        assertEquals(List.of("key", "prefixkey"), this.source.getKeys());
         assertEquals(List.of("prefixkey"), this.source.getKeys("prefix"));
     }
 

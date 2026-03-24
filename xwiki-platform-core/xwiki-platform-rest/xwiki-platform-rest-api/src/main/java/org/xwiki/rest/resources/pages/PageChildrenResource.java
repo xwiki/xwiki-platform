@@ -52,6 +52,8 @@ public interface PageChildrenResource
      * @return the child pages that match the search criteria
      * @throws XWikiRestException if there was an error while retrieving the child pages
      */
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GET Pages getPageChildren(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

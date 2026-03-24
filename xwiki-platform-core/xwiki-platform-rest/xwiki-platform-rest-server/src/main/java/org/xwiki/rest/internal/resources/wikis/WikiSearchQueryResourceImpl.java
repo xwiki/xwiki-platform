@@ -36,6 +36,8 @@ import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 public class WikiSearchQueryResourceImpl extends BaseSearchResult implements WikiSearchQueryResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public SearchResults search(String wikiName, String query,
             String queryTypeString, Integer number, Integer start, Boolean distinct, String orderField, String order,
             Boolean withPrettyNames, String className) throws XWikiRestException

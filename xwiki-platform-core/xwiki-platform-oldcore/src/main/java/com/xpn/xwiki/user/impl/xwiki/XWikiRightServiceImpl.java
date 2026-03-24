@@ -108,13 +108,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
     @Override
     public List<String> listAllLevels(XWikiContext context) throws XWikiException
     {
-        return new ArrayList<String>(ALLLEVELS);
+        return new ArrayList<>(ALLLEVELS);
     }
 
     public String getRight(String action)
     {
         if (actionMap == null) {
-            actionMap = new HashMap<String, String>();
+            actionMap = new HashMap<>();
             actionMap.put("login", "login");
             actionMap.put("logout", "login");
             actionMap.put("loginerror", "login");
@@ -376,10 +376,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         String[] userarray = GroupsClass.getListFromString(users).toArray(new String[0]);
 
                         for (int ii = 0; ii < userarray.length; ii++) {
-                            String value = userarray[ii];
-                            if (value.indexOf(".") == -1) {
-                                userarray[ii] = "XWiki." + value;
-                            }
+                            userarray[ii] = com.xpn.xwiki.api.Util.getStandardUsername(userarray[ii], true);
                         }
 
                         if (LOGGER.isDebugEnabled()) {
@@ -423,11 +420,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
         // Didn't found right at this level.. Let's go to group level
         Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get("grouplist");
         if (grouplistcache == null) {
-            grouplistcache = new HashMap<String, Collection<String>>();
+            grouplistcache = new HashMap<>();
             context.put("grouplist", grouplistcache);
         }
 
-        Collection<String> grouplist = new HashSet<String>();
+        Collection<String> grouplist = new HashSet<>();
 
         // Get member groups from document's wiki
         addMemberGroups(doc.getWikiName(), prefixedFullName, userOrGroupDocumentReference, grouplist, context);
@@ -473,7 +470,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get("grouplist");
         if (grouplistcache == null) {
-            grouplistcache = new HashMap<String, Collection<String>>();
+            grouplistcache = new HashMap<>();
             context.put("grouplist", grouplistcache);
         }
 
@@ -489,7 +486,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 Collection<DocumentReference> groupReferences =
                     groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, context);
 
-                tmpGroupList = new ArrayList<String>(groupReferences.size());
+                tmpGroupList = new ArrayList<>(groupReferences.size());
                 for (DocumentReference groupReference : groupReferences) {
                     tmpGroupList.add(this.entityReferenceSerializer.serialize(groupReference));
                 }
@@ -665,7 +662,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // through the space WebPreferences Global Rights
 
             String space = currentdoc.getSpace();
-            ArrayList<String> spacesChecked = new ArrayList<String>();
+            ArrayList<String> spacesChecked = new ArrayList<>();
             int recursiveSpaceChecks = 0;
             while ((space != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
                 // Add one to the recursive space checks
@@ -886,7 +883,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         // Verify Web super user
         String space = documentName.getSpace();
-        ArrayList<String> spacesChecked = new ArrayList<String>();
+        ArrayList<String> spacesChecked = new ArrayList<>();
         int recursiveSpaceChecks = 0;
         while ((space != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
             // Add one to the recursive space checks

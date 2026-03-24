@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.script;
 
-import org.xwiki.extension.internal.InstallOnRootNamespaceExtensionRewriter;
+import org.xwiki.extension.InstallOnRootNamespaceExtensionRewriter;
 
 /**
  * Script oriented helper with various ways of rewriting extensions.

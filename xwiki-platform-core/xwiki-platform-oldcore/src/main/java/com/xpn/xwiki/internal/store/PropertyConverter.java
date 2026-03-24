@@ -30,8 +30,10 @@ import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
@@ -63,7 +65,14 @@ public class PropertyConverter
      */
     public BaseProperty<?> convertProperty(BaseProperty<?> storedProperty, PropertyClass modifiedPropertyClass)
     {
-        Object newValue = convertPropertyValue(storedProperty.getValue(), modifiedPropertyClass);
+        Object newValue;
+        // If the property was a password and the new property class is not a PasswordClass, then we get rid of the
+        // value to not leak it.
+        if (storedProperty instanceof PasswordProperty && !(modifiedPropertyClass instanceof PasswordClass)) {
+            newValue = "";
+        } else {
+            newValue = convertPropertyValue(storedProperty.getValue(), modifiedPropertyClass);
+        }
         BaseProperty<?> newProperty = null;
         if (newValue != null) {
             newProperty = modifiedPropertyClass.newProperty();

@@ -323,7 +323,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -758,7 +758,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
@@ -861,7 +861,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
                     }
 
                     String anchor = url.getRef();

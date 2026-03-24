@@ -118,9 +118,9 @@ public class UploadAction extends XWikiAction
 
             return true;
         }
-        Map<String, String> fileNames = new LinkedHashMap<String, String>();
-        List<String> wrongFileNames = new ArrayList<String>();
-        Map<String, String> failedFiles = new LinkedHashMap<String, String>();
+        Map<String, String> fileNames = new LinkedHashMap<>();
+        List<String> wrongFileNames = new ArrayList<>();
+        Map<String, String> failedFiles = new LinkedHashMap<>();
         for (String fieldName : fileupload.getFileItemNames(context)) {
             try {
                 if (fieldName.startsWith(FILE_FIELD_NAME)) {

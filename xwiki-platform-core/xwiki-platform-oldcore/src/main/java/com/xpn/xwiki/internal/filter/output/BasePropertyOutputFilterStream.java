@@ -22,13 +22,21 @@ package com.xpn.xwiki.internal.filter.output;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
+import org.xwiki.internal.objects.ObjectPropertyParser;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
+import com.xpn.xwiki.objects.classes.StringClass;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * @version $Id$
@@ -38,6 +46,9 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterStream<BaseProperty>
 {
+    @Inject
+    private Provider<ComponentManager> componentManagerProvider;
+
     private BaseClass currentXClass;
 
     /**
@@ -63,33 +74,47 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {
-        if (this.currentXClass != null) {
-            PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXClass.safeget(name);
-
+        PropertyClassInterface propertyclass = (this.currentXClass != null)
+            ? (PropertyClassInterface) this.currentXClass.safeget(name) : null;
+        BaseProperty property;
+        try {
             if (propertyclass != null) {
                 // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not
                 // really a String property)
-                BaseProperty property =
-                    null;
-                try {
-                    property = value instanceof String
-                        ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
-                } catch (XWikiException e) {
-                    throw new FilterException(String.format("Error when handling object [%s] with value [%s]", name,
-                        value), e);
-                }
-
-                if (this.entity == null) {
-                    this.entity = property;
-                } else {
-                    this.entity.apply(property, true);
-                }
+                property = value instanceof String valueString ? propertyclass.fromString(valueString)
+                    : propertyclass.fromValue(value);
             } else {
-                // TODO: Log something ?
+                property = computeMissingProperty(value, parameters);
             }
-        } else {
-            // TODO: Log something ?
+        } catch (XWikiException | ComponentLookupException e) {
+            throw new FilterException(String.format("Error when handling object [%s] with value [%s]", name,
+                value), e);
         }
+        if (property != null) {
+            if (this.entity == null) {
+                this.entity = property;
+            } else {
+                this.entity.apply(property, true);
+            }
+        }
+    }
+
+    private BaseProperty<?> computeMissingProperty(Object value, FilterEventParameters parameters)
+        throws XWikiException, ComponentLookupException
+    {
+        BaseProperty<?> result;
+        ComponentManager componentManager = componentManagerProvider.get();
+        Object objectPropertyType = parameters.get(WikiObjectPropertyFilter.PARAMETER_OBJECTPROPERTY_TYPE);
+        if (objectPropertyType instanceof String objectPropertyTypeName
+            && componentManager.hasComponent(ObjectPropertyParser.class, objectPropertyTypeName)) {
+            ObjectPropertyParser objectPropertyParser =
+                componentManager.getInstance(ObjectPropertyParser.class, objectPropertyTypeName);
+            result = objectPropertyParser.fromValue(value);
+        } else {
+            StringClass stringClass = new StringClass();
+            result = stringClass.fromString(String.valueOf(value));
+        }
+        return result;
     }
 
     @Override

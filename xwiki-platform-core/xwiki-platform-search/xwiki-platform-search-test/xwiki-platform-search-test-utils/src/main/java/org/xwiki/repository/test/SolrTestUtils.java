@@ -64,9 +64,10 @@ public class SolrTestUtils
     private void initService() throws Exception
     {
         if (!this.testUtils.pageExists(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE)) {
-            // Create the utility page.
-            this.testUtils.rest().savePage(SOLRSERVICE_REFERENCE, "{{velocity}}$services.solr.queueSize{{/velocity}}",
-                null);
+            // Create the utility page as superadmin to avoid issues if the current user doesn't have script right
+            // or the permission to edit the page.
+            this.testUtils.rest().savePageAs(TestUtils.SUPER_ADMIN_CREDENTIALS, SOLRSERVICE_REFERENCE,
+                "{{velocity}}$services.solr.queueSize{{/velocity}}", null);
         }
     }
 

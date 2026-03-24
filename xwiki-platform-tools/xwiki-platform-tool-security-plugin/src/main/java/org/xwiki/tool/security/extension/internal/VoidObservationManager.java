@@ -32,6 +32,7 @@ import org.xwiki.observation.event.Event;
  * 
  * @version $Id$
  * @since 18.0.0RC1
+ * @since 17.10.3
  */
 @Component
 @Singleton

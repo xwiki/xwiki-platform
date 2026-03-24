@@ -37,7 +37,16 @@ import org.xwiki.xar.internal.XarObjectPropertySerializer;
  * @version $Id$
  * @since 5.4M1
  */
-@Component(hints = {"StaticList", "DBList", "DBTreeList", "Page" })
+@Component(hints = {
+    // Class Types
+    "StaticList",
+    "DBList",
+    "DBTreeList",
+    "Page",
+    // Property types
+    "DBStringList",
+    "StringList"
+})
 @Singleton
 public class ListXarObjectPropertySerializer implements XarObjectPropertySerializer
 {
@@ -72,7 +81,7 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
 
     private List<String> readList(XMLStreamReader reader) throws XMLStreamException
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         for (; reader.getEventType() == XMLStreamConstants.START_ELEMENT; reader.nextTag()) {
             reader.require(XMLStreamConstants.START_ELEMENT, null, ELEMENT_VALUE);

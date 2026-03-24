@@ -39,11 +39,7 @@
   <content>{{velocity}}
 #set($isActionAllowed = false)
 #if ("$!request.user" != "")
-    #if ($request.user.contains("."))
-      #set ($targetUser = $request.user)
-    #else
-      #set ($targetUser = "XWiki." + $request.user)
-    #end
+  #set ($targetUser = $util.getStandardUsername($request.user, true))
 #end
 #if ("$!request.target" == 'wiki')
   #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
@@ -60,7 +56,7 @@
   #set ($discard = $response.sendError(401, $services.localization.render('notifications.settings.error.badCSRF')))
 #elseif (!$isActionAllowed)
   #set ($discard = $response.sendError(401))
-#elseif ("$!request.action" == "" || "$!request.target" == "" || ("$!request.target" == 'user' &amp;&amp; "$!request.user" == ""))
+#elseif ("$!request.action" == "" || $targetDoc.isNew() || "$!request.target" == "" || ("$!request.target" == 'user' &amp;&amp; "$!request.user" == ""))
   #set ($discard = $response.sendError(400, $services.localization.render('notifications.settings.error.badParameters')))
 #elseif ("$!request.action" == "setInterval")
   #if ("$!request.interval" == '')

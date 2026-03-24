@@ -34,4 +34,9 @@ public class AllIT
     class NestedWikiSkinIT extends WikiSkinIT
     {
     }
+
+    @Nested
+    class NestedSXSkinIT extends SXSkinIT
+    {
+    }
 }

@@ -31,8 +31,6 @@
 #if (!$docextras)
   #set ($docextras = [])
   #if ($showcomments)
-    $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $services.localization.render('core.shortcuts.view.comments')]))
   #end
   #if ($showannotations)

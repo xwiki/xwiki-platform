@@ -67,6 +67,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
      */
     private static final JobGroupPath GROUP = new JobGroupPath(Arrays.asList("solr", "indexer"));
 
+    private static final String AND = " AND ";
+
     /**
      * Used to send documents to index or delete to/from Solr index.
      */
@@ -205,26 +207,27 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     {
         StringBuilder builder = new StringBuilder();
 
+        // Filter documents based on the indicated root reference
+        builder.append('(');
+        builder.append(this.solrReferenceResolver.getQuery(getRequest().getRootReference()));
+        builder.append(')');
+
+        builder.append(AND);
+
+        builder.append('-');
         builder.append('(');
 
         // All entries which don't have a docId set
-        builder.append(notSet(FieldUtils.DOC_ID));
+        builder.append(isSet(FieldUtils.DOC_ID));
 
-        builder.append(" OR ");
+        builder.append(AND);
 
         // All entries which don't have a fullName set
-        builder.append(notSet(FieldUtils.FULLNAME));
+        builder.append(isSet(FieldUtils.FULLNAME));
 
         // TODO: Remove from the core all entries for which no corresponding DOCUMENT type entry exist (see
         // https://jira.xwiki.org/browse/XWIKI-22949)
 
-        builder.append(')');
-
-        builder.append(" AND ");
-
-        // Filter documents based on the indicated root reference
-        builder.append('(');
-        builder.append(this.solrReferenceResolver.getQuery(getRequest().getRootReference()));
         builder.append(')');
 
         // Execute the delete
@@ -234,8 +237,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         this.solrInstance.commit();
     }
 
-    private String notSet(String field)
+    private String isSet(String field)
     {
-        return "-" + field + ":*";
+        return field + ":*";
     }
 }

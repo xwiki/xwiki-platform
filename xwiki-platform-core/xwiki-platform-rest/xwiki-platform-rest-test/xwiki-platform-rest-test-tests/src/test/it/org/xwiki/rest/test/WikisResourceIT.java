@@ -20,7 +20,6 @@
 package org.xwiki.rest.test;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Assert;
@@ -42,18 +40,15 @@ import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.model.jaxb.Link;
-import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
-import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.wikis.WikiAttachmentsResource;
 import org.xwiki.rest.resources.wikis.WikiChildrenResource;
 import org.xwiki.rest.resources.wikis.WikiPagesResource;
-import org.xwiki.rest.resources.wikis.WikiResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
@@ -544,28 +539,6 @@ public class WikisResourceIT extends AbstractHttpIT
         SearchResults searchResults = this.testUtils.getDriver().waitUntilCondition(d -> search(1, query));
 
         Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
-    }
-
-    @Test
-    public void testImportXAR() throws Exception
-    {
-        InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar");
-        String wiki = getWiki();
-
-        PostMethod postMethod = executePost(buildURI(WikiResource.class, wiki).toString(), is,
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_OK, postMethod.getStatusCode());
-
-        GetMethod getMethod = executeGet(buildURI(PageResource.class, wiki, Arrays.asList("Main"), "Foo").toString(),
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
-
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-
-        Assert.assertEquals(wiki, page.getWiki());
-        Assert.assertEquals("Main", page.getSpace());
-        Assert.assertEquals("Foo", page.getName());
-        Assert.assertEquals("Foo", page.getContent());
     }
 
     @Test

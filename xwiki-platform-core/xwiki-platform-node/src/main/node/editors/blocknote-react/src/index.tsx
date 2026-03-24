@@ -32,7 +32,7 @@ import type { LinkEditionContext } from "./misc/linkSuggest";
  *
  * @returns - An unmount function to properly dispose of the editor
  *
- * @since 0.19
+ * @since 18.0.0RC1
  * @beta
  */
 function mountBlockNote(
@@ -91,3 +91,10 @@ export {
   buildMacroRawContent,
   extractMacroRawContent,
 } from "./blocknote/utils";
+
+export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
+
+export type {
+  ImageEditionOverrideFn,
+  ImageUpdateResult,
+} from "./components/images/CustomImageToolbar";

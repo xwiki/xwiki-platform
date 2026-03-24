@@ -288,12 +288,7 @@ public class ModelFactory
                 BaseClass baseClass = xwikiObject.getXClass(this.xcontextProvider.get());
                 PropertyInterface field = baseClass.getField(firstPropertyName);
                 // The property might not exist in the class. But if it does, it will be a PropertyClass.
-                if (field != null) {
-                    String classType = ((com.xpn.xwiki.objects.classes.PropertyClass) field).getClassType();
-                    objectSummary.setHeadline(cleanupBeforeMakingPublic(classType, xwikiObject.get(firstPropertyName)));
-                } else {
-                    objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(firstPropertyName)));
-                }
+                objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(firstPropertyName)));
             } catch (XWikiException e) {
                 // Should never happen
             }
@@ -763,6 +758,14 @@ public class ModelFactory
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
     {
+        return this.toRestPage(baseUri, self, doc, useVersion, withPrettyNames, withObjects, withXClass,
+            withAttachments, List.of(), List.of());
+    }
+
+    public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights,
+        List<String> supportedSyntaxes) throws XWikiException
+    {
         Page page = this.objectFactory.createPage();
         toRestPageSummary(page, baseUri, doc, useVersion, withPrettyNames);
 
@@ -856,6 +859,31 @@ public class ModelFactory
         // Add xclass
         if (withXClass) {
             page.setClazz(toRestClass(baseUri, doc.getxWikiClass()));
+        }
+
+        // Add rights
+        for (Right checkRight : checkRights) {
+            org.xwiki.rest.model.jaxb.Right right = this.objectFactory.createRight();
+            right.setName(checkRight.getName());
+            right.setValue(this.authorizationManagerProvider.get().hasAccess(checkRight,
+                doc.getDocumentReference()));
+            page.withRights(right);
+        }
+
+        // Add html rendering if needed
+        if (!supportedSyntaxes.isEmpty() && !supportedSyntaxes.contains(page.getSyntax())) {
+            XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(doc.getDocumentReference(), xcontext);
+            XWikiDocument oldDoc = xcontext.getDoc();
+
+            try {
+                // Set the right document for rendering.
+                xcontext.setDoc(xwikiDocument);
+
+                page.setRenderedContent(doc.displayDocument());
+            } finally {
+                // Reset context.
+                xcontext.setDoc(oldDoc);
+            }
         }
 
         return page;
@@ -1039,7 +1067,7 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property. {@link ComputedFieldClass} properties are not evaluated.
+     * Serializes the value of the given XObject property.
      *
      * @param property an XObject property
      * @return the String representation of the property value
@@ -1050,7 +1078,7 @@ public class ModelFactory
             return "";
         }
 
-        java.lang.Object value = ((BaseProperty) property).getValue();
+        java.lang.Object value = ((BaseProperty) property).getObfuscatedValue();
         if (value instanceof List) {
             return StringUtils.join((List) value, "|");
         } else if (value != null) {
@@ -1072,25 +1100,26 @@ public class ModelFactory
     private String serializePropertyValue(PropertyInterface property,
         com.xpn.xwiki.objects.classes.PropertyClass propertyClass, XWikiContext context)
     {
-        if (propertyClass instanceof ComputedFieldClass) {
+        String result;
+        if (propertyClass instanceof ComputedFieldClass computedFieldClass) {
             // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
             // PropertyClass.renderInContext fires a null pointer exception: bug?
             XWikiDocument document = context.getDoc();
             try {
                 context.setDoc(property.getObject().getOwnerDocument());
-                ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
                 return computedFieldClass.getComputedValue(propertyClass.getName(), "", property.getObject(), context);
             } catch (Exception e) {
                 logger.error("Error while computing property value [{}] of [{}]", propertyClass.getName(),
                     property.getObject(), e);
-                return serializePropertyValue(property);
+                result = serializePropertyValue(property);
             } finally {
                 // Reset the context document to its original value, even if an exception is raised.
                 context.setDoc(document);
             }
         } else {
-            return cleanupBeforeMakingPublic(propertyClass.getClassType(), property);
+            result = serializePropertyValue(property);
         }
+        return result;
     }
 
     public JobRequest toRestJobRequest(Request request) throws XWikiRestException

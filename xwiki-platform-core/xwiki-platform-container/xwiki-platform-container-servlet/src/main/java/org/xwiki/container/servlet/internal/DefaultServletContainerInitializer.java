@@ -68,7 +68,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         if (response != null) {
             this.container.setResponse(new ServletResponse(response));
         }
-        this.container.setSession(new ServletSession(request.getSession(false)));
+        this.container.setSession(new ServletSession(request.getSession(true)));
 
         // 2) Create an empty Execution context so that the Container initializers can put things in the
         // execution context when they execute.

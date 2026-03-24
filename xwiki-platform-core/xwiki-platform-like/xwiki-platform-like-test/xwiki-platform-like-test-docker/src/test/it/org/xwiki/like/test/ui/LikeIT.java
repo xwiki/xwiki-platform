@@ -202,4 +202,24 @@ class LikeIT
         assertFalse(likeButton.canBeClicked());
         assertEquals(1, likeButton.getLikeNumber());
     }
+
+    /**
+     * Check that the like feature can be disabled.
+     */
+    @Test
+    @Order(4)
+    void disableLike(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.createPage(testReference, "some content");
+        updateLikeConfiguration(testUtils, "enabled", false);
+        testUtils.gotoPage(testReference);
+        LikeButton likeButton = new LikeButton();
+        // Even as an admin, the like button is not displayed
+        assertFalse(likeButton.isDisplayed());
+        updateLikeConfiguration(testUtils, "enabled", true);
+        testUtils.gotoPage(testReference);
+        likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+    }
 }

@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -376,7 +377,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public List<ObjectDiff> getDiff(Object oldEntity, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseObject oldObject = (BaseObject) oldEntity;
         // Iterate over the new properties first, to handle changed and added objects
         for (String propertyName : this.getPropertyList()) {
@@ -399,26 +400,42 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         BaseClass oldPropertyXClass = oldObject.getSourceXClassOrFallback(context);
         PropertyClass oldpclass =
             (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
-
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
         if (newProperty == null) {
             // The property exists in the old object, but not in the new one
             if ((oldProperty != null) && (!oldProperty.toText().isEmpty())) {
-                if (oldpclass != null) {
-                    // Put the values as they would be displayed in the interface
-                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                        : oldpclass.displayView(propertyName, oldObject, context);
-                    difflist.add(
-                        new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, oldpclass.getClassType(),
-                            oldPropertyValue, ""));
-                } else {
-                    // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(),
-                        oldObject.getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, "",
-                        oldProperty.toText(), ""));
-                }
+                String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
+                    oldObject);
+                String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
+                difflist.add(
+                    new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
+                        isSensitive));
             }
         }
+    }
+
+    private String getDiffPropertyValue(XWikiContext context, BaseProperty property, PropertyClass propertyClass,
+        String propertyName, BaseObject object)
+    {
+        String result;
+        if (propertyClass == null) {
+            result = property.toText();
+        } else if (property.getValue() instanceof String propertyValue) {
+            result = propertyValue;
+        // We never want to perform a DB query to compute a diff, so we rely on the actual text value of the object.
+        } else if (property instanceof ListProperty listProperty && propertyClass instanceof DBListClass) {
+            result = listProperty.getTextValue();
+        } else {
+            result = propertyClass.displayView(propertyName, object, context);
+        }
+        return result;
     }
 
     private void handleChangedAndAddedPropertiesInDiff(XWikiContext context, String propertyName, BaseObject oldObject,
@@ -432,6 +449,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
         PropertyClass newpclass =
             (PropertyClass) ((oldPropertyXClass == null) ? null : newPropertyXClass.getField(propertyName));
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
         if (oldProperty == null) {
             String propertyType;
             String newPropertyValue;
@@ -442,30 +466,24 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                     newPropertyValue = newProperty.toText();
                 } else {
                     propertyType = newpclass.getClassType();
-                    newPropertyValue = (newProperty.getValue() instanceof String)
-                        ? newProperty.toText() : newpclass.displayView(propertyName, this, context);
+                    newPropertyValue = getDiffPropertyValue(context, newProperty, newpclass, propertyName,
+                        this);
                 }
                 difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
-                    ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
+                    ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                    isSensitive));
             }
         } else if (newProperty == null || !oldProperty.toText().equals(newProperty.toText())) {
             // The property exists in both objects and is different
-            String newPropertyType;
-            String newPropertyValue;
-            if (newpclass == null) {
-                newPropertyType = "";
-                newPropertyValue = newProperty.toText();
-            } else {
-                newPropertyType = newpclass.getClassType();
-                newPropertyValue = (newProperty.getValue() instanceof String)
-                    ? newProperty.toText() : newpclass.displayView(propertyName, this, context);
-            }
-            String oldPropertyValue = (oldProperty.getValue() instanceof String || oldpclass == null)
-                ? oldProperty.toText() : oldpclass.displayView(propertyName, oldObject, context);
+            String newPropertyType = (newpclass != null) ? newpclass.getClassType() : "";
+            String newPropertyValue = getDiffPropertyValue(context, newProperty, newpclass, propertyName,
+                this);
 
+            String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName, oldObject);
             difflist.add(
                 new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
-                    propertyName, newPropertyType, oldPropertyValue, newPropertyValue));
+                    propertyName, newPropertyType, oldPropertyValue, newPropertyValue,
+                    isSensitive));
         }
     }
 

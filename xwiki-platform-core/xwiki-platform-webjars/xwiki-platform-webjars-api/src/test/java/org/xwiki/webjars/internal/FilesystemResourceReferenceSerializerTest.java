@@ -20,134 +20,167 @@
 package org.xwiki.webjars.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 
 import javax.inject.Provider;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
-public class FilesystemResourceReferenceSerializerTest
+/**
+ * Unit tests for {@link FilesystemResourceReferenceSerializer}.
+ *
+ * @version $Id$
+ */
+@ComponentTest
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
+class FilesystemResourceReferenceSerializerTest
 {
     private static final File BASEDIR = new File(System.getProperty("java.io.tmpdir"), "xwikitest");
 
-    @Rule
-    public MockitoComponentMockingRule<FilesystemResourceReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(FilesystemResourceReferenceSerializer.class);
+    @MockComponent
+    private Provider<FilesystemExportContext> exportContextProvider;
+
+    @InjectMockComponents
+    private FilesystemResourceReferenceSerializer serializer;
 
     private ClassLoader originalThreadContextClassLoader;
 
-    @Before
-    public void setUp() throws Exception
+    private String fontAwesomeVersion;
+
+    private String webjarPrefix;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.originalThreadContextClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         FileUtils.deleteDirectory(BASEDIR);
+
+        this.fontAwesomeVersion = loadFontAwesomeVersion();
+        this.webjarPrefix = "webjars/font-awesome/" + this.fontAwesomeVersion;
     }
 
-    @After
-    public void tearDown()
+    @AfterEach
+    void tearDown()
     {
         Thread.currentThread().setContextClassLoader(this.originalThreadContextClassLoader);
     }
 
     @Test
-    public void serialize() throws Exception
+    void serialize() throws Exception
     {
         FilesystemExportContext exportContext = new FilesystemExportContext();
         exportContext.setExportDir(BASEDIR);
 
-        Provider<FilesystemExportContext> exportContextProvider = this.mocker.getInstance(new DefaultParameterizedType(
-            null, Provider.class, FilesystemExportContext.class));
-        Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "4.7.0", "fonts/FontAwesome.otf"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("webjars/font-awesome/4.7.0/fonts/FontAwesome.otf",
-            this.mocker.getComponentUnderTest().serialize(reference).serialize());
+        assertEquals(this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/FontAwesome.otf").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
-    public void serializeWithCSSPathAdjustments() throws Exception
+    void serializeWithCSSPathAdjustments() throws Exception
     {
         FilesystemExportContext exportContext = new FilesystemExportContext();
         exportContext.setExportDir(BASEDIR);
         exportContext.pushCSSParentLevels(3);
 
-        Provider<FilesystemExportContext> exportContextProvider = this.mocker.getInstance(new DefaultParameterizedType(
-            null, Provider.class, FilesystemExportContext.class));
-        Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "4.7.0", "fonts/FontAwesome.otf"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../../webjars/font-awesome/4.7.0/fonts/FontAwesome.otf",
-            this.mocker.getComponentUnderTest().serialize(reference).serialize());
+        assertEquals("../../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/FontAwesome.otf").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
-    public void serializeWithCSSPathAdjustmentsWithDocParentLevels() throws Exception
+    void serializeWithCSSPathAdjustmentsWithDocParentLevels() throws Exception
     {
         FilesystemExportContext exportContext = new FilesystemExportContext();
         exportContext.setExportDir(BASEDIR);
         exportContext.setDocParentLevels(2);
 
-        Provider<FilesystemExportContext> exportContextProvider = this.mocker.getInstance(new DefaultParameterizedType(
-            null, Provider.class, FilesystemExportContext.class));
-        Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "4.7.0", "fonts/FontAwesome.otf"));
+            "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
-        assertEquals("../../webjars/font-awesome/4.7.0/fonts/FontAwesome.otf",
-            this.mocker.getComponentUnderTest().serialize(reference).serialize());
+        assertEquals("../../" + this.webjarPrefix + "/webfonts/fa-regular-400.woff2",
+            this.serializer.serialize(reference).serialize());
 
         // Also verify that the resource has been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/FontAwesome.otf").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
     }
 
     @Test
-    public void serializeCSSResourceWithURLsInIt() throws Exception
+    void serializeCSSResourceWithURLsInIt() throws Exception
     {
         FilesystemExportContext exportContext = new FilesystemExportContext();
         exportContext.setExportDir(BASEDIR);
 
-        Provider<FilesystemExportContext> exportContextProvider = this.mocker.getInstance(new DefaultParameterizedType(
-            null, Provider.class, FilesystemExportContext.class));
-        Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
+        when(this.exportContextProvider.get()).thenReturn(exportContext);
 
         WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
-            "font-awesome", "4.7.0", "css/font-awesome.min.css"));
+            "font-awesome", this.fontAwesomeVersion, "css/all.min.css"));
 
-        assertEquals("webjars/font-awesome/4.7.0/css/font-awesome.min.css",
-            this.mocker.getComponentUnderTest().serialize(reference).serialize());
+        assertEquals(this.webjarPrefix + "/css/all.min.css", this.serializer.serialize(reference).serialize());
 
         // Also verify that the resources haves been copied!
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/css/font-awesome.min.css").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/fontawesome-webfont.eot").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/fontawesome-webfont.woff").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/fontawesome-webfont.svg").exists());
-        assertTrue(new File(BASEDIR, "webjars/font-awesome/4.7.0/fonts/fontawesome-webfont.ttf").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/css/all.min.css").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-regular-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-solid-900.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-brands-400.woff2").exists());
+        assertTrue(new File(BASEDIR, this.webjarPrefix + "/webfonts/fa-v4compatibility.woff2").exists());
+    }
 
+    /**
+     * Load the Font Awesome version from the WebJar's pom.properties file.
+     *
+     * @return the Font Awesome version
+     */
+    private static String loadFontAwesomeVersion()
+    {
+        // Try to load from the WebJar's pom.properties file
+        String propertiesPath = "META-INF/maven/org.webjars/font-awesome/pom.properties";
+        try (InputStream is = Thread.currentThread().getContextClassLoader()
+            .getResourceAsStream(propertiesPath))
+        {
+            if (is == null) {
+                throw new RuntimeException("Could not find Font Awesome pom.properties at " + propertiesPath);
+            }
+
+            Properties properties = new Properties();
+            properties.load(is);
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load Font Awesome version from " + propertiesPath, e);
+        }
     }
 }

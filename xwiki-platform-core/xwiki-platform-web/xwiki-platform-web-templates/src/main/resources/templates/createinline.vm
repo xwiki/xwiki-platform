@@ -463,8 +463,7 @@
 </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-  #getRequiredSkinExtensions($requiredSkinExtensions)
-  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #sendRequiredSkinExtensions()
 #else
   </form>
 #end

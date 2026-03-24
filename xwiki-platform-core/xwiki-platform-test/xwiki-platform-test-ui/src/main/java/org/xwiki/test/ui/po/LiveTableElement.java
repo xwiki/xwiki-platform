@@ -101,7 +101,7 @@ public class LiveTableElement extends BaseElement
 
         WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
-            if (element.getAttribute("class").contains("selectized")) {
+            if (element.getAttribute("class").contains("tomselected")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
                 suggestInputElement.sendKeys(filterValue).selectTypedText();
             } else {

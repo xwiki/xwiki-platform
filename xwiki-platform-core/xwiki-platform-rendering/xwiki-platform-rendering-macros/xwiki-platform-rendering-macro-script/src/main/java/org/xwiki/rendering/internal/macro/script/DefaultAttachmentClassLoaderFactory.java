@@ -105,7 +105,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     private Set<URI> extractURIs(String jarURLs) throws URISyntaxException
     {
         // Parse the passed JAR URLs to tokenize it.
-        Set<URI> uris = new LinkedHashSet<URI>();
+        Set<URI> uris = new LinkedHashSet<>();
         if (StringUtils.isNotEmpty(jarURLs)) {
             StringTokenizer tokenizer = new StringTokenizer(jarURLs, ",");
             while (tokenizer.hasMoreElements()) {

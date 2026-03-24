@@ -383,6 +383,12 @@
               <wikiObjectProperty name="prop2">
                 <p>
                   <value t="java.lang.Long">2</value>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>Long</string>
+                    </entry>
+                  </parameters>
                 </p>
               </wikiObjectProperty>
             </wikiObject>
@@ -457,6 +463,12 @@
               <wikiObjectProperty name="prop1">
                 <p>
                   <value t="java.lang.Long">1</value>
+                  <parameters>
+                    <entry>
+                      <string>objectPropertyType</string>
+                      <string>Long</string>
+                    </entry>
+                  </parameters>
                 </p>
               </wikiObjectProperty>
             </wikiObject>
@@ -705,6 +717,12 @@
                 <wikiObjectProperty name="prop2">
                   <p>
                     <value t="java.lang.Long">2</value>
+                    <parameters>
+                      <entry>
+                        <string>objectPropertyType</string>
+                        <string>Long</string>
+                      </entry>
+                    </parameters>
                   </p>
                 </wikiObjectProperty>
               </wikiObject>
@@ -779,6 +797,12 @@
                 <wikiObjectProperty name="prop1">
                   <p>
                     <value t="java.lang.Long">1</value>
+                    <parameters>
+                      <entry>
+                        <string>objectPropertyType</string>
+                        <string>Long</string>
+                      </entry>
+                    </parameters>
                   </p>
                 </wikiObjectProperty>
               </wikiObject>

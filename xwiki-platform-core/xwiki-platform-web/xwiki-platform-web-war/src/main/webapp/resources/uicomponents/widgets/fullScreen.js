@@ -60,15 +60,7 @@ widgets.FullScreen = Class.create({
       this.toolbarPlaceholder = new Element("span");
       // The controls that will close the fullscreen
       this.createCloseButtons();
-      // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
-      // that full screen
       this.maximizedReference = $(document.body).down("input[name='x-maximized']");
-      if (this.maximizedReference && this.maximizedReference.value != "") {
-        var matches = $$(this.maximizedReference.value);
-        if (matches && matches.length > 0) {
-          this.makeFullScreen(matches[0]);
-        }
-      }
       // Cleanup before the window unloads.
       this.unloadHandler = this.cleanup.bind(this);
       Event.observe(window, 'unload', this.unloadHandler);
@@ -77,7 +69,7 @@ widgets.FullScreen = Class.create({
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
-    if (!this.isNotMaximizable(item)) {
+    if (!this.isNotMaximizable(item) && !this.isAlreadyAugmented(item)) {
       if (this.isWikiContent(item)) {
         this.addWikiContentButton(item);
       } else if (this.isWikiField(item)) {
@@ -87,6 +79,19 @@ widgets.FullScreen = Class.create({
         this.addElementButton(item);
       }
     }
+  },
+  restoreFullscreenFromPreview : function () {
+    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
+    // that full screen
+    if (this.maximizedReference && this.maximizedReference.value != "") {
+      var matches = $$(this.maximizedReference.value);
+      if (matches && matches.length > 0) {
+        this.makeFullScreen(matches[0]);
+      }
+    }
+  },
+  isAlreadyAugmented: function(item) {
+    return typeof item._x_fullScreenActivator !== 'undefined';
   },
   isNotMaximizable: function (item) {
     return item.hasClassName('not-maximizable');
@@ -409,12 +414,14 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
       XWiki.widgets.__fullscreenInstance.initDom();
       XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
     });
+    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
   });
   let init = function () {
     XWiki.widgets.__fullscreenInstance.initDom();
     $(document).find('textarea,.maximizable').each(function () {
       XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
     });
+    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
   }
   XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
 });

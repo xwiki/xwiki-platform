@@ -87,10 +87,10 @@
 
     if (!$.support.transition) return complete.call(this)
 
-    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+    const scrollSize = `scroll${dimension[0].toUpperCase()}${dimension.substring(1)}`;
 
     this.$element
-      .one('bsTransitionEnd', $.proxy(complete, this))
+      .one('bsTransitionEnd', complete.bind(this))
       .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
   }
 
@@ -128,7 +128,7 @@
 
     this.$element
       [dimension](0)
-      .one('bsTransitionEnd', $.proxy(complete, this))
+      .one('bsTransitionEnd', complete.bind(this))
       .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
   }
 
@@ -139,10 +139,10 @@
   Collapse.prototype.getParent = function () {
     return $(document).find(this.options.parent)
       .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
-      .each($.proxy(function (i, element) {
+      .each((i, element) => {
         var $element = $(element)
         this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
-      }, this))
+      })
       .end()
   }
 
@@ -173,7 +173,7 @@
       var data    = $this.data('bs.collapse')
       var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
 
-      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
+      if (!data && options.toggle && typeof option === 'string' && /show|hide/.test(option)) options.toggle = false
       if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
       if (typeof option == 'string') data[option]()
     })

@@ -191,7 +191,7 @@ public class DefaultWikiComponent implements WikiComponent
     /**
      * Sets the handled method.
      * 
-     * @see {@link #getHandledMethods()}
+     * @see #getHandledMethods()
      * 
      * @param methods the methods this component will handle
      */
@@ -203,7 +203,7 @@ public class DefaultWikiComponent implements WikiComponent
     /**
      * Sets the implemented interfaces.
      *
-     * @see {@link #getImplementedInterfaces()}
+     * @see #getImplementedInterfaces()
      *
      * @param interfaces the interfaces this component implements
      */

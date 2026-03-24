@@ -131,7 +131,7 @@ public class WikiTemplateManagerScript implements ScriptService
             return wikiTemplateManager.getTemplates();
         } catch (WikiTemplateManagerException e) {
             error("Error while getting all the wiki templates.", e);
-            return new ArrayList<WikiDescriptor>();
+            return new ArrayList<>();
         }
     }
 

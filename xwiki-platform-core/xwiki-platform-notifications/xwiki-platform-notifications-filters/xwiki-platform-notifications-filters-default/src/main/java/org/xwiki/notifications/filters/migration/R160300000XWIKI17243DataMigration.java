@@ -74,6 +74,7 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 @Component
 @Named("R160300000XWIKI17243")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigration
 {
     private static final String WATCHLIST_CLASSNAME = "WatchListClass";

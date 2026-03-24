@@ -46,11 +46,24 @@
   <complexType name="Step">
     <complexContent>
       <extension base="xwiki:LinkCollection">
-        <attribute name="hint" type="string"></attribute>
-        <attribute name="title" type="string"></attribute>
-        <attribute name="index" type="int"></attribute>
-        <attribute name="optional" type="boolean"></attribute>
-        <attribute name="hidden" type="boolean"></attribute>
+        <sequence>
+          <element name="hint" type="string"></element>
+          <element name="title" type="string"></element>
+          <element name="index" type="int"></element>
+          <element name="optional" type="boolean"></element>
+          <element name="hidden" type="boolean"></element>
+          <element name="html" type="string"></element>
+          <element name="uiComponent" type="distributionWizard:UIComponent"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="UIComponent">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="module" type="string"></attribute>
+        <attribute name="component" type="string"></attribute>
       </extension>
     </complexContent>
   </complexType>

@@ -20,51 +20,74 @@
 <script setup lang="ts">
 import WizardBreadcrumb from "./WizardBreadcrumb.vue";
 import WizardStep from "./WizardStep.vue";
-import { computed, onMounted, reactive, ref, useTemplateRef } from "vue";
+import {
+  computed,
+  onMounted,
+  onUpdated,
+  ref,
+  useTemplateRef,
+  watch,
+} from "vue";
+import type { StepsResolverFunction } from "../StepsResolver";
 import type { WizardStepProps } from "../WizardStepProps";
 
 const emit = defineEmits(["closed"]);
+const props = defineProps<{
+  stepResolver: StepsResolverFunction;
+  wizardTitle: string;
+}>();
 
-const steps: WizardStepProps[] = reactive([
-  {
-    title: "Step 1",
-    content: "Some content",
-    index: 0,
-  },
-  {
-    title: "Step 2",
-    content: "Some content2",
-    index: 1,
-  },
-]);
+const steps = ref<WizardStepProps[]>([]);
+let activeStep = ref<WizardStepProps | undefined>();
+const stepComponent = ref();
 
-let activeStep = ref(steps[0]);
 const htmlDialog = useTemplateRef("wizardDialog");
 
-const hasNextStep = computed(() => activeStep.value.index < steps.length - 1);
-const hasPreviousStep = computed(() => activeStep.value.index > 0);
+const stepIndex = computed(() => {
+  return activeStep.value ? activeStep.value.index : 0;
+});
+const hasNextStep = computed(() => stepIndex.value < steps.value.length - 1);
+const hasPreviousStep = computed(() => stepIndex.value > 0);
 const stepNames = computed(() => {
   let names = [];
-  for (let step of steps) {
+  for (let step of steps.value) {
     names.push(step.title);
   }
   return names;
 });
 const isFinished = true;
 
-onMounted(() => {
-  htmlDialog.value?.showModal();
+onMounted(async () => {
+  steps.value = await props.stepResolver();
+  if (steps.value.length > 1) {
+    activeStep.value = steps.value[0];
+  }
+});
+onUpdated(() => {
+  if (activeStep.value) {
+    htmlDialog.value?.showModal();
+  }
+});
+watch(activeStep, async (newStep, oldStep) => {
+  if (newStep && newStep.uiComponent) {
+    console.log("Loading", newStep.uiComponent);
+    stepComponent.value = (await import(newStep.uiComponent.module))[
+      newStep.uiComponent.component
+    ];
+  } else {
+    stepComponent.value = null;
+  }
 });
 
 function nextStep() {
   if (hasNextStep.value) {
-    activeStep.value = steps[activeStep.value.index + 1];
+    activeStep.value = steps.value[stepIndex.value + 1];
   }
 }
 
 function previousStep() {
   if (hasPreviousStep.value) {
-    activeStep.value = steps[activeStep.value.index - 1];
+    activeStep.value = steps.value[stepIndex.value - 1];
   }
 }
 function finishWizard() {
@@ -80,13 +103,14 @@ function finishWizard() {
     class="wizard-dialog"
     ref="wizardDialog"
     aria-labelledby="wizard-title"
+    v-if="activeStep"
   >
     <div class="wizard-header">
-      <h2 class="wizard-title">Welcome to XWiki</h2>
+      <h2 class="wizard-title">{{ wizardTitle }} - {{ activeStep.title }}</h2>
       <WizardBreadcrumb :steps="stepNames" :activeStep="activeStep.index" />
     </div>
     <main class="wizard-content">
-      <WizardStep :step="activeStep"></WizardStep>
+      <WizardStep :step="activeStep" :component="stepComponent"></WizardStep>
     </main>
     <div class="wizard-footer">
       <div class="footer-left">

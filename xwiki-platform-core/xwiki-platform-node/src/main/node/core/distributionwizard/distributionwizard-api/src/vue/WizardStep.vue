@@ -20,14 +20,13 @@
 <script setup lang="ts">
 import type { WizardStepProps } from "../WizardStepProps";
 
-defineProps<{ step: WizardStepProps }>();
+defineProps<{ step: WizardStepProps; component: unknown }>();
 </script>
 
 <template>
-  <h3>{{ step.title }}</h3>
-  <div>
-    {{ step.content }}
-  </div>
+  <component v-if="component" :is="component" />
+  <div v-else-if="step.html" v-html="step.html"></div>
+  <span v-else>The step is missing proper content.</span>
 </template>
 
 <style scoped></style>

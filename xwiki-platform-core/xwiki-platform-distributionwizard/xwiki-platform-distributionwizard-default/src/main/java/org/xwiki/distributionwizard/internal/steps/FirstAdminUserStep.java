@@ -43,13 +43,7 @@ public class FirstAdminUserStep extends AbstractStep
     @Override
     public String getTitle()
     {
-        return "First admin user step";
-    }
-
-    @Override
-    public Block render()
-    {
-        return null;
+        return "First admin setup";
     }
 
     @Override
@@ -79,11 +73,5 @@ public class FirstAdminUserStep extends AbstractStep
         } catch (XWikiException e) {
             throw new DistributionWizardException("Error when trying to compute if the step is done", e);
         }
-    }
-
-    @Override
-    public String getTemplateId()
-    {
-        return "";
     }
 }

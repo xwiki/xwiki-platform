@@ -19,11 +19,25 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+
+import jakarta.inject.Inject;
 
 public abstract class AbstractStep implements DistributionWizardStep
 {
-    public abstract String getTemplateId();
+    @Inject
+    private ComponentDescriptor componentDescriptor;
 
+    @Override
+    public String getUIComponentName()
+    {
+        return componentDescriptor.getRoleHint();
+    }
 
+    @Override
+    public String getUIComponentModule()
+    {
+        return "xwiki-platform-distributionwizard-webjar";
+    }
 }

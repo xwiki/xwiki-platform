@@ -27,9 +27,10 @@ import org.xwiki.template.Template;
 public interface DistributionWizardStep
 {
     String getTitle();
-    Block render();
     int getIndex();
     boolean isHidden();
     boolean isOptional();
     boolean isStepDone() throws DistributionWizardException;
+    String getUIComponentModule();
+    String getUIComponentName();
 }

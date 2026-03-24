@@ -17,7 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { App } from "@xwiki/platform-distributionwizard";
+import { WizardDialog } from "@xwiki/platform-distributionwizard-api";
+
+import {
+  FirstAdminUserStep,
+  WelcomeStep,
+} from "@xwiki/platform-distributionwizard-steps";
+import { XWikiStepsResolver } from "@xwiki/platform-distributionwizard-xwiki";
 import { createApp } from "vue";
 
-createApp(App).mount("#distributionWizard");
+createApp(WizardDialog, {
+  stepResolver: () =>
+    XWikiStepsResolver(
+      `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(XWiki.currentWiki)}/steps/`,
+    ),
+  wizardTitle: "First installation",
+}).mount("#distributionWizard");
+
+export { FirstAdminUserStep, WelcomeStep };

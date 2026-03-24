@@ -22,12 +22,24 @@ package org.xwiki.filter.xar.internal.output;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.apache.commons.io.output.DeferredFileOutputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.output.FileOutputTarget;
 import org.xwiki.filter.output.OutputStreamOutputTarget;
@@ -37,29 +49,47 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarPackage;
+import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
+@Component(roles = XARWikiWriter.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARWikiWriter implements Closeable
 {
-    private final String name;
+    /**
+     * Threshold in bytes below which entry content is kept in memory. Above this, a temporary file is used.
+     */
+    private static final int DEFERRED_THRESHOLD = 10_000;
 
-    private final XAROutputProperties xarProperties;
+    private String name;
 
-    private final ZipArchiveOutputStream zipStream;
+    private XAROutputProperties xarProperties;
+
+    private ZipArchiveOutputStream zipStream;
 
     private XarPackage xarPackage = new XarPackage();
 
+    private DeferredFileOutputStream currentEntryBuffer;
+
+    private String currentEntryName;
+
+    @Inject
+    private Environment environment;
+
+    @Inject
+    private Logger logger;
+
     /**
-     * Default constructor.
+     * Initialize the writer. Must be called before any other method.
      *
      * @param name the name of the package.
      * @param xarProperties the properties to be used for writing the XAR.
      * @throws FilterException in case of problem for creating the output target.
      */
-    public XARWikiWriter(String name, XAROutputProperties xarProperties) throws FilterException
+    public void initialize(String name, XAROutputProperties xarProperties) throws FilterException
     {
         this.name = name;
         this.xarProperties = xarProperties;
@@ -128,6 +158,7 @@ public class XARWikiWriter implements Closeable
 
     /**
      * Creates a new entry based on the given reference and returns the output stream for writing it.
+     *
      * @param reference the reference of the document for creating the entry in the XAR.
      * @return the output stream for writing it.
      * @throws FilterException in case of problem for creating the entry.
@@ -153,16 +184,25 @@ public class XARWikiWriter implements Closeable
 
         String entryName = path.toString();
 
-        ZipArchiveEntry zipentry = new ZipArchiveEntry(entryName);
-        try {
-            this.zipStream.putArchiveEntry(zipentry);
-        } catch (IOException e) {
-            throw new FilterException("Failed to add a new zip entry for [" + path + "]", e);
-        }
-
         this.xarPackage.addEntry(reference, entryName);
+        return initializeEntryBuffer(entryName);
+    }
 
-        return this.zipStream;
+    private DeferredFileOutputStream initializeEntryBuffer(String entryName)
+    {
+        // Buffer entry content in memory (up to DEFERRED_THRESHOLD bytes) or on disk.
+        // This is required for Zip64 support on non-seekable output streams as we need to know the uncompressed size
+        // before adding it to the ZIP archive.
+        this.currentEntryName = entryName;
+
+        File tempDir = this.environment.getTemporaryDirectory();
+        this.currentEntryBuffer = DeferredFileOutputStream.builder()
+            .setThreshold(DEFERRED_THRESHOLD)
+            .setDirectory(tempDir)
+            .setPrefix("xar-entry-")
+            .get();
+
+        return this.currentEntryBuffer;
     }
 
     /**
@@ -172,18 +212,46 @@ public class XARWikiWriter implements Closeable
     public void closeEntry() throws FilterException
     {
         try {
+            // Flush the entry content to the ZIP archive with a known uncompressed size.
+            this.currentEntryBuffer.close();
+
+            long size = this.currentEntryBuffer.isInMemory()
+                ? this.currentEntryBuffer.getData().length
+                : this.currentEntryBuffer.getFile().length();
+
+            ZipArchiveEntry entry = new ZipArchiveEntry(this.currentEntryName);
+            entry.setSize(size);
+            this.zipStream.putArchiveEntry(entry);
+
+            if (this.currentEntryBuffer.isInMemory()) {
+                this.zipStream.write(this.currentEntryBuffer.getData());
+            } else {
+                try (InputStream in = this.currentEntryBuffer.toInputStream()) {
+                    IOUtils.copyLarge(in, this.zipStream);
+                }
+            }
+
             this.zipStream.closeArchiveEntry();
         } catch (IOException e) {
             throw new FilterException("Failed to close zip archive entry", e);
+        } finally {
+            cleanupCurrentEntryBuffer();
         }
     }
 
     private void writePackage() throws FilterException
     {
+        DeferredFileOutputStream outputStream = initializeEntryBuffer(XarModel.PATH_PACKAGE);
         try {
-            this.xarPackage.write(this.zipStream, this.xarProperties.getEncoding());
+            // To be safe, use buffering to avoid Zip64 issues.
+            this.xarPackage.write(outputStream, this.xarProperties.getEncoding());
+            closeEntry();
         } catch (Exception e) {
             throw new FilterException("Failed to write package.xml entry", e);
+        } finally {
+            // Clean up the entry buffer for error cases. Calling this twice is safe as it does nothing if the buffer
+            // has already been closed.
+            cleanupCurrentEntryBuffer();
         }
     }
 
@@ -199,5 +267,25 @@ public class XARWikiWriter implements Closeable
 
         // Close zip stream
         this.zipStream.close();
+    }
+
+    private void cleanupCurrentEntryBuffer()
+    {
+        if (this.currentEntryBuffer != null && !this.currentEntryBuffer.isInMemory()) {
+            // Try to close the buffer before deleting the temporary file for error cases where the buffer might
+            // still be open.
+            IOUtils.closeQuietly(this.currentEntryBuffer);
+            File file = this.currentEntryBuffer.getFile();
+            if (file != null && file.exists()) {
+                try {
+                    Files.delete(file.toPath());
+                } catch (IOException e) {
+                    this.logger.warn("Failed to delete temporary file [{}], root cause: {}", file,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
+        this.currentEntryBuffer = null;
+        this.currentEntryName = null;
     }
 }

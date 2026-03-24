@@ -29,6 +29,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
@@ -101,6 +102,9 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     @Inject
     private XarObjectPropertySerializerManager propertySerializerManager;
+
+    @Inject
+    private Provider<XARWikiWriter> wikiWriterProvider;
 
     private XARWikiWriter wikiWriter;
 
@@ -195,7 +199,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.wikiWriter = new XARWikiWriter(
+        this.wikiWriter = this.wikiWriterProvider.get();
+        this.wikiWriter.initialize(
             this.properties.getPackageName() != null ? this.properties.getPackageName() : name, this.properties);
     }
 
@@ -306,7 +311,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 checkXMLWriter();
             } else {
                 if (this.wikiWriter == null) {
-                    this.wikiWriter = new XARWikiWriter(
+                    this.wikiWriter = this.wikiWriterProvider.get();
+                    this.wikiWriter.initialize(
                         this.properties.getPackageName() != null ? this.properties.getPackageName() : "package",
                         this.properties);
                 }

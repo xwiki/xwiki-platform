@@ -28,25 +28,13 @@ import jakarta.inject.Singleton;
 
 @Component
 @Singleton
-@Named("welcomestep")
+@Named("WelcomeStep")
 public class WelcomeStep extends AbstractStep
 {
     @Override
-    public String getTemplateId()
-    {
-        return "";
-    }
-
-    @Override
     public String getTitle()
     {
-        return "";
-    }
-
-    @Override
-    public Block render()
-    {
-        return null;
+        return "Welcome";
     }
 
     @Override

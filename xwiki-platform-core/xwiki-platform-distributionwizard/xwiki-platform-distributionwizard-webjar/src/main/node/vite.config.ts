@@ -21,5 +21,7 @@
 import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
 
 export default generateWebjarNodeConfig(import.meta.url, [
-  "@xwiki/platform-distributionwizard",
+  "@xwiki/platform-distributionwizard-api",
+  "@xwiki/platform-distributionwizard-steps",
+  "@xwiki/platform-distributionwizard-xwiki",
 ]);

@@ -17,9 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+type UIComponent = {
+  component: string;
+  module: string;
+};
 type WizardStepProps = {
   title: string;
-  content: string;
+  uiComponent: UIComponent;
+  html: string;
   index: number;
 };
+
 export type { WizardStepProps };

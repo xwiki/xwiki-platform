@@ -381,6 +381,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distributionwizard-rest</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Jakarta/Javax (make sure we provide the right ones, even if not yet used by XWiki Standard) -->

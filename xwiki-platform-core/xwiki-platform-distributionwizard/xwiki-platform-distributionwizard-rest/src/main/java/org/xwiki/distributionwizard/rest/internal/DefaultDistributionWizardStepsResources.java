@@ -28,13 +28,15 @@ import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
+import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
+import org.xwiki.rest.XWikiResource;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import jakarta.inject.Named;
 
 @Component
-@Singleton
-public class DefaultDistributionWizardStepsResources implements DistributionWizardStepsResources
+@Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepsResources")
+public class DefaultDistributionWizardStepsResources extends XWikiResource implements DistributionWizardStepsResources
 {
     @Inject
     private DistributionWizardManager distributionWizardManager;
@@ -59,6 +61,10 @@ public class DefaultDistributionWizardStepsResources implements DistributionWiza
         step.setIndex(wizardStep.getIndex());
         step.setOptional(wizardStep.isOptional());
         step.setTitle(wizardStep.getTitle());
+        UIComponent uiComponent = new UIComponent();
+        uiComponent.setComponent(wizardStep.getUIComponentName());
+        uiComponent.setModule(wizardStep.getUIComponentModule());
+        step.setUiComponent(uiComponent);
         return step;
     }
 }

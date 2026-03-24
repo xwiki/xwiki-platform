@@ -17,6 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import config from "@xwiki/platform-tool-eslintconfig";
+import type { WizardStepProps } from "@xwiki/platform-distributionwizard-api";
 
-export default config;
+type JSONSteps = {
+  step: WizardStepProps[];
+};
+
+async function fetchSteps(restURL: string): Promise<JSONSteps> {
+  const response = await fetch(restURL, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  // FIXME: handle fetch error
+  return response.json();
+}
+
+export async function XWikiStepsResolver(
+  restURL: string,
+): Promise<WizardStepProps[]> {
+  const steps = await fetchSteps(restURL);
+  return steps.step;
+}

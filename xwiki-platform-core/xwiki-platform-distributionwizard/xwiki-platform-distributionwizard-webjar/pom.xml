@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distributionwizard</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-distributionwizard-webjar</artifactId>
@@ -37,10 +37,11 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <!-- Put back .prod.js for vue -->
     <xwiki.extension.javascript.modules.importmap>
       {
-      "distributionwizard": "org.xwiki.platform:xwiki-platform-distributionwizard-webjar/index.es.js",
-      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js"
+      "xwiki-platform-distributionwizard-webjar": "org.xwiki.platform:xwiki-platform-distributionwizard-webjar/index.es.js",
+      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.js"
       }
     </xwiki.extension.javascript.modules.importmap>
   </properties>

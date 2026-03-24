@@ -29,18 +29,12 @@ import jakarta.inject.Singleton;
 @Component
 @Singleton
 @Named("UIDistributionStep")
-public class UIDistributionStep implements DistributionWizardStep
+public class UIDistributionStep extends AbstractStep
 {
     @Override
     public String getTitle()
     {
         return "UI Distribution Choice";
-    }
-
-    @Override
-    public Block render()
-    {
-        return null;
     }
 
     @Override

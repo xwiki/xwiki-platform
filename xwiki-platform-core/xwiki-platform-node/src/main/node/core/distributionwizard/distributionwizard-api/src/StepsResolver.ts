@@ -17,6 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import config from "@xwiki/platform-tool-eslintconfig";
+import type { WizardStepProps } from "./WizardStepProps";
 
-export default config;
+export type StepsResolverFunction = () => Promise<WizardStepProps[]>;

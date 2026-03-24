@@ -17,10 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import App from "./vue/App.vue";
 import WizardBreadcrumb from "./vue/WizardBreadcrumb.vue";
 import WizardDialog from "./vue/WizardDialog.vue";
 import WizardStep from "./vue/WizardStep.vue";
+import type { StepsResolverFunction } from "./StepsResolver";
+import type { WizardStepProps } from "./WizardStepProps";
 
-
-export { App, WizardBreadcrumb, WizardDialog, WizardStep };
+export {
+  type StepsResolverFunction,
+  WizardBreadcrumb,
+  WizardDialog,
+  WizardStep,
+  type WizardStepProps,
+};

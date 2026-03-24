@@ -17,18 +17,23 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-<form id="first-user" method="post">
-  <input type="text" id="first-name" />
-  <input type="text" id="last-name" />
-  <input type="text" id="first-name" />
-</form>
+  <form id="first-user" method="post" class="xform">
+    <dl>
+      <dt><label for="register_first_name">First Name</label></dt>
+      <dd><input type="text" id="register_first_name" /></dd>
+    </dl>
+    <dl>
+      <dt><label for="register_last_name">Last Name</label></dt>
+      <dd><input type="text" id="register_first_name" /></dd>
+    </dl>
+    <dl>
+      <dt><label for="register_username">Username</label></dt>
+      <dd><input type="text" id="register_username" /></dd>
+    </dl>
+  </form>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

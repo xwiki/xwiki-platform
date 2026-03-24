@@ -36,7 +36,7 @@
 </head>
 <body>
     <script type="module">
-        import "distributionwizard"
+        import "xwiki-platform-distributionwizard-webjar"
     </script>
     <div id="distributionWizard">
     </div>

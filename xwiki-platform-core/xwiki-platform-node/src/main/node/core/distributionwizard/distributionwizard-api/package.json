@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-distributionwizard-api",
-  "version": "18.2.0-SNAPSHOT",
-  "description": "Provide UI components for the Distribution Wizard.",
+  "version": "18.3.0-SNAPSHOT",
+  "description": "Provide XWiki bridge for the Distribution Wizard.",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -51,6 +51,8 @@
     "@microsoft/api-extractor": "catalog:",
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
@@ -60,8 +62,5 @@
   },
   "keywords": [
     "wizard"
-  ],
-  "dependencies": {
-    "@xwiki/platform-tool-tsconfig": "workspace:*"
-  }
+  ]
 }

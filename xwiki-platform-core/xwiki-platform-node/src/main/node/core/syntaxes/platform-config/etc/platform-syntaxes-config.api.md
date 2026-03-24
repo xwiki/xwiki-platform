@@ -7,7 +7,6 @@
 // @beta
 export type SyntaxConfig = {
     id: string;
-    displayName: string;
     features: SyntaxFeaturesWhitelist;
 };
 
@@ -19,6 +18,7 @@ export type SyntaxFeaturesWhitelist = {
             levels4To6: boolean;
         };
         lists: {
+            bulletLists: boolean;
             contiguousNumberedLists: boolean;
             contiguousNumberedListsAnyStartIndex: boolean;
             unorderedNumberedLists: boolean;
@@ -49,7 +49,8 @@ export type SyntaxFeaturesWhitelist = {
             insideLinks: boolean;
             customBorder: boolean;
         };
-        codeBlocks: {
+        quotes: boolean;
+        code: {
             basicCodeBlocks: boolean;
             language: boolean;
         };
@@ -70,6 +71,10 @@ export type SyntaxFeaturesWhitelist = {
             descriptiveTooltip: boolean;
         };
         images: boolean;
+        code: {
+            basicInlineCode: boolean;
+            language: boolean;
+        };
         macros: boolean;
         rawHtml: boolean;
         textStyles: {

@@ -741,7 +741,7 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 // Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
 //
 // @beta
-export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
+export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[], syntax: SyntaxConfig): DefaultReactSuggestionItem[];
 
 // (No @packageDocumentation comment for this package)
 

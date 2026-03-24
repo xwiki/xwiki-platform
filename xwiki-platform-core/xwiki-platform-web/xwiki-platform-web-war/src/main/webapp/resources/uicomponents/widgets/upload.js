@@ -133,7 +133,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     static createButton(content, handler)
     {
       let result = document.createElement('button');
-      result.classList.add(...'btn btn-default'.split(' '));
+      result.classList.add('btn', 'btn-default');
       result.innerHTML = content||'';
       if(handler) result.addEventListener('click', handler);
       return result;

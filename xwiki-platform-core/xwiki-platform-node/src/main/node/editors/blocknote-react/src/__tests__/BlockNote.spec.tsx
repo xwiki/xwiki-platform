@@ -20,6 +20,7 @@
 import { BlockNoteForTest } from "./BlockNote.story";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockOfType, BlockType } from "../blocknote";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
@@ -99,6 +100,61 @@ test("Image insertion UI can be overriden", async ({ mount }) => {
   expect(overrideFnCalledWithUrl).toBe(SMALL_IMG_DATA_URL);
 });
 
+test("Whitelisted syntax features should be available", async ({ mount }) => {
+  const component = await mount(
+    <BlockNoteForTest macros={false} content={[]} syntax={FULL_SYNTAX} />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+
+  await editorEl.press("/");
+
+  const slashMenuEl = component.locator("#bn-suggestion-menu");
+  await slashMenuEl.waitFor({ state: "attached" });
+
+  const menuItems = await slashMenuEl
+    .locator(".bn-suggestion-menu-item p:first-child")
+    .all();
+
+  const menuItemsText = await Promise.all(
+    menuItems.map((item) => item.textContent()),
+  );
+
+  expect(menuItemsText).toContain("Table");
+  expect(menuItemsText).toContain("Quote");
+});
+
+// eslint-disable-next-line max-statements
+test("Non-whitelisted syntax features should be unavailable", async ({
+  mount,
+}) => {
+  const syntax = structuredClone(FULL_SYNTAX);
+  syntax.features.blocks.tables.basicTables = false;
+  syntax.features.blocks.quotes = false;
+
+  const component = await mount(
+    <BlockNoteForTest macros={false} content={[]} syntax={syntax} />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+
+  await editorEl.press("/");
+
+  const slashMenuEl = component.locator("#bn-suggestion-menu");
+  await slashMenuEl.waitFor({ state: "attached" });
+
+  const menuItems = await slashMenuEl
+    .locator(".bn-suggestion-menu-item p:first-child")
+    .all();
+
+  const menuItemsText = await Promise.all(
+    menuItems.map((item) => item.textContent()),
+  );
+
+  expect(menuItemsText).not.toContain("Table");
+  expect(menuItemsText).not.toContain("Quote");
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),
@@ -139,3 +195,86 @@ function buildImage(url: string): BlockOfType<"image"> {
 
 const SMALL_IMG_DATA_URL =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+const FULL_SYNTAX: SyntaxConfig = {
+  id: "default-syntax",
+  features: {
+    blocks: {
+      headings: {
+        levels1To3: true,
+        levels4To6: true,
+      },
+      images: {
+        basicImages: true,
+        altText: true,
+        caption: true,
+        customBorder: true,
+        customDimensions: true,
+        insideLinks: true,
+      },
+      lists: {
+        bulletLists: true,
+        blockInListItems: true,
+        checkableLists: true,
+        contiguousNumberedLists: true,
+        contiguousNumberedListsAnyStartIndex: true,
+        mixableCheckableListItems: true,
+        multipleBlocksInListItems: true,
+        unorderedNumberedLists: true,
+        listsNesting: true,
+      },
+      quotes: true,
+      code: {
+        basicCodeBlocks: true,
+        language: true,
+      },
+      dividers: true,
+      macros: true,
+      nesting: true,
+      styling: {
+        justifyAlignment: true,
+        lcrAlignment: true,
+      },
+      tables: {
+        basicTables: true,
+        blockInTableCells: true,
+        colRows: true,
+        colSpan: true,
+        headerColumns: true,
+        multipleBlocksInTableCells: true,
+        multipleFooterRows: true,
+        multipleHeaderRows: true,
+        noHeaderRowTable: true,
+        singleFooterRow: true,
+        singleHeaderRow: true,
+      },
+    },
+    inlineContents: {
+      images: true,
+      links: {
+        basicLinks: true,
+        customText: true,
+        customTextStyling: true,
+        descriptiveTooltip: true,
+        metadata: true,
+      },
+      code: {
+        basicInlineCode: true,
+        language: true,
+      },
+      macros: true,
+      rawHtml: true,
+      textStyles: {
+        bold: true,
+        italic: true,
+        strikethrough: true,
+        underline: true,
+        nesting: true,
+        fontFamily: true,
+        fontSize: true,
+        subscript: true,
+        superscript: true,
+      },
+    },
+  },
+};

@@ -24,6 +24,7 @@ import type { CristalApp } from "../api/cristalApp";
 import type { Logger } from "../api/logger";
 import type { Storage } from "../api/storage";
 import type { WrappingStorage } from "../api/wrappingStorage";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * @since 18.0.0RC1
@@ -36,6 +37,7 @@ export type ConfigObjectType = {
   homePage: string;
   serverRendering: boolean;
   designSystem: string;
+  syntaxes: SyntaxConfig[];
   offline: boolean;
   realtimeURL?: string;
   authenticationBaseURL?: string;
@@ -94,6 +96,9 @@ export class DefaultWikiConfig implements WikiConfig {
   // @ts-expect-error designSystem is temporarily undefined during class
   // initialization
   public designSystem: string;
+  // @ts-expect-error designSystem is temporarily undefined during class
+  // initialization
+  public syntaxes: SyntaxConfig[];
   // @ts-expect-error editor is temporarily undefined during class
   // initialization
   public editor: string;
@@ -129,6 +134,7 @@ export class DefaultWikiConfig implements WikiConfig {
     designSystem: string,
     offline: boolean,
     editor: string,
+    syntaxes: SyntaxConfig[],
     optional?: {
       realtimeURL?: string;
       authenticationBaseURL?: string;
@@ -145,6 +151,7 @@ export class DefaultWikiConfig implements WikiConfig {
       designSystem,
       offline,
       editor,
+      syntaxes,
       ...optional,
     });
   }

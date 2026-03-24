@@ -60,6 +60,7 @@ import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * Default options for the BlockNote editor
@@ -161,6 +162,16 @@ type BlockNoteViewWrapperProps = {
   };
 
   /**
+   * List of features supported by the underlying syntax
+   *
+   * Features not enabled here will be disabled in the feature (when possible)
+   *
+   * @since 18.1.0RC1
+   * @beta
+   */
+  syntax: SyntaxConfig;
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
@@ -182,6 +193,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   lang,
   linkEditionCtx,
   overrides,
+  syntax,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
@@ -342,7 +354,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       <SuggestionMenuController
         triggerCharacter={"/"}
         getItems={async (query) =>
-          querySuggestionsMenuItems(editor, query, builtMacros)
+          querySuggestionsMenuItems(editor, query, builtMacros, syntax)
         }
       />
 

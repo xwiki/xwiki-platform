@@ -711,7 +711,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Tree");
-        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ", Keys.ARROW_LEFT);
 
         // Verify that the image uploaded from the second tab is visible in the first tab.
         firstTextArea.verifyContent(content -> {
@@ -734,7 +734,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
+        firstTextArea.sendKeys("est");
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickDone();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",

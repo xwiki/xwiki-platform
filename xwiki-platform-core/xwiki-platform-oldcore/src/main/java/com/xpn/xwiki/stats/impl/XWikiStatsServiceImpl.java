@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.stats.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -70,14 +69,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     /**
      * User actions statistics module saves.
      */
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new ActionExecutedEvent(ViewAction.VIEW_ACTION));
-            add(new ActionExecutedEvent(SaveAction.ACTION_NAME));
-            add(new ActionExecutedEvent(DownloadAction.ACTION_NAME));
-        }
-    };
+    private static final List<Event> EVENTS = List.of(
+        new ActionExecutedEvent(ViewAction.VIEW_ACTION),
+        new ActionExecutedEvent(SaveAction.ACTION_NAME),
+        new ActionExecutedEvent(DownloadAction.ACTION_NAME)
+    );
 
     /**
      * Used to resolve reference based on context.

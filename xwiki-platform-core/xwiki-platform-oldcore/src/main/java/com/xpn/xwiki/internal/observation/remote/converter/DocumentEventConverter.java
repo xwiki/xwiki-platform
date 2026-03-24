@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -63,15 +62,12 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     /**
      * The events supported by this converter.
      */
-    private static final Set<Class<? extends Event>> EVENTS = new HashSet<Class<? extends Event>>()
-    {
-        {
-            add(DocumentDeletedEvent.class);
-            add(DocumentCreatedEvent.class);
-            add(DocumentUpdatedEvent.class);
-            add(DocumentVersionRangeDeletedEvent.class);
-        }
-    };
+    private static final Set<Class<? extends Event>> EVENTS = Set.of(
+        DocumentDeletedEvent.class,
+        DocumentCreatedEvent.class,
+        DocumentUpdatedEvent.class,
+        DocumentVersionRangeDeletedEvent.class
+    );
 
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)

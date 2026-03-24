@@ -19,7 +19,6 @@
  */
 package org.xwiki.filter.xar.internal;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.filter.event.model.WikiObjectFilter;
@@ -35,13 +34,10 @@ public class XARObjectModel extends XarObjectModel
     /**
      * The list of parameters to be used when reading an object.
      */
-    public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()
-    {
-        {
-            put(ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME));
-            put(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
-            put(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID));
-            put(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
-        }
-    };
+    public static final Map<String, EventParameter> OBJECT_PARAMETERS = Map.ofEntries(
+        Map.entry(ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME)),
+        Map.entry(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE)),
+        Map.entry(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID)),
+        Map.entry(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class))
+    );
 }

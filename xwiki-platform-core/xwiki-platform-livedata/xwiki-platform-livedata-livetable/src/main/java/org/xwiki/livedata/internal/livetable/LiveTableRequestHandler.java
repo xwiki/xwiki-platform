@@ -65,15 +65,11 @@ public class LiveTableRequestHandler
 
     static final String CONTEXT_DOC = "$doc";
 
-    @SuppressWarnings("serial")
-    private static final Map<String, String> MATCH_TYPE = new HashMap<String, String>()
-    {
-        {
-            put("equals", "exact");
-            put("contains", "partial");
-            put("startsWith", "prefix");
-        }
-    };
+    private static final Map<String, String> MATCH_TYPE = Map.ofEntries(
+        Map.entry("equals", "exact"),
+        Map.entry("contains", "partial"),
+        Map.entry("startsWith", "prefix")
+    );
 
     @Inject
     private Logger logger;

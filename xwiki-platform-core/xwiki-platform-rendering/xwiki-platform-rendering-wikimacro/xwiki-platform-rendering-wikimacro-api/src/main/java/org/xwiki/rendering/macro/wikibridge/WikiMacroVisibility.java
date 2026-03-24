@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,14 +49,11 @@ public enum WikiMacroVisibility
      * Mapping between String definition of visibility and enums. The strings defined are coming from the
      * Wiki Macro Class field definition for the Visibility property.
      */
-    private static final Map<String, WikiMacroVisibility> MAPPINGS = new HashMap<String, WikiMacroVisibility>()
-    {
-        {
-            put("Current User", USER);
-            put("Current Wiki", WIKI);
-            put("Global", GLOBAL);
-        }
-    };
+    private static final Map<String, WikiMacroVisibility> MAPPINGS = Map.ofEntries(
+        Map.entry("Current User", USER),
+        Map.entry("Current Wiki", WIKI),
+        Map.entry("Global", GLOBAL)
+    );
 
     /**
      * Convert between a string representation of a Macro visibility and its matching enum. If no matching enum is

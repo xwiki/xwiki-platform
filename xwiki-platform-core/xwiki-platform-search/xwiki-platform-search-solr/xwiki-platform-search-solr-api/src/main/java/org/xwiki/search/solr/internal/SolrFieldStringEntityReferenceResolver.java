@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -54,22 +53,18 @@ public class SolrFieldStringEntityReferenceResolver extends AbstractEntityRefere
     /**
      * Map defining ordered entity types of a proper reference chain for a given entity type.
      */
-    @SuppressWarnings("serial")
-    private static final Map<EntityType, EntityType[]> ENTITY_TYPES = new HashMap<EntityType, EntityType[]>()
-    {
-        {
-            put(EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
-                EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
-                EntityType.SPACE, EntityType.WIKI});
-        }
-    };
+    private static final Map<EntityType, EntityType[]> ENTITY_TYPES = Map.ofEntries(
+        Map.entry(EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI}),
+        Map.entry(EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
+            EntityType.WIKI}),
+        Map.entry(EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI}),
+        Map.entry(EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
+            EntityType.WIKI}),
+        Map.entry(EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
+            EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI}),
+        Map.entry(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
+            EntityType.SPACE, EntityType.WIKI})
+    );
 
     @Inject
     @Named("current")

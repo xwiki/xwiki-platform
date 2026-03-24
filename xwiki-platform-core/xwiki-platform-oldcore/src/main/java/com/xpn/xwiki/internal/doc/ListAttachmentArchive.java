@@ -166,7 +166,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     private Archive toRCS(final XWikiContext context) throws Exception
     {
-        final Version[] versions = this.getVersions();
         XWikiAttachmentRCSArchive rcsArch = null;
 
         // We need to loop backward since the revision are ordered in desc order.

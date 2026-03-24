@@ -132,7 +132,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
     }
 
     private void saveConfiguration(WikiUserConfiguration configuration, String wikiId)
-        throws DataMigrationException, XWikiException
+        throws DataMigrationException
     {
         try {
             wikiUserConfigurationHelper.saveConfiguration(configuration, wikiId);
@@ -142,7 +142,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         }
     }
 
-    private void upgradeRegularSubwiki(String wikiId) throws DataMigrationException, XWikiException
+    private void upgradeRegularSubwiki(String wikiId) throws DataMigrationException
     {
         // Create the new configuration
         WikiUserConfiguration configuration = new WikiUserConfiguration();
@@ -156,7 +156,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
     private void upgradeWorkspace(BaseObject oldObject, String wikiId, XWikiDocument oldWikiDescriptor)
         throws DataMigrationException, XWikiException
     {
-        upgradeWorkspaceConfiguration(oldObject, wikiId, oldWikiDescriptor);
+        upgradeWorkspaceConfiguration(oldObject, wikiId);
 
         // We also need to upgrade workspaces candidacies
         try {
@@ -177,17 +177,12 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
      *
      * @param oldObject old workspace object
      * @param wikiId id of the wiki to upgrade
-     * @param oldWikiDescriptor document that holds the old object
      * @throws DataMigrationException if problems occur
      * @throws XWikiException if problems occur
      */
-    private void upgradeWorkspaceConfiguration(BaseObject oldObject, String wikiId,
-        XWikiDocument oldWikiDescriptor) throws DataMigrationException, XWikiException
+    private void upgradeWorkspaceConfiguration(BaseObject oldObject, String wikiId)
+        throws DataMigrationException
     {
-        // Context, XWiki
-        XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
-
         // Create the new configuration
         WikiUserConfiguration configuration = new WikiUserConfiguration();
 

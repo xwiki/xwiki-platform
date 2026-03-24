@@ -2460,6 +2460,7 @@ importers:
         version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility:
     dependencies:
       '@vue/test-utils':
@@ -2513,6 +2514,8 @@ importers:
         version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
 ||||||| parent of 77febe670eb (update)
 =======
+=======
+>>>>>>> 2665e90a88 (update)
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown:
     dependencies:
       '@xwiki/platform-model-api':
@@ -2565,10 +2568,56 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+<<<<<<< HEAD
 >>>>>>> 77febe670eb (update)
 >>>>>>> 57ae5c1fdc (update)
+<<<<<<< HEAD
 >>>>>>> c53bc900b3 (update)
+<<<<<<< HEAD
 >>>>>>> 933263af33 (update)
+=======
+=======
+=======
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility:
+    dependencies:
+      '@vue/test-utils':
+        specifier: 'catalog:'
+        version: 2.4.6
+      axe-core:
+        specifier: 'catalog:'
+        version: 4.11.1
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.18(@types/node@24.12.0)(happy-dom@20.7.0)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.30(typescript@5.9.3)
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.57.7(@types/node@24.12.0)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.3(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 69c827279f (update)
+>>>>>>> 0bc8dbe9d2 (update)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api:
     dependencies:
@@ -4626,8 +4675,14 @@ packages:
       vue:
         optional: true
 
+<<<<<<< HEAD
   '@vue/compiler-core@3.5.38':
     resolution: {integrity: sha512-s99aGxWYig9ErHbct27KXEGhrBYlRI6c4MwAgXErOAbX9xiW37/uMa+XUDO69zLz83dng8UUZ70CTOJrLrYrEQ==}
+=======
+<<<<<<< HEAD
+  '@vue/compiler-core@3.5.34':
+    resolution: {integrity: sha512-s9cLyK5mLcvZ4Agva5QgRsQyLKvts9WbU9DB6NqiZkkGEdwmcEiylj5Jbwkp680drF/NNCV8OlAJSe+yMLxaJw==}
+>>>>>>> 0bc8dbe9d2 (update)
 
   '@vue/compiler-dom@3.5.38':
     resolution: {integrity: sha512-JTqp25l8aFfJYF7/KmsXZjAxJz7T+SjmTJLoXVjHtc2BrSgSiW2n9Aem/cWq1OPe68A8JL06B3eVdhlP0H4TVw==}
@@ -4635,8 +4690,26 @@ packages:
   '@vue/compiler-sfc@3.5.38':
     resolution: {integrity: sha512-DuA2GiZawSEW442iw/9+Fkol8hTgb4Ke5KkhmSry65QA7YuyMbIdy8p0XZRMvNwJdgRz307W8g1CSzdvS4nuNg==}
 
+<<<<<<< HEAD
   '@vue/compiler-ssr@3.5.38':
     resolution: {integrity: sha512-7s+W5Gc42FGxZMcuwl8H5B29T8BJPMdBT7KHFE+BbAuZ/iTEdTtv7z2XiMjiaUUw4w3ZcCEdHs36RuYJ2VA7bA==}
+=======
+  '@vue/compiler-ssr@3.5.34':
+    resolution: {integrity: sha512-cDtTHKibkThKGHH1SP+WdccquNRYQDFH6rRjQCqT9G2ltFAfoR5pUftpab/z+aM5mW9HLLVQW7hfKKQe/1GBeQ==}
+=======
+  '@vue/compiler-core@3.5.30':
+    resolution: {integrity: sha512-s3DfdZkcu/qExZ+td75015ljzHc6vE+30cFMGRPROYjqkroYI5NV2X1yAMX9UeyBNWB9MxCfPcsjpLS11nzkkw==}
+
+  '@vue/compiler-dom@3.5.30':
+    resolution: {integrity: sha512-eCFYESUEVYHhiMuK4SQTldO3RYxyMR/UQL4KdGD1Yrkfdx4m/HYuZ9jSfPdA+nWJY34VWndiYdW/wZXyiPEB9g==}
+
+  '@vue/compiler-sfc@3.5.30':
+    resolution: {integrity: sha512-LqmFPDn89dtU9vI3wHJnwaV6GfTRD87AjWpTWpyrdVOObVtjIuSeZr181z5C4PmVx/V3j2p+0f7edFKGRMpQ5A==}
+
+  '@vue/compiler-ssr@3.5.30':
+    resolution: {integrity: sha512-NsYK6OMTnx109PSL2IAyf62JP6EUdk4Dmj6AkWcJGBvN0dQoMYtVekAmdqgTtWQgEJo+Okstbf/1p7qZr5H+bA==}
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
 
   '@vue/compiler-vue2@2.7.16':
     resolution: {integrity: sha512-qYC3Psj9S/mfu9uVi5WvNZIzq+xnXMhOwbTFKKDD7b1lhpnn71jXSFdTQ+WsIEk0ONCd7VV2IMm7ONl6tbQ86A==}
@@ -4704,11 +4777,27 @@ packages:
     peerDependencies:
       vue: 3.5.38
 
+<<<<<<< HEAD
   '@vue/shared@3.5.38':
     resolution: {integrity: sha512-FTW0AFZNaK5/mOqvGBwVfUlNLU38TiQn4+DQgIFUnrBBJQ1crMJ82yeGQLV5jyKFsO8yRukpbuP7x+nRbH6aug==}
+=======
+<<<<<<< HEAD
+  '@vue/shared@3.5.34':
+    resolution: {integrity: sha512-24uqU4OIiX29ryC3MeWid/Xf2fa2EFRUVLb77nRhk+UrTVrh/XiGtFAFmJBAtBRbjwNdsPRP+jj/OL27Eg1NDA==}
+>>>>>>> 0bc8dbe9d2 (update)
 
   '@vue/test-utils@2.4.10':
     resolution: {integrity: sha512-SmoZ5EA1kYiAFs9NkYdiFFQF+cSnUwnvlYEbY+DogWQZUiqOm/Y29eSbc5T6yi75SgSF9863SBeXniIEoPajCA==}
+=======
+  '@vue/shared@3.5.30':
+    resolution: {integrity: sha512-YXgQ7JjaO18NeK2K9VTbDHaFy62WrObMa6XERNfNOkAhD1F1oDSf3ZJ7K6GqabZ0BvSDHajp8qfS5Sa2I9n8uQ==}
+
+  '@vue/test-utils@2.4.6':
+    resolution: {integrity: sha512-FMxEjOpYNYiFe0GkaHsnJPXFHxQ6m4t8vI/ElPGpMWxZKpmRvQ33OIrvRXemy6yha03RxhOlQuy+gZMC3CQSow==}
+
+  '@vue/tsconfig@0.8.1':
+    resolution: {integrity: sha512-aK7feIWPXFSUhsCP9PFqPyFOcz4ENkb8hZ2pneL6m2UjCkccvaOhC/5KCKluuBufvp2KzkbdA2W2pk20vLzu3g==}
+>>>>>>> 2665e90a88 (update)
     peerDependencies:
       '@vue/compiler-dom': 3.x
       '@vue/server-renderer': 3.x
@@ -7878,9 +7967,27 @@ snapshots:
     dependencies:
       '@blocknote/core': 0.50.0(@types/hast@3.0.4)
       '@emoji-mart/data': 1.2.1
+<<<<<<< HEAD
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@floating-ui/utils': 0.2.11
       '@tanstack/react-store': 0.7.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+=======
+<<<<<<< HEAD
+      '@floating-ui/react': 0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@floating-ui/utils': 0.2.11
+      '@tanstack/react-store': 0.7.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+=======
+<<<<<<< HEAD
+      '@floating-ui/react': 0.27.19(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@floating-ui/utils': 0.2.11
+      '@tanstack/react-store': 0.7.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+=======
+      '@floating-ui/react': 0.27.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@floating-ui/utils': 0.2.11
+      '@tanstack/react-store': 0.7.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 69c827279f (update)
+>>>>>>> 0bc8dbe9d2 (update)
       '@tiptap/core': 3.15.3(@tiptap/pm@3.15.3)
       '@tiptap/pm': 3.15.3
       '@tiptap/react': 3.15.3(@floating-ui/dom@1.7.6)(@tiptap/core@3.15.3(@tiptap/pm@3.15.3))(@tiptap/pm@3.15.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -8151,7 +8258,11 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
+<<<<<<< HEAD
   '@exodus/bytes@1.15.0': {}
+=======
+  '@exodus/bytes@1.14.1': {}
+>>>>>>> 2665e90a88 (update)
 
   '@floating-ui/core@1.7.5':
     dependencies:
@@ -8162,15 +8273,45 @@ snapshots:
       '@floating-ui/core': 1.7.5
       '@floating-ui/utils': 0.2.11
 
+<<<<<<< HEAD
   '@floating-ui/react-dom@2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+=======
+<<<<<<< HEAD
+  '@floating-ui/react-dom@2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+=======
+<<<<<<< HEAD
+  '@floating-ui/react-dom@2.1.8(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+=======
+  '@floating-ui/react-dom@2.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 69c827279f (update)
+>>>>>>> 0bc8dbe9d2 (update)
     dependencies:
       '@floating-ui/dom': 1.7.6
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
+<<<<<<< HEAD
   '@floating-ui/react@0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+=======
+<<<<<<< HEAD
+  '@floating-ui/react@0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+=======
+<<<<<<< HEAD
+  '@floating-ui/react@0.27.19(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.8(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+=======
+  '@floating-ui/react@0.27.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 69c827279f (update)
+>>>>>>> 0bc8dbe9d2 (update)
       '@floating-ui/utils': 0.2.11
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
@@ -8275,8 +8416,23 @@ snapshots:
 
   '@mantine/core@8.3.14(@mantine/hooks@8.3.14(react@19.2.7))(@types/react@19.2.14)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
+<<<<<<< HEAD
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks': 8.3.14(react@19.2.7)
+=======
+<<<<<<< HEAD
+      '@floating-ui/react': 0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@mantine/hooks': 8.3.14(react@19.2.6)
+=======
+<<<<<<< HEAD
+      '@floating-ui/react': 0.27.19(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@mantine/hooks': 8.3.14(react@19.2.5)
+=======
+      '@floating-ui/react': 0.27.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@mantine/hooks': 8.3.14(react@19.2.4)
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 69c827279f (update)
+>>>>>>> 0bc8dbe9d2 (update)
       clsx: 2.1.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
@@ -8901,8 +9057,13 @@ snapshots:
       '@typescript-eslint/types': 8.56.1
       '@typescript-eslint/visitor-keys': 8.56.1
       debug: 4.4.3
+<<<<<<< HEAD
       minimatch: 10.2.5
       semver: 7.7.4
+=======
+      minimatch: 10.2.4
+      semver: 7.7.3
+>>>>>>> 2665e90a88 (update)
       tinyglobby: 0.2.15
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -9134,7 +9295,15 @@ snapshots:
 
   '@vue-macros/common@3.1.2(vue@3.5.38(typescript@5.9.3))':
     dependencies:
+<<<<<<< HEAD
       '@vue/compiler-sfc': 3.5.38
+=======
+<<<<<<< HEAD
+      '@vue/compiler-sfc': 3.5.34
+=======
+      '@vue/compiler-sfc': 3.5.30
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
       ast-kit: 2.2.0
       local-pkg: 1.1.2
       magic-string-ast: 1.0.3
@@ -9142,7 +9311,12 @@ snapshots:
     optionalDependencies:
       vue: 3.5.38(typescript@5.9.3)
 
+<<<<<<< HEAD
   '@vue/compiler-core@3.5.38':
+=======
+<<<<<<< HEAD
+  '@vue/compiler-core@3.5.34':
+>>>>>>> 0bc8dbe9d2 (update)
     dependencies:
       '@babel/parser': 7.29.7
       '@vue/shared': 3.5.38
@@ -9150,12 +9324,24 @@ snapshots:
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
+<<<<<<< HEAD
   '@vue/compiler-dom@3.5.38':
+=======
+  '@vue/compiler-dom@3.5.34':
+=======
+  '@vue/compiler-core@3.5.30':
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
     dependencies:
       '@vue/compiler-core': 3.5.38
       '@vue/shared': 3.5.38
 
+<<<<<<< HEAD
   '@vue/compiler-sfc@3.5.38':
+=======
+<<<<<<< HEAD
+  '@vue/compiler-sfc@3.5.34':
+>>>>>>> 0bc8dbe9d2 (update)
     dependencies:
       '@babel/parser': 7.29.7
       '@vue/compiler-core': 3.5.38
@@ -9169,8 +9355,36 @@ snapshots:
 
   '@vue/compiler-ssr@3.5.38':
     dependencies:
+<<<<<<< HEAD
       '@vue/compiler-dom': 3.5.38
       '@vue/shared': 3.5.38
+=======
+      '@vue/compiler-dom': 3.5.34
+      '@vue/shared': 3.5.34
+=======
+  '@vue/compiler-dom@3.5.30':
+    dependencies:
+      '@vue/compiler-core': 3.5.30
+      '@vue/shared': 3.5.30
+
+  '@vue/compiler-sfc@3.5.30':
+    dependencies:
+      '@babel/parser': 7.29.0
+      '@vue/compiler-core': 3.5.30
+      '@vue/compiler-dom': 3.5.30
+      '@vue/compiler-ssr': 3.5.30
+      '@vue/shared': 3.5.30
+      estree-walker: 2.0.2
+      magic-string: 0.30.21
+      postcss: 8.5.8
+      source-map-js: 1.2.1
+
+  '@vue/compiler-ssr@3.5.30':
+    dependencies:
+      '@vue/compiler-dom': 3.5.30
+      '@vue/shared': 3.5.30
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
 
   '@vue/compiler-vue2@2.7.16':
     dependencies:
@@ -9240,9 +9454,21 @@ snapshots:
   '@vue/language-core@2.2.0(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.28
+<<<<<<< HEAD
       '@vue/compiler-dom': 3.5.38
       '@vue/compiler-vue2': 2.7.16
       '@vue/shared': 3.5.38
+=======
+<<<<<<< HEAD
+      '@vue/compiler-dom': 3.5.34
+      '@vue/compiler-vue2': 2.7.16
+      '@vue/shared': 3.5.34
+=======
+      '@vue/compiler-dom': 3.5.30
+      '@vue/compiler-vue2': 2.7.16
+      '@vue/shared': 3.5.30
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
       alien-signals: 0.4.14
       minimatch: 9.0.5
       muggle-string: 0.4.1
@@ -9253,9 +9479,20 @@ snapshots:
   '@vue/language-core@3.3.4':
     dependencies:
       '@volar/language-core': 2.4.28
+<<<<<<< HEAD
       '@vue/compiler-dom': 3.5.38
       '@vue/shared': 3.5.38
+=======
+<<<<<<< HEAD
+      '@vue/compiler-dom': 3.5.34
+      '@vue/shared': 3.5.34
+>>>>>>> 0bc8dbe9d2 (update)
       alien-signals: 3.2.1
+=======
+      '@vue/compiler-dom': 3.5.30
+      '@vue/shared': 3.5.30
+      alien-signals: 3.1.2
+>>>>>>> 2665e90a88 (update)
       muggle-string: 0.4.1
       path-browserify: 1.0.1
       picomatch: 4.0.4
@@ -9282,9 +9519,21 @@ snapshots:
       '@vue/shared': 3.5.38
       vue: 3.5.38(typescript@5.9.3)
 
+<<<<<<< HEAD
   '@vue/shared@3.5.38': {}
 
   '@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.38)(@vue/server-renderer@3.5.38(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))':
+=======
+<<<<<<< HEAD
+  '@vue/shared@3.5.34': {}
+
+  '@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.34)(@vue/server-renderer@3.5.34(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3))':
+=======
+  '@vue/shared@3.5.30': {}
+
+  '@vue/test-utils@2.4.6':
+>>>>>>> 2665e90a88 (update)
+>>>>>>> 0bc8dbe9d2 (update)
     dependencies:
       '@vue/compiler-dom': 3.5.38
       js-beautify: 1.15.4

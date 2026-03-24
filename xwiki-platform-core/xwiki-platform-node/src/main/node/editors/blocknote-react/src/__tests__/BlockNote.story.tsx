@@ -28,19 +28,24 @@ import { useMemo } from "react";
 import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { ModelReferenceParser } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 export type BlockNoteForTestProps = Omit<
   BlockNoteViewWrapperProps,
-  "lang" | "linkEditionCtx"
->;
+  "lang" | "linkEditionCtx" | "syntax"
+> & { syntax?: SyntaxConfig };
 
-export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
+export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
+  syntax,
+  ...props
+}) => {
   const linkEditionCtx = useMemo(linkEditionCtxMock, []);
 
   return (
     <BlockNoteViewWrapper
       lang="en"
       linkEditionCtx={linkEditionCtx}
+      syntax={syntax ?? FULL_SYNTAX}
       {...props}
     />
   );
@@ -131,4 +136,87 @@ const parseModelReference: ModelReferenceParser["parse"] = (
   }
 
   throw new Error("Invalid reference provided");
+};
+
+const FULL_SYNTAX: SyntaxConfig = {
+  id: "default-syntax",
+  features: {
+    blocks: {
+      headings: {
+        levels1To3: true,
+        levels4To6: true,
+      },
+      images: {
+        basicImages: true,
+        altText: true,
+        caption: true,
+        customBorder: true,
+        customDimensions: true,
+        insideLinks: true,
+      },
+      lists: {
+        bulletLists: true,
+        blockInListItems: true,
+        checkableLists: true,
+        contiguousNumberedLists: true,
+        contiguousNumberedListsAnyStartIndex: true,
+        mixableCheckableListItems: true,
+        multipleBlocksInListItems: true,
+        unorderedNumberedLists: true,
+        listsNesting: true,
+      },
+      quotes: true,
+      code: {
+        basicCodeBlocks: true,
+        language: true,
+      },
+      dividers: true,
+      macros: true,
+      nesting: true,
+      styling: {
+        justifyAlignment: true,
+        lcrAlignment: true,
+      },
+      tables: {
+        basicTables: true,
+        blockInTableCells: true,
+        colRows: true,
+        colSpan: true,
+        headerColumns: true,
+        multipleBlocksInTableCells: true,
+        multipleFooterRows: true,
+        multipleHeaderRows: true,
+        noHeaderRowTable: true,
+        singleFooterRow: true,
+        singleHeaderRow: true,
+      },
+    },
+    inlineContents: {
+      images: true,
+      links: {
+        basicLinks: true,
+        customText: true,
+        customTextStyling: true,
+        descriptiveTooltip: true,
+        metadata: true,
+      },
+      code: {
+        basicInlineCode: true,
+        language: true,
+      },
+      macros: true,
+      rawHtml: true,
+      textStyles: {
+        bold: true,
+        italic: true,
+        strikethrough: true,
+        underline: true,
+        nesting: true,
+        fontFamily: true,
+        fontSize: true,
+        subscript: true,
+        superscript: true,
+      },
+    },
+  },
 };

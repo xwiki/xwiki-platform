@@ -34,6 +34,7 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * Create the BlockNote editor's schema
@@ -122,32 +123,90 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
  * @since 18.0.0RC1
  * @beta
  */
+// eslint-disable-next-line max-statements
 function querySuggestionsMenuItems(
   editor: EditorType,
   query: string,
   macros: BlockNoteConcreteMacro[],
+  syntax: SyntaxConfig,
 ): DefaultReactSuggestionItem[] {
-  return filterSuggestionItems(
+  const { blocks: blocksSupport, inlineContents: inlineSupport } =
+    syntax.features;
+
+  let items = filterSuggestionItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
       // Block macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "block" && bnRendering.block.slashMenuEntry
-          ? bnRendering.block.slashMenuEntry(editor)
-          : null,
-      ),
+      blocksSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "block" && bnRendering.block.slashMenuEntry
+              ? bnRendering.block.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
 
       // Inline macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "inline" &&
-        bnRendering.inlineContent.slashMenuEntry
-          ? bnRendering.inlineContent.slashMenuEntry(editor)
-          : null,
-      ),
+      inlineSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "inline" &&
+            bnRendering.inlineContent.slashMenuEntry
+              ? bnRendering.inlineContent.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
     ),
     query,
   );
+
+  // NOTE: there is no "clean" way to filter these elements as of now, so we rely on their hardcoded title instead
+  // See https://github.com/TypeCellOS/BlockNote/issues/1816
+
+  if (!blocksSupport.headings.levels1To3) {
+    items = items.filter(
+      (item) => !["Heading 1", "Heading 2", "Heading 3"].includes(item.title),
+    );
+  }
+
+  if (!blocksSupport.headings.levels4To6) {
+    items = items.filter(
+      (item) => !["Heading 4", "Heading 5", "Heading 6"].includes(item.title),
+    );
+  }
+
+  if (!blocksSupport.code.basicCodeBlocks) {
+    items = items.filter((item) => item.title !== "Code Block");
+  }
+
+  if (!blocksSupport.quotes) {
+    items = items.filter((item) => item.title !== "Quote");
+  }
+
+  if (!blocksSupport.lists.bulletLists) {
+    items = items.filter((item) => item.title !== "Bullet List");
+  }
+
+  if (!blocksSupport.lists.contiguousNumberedLists) {
+    items = items.filter((item) => item.title !== "Numbered List");
+  }
+
+  if (!blocksSupport.lists.checkableLists) {
+    items = items.filter((item) => item.title !== "Check List");
+  }
+
+  if (!blocksSupport.tables.basicTables) {
+    items = items.filter((item) => item.title !== "Table");
+  }
+
+  if (!blocksSupport.images.basicImages) {
+    items = items.filter((item) => item.title !== "Image");
+  }
+
+  if (!blocksSupport.dividers) {
+    items = items.filter((item) => item.title !== "Divider");
+  }
+
+  return items;
 }
 
 /**

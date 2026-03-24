@@ -13,6 +13,7 @@ import { Configurations } from '@xwiki/platform-configuration-api';
 import { Container } from 'inversify';
 import { Ref } from 'vue';
 import { Router } from 'vue-router';
+import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 import { UserDetails } from '@xwiki/platform-authentication-api';
 
 // @beta
@@ -34,6 +35,7 @@ export type ConfigObjectType = {
     homePage: string;
     serverRendering: boolean;
     designSystem: string;
+    syntaxes: SyntaxConfig[];
     offline: boolean;
     realtimeURL?: string;
     authenticationBaseURL?: string;
@@ -227,7 +229,7 @@ export class DefaultWikiConfig implements WikiConfig {
     // (undocumented)
     serverRendering: boolean;
     // (undocumented)
-    setConfig(name: string, baseURL: string, baseRestURL: string, homePage: string, serverRendering: boolean, designSystem: string, offline: boolean, editor: string, optional?: {
+    setConfig(name: string, baseURL: string, baseRestURL: string, homePage: string, serverRendering: boolean, designSystem: string, offline: boolean, editor: string, syntaxes: SyntaxConfig[], optional?: {
         realtimeURL?: string;
         authenticationBaseURL?: string;
         authenticationManager?: string;
@@ -240,6 +242,8 @@ export class DefaultWikiConfig implements WikiConfig {
     // (undocumented)
     storage: Storage_2;
     storageRoot?: string;
+    // (undocumented)
+    syntaxes: SyntaxConfig[];
 }
 
 // @beta (undocumented)
@@ -465,12 +469,13 @@ export interface WikiConfig {
     // (undocumented)
     serverRendering: boolean;
     // (undocumented)
-    setConfig(name: string, baseURL: string, baseRestURL: string, homePage: string, serverRendering: boolean, designSystem: string, offline: boolean, editor: string): void;
+    setConfig(name: string, baseURL: string, baseRestURL: string, homePage: string, serverRendering: boolean, designSystem: string, offline: boolean, editor: string, syntaxes: SyntaxConfig[]): void;
     // (undocumented)
     setConfigFromObject(configObject: any): void;
     // (undocumented)
     storage: Storage_2;
     storageRoot?: string;
+    syntaxes: SyntaxConfig[];
 }
 
 // @beta (undocumented)

@@ -79,7 +79,7 @@ interface WikiConfig {
   /**
    * List of supported syntaxes, along with their configuration
    *
-   * @since 18.1.0RC1
+   * @since 18.2.0RC1
    * @beta
    */
   syntaxes: SyntaxConfig[];

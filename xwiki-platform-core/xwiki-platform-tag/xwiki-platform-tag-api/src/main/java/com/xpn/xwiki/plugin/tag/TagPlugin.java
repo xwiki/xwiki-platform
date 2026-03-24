@@ -132,6 +132,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                 return new ArrayList<>(tags);
             }
         } catch (NullPointerException ex) {
+            // TODO: This needs to be fixed, it's a very bad way to check for some non-existing Tag xobject or Tags
+            // property.
         }
 
         return new ArrayList<>();

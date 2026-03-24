@@ -31,6 +31,8 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 8.1M2
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface EntityReferenceConstants
 {
     /**

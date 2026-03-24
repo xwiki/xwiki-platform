@@ -23,11 +23,13 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Informations about the way to store translation documents.
+ * Information about the way to store translation documents.
  * 
  * @version $Id$
  * @since 4.3M2
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface TranslationDocumentModel
 {
     /**

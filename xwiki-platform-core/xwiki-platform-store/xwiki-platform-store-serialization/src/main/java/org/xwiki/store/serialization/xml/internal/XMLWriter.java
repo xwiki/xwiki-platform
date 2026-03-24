@@ -89,10 +89,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      */
     private LastCharWriter lcWriter;
 
-    /** True if the last thing written was content from an InputStream and 
-     private boolean indentUnsafe;
-
-     /** Need to catch this exception so this has to be done in an initializer block. */
+    // Need to catch this exception so this has to be done in an initializer block.
     static {
         try {
             NEWLINE = System.getProperty("line.separator").getBytes("UTF-8");

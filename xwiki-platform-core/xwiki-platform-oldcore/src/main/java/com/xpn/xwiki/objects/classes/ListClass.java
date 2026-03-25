@@ -139,7 +139,7 @@ public abstract class ListClass extends PropertyClass
     public String getSeparators()
     {
         String separators = getStringValue("separators");
-        if (separators == null || separators.equals("")) {
+        if (separators == null || separators.isEmpty()) {
             separators = "|,";
         }
         return separators;
@@ -629,7 +629,7 @@ public abstract class ListClass extends PropertyClass
 
         // If Multiselect and multiple results
         for (String item : strings) {
-            if (!item.trim().equals("")) {
+            if (!item.trim().isEmpty()) {
                 list.add(item);
             }
         }

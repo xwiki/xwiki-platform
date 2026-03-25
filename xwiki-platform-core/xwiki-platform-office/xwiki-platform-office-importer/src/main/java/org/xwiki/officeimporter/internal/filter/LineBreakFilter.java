@@ -135,12 +135,12 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     private boolean isEmptyTextNode(Node node)
     {
-        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().equals("");
+        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().isEmpty();
     }
 
     /**
      * Checks if a node represents an html comment.
-     * 
+     *
      * @param node the {@link Node}.
      * @return true if the node is a comment node.
      */
@@ -151,12 +151,12 @@ public class LineBreakFilter extends AbstractHTMLFilter
 
     /**
      * Checks if a node represents an html line break.
-     * 
+     *
      * @param node the {@link Node}
      * @return true of the node represents a line break.
      */
     private boolean isLineBreak(Node node)
     {
-        return null != node && node.getNodeName().equals(TAG_BR);
+        return null != node && TAG_BR.equals(node.getNodeName());
     }
 }

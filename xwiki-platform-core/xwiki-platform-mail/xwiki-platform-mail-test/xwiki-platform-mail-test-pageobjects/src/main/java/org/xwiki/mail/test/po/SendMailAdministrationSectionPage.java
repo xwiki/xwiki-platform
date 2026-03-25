@@ -110,6 +110,6 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
      */
     public boolean getDiscardSuccessStatuses()
     {
-        return !(new Select(this.discardSuccessStatuses).getFirstSelectedOption().getAttribute("value").equals("0"));
+        return !("0".equals(new Select(this.discardSuccessStatuses).getFirstSelectedOption().getAttribute("value")));
     }
 }

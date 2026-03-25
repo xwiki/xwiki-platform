@@ -59,7 +59,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
     public XWikiAuthService getAuthService(XWikiContext context)
     {
         String authservicepage = getParam("groovy_pagename", context);
-        if ((authservicepage == null) || authservicepage.trim().equals("")) {
+        if ((authservicepage == null) || authservicepage.trim().isEmpty()) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("No page specified for auth service implementation");
             }

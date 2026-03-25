@@ -91,9 +91,9 @@ public class ExportAction extends XWikiAction
 
             if (!validateExportRequest(request)) {
                 return "docdoesnotexist";
-            } else if (format == null || format.equals("xar")) {
+            } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
-            } else if (format.equals("html")) {
+            } else if ("html".equals(format)) {
                 defaultPage = exportHTML(context);
             } else {
                 defaultPage = export(format, context);

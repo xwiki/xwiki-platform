@@ -40,7 +40,7 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
-        if ((user == null) || user.equals("")) {
+        if ((user == null) || user.isEmpty()) {
             return super.checkAuth(context);
         } else {
             LOGGER.debug("Launching create user for [{}]", user);
@@ -61,7 +61,7 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
         throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
-        if ((user == null) || user.equals("")) {
+        if ((user == null) || user.isEmpty()) {
             return super.checkAuth(username, password, rememberme, context);
         } else {
             createUser(user, context);

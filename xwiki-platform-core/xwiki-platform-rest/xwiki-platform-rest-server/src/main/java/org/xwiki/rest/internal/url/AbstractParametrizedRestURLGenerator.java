@@ -60,7 +60,7 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
             }
 
             String webAppPath = xwiki.getWebAppPath(context);
-            if (!webAppPath.equals("/")) {
+            if (!"/".equals(webAppPath)) {
                 url.append(webAppPath);
             }
 

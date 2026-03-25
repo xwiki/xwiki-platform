@@ -275,7 +275,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     private void addRefererStats(XWikiDocument doc, XWikiContext context)
     {
         String referer = StatsUtil.getReferer(context);
-        if ((referer != null) && (!referer.equals(""))) {
+        if ((referer != null) && (!referer.isEmpty())) {
             add(new RefererStatsStoreItem(doc.getFullName(), new Date(), StatsUtil.PeriodType.MONTH, referer, context));
         }
     }

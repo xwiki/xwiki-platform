@@ -420,9 +420,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     value += line;
                     line = input.readLine();
                 }
-                if (header.equals(SUBJECT)) {
+                if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
-                } else if (header.equals(FROM)) {
+                } else if (FROM.equals(header)) {
                     toMail.setFrom(value);
                 } else {
                     toMail.setHeader(header, value);

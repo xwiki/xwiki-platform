@@ -89,7 +89,7 @@ public class XWikiExecutor
 
     private static final String STOP_COMMAND = System.getProperty("xwikiExecutionStopCommand");
 
-    private static final boolean DEBUG = System.getProperty("debug", "false").equalsIgnoreCase("true");
+    private static final boolean DEBUG = "true".equalsIgnoreCase(System.getProperty("debug", "false"));
 
     private static final String WEBINF_PATH = "/webapps/xwiki/WEB-INF";
 
@@ -250,7 +250,7 @@ public class XWikiExecutor
         }
 
         this.wasStarted = false;
-        if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
+        if ("true".equals(VERIFY_RUNNING_XWIKI_AT_START)) {
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !this.watchdog.isXWikiStarted(getURL(), VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT).timedOut;
@@ -568,7 +568,7 @@ public class XWikiExecutor
         File[] directories = targetFile.listFiles(
             file -> file.isDirectory() && file.getName().startsWith("xwiki"));
         for (File directory : directories) {
-            File[] startFiles = directory.listFiles(file -> file.getName().equals("start_xwiki.sh"));
+            File[] startFiles = directory.listFiles(file -> "start_xwiki.sh".equals(file.getName()));
             if (startFiles != null && startFiles.length > 0) {
                 return directory.getPath();
             }

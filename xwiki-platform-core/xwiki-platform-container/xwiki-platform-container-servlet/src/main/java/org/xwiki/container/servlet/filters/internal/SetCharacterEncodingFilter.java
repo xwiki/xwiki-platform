@@ -133,9 +133,9 @@ public class SetCharacterEncodingFilter implements Filter
         String value = filterConfig.getInitParameter("ignore");
         if (value == null) {
             this.ignore = true;
-        } else if (value.equalsIgnoreCase("true")) {
+        } else if ("true".equalsIgnoreCase(value)) {
             this.ignore = true;
-        } else if (value.equalsIgnoreCase("yes")) {
+        } else if ("yes".equalsIgnoreCase(value)) {
             this.ignore = true;
         } else {
             this.ignore = false;

@@ -1399,7 +1399,7 @@ public class TestUtils
         } else if (!StringUtils.isEmpty(this.currentWiki)) {
             wikiName = this.currentWiki;
         }
-        return getBaseURL() + (wikiName.equals(MAIN_WIKI_NAME) ? "bin/" : "wiki/" + wikiName + '/');
+        return getBaseURL() + (MAIN_WIKI_NAME.equals(wikiName) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**

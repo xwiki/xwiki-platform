@@ -149,7 +149,7 @@ public class EditForm extends XWikiForm
         StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
-            if (!parameter[i].equals("")) {
+            if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {

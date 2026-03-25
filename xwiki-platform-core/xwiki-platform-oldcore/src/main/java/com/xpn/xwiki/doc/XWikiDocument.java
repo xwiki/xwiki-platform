@@ -2651,7 +2651,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context)
     {
-        if (!((customClassName == null) || (customClassName.equals("")))) {
+        if (!((customClassName == null) || (customClassName.isEmpty()))) {
             try {
                 return newDocument(Class.forName(customClassName), context);
             } catch (ClassNotFoundException e) {
@@ -3956,9 +3956,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 return "";
             } else if (pclass.isCustomDisplayed(context)) {
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);
-            } else if (type.equals("view")) {
+            } else if ("view".equals(type)) {
                 pclass.displayView(result, fieldname, prefix, obj, isolated, context);
-            } else if (type.equals("rendered")) {
+            } else if ("rendered".equals(type)) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
@@ -3968,7 +3968,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 } else {
                     result.append(fcontent);
                 }
-            } else if (type.equals("edit")) {
+            } else if ("edit".equals(type)) {
                 context.addDisplayedField(fieldname);
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
@@ -3985,7 +3985,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                         result.append("{/pre}");
                     }
                 }
-            } else if (type.equals("hidden")) {
+            } else if ("hidden".equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
@@ -3996,13 +3996,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
                     result.append("{/pre}");
                 }
-            } else if (type.equals("search")) {
+            } else if ("search".equals(type)) {
                 // Backward compatibility
 
                 // Check if the method has been injected using aspects
                 Method searchMethod = null;
                 for (Method method : pclass.getClass().getMethods()) {
-                    if (method.getName().equals("displaySearch") && method.getParameterTypes().length == 5) {
+                    if ("displaySearch".equals(method.getName()) && method.getParameterTypes().length == 5) {
                         searchMethod = method;
                         break;
                     }
@@ -4594,7 +4594,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (templateDocumentReference != null) {
             String content = getContent();
-            if (!content.equals("\n") && !content.equals("") && !isNew()) {
+            if (!"\n".equals(content) && !"".equals(content) && !isNew()) {
                 Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
@@ -5847,8 +5847,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 }
 
                 // Let's get rid of anything that's not a real link
-                if (name.trim().equals("") || (name.indexOf('$') != -1) || (name.indexOf("://") != -1)
-                    || (name.indexOf('"') != -1) || (name.indexOf('\'') != -1) || (name.indexOf("..") != -1)
+                if (name.trim().isEmpty() || (name.indexOf('$') != -1) || (name.contains("://"))
+                    || (name.indexOf('"') != -1) || (name.indexOf('\'') != -1) || (name.contains(".."))
                     || (name.indexOf(':') != -1) || (name.indexOf('=') != -1)) {
                     continue;
                 }
@@ -6291,7 +6291,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
                 // play nice with people migrating from 1.0 to 2.0 syntax
 
-                if (macroBlock.getId().equalsIgnoreCase("include") || macroBlock.getId().equalsIgnoreCase("display")) {
+                if ("include".equalsIgnoreCase(macroBlock.getId()) || "display".equalsIgnoreCase(macroBlock.getId())) {
                     String documentName = macroBlock.getParameters().get("reference");
                     if (StringUtils.isEmpty(documentName)) {
                         documentName = macroBlock.getParameters().get("document");
@@ -6310,7 +6310,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     documentName = LOCAL_REFERENCE_SERIALIZER.serialize(documentReference);
 
                     result.add(documentName);
-                } else if (macroBlock.getId().equalsIgnoreCase("velocity")
+                } else if ("velocity".equalsIgnoreCase(macroBlock.getId())
                     && !StringUtils.isEmpty(macroBlock.getContent())) {
                     // Try to find matching content inside each velocity macro
                     result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
@@ -7026,7 +7026,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public String getRealLanguage()
     {
         String lang = getLanguage();
-        if (lang.equals("")) {
+        if ("".equals(lang)) {
             return getDefaultLanguage();
         } else {
             return lang;
@@ -7735,7 +7735,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         String language = "";
         XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
         String realLang = tdoc.getRealLanguage(context);
-        if ((xwiki.isMultiLingual(context) == true) && (!realLang.equals(""))) {
+        if (xwiki.isMultiLingual(context) && (!"".equals(realLang))) {
             language = realLang;
         }
 
@@ -7745,13 +7745,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public String getEditURL(String action, String mode, String language, XWikiContext context)
     {
         StringBuilder editparams = new StringBuilder();
-        if (!mode.equals("")) {
+        if (!"".equals(mode)) {
             editparams.append("xpage=");
             editparams.append(mode);
         }
 
-        if (!language.equals("")) {
-            if (!mode.equals("")) {
+        if (!"".equals(language)) {
+            if (!"".equals(mode)) {
                 editparams.append("&");
             }
             editparams.append("language=");
@@ -8988,11 +8988,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             validationScript = req.get("xvalidation");
         }
 
-        if ((validationScript == null) || (validationScript.trim().equals(""))) {
+        if ((validationScript == null) || (validationScript.trim().isEmpty())) {
             validationScript = getValidationScript();
         }
 
-        if ((validationScript != null) && (!validationScript.trim().equals(""))) {
+        if ((validationScript != null) && (!validationScript.trim().isEmpty())) {
             isValid &= executeValidationScript(context, validationScript);
         }
 

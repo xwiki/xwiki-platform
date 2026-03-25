@@ -162,11 +162,11 @@ public enum ServletEngine
     public String getPermanentDirectory()
     {
         // Choose directories that can be created by the default user in the related containers.
-        if (name().equals("JETTY")) {
+        if ("JETTY".equals(name())) {
             return "/var/lib/jetty/xwiki-data";
-        } else if (name().equals("TOMCAT")) {
+        } else if ("TOMCAT".equals(name())) {
             return "/usr/local/tomcat/xwiki-data";
-        } else if (name().equals("WILDFLY")) {
+        } else if ("WILDFLY".equals(name())) {
             return "/opt/jboss/xwiki-data";
         } else {
             throw new RuntimeException(String.format("Permanent directory not supported for [%s]", name()));

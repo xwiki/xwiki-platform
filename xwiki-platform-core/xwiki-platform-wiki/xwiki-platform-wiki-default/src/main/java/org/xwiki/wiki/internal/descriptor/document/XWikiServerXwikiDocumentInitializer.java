@@ -112,7 +112,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                     ServletRequest servletRequest = (ServletRequest) request;
                     URL sourceURL = HttpServletUtils.getSourceBaseURL(servletRequest.getHttpServletRequest());
                     xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER, sourceURL.getHost());
-                    if (sourceURL.getProtocol().equals("https")) {
+                    if ("https".equals(sourceURL.getProtocol())) {
                         // Explicitly set the secure property if the input is HTTPS
                         xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 1);
                     }

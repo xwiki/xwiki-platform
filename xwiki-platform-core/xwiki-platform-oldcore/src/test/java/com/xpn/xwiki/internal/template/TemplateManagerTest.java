@@ -121,8 +121,6 @@ class TemplateManagerTest
         this.velocityEngineMock = mock();
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
-
-        //when(this.environmentMock.getResource("/templates/")).thenReturn(new URL("file://templates/"));
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException

@@ -209,7 +209,7 @@ public class SkinAction extends XWikiAction
      * @deprecated use {@link Environment#getResource(String, String)} or
      *             {@link Environment#getResourceAsStream(String, String)} instead
      */
-    @Deprecated(since = "18.2.0RC1, 17.10.5")
+    @Deprecated(since = "18.2.0, 17.10.5")
     public String getSkinFilePath(String filename, String skin) throws IOException
     {
         String path = URI.create(getSkinPath(skin) + filename).normalize().toString();
@@ -239,7 +239,7 @@ public class SkinAction extends XWikiAction
      * @deprecated use {@link Environment#getResource(String, String)} or
      *             {@link Environment#getResourceAsStream(String, String)} instead
      */
-    @Deprecated(since = "18.2.0RC1, 17.10.5")
+    @Deprecated(since = "18.2.0, 17.10.5")
     public String getResourceFilePath(String filename) throws IOException
     {
         String path = URI.create(getResourcePath() + filename).normalize().toString();

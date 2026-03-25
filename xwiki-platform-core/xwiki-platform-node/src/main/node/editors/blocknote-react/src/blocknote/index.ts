@@ -129,6 +129,7 @@ function querySuggestionsMenuItems(
   query: string,
   macros: BlockNoteConcreteMacro[],
   syntax: SyntaxConfig,
+  lang: EditorLanguage,
 ): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
@@ -162,48 +163,67 @@ function querySuggestionsMenuItems(
   // NOTE: there is no "clean" way to filter these elements as of now, so we rely on their hardcoded title instead
   // See https://github.com/TypeCellOS/BlockNote/issues/1816
 
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.findIndex(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    ) !== -1;
+
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(
-      (item) => !["Heading 1", "Heading 2", "Heading 3"].includes(item.title),
+      (item) =>
+        !isLocale(item.title, [
+          "heading",
+          "heading_2",
+          "heading_3",
+          "toggle_heading",
+          "toggle_heading_2",
+          "toggle_heading_3",
+        ]),
     );
   }
 
   if (!blocksSupport.headings.levels4To6) {
     items = items.filter(
-      (item) => !["Heading 4", "Heading 5", "Heading 6"].includes(item.title),
+      (item) => !isLocale(item.title, ["heading_4", "heading_5", "heading_6"]),
     );
   }
 
   if (!blocksSupport.code.basicCodeBlocks) {
-    items = items.filter((item) => item.title !== "Code Block");
+    items = items.filter((item) => !isLocale(item.title, ["code_block"]));
   }
 
   if (!blocksSupport.quotes) {
-    items = items.filter((item) => item.title !== "Quote");
+    items = items.filter((item) => !isLocale(item.title, ["quote"]));
   }
 
   if (!blocksSupport.lists.bulletLists) {
-    items = items.filter((item) => item.title !== "Bullet List");
+    items = items.filter(
+      (item) => !isLocale(item.title, ["bullet_list", "toggle_list"]),
+    );
   }
 
   if (!blocksSupport.lists.contiguousNumberedLists) {
-    items = items.filter((item) => item.title !== "Numbered List");
+    items = items.filter((item) => !isLocale(item.title, ["numbered_list"]));
   }
 
   if (!blocksSupport.lists.checkableLists) {
-    items = items.filter((item) => item.title !== "Check List");
+    items = items.filter((item) => !isLocale(item.title, ["check_list"]));
   }
 
   if (!blocksSupport.tables.basicTables) {
-    items = items.filter((item) => item.title !== "Table");
+    items = items.filter((item) => !isLocale(item.title, ["table"]));
   }
 
   if (!blocksSupport.images.basicImages) {
-    items = items.filter((item) => item.title !== "Image");
+    items = items.filter((item) => !isLocale(item.title, ["image"]));
   }
 
   if (!blocksSupport.dividers) {
-    items = items.filter((item) => item.title !== "Divider");
+    items = items.filter((item) => !isLocale(item.title, ["divider"]));
   }
 
   return items;

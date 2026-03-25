@@ -33,7 +33,7 @@ type SyntaxConfig = {
   /**
    * List of supported features
    */
-  features: SyntaxFeaturesWhitelist;
+  features: SyntaxAllowedFeatures;
 };
 
 /**
@@ -44,7 +44,7 @@ type SyntaxConfig = {
  * @since 18.2.0RC1
  * @beta
  */
-type SyntaxFeaturesWhitelist = {
+type SyntaxAllowedFeatures = {
   /**
    * Support for various blocks
    */
@@ -344,4 +344,4 @@ type SyntaxFeaturesWhitelist = {
   };
 };
 
-export type { SyntaxConfig, SyntaxFeaturesWhitelist };
+export type { SyntaxAllowedFeatures, SyntaxConfig };

@@ -1541,6 +1541,10 @@
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.webjars.npm:momentjs</id>
+                <features>org.webjars:momentjs</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

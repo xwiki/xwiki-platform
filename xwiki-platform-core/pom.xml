@@ -189,6 +189,7 @@
             <revapi.differences>
               <justification>The removed methods were not implemented nor used. Change voted in the
                 forum.</justification>
+              <criticality>highlight</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>

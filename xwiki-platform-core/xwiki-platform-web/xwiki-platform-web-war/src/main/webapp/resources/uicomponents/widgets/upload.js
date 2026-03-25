@@ -118,8 +118,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     static createSpan(cssClass, content)
     {
       let result = document.createElement('span');
-      if (cssClass.length) result.classList.add(...cssClass.split(' '));
-      result.innerHTML = content||'';
+      if (cssClass.length) {
+        result.classList.add(...cssClass.split(' '));
+      }
+      result.innerHTML = content || '';
       return result;
     }
 
@@ -134,8 +136,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     {
       let result = document.createElement('button');
       result.classList.add('btn', 'btn-default');
-      result.innerHTML = content||'';
-      if(handler) result.addEventListener('click', handler);
+      result.innerHTML = content || '';
+      if (handler) {
+        result.addEventListener('click', handler);
+      }
       return result;
     }
   }

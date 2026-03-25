@@ -103,17 +103,17 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       addButton.attr('class', "attachmentActionButton add-file-input");
       this.addDiv = document.createElement("div");
       this.addDiv.append(addButton);
-      addButton.observe('click', this.addField.bindAsEventListener(this));
+      addButton.on('click', this.addField);
       this.defaultFileDiv.up().insertBefore(this.addDiv, this.defaultFileDiv.next());
     }
     /** Add a submit listener that prevents submitting the form if no file was specified. */
     blockEmptySubmit() {
-      this.form[0].observe('submit', this.onSubmit.bindAsEventListener(this));
+      this.form[0].on('submit', this.onSubmit);
     }
     /** Add a reset listener that resets the number of file fields to 1. */
     resetOnCancel() {
-      this.form[0].observe('reset', this.onReset.bindAsEventListener(this));
-      this.form.down('.cancel')[0].observe('click', this.onReset.bindAsEventListener(this));
+      this.form[0].on('reset', this.onReset);
+      this.form.find('.cancel')[0].on('click', this.onReset);
     }
     /** Creates and inserts a new file input field. */
     addField(event) {
@@ -145,7 +145,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
         title: l10n['core.viewers.attachments.upload.removeFileInput.title'],
         className: "attachmentActionButton remove-file-input"
       });
-      Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
+      removeButton.on("click", this.removeField);
       return removeButton;
     }
     /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */

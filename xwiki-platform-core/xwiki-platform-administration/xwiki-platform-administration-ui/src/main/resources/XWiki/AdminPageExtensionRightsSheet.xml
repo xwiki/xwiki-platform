@@ -295,7 +295,7 @@ $services.localization.render('admin.pagerights.info') **$services.localization.
       <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
-      <displayInSection>usersgroups.pageextensionrights</displayInSection>
+      <displayInSection>usersgroups.extensionrights.page</displayInSection>
     </property>
     <property>
       <heading/>
@@ -310,7 +310,7 @@ $services.localization.render('admin.pagerights.info') **$services.localization.
       <propertiesToShow/>
     </property>
     <property>
-      <scope>WIKI+ALL_SPACES</scope>
+      <scope>ALL_SPACES</scope>
     </property>
     <property>
       <sectionOrder>380</sectionOrder>

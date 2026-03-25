@@ -36,7 +36,7 @@
     if (data.resetText == null) $el.data('resetText', $el[val]())
 
     // push to event loop to allow forms to submit
-    setTimeout($.proxy(function () {
+    setTimeout(() => {
       $el[val](data[state] == null ? this.options[state] : data[state])
 
       if (state == 'loadingText') {
@@ -46,7 +46,7 @@
         this.isLoading = false
         $el.removeClass(d).removeAttr(d).prop(d, false)
       }
-    }, this), 0)
+    }, 0)
   }
 
   Button.prototype.toggle = function () {

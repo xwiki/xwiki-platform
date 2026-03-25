@@ -37,6 +37,7 @@ import org.xwiki.extension.ExtensionSupportPlans;
 import org.xwiki.extension.ExtensionSupporter;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.internal.converter.ExtensionPatternConverter;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
@@ -180,6 +181,9 @@ public class RepositoryTestUtils
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version));
 
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId()));
+
+        dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS,
+            ExtensionPatternConverter.toStringList(dependency.getExclusions())));
 
         dependencyObject.getProperties()
             .add(property(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0));
@@ -436,6 +440,8 @@ public class RepositoryTestUtils
             XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
             dependency.getVersionConstraint(), XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(),
             XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0,
+            XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS,
+            ExtensionPatternConverter.toStringList(dependency.getExclusions()),
             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version);
     }
 

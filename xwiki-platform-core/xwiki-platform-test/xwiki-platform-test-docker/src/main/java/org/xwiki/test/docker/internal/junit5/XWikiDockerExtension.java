@@ -92,6 +92,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
@@ -412,11 +413,15 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         AbstractTest.initializeSystem(testContext);
         savePersistentTestContext(extensionContext, testContext);
 
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
         // Set the URLs to access XWiki:
         // - the one used inside the Selenium container
         testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort()));
+            servletEngine.getInternalIP(),
+            servletEngine.getInternalPort()));
+        testContext.getUtil().setDockerBaseUrl(
+            String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT));
 
         // Setup the wcag validation context.
         testContext.getUtil().getWCAGUtils().setupWCAGValidation(

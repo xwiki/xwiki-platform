@@ -30,9 +30,7 @@ import type { TableCell } from "@blocknote/core";
 import type {
   BlockType,
   EditorInlineContentSchema,
-  EditorLink,
   EditorStyleSchema,
-  EditorStyledText,
   InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
@@ -90,14 +88,27 @@ export class UniAstToBlockNoteConverter {
           },
         };
 
-      case "quote":
+      case "quote": {
+        // Quotes must start with actual text (a paragraph)
+        if (block.content.length < 1 || block.content[0].type !== "paragraph") {
+          throw new Error("Expected a paragraph to begin quote block");
+        }
+
         return {
           type: "quote",
           id: genId(),
-          children: [],
-          content: this.convertCustomBlockContent(block.content),
+          // First paragraph is the base content of the quote
+          content: block.content[0].content.map((item) =>
+            this.convertInlineContent(item),
+          ),
+          // Rest is the following children
+          children: block.content
+            .slice(1)
+            .map((block) => this.convertBlock(block))
+            .flat(),
           props: this.convertBlockStyles(block.styles),
         };
+      }
 
       case "code":
         return {
@@ -154,7 +165,13 @@ export class UniAstToBlockNoteConverter {
         return this.convertImage(block);
 
       case "break":
-        throw new Error("TODO: handle block of type " + block.type);
+        return {
+          type: "divider",
+          id: genId(),
+          children: [],
+          content: undefined,
+          props: {},
+        };
 
       case "macroBlock": {
         let content: InlineContentType[] | null = null;
@@ -214,16 +231,6 @@ export class UniAstToBlockNoteConverter {
         rowspan: cell.rowSpan,
       },
     };
-  }
-
-  private convertCustomBlockContent(
-    content: Block[],
-  ): Array<EditorStyledText | EditorLink> {
-    if (content.length > 1 || content[0].type !== "paragraph") {
-      throw new Error("Expected a single paragraph inside custom block");
-    }
-
-    return content[0].content.map((item) => this.convertInlineContent(item));
   }
 
   private convertBlockStyles(styles: BlockStyles) {

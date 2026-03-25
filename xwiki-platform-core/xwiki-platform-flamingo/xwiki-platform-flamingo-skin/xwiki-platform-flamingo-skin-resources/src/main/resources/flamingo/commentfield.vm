@@ -57,5 +57,4 @@
 $commentObj.display('comment', 'edit', true, $withNumber)
 
 ## ensure to load the appropriate JSX for the editor.
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()

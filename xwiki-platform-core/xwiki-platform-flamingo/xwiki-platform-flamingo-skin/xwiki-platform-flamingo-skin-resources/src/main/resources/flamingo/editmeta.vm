@@ -17,9 +17,14 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#set($docTitle = $request.getParameter('title'))
-#if("$!docTitle" == '')
-  #set($docTitle = $!tdoc.title)
+#set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+#set ($docTitle = $request.getParameter('title'))
+#if ("$!docTitle" == '')
+  #set ($docTitle = $tdoc.title)
+  #if ("$!docTitle" == '' && $titleIsMandatory)
+    ## Provide a reasonable initial value for the mandatory document title.
+    #set ($docTitle = $tdoc.pageReference.name)
+  #end
 #end
 #set($docParent = $request.getParameter('parent'))
 #if("$!docParent" == '')
@@ -35,7 +40,6 @@
 #if ($editor != 'inline')
 <dl id="titleinput" class="form-group">
   <dt>
-    #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
     #set ($wysiwygWithOptionalTitle = $editor == 'wysiwyg' && !$titleIsMandatory)
     <label for="xwikidoctitleinput"#if ($wysiwygWithOptionalTitle) class="sr-only"#end>
       $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))

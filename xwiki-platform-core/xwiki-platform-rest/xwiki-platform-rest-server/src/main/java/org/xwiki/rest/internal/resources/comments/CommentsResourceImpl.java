@@ -60,8 +60,7 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
 
             Vector<com.xpn.xwiki.api.Object> xwikiComments = doc.getComments();
 
-            RangeIterable<com.xpn.xwiki.api.Object> ri =
-                    new RangeIterable<com.xpn.xwiki.api.Object>(xwikiComments, start, number);
+            RangeIterable<com.xpn.xwiki.api.Object> ri = new RangeIterable<>(xwikiComments, start, number);
 
             for (com.xpn.xwiki.api.Object xwikiComment : ri) {
                 comments.getComments().add(

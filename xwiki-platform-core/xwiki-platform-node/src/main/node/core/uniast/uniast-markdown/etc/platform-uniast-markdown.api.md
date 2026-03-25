@@ -6,11 +6,23 @@
 
 import { Container } from 'inversify';
 import { InlineContent } from '@xwiki/platform-uniast-api';
+import { Link } from '@xwiki/platform-uniast-api';
+import { LinkTarget } from '@xwiki/platform-uniast-api';
 import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export class ComponentInit {
     constructor(container: Container);
+}
+
+// @beta
+export interface InternalLinksSerializer {
+    serialize(content: Link["content"], target: Extract<LinkTarget, {
+        type: "internal";
+    }>, uniAstToMarkdownConverter: UniAstToMarkdownConverter): Promise<string>;
+    serializeImage(target: Extract<LinkTarget, {
+        type: "internal";
+    }>, alt?: string): Promise<string>;
 }
 
 // @beta

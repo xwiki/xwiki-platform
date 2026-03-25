@@ -118,6 +118,9 @@
   #end
   #if (!$_obfuscate)
     <dd>#unifiedDiff($previousValue $newValue $conflictsDiff)</dd>
+  #else
+    ## We keep an empty dd tag to comply with WCAG rule: each <dt> element needs to have a sibling <dd>
+    <dd></dd>
   #end
   #set ($_obfuscate = $NULL)
 #end
@@ -138,7 +141,7 @@
     #end
   #end
   #set ($obfuscate = $NULL)
-  #if ($diff.propType == 'Password' || ($diff.propType == 'Email' && $diff.className == 'XWiki.XWikiUsers'))
+  #if ($diff.sensitive)
     #set ($obfuscate = 'web.history.changes.privateInformation')
   #end
   #if (!$fieldName)

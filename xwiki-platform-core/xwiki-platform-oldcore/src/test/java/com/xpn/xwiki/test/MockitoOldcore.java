@@ -41,6 +41,7 @@ import javax.script.ScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hibernate.cfg.Configuration;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
@@ -353,14 +354,30 @@ public class MockitoOldcore
             // DocumentAuthorizationManager are available
             if (!getMocker().hasComponent(AuthorizationManager.class)) {
                 this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+            } else {
+                AuthorizationManager registered = getMocker().getInstance(AuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            } else {
+                ContextualAuthorizationManager registered =
+                    getMocker().getInstance(ContextualAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockContextualAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(DocumentAuthorizationManager.class)) {
                 this.mockDocumentAuthorizationManager =
                     getMocker().registerMockComponent(DocumentAuthorizationManager.class);
+            } else {
+                DocumentAuthorizationManager registered = getMocker().getInstance(DocumentAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockDocumentAuthorizationManager = registered;
+                }
             }
         }
 
@@ -856,7 +873,7 @@ public class MockitoOldcore
                     XWikiDocument doc = invocation.getArgument(0);
                     String revision = invocation.getArgument(1);
 
-                    if (StringUtils.equals(revision, doc.getVersion())) {
+                    if (Strings.CS.equals(revision, doc.getVersion())) {
                         return doc;
                     }
 

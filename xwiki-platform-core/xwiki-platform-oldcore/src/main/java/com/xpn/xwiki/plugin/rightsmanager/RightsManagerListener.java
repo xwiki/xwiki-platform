@@ -20,7 +20,6 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Listener to user and groups events to apply related automatic task like cleaning groups and rights objects.
+ * Listener to user and groups events, to apply related and automatic tasks like cleaning groups and rights objects.
  *
  * @version $Id$
  * @since 2.2.3
@@ -58,12 +57,7 @@ public final class RightsManagerListener implements EventListener
     /**
      * The events to match.
      */
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentDeletedEvent());
-        }
-    };
+    private static final List<Event> EVENTS = List.of(new DocumentDeletedEvent());
 
     private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
 
@@ -141,7 +135,7 @@ public final class RightsManagerListener implements EventListener
     }
 
     /**
-     * Remove reference to provided user or group in all groups and rights in current wiki.
+     * Remove the reference to the provided user or group in all groups and rights, in the current wiki.
      *
      * @param userOrGroupWiki the wiki name of the group or user.
      * @param userOrGroupSpace the space name of the group or user.
@@ -160,7 +154,7 @@ public final class RightsManagerListener implements EventListener
     }
 
     /**
-     * Remove reference to provided user or group in all groups and rights in all wikis.
+     * Remove the reference to the provided user or group in all groups and rights, in all wikis.
      *
      * @param userOrGroupWiki the wiki name of the group or user.
      * @param userOrGroupSpace the space name of the group or user.

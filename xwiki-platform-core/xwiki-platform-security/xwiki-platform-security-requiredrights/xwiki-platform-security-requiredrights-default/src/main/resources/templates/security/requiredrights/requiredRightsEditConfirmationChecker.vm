@@ -137,6 +137,5 @@
 {{/velocity}}
 
 {{velocity output='false'}}
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()
 {{/velocity}}

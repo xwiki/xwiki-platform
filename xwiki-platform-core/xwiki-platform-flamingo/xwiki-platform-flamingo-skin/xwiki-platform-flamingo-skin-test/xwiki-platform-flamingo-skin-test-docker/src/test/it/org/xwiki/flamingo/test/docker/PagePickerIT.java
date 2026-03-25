@@ -64,11 +64,10 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
-
         pagePicker.sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions().selectByVisibleText(pageName);
-        pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions()
+        // Clear and perform the same query again. We don't wait for remote suggestions this time because the query
+        // results have been cached.
+        pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions(false)
             .selectByVisibleText(pageName);
     }
 
@@ -124,9 +123,6 @@ class PagePickerIT
 
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
-
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
 
         List<SuggestInputElement.SuggestionElement> suggestions =
             pagePicker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions();

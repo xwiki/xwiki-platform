@@ -92,7 +92,7 @@ class DefaultRequiredRightsRestResourceTest
         document.setTitle("Test");
         this.oldcore.getSpyXWiki().saveDocument(document, "Test setup", this.oldcore.getXWikiContext());
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any(), any())).thenReturn(true);
     }
 
     @Test

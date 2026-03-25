@@ -26,4 +26,6 @@ package org.xwiki.xar.internal.model;
 public class XarObjectPropertyModel
 {
     public static final String ELEMENT_PROPERTY = "property";
+
+    public static final String ATTRIBUTE_TYPE = "type";
 }

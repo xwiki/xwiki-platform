@@ -19,8 +19,7 @@
  */
 package org.xwiki.url.internal.standard.entity;
 
-import java.net.URL;
-import java.util.Arrays;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,22 +57,18 @@ class BinEntityResourceReferenceResolverTest
 
     private WikiReference wikiReference = new WikiReference("wiki");
 
-    private WikiReferenceExtractor wikiReferenceExtractor;
-
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
-
-    private EntityResourceActionLister entityResourceActionLister;
 
     private StandardURLConfiguration configuration;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         this.resolver = new BinEntityResourceReferenceResolver();
 
-        this.wikiReferenceExtractor = mock(WikiReferenceExtractor.class);
-        when(this.wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(this.wikiReference);
-        ReflectionUtils.setFieldValue(this.resolver, "wikiExtractor", this.wikiReferenceExtractor);
+        WikiReferenceExtractor wikiReferenceExtractor = mock(WikiReferenceExtractor.class);
+        when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(this.wikiReference);
+        ReflectionUtils.setFieldValue(this.resolver, "wikiExtractor", wikiReferenceExtractor);
 
         this.entityReferenceResolver = mock(EntityReferenceResolver.class);
         ReflectionUtils.setFieldValue(this.resolver, "defaultReferenceEntityReferenceResolver",
@@ -82,9 +77,9 @@ class BinEntityResourceReferenceResolverTest
         this.configuration = mock(StandardURLConfiguration.class);
         ReflectionUtils.setFieldValue(this.resolver, "configuration", this.configuration);
 
-        this.entityResourceActionLister = mock(EntityResourceActionLister.class);
-        when(this.entityResourceActionLister.listActions()).thenReturn(Arrays.asList("view", "download"));
-        ReflectionUtils.setFieldValue(this.resolver, "entityResourceActionLister", this.entityResourceActionLister);
+        EntityResourceActionLister entityResourceActionLister = mock(EntityResourceActionLister.class);
+        when(entityResourceActionLister.listActions()).thenReturn(List.of("view", "download"));
+        ReflectionUtils.setFieldValue(this.resolver, "entityResourceActionLister", entityResourceActionLister);
     }
 
     @Test
@@ -92,9 +87,9 @@ class BinEntityResourceReferenceResolverTest
     {
         when(this.configuration.isViewActionHidden()).thenReturn(true);
 
-        EntityReference fullSingleSpaceReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
+        EntityReference fullSingleSpaceReference = buildEntityReference(List.of("space"), "page");
         EntityReference fullTwoSpacesReference =
-            buildEntityReference("wiki", Arrays.asList("space1", "space2"), "page");
+            buildEntityReference(List.of("space1", "space2"), "page");
 
         // Test when no segment
         testCreateResource("http://localhost/bin", "view", this.wikiReference, fullSingleSpaceReference,
@@ -104,23 +99,23 @@ class BinEntityResourceReferenceResolverTest
         testCreateResource("http://localhost/bin/", "view", this.wikiReference, fullSingleSpaceReference,
             EntityType.DOCUMENT);
 
-        // Test when single space segment, to be Nested Document friendly.
-        // Normally the last segment is always the page name but we want to handle a special case when we
+        // Test when there's a single space segment, to be Nested-Document friendly.
+        // Normally the last segment is always the page name, but we want to handle a special case when we
         // have "/view/something" and we wish in this case to consider that "something" is the space. This
-        // is to handle Nested Documents, so that the user can have a top level Nested Document
-        // (something.WebHome) and access it from /view/something. If we didn't handle this special case
+        // is to handle Nested Documents so that the user can have a top-level Nested Document
+        // (something.WebHome) and access it from /view/something. If we didn't handle this special case,
         // the user would get Main.something and thus wouldn't be able to access something.WebHome. He'd
         // need to use /view/something/ which is not natural in the Nested Document mode.
         testCreateResource("http://localhost/bin/space", "view",
-            buildEntityReference("wiki", Arrays.asList("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
+            buildEntityReference(List.of("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
 
         // Test when 1 space segment and trailing slash
         testCreateResource("http://localhost/bin/space/", "view",
-            buildEntityReference("wiki", Arrays.asList("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
+            buildEntityReference(List.of("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
 
         // Test when 2 space segments and trailing slash
         testCreateResource("http://localhost/bin/space1/space2/", "view",
-            buildEntityReference("wiki", Arrays.asList("space1", "space2"), null), fullTwoSpacesReference,
+            buildEntityReference(List.of("space1", "space2"), null), fullTwoSpacesReference,
             EntityType.DOCUMENT);
 
         // Test when 1 space and page segments
@@ -131,17 +126,17 @@ class BinEntityResourceReferenceResolverTest
         testCreateResource("http://localhost/bin/space1/space2/page", "view", fullTwoSpacesReference,
             fullTwoSpacesReference, EntityType.DOCUMENT);
 
-        // Test when space segment is called "view"
+        // Test when the space segment is called "view"
         testCreateResource("http://localhost/bin/view/space/page", "view", fullSingleSpaceReference,
             fullSingleSpaceReference, EntityType.DOCUMENT);
         EntityReference viewTwoSpacesReference =
-            buildEntityReference("wiki", Arrays.asList("view", "space2"), "page");
+            buildEntityReference(List.of("view", "space2"), "page");
         testCreateResource("http://localhost/bin/view/view/space2/page", "view", viewTwoSpacesReference,
             viewTwoSpacesReference, EntityType.DOCUMENT);
 
-        // Test when space segment is called "download"
+        // Test when the space segment is called "download"
         EntityReference downloadTwoSpacesReference =
-            buildEntityReference("wiki", Arrays.asList("download", "space2"), "page");
+            buildEntityReference(List.of("download", "space2"), "page");
         testCreateResource("http://localhost/bin/view/download/space2/page", "view", downloadTwoSpacesReference,
             downloadTwoSpacesReference, EntityType.DOCUMENT);
 
@@ -155,21 +150,21 @@ class BinEntityResourceReferenceResolverTest
     {
         when(this.configuration.isViewActionHidden()).thenReturn(false);
 
-        EntityReference fullSingleSpaceReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
+        EntityReference fullSingleSpaceReference = buildEntityReference(List.of("space"), "page");
         EntityReference fullTwoSpacesReference =
-            buildEntityReference("wiki", Arrays.asList("space1", "space2"), "page");
+            buildEntityReference(List.of("space1", "space2"), "page");
 
         // Test when 1 space segment to be Nested Document friendly (see the test above for more explanations)
         testCreateResource("http://localhost/bin/view/space", "view",
-            buildEntityReference("wiki", Arrays.asList("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
+            buildEntityReference(List.of("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
 
         // Test when 1 space segment and trailing slash
         testCreateResource("http://localhost/bin/view/space/", "view",
-            buildEntityReference("wiki", Arrays.asList("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
+            buildEntityReference(List.of("space"), null), fullSingleSpaceReference, EntityType.DOCUMENT);
 
         // Test when 2 space segments and trailing slash
         testCreateResource("http://localhost/bin/view/space1/space2/", "view",
-            buildEntityReference("wiki", Arrays.asList("space1", "space2"), null), fullTwoSpacesReference,
+            buildEntityReference(List.of("space1", "space2"), null), fullTwoSpacesReference,
             EntityType.DOCUMENT);
 
         // Test when 1 space and page segments
@@ -189,7 +184,7 @@ class BinEntityResourceReferenceResolverTest
     @Test
     void createResourceWhenSpaceAndPageNamesContainDots() throws Exception
     {
-        EntityReference reference = buildEntityReference("wiki", Arrays.asList("space.with.dots"), "page.with.dots");
+        EntityReference reference = buildEntityReference(List.of("space.with.dots"), "page.with.dots");
         testCreateResource("http://localhost/bin/view/space.with.dots/page.with.dots", "view",
             reference, reference, EntityType.DOCUMENT);
     }
@@ -198,9 +193,9 @@ class BinEntityResourceReferenceResolverTest
     void createResourceWhenFileActionAction() throws Exception
     {
         EntityReference singleSpaceReference =
-            buildEntityReference("wiki", Arrays.asList("space"), "page", "attachment.ext");
+            buildEntityReference(List.of("space"), "page", "attachment.ext");
         EntityReference twoSpaceReference =
-            buildEntityReference("wiki", Arrays.asList("space1", "space2"), "page", "attachment.ext");
+            buildEntityReference(List.of("space1", "space2"), "page", "attachment.ext");
 
         testCreateResource("http://localhost/bin/download/space/page/attachment.ext", "download", singleSpaceReference,
             singleSpaceReference, EntityType.ATTACHMENT);
@@ -226,30 +221,30 @@ class BinEntityResourceReferenceResolverTest
     @Test
     void createResourceWhenURLHasParameters() throws Exception
     {
-        EntityReference fullReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
+        EntityReference fullReference = buildEntityReference(List.of("space"), "page");
         ResourceReference resource =
             testCreateResource("http://localhost/bin/view/space/page?param1=value1&param2=value2", "view",
                 fullReference, fullReference, EntityType.DOCUMENT);
 
         // Assert parameters
         // Note: the parameters order are the same as the order specified in the URL.
-        Map<String, List<String>> expectedMap = new LinkedHashMap<String, List<String>>();
-        expectedMap.put("param1", Arrays.asList("value1"));
-        expectedMap.put("param2", Arrays.asList("value2"));
+        Map<String, List<String>> expectedMap = new LinkedHashMap<>();
+        expectedMap.put("param1", List.of("value1"));
+        expectedMap.put("param2", List.of("value2"));
         assertEquals(expectedMap, resource.getParameters());
 
         // Also verify it works when there's a param with no value.
         resource = testCreateResource("http://localhost/bin/view/space/page?param",
             "view", fullReference, fullReference, EntityType.DOCUMENT);
         expectedMap = new LinkedHashMap<>();
-        expectedMap.put("param", Collections.<String>emptyList());
+        expectedMap.put("param", Collections.emptyList());
         assertEquals(expectedMap, resource.getParameters());
     }
 
     @Test
     void createEntityResourceWhenURLHasAnchor() throws Exception
     {
-        EntityReference fullReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
+        EntityReference fullReference = buildEntityReference(List.of("space"), "page");
         EntityResourceReference resource =
             testCreateResource("http://localhost/bin/view/space/page#anchor", "view",
                 fullReference, fullReference, EntityType.DOCUMENT);
@@ -262,11 +257,11 @@ class BinEntityResourceReferenceResolverTest
         throws Exception
     {
         when(this.entityReferenceResolver.resolve(expectedReference, expectedEntityType)).thenReturn(returnedReference);
-        ExtendedURL extendedURL = new ExtendedURL(new URL(testURL), null);
+        ExtendedURL extendedURL = new ExtendedURL(new URI(testURL).toURL(), null);
         // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
-        extendedURL.getSegments().remove(0);
+        extendedURL.getSegments().removeFirst();
         EntityResourceReference entityResource = this.resolver.resolve(extendedURL,
-            new ResourceType("bin"), Collections.<String, Object>emptyMap());
+            new ResourceType("bin"), Collections.emptyMap());
 
         assertEquals(expectedActionName, entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());
@@ -274,14 +269,14 @@ class BinEntityResourceReferenceResolverTest
         return entityResource;
     }
 
-    private EntityReference buildEntityReference(String wiki, List<String> spaces, String page)
+    private EntityReference buildEntityReference(List<String> spaces, String page)
     {
-        return buildEntityReference(wiki, spaces, page, null);
+        return buildEntityReference(spaces, page, null);
     }
 
-    private EntityReference buildEntityReference(String wiki, List<String> spaces, String page, String attachment)
+    private EntityReference buildEntityReference(List<String> spaces, String page, String attachment)
     {
-        EntityReference entityReference = new WikiReference(wiki);
+        EntityReference entityReference = new WikiReference("wiki");
         if (spaces != null) {
             EntityReference parent = entityReference;
             for (String space : spaces) {

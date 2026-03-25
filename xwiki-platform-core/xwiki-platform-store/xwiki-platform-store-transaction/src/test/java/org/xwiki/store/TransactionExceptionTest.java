@@ -19,8 +19,8 @@
  */
 package org.xwiki.store;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,65 +36,61 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 3.0M2
  */
-public class TransactionExceptionTest
+class TransactionExceptionTest
 {
-    private static final String SIMPLE_TEST_OUT =
-    // @formatter:off
-        "Caused by:\n"
-      + "java.lang.Exception\n"
-      + "\t" + "One exception.\n"
-      + "java.lang.RuntimeException\n"
-      + "\t" + "Number 2\n"
-      + "java.lang.OutOfMemoryError\n"
-      + "\t" + "Ut oh\n";
-      // @formatter:on
+    private static final String SIMPLE_TEST_OUT = """
+        Caused by:
+        java.lang.Exception
+        \tOne exception.
+        java.lang.RuntimeException
+        \tNumber 2
+        java.lang.OutOfMemoryError
+        \tUt oh
+        """;
 
-    private static final String COMPOUND_TEST_OUT =
-    // @formatter:off
-        "Caused by:\n"
-      + "java.lang.Exception\n"
-      + "\t" + "something bad happened.\n"
-      + "org.xwiki.store.TransactionException\n"
-      + "\t" + "Caused by:\n"
-      + "\t" + "java.lang.Exception\n"
-      + "\t" + "\t" + "One exception.\n"
-      + "\t" + "java.lang.RuntimeException\n"
-      + "\t" + "\t" + "Number 2\n"
-      + "\t" + "java.lang.OutOfMemoryError\n"
-      + "\t" + "\t" + "Ut oh\n"
-      + "\t" + "\n"
-      + "java.lang.Error\n"
-      + "\t" + "SEGFAULT!\n";
-      // @formatter:on
+    private static final String COMPOUND_TEST_OUT = """
+        Caused by:
+        java.lang.Exception
+        \tsomething bad happened.
+        org.xwiki.store.TransactionException
+        \tCaused by:
+        \tjava.lang.Exception
+        \t\tOne exception.
+        \tjava.lang.RuntimeException
+        \t\tNumber 2
+        \tjava.lang.OutOfMemoryError
+        \t\tUt oh
+        \t
+        java.lang.Error
+        \tSEGFAULT!
+        """;
 
-    private static final String NONRECOVERABLE_TEST_OUT =
-    // @formatter:off
-        "Caused by:\n"
-      + "java.lang.Exception\n"
-      + "\t" + "something bad happened.\n"
-      + "org.xwiki.store.TransactionException\n"
-      + "\t" + "This means there is db corruption\n"
-      + "\t" + "Caused by:\n"
-      + "\t" + "java.lang.Error\n"
-      + "\t" + "\t" + "Corruption!!\n"
-      + "\t" + "\n"
-      + "java.lang.Error\n"
-      + "\t" + "SEGFAULT!\n";
-      // @formatter:on
+    private static final String NONRECOVERABLE_TEST_OUT = """
+        Caused by:
+        java.lang.Exception
+        \tsomething bad happened.
+        org.xwiki.store.TransactionException
+        \tThis means there is db corruption
+        \tCaused by:
+        \tjava.lang.Error
+        \t\tCorruption!!
+        \t
+        java.lang.Error
+        \tSEGFAULT!
+        """;
 
     @Test
-    private void emptyException()
+    void emptyException()
     {
-        TransactionException exception =  new TransactionException(Collections.emptyList());
-
+        TransactionException exception = new TransactionException(Collections.emptyList());
         assertNull(exception.getCause());
     }
-    
+
     /**
      * Make sure the messages from the underlying throwables are preserved.
      */
     @Test
-    public void simpleExceptionTest()
+    void simpleExceptionTest()
     {
         TransactionException te = this.getException();
         assertFalse(te.isNonRecoverable());
@@ -104,37 +100,26 @@ public class TransactionExceptionTest
     }
 
     @Test
-    public void compoundExceptionTest()
+    void compoundExceptionTest()
     {
-        TransactionException te = new TransactionException(new ArrayList<Throwable>()
-        {
-            {
-                add(new Exception("something bad happened."));
-                add(getException());
-                add(new Error("SEGFAULT!"));
-            }
-        });
+        TransactionException te = new TransactionException(List.of(
+            new Exception("something bad happened."),
+            getException(),
+            new Error("SEGFAULT!")
+        ));
         assertFalse(te.isNonRecoverable());
         assertEquals(5, te.exceptionCount(), "Wrong number of exceptions reported");
         assertEquals(COMPOUND_TEST_OUT, te.getMessage(), "The wrong exception message was given");
     }
 
     @Test
-    public void nonRecoverableTest()
+    void nonRecoverableTest()
     {
-        TransactionException te = new TransactionException(new ArrayList<Throwable>()
-        {
-            {
-                add(new Exception("something bad happened."));
-                add(new TransactionException("This means there is db corruption", new ArrayList<Throwable>()
-                {
-                    {
-                        add(new Error("Corruption!!"));
-                    }
-                }, true));
-                add(new Error("SEGFAULT!"));
-            }
-        });
+        TransactionException te = new TransactionException(List.of(
+            new Exception("something bad happened."),
+            new TransactionException("This means there is db corruption", List.of(new Error("Corruption!!")), true),
+            new Error("SEGFAULT!")
+        ));
         assertTrue(te.isNonRecoverable());
         assertEquals(3, te.exceptionCount(), "Wrong number of exceptions reported");
         assertEquals(NONRECOVERABLE_TEST_OUT, te.getMessage(), "The wrong exception message was given");
@@ -142,13 +127,10 @@ public class TransactionExceptionTest
 
     private TransactionException getException()
     {
-        return new TransactionException(new ArrayList<Throwable>()
-        {
-            {
-                add(new Exception("One exception."));
-                add(new RuntimeException("Number 2"));
-                add(new OutOfMemoryError("Ut oh"));
-            }
-        });
+        return new TransactionException(List.of(
+            new Exception("One exception."),
+            new RuntimeException("Number 2"),
+            new OutOfMemoryError("Ut oh")
+        ));
     }
 }

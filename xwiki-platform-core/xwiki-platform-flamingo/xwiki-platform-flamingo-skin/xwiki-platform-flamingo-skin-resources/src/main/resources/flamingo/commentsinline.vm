@@ -44,8 +44,9 @@
  *
  *###
 ##
-## These are used when this page is accessed directly but are useless when the page is pulled in with ajax using 
-## bin/view/Space/Page?xpage=xpart&vm=commentsinline.vm
+## Support skin extensions for ajax requests.
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
@@ -272,11 +273,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         $services.captcha.default.display()
       </div>
     </div>
-    ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
-    #if($hideCaptcha)
-      ## Since each CAPTCHA displayer can have its own JS+CSS, we need to make sure that, when comments are shown with AJAX, those resources are also included.
-      #skinExtensionHooks()
-    #end
     #if($captchaAnswerWrong)
       <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
     #end
@@ -472,3 +468,4 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #showDeleteModal
 </div> ## commentscontent
 #end ## comment == ''
+#sendRequiredSkinExtensions()

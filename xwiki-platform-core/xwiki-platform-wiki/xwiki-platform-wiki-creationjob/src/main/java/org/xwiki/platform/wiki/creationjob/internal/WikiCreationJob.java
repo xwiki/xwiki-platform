@@ -76,6 +76,7 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
             this.xcontextProvider.get().setUserReference(
                 this.defaultDocumentReferenceResolver.resolve(getRequest().getOwnerId()));
 
+            // FIXME: we don't need this comparison anymore: we could rely on component priority no?
             List<WikiCreationStep> wikiCreationStepList = componentManager.getInstanceList(WikiCreationStep.class);
             // Some extra steps needs to be executed AFTER some others, so we have introduce a getOrder() method in the
             // interface. We use this method to sort the list of extra steps by this order.

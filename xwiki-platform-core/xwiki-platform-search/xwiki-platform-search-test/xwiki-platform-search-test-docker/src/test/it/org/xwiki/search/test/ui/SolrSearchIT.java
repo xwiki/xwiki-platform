@@ -84,8 +84,8 @@ class SolrSearchIT
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage = searchPage.search("\"Test Document\"");
-        searchPage.toggleSpaceFaucet();
-        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
+        searchPage.toggleSpaceFacet();
+        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFacetContent());
     }
 
     @ParameterizedTest
@@ -232,7 +232,7 @@ class SolrSearchIT
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
         searchAdminPage.getSearchExclusionsField().sendKeys("Two").waitForSuggestions().selectByVisibleText("Two")
-            .sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
+            .clear().sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
         searchAdminPage.clickSave();
 
         // Check the search results after configuring search exclusions.

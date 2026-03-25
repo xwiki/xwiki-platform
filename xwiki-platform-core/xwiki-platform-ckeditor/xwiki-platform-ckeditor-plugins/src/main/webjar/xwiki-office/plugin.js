@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
+ define('officeImporterModal', ['jquery', 'xwiki-wysiwyg-modal'], function($, $modal) {
   'use strict';
   return $modal.createModalStep({
     'class': 'office-importer-modal',
@@ -177,14 +177,7 @@
             filterStyles: upload.file.filterStyles,
             useOfficeViewer: upload.file.useOfficeViewer,
             outputSyntax: 'plain'
-          }).done(function(html, textStatus, jqXHR) {
-            // Load the required skin extensions reusing the function defined by the Macro Wizard. This is needed for
-            // instance when importing a presentation using the Office Viewer macro which requires the gallery widget so
-            // we need to load the gallery CSS and JavaScript resources (skin extensions).
-            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            require(['macroWizard'], function() {
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-            });
+          }).done(function(html) {
             widget.replaceWith(html);
             notification.update({
               message: editor.localization.get('xwiki-office.importer.done'),

@@ -40,7 +40,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.internal.StackingComponentEventManager;
+import org.xwiki.component.internal.QueueComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.ApplicationContextListenerManager;
@@ -97,7 +97,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
         // be set up before we start sending events since there can be Observation Listener components that require
         // the Application Context (this is the case for example for the Office Importer Lifecycle Listener).
-        StackingComponentEventManager eventManager = new StackingComponentEventManager();
+        QueueComponentEventManager eventManager = new QueueComponentEventManager();
         this.componentManager.setComponentEventManager(eventManager);
 
         // Initialize the Environment
@@ -149,7 +149,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Now that the Application Context is set up and the component are registered, send the Component instance
         // creation events we had stacked up.
         eventManager.setObservationManager(observationManager);
-        eventManager.shouldStack(false);
+        eventManager.shouldQueue(false);
         eventManager.flushEvents();
 
         // Force allowing any character in the input URLs, contrary to what Servlet 6 specifications indicate

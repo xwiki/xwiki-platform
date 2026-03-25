@@ -129,12 +129,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS).safeget(TAG_PROPERTY);
             List<String> tags = (List<String>) prop.getValue();
             if (tags != null) {
-                return new ArrayList<String>(tags);
+                return new ArrayList<>(tags);
             }
         } catch (NullPointerException ex) {
+            // TODO: This needs to be fixed, it's a very bad way to check for some non-existing Tag xobject or Tags
+            // property.
         }
 
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**

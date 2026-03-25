@@ -127,9 +127,8 @@ class ObjectsAtPageVersionResourceImplTest
         baseObject.setStringListValue(XWikiConstant.TAG_CLASS_PROP_TAGS, List.of("deleted"));
         when(this.deletedDocumentRevisionProvider.getRevision(this.document.getDocumentReferenceWithLocale(),
             "1")).thenReturn(deletedVersion);
-        when(this.mockitoOldcore.getMockRightService().hasAccessLevel("view",
-            this.mockitoOldcore.getXWikiContext().getUser(), this.document.getPrefixedFullName(),
-            this.mockitoOldcore.getXWikiContext())).thenReturn(true);
+        when(this.mockitoOldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW,
+            this.document.getDocumentReference())).thenReturn(true);
 
         Objects objects = this.objectsAtPageVersionResource.getObjects(DOCUMENT_REFERENCE.getWikiReference().getName(),
             DOCUMENT_REFERENCE.getParent().getName(), DOCUMENT_REFERENCE.getName(), version, 0, 10, false);

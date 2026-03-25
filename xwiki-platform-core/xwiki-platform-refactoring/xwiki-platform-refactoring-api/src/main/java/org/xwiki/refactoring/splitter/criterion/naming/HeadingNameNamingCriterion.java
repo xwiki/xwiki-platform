@@ -140,7 +140,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
                 {
                     public List<Block> filter(Block block)
                     {
-                        List<Block> blocks = new ArrayList<Block>();
+                        List<Block> blocks = new ArrayList<>();
                         if (block instanceof WordBlock || block instanceof SpaceBlock
                             || block instanceof SpecialSymbolBlock) {
                             blocks.add(block);

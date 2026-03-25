@@ -75,9 +75,10 @@
   #foreach($colname in $collist)
     ## If a classname is defined and the class field corresponding to the column name,
     ## we check the type of the field and skip it if it's Password.
-    #if ($className != '' &amp;&amp; $class.get($colname))
-      #set ($isPasswordType = $class.get($colname).classType == 'Password')
-      #set ($isEmailType = $class.get($colname).classType == 'Email')
+    #livetable_getPropertyClassAndType($colname)
+    #if ($propType != '')
+      #set ($isPasswordType = $propClass.get($colname).classType == 'Password')
+      #set ($isEmailType = $propClass.get($colname).classType == 'Email')
       #set ($emailObfuscated = $services.mail.general.shouldObfuscate())
       #if (!($isPasswordType || ($isEmailType &amp;&amp; $emailObfuscated)))
         #livetable_addColumnToQuery($colname)
@@ -503,13 +504,7 @@
     #end
     #set($fieldObject = $itemDoc.getFirstObject($colname))
     #set($fieldProperty = $fieldObject.getProperty($colname))
-    #if ($fieldProperty.getPropertyClass().classType == 'Password')
-      #set($fieldValue = '********')
-    #elseif ($fieldProperty.getPropertyClass().classType == 'Email' &amp;&amp; $services.mail.general.shouldObfuscate())
-      #set ($fieldValue = $services.mail.general.obfuscate("$!fieldProperty.getValue()"))
-    #else
-      #set($fieldValue = "$!fieldProperty.getValue()")
-    #end
+    #set($fieldValue = "$!fieldProperty.getValue()")
     #set($fieldDisplayValue = "#unwrapXPropertyDisplay($itemDoc.display($colname, 'view'))")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
@@ -732,6 +727,19 @@
         #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
           #livetable_getTableAlias($colName)
           #livetable_filterDateProperty()
+        #elseif ($colName == 'doc.hidden' || $colName == 'doc.minorEdit1' || $colName == 'doc.enforceRequiredRights')
+          ## Boolean document fields need special handling to work across all databases
+          ## (HSQLDB/PostgreSQL use true/false, MySQL/MariaDB/Oracle use 1/0).
+          ## Support both true/false and 1/0 as Live Data uses the former while LiveTable uses the latter.
+          #set ($booleanValue = ($filterValue.toLowerCase() == 'true' || $filterValue == '1'))
+          ## No need to clean the column name since it's only one of the given values.
+          #if ($whereParams.entrySet())
+            #set ($whereSql = "${whereSql} and $colName = :${colName.replace('.', '_')}_filter")
+            #set ($discard = $whereParams.put("${colName.replace('.', '_')}_filter", $booleanValue))
+          #else
+            #set ($whereSql = "${whereSql} and $colName = ?")
+            #set ($discard = $whereParams.add($booleanValue))
+          #end
         #else
           #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
           #if ($whereParams.entrySet())

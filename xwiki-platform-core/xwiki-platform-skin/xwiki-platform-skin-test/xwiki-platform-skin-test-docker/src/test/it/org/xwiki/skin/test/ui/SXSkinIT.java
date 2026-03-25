@@ -22,7 +22,9 @@ package org.xwiki.skin.test.ui;
 import java.net.URI;
 
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.jupiter.api.Test;
+import org.apache.commons.lang3.Strings;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
@@ -36,15 +38,19 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 @UITest
 class SXSkinIT
 {
-    @Test
-    void pathTraversal(TestUtils setup) throws Exception
+    @ParameterizedTest
+    @ValueSource(strings = {"../../WEB-INF/xwiki.cfg", "/../../WEB-INF/xwiki.cfg", "///../../WEB-INF/xwiki.cfg"})
+    void pathTraversalWithoutLeadingSlash(String resource, TestUtils setup) throws Exception
     {
-        URI uri = new URI(setup.getURL("Main", "WebHome", "sx", "resource=../../WEB-INF/xwiki.cfg"));
+        URI uri = new URI(
+            Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest") + "bin/jsx/Main/WebHome?resource=" + resource);
 
         GetMethod response = setup.rest().executeGet(uri);
 
-        assertNotEquals(200, response.getStatusCode());
-
-        response.releaseConnection();
-     }
+        try {
+            assertNotEquals(200, response.getStatusCode());
+        } finally {
+            response.releaseConnection();
+        }
+    }
 }

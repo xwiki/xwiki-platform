@@ -84,9 +84,9 @@ class PinnedPagesIT
             PinnedPagesAdministrationSectionPage.gotoPage(levelTwo.getLastSpaceReference());
         SuggestInputElement pinnedPagesPicker = pinnedPagesAdminSection.getPinnedPagesPicker();
         pinnedPagesPicker.sendKeys("Carol").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.sendKeys("Bob").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.sendKeys("Denis").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.sendKeys("Alice").waitForSuggestions().selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Bob").waitForSuggestions().selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Denis").waitForSuggestions().selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Alice").waitForSuggestions().selectByIndex(0);
         // Close the suggestions dropdown because it may hide the save button.
         pinnedPagesPicker.sendKeys(Keys.ESCAPE);
         pinnedPagesAdminSection.clickSave();

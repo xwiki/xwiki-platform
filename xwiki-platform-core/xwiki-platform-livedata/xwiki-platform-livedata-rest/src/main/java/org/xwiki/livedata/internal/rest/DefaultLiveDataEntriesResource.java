@@ -68,6 +68,8 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     private LiveDataResourceContextInitializer contextInitializer;
 
     @Override
+    // The GET request to retrieve, sort and filter the live data entries has many request parameters.
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Entries getEntries(String sourceId, String namespace, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {

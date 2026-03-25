@@ -19,7 +19,6 @@
  */
 package org.xwiki.component.wiki;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,14 +49,11 @@ public enum WikiComponentScope
      * Mapping between String definition of scope and enums. The strings defined are coming from the scope property of
      * the Wiki Component Class.
      */
-    private static final Map<String, WikiComponentScope> MAPPINGS = new HashMap<String, WikiComponentScope>()
-    {
-        {
-            put("wiki", WIKI);
-            put("user", USER);
-            put("global", GLOBAL);
-        }
-    };
+    private static final Map<String, WikiComponentScope> MAPPINGS = Map.of(
+        "wiki", WIKI,
+        "user", USER,
+        "global", GLOBAL
+    );
 
     /**
      * Convert between a string representation of a Macro scope and its matching enum. If no matching enum is found then

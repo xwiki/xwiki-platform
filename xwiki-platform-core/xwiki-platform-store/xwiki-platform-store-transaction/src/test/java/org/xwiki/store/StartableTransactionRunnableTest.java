@@ -19,8 +19,11 @@
  */
 package org.xwiki.store;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for StartableTransactionRunnable
@@ -28,22 +31,21 @@ import org.junit.Test;
  * @version $Id$
  * @since 3.0M2
  */
-public class StartableTransactionRunnableTest
+class StartableTransactionRunnableTest
 {
     private final StartableTransactionRunnable testRunnable = new StartableTransactionRunnable();
 
     private boolean hasRun;
 
-    @Test(expected = IllegalStateException.class)
-    public void alreadyRunTest() throws Exception
+    @Test
+    void alreadyRunTest() throws Exception
     {
         this.testRunnable.start();
-        this.testRunnable.start();
-        Assert.fail("exception was not thrown");
+        assertThrows(IllegalStateException.class, () -> this.testRunnable.start()) ;
     }
 
-    @Test(expected = TransactionException.class)
-    public void rollbackAfterExceptionTest() throws Exception
+    @Test
+    void rollbackAfterExceptionTest()
     {
         new TransactionRunnable()
         {
@@ -58,18 +60,13 @@ public class StartableTransactionRunnableTest
             }
         } .runIn(this.testRunnable);
 
-        try {
-            this.testRunnable.start();
-        } catch (TransactionException e) {
-            Assert.assertEquals("Wrong number of exceptions reported", 1, e.exceptionCount());
-            Assert.assertTrue("Rollback did not run after exception", hasRun());
-            throw e;
-        }
-        Assert.fail("exception was not thrown");
+        var e = assertThrows(TransactionException.class, () -> this.testRunnable.start()) ;
+        assertEquals(1, e.exceptionCount(), "Wrong number of exceptions reported");
+        assertTrue(hasRun(), "Rollback did not run after exception");
     }
 
-    @Test(expected = TransactionException.class)
-    public void exceptionInRollbackTest() throws Exception
+    @Test
+    void exceptionInRollbackTest()
     {
         new TransactionRunnable()
         {
@@ -89,23 +86,17 @@ public class StartableTransactionRunnableTest
             }
         } .runIn(this.testRunnable);
 
-        try {
-            this.testRunnable.start();
-        } catch (TransactionException e) {
-            Assert.assertEquals("Wrong number of exceptions reported", 2, e.exceptionCount());
-            Assert.assertTrue("Rollback failed and yet the exception did not warn of possible corruption.",
-                e.isNonRecoverable());
-            Assert.assertTrue("Complete did not run after exception", hasRun());
-            throw e;
-        }
-        Assert.fail("exception was not thrown");
+        var e = assertThrows(TransactionException.class, () -> this.testRunnable.start()) ;
+        assertEquals(2, e.exceptionCount(), "Wrong number of exceptions reported");
+        assertTrue(e.isNonRecoverable(), "Rollback failed and yet the exception did not warn of possible corruption.");
+        assertTrue(hasRun(), "Complete did not run after exception");
     }
 
     /**
      * Make sure an exception or error in onComplete is caught and reported.
      */
-    @Test(expected = TransactionException.class)
-    public void exceptionInCompleteTest() throws Exception
+    @Test
+    void exceptionInCompleteTest()
     {
         new TransactionRunnable()
         {
@@ -115,16 +106,16 @@ public class StartableTransactionRunnableTest
             }
         } .runIn(this.testRunnable);
 
-        this.testRunnable.start();
-        Assert.fail("exception was not thrown");
+        assertThrows(TransactionException.class, () -> this.testRunnable.start());
+
     }
 
-    public boolean hasRun()
+    private boolean hasRun()
     {
         return this.hasRun;
     }
 
-    public void itRan()
+    private void itRan()
     {
         this.hasRun = true;
     }

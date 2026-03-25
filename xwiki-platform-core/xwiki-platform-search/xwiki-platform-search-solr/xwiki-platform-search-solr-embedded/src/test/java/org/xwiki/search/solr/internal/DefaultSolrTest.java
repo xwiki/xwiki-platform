@@ -20,7 +20,10 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +32,9 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -111,6 +116,7 @@ class DefaultSolrTest
     @Test
     void searchClient() throws Exception
     {
+        Date date = new Date();
         Solr instance = this.componentManager.getInstance(Solr.class);
 
         SolrClient client = instance.getClient("search");
@@ -118,6 +124,7 @@ class DefaultSolrTest
         assertNotNull(client);
 
         client.add(new SolrInputDocument("id", "0"));
+        client.commit();
 
         SolrDocument storedDocument = client.getById("0");
 
@@ -127,6 +134,7 @@ class DefaultSolrTest
 
         inputDocument.setField(FieldUtils.NAME, "name");
         inputDocument.setField(FieldUtils.DOCUMENT_LOCALE, "");
+        inputDocument.addField(FieldUtils.DATE, date);
 
         inputDocument.addField(FieldUtils.LINKS, "link1");
         inputDocument.addField(FieldUtils.LINKS, "link2");
@@ -142,15 +150,51 @@ class DefaultSolrTest
         inputDocument.setField(titleRootLocaleField, "Some title");
 
         client.add(inputDocument);
+        client.commit();
 
         storedDocument = client.getById("1");
 
         assertEquals("name", storedDocument.get(FieldUtils.NAME));
         assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
+        assertEquals(date, storedDocument.get(FieldUtils.DATE));
         assertEquals(Arrays.asList("link1", "link2"), storedDocument.getFieldValues(FieldUtils.LINKS));
         assertEquals(Arrays.asList("Some title"), storedDocument.get(titleRootLocaleField));
         assertEquals(List.of("StringValue"), storedDocument.get(propertyName));
         assertEquals(List.of("stringvalue"), storedDocument.get(propertyName + "_lowercase"));
+
+        SolrQuery solrQuery = new SolrQuery("*:*");
+
+        QueryResponse response = client.query(solrQuery);
+        assertEquals(2, response.getResults().getNumFound());
+
+        List<String> ids = new ArrayList<>();
+        List<Date> dates = new ArrayList<>();
+        List<Collection<Object>> links = new ArrayList<>();
+        Object[] info = new Object[3];
+        StreamingResponseCallback callback = new StreamingResponseCallback()
+        {
+            @Override
+            public void streamSolrDocument(SolrDocument doc)
+            {
+                ids.add((String) doc.getFieldValue("id"));
+                dates.add((Date) doc.getFieldValue(FieldUtils.DATE));
+                links.add(doc.getFieldValues(FieldUtils.LINKS));
+            }
+
+            @Override
+            public void streamDocListInfo(long numFound, long start, Float maxScore)
+            {
+                info[0] = numFound;
+                info[1] = start;
+                info[2] = maxScore;
+            }
+        };
+        client.queryAndStreamResponse(solrQuery, callback);
+
+        assertEquals(2L, info[0]);
+        assertEquals(Arrays.asList("0", "1"), ids);
+        assertEquals(Arrays.asList(null, date), dates);
+        assertEquals(Arrays.asList(null, List.of("link1", "link2")), links);
     }
 
     @Test

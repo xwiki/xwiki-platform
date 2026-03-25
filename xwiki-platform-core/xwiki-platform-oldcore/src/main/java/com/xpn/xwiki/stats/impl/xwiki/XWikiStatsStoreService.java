@@ -281,31 +281,3 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     }
 }
 
-/**
- * Item used to stop the statistics storing.
- *
- * @version $Id$
- */
-class StopStatsRegisterObject implements XWikiStatsStoreItem
-{
-    @Override
-    public String getId()
-    {
-        return null;
-    }
-
-    @Override
-    public void store(List<XWikiStatsStoreItem> register)
-    {
-    }
-}
-
-/**
- * Used to order stopping storing thread.
- *
- * @version $Id$
- */
-class StopStatsStoreException extends Exception
-{
-
-}

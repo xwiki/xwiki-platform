@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.properties.internal.converter.CollectionConverter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
@@ -38,8 +39,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin;
+import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,8 +57,10 @@ import static org.mockito.Mockito.when;
 @SecurityScriptServiceComponentList
 @ComponentList({
     ModelScriptService.class,
-    TemplateScriptService.class
+    TemplateScriptService.class,
+    CollectionConverter.class
 })
+@SuppressWarnings("multipleStringLiterals")
 class DisplayPageTest extends PageTest
 {
     private static final String DISPLAY_VM = "display.vm";
@@ -163,5 +171,28 @@ class DisplayPageTest extends PageTest
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_SELECT.replaceAll("_0_", "_3_"), result.trim());
+    }
+
+    @Test
+    void displayWithSkinExtensions() throws Exception
+    {
+        // Replace the response by a spy to intercept the call to set the header.
+        this.response = spy(this.response);
+        this.context.setResponse(this.response);
+
+        SkinExtensionPluginApi mockJSX = mock();
+        when(mockJSX.getImportString()).thenReturn("common.js\npage.js", "common.js\nnew.js\npage.js");
+
+        when(this.oldcore.getSpyXWiki().getPluginApi("jsx", this.context)).thenReturn(mockJSX);
+
+        this.request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+
+        this.templateManager.render(DISPLAY_VM);
+
+        // Verify that our mock was used.
+        verify(mockJSX, times(2)).getImportString();
+
+        // Verify that the header was set with the new skin extension.
+        verify(this.response).setHeader("X-XWIKI-HTML-HEAD", "new.js");
     }
 }

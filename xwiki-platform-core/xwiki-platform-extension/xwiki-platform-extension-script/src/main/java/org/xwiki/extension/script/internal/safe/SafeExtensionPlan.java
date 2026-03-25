@@ -71,7 +71,7 @@ public class SafeExtensionPlan<J extends ExtensionPlan> extends SafeJobStatus<J>
             if (actions.isEmpty()) {
                 this.wrappedActions = Collections.emptyList();
             } else {
-                this.wrappedActions = new ArrayList<ExtensionPlanAction>(actions.size());
+                this.wrappedActions = new ArrayList<>(actions.size());
                 for (ExtensionPlanAction action : actions) {
                     this.wrappedActions.add(new SafeExtensionPlanAction(action, this.safeProvider));
                 }

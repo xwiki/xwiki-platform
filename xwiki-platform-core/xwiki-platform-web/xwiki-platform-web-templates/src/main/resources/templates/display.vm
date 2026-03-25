@@ -46,8 +46,7 @@
       #else
         #displayDocumentProperty($propertyReference $displayMode)
       #end
-      #getRequiredSkinExtensions($requiredSkinExtensions)
-      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+      #sendRequiredSkinExtensions()
     #else
       ## Bad request.
       #set ($discard = $response.sendError(400, 'Unknown property type.'))

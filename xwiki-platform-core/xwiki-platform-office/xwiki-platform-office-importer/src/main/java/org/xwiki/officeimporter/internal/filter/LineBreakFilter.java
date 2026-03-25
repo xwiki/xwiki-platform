@@ -50,9 +50,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
     private static final String[] BLOCK_ELEMENT_TAGS =
         new String[] {TAG_P, TAG_UL, TAG_OL, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_TABLE};
 
-    /**
-     * Sort the block elements tag name array.
-     */
+    // Sort the block elements tag name array.
     static {
         Arrays.sort(BLOCK_ELEMENT_TAGS);
     }

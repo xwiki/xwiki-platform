@@ -23,5 +23,4 @@
 #initRequiredSkinExtensions()
 #set ($message = $services.localization.render('security.requiredRights.configurationChecker.exception'))
 #displayException($escapetool.xml($message) $exception)
-#getRequiredSkinExtensions($requiredSkinExtensions)
-#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#sendRequiredSkinExtensions()

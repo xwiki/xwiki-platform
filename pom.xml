@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.0.0-SNAPSHOT</version>
+    <version>18.3.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.0.0-SNAPSHOT</version>
+  <version>18.3.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -59,24 +59,27 @@
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>3.2.3</tika.version>
-    <pdfbox.version>3.0.6</pdfbox.version>
+    <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.5</jetty.server.version>
+    <jetty.server.version>12.1.7</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.9.Final</netty.version>
+    <netty.version>4.2.10.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.150.2</metaeffekt.version>
+    <metaeffekt.version>0.153.1</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.4</zookeeper.version>
+    <zookeeper.version>3.9.5</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
+
+    <!-- The default Tomcat cache size  -->
+    <xwiki.tomcat.cacheMaxSize>100176</xwiki.tomcat.cacheMaxSize>
 
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
@@ -84,7 +87,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>25.2.7</libreoffice.version>
+    <libreoffice.version>25.8.5</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -112,7 +115,7 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.5.0</mysql.version>
+    <mysql.version>9.6.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.5.7</mariadb.version>
@@ -121,10 +124,10 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.8</pgsql.version>
+    <pgsql.version>42.7.10</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.20.0.0</oracle.version>
+    <oracle.version>21.21.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
@@ -145,17 +148,6 @@
   <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>
     <dependencies>
-      <!-- Standard dependencies used in several modules -->
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>mchange-commons-java</artifactId>
-        <version>0.3.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <version>0.11.2</version>
-      </dependency>
       <!-- Hibernate -->
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -321,6 +313,12 @@
         <version>${tika.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.junrar</groupId>
+        <artifactId>junrar</artifactId>
+        <version>7.5.8</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>2.1.0</version>
@@ -347,7 +345,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -359,13 +357,13 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>3.7.1</version>
+        <version>4.0.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.14.1</version>
+        <version>1.14.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -399,12 +397,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>bootstrap-3-typeahead</artifactId>
-        <version>4.0.2</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>
@@ -435,16 +427,10 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>selectize.js</artifactId>
-        <version>0.13.3</version>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>tom-select</artifactId>
+        <version>2.5.2</version>
         <scope>runtime</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Apache POI -->
@@ -539,7 +525,7 @@
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.4.0</version>
+        <version>2.5.2</version>
       </dependency>
 
       <dependency>
@@ -636,6 +622,12 @@
             <artifactId>bootstrap</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <!-- Needed for bootstrap-switch and bootstrap-tour that are not compatible with jquery 4 -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>jquery-migrate</artifactId>
+        <version>4.0.2</version>
       </dependency>
       <!--Used by oldcore + querymanager -->
       <dependency>
@@ -1148,7 +1140,7 @@
       <dependency>
         <groupId>com.jayway.jsonpath</groupId>
         <artifactId>json-path</artifactId>
-        <version>2.10.0</version>
+        <version>3.0.0</version>
       </dependency>
 
       <!-- Database connectors -->
@@ -1211,12 +1203,27 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.26</version>
+        <version>3.5.30</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.1.12</version>
+        <version>11.2.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>font-awesome</artifactId>
+        <version>7.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>inversify</artifactId>
+        <version>7.10.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>reflect-metadata</artifactId>
+        <version>0.2.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1553,6 +1560,10 @@
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.webjars.npm:momentjs</id>
+                <features>org.webjars:momentjs</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>
@@ -1570,12 +1581,12 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.15.1</version>
+          <version>2.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.2.1</version>
+          <version>4.3.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

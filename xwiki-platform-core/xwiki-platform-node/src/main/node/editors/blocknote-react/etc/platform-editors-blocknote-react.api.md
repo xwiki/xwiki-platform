@@ -61,7 +61,7 @@ export type BlockNoteConcreteMacro = {
 
 // @beta
 export type BlockNoteViewWrapperProps = {
-    blockNoteOptions?: Partial<Omit<DefaultEditorOptionsType, "schema" | "collaboration">>;
+    blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">>;
     theme?: "light" | "dark";
     lang: EditorLanguage;
     label: string;
@@ -79,6 +79,9 @@ export type BlockNoteViewWrapperProps = {
     };
     onChange?: (editor: EditorType) => void;
     linkEditionCtx: LinkEditionContext;
+    overrides?: {
+        imageEdition?: ImageEditionOverrideFn;
+    };
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -297,7 +300,7 @@ readonly propSchema: "string";
 // Warning: (ae-internal-missing-underscore) The name "createCustomBlockSpec" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">({ config, implementation, slashMenu, customToolbar, }: {
+export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">(input: {
     config: BlockConfig<Name, Props, InlineType>;
     implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
     slashMenu: false | {
@@ -323,7 +326,7 @@ export function createCustomBlockSpec<const Name extends string, const Props ext
 // Warning: (ae-internal-missing-underscore) The name "createCustomInlineContentSpec" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>({ config, implementation, slashMenu, customToolbar, }: {
+export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>(input: {
     config: I;
     implementation: ReactInlineContentImplementation<I, S>;
     slashMenu: false | {
@@ -669,6 +672,9 @@ export function createDictionary(lang: EditorLanguage): {
 };
 
 // @beta
+export type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
+
+// @beta
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
 
 // @beta
@@ -698,6 +704,17 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
+export type ImageEditionOverrideFn = (image: BlockOfType<"image">["props"], update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageUpdateResult = {
+    type: "update";
+    updatedProps: Partial<BlockOfType<"image">["props"]>;
+} | {
+    type: "aborted";
+};
+
+// @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta (undocumented)
@@ -724,10 +741,6 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 //
 // @beta
 export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
-
-// Warnings were encountered during analysis:
-//
-// dist/components/BlockNoteViewWrapper.d.ts:17:5 - (ae-forgotten-export) The symbol "DefaultEditorOptionsType" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

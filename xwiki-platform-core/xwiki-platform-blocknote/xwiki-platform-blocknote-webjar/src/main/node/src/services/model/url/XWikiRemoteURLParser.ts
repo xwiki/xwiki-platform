@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,14 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityReference } from "@xwiki/platform-model-api";
-import { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 
 @injectable("Singleton")
 export class XWikiRemoteURLParser implements RemoteURLParser {
   public static bind(container: Container): void {
-    container.bind("RemoteURLParser").to(XWikiRemoteURLParser).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("RemoteURLParser")
+      .to(XWikiRemoteURLParser)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

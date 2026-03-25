@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockType } from "../blocknote";
 import { BlockNoteViewWrapper } from "../components/BlockNoteViewWrapper";
-import { LinkEditionContext } from "../misc/linkSuggest";
 import {
   AttachmentReference,
   DocumentReference,
@@ -27,27 +25,23 @@ import {
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { useMemo } from "react";
+import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
+import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { ModelReferenceParser } from "@xwiki/platform-model-reference-api";
 
-export type BlockNoteForTestProps = {
-  content: BlockType[];
-};
+export type BlockNoteForTestProps = Omit<
+  BlockNoteViewWrapperProps,
+  "lang" | "linkEditionCtx"
+>;
 
-export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
-  content,
-}) => {
+export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
   const linkEditionCtx = useMemo(linkEditionCtxMock, []);
 
   return (
     <BlockNoteViewWrapper
-      content={content}
       lang="en"
       linkEditionCtx={linkEditionCtx}
-      macros={{
-        list: [], // TODO: add tests with actual macros
-        openMacroParamsEditor() {
-          throw new Error("Macros params editor is not supported");
-        },
-      }}
+      {...props}
     />
   );
 };
@@ -83,25 +77,12 @@ function linkEditionCtxMock(): LinkEditionContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     modelReferenceHandler: null as any,
     modelReferenceParser: {
-      parse(reference, type) {
-        if (
-          reference === "some page reference" &&
-          (!type || type === EntityType.DOCUMENT)
-        ) {
-          return new DocumentReference("some page", new SpaceReference());
-        }
+      parse(reference, opts) {
+        return parseModelReference(reference, opts);
+      },
 
-        if (
-          reference === "some attachment reference" &&
-          (!type || type === EntityType.ATTACHMENT)
-        ) {
-          return new AttachmentReference(
-            "some attachment",
-            new DocumentReference("some attachment", new SpaceReference()),
-          );
-        }
-
-        throw new Error("Invalid reference provided");
+      async parseAsync(reference, opts) {
+        return parseModelReference(reference, opts);
       },
     },
     modelReferenceSerializer: {
@@ -127,3 +108,27 @@ function linkEditionCtxMock(): LinkEditionContext {
     remoteURLSerializer: null as any,
   };
 }
+
+const parseModelReference: ModelReferenceParser["parse"] = (
+  reference,
+  opts,
+) => {
+  if (
+    reference === "some page reference" &&
+    (!opts?.type || opts?.type === EntityType.DOCUMENT)
+  ) {
+    return new DocumentReference("some page", new SpaceReference());
+  }
+
+  if (
+    reference === "some attachment reference" &&
+    (!opts?.type || opts?.type === EntityType.ATTACHMENT)
+  ) {
+    return new AttachmentReference(
+      "some attachment",
+      new DocumentReference("some attachment", new SpaceReference()),
+    );
+  }
+
+  throw new Error("Invalid reference provided");
+};

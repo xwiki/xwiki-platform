@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -38,6 +39,8 @@ public class HistoryDropdown extends BaseElement
 {
     private static final By DROPDOWN_MENU = By.cssSelector(".realtime-versions.dropdown-menu");
 
+    private static final By SUMMARIZE_CHANGES_ACTION = By.cssSelector(".realtime-versions .realtime-action-summarize");
+
     /**
      * Clicks on the dropdown toggle to open the dropdown.
      * 
@@ -45,7 +48,9 @@ public class HistoryDropdown extends BaseElement
      */
     public HistoryDropdown open()
     {
-        getToggle().click();
+        WebElement toggle = getToggle();
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(toggle));
+        toggle.click();
         getDriver().waitUntilElementIsVisible(DROPDOWN_MENU);
         return this;
     }
@@ -98,7 +103,20 @@ public class HistoryDropdown extends BaseElement
      */
     public SummaryModal summarizeChanges()
     {
-        getDriver().findElement(By.cssSelector(".realtime-versions .realtime-action-summarize")).click();
+        getDriver().findElement(SUMMARIZE_CHANGES_ACTION).click();
         return new SummaryModal();
+    }
+
+    /**
+     * @return {@code true} if the "Summarize Changes" action is available in the history dropdown, {@code false}
+     *         otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean hasSummarizeChangesAction()
+    {
+        return !getDriver().findElementsWithoutWaiting(SUMMARIZE_CHANGES_ACTION).isEmpty();
     }
 }

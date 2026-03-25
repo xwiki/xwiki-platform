@@ -63,7 +63,7 @@ public class StyleFilter extends AbstractHTMLFilter
      */
     public StyleFilter()
     {
-        this.attributeMappingsStrict = new HashMap<String, String>();
+        this.attributeMappingsStrict = new HashMap<>();
         this.attributeMappingsStrict.put(TAG_A, "|href|name|");
         this.attributeMappingsStrict.put(TAG_IMG, "|alt|src|height|width|");
         this.attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
@@ -98,7 +98,7 @@ public class StyleFilter extends AbstractHTMLFilter
                 }
             } else {
                 // Collect those attributes that need to be removed.
-                List<String> attributesToBeRemoved = new ArrayList<String>();
+                List<String> attributesToBeRemoved = new ArrayList<>();
                 for (int i = 0; i < currentAttributes.getLength(); i++) {
                     String attributeName = currentAttributes.item(i).getNodeName();
                     String pattern = ATTRIBUTE_SEPARATOR + attributeName.toLowerCase() + ATTRIBUTE_SEPARATOR;

@@ -80,7 +80,7 @@ public class MergeResult
      */
     private List<Exception> getExceptions(LogLevel logLevel)
     {
-        List<Exception> exceptions = new LinkedList<Exception>();
+        List<Exception> exceptions = new LinkedList<>();
 
         for (LogEvent logEvent : getLog()) {
             if (logEvent.getLevel() == logLevel) {

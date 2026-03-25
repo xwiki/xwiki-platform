@@ -21,7 +21,6 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -179,15 +178,16 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
-     * Test if the text "No notification available!" is displayed in the notification tray.
-     *
-     * @return true if the text is not displayed
+     * @return the container element containing the actual notifications.
+     * @since 18.1.0RC1
+     * @since 17.10.3
+     * @since 17.4.9
+     * @since 16.10.17
      */
-    public boolean areNotificationsAvailable()
+    public NotificationsContainerElement getNotificationsContainerElement()
     {
         this.showNotificationTray();
-
-        return !this.notificationsArea.getText().equals("No notifications available!");
+        return new NotificationsContainerElement(this.notificationsArea);
     }
 
     /**
@@ -198,7 +198,7 @@ public class NotificationsTrayPage extends ViewPage
     public int getNotificationsCount()
     {
         // This part is async
-        if (!this.areNotificationsAvailable()) {
+        if (!this.getNotificationsContainerElement().areNotificationsAvailable()) {
             return 0;
         }
         if (this.countBadge.getText().equals("20+")) {
@@ -213,7 +213,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public void clearAllNotifications()
     {
-        if (!this.areNotificationsAvailable()) {
+        if (!this.getNotificationsContainerElement().areNotificationsAvailable()) {
             return;
         } else {
             this.showNotificationTray();
@@ -268,11 +268,6 @@ public class NotificationsTrayPage extends ViewPage
         });
     }
 
-    private List<WebElement> getNotifications()
-    {
-        return getDriver().findElementsWithoutWaiting(By.cssSelector("li#tmNotifications div.notification-event"));
-    }
-
     /**
      * Get the number of unread notifications.
      *
@@ -293,113 +288,6 @@ public class NotificationsTrayPage extends ViewPage
     {
         return getDriver().findElementsWithoutWaiting(By.cssSelector(
             "li#tmNotifications div.notification-event:not(.notification-event-unread)")).size();
-    }
-
-    /**
-     * Get the number of notifications displayed.
-     *
-     * @return number of notifications
-     */
-    public int getNotificationsListCount()
-    {
-        return this.getNotifications().size();
-    }
-
-    /**
-     * Get the type of notification (bold text before notification content).
-     *
-     * @param notificationNumber index of the notification in the list
-     * @return notification type
-     */
-    public String getNotificationType(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return this.getNotifications().get(notificationNumber).getAttribute("data-eventtype");
-    }
-
-    /**
-     * Get the content of a notification.
-     *
-     * @param notificationNumber index of the notification in the list
-     * @return notification content
-     */
-    public String getNotificationContent(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return this.getNotifications().get(notificationNumber).findElement(
-            By.cssSelector(".notification-content")).getText();
-    }
-
-    /**
-     * Get the page concerned by a notification (if any).
-     *
-     * @param notificationNumber index of the notification in the list
-     * @return notification page
-     */
-    public String getNotificationPage(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return this.getNotifications().get(notificationNumber).findElement(
-            By.cssSelector(".notification-page")).getText();
-    }
-
-    /**
-     * Get the description of a notification.
-     *
-     * @param notificationNumber index of the notification in the list
-     * @return notification description
-     */
-    public String getNotificationDescription(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return this.getNotifications().get(notificationNumber).findElement(
-            By.cssSelector(".notification-description")).getText();
-    }
-
-    /**
-     * Get the raw content of a notification.
-     *
-     * @param notificationNumber index of the notification in the list
-     * @return the notification raw content
-     */
-    public String getNotificationRawContent(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return this.getNotifications().get(notificationNumber).getText();
-    }
-
-    /**
-     * Mark a notification as read.
-     *
-     * @param notificationNumber index of the notification in the list
-     */
-    public void markAsRead(int notificationNumber)
-    {
-        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        WebElement e = getNotifications().get(notificationNumber)
-            .findElement(By.cssSelector("button.notification-event-read-button"));
-
-        if (e != null) {
-            e.click();
-        }
     }
 
     /**
@@ -432,5 +320,90 @@ public class NotificationsTrayPage extends ViewPage
     public GroupedNotificationElementPage getGroupedNotificationsPage()
     {
         return new GroupedNotificationElementPage(this.getNotificationsButton());
+    }
+
+    /**
+     * Test if the text "No notification available!" is displayed in the notification tray.
+     *
+     * @return true if the text is not displayed
+     */
+    public boolean areNotificationsAvailable()
+    {
+        return getNotificationsContainerElement().areNotificationsAvailable();
+    }
+
+    /**
+     * Get the number of notifications displayed.
+     *
+     * @return number of notifications
+     */
+    public int getNotificationsListCount()
+    {
+        return getNotificationsContainerElement().getNotificationsListCount();
+    }
+
+    /**
+     * Get the type of notification (bold text before notification content).
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification type
+     */
+    public String getNotificationType(int notificationNumber)
+    {
+        return getNotificationsContainerElement().getNotificationType(notificationNumber);
+    }
+
+    /**
+     * Get the content of a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification content
+     */
+    public String getNotificationContent(int notificationNumber)
+    {
+        return getNotificationsContainerElement().getNotificationContent(notificationNumber);
+    }
+
+    /**
+     * Get the page concerned by a notification (if any).
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification page
+     */
+    public String getNotificationPage(int notificationNumber)
+    {
+        return getNotificationsContainerElement().getNotificationPage(notificationNumber);
+    }
+
+    /**
+     * Get the description of a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification description
+     */
+    public String getNotificationDescription(int notificationNumber)
+    {
+        return getNotificationsContainerElement().getNotificationDescription(notificationNumber);
+    }
+
+    /**
+     * Get the raw content of a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return the notification raw content
+     */
+    public String getNotificationRawContent(int notificationNumber)
+    {
+        return getNotificationsContainerElement().getNotificationRawContent(notificationNumber);
+    }
+
+    /**
+     * Mark a notification as read.
+     *
+     * @param notificationNumber index of the notification in the list
+     */
+    public void markAsRead(int notificationNumber)
+    {
+        getNotificationsContainerElement().markAsRead(notificationNumber);
     }
 }

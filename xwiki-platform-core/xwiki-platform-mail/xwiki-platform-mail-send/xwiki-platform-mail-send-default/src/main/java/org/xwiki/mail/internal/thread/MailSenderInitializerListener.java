@@ -57,7 +57,7 @@ public class MailSenderInitializerListener implements EventListener, Disposable
     /**
      * The events observed by this event listener.
      */
-    private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent()));
+    private static final List<Event> EVENTS = new ArrayList<>(Arrays.asList(new ApplicationReadyEvent()));
 
     /**
      * Logger to use to log shutdown information (opposite of initialization).

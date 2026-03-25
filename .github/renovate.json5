@@ -74,6 +74,12 @@
       "matchDatasources": ["npm"],
       "groupName": "react",
       "matchDepPatterns": "^react(-dom)?"
+    },
+    // Group BlockNote dependencies together
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "blocknote",
+      "matchDepPatterns": "@blocknote/.+"
     }
   ]
 }

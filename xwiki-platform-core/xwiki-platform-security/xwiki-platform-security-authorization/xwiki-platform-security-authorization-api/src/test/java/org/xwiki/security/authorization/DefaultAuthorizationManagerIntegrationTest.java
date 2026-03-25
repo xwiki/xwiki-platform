@@ -1025,25 +1025,8 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             assertSame(registeredRight, Right.toRight("foo"));
         } finally {
             if (registeredRight != null) {
-                this.authorizationManager.unregister(registeredRight);
+                registeredRight.unregister();
             }
         }
-    }
-
-    @Test
-    void unregister() throws AuthorizationException
-    {
-        AuthorizationException authorizationException = assertThrows(AuthorizationException.class, () -> {
-            this.authorizationManager.unregister(SCRIPT);
-        });
-        assertEquals("Attempt to unregister the static right [script]", authorizationException.getMessage());
-
-        Right registeredRight =
-            this.authorizationManager.register(new CustomRightDescription(), Collections.singleton(SCRIPT));
-        this.authorizationManager.unregister(registeredRight);
-        assertFalse(SCRIPT.getImpliedRights().contains(registeredRight));
-        assertFalse(PROGRAM.getImpliedRights().contains(registeredRight));
-
-        assertEquals(ILLEGAL, Right.toRight("foo"));
     }
 }

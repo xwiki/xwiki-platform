@@ -24,13 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -38,129 +37,128 @@ import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.URLNormalizer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.url.internal.stadard.ContextAndActionURLNormalizer}.
+ * Unit tests for {@link org.xwiki.url.internal.standard.ContextAndActionURLNormalizer}.
  *
  * @version $Id$
  * @since 7.4M1
  */
-public class ContextAndActionURLNormalizerTest
+@ComponentTest
+class ContextAndActionURLNormalizerTest
 {
-    private ServletEnvironment environment;
+    @InjectMockComponents
+    private ContextAndActionURLNormalizer normalizer;
 
+    @MockComponent
     private Container container;
+
+    @MockComponent
+    @Named("xwikicfg")
+    private ConfigurationSource xwikiCfg;
+
+    @MockComponent
+    private ModelContext modelContext;
+
+    @MockComponent
+    private StandardURLConfiguration urlConfiguration;
+
+    private ServletEnvironment environment;
 
     private ServletContext servletContext;
 
-    private ConfigurationSource xwikiCfg;
-
-    private ModelContext modelContext;
-
-    private StandardURLConfiguration urlConfiguration;
-
     private ExtendedURL testURL = new ExtendedURL(Arrays.asList("one", "two"));
 
-    @Rule
-    public MockitoComponentMockingRule<URLNormalizer<ExtendedURL>> mocker =
-        new MockitoComponentMockingRule<URLNormalizer<ExtendedURL>>(ContextAndActionURLNormalizer.class);
-
-    @Before
-    public void configure() throws Exception
+    @BeforeComponent
+    void configureBefore(MockitoComponentManager componentManager) throws Exception
     {
-        // Configure the super class
-        this.container = this.mocker.getInstance(Container.class);
         this.environment = mock(ServletEnvironment.class);
-        this.mocker.registerComponent(Environment.class, this.environment);
+        componentManager.registerComponent(Environment.class, this.environment);
         this.servletContext = mock(ServletContext.class);
         when(this.environment.getServletContext()).thenReturn(this.servletContext);
         ServletRegistration sr = mock(ServletRegistration.class);
         when(this.servletContext.getServletRegistration("action")).thenReturn(sr);
         when(sr.getMappings()).thenReturn(Arrays.asList("/bin/*", "/wiki/*", "/testbin/*"));
 
-        // Configure the tested class
-        this.xwikiCfg = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        this.modelContext = this.mocker.getInstance(ModelContext.class);
-        this.urlConfiguration = this.mocker.getInstance(StandardURLConfiguration.class);
         when(this.urlConfiguration.getEntityPathPrefix()).thenReturn("bin");
         when(this.urlConfiguration.getWikiPathPrefix()).thenReturn("wiki");
     }
 
     @Test
-    public void normalizeWithNoKnownContextPathThrowsException() throws Exception
+    void normalizeWithNoKnownContextPathThrowsException()
     {
-        this.mocker.registerMockComponent(Environment.class);
-        try {
-            this.mocker.getComponentUnderTest().normalize(this.testURL);
-            fail("Should have thrown an exception");
-        } catch (RuntimeException expected) {
-            assertEquals("Failed to normalize the URL [/one/two] since the application's Servlet context couldn't be "
-                + "computed.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            this.normalizer.normalize(this.testURL);
+        });
+        assertEquals("Failed to normalize the URL [/one/two] since the application's Servlet context couldn't be "
+            + "computed.", exception.getMessage());
     }
 
     @Test
-    public void normalizeUsesTheSpecifiedConfiguration() throws Exception
+    void normalizeUsesTheSpecifiedConfiguration()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("good");
         when(this.servletContext.getContextPath()).thenReturn("/bad");
 
-        assertEquals("/good/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/good/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeRemovesLeadingAndTrailingSlashFromConfiguration() throws Exception
+    void normalizeRemovesLeadingAndTrailingSlashFromConfiguration()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("/xwiki/");
 
-        assertEquals("/xwiki/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/xwiki/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeWithRootConfiguration() throws Exception
+    void normalizeWithRootConfiguration()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("");
         when(this.servletContext.getContextPath()).thenReturn("/bad");
 
-        assertEquals("/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeWithSlashRootConfiguration() throws Exception
+    public void normalizeWithSlashRootConfiguration()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("/");
         when(this.servletContext.getContextPath()).thenReturn("/bad");
 
-        assertEquals("/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeWithNoConfigurationUsesServletContext() throws Exception
+    void normalizeWithNoConfigurationUsesServletContext()
     {
         when(this.servletContext.getContextPath()).thenReturn("/xwiki");
 
-        assertEquals("/xwiki/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/xwiki/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeWithNoConfigurationAndRootServletContext() throws Exception
+    void normalizeWithNoConfigurationAndRootServletContext()
     {
         when(this.servletContext.getContextPath()).thenReturn("");
 
-        assertEquals("/bin/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/bin/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizeFromVirtualWikiRequestPreservesWikiPath() throws Exception
+    void normalizeFromVirtualWikiRequestPreservesWikiPath()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("xwiki");
 
@@ -168,12 +166,11 @@ public class ContextAndActionURLNormalizerTest
         when(req.getServletPath()).thenReturn("/wiki");
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("dev"));
 
-        assertEquals("/xwiki/wiki/dev/one/two",
-            this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+        assertEquals("/xwiki/wiki/dev/one/two", this.normalizer.normalize(this.testURL).serialize());
     }
 
     @Test
-    public void normalizePreservesParameters() throws Exception
+    void normalizePreservesParameters() throws Exception
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("xwiki");
 
@@ -182,7 +179,7 @@ public class ContextAndActionURLNormalizerTest
         params.put("colors", Arrays.asList("red", "blue"));
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"), params);
 
-        assertSame(params, this.mocker.getComponentUnderTest().normalize(extendedURL).getParameters());
+        assertSame(params, this.normalizer.normalize(extendedURL).getParameters());
     }
 
     private HttpServletRequest createMockRequest()

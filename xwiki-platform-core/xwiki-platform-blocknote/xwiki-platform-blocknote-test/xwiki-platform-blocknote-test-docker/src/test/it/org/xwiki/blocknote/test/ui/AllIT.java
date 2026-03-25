@@ -35,4 +35,9 @@ class AllIT
     class NestedBlockNoteIT extends BlockNoteIT
     {
     }
+
+    @Nested
+    class NestedRoundTripIT extends RoundTripIT
+    {
+    }
 }

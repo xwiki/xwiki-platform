@@ -162,6 +162,9 @@ reposition=reposition
 sort-ascending = arrow_up
 sort-descending = arrow_down
 
+## Since 18.0.0RC1
+note = note
+
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept
 add = add

@@ -711,7 +711,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         for (BaseObject removedObject : doc.getXObjectsToRemove()) {
                             deleteXWikiCollection(removedObject, context, false, false);
                         }
-                        doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                        doc.setXObjectsToRemove(new ArrayList<>());
                     }
 
                     if (bclass != null) {
@@ -1301,7 +1301,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 deleteXWikiCollection(bobj, context, false, false);
                             }
                         }
-                        doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                        doc.setXObjectsToRemove(new ArrayList<>());
                     }
                     for (List<BaseObject> objects : doc.getXObjects().values()) {
                         for (BaseObject obj : objects) {

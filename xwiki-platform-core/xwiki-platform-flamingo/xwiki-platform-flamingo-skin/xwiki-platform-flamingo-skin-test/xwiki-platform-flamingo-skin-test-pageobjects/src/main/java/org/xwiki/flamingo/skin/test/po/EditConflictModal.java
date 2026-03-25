@@ -178,6 +178,7 @@ public class EditConflictModal extends BaseModal
         try {
             this.waitForClosed();
         } catch (StaleElementReferenceException e) {
+            // the JS remove the modal so the element might be stale
         }
 
         return new EditConflictModal();
@@ -247,6 +248,7 @@ public class EditConflictModal extends BaseModal
         try {
             this.waitForClosed();
         } catch (StaleElementReferenceException e) {
+            // the JS remove the modal so the element might be stale
         }
 
         return new EditConflictModal();
@@ -275,6 +277,7 @@ public class EditConflictModal extends BaseModal
                 new EditPage().waitForNotificationSuccessMessage("Saved");
             }
         } catch (StaleElementReferenceException e) {
+            // the JS remove the modal so the element might be stale
         }
     }
 

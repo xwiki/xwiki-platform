@@ -95,7 +95,7 @@ public class TransactionException extends Exception
         final boolean isNonRecoverable)
     {
         super(message);
-        this.causes = new ArrayList<Throwable>(causes);
+        this.causes = new ArrayList<>(causes);
         boolean nonRecoverable = isNonRecoverable;
 
         int total = 0;
@@ -126,7 +126,7 @@ public class TransactionException extends Exception
      */
     public List<Throwable> getCauses()
     {
-        return new ArrayList<Throwable>(this.causes);
+        return new ArrayList<>(this.causes);
     }
 
     /**

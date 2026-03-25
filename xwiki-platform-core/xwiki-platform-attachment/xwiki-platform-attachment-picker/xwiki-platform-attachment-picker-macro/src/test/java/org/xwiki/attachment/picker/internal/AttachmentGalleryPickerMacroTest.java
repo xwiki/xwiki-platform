@@ -103,12 +103,12 @@ class AttachmentGalleryPickerMacroTest
                 List.of(this.translationRenderBlockGlobalSelection),
                 Map.of("class", "attachmentPickerGlobalSelection hidden box warningmessage"))
 
-        ), Map.ofEntries(
-            entry("id", "my-id"),
-            entry("class", "attachmentGalleryPicker"),
-            entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-filter", ""),
-            entry("data-xwiki-attachment-picker-limit", "20")
+        ), Map.of(
+            "id", "my-id",
+            "class", "attachmentGalleryPicker",
+            "data-xwiki-lightbox", "false",
+            "data-xwiki-attachment-picker-filter", "",
+            "data-xwiki-attachment-picker-limit", "20"
         ))), actual);
         verify(this.jsx).use("Attachment.Picker.Code.AttachmentGalleryPicker");
         verify(this.ssx).use("Attachment.Picker.Code.AttachmentGalleryPicker");

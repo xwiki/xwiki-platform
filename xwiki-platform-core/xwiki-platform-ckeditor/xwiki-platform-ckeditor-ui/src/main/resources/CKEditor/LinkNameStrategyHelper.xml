@@ -39,15 +39,9 @@
   <content>{{template name="hierarchy_macros.vm"/}}
 
 {{velocity output="false"}}
-#macro (computeInfoFromReference $reference $result)
-  #set ($title = $reference.name)
-  #set ($options = {
-    'excludeSelf': false,
-    'limit': 4
-  })
-  #getHierarchyPath($reference $path $options)
-  #getHierarchyPathLabels($path $labels $options)
-  #set ($location = $stringtool.join($labels, ' / '))
+#macro (computeLocationFromReference $reference $result $excludeSelf)
+  ## Match the output of getSearchSuggestResults from XWiki.SuggestSolrMacros
+  #set ($location = "#hierarchy($reference {'local': true, 'excludeSelf': $excludeSelf, 'plain': true})")
   #setVariable("$result" $location)
 #end
 
@@ -80,7 +74,7 @@
   #set ($requestedReference = $services.model.resolveDocument($request.input, 'default'))
   #if ($xwiki.exists($requestedReference))
     #set ($location = $NULL)
-    #computeInfoFromReference($requestedReference $location)
+    #computeLocationFromReference($requestedReference $location true)
     #set ($discard = $result.add({
       'reference':  $services.model.serialize($requestedReference, 'default'),
       'type': 'exactMatch',
@@ -91,7 +85,7 @@
     #if ($isAdvanced)
       #set ($cleanRequestedReference = $services.modelvalidation.transformEntityReference($requestedReference))
       #set ($location = $NULL)
-      #computeInfoFromReference($cleanRequestedReference $location)
+      #computeLocationFromReference($cleanRequestedReference $location false)
       #set ($discard = $result.add({
         'reference':  $services.model.serialize($cleanRequestedReference, 'default'),
         'type': 'fullyResolvedInput',
@@ -104,7 +98,7 @@
     #set ($spaceReference = $services.model.createSpaceReference($transformedName, $parentReference.lastSpaceReference))
     #set ($documentReference = $services.model.createDocumentReference('WebHome', $spaceReference))
     #set ($location = $NULL)
-    #computeInfoFromReference($documentReference $location)
+    #computeLocationFromReference($documentReference $location false)
     #set ($discard = $result.add({
       'reference':  $services.model.serialize($documentReference, 'default'),
       'type': 'resolvedInSpace',

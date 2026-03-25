@@ -29,31 +29,32 @@ define('entityResourceSuggester', [
 ], function($, $resource, translations) {
   'use strict';
 
-  async function search(query, input, entityType, base, withCreateSuggestions) {
+  async function search(query, input, expectedEntityType, base, withCreateSuggestions) {
     let suggestions = [];
     try {
-      const response = await $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
+      const results = await $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
         outputSyntax: 'plain',
+        media: 'json',
         language: $('html').attr('lang'),
         query: query.join('\n'),
         input: input,
         nb: 8
       });
 
-      if (response.documentElement) {
-        let results = response.getElementsByTagName('rs');
-        let containsExactMatch = false;
-        let inputReference = XWiki.Model.resolve(input, entityType);
+      let containsExactMatch = false;
+      if (Array.isArray(results)) {
+        let inputReference = XWiki.Model.resolve(input, expectedEntityType);
         let inputResourceReference = $resource.convertEntityReferenceToResourceReference(inputReference, base);
-        for (let i = 0; i < results.length; i++) {
-          let result = convertSearchResultToResource(results.item(i), entityType, base);
-          containsExactMatch = isSameResource(result.reference, inputResourceReference);
-          suggestions.push(result);
+        for (let result of results) {
+          const resource = convertSearchResultToResource(result, base);
+          containsExactMatch = containsExactMatch || isSameResource(resource.reference, inputResourceReference);
+          suggestions.push(resource);
         }
-        if (!containsExactMatch && withCreateSuggestions) {
-          suggestions = await suggestCreateDocument(input, base, suggestions);
-        }
-      } else if (withCreateSuggestions) {
+      } else {
+        console.error("Unexpected search response: ", results);
+      }
+
+      if (!containsExactMatch && withCreateSuggestions) {
         suggestions = await suggestCreateDocument(input, base, suggestions);
       }
     } catch (error) {
@@ -117,15 +118,13 @@ define('entityResourceSuggester', [
     };
   }
 
-  function convertSearchResultToResource(result, expectedEntityType, base) {
-    const entityType = result.getAttribute('type');
-    const serializedEntityReference = result.getAttribute('id');
-    const entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
+  function convertSearchResultToResource(result, base) {
+    const entityReference = XWiki.Model.resolve(result.reference);
     return {
       reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
       entityReference,
-      label: result.childNodes[0].nodeValue,
-      hint: result.getAttribute('info')
+      label: result.title_ || getEntityName(entityReference),
+      hint: result.location
     };
   }
 
@@ -147,19 +146,7 @@ define('entityResourceSuggester', [
     suggestion.searchValue = suggestion.toCreate ? suggestion.value : getEntityName(suggestion.entityReference);
     suggestion.icon = $resource.types[suggestion.reference.type]?.icon || $resource.types.unknown.icon;
     suggestion.label = suggestion.label || suggestion.searchValue;
-    suggestion.hint = suggestion.hint || '';
-    // Remove the home icon from the location (breadcrumb) because it distracts the user (from the resource icon) and
-    // because it doesn't bring additional information to identify the resource. We all know that every path starts
-    // from home.
-    if (suggestion.hint.trim().startsWith('<')) {
-      const firstPathSeparatorIndex = suggestion.hint.indexOf(' / ');
-      if (firstPathSeparatorIndex >= 0) {
-        suggestion.hint = suggestion.hint.substring(firstPathSeparatorIndex + 3);
-      } else {
-        // Top level resource.
-        suggestion.hint = '';
-      }
-    }
+    suggestion.hint = suggestion.hint?.trim() || '';
     return suggestion;
   }
 
@@ -179,12 +166,16 @@ define('entityResourceSuggester', [
     return parent;
   }
 
+  // Fetch only the fields needed to identify and locate the resource.
+  const fieldList = 'fl=type,reference,wiki,spaces,name,filename,class,number,propertyname,doclocale,title_,location';
+
   async function retrieveSelected(resourceReference, base) {
     const entityType = XWiki.EntityType.byName($resource.types[resourceReference.type].entityType);
     const entityTypeName = XWiki.EntityType.getName(entityType);
     const query = [
       'q="__INPUT__"',
-      'qf=reference'
+      'qf=reference',
+      fieldList
     ];
     let entityReference = `${entityTypeName}:${resourceReference.reference}`;
     const suggestions = await search(query, entityReference, entityType, base, false);
@@ -207,7 +198,8 @@ define('entityResourceSuggester', [
     retrieve: function(resourceReference, base) {
       const query = [
         'q=__INPUT__',
-        'fq=type:DOCUMENT'
+        'fq=type:DOCUMENT',
+        fieldList
       ];
       let input = resourceReference.reference.trim();
       const withCreateSuggestions = input.length > 0;
@@ -232,7 +224,8 @@ define('entityResourceSuggester', [
     retrieve: function(resourceReference, base) {
       const query = [
         'q=__INPUT__',
-        'fq=type:ATTACHMENT'
+        'fq=type:ATTACHMENT',
+        fieldList
       ];
       let input = resourceReference.reference.trim();
       if (input) {

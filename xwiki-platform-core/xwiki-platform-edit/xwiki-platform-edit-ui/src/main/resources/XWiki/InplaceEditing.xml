@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="XWiki.InplaceEditing" locale="">
+<xwikidoc version="1.7" reference="XWiki.InplaceEditing" locale="">
   <web>XWiki</web>
   <name>InplaceEditing</name>
   <language/>
@@ -101,7 +101,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -145,10 +144,10 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>(function(config) {
   "use strict";
 
@@ -163,6 +162,10 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
   function getOldAPI(xwikiDocument) {
     return (xwikiDocument.documentReference &amp;&amp; new XWiki.Document(xwikiDocument.documentReference)) ||
       XWiki.currentDocument;
+  }
+
+  function removeNullProperties(object) {
+    return Object.fromEntries(Object.entries(object).filter(([key, value]) =&gt; value != null));
   }
 
   class XWikiDocument {
@@ -296,7 +299,10 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
         this.documentReference = XWiki.Model.resolve(newXWikiDocument.id, XWiki.EntityType.DOCUMENT);
         // We were able to load the document so it's not new.
         this.isNew = false;
-        return $.extend(this, newXWikiDocument);
+        // The REST API response includes some (document) properties with null values. We have to remove them before
+        // merging the response into this document, otherwise we risk overwriting properties of this document instance
+        // that have a value set.
+        return $.extend(this, removeNullProperties(newXWikiDocument));
       }).catch(response =&gt; {
         if (response.status === 404) {
           // This document doesn't exist.
@@ -1384,13 +1390,13 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
 })(JSON.parse(document.querySelector('[data-inplace-editing-config]')?.getAttribute('data-inplace-editing-config')) ||
   {});</code>
     </property>
-    <property>
+    <property type="String">
       <name/>
     </property>
-    <property>
+    <property type="Integer">
       <parse>0</parse>
     </property>
-    <property>
+    <property type="String">
       <use>onDemand</use>
     </property>
   </object>
@@ -1434,7 +1440,6 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -1496,20 +1501,13 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>#xwikicontent[contenteditable]:focus,
 #xwikicontent[tabindex]:focus {
   outline: 0;
-}
-
-#xwikicontent[contenteditable],
-#xwikicontent[tabindex] {
-  border: 1px solid transparent;
-  margin-top: -1px;
-  margin-left: -1px;
 }
 
 #xwikicontent.loading {
@@ -1530,16 +1528,16 @@ form#inplace-editing {
   margin-top: 7px;
 }</code>
     </property>
-    <property>
+    <property type="String">
       <contentType>LESS</contentType>
     </property>
-    <property>
+    <property type="String">
       <name/>
     </property>
-    <property>
+    <property type="Integer">
       <parse>0</parse>
     </property>
-    <property>
+    <property type="String">
       <use>onDemand</use>
     </property>
   </object>
@@ -1603,7 +1601,6 @@ form#inplace-editing {
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1634,7 +1631,6 @@ form#inplace-editing {
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1659,16 +1655,16 @@ form#inplace-editing {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content>{{velocity output="false"}}
 ## TODO: Remove this when XWIKI-18511 (Add support for passing a query string when calling getSkinFile) is implemented.
 #macro (getSkinFileWithParams $file $params)
@@ -1741,16 +1737,16 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
 {{/html}}
 {{/velocity}}</content>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.template.header.after.inplaceEditing</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters/>
     </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>

@@ -100,7 +100,7 @@ test("Image insertion UI can be overriden", async ({ mount }) => {
   expect(overrideFnCalledWithUrl).toBe(SMALL_IMG_DATA_URL);
 });
 
-test("Whitelisted syntax features should be available", async ({ mount }) => {
+test("Allowed syntax features should be available", async ({ mount }) => {
   const component = await mount(
     <BlockNoteForTest macros={false} content={[]} syntax={FULL_SYNTAX} />,
   );
@@ -125,9 +125,7 @@ test("Whitelisted syntax features should be available", async ({ mount }) => {
 });
 
 // eslint-disable-next-line max-statements
-test("Non-whitelisted syntax features should be unavailable", async ({
-  mount,
-}) => {
+test("Disallowed syntax features should be unavailable", async ({ mount }) => {
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;
   syntax.features.blocks.quotes = false;

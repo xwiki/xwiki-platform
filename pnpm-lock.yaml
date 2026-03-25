@@ -1778,6 +1778,9 @@ importers:
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../platform-config
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -1803,6 +1806,9 @@ importers:
       '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'

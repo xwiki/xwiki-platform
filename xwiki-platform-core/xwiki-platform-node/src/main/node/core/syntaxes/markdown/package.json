@@ -36,7 +36,8 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-syntaxes-config": "workspace:*"
+    "@xwiki/platform-syntaxes-config": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

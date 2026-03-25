@@ -172,7 +172,7 @@
     <property type="LargeString">
       <parameters>id=xwiki-wysiwyg-bundle
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-wysiwyg-webjar', 'webjar.bundle.min')
-bundles=xwiki-wysiwyg-attachment-service, xwiki-wysiwyg-entity-resource-picker, xwiki-wysiwyg-entity-resource-suggester, xwiki-wysiwyg-icon-service, xwiki-wysiwyg-image-wizard, xwiki-wysiwyg-macro-selector-translation-keys, xwiki-wysiwyg-macro-service, xwiki-wysiwyg-macro-wizard, xwiki-wysiwyg-modal, xwiki-wysiwyg-resource, xwiki-wysiwyg-resource-picker-bundle</parameters>
+bundles=xwiki-wysiwyg-attachment-service, xwiki-wysiwyg-entity-resource-picker, xwiki-wysiwyg-entity-resource-suggester, xwiki-wysiwyg-icon-service, xwiki-wysiwyg-image-style-client, xwiki-wysiwyg-image-wizard, xwiki-wysiwyg-macro-selector-translation-keys, xwiki-wysiwyg-macro-service, xwiki-wysiwyg-macro-wizard, xwiki-wysiwyg-modal, xwiki-wysiwyg-resource, xwiki-wysiwyg-resource-picker-bundle</parameters>
     </property>
     <property type="String">
       <scope>wiki</scope>

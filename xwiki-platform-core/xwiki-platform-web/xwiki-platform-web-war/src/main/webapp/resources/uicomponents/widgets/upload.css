@@ -128,6 +128,10 @@
   gap: .2em;
 }
 
+.upload-waiting .progress-time {
+  display: none;
+}
+
 .upload-error .file-info .file-name,
 .upload-error .status-icon.icon-error {
   color: var(--brand-error);

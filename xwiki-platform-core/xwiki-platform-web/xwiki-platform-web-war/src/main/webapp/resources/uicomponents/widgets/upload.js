@@ -170,7 +170,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     {
       let statusUI = this.statusUI = {};
 
-      statusUI.UPLOAD_STATUS = UploadUtils.createDiv('upload-status upload-inprogress');
+      statusUI.UPLOAD_STATUS = UploadUtils.createDiv('upload-status upload-inprogress upload-waiting');
       statusUI.UPLOAD_STATUS_MAIN = document.createElement('div');
       statusUI.UPLOAD_STATUS.append(statusUI.UPLOAD_STATUS_MAIN);
 
@@ -196,6 +196,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       if (this.options.enableProgressInfo) {
         statusUI.PROGRESS_INFO = UploadUtils.createDiv('progress-info');
         statusUI.PROGRESS = document.createElement('progress');
+        statusUI.PROGRESS.setAttribute('value', 0);
         statusUI.PROGRESS_PERCENTAGE = UploadUtils.createSpan('progress-percentage', '&nbsp;');
         statusUI.PROGRESS_SPEED = UploadUtils.createSpan('progress-speed', '&nbsp;');
         statusUI.PROGRESS_REMAINING = UploadUtils.createSpan('progress-remaining', '&nbsp;');
@@ -294,7 +295,8 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
       // Create XMLHttpRequest object, adding few event listeners, and POST the data
       let request = this.request = new XMLHttpRequest();
-
+      
+      this.statusUI.UPLOAD_STATUS.classList.remove('upload-waiting');
       if (this.options.enableProgressInfo) {
         // Progress listener
         request.upload.addEventListener('progress', this.onUploadProgress.bindAsEventListener(this), false);

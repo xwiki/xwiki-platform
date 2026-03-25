@@ -139,8 +139,9 @@ administration.section.users.deleteUser.newAuthor.hint=Select an user that has {
 administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 administration.section.users.deleteUser.newAuthor.programming=programming
 administration.section.users.deleteUser.newAuthor.script=script
-admin.usersgroups.extensionrights=Extension Rights: Page &amp; Children
-admin.usersgroups.pageextensionrights=Extension Rights: Page
+admin.usersgroups.extensionrights=Extension Rights
+admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Removing member from group

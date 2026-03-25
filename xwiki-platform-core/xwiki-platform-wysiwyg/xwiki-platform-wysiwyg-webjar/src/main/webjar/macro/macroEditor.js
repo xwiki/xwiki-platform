@@ -246,7 +246,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       <fieldset class="feature-choice-body"></fieldset>
     </div>`,
 
-    createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory) {
+  createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory) {
     let paramNode = parametersMap[nodeKey];
     let radioName = 'feature-radio-' + featureName;
     let radioId = radioName + '-' + paramNode.id;

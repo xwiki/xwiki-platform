@@ -49,10 +49,10 @@ public enum WikiComponentScope
      * Mapping between String definition of scope and enums. The strings defined are coming from the scope property of
      * the Wiki Component Class.
      */
-    private static final Map<String, WikiComponentScope> MAPPINGS = Map.ofEntries(
-        Map.entry("wiki", WIKI),
-        Map.entry("user", USER),
-        Map.entry("global", GLOBAL)
+    private static final Map<String, WikiComponentScope> MAPPINGS = Map.of(
+        "wiki", WIKI,
+        "user", USER,
+        "global", GLOBAL
     );
 
     /**

@@ -37,8 +37,6 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
-import static java.util.Map.entry;
-
 /**
  * Display an attachment picker with a search field and a grid preview of the attachments. This widget is adapted to UIs
  * where vertical space usage is not an issue.
@@ -99,10 +97,10 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
     {
         this.jsx.use(SKIN_RESOURCES_DOCUMENT_REFERENCE);
         this.ssx.use(SKIN_RESOURCES_DOCUMENT_REFERENCE);
-        Map<String, String> attachmentPickerParameters = new HashMap<>(Map.ofEntries(
-            entry(BLOCK_PARAM_CLASS, ATTACHMENT_GALLERY_PICKER_CLASSES),
-            entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter()))
+        Map<String, String> attachmentPickerParameters = new HashMap<>(Map.of(
+            BLOCK_PARAM_CLASS, ATTACHMENT_GALLERY_PICKER_CLASSES,
+            "data-xwiki-lightbox", "false",
+            "data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter())
         ));
         if (parameters.getId() != null) {
             attachmentPickerParameters.put(BLOCK_PARAM_ID, parameters.getId());

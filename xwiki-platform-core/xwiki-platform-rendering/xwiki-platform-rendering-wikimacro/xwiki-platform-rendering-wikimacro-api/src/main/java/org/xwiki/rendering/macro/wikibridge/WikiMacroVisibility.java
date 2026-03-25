@@ -49,10 +49,10 @@ public enum WikiMacroVisibility
      * Mapping between String definition of visibility and enums. The strings defined are coming from the
      * Wiki Macro Class field definition for the Visibility property.
      */
-    private static final Map<String, WikiMacroVisibility> MAPPINGS = Map.ofEntries(
-        Map.entry("Current User", USER),
-        Map.entry("Current Wiki", WIKI),
-        Map.entry("Global", GLOBAL)
+    private static final Map<String, WikiMacroVisibility> MAPPINGS = Map.of(
+        "Current User", USER,
+        "Current Wiki", WIKI,
+        "Global", GLOBAL
     );
 
     /**

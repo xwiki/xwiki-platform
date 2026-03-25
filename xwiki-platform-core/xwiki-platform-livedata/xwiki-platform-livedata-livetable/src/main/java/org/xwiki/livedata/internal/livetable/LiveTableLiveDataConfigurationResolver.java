@@ -79,10 +79,10 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String QUERY_FILTERS = "queryFilters";
 
-    private static final Map<String, String> DEFAULT_OPERATOR = Map.ofEntries(
-        Map.entry("exact", "equals"),
-        Map.entry("partial", "contains"),
-        Map.entry("prefix", "startsWith")
+    private static final Map<String, String> DEFAULT_OPERATOR = Map.of(
+        "exact", "equals",
+        "partial", "contains",
+        "prefix", "startsWith"
     );
 
     @Inject

@@ -34,10 +34,10 @@ public class XARObjectModel extends XarObjectModel
     /**
      * The list of parameters to be used when reading an object.
      */
-    public static final Map<String, EventParameter> OBJECT_PARAMETERS = Map.ofEntries(
-        Map.entry(ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME)),
-        Map.entry(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE)),
-        Map.entry(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID)),
-        Map.entry(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class))
+    public static final Map<String, EventParameter> OBJECT_PARAMETERS = Map.of(
+        ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME),
+        ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE),
+        ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID),
+        ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class)
     );
 }

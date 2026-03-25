@@ -98,10 +98,6 @@
   height: fit-content;
 }
 
-.upload-inprogress .progress-info {
-  display: default;
-}
-
 .upload-inprogress .file-info .progress-info {
   margin-left: .5em;
   display: inline-flex;

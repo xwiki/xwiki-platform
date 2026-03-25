@@ -239,7 +239,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         <input type="radio" class="feature-radio" />
         <label class="feature-choice-name"></label>
       </div>
-      <div class="feature-choice-body"></div>
+      <fieldset class="feature-choice-body"></fieldset>
     </div>`,
 
   createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory) {
@@ -256,6 +256,18 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     });
     nodeOutput.find('.feature-choice-name').attr('for', radioId);
     nodeOutput.find('.feature-choice-name').text(translations.get('selectFeature', paramNode.name));
+
+    if (isFeature && !hidden) {
+      // Note that the change event of a radio button is only triggered when the button is checked, not when it's
+      // unchecked. So we assume in the following code that the producer of the event has been checked.
+      nodeOutput.find('.feature-radio').on('change', function() {
+        let currentFeatureParameter = $(this).parents('.feature-parameter').first();
+        currentFeatureParameter.find('.feature-choice-body').prop('disabled', false);
+        currentFeatureParameter.siblings('.feature-parameter').each((index, element) => {
+          $(element).find('.feature-choice-body').prop('disabled', true);
+        });
+      });
+    }
 
     if (isFeature && isMandatory && !hidden) {
       nodeOutput.find('.feature-radio').on('change', function() {
@@ -383,7 +395,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     if (parameter.hasOwnProperty('value')) {
       value = parameter.value;
       if (featureRadioButton) {
-        featureRadioButton.attr('checked', 'checked');
+        featureRadioButton.addClass('radio-to-check');
       }
     }
 
@@ -454,6 +466,13 @@ define(
         .display(macroDescriptor, macroDescriptorData.requiredSkinExtensions));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+
+    // check the radio buttons of the features
+    this.find('.radio-to-check').each(function() {
+      $(this).prop('checked', true);
+      $(this).removeClass('radio-to-check');
+      $(this).trigger('change');
+    });
   },
 
   maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData, macroParameters,

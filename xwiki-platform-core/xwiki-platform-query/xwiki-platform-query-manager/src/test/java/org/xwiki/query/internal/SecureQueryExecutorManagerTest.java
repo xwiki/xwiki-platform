@@ -21,12 +21,10 @@ package org.xwiki.query.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutorManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -36,7 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.security.authorization.Right.PROGRAM;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
@@ -44,10 +44,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class SecureQueryExecutorManagerTest
+class SecureQueryExecutorManagerTest
 {
     @InjectMockComponents
     private SecureQueryExecutorManager executor;
+
+    @MockComponent
+    private QueryExecutorManager defaultQueryExecutorManager;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
@@ -55,16 +58,10 @@ public class SecureQueryExecutorManagerTest
     private boolean hasProgrammingRight;
 
     @BeforeEach
-    public void before() throws Exception
+    void before()
     {
-        when(this.authorization.hasAccess(Right.PROGRAM)).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                return hasProgrammingRight;
-            }
-        });
+        when(this.authorization.hasAccess(PROGRAM))
+            .then(invocation -> SecureQueryExecutorManagerTest.this.hasProgrammingRight);
 
         this.hasProgrammingRight = true;
     }
@@ -72,7 +69,7 @@ public class SecureQueryExecutorManagerTest
     // Tests
 
     @Test
-    public void executeNotSecureQueryWithoutProgrammingRight()
+    void executeNotSecureQueryWithoutProgrammingRight()
     {
         this.hasProgrammingRight = false;
 
@@ -86,17 +83,20 @@ public class SecureQueryExecutorManagerTest
     }
 
     @Test
-    public void executeNotSecureQueryWithProgrammingRight() throws QueryException
+    void executeNotSecureQueryWithProgrammingRight() throws QueryException
     {
         this.hasProgrammingRight = true;
 
         Query query = mock(Query.class);
 
         this.executor.execute(query);
+
+        verify(this.authorization).hasAccess(PROGRAM);
+        verify(this.defaultQueryExecutorManager).execute(query);
     }
 
     @Test
-    public void executeSecureQueryWithoutCheckCurrentAuthor() throws QueryException
+    void executeSecureQueryWithoutCheckCurrentAuthor() throws QueryException
     {
         DefaultQuery query = new DefaultQuery("statement", "language", this.executor);
 

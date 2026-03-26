@@ -264,6 +264,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             LOGGER.debug("Adding cookie: " + cookie.getDomain() + cookie.getPath() + " " + cookie.getName() + "="
                 + cookie.getValue());
         }
+        LOGGER.warn("Adding cookie with value [{}]", cookie.getValue());
         response.addCookie(cookie);
     }
 

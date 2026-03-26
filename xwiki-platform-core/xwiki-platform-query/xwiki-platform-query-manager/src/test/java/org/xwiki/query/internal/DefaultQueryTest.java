@@ -23,17 +23,17 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link DefaultQuery}.
  *
  * @version $Id$
  */
-public class DefaultQueryTest
+class DefaultQueryTest
 {
     @Test
-    public void addSameFilterMultipleTimes()
+    void addSameFilterMultipleTimes()
     {
         Query query = new DefaultQuery("", Query.XWQL, null);
         QueryFilter filter = new HiddenDocumentFilter();
@@ -43,6 +43,6 @@ public class DefaultQueryTest
 
         // We're assuming filters are used with our Component manager, with @Singleton. To go further we'd need to add
         // QueryFilter#getName() or QueryFilter#getID() in order to forbid the addition of multiple identical filters.
-        assertTrue(query.getFilters().size() == 1);
+        assertEquals(1, query.getFilters().size());
     }
 }

@@ -105,7 +105,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     {
         return colorThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
     }
-    
+
     /**
     * @param themeInput is the input from which to retrieve themes.
     * @return a list of the name of all the themes proposed by the themeInput.
@@ -159,7 +159,6 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified color theme.
-     *
      * @param colorThemeName name of the color theme to select
      */
     public void setColorTheme(String colorThemeName)
@@ -169,7 +168,6 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified icon theme.
-     *
      * @param iconThemeName name of the icon theme to select
      */
     public void setIconTheme(String iconThemeName)
@@ -255,7 +253,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public void clickOnCustomizeColorTheme()
     {
         getDriver().waitUntilElementIsVisible(
-            By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
+                By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
         customizeColorThemeButton.click();
     }
 

@@ -98,6 +98,12 @@ type BlockNoteViewWrapperProps = {
   lang: EditorLanguage;
 
   /**
+   * The editor's label. Used for accessibility.
+   * @since 18.3.0RC1
+   */
+  label: string;
+
+  /**
    * The editor's initial content
    * If realtime is enabled, this content may be replaced by the other users' own editor content
    */
@@ -182,6 +188,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   lang,
   linkEditionCtx,
   overrides,
+  label,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
@@ -231,6 +238,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     // it with the multi-column one that also shows up on the sides of blocks.
     tables: {
       headers: true,
+    },
+    domAttributes: {
+      editor: {
+        "aria-label": label,
+      },
     },
   });
 

@@ -57,14 +57,5 @@ abstract class AbstractBlockNoteIT
         setup.login("John", "pass");
     }
 
-    protected <T> T disableWCAG(TestUtils setup, Callable<T> testCode) throws Exception
-    {
-        boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
-        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
-        try {
-            return testCode.call();
-        } finally {
-            setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
-        }
-    }
+
 }

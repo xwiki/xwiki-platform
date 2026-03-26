@@ -32,6 +32,12 @@ global.matchMedia = vi.fn().mockImplementation((query) => ({
   dispatchEvent: vi.fn(),
 }));
 
+vi.mock("xwiki-platform-localization-webjar", () => ({
+  resolver: {
+    resolve: () => ({ translations: [] }),
+  },
+}));
+
 describe("Logic", () => {
   it("should create a BlockNote instance", async () => {
     mockI18n();

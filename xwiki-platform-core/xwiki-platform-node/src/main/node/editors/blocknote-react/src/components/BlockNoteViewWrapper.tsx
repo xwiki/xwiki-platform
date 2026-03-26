@@ -98,8 +98,8 @@ type BlockNoteViewWrapperProps = {
   lang: EditorLanguage;
 
   /**
-   * The editor's label. Used for accessibility
-   * @since 18.0.0RC1
+   * The editor's label. Used for accessibility.
+   * @since 18.3.0RC1
    */
   label: string;
 

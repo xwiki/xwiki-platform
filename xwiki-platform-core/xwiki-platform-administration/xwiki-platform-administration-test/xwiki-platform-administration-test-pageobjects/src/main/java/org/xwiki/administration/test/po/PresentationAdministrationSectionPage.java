@@ -106,6 +106,9 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     @FindBy(id = "XWiki.XWikiPreferences_0_webcopyright")
     private WebElement copyright;
 
+    @FindBy(id = "XWiki.XWikiPreferences_0_version")
+    private WebElement version;
+
     /**
      * Default constructor.
      */
@@ -202,10 +205,25 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
         this.copyright.sendKeys(value);
     }
     /**
-     * @return return the content of the copyright section in the page footer
+     * @return the content of the copyright section in the page footer
      */
     public String getCopyright()
     {
         return this.getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @param value the value to set for the "Version" option
+     */
+    public void setVersion(String value)
+    {
+        this.version.sendKeys(value);
+    }
+    /**
+     * @return return the content of the version section in the page footer
+     */
+    public String getVersion()
+    {
+        return this.getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 }

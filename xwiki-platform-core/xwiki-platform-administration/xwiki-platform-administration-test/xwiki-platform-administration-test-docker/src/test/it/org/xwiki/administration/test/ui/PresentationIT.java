@@ -64,6 +64,7 @@ class PresentationIT
         presentationSectionPage.setShowHistory(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setShowInformation(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setCopyright("");
+        presentationSectionPage.setVersion("");
         presentationSectionPage.clickSave();
     }
 
@@ -158,14 +159,22 @@ class PresentationIT
     }
 
     @Test
-    void addFooterCopyright(TestUtils setup, TestReference testReference) {
+    void customizeFooter(TestUtils setup, TestReference testReference) {
         PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
         // Check that there is no copyright in the footer by default
         assertTrue(presentationSectionPage.getCopyright().isEmpty());
-        presentationSectionPage.setCopyright("test");
+        presentationSectionPage.setCopyright("test-copyright");
         presentationSectionPage.clickSave();
         // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
-        assertEquals("test", presentationSectionPage.getCopyright());
+        assertEquals("test-copyright", presentationSectionPage.getCopyright());
+        
+        String defaultVersion = presentationSectionPage.getVersion();
+        // The default version should contain the xwiki-platform project version.
+        assertFalse(defaultVersion.isEmpty());
+        presentationSectionPage.setVersion("test-version");
+        presentationSectionPage.clickSave();
+        // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
+        assertEquals("test-version", presentationSectionPage.getVersion());
     }
 
     private static PresentationAdministrationSectionPage gotoPresentationAdministration()

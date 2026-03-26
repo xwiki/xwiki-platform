@@ -20,12 +20,12 @@
 package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.validator.framework.AbstractXMLValidator;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -37,28 +37,27 @@ public class XMLValidatorTest
         {
             return "XML validator";
         }
-
     }
 
     private XMLValidator validator;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         this.validator = new XMLValidator();
     }
 
     @Test
-    public void testValidate() throws UnsupportedEncodingException
+    public void testValidate()
     {
         this.validator.setValidateXML(false);
-        
-        this.validator.setDocument(new ByteArrayInputStream("<element/>".getBytes("UTF-8")));
+
+        this.validator.setDocument(new ByteArrayInputStream("<element/>".getBytes(UTF_8)));
 
         assertTrue(this.validator.validate().isEmpty());
-        
-        this.validator.setDocument(new ByteArrayInputStream("not XML".getBytes("UTF-8")));
-        
+
+        this.validator.setDocument(new ByteArrayInputStream("not XML".getBytes(UTF_8)));
+
         assertFalse(this.validator.validate().isEmpty());
     }
 }

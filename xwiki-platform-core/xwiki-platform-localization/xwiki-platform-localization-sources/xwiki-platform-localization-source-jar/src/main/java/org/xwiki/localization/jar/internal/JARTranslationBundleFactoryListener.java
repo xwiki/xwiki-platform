@@ -38,7 +38,6 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
@@ -69,12 +68,12 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     /**
      * The type of extension supported by this translation bundle.
      */
-    private static final String EXTENSION_TYPE = "jar";
+    private static final List<String> EXTENSION_TYPES = List.of("jar", "webjar", "webjar-node");
 
     /**
      * The events to listen.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
+    private static final List<Event> EVENTS = Arrays.asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     /**
@@ -115,11 +114,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         InstalledExtension extension = (InstalledExtension) source;
 
         if (event instanceof ExtensionInstalledEvent) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (EXTENSION_TYPES.contains(extension.getType())) {
                 extensionAdded(extension, extensionEvent.getNamespace());
             }
         } else if (event instanceof ExtensionUninstalledEvent) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (EXTENSION_TYPES.contains(extension.getType())) {
                 extensionDeleted(extension, extensionEvent.getNamespace());
             }
         } else {
@@ -140,11 +139,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     }
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         // Load installed extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (EXTENSION_TYPES.contains(extension.getType())) {
                 if (extension.isInstalled(null)) {
                     extensionAdded(extension, null);
                 } else {
@@ -194,11 +193,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         String namespace)
     {
         for (InstalledExtension previousExtension : previousExtensions) {
-            if (EXTENSION_TYPE.equals(previousExtension.getType())) {
+            if (EXTENSION_TYPES.contains(previousExtension.getType())) {
                 extensionDeleted(previousExtension, namespace);
             }
         }
-        if (EXTENSION_TYPE.equals(newExtension.getType())) {
+        if (EXTENSION_TYPES.contains(newExtension.getType())) {
             extensionAdded(newExtension, namespace);
         }
     }

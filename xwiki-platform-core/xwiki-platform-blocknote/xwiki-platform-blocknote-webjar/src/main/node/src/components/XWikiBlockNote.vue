@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
         v-if="editorContent"
@@ -71,6 +71,7 @@
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import { resolver } from "xwiki-platform-localization-webjar";
 import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import type {
@@ -122,12 +123,9 @@ const {
 //
 const value = ref(initialValue);
 const dirty = ref(false);
+const isLoading = ref(true);
 
 const editorContent = ref();
-
-onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
-});
 
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
@@ -140,6 +138,15 @@ const editorProps = shallowRef<
   theme: "light",
   lang: getLanguage(),
   label: "Editor",
+});
+
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+  editorProps.value.label =
+    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
+      "platform.blocknote.editor.label"
+    ] ?? "Editor";
+  isLoading.value = false;
 });
 
 const macros = {

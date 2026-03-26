@@ -350,6 +350,9 @@ importers:
       vue-i18n:
         specifier: 'catalog:'
         version: 11.2.8(vue@3.5.30(typescript@5.9.3))
+      xwiki-platform-localization-webjar:
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-localization/xwiki-platform-localization-webjar/src/main/node
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'

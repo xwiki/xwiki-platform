@@ -17,35 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Logic } from "./Logic";
-import { mockI18n } from "../testUtils";
-import { describe, it, vi } from "vitest";
+import type { Resolver } from "@xwiki/platform-localization-api";
 
-define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
-
-global.matchMedia = vi.fn().mockImplementation((query) => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
-}));
-
-vi.mock("xwiki-platform-localization-webjar", () => ({
-  resolver: {
-    resolve: () => ({ translations: [] }),
-  },
-}));
-
-describe("Logic", () => {
-  it("should create a BlockNote instance", async () => {
-    mockI18n();
-
-    const host = document.createElement("div");
-    host.name = "test";
-
-    const logic = new Logic(host);
-    await logic.ready;
-  });
-});
+/**
+ * Re-export the private global resolver as a module constant for ES modules.
+ * Since 18.3.0RC1
+ * @beta
+ */
+export declare const resolver: Resolver;

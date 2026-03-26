@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 9.7RC1
  */
 @ComponentTest
-public class AttachmentQueryFilterTest
+class AttachmentQueryFilterTest
 {
     @InjectMockComponents
     private AttachmentQueryFilter queryFilter;
@@ -56,7 +56,7 @@ public class AttachmentQueryFilterTest
     private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void filterStatementWithoutFromAndWhere()
+    void filterStatementWithoutFromAndWhere()
     {
         String result = this.queryFilter.filterStatement(
             "select doc.fullName from XWikiDocument doc order by attachment.date", Query.HQL);
@@ -65,7 +65,7 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterStatementWithWhere()
+    void filterStatementWithWhere()
     {
         String result = this.queryFilter.filterStatement(
             "select doc.fullName from XWikiDocument doc where attachment.mimeType like 'image/%'", Query.HQL);
@@ -74,7 +74,7 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterStatementWithFromAndWhere()
+    void filterStatementWithFromAndWhere()
     {
         String result = this.queryFilter.filterStatement(
             "select doc.fullName from XWikiDocument doc, BaseObject as obj where doc.fullName = obj.name and "
@@ -86,14 +86,14 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterStatementNonHQL()
+    void filterStatementNonHQL()
     {
         String statement = "select doc.fullName from XWikiDocument doc ...";
         assertSame(statement, this.queryFilter.filterStatement(statement, Query.XWQL));
     }
 
     @Test
-    public void filterStatementThatDoesNotMatch()
+    void filterStatementThatDoesNotMatch()
     {
         String statement = "one two three";
         assertSame(statement, this.queryFilter.filterStatement(statement, Query.HQL));
@@ -103,10 +103,10 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterResults()
+    void filterResults()
     {
         List<Object[]> results = new ArrayList<>();
-        results.add(new Object[]{ "A.B", "image.png" });
+        results.add(new Object[] { "A.B", "image.png" });
 
         DocumentReference documentReference = new DocumentReference("wiki", "A", "B");
         when(this.resolver.resolve("A.B")).thenReturn(documentReference);
@@ -117,7 +117,7 @@ public class AttachmentQueryFilterTest
     }
 
     @Test
-    public void filterResultsWithOneColumn()
+    void filterResultsWithOneColumn()
     {
         List<Object> results = Arrays.asList(13, 27);
         assertSame(results, this.queryFilter.filterResults(results));

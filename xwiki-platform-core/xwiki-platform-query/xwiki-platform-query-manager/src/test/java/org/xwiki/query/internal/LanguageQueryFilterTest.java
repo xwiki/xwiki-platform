@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @since 5.1M2
  */
 @ComponentTest
-public class LanguageQueryFilterTest
+class LanguageQueryFilterTest
 {
     @InjectMockComponents
     private LanguageQueryFilter filter;
 
     @Test
-    public void filterStatementWhenStatementMatches()
+    void filterStatementWhenStatementMatches()
     {
         String result = this.filter.filterStatement(
             "select doc.fullName from XWikiDocument doc ...", Query.HQL);
@@ -51,14 +51,14 @@ public class LanguageQueryFilterTest
     }
 
     @Test
-    public void filterStatementWhenStatementDoesntMatches()
+    void filterStatementWhenStatementDoesntMatches()
     {
         String result = this.filter.filterStatement("select whatever", Query.HQL);
         assertEquals("select whatever", result);
     }
 
     @Test
-    public void filterStatementWhenStatementIsNotHQL()
+    void filterStatementWhenStatementIsNotHQL()
     {
         String result = this.filter.filterStatement(
             "select doc.fullName from XWikiDocument doc ...", Query.XWQL);
@@ -66,7 +66,7 @@ public class LanguageQueryFilterTest
     }
 
     @Test
-    public void filterResults()
+    void filterResults()
     {
         List<String> items = Arrays.asList("one", "two");
         List<String> result = this.filter.filterResults(items);

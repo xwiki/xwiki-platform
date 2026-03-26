@@ -40,13 +40,13 @@ import static org.mockito.Mockito.when;
  * @since 9.3RC1
  */
 @ComponentTest
-public class EscapeLikeParametersFilterTest
+class EscapeLikeParametersFilterTest
 {
     @InjectMockComponents
     private EscapeLikeParametersFilter filter;
 
     @Test
-    public void filterWithNamedParameterAndNoEscape()
+    void filterWithNamedParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -66,7 +66,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndLikeAtEnd()
+    void filterWithNamedParameterAndLikeAtEnd()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -82,7 +82,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNamedParameterAndEscape()
+    void filterWithNamedParameterAndEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -98,7 +98,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndNoEscape()
+    void filterWithPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -121,7 +121,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithNumberedPositionalParameterAndNoEscape()
+    void filterWithNumberedPositionalParameterAndNoEscape()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -140,7 +140,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWithPositionalParameterAndFunction()
+    void filterWithPositionalParameterAndFunction()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -157,7 +157,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void filterWhenUsingBangInLike()
+    void filterWhenUsingBangInLike()
     {
         Query query = mock(Query.class);
         when(query.getLanguage()).thenReturn(Query.HQL);
@@ -175,7 +175,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void namedParametersLikeAPICustomEscape()
+    void namedParametersLikeAPICustomEscape()
     {
         String statement = "select doc.fullName from XWikiDocument doc where "
             + "doc.fullName like :fullName escape '/' and doc.author like :author escape '!'";
@@ -206,7 +206,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void positionalParametersLikeAPICustomEscape()
+    void positionalParametersLikeAPICustomEscape()
     {
         String statement = "select doc.fullName from XWikiDocument doc where "
             + "doc.fullName like ? and doc.author like ? escape '!'";
@@ -235,7 +235,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void positionalAndNamedParameters()
+    void positionalAndNamedParameters()
     {
         String statement = "select doc.fullName from XWikiDocument doc where "
             + "doc.fullName like :fullName escape '/' and "
@@ -280,7 +280,7 @@ public class EscapeLikeParametersFilterTest
     }
 
     @Test
-    public void notLike()
+    void notLike()
     {
         String statement = "select doc.fullName from XWikiDocument doc where doc.fullName not like ?";
         Query query = mock(Query.class);
@@ -292,7 +292,8 @@ public class EscapeLikeParametersFilterTest
         when(query.getPositionalParameters()).thenReturn(positionalParameters);
 
         Query query1 = this.filter.filterQuery(query);
-        String expectedStatement = "select doc.fullName from XWikiDocument doc where doc.fullName not like ? escape '!'";
+        String expectedStatement =
+            "select doc.fullName from XWikiDocument doc where doc.fullName not like ? escape '!'";
         assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
 
         statement = "select doc.fullName from XWikiDocument doc where (doc.fullName not like ?)";

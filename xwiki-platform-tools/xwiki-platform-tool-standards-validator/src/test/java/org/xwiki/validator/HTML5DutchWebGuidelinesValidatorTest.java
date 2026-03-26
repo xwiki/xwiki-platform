@@ -21,24 +21,33 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.validator.ValidationError.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HTML5DutchWebGuidelinesValidatorTest
+// TODO: testRpd2s5FramesetDoctype - JSoup does not handle the doctype.
+// TODO: testRpd2s5FramesetTag - JSoup does not handle the <frameset> tag
+// TODO: testRpd2s5FrameTag - JSoup does not handle <frame> tags
+// TODO: testRpd3s13BulletList - difficult to do with JSoup
+// TODO: testRpd3s13DashList - difficult to do with JSoup
+// TODO: testRpd3s13NumberedList - difficult to do with JSoup
+class HTML5DutchWebGuidelinesValidatorTest
 {
     private HTML5DutchWebGuidelinesValidator validator;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.validator = new HTML5DutchWebGuidelinesValidator();
     }
@@ -48,9 +57,9 @@ public class HTML5DutchWebGuidelinesValidatorTest
         this.validator.setDocument(document);
     }
 
-    private void setValidatorDocument(String content) throws Exception
+    private void setValidatorDocument(String content)
     {
-        this.validator.setDocument(new ByteArrayInputStream(content.getBytes("UTF-8")));
+        this.validator.setDocument(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
         if (this.validator.getHTML5Document() != null) {
             this.validator.clear();
         }
@@ -73,6 +82,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
         for (ValidationError error : validator.getErrors()) {
             if (error.getType() != Type.WARNING) {
                 isValid = false;
+                break;
             }
         }
 
@@ -82,7 +92,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // All
 
     @Test
-    public void testValid() throws Exception
+    void testValid()
     {
         setValidatorDocument(getClass().getResourceAsStream("/html5-valid.html"));
         this.validator.validate();
@@ -95,7 +105,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testInvalid()
+    void testInvalid()
     {
         setValidatorDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         this.validator.validate();
@@ -106,17 +116,21 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     // RPD 1s3
-
-    @Test
-    public void testRpd1s3LinkValid() throws Exception
+    @ParameterizedTest
+    @CsvSource({
+        "<a href='test'>test</a>",
+        "<form><fieldset><input type='submit' /></fieldset></form>",
+        "<form><fieldset><input type='image' alt='submit' /></fieldset></form>"
+    })
+    void testRpd1s3(String document)
     {
-        setValidatorDocument("<a href='test'>test</a>");
+        setValidatorDocument(document);
         this.validator.validateRpd1s3();
         assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test
-    public void testRpd1s3LinkJavascript() throws Exception
+    void testRpd1s3LinkJavascript()
     {
         setValidatorDocument("<a href='javascript:'>test</a>");
         this.validator.validateRpd1s3();
@@ -124,7 +138,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd1s3LinkEventHandlers() throws Exception
+    void testRpd1s3LinkEventHandlers()
     {
         setValidatorDocument("<a href='' onclick=''></a>");
         this.validator.validateRpd1s3();
@@ -140,15 +154,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd1s3FormValidInput() throws Exception
-    {
-        setValidatorDocument("<form><fieldset><input type='submit' /></fieldset></form>");
-        this.validator.validateRpd1s3();
-        assertTrue(isValid(this.validator), getErrors(this.validator));
-    }
-
-    @Test
-    public void testRpd1s3FormValidSubmitButton() throws Exception
+    void testRpd1s3FormValidSubmitButton()
     {
         setValidatorDocument("<form><fieldset><button type='submit'>Go</button></fieldset></form>");
         this.validator.validateRpd1s3();
@@ -160,7 +166,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd1s3FormInvalidImageInput() throws Exception
+    void testRpd1s3FormInvalidImageInput()
     {
         setValidatorDocument("<form><fieldset><input type='image' alt='' /></fieldset></form>");
         this.validator.validateRpd1s3();
@@ -168,15 +174,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd1s3FormValidImageInput() throws Exception
-    {
-        setValidatorDocument("<form><fieldset><input type='image' alt='submit' /></fieldset></form>");
-        this.validator.validateRpd1s3();
-        assertTrue(isValid(this.validator), getErrors(this.validator));
-    }
-
-    @Test
-    public void testRpd1s3FormNoSubmit() throws Exception
+    void testRpd1s3FormNoSubmit()
     {
         setValidatorDocument("<form></form>");
         this.validator.validateRpd1s3();
@@ -194,7 +192,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 2s3
 
     @Test
-    public void testRpd2s3NoDoctype() throws Exception
+    void testRpd2s3NoDoctype()
     {
         setValidatorDocument("<html></html>");
         this.validator.validateRpd2s3();
@@ -205,7 +203,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 2s4
 
     @Test
-    public void testRpd2s4NoDoctype() throws Exception
+    void testRpd2s4NoDoctype()
     {
         setValidatorDocument("<html></html>");
         this.validator.validateRpd2s4();
@@ -216,7 +214,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 2s5
 
     @Test
-    public void testRpd2s5ValidDoctype() throws Exception
+    void testRpd2s5ValidDoctype()
     {
         setValidatorDocument("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' "
             + "'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'><html></html>");
@@ -224,28 +222,10 @@ public class HTML5DutchWebGuidelinesValidatorTest
         assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
-    @Test
-    public void testRpd2s5FramesetDoctype()
-    {
-        // JSoup does not handle the doctype.
-    }
-
-    @Test
-    public void testRpd2s5FramesetTag()
-    {
-        // JSoup does not handle the <frameset> tag
-    }
-
-    @Test
-    public void testRpd2s5FrameTag()
-    {
-        // JSoup does not handle <frame> tags
-    }
-
     // RPD 3s1
 
     @Test
-    public void testRpd3s1BoldMarkup() throws Exception
+    void testRpd3s1BoldMarkup()
     {
         setValidatorDocument("<p><b></b></p>");
         this.validator.validateRpd3s1();
@@ -253,7 +233,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s1ItalicMarkup() throws Exception
+    void testRpd3s1ItalicMarkup()
     {
         setValidatorDocument("<p><i></i></p>");
         this.validator.validateRpd3s1();
@@ -263,7 +243,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s2
 
     @Test
-    public void testRpd3s2NoHeading() throws Exception
+    void testRpd3s2NoHeading()
     {
         setValidatorDocument("<body></body>");
         this.validator.validateRpd3s2();
@@ -273,7 +253,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s3
 
     @Test
-    public void testRpd3s3HeadingsValid() throws Exception
+    void testRpd3s3HeadingsValid()
     {
         setValidatorDocument("<body><h1></h1><h2></h2><h2></h2><h3></h3></body>");
         this.validator.validateRpd3s3();
@@ -281,7 +261,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s3HeadingsMissingLevel() throws Exception
+    void testRpd3s3HeadingsMissingLevel()
     {
         setValidatorDocument("<body><h1></h1><h3></h3></body>");
         this.validator.validateRpd3s3();
@@ -291,7 +271,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s4
 
     @Test
-    public void testRpd3s4ValidParagraphs() throws Exception
+    void testRpd3s4ValidParagraphs()
     {
         setValidatorDocument("<body><p>content<br/>content<br/>content<br/></p>"
             + "<p>content<br/>content<br/>content<br/></p><p>content<br/>content<br/>content<br/></p></body>");
@@ -300,7 +280,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s4MissingParagraph() throws Exception
+    void testRpd3s4MissingParagraph()
     {
         // Consecutive line breaks.
         setValidatorDocument("<body><p>content<br/><br/>content</p></body>");
@@ -316,7 +296,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s5
 
     @Test
-    public void testRpd3s5InvalidMarkup() throws Exception
+    void testRpd3s5InvalidMarkup()
     {
         setValidatorDocument("<body><p><b>bold</b></p></body>");
         this.validator.validateRpd3s5();
@@ -330,81 +310,37 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s9
 
     @Test
-    public void testRpd3s9Sub() throws Exception
+    void testRpd3s9Sub()
     {
         setValidatorDocument("<body><p><sub>sub</sub></p></body>");
         this.validator.validateRpd3s9();
-        assertEquals("WARNING: The use of <sub> is not recommended.", getErrors(validator));
+        assertEquals("WARNING: The use of <sub> is not recommended.", getErrors(this.validator));
         assertTrue(isValid(this.validator));
     }
 
     @Test
-    public void testRpd3s9Sup() throws Exception
+    void testRpd3s9Sup()
     {
         setValidatorDocument("<body><p><sup>sup</sup></p></body>");
         this.validator.validateRpd3s9();
-        assertEquals("WARNING: The use of <sup> is not recommended.", getErrors(validator));
+        assertEquals("WARNING: The use of <sup> is not recommended.", getErrors(this.validator));
         assertTrue(isValid(this.validator));
     }
 
     // RPD 3s11
 
     @Test
-    public void testRpd3s11Quotation() throws Exception
+    void testRpd3s11Quotation()
     {
         setValidatorDocument("<body><p><q>quotation</q></p></body>");
         this.validator.validateRpd3s11();
         assertFalse(isValid(this.validator), getErrors(this.validator));
     }
 
-    // RPD 3s13
+    // RPD 6s1
 
     @Test
-    public void testRpd3s13BulletList()
-    {
-        //ToDo: difficult to do with JSoup
-        /*
-        setValidatorDocument("<body> * item1<br/> * item2 <br/> * item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
-
-        setValidatorDocument("<body>*item1<br/>*item2<br/>*item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(isValid(this.validator), getErrors(this.validator));*/
-
-    }
-
-    @Test
-    public void testRpd3s13DashList()
-    {
-        //ToDo: difficult to do with JSoup
-        /*
-        setValidatorDocument("<body> - item1<br/> - item2 <br/> - item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
-
-        setValidatorDocument("<body>-item1<br/>-item2 <br/>-item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(isValid(this.validator), getErrors(this.validator));
-        */
-    }
-
-    @Test
-    public void testRpd3s13NumberedList()
-    {
-        //ToDo: difficult to do with JSoup
-        /*
-        setValidatorDocument("<body> 1. item1<br/> 2. item2 <br/> 3. item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(getErrors(validator), isValid(validator));
-
-        setValidatorDocument("<body>1.item1<br/>2.item2<br/>3.item3</body>");
-        this.validator.validateRpd3s13();
-        assertFalse(isValid(this.validator), getErrors(this.validator));*/
-    }
-
-    @Test
-    public void testRpd6s1Doctypes() throws Exception
+    void testRpd6s1Doctypes()
     {
         setValidatorDocument("<!DOCTYPE html><html></html>");
         this.validator.validateRpd6s1();
@@ -417,7 +353,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd7s1ValidAlts() throws Exception
+    void testRpd7s1ValidAlts()
     {
         setValidatorDocument("<body><img alt='' /></body>");
         this.validator.validateRpd7s1();
@@ -433,7 +369,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd7s1MissingAlts() throws Exception
+    void testRpd7s1MissingAlts()
     {
         setValidatorDocument("<body><img /></body>");
         this.validator.validateRpd7s1();
@@ -449,7 +385,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd7s4ImagesInLinks() throws Exception
+    void testRpd7s4ImagesInLinks()
     {
         setValidatorDocument("<body><a><img alt=''/></a></body>");
         this.validator.validateRpd7s4();
@@ -462,7 +398,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
         setValidatorDocument("<body><a><img alt='text' /></a></body>");
         this.validator.validateRpd7s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
-        
+
         setValidatorDocument("<body><a><span>text</span></a></body>");
         this.validator.validateRpd7s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
@@ -477,7 +413,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd7s5ImageMaps() throws Exception
+    void testRpd7s5ImageMaps()
     {
         setValidatorDocument("<body><img alt='' usemap='#map' /></body>");
         this.validator.validateRpd7s5();
@@ -493,7 +429,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd8s1Links() throws Exception
+    void testRpd8s1Links()
     {
         setValidatorDocument("<body><a>to get the resource, click here</a></body>");
         this.validator.validateRpd8s1();
@@ -505,7 +441,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd8s11Accesskeys() throws Exception
+    void testRpd8s11Accesskeys()
     {
         setValidatorDocument("<body><a accesskey='a'></a></body>");
         this.validator.validateRpd8s11();
@@ -517,7 +453,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd8s14Links() throws Exception
+    void testRpd8s14Links()
     {
         setValidatorDocument("<body><a target='any'></a></body>");
         this.validator.validateRpd8s14();
@@ -529,7 +465,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd8s16Links() throws Exception
+    void testRpd8s16Links()
     {
         setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
         this.validator.validateRpd8s16();
@@ -541,7 +477,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd8s17Links() throws Exception
+    void testRpd8s17Links()
     {
         setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
         this.validator.validateRpd8s17();
@@ -553,7 +489,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd9s1StyleAttr() throws Exception
+    void testRpd9s1StyleAttr()
     {
         setValidatorDocument("<body><div style='test'></div></body>");
         this.validator.validateRpd9s1();
@@ -561,7 +497,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd9s1StyleTag() throws Exception
+    void testRpd9s1StyleTag()
     {
         setValidatorDocument("<body><style></style></body>");
         this.validator.validateRpd9s1();
@@ -569,7 +505,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd11s2Table() throws Exception
+    void testRpd11s2Table()
     {
         setValidatorDocument("<body><table></table></body>");
         this.validator.validateRpd11s2();
@@ -581,7 +517,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd11s4Table() throws Exception
+    void testRpd11s4Table()
     {
         setValidatorDocument("<body><table><th/><th/></table></body>");
         this.validator.validateRpd11s4();
@@ -597,7 +533,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd11s5Table() throws Exception
+    void testRpd11s5Table()
     {
         setValidatorDocument("<body><table><th/><th/></table></body>");
         this.validator.validateRpd11s5();
@@ -613,7 +549,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd12s1Iframe() throws Exception
+    void testRpd12s1Iframe()
     {
         setValidatorDocument("<body><iframe/></body>");
         this.validator.validateRpd12s1();
@@ -633,7 +569,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd13s1Label() throws Exception
+    void testRpd13s1Label()
     {
         setValidatorDocument("<body><form><input name='test' /></form></body>");
         this.validator.validateRpd13s1();
@@ -647,7 +583,8 @@ public class HTML5DutchWebGuidelinesValidatorTest
         this.validator.validateRpd13s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<body><form><label for='test' /><input name='test' id='test' /><input type='button'/></form></body>");
+        setValidatorDocument(
+            "<body><form><label for='test' /><input name='test' id='test' /><input type='button'/></form></body>");
         this.validator.validateRpd13s1();
         assertTrue(isValid(this.validator), getErrors(this.validator));
 
@@ -658,7 +595,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd13s4Submits() throws Exception
+    void testRpd13s4Submits()
     {
         setValidatorDocument("<body><form><input name='test' /></form></body>");
         this.validator.validateRpd13s4();
@@ -684,7 +621,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd13s18Reset() throws Exception
+    void testRpd13s18Reset()
     {
         setValidatorDocument("<body><form><input type='reset' /></form></body>");
         this.validator.validateRpd13s18();
@@ -692,7 +629,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd15s6Language() throws Exception
+    void testRpd15s6Language()
     {
         setValidatorDocument("<html></html>");
         this.validator.validateRpd15s6();
@@ -704,19 +641,20 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd16s1Charset() throws Exception
+    void testRpd16s1Charset()
     {
         setValidatorDocument("<html><head></head></html>");
         this.validator.validateRpd16s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<html><head><meta http-equiv='Content-Type' content='text/html; charset=foo' /></head></html>");
+        setValidatorDocument(
+            "<html><head><meta http-equiv='Content-Type' content='text/html; charset=foo' /></head></html>");
         this.validator.validateRpd16s1();
         assertTrue(isValid(this.validator), getErrors(this.validator));
     }
 
     @Test
-    public void testRpd16s2Charset() throws Exception
+    void testRpd16s2Charset()
     {
         setValidatorDocument("<html><head></head></html>");
         this.validator.validateRpd16s2();
@@ -729,14 +667,15 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd16s4CharsetPosition() throws Exception
+    void testRpd16s4CharsetPosition()
     {
         setValidatorDocument("<html><head><meta/>"
             + "<meta http-equiv='Content-Type' content='text/html; charset=foo' /></head></html>");
         this.validator.validateRpd16s4();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /><meta/></head></html>");
+        setValidatorDocument(
+            "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /><meta/></head></html>");
         this.validator.validateRpd16s4();
         assertTrue(isValid(this.validator), getErrors(this.validator));
     }

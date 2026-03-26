@@ -47,11 +47,12 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="hint" type="string"></element>
+          <element name="id" type="string"></element>
           <element name="title" type="string"></element>
           <element name="index" type="int"></element>
           <element name="optional" type="boolean"></element>
           <element name="hidden" type="boolean"></element>
+          <element name="done" type="boolean"></element>
           <element name="html" type="string"></element>
           <element name="uiComponent" type="distributionWizard:UIComponent"></element>
         </sequence>

@@ -19,12 +19,15 @@
  */
 package org.xwiki.distributionwizard.rest.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.distributionwizard.rest.DistributionWizardStepResources;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
@@ -35,8 +38,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 @Component
-@Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepsResources")
-public class DefaultDistributionWizardStepsResources extends XWikiResource implements DistributionWizardStepsResources
+@Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepResources")
+public class DefaultDistributionWizardStepResources extends XWikiResource implements DistributionWizardStepResources
 {
     @Inject
     private DistributionWizardManager distributionWizardManager;
@@ -45,15 +48,16 @@ public class DefaultDistributionWizardStepsResources extends XWikiResource imple
     private StepResourceHelper stepResourceHelper;
 
     @Override
-    public Steps getSteps(String wikiId) throws Exception
+    public Step getStep(String wikiId, String stepId) throws Exception
     {
-        List<DistributionWizardStep> wizardSteps = this.distributionWizardManager.getSteps(wikiId);
-        Steps steps = new Steps();
-        List<Step> stepList = new ArrayList<>();
-        for (DistributionWizardStep wizardStep : wizardSteps) {
-            stepList.add(this.stepResourceHelper.toStep(wizardStep));
-        }
-        steps.withStep(stepList);
-        return steps;
+        DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
+        return this.stepResourceHelper.toStep(wizardStep);
+    }
+
+    @Override
+    public void answerStep(String wikiId, String stepId, Map<String, Serializable> data) throws Exception
+    {
+        DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
+        wizardStep.handleAnswer(data);
     }
 }

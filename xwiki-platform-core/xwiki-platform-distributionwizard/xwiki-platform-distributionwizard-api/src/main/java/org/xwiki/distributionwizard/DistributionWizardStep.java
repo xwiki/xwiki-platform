@@ -19,6 +19,9 @@
  */
 package org.xwiki.distributionwizard;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.template.Template;
@@ -26,6 +29,7 @@ import org.xwiki.template.Template;
 @Role
 public interface DistributionWizardStep
 {
+    String getHint();
     String getTitle();
     int getIndex();
     boolean isHidden();
@@ -33,4 +37,6 @@ public interface DistributionWizardStep
     boolean isStepDone() throws DistributionWizardException;
     String getUIComponentModule();
     String getUIComponentName();
+
+    boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException;
 }

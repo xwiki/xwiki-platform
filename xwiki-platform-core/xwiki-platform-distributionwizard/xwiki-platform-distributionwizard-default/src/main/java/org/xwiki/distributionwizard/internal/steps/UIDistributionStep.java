@@ -20,9 +20,15 @@
 package org.xwiki.distributionwizard.internal.steps;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.rendering.block.Block;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -31,6 +37,12 @@ import jakarta.inject.Singleton;
 @Named("UIDistributionStep")
 public class UIDistributionStep extends AbstractStep
 {
+    @Inject
+    private FlavorManager flavorManager;
+
+    @Inject
+    private DistributionManager distributionManager;
+
     @Override
     public String getTitle()
     {
@@ -58,6 +70,10 @@ public class UIDistributionStep extends AbstractStep
     @Override
     public boolean isStepDone()
     {
-        return false;
+        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
+        String wiki = distributionJob.getRequest().getWiki();
+        Namespace namespace = wiki == null ? null : new Namespace("wiki", wiki);
+        InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
+        return  (flavor != null && flavor.isValid(namespace.toString()));
     }
 }

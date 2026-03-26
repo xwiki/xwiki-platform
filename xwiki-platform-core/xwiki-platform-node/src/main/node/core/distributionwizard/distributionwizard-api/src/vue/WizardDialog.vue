@@ -46,6 +46,7 @@ const htmlDialog = useTemplateRef("wizardDialog");
 const stepIndex = computed(() => {
   return activeStep.value ? activeStep.value.index : 0;
 });
+// TODO: define events to know if next step can be reached
 const hasNextStep = computed(() => stepIndex.value < steps.value.length - 1);
 const hasPreviousStep = computed(() => stepIndex.value > 0);
 const stepNames = computed(() => {

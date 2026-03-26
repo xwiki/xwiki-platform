@@ -19,9 +19,16 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,6 +46,9 @@ public class FirstAdminUserStep extends AbstractStep
 {
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public String getTitle()
@@ -69,9 +79,32 @@ public class FirstAdminUserStep extends AbstractStep
     {
         try {
             return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null,
-                this.contextProvider.get()) == 0;
+                this.contextProvider.get()) > 0;
         } catch (XWikiException e) {
             throw new DistributionWizardException("Error when trying to compute if the step is done", e);
         }
+    }
+
+    @Override
+    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    {
+        XWikiContext context = this.contextProvider.get();
+        String username = String.valueOf(data.get("username"));
+        try {
+            int result = context.getWiki().createUser(username, data, context);
+            if (result == 1) {
+                WikiDescriptor wikiDescriptor = this.wikiDescriptorManager.getCurrentWikiDescriptor();
+                wikiDescriptor.setOwnerId("XWiki." + username);
+                this.wikiDescriptorManager.saveDescriptor(wikiDescriptor);
+            } else {
+                throw new DistributionWizardException(String.format("Error while registering first admin user code "
+                    + "[%s]", result));
+            }
+        } catch (XWikiException e) {
+            throw new DistributionWizardException("Unhandled error while registering first admin user", e);
+        } catch (WikiManagerException e) {
+            throw new DistributionWizardException("Error while setting user as owner of the wiki descriptor", e);
+        }
+        return true;
     }
 }

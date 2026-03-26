@@ -19,41 +19,31 @@
  */
 package org.xwiki.distributionwizard.rest.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.xwiki.component.annotation.Component;
-import org.xwiki.distributionwizard.DistributionWizardManager;
+import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
-import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
-import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
 import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
-import org.xwiki.rest.XWikiResource;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
-@Component
-@Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepsResources")
-public class DefaultDistributionWizardStepsResources extends XWikiResource implements DistributionWizardStepsResources
+@Component(roles = StepResourceHelper.class)
+@Singleton
+public class StepResourceHelper
 {
-    @Inject
-    private DistributionWizardManager distributionWizardManager;
-
-    @Inject
-    private StepResourceHelper stepResourceHelper;
-
-    @Override
-    public Steps getSteps(String wikiId) throws Exception
+    public Step toStep(DistributionWizardStep wizardStep) throws DistributionWizardException
     {
-        List<DistributionWizardStep> wizardSteps = this.distributionWizardManager.getSteps(wikiId);
-        Steps steps = new Steps();
-        List<Step> stepList = new ArrayList<>();
-        for (DistributionWizardStep wizardStep : wizardSteps) {
-            stepList.add(this.stepResourceHelper.toStep(wizardStep));
-        }
-        steps.withStep(stepList);
-        return steps;
+        Step step = new Step();
+        step.setId(wizardStep.getHint());
+        step.setHidden(wizardStep.isHidden());
+        step.setIndex(wizardStep.getIndex());
+        step.setOptional(wizardStep.isOptional());
+        step.setTitle(wizardStep.getTitle());
+        step.setDone(wizardStep.isStepDone());
+        UIComponent uiComponent = new UIComponent();
+        uiComponent.setComponent(wizardStep.getUIComponentName());
+        uiComponent.setModule(wizardStep.getUIComponentModule());
+        step.setUiComponent(uiComponent);
+        return step;
     }
 }

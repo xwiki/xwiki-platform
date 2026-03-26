@@ -58,6 +58,7 @@
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
+    "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-uniast-markdown": "workspace:*",
     "i18next": "catalog:",
     "lodash-es": "catalog:",

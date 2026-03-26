@@ -1,0 +1,50 @@
+{
+  "name": "@xwiki/markdown-syntax-config",
+  "version": "18.2.0-SNAPSHOT",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
+  "scripts": {
+    "api-extractor:ci": "api-extractor run",
+    "api-extractor:local": "api-extractor run --local",
+    "build": "rimraf dist && tsc",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-model-api": "workspace:*",
+    "@xwiki/platform-syntaxes-config": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -34,6 +34,7 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * Create the BlockNote editor's schema
@@ -122,32 +123,110 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
  * @since 18.0.0RC1
  * @beta
  */
+// eslint-disable-next-line max-statements
 function querySuggestionsMenuItems(
   editor: EditorType,
   query: string,
   macros: BlockNoteConcreteMacro[],
+  syntax: SyntaxConfig,
+  lang: EditorLanguage,
 ): DefaultReactSuggestionItem[] {
-  return filterSuggestionItems(
+  const { blocks: blocksSupport, inlineContents: inlineSupport } =
+    syntax.features;
+
+  let items = filterSuggestionItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
       // Block macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "block" && bnRendering.block.slashMenuEntry
-          ? bnRendering.block.slashMenuEntry(editor)
-          : null,
-      ),
+      blocksSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "block" && bnRendering.block.slashMenuEntry
+              ? bnRendering.block.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
 
       // Inline macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "inline" &&
-        bnRendering.inlineContent.slashMenuEntry
-          ? bnRendering.inlineContent.slashMenuEntry(editor)
-          : null,
-      ),
+      inlineSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "inline" &&
+            bnRendering.inlineContent.slashMenuEntry
+              ? bnRendering.inlineContent.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
     ),
     query,
   );
+
+  // NOTE: there is no "clean" way to filter these elements as of now, so we rely on their hardcoded title instead
+  // See https://github.com/TypeCellOS/BlockNote/issues/1816
+
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.findIndex(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    ) !== -1;
+
+  if (!blocksSupport.headings.levels1To3) {
+    items = items.filter(
+      (item) =>
+        !isLocale(item.title, [
+          "heading",
+          "heading_2",
+          "heading_3",
+          "toggle_heading",
+          "toggle_heading_2",
+          "toggle_heading_3",
+        ]),
+    );
+  }
+
+  if (!blocksSupport.headings.levels4To6) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["heading_4", "heading_5", "heading_6"]),
+    );
+  }
+
+  if (!blocksSupport.code.basicCodeBlocks) {
+    items = items.filter((item) => !isLocale(item.title, ["code_block"]));
+  }
+
+  if (!blocksSupport.quotes) {
+    items = items.filter((item) => !isLocale(item.title, ["quote"]));
+  }
+
+  if (!blocksSupport.lists.bulletLists) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["bullet_list", "toggle_list"]),
+    );
+  }
+
+  if (!blocksSupport.lists.contiguousNumberedLists) {
+    items = items.filter((item) => !isLocale(item.title, ["numbered_list"]));
+  }
+
+  if (!blocksSupport.lists.checkableLists) {
+    items = items.filter((item) => !isLocale(item.title, ["check_list"]));
+  }
+
+  if (!blocksSupport.tables.basicTables) {
+    items = items.filter((item) => !isLocale(item.title, ["table"]));
+  }
+
+  if (!blocksSupport.images.basicImages) {
+    items = items.filter((item) => !isLocale(item.title, ["image"]));
+  }
+
+  if (!blocksSupport.dividers) {
+    items = items.filter((item) => !isLocale(item.title, ["divider"]));
+  }
+
+  return items;
 }
 
 /**

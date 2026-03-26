@@ -127,6 +127,7 @@ const isLoading = ref(true);
 
 const editorContent = ref();
 
+const defaultLabel = "Editor";
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
 >({
@@ -137,7 +138,7 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: getLanguage(),
-  label: "Editor",
+  label: defaultLabel,
 });
 
 onBeforeMount(async () => {
@@ -145,7 +146,7 @@ onBeforeMount(async () => {
   editorProps.value.label =
     (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
       "platform.blocknote.editor.label"
-    ] ?? "Editor";
+    ] ?? defaultLabel;
   isLoading.value = false;
 });
 

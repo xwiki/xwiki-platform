@@ -30,7 +30,5 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
-  },
-  "main": "src/index.ts",
-  "types": "src/index.d.ts"
+  }
 }

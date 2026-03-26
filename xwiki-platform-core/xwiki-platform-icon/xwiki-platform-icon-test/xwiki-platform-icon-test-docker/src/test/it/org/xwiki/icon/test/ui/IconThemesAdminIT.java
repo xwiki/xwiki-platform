@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
@@ -64,9 +63,10 @@ class IconThemesAdminIT
     {
         // Go to the Theme Admin UI to verify we can set a new theme from there using the select control
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = 
+            ThemesAdministrationSectionPage.gotoPage();
         // We expect the default icon to be Silk
-        assertFalse(setup.isUsingFA());
+        assertFalse(presentationAdministrationSectionPage.isUsingFA());
 
         // Set the new icon theme as the active theme
         presentationAdministrationSectionPage.setIconTheme(FA_THEME);
@@ -74,11 +74,9 @@ class IconThemesAdminIT
         presentationAdministrationSectionPage.clickSave();
 
         // Verify that the icon theme has been applied.
-        assertTrue(setup.isUsingFA());
+        assertTrue(presentationAdministrationSectionPage.isUsingFA());
 
         // Switch back to Silk
-        administrationPage = AdministrationPage.gotoPage();
-        presentationAdministrationSectionPage = administrationPage.clickThemesSection();
         presentationAdministrationSectionPage.setIconTheme(SILK_THEME);
         presentationAdministrationSectionPage.clickSave();
     }
@@ -97,20 +95,17 @@ class IconThemesAdminIT
 
         // Navigate to the top page's admin UI.
         AdministrationPage page = ap.clickAdministerPage();
-        ThemesAdministrationSectionPage presentationAdministrationSectionPage = page.clickThemesSection();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = ThemesAdministrationSectionPage.gotoPage();
 
         // Set the newly created icon theme as the active theme for the page and children
         presentationAdministrationSectionPage.setIconTheme(FA_THEME);
         assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
         presentationAdministrationSectionPage.clickSave();
 
-        // Verify that the icon theme has been applied to the top page
-        setup.gotoPage(topPage);
-        assertTrue(setup.isUsingFA());
-
-        // Verify that the icon theme has been applied to the children page
-        setup.gotoPage(childPage);
-        assertTrue(setup.isUsingFA());
+        // Check that the icon theme has been applied to the top page
+        assertTrue(setup.gotoPage(topPage).isUsingFA());
+        // Check that the icon theme has been applied to the children page
+        assertTrue(setup.gotoPage(childPage).isUsingFA());
 
         // Possible extension of the test:
         // Verify that the icon theme has not been applied to other pages.

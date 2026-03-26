@@ -39,6 +39,7 @@ import org.xwiki.text.StringUtils;
  */
 public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 {
+    public static final String ADMINISTRATION_SECTION_ID = "Themes";
     /**
      * The select input to set the color theme.
      */
@@ -69,6 +70,15 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public ThemesAdministrationSectionPage()
     {
         super("Themes");
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public static ThemesAdministrationSectionPage gotoPage()
+    {
+        AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
+        return new ThemesAdministrationSectionPage();
     }
 
     private List<WebElement> getThemeOptions(WebElement themeInput)

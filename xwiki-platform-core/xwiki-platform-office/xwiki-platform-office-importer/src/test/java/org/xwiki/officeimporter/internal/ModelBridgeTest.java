@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link ModelBridge}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -81,8 +81,8 @@ class ModelBridgeTest
         String title = "Office Document Title";
         String content = "Office Document Content";
         String fileName = "logo.png";
-        byte[] fileContent = new byte[] {65, 82};
-        File artifact = new File(tempDir, fileName);
+        byte[] fileContent = new byte[] { 65, 82 };
+        File artifact = new File(this.tempDir, fileName);
         try (FileOutputStream fos = new FileOutputStream(artifact)) {
             IOUtils.write(fileContent, fos);
         }
@@ -93,7 +93,7 @@ class ModelBridgeTest
             .thenReturn(Collections.singletonMap(fileName, new FileOfficeDocumentArtifact(fileName, artifact)));
         // Store all attachment contents that are set on the mock.
         Map<AttachmentReference, byte[]> attachmentContents = new HashMap<>();
-        doAnswer((invocation) -> attachmentContents.put(
+        doAnswer(invocation -> attachmentContents.put(
             invocation.getArgument(0, AttachmentReference.class),
             IOUtils.toByteArray(invocation.getArgument(1, InputStream.class))
         )).when(this.documentAccessBridge)
@@ -101,11 +101,11 @@ class ModelBridgeTest
 
         this.modelBridge.save(doc, documentReference, syntaxId, parentReference, title, false);
 
-        verify(documentAccessBridge).setDocumentSyntaxId(documentReference, syntaxId);
-        verify(documentAccessBridge).setDocumentContent(documentReference, content, "Created by office importer.",
+        verify(this.documentAccessBridge).setDocumentSyntaxId(documentReference, syntaxId);
+        verify(this.documentAccessBridge).setDocumentContent(documentReference, content, "Created by office importer.",
             false);
-        verify(documentAccessBridge).setDocumentParentReference(documentReference, parentReference);
-        verify(documentAccessBridge).setDocumentTitle(documentReference, title);
+        verify(this.documentAccessBridge).setDocumentParentReference(documentReference, parentReference);
+        verify(this.documentAccessBridge).setDocumentTitle(documentReference, title);
         assertEquals(1, attachmentContents.size());
         AttachmentReference expectedAttachmentReference = new AttachmentReference(fileName, documentReference);
         assertEquals(expectedAttachmentReference, attachmentContents.keySet().iterator().next());
@@ -120,18 +120,18 @@ class ModelBridgeTest
         String syntaxId = "test/1.0";
 
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)).thenReturn(true);
-        when(documentAccessBridge.exists(documentReference)).thenReturn(true);
+        when(this.documentAccessBridge.exists(documentReference)).thenReturn(true);
 
         DocumentModelBridge document = mock(DocumentModelBridge.class);
-        when(documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
         when(document.getSyntax()).thenReturn(new Syntax(new SyntaxType("test", "Test"), "1.0"));
 
-        when(documentAccessBridge.getDocumentContent(documentReference, null)).thenReturn("before");
+        when(this.documentAccessBridge.getDocumentContent(documentReference, null)).thenReturn("before");
         when(doc.getContentAsString(syntaxId)).thenReturn("after");
 
         this.modelBridge.save(doc, documentReference, syntaxId, null, null, true);
 
-        verify(documentAccessBridge).setDocumentContent(documentReference, "before\nafter",
+        verify(this.documentAccessBridge).setDocumentContent(documentReference, "before\nafter",
             "Updated by office importer.", false);
     }
 }

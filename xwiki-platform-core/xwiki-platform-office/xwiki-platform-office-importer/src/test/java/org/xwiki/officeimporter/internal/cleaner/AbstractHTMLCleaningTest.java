@@ -67,12 +67,12 @@ abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
     /**
      * Asserts that the given dirty HTML fragment equals the expected clean HTML after the cleaning process.
      *
-     * @param dirtyHTML         the HTML fragment to be cleaned
+     * @param dirtyHTML the HTML fragment to be cleaned
      * @param expectedCleanHTML expected clean HTML
      */
     protected void assertCleanHTML(String dirtyHTML, String expectedCleanHTML)
     {
-        Document document = officeHTMLCleaner.clean(new StringReader(header + dirtyHTML + footer));
-        assertEquals(header + expectedCleanHTML + footer, HTMLUtils.toString(document, true, true).trim());
+        Document document = this.officeHTMLCleaner.clean(new StringReader(this.header + dirtyHTML + this.footer));
+        assertEquals(this.header + expectedCleanHTML + this.footer, HTMLUtils.toString(document, true, true).trim());
     }
 }

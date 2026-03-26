@@ -30,26 +30,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for filtering redundant html tags in {@link OfficeHTMLCleaner}.
- * 
+ *
  * @version $Id$
  * @since 1.8
  */
 @ComponentTest
-public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
+class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * Test filtering of those tags which doesn't have any attributes set.
      */
     @Test
-    public void filterIfZeroAttributes()
+    void filterIfZeroAttributes()
     {
-        String htmlTemplate = header + "<p>Test%sRedundant%sFiltering</p>" + footer;
-        String[] filterIfZeroAttributesTags = new String[] {"span", "div"};
+        String htmlTemplate = this.header + "<p>Test%sRedundant%sFiltering</p>" + this.footer;
+        String[] filterIfZeroAttributesTags = new String[] { "span", "div" };
         for (String tag : filterIfZeroAttributesTags) {
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";
             String html = String.format(htmlTemplate, startTag, endTag);
-            Document doc = officeHTMLCleaner.clean(new StringReader(html));
+            Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
             assertEquals(0, nodes.getLength());
         }
@@ -59,17 +59,17 @@ public class RedundantTagOfficeCleaningTest extends AbstractHTMLCleaningTest
      * Test filtering of those tags which doesn't have any textual content in them.
      */
     @Test
-    public void filterIfNoContent()
+    void filterIfNoContent()
     {
-        String htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering</p>" + footer;
+        String htmlTemplate = this.header + "<p>Test%sRedundant%s%s%sFiltering</p>" + this.footer;
         String[] filterIfNoContentTags =
-            new String[] {"em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
-                "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6"};
+            new String[] { "em", "strong", "dfn", "code", "samp", "kbd", "var", "cite", "abbr", "acronym", "address",
+                "blockquote", "q", "pre", "h1", "h2", "h3", "h4", "h5", "h6" };
         for (String tag : filterIfNoContentTags) {
             String startTag = "<" + tag + ">";
             String endTag = "</" + tag + ">";
             String html = String.format(htmlTemplate, startTag, endTag, startTag, endTag);
-            Document doc = officeHTMLCleaner.clean(new StringReader(html));
+            Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
             assertEquals(1, nodes.getLength());
         }

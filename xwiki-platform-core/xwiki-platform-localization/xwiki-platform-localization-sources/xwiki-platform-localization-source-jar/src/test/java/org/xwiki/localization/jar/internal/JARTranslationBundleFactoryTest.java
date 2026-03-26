@@ -29,7 +29,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
@@ -197,7 +197,7 @@ class JARTranslationBundleFactoryTest
     }
 
     @ParameterizedTest
-    @CsvSource({"jar", "webjar"})
+    @ValueSource(strings = {"jar", "webjar"})
     void upgradeJar(String type) throws ComponentLookupException
     {
         ExtensionId previousExtensionId = new ExtensionId("jar", "1.0");

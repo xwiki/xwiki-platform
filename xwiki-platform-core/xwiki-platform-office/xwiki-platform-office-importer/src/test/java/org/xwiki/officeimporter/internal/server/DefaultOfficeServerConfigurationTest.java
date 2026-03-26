@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultOfficeServerConfiguration}.
- * 
+ *
  * @version $Id$
  * @since 1.8RC3
  */
@@ -58,25 +58,26 @@ class DefaultOfficeServerConfigurationTest
     @Test
     void defaultConfiguration()
     {
-        when(configuration.getProperty(any(String.class), any(Object.class))).thenAnswer(
+        when(this.configuration.getProperty(any(String.class), any(Object.class))).thenAnswer(
             invocationOnMock -> invocationOnMock.getArgument(1));
-        assertEquals(OfficeServerConfiguration.SERVER_TYPE_INTERNAL, defaultOfficeServerConfiguration.getServerType());
-        assertArrayEquals(new int[] {8100}, defaultOfficeServerConfiguration.getServerPorts());
-        assertNull(defaultOfficeServerConfiguration.getProfilePath());
-        assertTrue(defaultOfficeServerConfiguration.getMaxTasksPerProcess() > 0);
-        assertTrue(defaultOfficeServerConfiguration.getTaskExecutionTimeout() > 0);
+        assertEquals(OfficeServerConfiguration.SERVER_TYPE_INTERNAL,
+            this.defaultOfficeServerConfiguration.getServerType());
+        assertArrayEquals(new int[] { 8100 }, this.defaultOfficeServerConfiguration.getServerPorts());
+        assertNull(this.defaultOfficeServerConfiguration.getProfilePath());
+        assertTrue(this.defaultOfficeServerConfiguration.getMaxTasksPerProcess() > 0);
+        assertTrue(this.defaultOfficeServerConfiguration.getTaskExecutionTimeout() > 0);
     }
 
     @Test
     void serverPorts()
     {
-        when(configuration.getProperty("openoffice.serverPorts", List.class))
+        when(this.configuration.getProperty("openoffice.serverPorts", List.class))
             .thenReturn(Arrays.asList("10", "12", "8569"));
-        assertArrayEquals(new int[] {10, 12, 8569}, defaultOfficeServerConfiguration.getServerPorts());
+        assertArrayEquals(new int[] { 10, 12, 8569 }, this.defaultOfficeServerConfiguration.getServerPorts());
 
-        when(configuration.getProperty("openoffice.serverPorts", List.class))
+        when(this.configuration.getProperty("openoffice.serverPorts", List.class))
             .thenReturn(Collections.emptyList());
-        when(configuration.getProperty("openoffice.serverPort", 8100)).thenReturn(4242);
-        assertArrayEquals(new int[] {4242}, defaultOfficeServerConfiguration.getServerPorts());
+        when(this.configuration.getProperty("openoffice.serverPort", 8100)).thenReturn(4242);
+        assertArrayEquals(new int[] { 4242 }, this.defaultOfficeServerConfiguration.getServerPorts());
     }
 }

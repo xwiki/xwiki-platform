@@ -34,19 +34,19 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test case for cleaning html {@code<br/>} elements in {@link OfficeHTMLCleaner}.
- * 
+ *
  * @version $Id$
  * @since 1.8
  */
 @ComponentTest
-public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
+class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
-     * {@code <br/>} elements placed next to paragraph elements should be converted to {@code<div
-     * class="wikikmodel-emptyline"/>} elements.
+     * {@code <br/>} elements placed next to paragraph elements should be converted to
+     * {@code<div class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void lineBreaksNextToParagraphElements()
+    void lineBreaksNextToParagraphElements()
     {
         checkLineBreakReplacements("<div><br/><br/><p>para</p></div>", 0, 2);
         checkLineBreakReplacements("<div><p>para</p><br/><br/></div>", 0, 2);
@@ -54,11 +54,11 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
-     * {@code <br/>} elements placed next to list elements should be converted to {@code<div
-     * class="wikikmodel-emptyline"/>} elements.
+     * {@code <br/>} elements placed next to list elements should be converted to
+     * {@code<div class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void lineBreaksNextToListElements()
+    void lineBreaksNextToListElements()
     {
         checkLineBreakReplacements("<div><br/><br/><ol><li>para</li></ol></div>", 0, 2);
         checkLineBreakReplacements("<div><ol><li>para</li></ol><br/><br/></div>", 0, 2);
@@ -70,11 +70,11 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
-     * {@code <br/>} elements placed next to html heading elements should be converted to {@code<div
-     * class="wikikmodel-emptyline"/>} elements.
+     * {@code <br/>} elements placed next to html heading elements should be converted to
+     * {@code<div class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void lineBreaksNextToHeadingElements()
+    void lineBreaksNextToHeadingElements()
     {
         checkLineBreakReplacements("<div><br/><br/><h1>test</h1></div>", 0, 2);
         checkLineBreakReplacements("<div><h1>test</h1><br/><br/></div>", 0, 2);
@@ -102,11 +102,11 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
-     * {@code <br/>} elements placed next to html table elements should be converted to {@code<div
-     * class="wikikmodel-emptyline"/>} elements.
+     * {@code <br/>} elements placed next to html table elements should be converted to
+     * {@code<div class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void lineBreaksNextToTableElements()
+    void lineBreaksNextToTableElements()
     {
         checkLineBreakReplacements("<div><br/><br/><table><tr><td>test</td></tr></table></div>", 0, 2);
         checkLineBreakReplacements("<div><table><tr><td>test</td></tr></table><br/><br/></div>", 0, 2);
@@ -115,12 +115,13 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
-     * Utility methods for checking if {@code <br/>} elements are properly converted to {@code<div
-     * class="wikikmodel-emptyline"/>} elements.
-     * 
+     * Utility methods for checking if {@code <br/>} elements are properly converted to
+     * {@code<div class="wikikmodel-emptyline"/>} elements.
+     *
      * @param html the html content.
      * @param expectedBrCount expected count of {@code <br/>} elements after cleaning.
-     * @param expectedDivCount expected count of {@code<div class="wikikmodel-emptyline"/>} elements after cleaning.
+     * @param expectedDivCount expected count of {@code<div class="wikikmodel-emptyline"/>} elements after
+     *     cleaning.
      */
     private void checkLineBreakReplacements(String html, int expectedBrCount, int expectedDivCount)
     {
@@ -129,7 +130,7 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
 
         HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
-        Document doc = officeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(this.header + html + this.footer), configuration);
         NodeList lineBreaks = doc.getElementsByTagName("br");
         assertEquals(expectedBrCount, lineBreaks.getLength());
         NodeList divs = doc.getElementsByTagName("div");

@@ -30,21 +30,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for filtering {@code<p><br/></p>} elements in {@link OfficeHTMLCleaner}.
- * 
+ *
  * @version $Id$
  * @since 1.8
  */
 @ComponentTest
-public class EmptyLineParagraphOfficeCleaningTest extends AbstractHTMLCleaningTest
+class EmptyLineParagraphOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * The first {@code<p><br/></p>} element in a sequence of such elements should be removed.
      */
     @Test
-    public void removeFirstEmptyLineParagraph()
+    void removeFirstEmptyLineParagraph()
     {
-        String html = header + "<p><br/></p>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+        String html = this.header + "<p><br/></p>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList paras = doc.getElementsByTagName("p");
         assertEquals(0, paras.getLength());
         NodeList breaks = doc.getElementsByTagName("br");
@@ -56,10 +56,10 @@ public class EmptyLineParagraphOfficeCleaningTest extends AbstractHTMLCleaningTe
      * {@code<br/>} elements.
      */
     @Test
-    public void replaceAdditionalEmptyLineParagraphs()
+    void replaceAdditionalEmptyLineParagraphs()
     {
-        String html = header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+        String html = this.header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList breaks = doc.getElementsByTagName("br");
         assertEquals(3, breaks.getLength());
     }

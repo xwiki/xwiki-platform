@@ -17,20 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.distributionwizard;
+package org.xwiki.distributionwizard.rest;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.annotation.Role;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
-@Role
-public interface DistributionWizardManager
+import org.xwiki.distributionwizard.rest.model.jaxb.Step;
+import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
+
+@Path("/distributionWizard/{wikiId}/step/{stepId}")
+public interface DistributionWizardStepResources
 {
-    List<DistributionWizardStep> getSteps(String wikiId) throws DistributionWizardException;
+    @GET
+    Step getStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId) throws Exception;
 
-    DistributionWizardStep getStep(String wikiId, String stepHint) throws DistributionWizardException;
-
-    boolean shouldBeDisplayed();
+    @POST
+    void answerStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId,
+        Map<String, Serializable> data) throws Exception;
 }

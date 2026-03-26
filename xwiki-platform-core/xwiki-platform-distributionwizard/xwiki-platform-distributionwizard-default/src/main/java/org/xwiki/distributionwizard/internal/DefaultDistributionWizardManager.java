@@ -19,10 +19,11 @@
  */
 package org.xwiki.distributionwizard.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -30,6 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.extension.distribution.internal.DistributionManager;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -42,6 +44,9 @@ public class DefaultDistributionWizardManager implements DistributionWizardManag
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    private DistributionManager distributionManager;
 
     @Override
     public List<DistributionWizardStep> getSteps(String wikiId) throws DistributionWizardException
@@ -62,8 +67,22 @@ public class DefaultDistributionWizardManager implements DistributionWizardManag
     }
 
     @Override
+    public DistributionWizardStep getStep(String wikiId, String stepHint) throws DistributionWizardException
+    {
+        if (componentManager.hasComponent(DistributionWizardStep.class, stepHint)) {
+            try {
+                return componentManager.getInstance(DistributionWizardStep.class, stepHint);
+            } catch (ComponentLookupException e) {
+                throw new DistributionWizardException(String.format("Error while loading step [%s].", stepHint), e);
+            }
+        } else {
+            throw new DistributionWizardException(String.format("Step [%s] does not exist.", stepHint));
+        }
+    }
+
+    @Override
     public boolean shouldBeDisplayed()
     {
-        return true;
+        return this.distributionManager.canDisplayDistributionWizard();
     }
 }

@@ -30,6 +30,12 @@ public abstract class AbstractStep implements DistributionWizardStep
     private ComponentDescriptor componentDescriptor;
 
     @Override
+    public String getHint()
+    {
+        return componentDescriptor.getRoleHint();
+    }
+
+    @Override
     public String getUIComponentName()
     {
         return componentDescriptor.getRoleHint();

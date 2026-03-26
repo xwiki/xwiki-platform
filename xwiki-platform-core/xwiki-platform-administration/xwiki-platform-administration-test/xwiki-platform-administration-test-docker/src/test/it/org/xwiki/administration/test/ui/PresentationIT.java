@@ -63,6 +63,7 @@ class PresentationIT
         presentationSectionPage.setShowAttachments(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setShowHistory(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setShowInformation(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
+        presentationSectionPage.setCopyright("");
         presentationSectionPage.clickSave();
     }
 
@@ -154,6 +155,17 @@ class PresentationIT
         // Check that the history tab is no longer displayed.
         viewPage = setup.gotoPage(testReference);
         assertFalse(viewPage.hasHistoryDocExtraPane());
+    }
+
+    @Test
+    void addFooterCopyright(TestUtils setup, TestReference testReference) {
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
+        // Check that there is no copyright in the footer by default
+        assertTrue(presentationSectionPage.getCopyright().isEmpty());
+        presentationSectionPage.setCopyright("test");
+        presentationSectionPage.clickSave();
+        // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
+        assertEquals("test", presentationSectionPage.getCopyright());
     }
 
     private static PresentationAdministrationSectionPage gotoPresentationAdministration()

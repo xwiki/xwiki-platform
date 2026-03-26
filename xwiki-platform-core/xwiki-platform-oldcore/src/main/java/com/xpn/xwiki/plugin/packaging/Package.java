@@ -385,7 +385,7 @@ public class Package
         add(doc, DefaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
-            if (!((language == null) || (language.equals("")) || (language.equals(doc.getDefaultLanguage())))) {
+            if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
                 add(doc.getTranslatedDocument(language, context), DefaultAction, context);
             }
         }
@@ -397,7 +397,7 @@ public class Package
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        if ((language == null) || (language.equals(""))) {
+        if ((language == null) || (language.isEmpty())) {
             add(doc, DefaultAction, context);
         } else {
             add(doc.getTranslatedDocument(language, context), DefaultAction, context);
@@ -1183,7 +1183,7 @@ public class Package
 
         // Add language
         String language = doc.getLanguage();
-        if ((language != null) && (!language.equals(""))) {
+        if ((language != null) && (!language.isEmpty())) {
             fileName.append(".");
             fileName.append(language);
         }

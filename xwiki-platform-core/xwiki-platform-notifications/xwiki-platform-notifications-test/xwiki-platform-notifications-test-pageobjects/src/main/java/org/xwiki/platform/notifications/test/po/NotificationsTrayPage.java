@@ -201,7 +201,7 @@ public class NotificationsTrayPage extends ViewPage
         if (!this.getNotificationsContainerElement().areNotificationsAvailable()) {
             return 0;
         }
-        if (this.countBadge.getText().equals("20+")) {
+        if ("20+".equals(this.countBadge.getText())) {
             return Integer.MAX_VALUE;
         } else {
             return Integer.parseInt(this.countBadge.getText());

@@ -171,7 +171,7 @@ public class ExtensionTestUtils
             parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
         }
 
-        return execute("is_installed", parameters).equals("true");
+        return "true".equals(execute("is_installed", parameters));
     }
 
     private void doAction(String action, Map<String, String> parameters) throws Exception

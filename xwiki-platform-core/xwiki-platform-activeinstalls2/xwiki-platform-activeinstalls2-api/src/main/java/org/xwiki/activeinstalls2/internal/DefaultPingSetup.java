@@ -90,7 +90,7 @@ public class DefaultPingSetup implements PingSetup
                 .settings(provideIndexSettings()));
         } catch (ElasticsearchException e) {
             // Don't fail if the index already exists, just ignore it.
-            if (!e.response().error().type().equals("resource_already_exists_exception")) {
+            if (!"resource_already_exists_exception".equals(e.response().error().type())) {
                 throw e;
             }
         }

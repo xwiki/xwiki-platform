@@ -219,7 +219,7 @@ public class HttpServletRequestStub implements HttpServletRequest
             this.serverName = builder.requestURL.getHost();
             this.serverPort = builder.requestURL.getPort();
 
-            this.secure = this.protocol.equalsIgnoreCase("https");
+            this.secure = "https".equalsIgnoreCase(this.protocol);
 
             this.requestURI = builder.requestURL.getPath();
             this.requestURL = new StringBuffer(builder.requestURL.toString());

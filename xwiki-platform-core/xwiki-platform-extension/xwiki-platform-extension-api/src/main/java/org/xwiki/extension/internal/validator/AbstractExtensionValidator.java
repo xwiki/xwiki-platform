@@ -152,7 +152,7 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
 
         if (namespace.getType() != null) {
             // User
-            if (namespace.getType().equals("user")) {
+            if ("user".equals(namespace.getType())) {
                 EntityReference reference = this.resolver.resolve(namespace.getValue(), EntityType.DOCUMENT);
 
                 checkUserRight(reference, request);

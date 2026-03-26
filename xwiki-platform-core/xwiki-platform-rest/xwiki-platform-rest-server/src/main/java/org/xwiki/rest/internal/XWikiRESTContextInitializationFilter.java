@@ -83,7 +83,7 @@ public class XWikiRESTContextInitializationFilter extends XWikiContextInitializa
     {
         String[] elements = StringUtils.split(path, '/');
 
-        if (elements.length >= 2 && elements[0].equals("wikis")) {
+        if (elements.length >= 2 && "wikis".equals(elements[0])) {
             return elements[1];
         }
 

@@ -76,7 +76,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayType()
     {
         String dtype = getStringValue("displayType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "yesno";
         }
         return dtype;
@@ -85,7 +85,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayFormType()
     {
         String dtype = getStringValue("displayFormType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "radio";
         }
         return dtype;
@@ -174,13 +174,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if (getDisplayType().equals("checkbox")) {
+        if ("checkbox".equals(getDisplayType())) {
             displayFormType = "checkbox";
         }
 
-        if (displayFormType.equals("checkbox")) {
+        if ("checkbox".equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if (displayFormType.equals("select")) {
+        } else if ("select".equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);

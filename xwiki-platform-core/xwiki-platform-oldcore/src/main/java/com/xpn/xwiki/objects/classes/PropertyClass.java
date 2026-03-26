@@ -433,7 +433,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
-                if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
+                if (CLASS_DISPLAYER_IDENTIFIER.equals(customDisplayer)) {
                     final String rawContent = getCustomDisplay();
                     XWikiDocument classDocument = getObject().getOwnerDocument();
                     final String classSyntax = classDocument.getSyntax().toIdString();
@@ -909,7 +909,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public boolean validateProperty(BaseProperty property, XWikiContext context)
     {
         String regexp = getValidationRegExp();
-        if ((regexp == null) || (regexp.trim().equals(""))) {
+        if ((regexp == null) || (regexp.trim().isEmpty())) {
             return true;
         }
 

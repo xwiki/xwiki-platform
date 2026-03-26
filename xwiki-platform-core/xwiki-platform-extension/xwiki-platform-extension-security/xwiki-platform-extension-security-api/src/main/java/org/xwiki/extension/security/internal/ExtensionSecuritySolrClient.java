@@ -184,7 +184,7 @@ public class ExtensionSecuritySolrClient
 
             ORDER order = sortEntry.isDescending() ? desc : asc;
             solrQuery.addSort(field, order);
-            if (field.equals(NAME)) {
+            if (NAME.equals(field)) {
                 // If the name is null (and therefore always equals), also sort by extension id.
                 solrQuery.addSort(SOLR_FIELD_EXTENSIONID, order);
             }

@@ -133,7 +133,7 @@ public class TableLayoutElement extends BaseElement
             URIBuilder uriBuilder = new URIBuilder(initialUri);
             List<String> pathSegments = uriBuilder.getPathSegments();
             URI uri;
-            if (pathSegments.get(pathSegments.size() - 1).equals("")) {
+            if ("".equals(pathSegments.getLast())) {
                 pathSegments.remove(pathSegments.size() - 1);
                 try {
                     uri = uriBuilder.setPathSegments(pathSegments).build();
@@ -175,7 +175,7 @@ public class TableLayoutElement extends BaseElement
         @Override
         protected boolean matchesSafely(WebElement item)
         {
-            return item.getText().equals(this.value);
+            return this.value.equals(item.getText());
         }
 
         @Override
@@ -984,7 +984,7 @@ public class TableLayoutElement extends BaseElement
         List<WebElement> elements = getRoot().findElements(By.cssSelector("thead tr th .property-name"));
         int index = -1;
         for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).getText().equals(columnLabel)) {
+            if (columnLabel.equals(elements.get(i).getText())) {
                 index = i + 1;
                 break;
             }

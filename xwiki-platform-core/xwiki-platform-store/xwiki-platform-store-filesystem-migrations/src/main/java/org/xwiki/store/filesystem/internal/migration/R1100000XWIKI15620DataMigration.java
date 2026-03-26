@@ -158,7 +158,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         // Migrate directory content
         for (File child : directory.listFiles()) {
             if (child.isDirectory()) {
-                if (!wiki && child.getName().equals(THIS_DIR_NAME)) {
+                if (!wiki && THIS_DIR_NAME.equals(child.getName())) {
                     migrateDocumentContent(child);
                 } else {
                     migrate(child, false);
@@ -303,7 +303,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     {
         String localeString = FileSystemStoreUtils.decode(localeFile.getName());
 
-        if (localeString.equals(DOCUMENT_LOCALE_ROOT_NAME)) {
+        if (DOCUMENT_LOCALE_ROOT_NAME.equals(localeString)) {
             return Locale.ROOT;
         }
 

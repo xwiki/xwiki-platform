@@ -202,7 +202,7 @@ public class DBTreeListClass extends DBListClass
             selectlist.add(String.valueOf(prop.getValue()));
         }
         String result = displayFlatView(selectlist, context);
-        if (result.equals("")) {
+        if ("".equals(result)) {
             super.displayView(buffer, name, prefix, object, context);
         } else {
             buffer.append(result);
@@ -218,7 +218,7 @@ public class DBTreeListClass extends DBListClass
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);
-            if (result.equals("")) {
+            if ("".equals(result)) {
                 displayTreeSelectEdit(buffer, name, prefix, object, context);
             } else {
                 displayHidden(buffer, name, prefix, object, context);

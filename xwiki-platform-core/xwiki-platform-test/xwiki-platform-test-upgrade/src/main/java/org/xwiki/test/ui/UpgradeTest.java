@@ -397,7 +397,7 @@ public class UpgradeTest extends AbstractTest
             // Confirm upgrade
             upgradeFlavor = upgradeFlavor.confirm();
 
-            if (upgradeFlavor.getStatus().equals("loading")) {
+            if ("loading".equals(upgradeFlavor.getStatus())) {
                 ExtensionProgressPane extensionProgress = upgradeFlavor.openProgressSection();
 
                 if (extensionProgress.getUnusedPages() != null) {

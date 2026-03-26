@@ -78,12 +78,12 @@ public class RedundancyFilter extends AbstractHTMLFilter
                 @Override
                 public boolean isSelected(Element element)
                 {
-                    return element.getTextContent().trim().equals("");
+                    return "".equals(element.getTextContent().trim());
                 }
             });
         for (Element element : elementsWithNoContent) {
             String textContent = element.getTextContent();
-            if (textContent.equals("")) {
+            if ("".equals(textContent)) {
                 element.getParentNode().removeChild(element);
             } else {
                 element.setTextContent(textContent.replaceAll(" ", "&nbsp;"));

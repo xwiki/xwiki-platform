@@ -101,6 +101,8 @@ class InplaceEditIT
         viewPage.setDocumentTitle("updated title");
         viewPage.cancel();
         assertEquals("test title", viewPage.getDocumentTitle());
+        // The "Edit" text comes from the section edit link.
+        assertEquals("before\nSection\nEdit\nafter", viewPage.getContent());
         assertTrue(viewPage.getPageURL().endsWith("/editInplace/#"), viewPage.getPageURL());
 
         // Save + Cancel

@@ -576,7 +576,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         for (String fieldName : sourceDocument.getFieldNames()) {
             // Fix special fields:
             // * _version_: internal Solr field used for atomic updates
-            if (!fieldName.equals("_version_")) {
+            if (!"_version_".equals(fieldName)) {
                 targetDocument.setField(fieldName, sourceDocument.getFieldValue(fieldName));
             }
         }

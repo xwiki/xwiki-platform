@@ -38,7 +38,7 @@ public class StubHTTPChecker implements HTTPChecker
     @Override
     public int check(String url)
     {
-        if (url.equals("http://doesntexist")) {
+        if ("http://doesntexist".equals(url)) {
             return 404;
         } else {
             return 200;

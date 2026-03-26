@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class XWikiWatchdog
 {
-    private static final boolean DEBUG = System.getProperty("debug", "false").equalsIgnoreCase("true");
+    private static final boolean DEBUG = "true".equalsIgnoreCase(System.getProperty("debug", "false"));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWatchdog.class);
 

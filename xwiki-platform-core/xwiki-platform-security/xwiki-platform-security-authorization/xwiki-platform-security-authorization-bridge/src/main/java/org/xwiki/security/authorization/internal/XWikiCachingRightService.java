@@ -215,7 +215,7 @@ public class XWikiCachingRightService implements XWikiRightService
                  * will call checkAccess with action 'view', if the document 'XWiki.XWikiLogin' exists.
                  */
                 && !LOGIN_ACTION.equals(context.getAction())
-                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
+                && !"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
                 context.getWiki().getAuthService().showLogin(context);
             }
         } catch (XWikiException e) {

@@ -1508,7 +1508,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
 
                         String pname = prop.getName();
-                        if (pname != null && !pname.trim().equals("") && !handledProps.contains(pname)) {
+                        if (pname != null && !pname.trim().isEmpty() && !handledProps.contains(pname)) {
                             saveXWikiPropertyInternal(prop, context, false);
                         }
                     }

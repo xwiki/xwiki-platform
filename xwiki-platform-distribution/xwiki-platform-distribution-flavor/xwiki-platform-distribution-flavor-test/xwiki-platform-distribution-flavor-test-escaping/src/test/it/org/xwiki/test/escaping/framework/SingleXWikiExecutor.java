@@ -71,7 +71,7 @@ public final class SingleXWikiExecutor extends XWikiExecutor
     public synchronized void start() throws Exception
     {
         if (counter == 0) {
-            if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true") || this.watchdog.isXWikiStarted(getURL(), 15).timedOut) {
+            if (!"true".equals(VERIFY_RUNNING_XWIKI_AT_START) || this.watchdog.isXWikiStarted(getURL(), 15).timedOut) {
                 // Disable extensions manager external repositories
                 PropertiesConfiguration properties = loadXWikiPropertiesConfiguration();
                 if (!properties.containsKey("extension.repositories")) {

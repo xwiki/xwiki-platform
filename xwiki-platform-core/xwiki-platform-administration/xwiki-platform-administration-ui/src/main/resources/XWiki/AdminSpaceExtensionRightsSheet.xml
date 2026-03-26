@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.AdminExtensionRightsSheet" locale="">
+<xwikidoc version="1.4" reference="XWiki.AdminSpaceExtensionRightsSheet" locale="">
   <web>XWiki</web>
-  <name>AdminExtensionRightsSheet</name>
+  <name>AdminSpaceExtensionRightsSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -31,17 +31,25 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>AdminExtensionRightsSheet</title>
+  <title>AdminSpaceExtensionRightsSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
+{{info}}
+  #set($webHomeRef = $services.model.resolveDocument('WebHome'))
+  ## For the children link, we do not use 'viewer=children' because the WebHome might not exist and the viewer shows a
+  ## 404 error in that case. Instead, we use 'xpage=children' because it always works, and because children document
+  ## could exist even if the parent document does not.
+  $services.localization.render('admin.pageandchildrenrights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
+{{/info}}
+
 {{html}}
   &lt;form method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" class="xform"&gt;
     ############################################################################################
-    ## EXTENSION RIGHTS
+    ## EXTENSION RIGHTS - PAGE &amp; CHILDREN
     ############################################################################################
     &lt;fieldset&gt;
       #template('rightsUI.vm')
@@ -50,10 +58,10 @@
 {{/html}}
 {{/velocity}}</content>
   <object>
-    <name>XWiki.AdminExtensionRightsSheet</name>
+    <name>XWiki.AdminSpaceExtensionRightsSheet</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>bad3af00-4a01-48b8-94ca-2111b758d219</guid>
+    <guid>bad3af00-4a01-48b8-94ca-2111b758d221</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -275,7 +283,7 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute>{{include reference="XWiki.AdminExtensionRightsSheet" /}}</codeToExecute>
+      <codeToExecute>{{include reference="XWiki.AdminSpaceExtensionRightsSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -287,7 +295,7 @@
       <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
-      <displayInSection>usersgroups.extensionrights</displayInSection>
+      <displayInSection>usersgroups.extensionrights.space</displayInSection>
     </property>
     <property>
       <heading/>
@@ -302,7 +310,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <scope>WIKI</scope>
+      <scope>ALL_SPACES</scope>
     </property>
     <property>
       <sectionOrder>375</sectionOrder>

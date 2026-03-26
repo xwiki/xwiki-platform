@@ -246,6 +246,6 @@ public class OfficeServerScriptService implements ScriptService
     {
         String currentWiki = this.modelContext.getCurrentEntityReference().getName();
         // TODO: Remove the hard-coded main wiki name when a fix becomes available.
-        return (currentWiki != null) && currentWiki.equals("xwiki");
+        return "xwiki".equals(currentWiki);
     }
 }

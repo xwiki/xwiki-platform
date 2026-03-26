@@ -374,7 +374,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
             Dialect dialect = this.store.getDialect();
-            if (dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
+            if ("sequence".equals(dialect.getNativeIdentifierGeneratorStrategy())) {
                 // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
                 // error that the sequence already exists ("relation "hibernate_sequence" already exists").
                 boolean hasSequence = false;

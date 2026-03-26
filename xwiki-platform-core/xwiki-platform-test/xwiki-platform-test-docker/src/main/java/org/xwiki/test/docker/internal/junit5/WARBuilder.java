@@ -150,19 +150,19 @@ public class WARBuilder
             for (ArtifactResult artifactResult : artifactResults) {
                 Artifact artifact = artifactResult.getArtifact();
                 // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
-                if (artifact.getExtension().equalsIgnoreCase("war")) {
+                if ("war".equalsIgnoreCase(artifact.getExtension())) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
+                    if ("xwiki-platform-web-war".equals(artifact.getArtifactId())) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
-                    && artifact.getExtension().equals("jar"))
+                } else if ("xwiki-platform-flamingo-skin-resources".equals(artifact.getArtifactId())
+                    && "jar".equals(artifact.getExtension()))
                 {
                     skinDependencies.add(artifact.getFile());
-                } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
+                } else if (JAR.equalsIgnoreCase(artifact.getExtension())) {
                     jarDependencies.add(artifact);
                 }
             }
@@ -304,7 +304,7 @@ public class WARBuilder
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
     {
-        return jdbcDriverVersion != null && !jdbcDriverVersion.equalsIgnoreCase("pom");
+        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception

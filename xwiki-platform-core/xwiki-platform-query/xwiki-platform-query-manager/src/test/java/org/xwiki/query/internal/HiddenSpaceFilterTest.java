@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class HiddenSpaceFilterTest
+class HiddenSpaceFilterTest
 {
     @InjectMockComponents
     private HiddenSpaceFilter filter;
@@ -60,7 +60,7 @@ public class HiddenSpaceFilterTest
     void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences()
     {
         assertEquals("select space.reference from XWikiSpace space where space.hidden <> true and (1=1)",
-            filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.HQL));
+            this.filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.HQL));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class HiddenSpaceFilterTest
 
         // Insertions of distinct
         assertEquals("select space.reference from XWikiSpace space where 1=1",
-            filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.HQL));
+            this.filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.HQL));
     }
 
     @Test
@@ -80,14 +80,14 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.reference from XWikiSpace mydoc where 1=1",
-            filter.filterStatement("select space.reference from XWikiSpace mydoc where 1=1", Query.HQL));
+            this.filter.filterStatement("select space.reference from XWikiSpace mydoc where 1=1", Query.HQL));
     }
 
     @Test
     void filterXWQLStatement()
     {
         assertEquals("select space.reference from XWikiSpace space where 1=1",
-            filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.XWQL));
+            this.filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.XWQL));
     }
 
     @Test
@@ -95,8 +95,9 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
-            + "(1=1) order by space.name",
-            filter.filterStatement("select space.name from XWikiSpace space where 1=1 order by space.name", Query.HQL));
+                + "(1=1) order by space.name",
+            this.filter.filterStatement("select space.name from XWikiSpace space where 1=1 order by space.name",
+                Query.HQL));
     }
 
     @Test
@@ -104,8 +105,9 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
-            + "(1=1) group by space.name",
-            filter.filterStatement("select space.name from XWikiSpace space where 1=1 group by space.name", Query.HQL));
+                + "(1=1) group by space.name",
+            this.filter.filterStatement("select space.name from XWikiSpace space where 1=1 group by space.name",
+                Query.HQL));
     }
 
     @Test
@@ -113,9 +115,10 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
-            + "(1=1) order by space.name group by space.name",
-            filter.filterStatement("select space.name from XWikiSpace space where 1=1 order by space.name group by "
-                + "space.name", Query.HQL));
+                + "(1=1) order by space.name group by space.name",
+            this.filter.filterStatement(
+                "select space.name from XWikiSpace space where 1=1 order by space.name group by "
+                    + "space.name", Query.HQL));
     }
 
     @Test
@@ -123,7 +126,7 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true",
-            filter.filterStatement("select space.name from XWikiSpace space", Query.HQL));
+            this.filter.filterStatement("select space.name from XWikiSpace space", Query.HQL));
     }
 
     @Test
@@ -131,7 +134,7 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true order by " + "space.name asc",
-            filter.filterStatement("select space.name from XWikiSpace space order by space.name asc", Query.HQL));
+            this.filter.filterStatement("select space.name from XWikiSpace space order by space.name asc", Query.HQL));
     }
 
     @Test
@@ -139,7 +142,8 @@ public class HiddenSpaceFilterTest
     {
         // Insertions of distinct
         assertEquals("select space.web, space.name from XWikiSpace space where space.hidden <> true "
-            + "group by space.web",
-            filter.filterStatement("select space.web, space.name from XWikiSpace space group by space.web", Query.HQL));
+                + "group by space.web",
+            this.filter.filterStatement("select space.web, space.name from XWikiSpace space group by space.web",
+                Query.HQL));
     }
 }

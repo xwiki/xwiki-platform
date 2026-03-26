@@ -726,7 +726,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (fullContent) {
             String url = entry.getLink();
-            if ((url != null) && (!url.trim().equals(""))) {
+            if ((url != null) && (!url.trim().isEmpty())) {
                 try {
                     String sfullContent = context.getWiki().getURLContent(url, context);
                     obj.setLargeStringValue("fullContent",

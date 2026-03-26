@@ -1564,6 +1564,10 @@
                 <id>org.webjars.npm:momentjs</id>
                 <features>org.webjars:momentjs</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.webjars.npm:moment-jdateformatparser</id>
+                <features>org.webjars:moment-jdateformatparser</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

@@ -1009,7 +1009,7 @@ public class HibernateStore implements Disposable, Initializable
     private void createSequenceIfMissing(String wikiId)
     {
         // There's no issue with catalog based databases, only with schemas.
-        if (!getAdapter().isCatalog() && getDialect().getNativeIdentifierGeneratorStrategy().equals("sequence")) {
+        if (!getAdapter().isCatalog() && "sequence".equals(getDialect().getNativeIdentifierGeneratorStrategy())) {
             String schemaName = getAdapter().getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;
@@ -1031,7 +1031,7 @@ public class HibernateStore implements Disposable, Initializable
 
                     for (SequenceInformation sequence : sequences) {
                         QualifiedSequenceName sequenceName = sequence.getSequenceName();
-                        if (sequenceName.getSequenceName().getCanonicalName().equalsIgnoreCase("hibernate_sequence")
+                        if ("hibernate_sequence".equalsIgnoreCase(sequenceName.getSequenceName().getCanonicalName())
                             && sequenceName.getSchemaName() != null
                             && sequenceName.getSchemaName().getCanonicalName().equals(schemaName)) {
                             // The sequence already exist, no need to create it

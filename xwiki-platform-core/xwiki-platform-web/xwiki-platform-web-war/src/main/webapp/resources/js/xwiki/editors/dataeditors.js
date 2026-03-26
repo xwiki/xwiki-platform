@@ -18,18 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'jquery-ui': $services.webjars.url('jquery-ui', "jquery-ui#if ($services.debug.minify).min#{end}.js")
-})
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
 
-(function(icons, paths) {
+(function(icons) {
   "use strict";
-  require.config({
-    paths
-  });
   define('dataeditors-translations', {
     prefix: 'core.editors.',
     keys: [
@@ -117,17 +111,17 @@
           self.editorStatus.deletedXObjects = {};
           self.unsavedChanges = false;
         });
-        // We don't want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
+        // We want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
         // to create a property or an object.
         let filterInputs = function () {
             return $(this).parents('#add_xproperty,#add_xobject').length === 0
                 && $(this).parents('.xclass').length > 0;
         };
-        $('input').filter(filterInputs).on('change', function(e) {
+        $('input,textarea').filter(filterInputs).on('change', function(e) {
           self.unsavedChanges = true;
         });
         $(document).on('xwiki:dom:updated', function (event, data) {
-          $(data.elements).find('input').filter(filterInputs).on('change', function (e) {
+          $(data.elements).find('input,textarea').filter(filterInputs).on('change', function (e) {
             self.unsavedChanges = true;
           });
         });
@@ -533,9 +527,9 @@
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
                 let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
-                // Expand the newly inserted property, since the user will probably want to edit it once it was added
-                self.expandCollapseMetaProperty(insertedPropertyElt);
-                // Make teh newly added property sortable
+                // Make the newly added property collapsable since the user will probably want to edit it
+                self.expandCollapseMetaProperty(insertedPropertyElt, true);
+                // Make the newly added property sortable
                 self.makeSortable(insertedPropertyElt);
                 self.ajaxPropertyDeletion(insertedPropertyElt);
                 self.makeDisableVisible(insertedPropertyElt);
@@ -683,15 +677,20 @@
 
       // ------------------------------------
       // Class editor: expand-collapse meta properties
-      expandCollapseMetaProperty(property) {
+      expandCollapseMetaProperty(property, startExpanded = false) {
         let propertyTitle = property.find('.xproperty-title');
         if (!propertyTitle) {
           // No such object...
           return;
         }
         property.addClass('collapsable');
-        property.addClass('collapsed');
-        propertyTitle.on('click', function() {
+        // By default, the property is collapsed when made collapsable.
+        if(!startExpanded) {
+          property.addClass('collapsed');
+        }
+        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // especially the move action which is dragAndDrop.
+        propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
         });
       }
@@ -740,8 +739,10 @@
 
       updateOrder() {
         let i = 1;
-        $(this).find(".xproperty-content").data('numberProperty').val(function() {
-          return i++;
+        $(this).find(".xproperty-content").each(function () {
+          let item = $(this);
+          // the numberProperty data is actually a reference to an input.
+          item.data('numberProperty').val(i++);
         });
       }
 
@@ -805,4 +806,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $paths]));
+}).apply(']]#', $jsontool.serialize([$icons]));

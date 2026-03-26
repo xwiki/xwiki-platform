@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Den valgte handlingen vil påvirke alle dokumenter
 solr.admin.indexing.wiki.select_farm=Hele farmen
 solr.admin.indexing.query.label=Egendefinert spørring (Query)
 solr.admin.indexing.query.hint=Valgfri forespørsel for å begrense dokumentene som vil bli påvirket av den valgte handlingen på indeksen.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 solr.admin.info.affectedDocuments=Berørte dokumenter i indeksen:
-solr.sortBy=Sorter etter:
-solr.sortBy.score=Relevanse
-solr.sortBy.title_sort=Tittel
-solr.sortBy.date=Siste endringsdato
-solr.sortBy.author_display_sort=Siste forfatter
-solr.sortBy.filename_sort=Filnavn
-solr.sortBy.attsize_sort=Filstørrelse
-solr.sortBy.attdate_sort=Dato opplastet
-solr.sortBy.attauthor_display_sort=Lastet opp av
-solr.sortOrder.asc=Stigende
-solr.sortOrder.desc=Synkende
-solr.options=Vis:
-solr.options.highlight=Utheving
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Vis et utdrag av det som ble matchet i hvert resultat
-solr.options.facet=Fasetter
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Tillat ekstra filtrering av resultatet
 solr.result.language=Språk
 solr.result.locatedIn=Lokalisert i
@@ -172,6 +172,18 @@ solr.result.location=Funnet i {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Plassering
+solr.sortBy=Sorter etter:
+solr.sortBy.score=Relevanse
+solr.sortBy.title_sort=Tittel
+solr.sortBy.date=Siste endringsdato
+solr.sortBy.author_display_sort=Siste forfatter
+solr.sortBy.filename_sort=Filnavn
+solr.sortBy.attsize_sort=Filstørrelse
+solr.sortBy.attdate_sort=Dato opplastet
+solr.sortBy.attauthor_display_sort=Lastet opp av
+solr.options=Vis:
+solr.options.highlight=Utheving
+solr.options.facet=Fasetter
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

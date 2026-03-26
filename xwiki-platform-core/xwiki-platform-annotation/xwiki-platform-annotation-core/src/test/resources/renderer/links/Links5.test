@@ -4,11 +4,11 @@
 .source
 Some link [[Space.ExistingPage]] with generated label
 .rendered
-<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span> with generated label</p>
+<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">ExistingPage</span></a></span> with generated label</p>
 .annotation
 0
 XWiki.XWikiGuest
 Link with label
-link Space.ExistingPage with
+link ExistingPage with
 .annotated
-<p>Some <span class="annotation ID0">link&nbsp;</span><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent"><span class="annotation ID0">Space.ExistingPage</span></span></a></span><span class="annotation ID0">&nbsp;with</span> generated label</p>
+<p>Some <span class="annotation ID0">link&nbsp;</span><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent"><span class="annotation ID0">ExistingPage</span></span></a></span><span class="annotation ID0">&nbsp;with</span> generated label</p>

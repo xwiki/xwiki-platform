@@ -163,6 +163,7 @@ com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
 org.xwiki.internal.web.EffectiveAuthorSetterListener
 org.xwiki.internal.web.GetDocExistValidator
 org.xwiki.internal.web.ViewDocExistValidator
+org.xwiki.internal.web.PageTemplateRequiredRightsChecker
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass
 com.xpn.xwiki.objects.meta.DateMetaClass
@@ -265,8 +266,14 @@ com.xpn.xwiki.web.ViewAttachRevAction
 2000:org.xwiki.internal.attachment.validation.VoidAttachmentValidator
 org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R150000000XWIKI20285DataMigration
+org.xwiki.internal.migration.R180100000XWIKI23827DataMigration
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
+org.xwiki.internal.objects.DatePropertyParser
+org.xwiki.internal.objects.ListPropertyParser
+org.xwiki.internal.objects.NumberPropertyParser
+org.xwiki.internal.objects.PasswordPropertyParser
+org.xwiki.internal.objects.StringPropertyParser
 500:org.xwiki.internal.velocity.XWikiVelocityManager
 org.xwiki.internal.script.XWikiScriptContextInitializer
 org.xwiki.security.authservice.internal.AuthServiceConfiguration

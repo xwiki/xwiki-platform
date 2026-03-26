@@ -397,7 +397,7 @@ public class UpgradeTest extends AbstractTest
             // Confirm upgrade
             upgradeFlavor = upgradeFlavor.confirm();
 
-            if (upgradeFlavor.getStatus().equals("loading")) {
+            if ("loading".equals(upgradeFlavor.getStatus())) {
                 ExtensionProgressPane extensionProgress = upgradeFlavor.openProgressSection();
 
                 if (extensionProgress.getUnusedPages() != null) {
@@ -423,14 +423,9 @@ public class UpgradeTest extends AbstractTest
     {
         List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 
-        StringBuilder builder = new StringBuilder();
-        for (LogItemPane log : logs) {
-            builder.append(log.getMessage());
-            builder.append('\n');
-        }
-
         LogCaptureValidator validator = new LogCaptureValidator();
-        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration(), false);
+        validator.validate(
+            logs.stream().map(LogItemPane::getMessage), validateConsole.getLogCaptureConfiguration(), false, true);
     }
 
     private void orphanedDependenciesStep()

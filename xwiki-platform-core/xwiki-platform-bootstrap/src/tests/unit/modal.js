@@ -289,9 +289,9 @@ $(function () {
       .one('show.bs.modal', function (e) {
         e.preventDefault()
         $otherBtn.trigger('focus')
-        setTimeout($.proxy(function () {
+        setTimeout(() => {
           $(this).bootstrapModal('show')
-        }, this), 0)
+        }, 0)
       })
       .on('hidden.bs.modal', function () {
         setTimeout(function () {

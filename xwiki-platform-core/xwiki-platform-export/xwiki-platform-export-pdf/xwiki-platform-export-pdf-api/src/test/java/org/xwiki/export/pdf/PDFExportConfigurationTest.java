@@ -19,15 +19,16 @@
  */
 package org.xwiki.export.pdf;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the default methods of {@link PDFExportConfiguration}.
@@ -51,5 +52,13 @@ class PDFExportConfigurationTest
 
         when(this.config.getXWikiURI()).thenThrow(new URISyntaxException("some URI", "some reason"));
         assertTrue(this.config.isXWikiURISpecified());
+    }
+
+    @Test
+    void getChromeRemoteDebuggingTimeout()
+    {
+        when(this.config.getChromeRemoteDebuggingTimeout()).thenCallRealMethod();
+        when(this.config.getPageReadyTimeout()).thenReturn(300);
+        assertEquals(300 / 6, this.config.getChromeRemoteDebuggingTimeout());
     }
 }

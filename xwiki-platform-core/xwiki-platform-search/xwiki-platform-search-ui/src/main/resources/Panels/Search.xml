@@ -125,7 +125,9 @@
   &lt;form action="$xwiki.getURL('Main.Search')" class='xformInline'&gt;
     &lt;div class="globalsearch input-group"&gt;
       &lt;label for="globalsearchinput" class="hidden"&gt;$services.localization.render('panels.search.query')&lt;/label&gt;
-      &lt;input id="globalsearchinput" class="globalsearchinput withTip useTitleAsTip" type="text" name="text" title="$services.localization.render('panels.search.inputText')" size="15"/&gt;
+      &lt;input id="globalsearchinput" class="globalsearchinput" type="text" name="text"
+        placeholder="$services.localization.render('panels.search.inputText')"
+        title="$services.localization.render('panels.search.inputText')" size="15"/&gt;
       &lt;span class="input-group-btn buttonwrapper"&gt;
         &lt;button type="submit" class="btn btn-primary"&gt;
           $services.icon.renderHTML('search')&lt;span class="hidden"&gt;$services.localization.render('panels.search.submit')&lt;/span&gt;

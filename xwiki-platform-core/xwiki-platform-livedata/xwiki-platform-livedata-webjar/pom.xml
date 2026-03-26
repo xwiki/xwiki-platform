@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>17.8.0-SNAPSHOT</version>
+    <version>18.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -37,8 +37,42 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>
+    {
+      "@xwiki/platform-livedata-componentstore": "org.xwiki.platform:xwiki-platform-livedata-node-componentstore/index.es.js",
+      "@xwiki/platform-livedata-ui": "org.xwiki.platform:xwiki-platform-livedata-node-ui/index.es.js",
+      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
+      "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
+    }
+    </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
+    <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-node</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-componentstore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
@@ -68,12 +102,18 @@
     </dependency>
     <!-- Used by the suggest filter. -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tom-select</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-livedata-rest</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-javascript-importmap</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -96,7 +136,7 @@
               </outputDirectory>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/node-src/src/</directory>
+                  <directory>${basedir}/src/main/node/src</directory>
                   <includes>
                     <include>variables.less</include>
                     <include>reactive.less</include>

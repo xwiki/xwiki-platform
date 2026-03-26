@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -140,6 +141,7 @@ public class WARBuilder
             List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
+            maybeAddS3BlobStore(extraArtifacts);
             Collection<ArtifactResult> artifactResults =
                 this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
             List<File> warDependencies = new ArrayList<>();
@@ -148,19 +150,19 @@ public class WARBuilder
             for (ArtifactResult artifactResult : artifactResults) {
                 Artifact artifact = artifactResult.getArtifact();
                 // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
-                if (artifact.getExtension().equalsIgnoreCase("war")) {
+                if ("war".equalsIgnoreCase(artifact.getExtension())) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
+                    if ("xwiki-platform-web-war".equals(artifact.getArtifactId())) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
-                    && artifact.getExtension().equals("jar"))
+                } else if ("xwiki-platform-flamingo-skin-resources".equals(artifact.getArtifactId())
+                    && "jar".equals(artifact.getExtension()))
                 {
                     skinDependencies.add(artifact.getFile());
-                } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
+                } else if (JAR.equalsIgnoreCase(artifact.getExtension())) {
                     jarDependencies.add(artifact);
                 }
             }
@@ -279,6 +281,16 @@ public class WARBuilder
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
+    private void maybeAddS3BlobStore(List<Artifact> extraArtifacts) throws Exception
+    {
+        if (this.testConfiguration.getBlobStore() == BlobStore.S3) {
+            // Explicitly add the S3 Blob Store since it's not part of the minimal dependencies, and we want to be
+            // able to start any test module with the S3 blob store without adding an explicit dependency.
+            extraArtifacts.add(new DefaultArtifact("org.xwiki.commons", "xwiki-commons-store-blob-s3", JAR,
+                this.mavenResolver.getCommonsVersion()));
+        }
+    }
+
     private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
     {
         String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
@@ -292,7 +304,7 @@ public class WARBuilder
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
     {
-        return jdbcDriverVersion != null && !jdbcDriverVersion.equalsIgnoreCase("pom");
+        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception

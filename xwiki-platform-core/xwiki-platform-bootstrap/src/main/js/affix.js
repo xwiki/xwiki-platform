@@ -19,8 +19,8 @@
     var target = this.options.target === Affix.DEFAULTS.target ? $(this.options.target) : $(document).find(this.options.target)
 
     this.$target = target
-      .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
-      .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
+      .on('scroll.bs.affix.data-api', this.checkPosition.bind(this))
+      .on('click.bs.affix.data-api',  this.checkPositionWithEventLoop.bind(this))
 
     this.$element     = $(element)
     this.affixed      = null
@@ -70,7 +70,7 @@
   }
 
   Affix.prototype.checkPositionWithEventLoop = function () {
-    setTimeout($.proxy(this.checkPosition, this), 1)
+    setTimeout(this.checkPosition.bind(this), 1)
   }
 
   Affix.prototype.checkPosition = function () {
@@ -147,7 +147,7 @@
   // AFFIX DATA-API
   // ==============
 
-  $(window).on('load', function () {
+  $(function () {
     $('[data-spy="affix"]').each(function () {
       var $spy = $(this)
       var data = $spy.data()

@@ -65,7 +65,7 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
         SecurityRuleEntry entry, Policies policies)
     {
         XWikiSecurityAccess access = new XWikiSecurityAccess();
-        Map<Right, Integer> priorities = new RightMap<Integer>();
+        Map<Right, Integer> priorities = new RightMap<>();
         SecurityReference reference = entry.getReference();
         Set<Right> enabledRights = Right.getEnabledRights(reference.getSecurityType());
 
@@ -176,7 +176,7 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
      */
     private int getPriority(GroupSecurityReference group)
     {
-        if (group.getName().equals("XWikiAllGroup")) {
+        if ("XWikiAllGroup".equals(group.getName())) {
             return ALL_GROUP_PRIORITY;
         } else {
             return ALL_GROUP_PRIORITY + 1;

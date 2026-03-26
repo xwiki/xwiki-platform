@@ -54,6 +54,14 @@ if not defined JETTY_STOP_PORT (
   )
 )
 
+rem Get the directory of this script (always ends with a backslash)
+set "XWIKI_HOME=%~dp0"
+
+rem Create environments folder if missing
+if not exist "%XWIKI_HOME%environments" (
+    mkdir "%XWIKI_HOME%environments"
+)
+
 REM Discover java.exe from the latest properly installed JRE
 for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
 set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe

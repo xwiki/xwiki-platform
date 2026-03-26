@@ -123,6 +123,35 @@ class DefaultIconRendererTest
     }
 
     @Test
+    void renderWithMultipleCSS() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        String template = "image:$icon.png";
+        iconSet.setRenderWiki(template);
+        String css = "css1,css2";
+        iconSet.setCss(css);
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        IconTemplateRenderer mockRenderer = mock();
+        when(this.rendererManager.getRenderer(css)).thenReturn(mockRenderer);
+        String parsedCSS = "velocityParsedCSS1,velocityParsedCSS2";
+        when(mockRenderer.render(null, null)).thenReturn(parsedCSS);
+
+        setupSimpleTemplate(template);
+
+        // Test
+        this.iconRenderer.render("test", iconSet);
+
+        // Verify
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("rel", "stylesheet");
+        verify(this.linkExtension).use("velocityParsedCSS1", parameters);
+        verify(this.linkExtension).use("velocityParsedCSS2", parameters);
+        verify(this.skinExtension, never()).use(any());
+        verify(this.jsExtension, never()).use(any());
+    }
+
+    @Test
     void renderWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");

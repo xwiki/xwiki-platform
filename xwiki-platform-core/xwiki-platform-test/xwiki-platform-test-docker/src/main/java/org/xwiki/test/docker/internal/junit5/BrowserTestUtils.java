@@ -57,7 +57,7 @@ public final class BrowserTestUtils
 
     private static final String SELENIARM_CHROME_DOCKER_IMAGE_NAME = "seleniarm/standalone-chromium:%s";
 
-    private static final boolean IS_ARM64 = System.getProperty("os.arch").equals("aarch64");
+    private static final boolean IS_ARM64 = "aarch64".equals(System.getProperty("os.arch"));
 
     private static List<String> pulledImages = new ArrayList<>();
 

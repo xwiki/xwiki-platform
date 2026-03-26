@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.docker;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +35,11 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.command.AsyncDockerCmd;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.ExecCreateCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.SyncDockerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -44,6 +47,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ContainerNetwork;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
@@ -59,6 +63,26 @@ import com.github.dockerjava.api.model.Volume;
 @Singleton
 public class ContainerManager implements Initializable
 {
+
+    /**
+     * Callback to capture the output of a command execution.
+     */
+    private static final class StringResultCallback extends Adapter<Frame>
+    {
+        private final StringBuilder result = new StringBuilder();
+
+        @Override
+        public void onNext(Frame frame)
+        {
+            result.append(new String(frame.getPayload(), StandardCharsets.UTF_8));
+        }
+
+        public String getResult()
+        {
+            return result.toString();
+        }
+    }
+
     /**
      * The labels used to identify the Docker containers created by this component. This is needed for instance to be
      * able to cleanup the created Docker containers after running the functional tests.
@@ -167,8 +191,7 @@ public class ContainerManager implements Initializable
             containerName, imageName, parameters);
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
-            List<ExposedPort> exposedPorts =
-                hostConfig.getPortBindings().getBindings().keySet().stream().toList();
+            List<ExposedPort> exposedPorts = hostConfig.getPortBindings().getBindings().keySet().stream().toList();
             CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
                 .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).withEnv(envVars).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
@@ -269,18 +292,63 @@ public class ContainerManager implements Initializable
         return network.getIpAddress();
     }
 
-    private void wait(AsyncDockerCmd<?, ?> command)
+    /**
+     * Execute a command inside the specified Docker container.
+     *
+     * @param containerId the container id
+     * @param command the command to execute
+     * @return the execution result
+     */
+    public String execInContainer(String containerId, String... command)
+    {
+        return execInContainer(containerId, false, command);
+    }
+
+    /**
+     * Execute a command inside the specified Docker container.
+     *
+     * @param containerId the container id
+     * @param asRoot whether to execute the command as root user (with privileges) or not
+     * @param command the command to execute
+     * @return the execution result
+     */
+    public String execInContainer(String containerId, boolean asRoot, String... command)
+    {
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Executing command in container [{}]: [{}]", containerId, String.join(" ", command));
+        }
+
+        // Create the executable command.
+        ExecCreateCmd execCommand =
+            this.client.execCreateCmd(containerId).withAttachStdout(true).withAttachStderr(true).withCmd(command);
+        if (asRoot) {
+            execCommand.withUser("root");
+        }
+        String execId = exec(execCommand).getId();
+
+        // Execute the command and capture output.
+        return wait(this.client.execStartCmd(execId), new StringResultCallback()).getResult();
+    }
+
+    private <R> Adapter<R> wait(AsyncDockerCmd<?, R> command)
+    {
+        return wait(command, new Adapter<R>());
+    }
+
+    private <T extends Adapter<R>, R> T wait(AsyncDockerCmd<?, R> command, T callback)
     {
         // Can't write simply try(command) because spoon complains about "Variable resource not allowed here for source
         // level below 9".
-        try (AsyncDockerCmd<?, ?> cmd = command) {
-            cmd.start().awaitCompletion();
+        try (AsyncDockerCmd<?, R> cmd = command) {
+            cmd.exec(callback).awaitCompletion();
         } catch (InterruptedException e) {
             this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
                 ExceptionUtils.getRootCauseMessage(e));
             // Restore the interrupted state.
             Thread.currentThread().interrupt();
         }
+
+        return callback;
     }
 
     private <T> T exec(SyncDockerCmd<T> command)

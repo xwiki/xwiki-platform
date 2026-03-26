@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Properties;
 
 import javax.inject.Provider;
-import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -153,8 +152,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);
 
-        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
-            ExecutionContext.class));
+        this.componentManager
+            .registerMockComponent(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
@@ -167,9 +166,8 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         // Create a user in the SMTP server.
         this.greenMail.setUser("peter@doe.com", "peter", "password");
 
-        this.defaultBodyPartFactory =
-            this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
-                String.class));
+        this.defaultBodyPartFactory = this.componentManager
+            .getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.sender = this.componentManager.getInstance(MailSender.class);
 
         // Simulate receiving the Application Ready Event to start the mail threads
@@ -230,15 +228,16 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.greenMail.getReceivedMessages();
+        jakarta.mail.internet.MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals(1, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
-        assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
+        assertEquals(1, ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getCount());
 
-        BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        jakarta.mail.BodyPart textBodyPart =
+            ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
     }

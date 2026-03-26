@@ -69,6 +69,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultMacroRefactoring implements MacroRefactoring
 {
     @Inject

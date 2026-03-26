@@ -89,7 +89,7 @@ class ExtensionSecuritySolrClientTest
         assertEquals(42, this.solrClient.getVulnerableExtensionsCount());
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
+        params.addFilterQuery(SECURITY_CVE_ID + ":[* TO *]");
         params.addFilterQuery(getNamespaceFilterQuery());
         params.addFilterQuery(String.format("%s:false", IS_REVIEWED_SAFE));
         verify(this.extensionIndexStore)
@@ -111,7 +111,7 @@ class ExtensionSecuritySolrClientTest
         this.solrClient.solrQuery(liveDataQuery);
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        params.addFilterQuery(SECURITY_CVE_ID + ":[* TO *]");
         params.addFilterQuery(IS_CORE_EXTENSION + ":false");
         params.addFilterQuery(getNamespaceFilterQuery());
 
@@ -138,7 +138,7 @@ class ExtensionSecuritySolrClientTest
         this.solrClient.solrQuery(liveDataQuery);
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        params.addFilterQuery(SECURITY_CVE_ID + ":[* TO *]");
         params.addFilterQuery(IS_CORE_EXTENSION + ":true");
         params.addFilterQuery(getNamespaceFilterQuery());
 
@@ -168,7 +168,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery expectedSolrQuery = new SolrQuery();
         expectedSolrQuery.addFilterQuery(String.format("%s:*test*", SECURITY_CVE_ID));
-        expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        expectedSolrQuery.addFilterQuery(SECURITY_CVE_ID + ":[* TO *]");
         expectedSolrQuery.addFilterQuery(getNamespaceFilterQuery());
         expectedSolrQuery.addFilterQuery(IS_CORE_EXTENSION + ":false");
 
@@ -200,7 +200,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery expectedSolrQuery = new SolrQuery();
         expectedSolrQuery.addFilterQuery(String.format("%s:[%s TO 10]", SECURITY_MAX_CVSS, convertedValue));
-        expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        expectedSolrQuery.addFilterQuery(SECURITY_CVE_ID + ":[* TO *]");
         expectedSolrQuery.addFilterQuery(getNamespaceFilterQuery());
         expectedSolrQuery.addFilterQuery(IS_CORE_EXTENSION + ":false");
 

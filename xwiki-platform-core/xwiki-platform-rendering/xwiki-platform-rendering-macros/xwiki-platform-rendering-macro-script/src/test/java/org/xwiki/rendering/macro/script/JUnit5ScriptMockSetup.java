@@ -38,8 +38,6 @@ import static org.mockito.Mockito.when;
  */
 public class JUnit5ScriptMockSetup
 {
-    public DocumentAccessBridge bridge;
-
     public ContextualAuthorizationManager authorizationManager;
 
     public AttachmentReferenceResolver<String> attachmentReferenceResolver;
@@ -53,9 +51,8 @@ public class JUnit5ScriptMockSetup
     public JUnit5ScriptMockSetup(MockitoComponentManager cm) throws Exception
     {
         // Document Access Bridge Mock setup
-        this.bridge = cm.registerMockComponent(DocumentAccessBridge.class);
-        when(this.bridge.hasProgrammingRights()).thenReturn(true);
-
+        // This mock is required as it's injected in component, but does not need specific mocking.
+        cm.registerMockComponent(DocumentAccessBridge.class);
         // Contextual Authorization Manager Mock setup
         this.authorizationManager = cm.registerMockComponent(ContextualAuthorizationManager.class);
         when(this.authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);

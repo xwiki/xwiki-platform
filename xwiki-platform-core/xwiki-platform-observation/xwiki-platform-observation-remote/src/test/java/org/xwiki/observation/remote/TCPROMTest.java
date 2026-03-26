@@ -20,6 +20,7 @@
 package org.xwiki.observation.remote;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import org.xwiki.observation.remote.test.AbstractROMTestCase;
 import org.xwiki.observation.remote.test.TestEvent;
 import org.xwiki.test.annotation.AllComponents;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -47,6 +49,10 @@ class TCPROMTest extends AbstractROMTestCase
     {
     }
 
+    private RemoteObservationManager rom1;
+
+    private RemoteObservationManager rom2;
+
     @Override
     @BeforeEach
     public void beforeEach() throws Exception
@@ -56,8 +62,9 @@ class TCPROMTest extends AbstractROMTestCase
         System.setProperty("jgroups.bind_addr", "localhost");
 
         getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp"));
-        RemoteObservationManager rom = getComponentManager2().getInstance(RemoteObservationManager.class);
-        rom.startChannel("tcp");
+        this.rom1 = getComponentManager1().getInstance(RemoteObservationManager.class);
+        getConfigurationSource2().setProperty("observation.remote.channels", Arrays.asList("tcp"));
+        this.rom2 = getComponentManager2().getInstance(RemoteObservationManager.class);
     }
 
     /**
@@ -81,8 +88,11 @@ class TCPROMTest extends AbstractROMTestCase
         getObservationManager1().addListener(localListener);
         getObservationManager2().addListener(remoteListener);
 
+        // By default, fully serializable events and parameters
         getObservationManager1().notify(event, "some source", "some data");
+        // By default, unserializable parameters are not sent
         getObservationManager1().notify(event, unserializable, unserializable);
+        // A custom converter prevent from sending log events
         getObservationManager1().notify(new LogEvent(), "some source", "some data");
 
         // Make sure JGroups has enough time to send the message
@@ -91,5 +101,15 @@ class TCPROMTest extends AbstractROMTestCase
         verify(localListener).onEvent(same(event), eq("some source"), eq("some data"));
         verify(localListener).onEvent(same(event), same(unserializable), same(unserializable));
         verify(remoteListener).onEvent(eq(event), eq("some source"), eq("some data"));
+    }
+
+    @Test
+    void members() throws Exception
+    {
+        NetworkChannel channel1 = this.rom1.getChannels().iterator().next();
+        NetworkChannel channel2 = this.rom2.getChannels().iterator().next();
+
+        assertEquals(List.copyOf(channel1.getMembers()), List.copyOf(channel2.getMembers()));
+        assertEquals(channel1.getLeader(), channel2.getLeader());
     }
 }

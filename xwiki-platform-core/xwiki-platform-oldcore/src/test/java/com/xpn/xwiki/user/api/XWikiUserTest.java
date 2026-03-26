@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiUserTest
+class XWikiUserTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore mockitoOldcore;
@@ -76,7 +75,7 @@ public class XWikiUserTest
     private final DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         when(this.mockitoOldcore.getSpyXWiki().getDocument(this.userReference, this.mockitoOldcore.getXWikiContext()))
             .thenReturn(this.userDocument);
@@ -88,7 +87,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void createWithNullReference()
+    void createWithNullReference()
     {
         XWikiUser user = new XWikiUser((DocumentReference) null);
 
@@ -97,7 +96,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void createWithNullFullName()
+    void createWithNullFullName()
     {
         XWikiUser user = new XWikiUser((String) null);
 
@@ -106,7 +105,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void isDisabled()
+    void isDisabled()
     {
         XWikiUser user = new XWikiUser(this.userReference);
         when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(1);
@@ -123,31 +122,31 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setDisabledFalseNormalUser() throws XWikiException
+    void setDisabledFalseNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
-        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors).setOriginalMetadataAuthor(any());
         verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
     @Test
-    public void setDisabledTrueNormalUser() throws XWikiException
+    void setDisabledTrueNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
-        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors).setOriginalMetadataAuthor(any());
         verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
     @Test
-    public void setDisabledGuestOrSuperadminUser() throws XWikiException
+    void setDisabledGuestOrSuperadminUser() throws XWikiException
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);
@@ -179,7 +178,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void isEmailChecked()
+    void isEmailChecked()
     {
         XWikiUser user = new XWikiUser(this.userReference);
         when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(1);
@@ -196,27 +195,27 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setEmailCheckedFalseNormalUser() throws XWikiException
+    void setEmailCheckedFalseNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
-    public void setEmailCheckedTrueNormalUser() throws XWikiException
+    void setEmailCheckedTrueNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
-    public void setEmailCheckedGuestOrSuperadminUser() throws XWikiException
+    void setEmailCheckedGuestOrSuperadminUser() throws XWikiException
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);

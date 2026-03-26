@@ -40,6 +40,7 @@ import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -138,7 +139,7 @@ public abstract class ListClass extends PropertyClass
     public String getSeparators()
     {
         String separators = getStringValue("separators");
-        if (separators == null || separators.equals("")) {
+        if (separators == null || separators.isEmpty()) {
             separators = "|,";
         }
         return separators;
@@ -574,6 +575,9 @@ public abstract class ListClass extends PropertyClass
         BaseProperty lprop;
 
         // FIXME: this if is actually wrong: it means a multiselect static list cannot be stored with a large storage.
+        // But on the other hand, large storage is quite bad for performance, so if really needed we should ideally
+        // find a better solution than simply using a larger storage.
+        // Any change of this logic might need to be mirrored in UsedValuesListQueryBuilder and LiveTableResultsMacros.
         if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
@@ -589,7 +593,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         if (isMultiSelect()) {
@@ -601,7 +605,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         if (!isMultiSelect()) {
             return fromString(strings[0]);
@@ -625,7 +629,7 @@ public abstract class ListClass extends PropertyClass
 
         // If Multiselect and multiple results
         for (String item : strings) {
-            if (!item.trim().equals("")) {
+            if (!item.trim().isEmpty()) {
                 list.add(item);
             }
         }
@@ -637,7 +641,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         if (!isMultiSelect()) {
             return super.newPropertyfromXML(ppcel);

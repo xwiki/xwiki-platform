@@ -531,6 +531,9 @@
 }
 .search-facet-body .customDateInterval form {
   margin-top: .5em;
+  /* We want the form to stay on its own flex line no matter how much space is provided. */
+  width: 80%;
+  margin-left: 16px;
 }
 .search-facet-body .customDateInterval dl {
   margin: 0;

@@ -51,7 +51,7 @@ class ActionFilterTest
     private final ActionFilter filter = new ActionFilter();
 
     @BeforeComponent
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         Utils.setComponentManager(componentManager);
         componentManager.registerMockComponent(ConfigurationSource.class, "xwikicfg");

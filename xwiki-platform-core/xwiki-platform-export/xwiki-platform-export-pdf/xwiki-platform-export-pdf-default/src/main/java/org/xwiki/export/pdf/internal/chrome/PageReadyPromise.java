@@ -135,7 +135,8 @@ public class PageReadyPromise
             /* disableBreaks */ true,
             /* replMode */ false,
             /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null
+            /* uniqueContextId */ null,
+            /* serializationOptions */ null
         );
     }
 

@@ -108,7 +108,7 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
     {
         methodContext.put(OUTPUT_KEY, new WikiMethodOutputHandler());
 
-        Map<Integer, Object> inputs = new HashMap<Integer, Object>();
+        Map<Integer, Object> inputs = new HashMap<>();
         if (args != null && args.length > 0) {
             // Start with "0" as first input key.
             for (int i = 0; i < args.length; i++) {
@@ -186,7 +186,7 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
                     "Error while executing wiki component macro transformation for method [%s]", method.getName()), e);
             }
 
-            if (!method.getReturnType().getName().equals("void")) {
+            if (!"void".equals(method.getReturnType().getName())) {
                 if (methodContext.get(OUTPUT_KEY) != null
                     && ((WikiMethodOutputHandler)
                     methodContext.get(OUTPUT_KEY)).getValue() != null) {

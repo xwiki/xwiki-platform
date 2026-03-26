@@ -152,16 +152,18 @@ public class ChromeTab implements BrowserTab
         Double marginLeft = 0d;
         Double marginRight = 0d;
         String pageRanges = "";
-        Boolean ignoreInvalidPageRanges = false;
         String headerTemplate = "";
         String footerTemplate = "";
         Boolean preferCSSPageSize = false;
-        PrintToPDFTransferMode mode = PrintToPDFTransferMode.RETURN_AS_STREAM;
+        PrintToPDFTransferMode transferMode = PrintToPDFTransferMode.RETURN_AS_STREAM;
+        Boolean generateTaggedPDF = true;
+        Boolean generateDocumentOutline = true;
 
         // See https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
-        PrintToPDF printToPDF = this.tabDevToolsService.getPage().printToPDF(landscape, displayHeaderFooter,
-            printBackground, scale, paperWidth, paperHeight, marginTop, marginBottom, marginLeft, marginRight,
-            pageRanges, ignoreInvalidPageRanges, headerTemplate, footerTemplate, preferCSSPageSize, mode);
+        PrintToPDF printToPDF =
+            this.tabDevToolsService.getPage().printToPDF(landscape, displayHeaderFooter, printBackground, scale,
+                paperWidth, paperHeight, marginTop, marginBottom, marginLeft, marginRight, pageRanges, headerTemplate,
+                footerTemplate, preferCSSPageSize, transferMode, generateTaggedPDF, generateDocumentOutline);
         return new PrintToPDFInputStream(this.tabDevToolsService.getIO(), printToPDF.getStream(), cleanup);
     }
 

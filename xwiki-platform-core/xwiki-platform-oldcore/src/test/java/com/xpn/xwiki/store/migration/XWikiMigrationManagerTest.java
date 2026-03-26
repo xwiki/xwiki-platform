@@ -20,29 +20,46 @@
 package com.xpn.xwiki.store.migration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.store.migration.AbstractDataMigrationManager.XWikiMigration;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test for {@link AbstractDataMigrationManager}
- * 
+ * Test for {@link AbstractDataMigrationManager}.
+ *
  * @version $Id$
  */
-public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class XWikiMigrationManagerTest
 {
-    /** mocked migration manager */
+    @InjectMockitoOldcore
+    private MockitoOldcore oldCore;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    /**
+     * mocked migration manager.
+     */
     @Component(staticRegistration = false)
     @Named("TestDataMigration")
     @Singleton
@@ -120,47 +137,44 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass, 0);
 
         for (ComponentDescriptor<?> descriptor : descriptors) {
-            getComponentManager().registerComponent(descriptor);
+            this.componentManager.registerComponent(descriptor);
         }
     }
 
-    @Override
-    protected void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        super.setUp();
-        getContext().setWiki(new XWiki() {
-            @Override
-            public List<String> getVirtualWikisDatabaseNames(XWikiContext context)
-            {
-                return Arrays.asList("xwiki");
-            }
-        });
-
-        registerComponent(TestDataMigrationManager.class);
+        this.componentManager.registerComponent(TestDataMigrationManager.class);
     }
 
-    /** test migration if there are no data version */
-    public void testMigrationWhenNoVersion() throws Exception
+    /**
+     * test migration if there are no data version.
+     */
+    @Test
+    void migrationWhenNoVersion() throws Exception
     {
-        TestDataMigrationManager mm = getComponentManager().getInstance(DataMigrationManager.class,"TestDataMigration");
-        Collection neededMigration = mm.getNeededMigrations();
+        TestDataMigrationManager mm =
+            this.componentManager.getInstance(DataMigrationManager.class, "TestDataMigration");
+        Collection<XWikiMigration> neededMigration = mm.getNeededMigrations();
         assertEquals(0, neededMigration.size());
         mm.startMigrations();
         assertEquals(456, mm.curversion.getVersion());
     }
 
     /**
-     * test parameters "xwiki.store.migration.version", "xwiki.store.migration.ignored" and migrations order
+     * test parameters "xwiki.store.migration.version", "xwiki.store.migration.ignored" and migrations order.
      */
-    public void testMigrationOrderAndIgnore() throws Exception
+    @Test
+    void migrationOrderAndIgnore() throws Exception
     {
-        getConfigurationSource().setProperty("xwiki.store.migration.version", "123");
-        getConfigurationSource().setProperty("xwiki.store.migration.ignored", "345");
-        TestDataMigrationManager mm = getComponentManager().getInstance(
-            DataMigrationManager.class,"TestDataMigration");
-        Collection neededMigration = mm.getNeededMigrations();
+
+        this.oldCore.getSpyXWiki().getConfig().setProperty("xwiki.store.migration.version", "123");
+        this.oldCore.getSpyXWiki().getConfig().setProperty("xwiki.store.migration.ignored", "345");
+        TestDataMigrationManager mm = this.componentManager.getInstance(
+            DataMigrationManager.class, "TestDataMigration");
+        Collection<XWikiMigration> neededMigration = mm.getNeededMigrations();
         assertEquals(2, neededMigration.size());
-        AbstractDataMigrationManager.XWikiMigration[] actual = new AbstractDataMigrationManager.XWikiMigration[2];
+        XWikiMigration[] actual = new XWikiMigration[2];
         neededMigration.toArray(actual);
         assertEquals(234, actual[0].dataMigration.getVersion().getVersion());
         assertEquals(456, actual[1].dataMigration.getVersion().getVersion());
@@ -201,18 +215,21 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         }
     }
 
-    /** test "xwiki.store.migration.force" parameter */
-    public void testMigrationForce() throws Exception
+    /**
+     * test "xwiki.store.migration.force" parameter.
+     */
+    @Test
+    void migrationForce() throws Exception
     {
-        getConfigurationSource().setProperty("xwiki.store.migration.version", "234");
-        getConfigurationSource().setProperty("xwiki.store.migration.force", "TestForcedMigration");
+        this.oldCore.getSpyXWiki().getConfig().setProperty("xwiki.store.migration.version", "234");
+        this.oldCore.getSpyXWiki().getConfig().setProperty("xwiki.store.migration.force", "TestForcedMigration");
         registerComponent(TestForceMigration.class);
 
-        TestDataMigrationManager mm = getComponentManager().getInstance(
-            DataMigrationManager.class,"TestDataMigration");
-        Collection neededMigration = mm.getNeededMigrations();
+        TestDataMigrationManager mm = this.componentManager.getInstance(
+            DataMigrationManager.class, "TestDataMigration");
+        Collection<XWikiMigration> neededMigration = mm.getNeededMigrations();
         assertEquals(1, neededMigration.size());
-        assertEquals(567, ((AbstractDataMigrationManager.XWikiMigration) neededMigration.toArray()[0])
+        assertEquals(567, ((XWikiMigration) neededMigration.toArray()[0])
             .dataMigration.getVersion().getVersion());
     }
 }

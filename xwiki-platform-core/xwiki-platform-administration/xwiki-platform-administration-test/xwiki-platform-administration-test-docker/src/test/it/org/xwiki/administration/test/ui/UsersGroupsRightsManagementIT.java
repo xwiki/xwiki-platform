@@ -22,6 +22,7 @@ package org.xwiki.administration.test.ui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
@@ -32,12 +33,16 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ConfirmationModal;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.EditRightsPane;
+import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 
@@ -63,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UsersGroupsRightsManagementIT
 {
     @BeforeEach
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
@@ -447,5 +452,274 @@ class UsersGroupsRightsManagementIT
             deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
         deleteUserConfirmationModal.clickOk();
         assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
+    }
+
+    @ParameterizedTest
+    @Order(9)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void renameUserUpdatesGroupAndRights(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+        String userName = "userToRename";
+        String newUserName = "renamedUser";
+        String groupName = "groupForRenamedUser";
+        DocumentReference userRef = new DocumentReference(wiki.getName(), "XWiki", userName);
+        // Ensure the user and group doesn't exist yet.
+        setup.deletePage("XWiki", userName);
+        setup.deletePage("XWiki", newUserName);
+        setup.deletePage("XWiki", groupName);
+
+        // Create user, group and put the user has member of the group.
+        setup.createUser(userName, userName, "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage = groupsPage.addNewGroup(groupName);
+        groupsPage.clickEditGroup(groupName).addMember(userName, true).close();
+
+        // Give "view" global right to the user on wiki.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToUsers();
+        assertTrue(editRightsPane.hasEntity(userName));
+        editRightsPane.setRight(userName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Rename the user.
+        ViewPage userProfile = setup.gotoPage(userRef);
+        RenamePage rename = userProfile.rename();
+        rename.getDocumentPicker().setTitle(newUserName);
+        rename.setTerminal(true);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = rename.clickRenameButton();
+        renameStatusPage.waitUntilFinished();
+
+        // Verify the user has been renamed.
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        TableLayoutElement usersTable = usersPage.getUsersLiveData().getTableLayout();
+        usersTable.filterColumn("User", userName);
+        assertEquals(0, usersTable.countRows());
+        usersTable.filterColumn("User", newUserName);
+        usersTable.assertRow("User", newUserName);
+
+        // Verify the group has been updated with the new user name.
+        groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(groupName);
+        TableLayoutElement membersTable = editGroupModal.getMembersTable();
+        membersTable.filterColumn("Member", userName);
+        assertEquals(0, membersTable.countRows());
+        membersTable.filterColumn("Member", newUserName);
+        membersTable.assertRow("Member", newUserName);
+        editGroupModal.close();
+
+        // Verify the global rights have been updated with the new user name.
+        administrationPage = AdministrationPage.gotoPage();
+        editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToUsers();
+        assertFalse(editRightsPane.hasEntity(userName));
+        assertTrue(editRightsPane.hasEntity(newUserName));
+        assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newUserName, EditRightsPane.Right.VIEW));
+        // Reset the right to avoid interference with other tests.
+        editRightsPane.setRight(newUserName, EditRightsPane.Right.VIEW, EditRightsPane.State.NONE);
+    }
+
+    @ParameterizedTest
+    @Order(10)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void renameGroupUpdatesGroupsAndRights(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+        String groupName = "groupToRename";
+        String newGroupName = "renamedGroupName";
+        String parentGroupName = "parentGroupForRenamedGroup";
+        DocumentReference groupRef = new DocumentReference(wiki.getName(), "XWiki", groupName);
+        // Ensure the group doesn't exist yet.
+        setup.deletePage("XWiki", groupName);
+        setup.deletePage("XWiki", newGroupName);
+        setup.deletePage("XWiki", parentGroupName);
+
+        // create groups and put one group as member of the other group.
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage.addNewGroup(groupName).addNewGroup(parentGroupName);
+        groupsPage.clickEditGroup(parentGroupName).addMember(groupName, false).close();
+
+        // Give "view" global right to the group on wiki.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToGroups();
+        assertTrue(editRightsPane.hasEntity(groupName));
+        editRightsPane.setRight(groupName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Rename the group.
+        ViewPage groupPage = setup.gotoPage(groupRef);
+        RenamePage rename = groupPage.rename();
+        rename.getDocumentPicker().setTitle(newGroupName);
+        rename.setTerminal(true);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = rename.clickRenameButton();
+        renameStatusPage.waitUntilFinished();
+
+        // Verify the group has been renamed.
+        groupsPage = GroupsPage.gotoPage();
+        TableLayoutElement groupsTable = groupsPage.getGroupsTable();
+        groupsTable.filterColumn("Group Name", groupName);
+        assertEquals(0, groupsTable.countRows());
+        groupsTable.filterColumn("Group Name", newGroupName);
+        groupsTable.assertRow("Group Name", newGroupName);
+
+        // Verify the global rights have been updated with the new group name.
+        administrationPage = AdministrationPage.gotoPage();
+        editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToGroups();
+        assertFalse(editRightsPane.hasEntity(groupName));
+        assertTrue(editRightsPane.hasEntity(newGroupName));
+        assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newGroupName, EditRightsPane.Right.VIEW));
+        // Reset the right to avoid interference with other tests.
+        editRightsPane.setRight(newGroupName, EditRightsPane.Right.VIEW, EditRightsPane.State.NONE);
+
+        // Verify the parent group has been updated with the new group name.
+        groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(parentGroupName);
+        TableLayoutElement membersTable = editGroupModal.getMembersTable();
+        membersTable.filterColumn("Member", groupName);
+        assertEquals(0, membersTable.countRows());
+        membersTable.filterColumn("Member", newGroupName);
+        membersTable.assertRow("Member", newGroupName);
+        editGroupModal.close();
+    }
+
+    /**
+     * Validate that extension rights can be set for a page and its children.
+     * <ul>
+     * <li>Verify the "Extension Rights: Page & Children" section appears in page administration.</li>
+     * <li>Verify the custom test extension right appears and can be set.</li>
+     * <li>Verify the right applies to both the page and its children.</li>
+     * </ul>
+     */
+    @Test
+    @Order(11)
+    void setExtensionRightsForPageAndChildren(TestUtils setup, TestReference testReference)
+    {
+        // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
+        // LiveTable and we can set rights for it. The better alternative would have been to introduce a filter()
+        // method in EditRightsPane but that's more complex and that Rights Table needs to be moved to a LD ASAP.
+        String userName = "createAndDeleteUser";
+
+        // Create a test user
+        setup.deletePage("XWiki", userName);
+        setup.createUser(userName, userName, "");
+
+        // Create a parent page and a child page
+        String verifyScript = "{{velocity}}"
+            + "#if($services.security.authorization.hasAccess('testextensionright'))"
+            + "ALLOWED"
+            + "#{else}"
+            + "DENIED"
+            + "#end"
+            + "{{/velocity}}";
+
+        DocumentReference parentRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.createPage(parentRef, verifyScript, "Parent Page");
+
+        DocumentReference childRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "ChildPage");
+        setup.createPage(childRef, verifyScript, "Child Page");
+
+        // Navigate to the parent page and open the "Extension Rights: Page & Children" page administration section
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(parentRef.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Extension Rights: Page & Children");
+
+        // Get the rights pane and switch to users
+        EditRightsPane editRightsPane = new EditRightsPane();
+        editRightsPane.switchToUsers();
+
+        // Verify the user exists in the rights table
+        assertTrue(editRightsPane.hasEntity(userName));
+
+        // Deny the custom test extension right to the user
+        editRightsPane.setRight(userName, "rightsmanager.testextensionright", EditRightsPane.State.DENY);
+
+        // Verify the right was set on the parent WebHome page for the test user
+        setup.login(userName, userName);
+        ViewPage vp = setup.gotoPage(parentRef);
+
+        // Verify the custom right is denied for both parent and child pages
+        // Since we set rights on page+children, the right should be denied on both pages
+        // The custom right is registered with AuthorizationManager so it should be checked
+
+        // Check on the parent page
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on parent page");
+
+        // Check on the child page - the right should also be denied since we set it on page+children
+        vp = setup.gotoPage(childRef);
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on child page");
+    }
+
+    /**
+     * Validate that extension rights can be set for a page only (not its children).
+     * <ul>
+     * <li>Verify the "Extension Rights: Page" section appears in page administration.</li>
+     * <li>Verify the custom test extension right appears and can be set.</li>
+     * <li>Verify the right applies only to the page, not its children.</li>
+     * </ul>
+     */
+    @Test
+    @Order(12)
+    void setExtensionRightsForPageOnly(TestUtils setup, TestReference testReference)
+    {
+        // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
+        // LiveTable and we can set rights for it. The better alternative would have been to introduce a filter()
+        // method in EditRightsPane but that's more complex and that Rights Table needs to be moved to a LD ASAP.
+        String userName = "createAndDeleteUser";
+
+        // Create a test user
+        setup.deletePage("XWiki", userName);
+        setup.createUser(userName, userName, "");
+
+        // Create a parent page and a child page
+        String verifyScript = "{{velocity}}"
+            + "#if($services.security.authorization.hasAccess('testextensionright'))"
+            + "ALLOWED"
+            + "#{else}"
+            + "DENIED"
+            + "#end"
+            + "{{/velocity}}";
+
+        DocumentReference parentRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.createPage(parentRef, verifyScript, "Parent Page");
+
+        DocumentReference childRef = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName(), "ChildPage");
+        setup.createPage(childRef, verifyScript, "Child Page");
+
+        // Navigate to the parent page and open the "Extension Rights: Page" page administration section
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(parentRef.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Extension Rights: Page");
+
+        // Get the rights pane and switch to users
+        EditRightsPane editRightsPane = new EditRightsPane();
+        editRightsPane.switchToUsers();
+
+        // Verify the user exists in the rights table
+        assertTrue(editRightsPane.hasEntity(userName));
+
+        // Deny the custom test extension right to the user
+        editRightsPane.setRight(userName, "rightsmanager.testextensionright", EditRightsPane.State.DENY);
+
+        // Verify the right was set on the parent WebHome page for the test user
+        setup.login(userName, userName);
+        ViewPage vp = setup.gotoPage(parentRef);
+
+        // Verify the custom right is denied for the parent page only
+        // Since we set rights for page-only, the right should be denied on the parent but allowed on the child
+
+        // Check on the parent page - should be DENIED
+        assertTrue(vp.getContent().contains("DENIED"), "Custom right should be denied on parent page");
+
+        // Check on the child page - should be ALLOWED since we only set page-only rights
+        vp = setup.gotoPage(childRef);
+        assertTrue(vp.getContent().contains("ALLOWED"),
+            "Custom right should be allowed on child page when set as page-only on parent");
     }
 }

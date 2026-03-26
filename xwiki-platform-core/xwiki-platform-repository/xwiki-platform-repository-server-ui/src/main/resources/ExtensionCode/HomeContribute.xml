@@ -48,7 +48,7 @@
   &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
   &lt;input type="hidden" name="createExtension" value="true" /&gt;
-  &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
+  &lt;input type="text" name="name" placeholder="extension name..."  size="25" id="contributeNameInput"/&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="btn btn-success" type="submit" value="Add" id="contributeSubmit"/&gt;
   &lt;/span&gt;

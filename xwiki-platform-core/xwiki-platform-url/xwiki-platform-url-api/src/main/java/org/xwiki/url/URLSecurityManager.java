@@ -24,7 +24,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Dedicated component to perform security checks on URLs.
@@ -114,7 +113,6 @@ public interface URLSecurityManager
      * @since 16.4.4
      * @since 15.10.13
      */
-    @Unstable
     default URI parseToSafeURI(String serializedURI, String requestHost) throws URISyntaxException, SecurityException
     {
         throw new SecurityException("Cannot guarantee that " + serializedURI + " is safe.");

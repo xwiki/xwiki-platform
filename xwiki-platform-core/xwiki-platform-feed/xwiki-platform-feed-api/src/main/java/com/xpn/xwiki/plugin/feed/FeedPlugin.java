@@ -227,7 +227,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         } else {
             feeds = sfeeds.split("\\|");
         }
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        List<SyndEntry> entries = new ArrayList<>();
         SyndFeed outputFeed = new SyndFeedImpl();
         if (context.getDoc() != null) {
             outputFeed.setTitle(context.getDoc().getFullName());
@@ -299,7 +299,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 @SuppressWarnings("unchecked")
                 Map<String, Exception> map = (Map<String, Exception>) context.get("invalidFeeds");
                 if (map == null) {
-                    map = new HashMap<String, Exception>();
+                    map = new HashMap<>();
                     context.put("invalidFeeds", map);
                 }
                 map.put(sfeed, ex);
@@ -400,7 +400,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     @SuppressWarnings("unchecked")
                     Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
                     if (map == null) {
-                        map = new HashMap<String, Exception>();
+                        map = new HashMap<>();
                         context.put("updateFeedError", map);
                     }
                     map.put(feedDocName, e);
@@ -726,7 +726,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (fullContent) {
             String url = entry.getLink();
-            if ((url != null) && (!url.trim().equals(""))) {
+            if ((url != null) && (!url.trim().isEmpty())) {
                 try {
                     String sfullContent = context.getWiki().getURLContent(url, context);
                     obj.setLargeStringValue("fullContent",
@@ -781,7 +781,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return null;
             }
 
-            List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<com.xpn.xwiki.api.Object>();
+            List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<>();
             for (Object obj[] : res) {
                 try {
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
@@ -794,7 +794,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     @SuppressWarnings("unchecked")
                     Map<String, Exception> map = (Map<String, Exception>) context.get("searchFeedError");
                     if (map == null) {
-                        map = new HashMap<String, Exception>();
+                        map = new HashMap<>();
                         context.put("searchFeedError", map);
                     }
                     map.put(query, e);

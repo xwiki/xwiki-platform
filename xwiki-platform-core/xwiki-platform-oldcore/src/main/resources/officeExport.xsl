@@ -108,4 +108,11 @@
       <xsl:apply-templates select="@*|node()" />
     </xsl:element>
   </xsl:template>
+  <!-- Replace <strong> by <b> as nested <em> and <strong> tags are not properly handled (only the inner style is
+  applied), see https://bugs.documentfoundation.org/show_bug.cgi?id=99737. -->
+  <xsl:template match="xhtml:strong">
+    <xsl:element name="b">
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:element>
+  </xsl:template>
 </xsl:stylesheet>

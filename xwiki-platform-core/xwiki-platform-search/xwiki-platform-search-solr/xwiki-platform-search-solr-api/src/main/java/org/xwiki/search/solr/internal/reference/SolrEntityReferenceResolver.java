@@ -28,8 +28,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexableField;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -177,17 +175,9 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
         return entityReference.replaceParent(entityReference.getParent(), parent);
     }
 
-    // Tools to workaround a change in Solr 5.3 which caused SolrDocument to return Field instead of value in some cases
-
     private String getFieldStringValue(SolrDocument solrDocument, String fieldName)
     {
         Object field = solrDocument.get(fieldName);
-
-        if (field instanceof Field) {
-            return ((Field) field).stringValue();
-        } else if (field instanceof IndexableField) {
-            return ((IndexableField) field).stringValue();
-        }
 
         return field != null ? field.toString() : null;
     }
@@ -196,24 +186,12 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     {
         Object field = solrDocument.getFirstValue(fieldName);
 
-        if (field instanceof Field) {
-            return ((Field) field).stringValue();
-        } else if (field instanceof IndexableField) {
-            return ((IndexableField) field).stringValue();
-        }
-
         return field != null ? field.toString() : null;
     }
 
     private Number getFieldNumberValue(SolrDocument solrDocument, String fieldName)
     {
         Object field = solrDocument.get(fieldName);
-
-        if (field instanceof Field) {
-            return ((Field) field).numericValue();
-        } else if (field instanceof IndexableField) {
-            return ((IndexableField) field).numericValue();
-        }
 
         return field != null ? (Number) field : null;
     }

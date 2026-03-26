@@ -397,14 +397,14 @@ class DefaultParametrizedNotificationManagerTest
         // We also check that we tried to look in the groups.
         List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertTrue(results.isEmpty());
-        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+        verify(this.groupManager).getGroups(this.userReference, null, true);
 
         // the current user is targeted explicitely by the event: we get a result.
         // We also check that we don't perform any check in groups in that case
         when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar", "XWiki.UserA")));
         results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertEquals(1, results.size());
-        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+        verify(this.groupManager).getGroups(this.userReference, null, true);
 
         DocumentReference groupReference = mock(DocumentReference.class);
         when(this.groupManager.getGroups(this.userReference, null, true)).thenReturn(Arrays.asList(groupReference));

@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  * @since 6.3M2
  */
 @OldcoreTest
-public class ExportActionTest
+class ExportActionTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -88,7 +88,7 @@ public class ExportActionTest
 
     @SuppressWarnings("unchecked")
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         this.oldcore.getXWikiContext().setRequest(this.request);
 
@@ -105,15 +105,23 @@ public class ExportActionTest
     }
 
     @Test
-    public void exportXARForbidden() throws Exception
+    void exportXARForbidden() throws Exception
     {
         assertEquals("exception", this.action.render(this.oldcore.getXWikiContext()));
         assertEquals("needadminrights", this.oldcore.getXWikiContext().get("message"));
     }
 
     @Test
+    void exportXARInvalid() throws Exception
+    {
+        // A request originating from a script tag in an HTML page.
+        when(this.request.getHeader("Sec-Fetch-Dest")).thenReturn("script");
+        assertEquals("docdoesnotexist", this.action.render(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     @SuppressWarnings("deprecation")
-    public void exportPartialXAR() throws Exception
+    void exportPartialXAR() throws Exception
     {
         // XAR export requires administration right.
         XWikiContext context = this.oldcore.getXWikiContext();
@@ -159,7 +167,7 @@ public class ExportActionTest
 
     @Test
     @SuppressWarnings("deprecation")
-    public void exportFullXAR() throws Exception
+    void exportFullXAR() throws Exception
     {
         XWikiContext context = this.oldcore.getXWikiContext();
         WikiReference wikiReference = new WikiReference("mywiki");

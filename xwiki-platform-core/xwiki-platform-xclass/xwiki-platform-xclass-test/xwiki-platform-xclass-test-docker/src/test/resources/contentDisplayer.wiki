@@ -1,7 +1,8 @@
 {{velocity}}
 #if ($type == 'edit')
   {{html clean="false"}}
-  <textarea name="content">$!escapetool.xml($tdoc.content)</textarea>
+  <label for="content-textarea" class="sr-only">Content</label>
+  <textarea name="content" id="content-textarea">$!escapetool.xml($tdoc.content)</textarea>
   {{/html}}
 #elseif ("$!type" != '')
   {{include reference="" /}}

@@ -33,12 +33,12 @@ import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.ratings.internal.DefaultRating;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.document.DocumentUserReference;
@@ -80,8 +80,7 @@ class LikersPageTest extends PageTest
 
     private RatingsManager ratingsManager;
 
-    private AuthorizationManager authorizationManager;
-
+    @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @BeforeEach
@@ -93,9 +92,6 @@ class LikersPageTest extends PageTest
 
         this.ratingsManager = this.componentManager.<RatingsManagerFactory>getInstance(RatingsManagerFactory.class)
             .getRatingsManager(LikeRatingsConfiguration.RATING_MANAGER_HINT);
-
-        this.authorizationManager = this.componentManager.getInstance(AuthorizationManager.class);
-        this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);
 
         // Make sure LikeScriptService loads properly.
         this.componentManager.getInstance(ScriptService.class, "like");
@@ -128,8 +124,7 @@ class LikersPageTest extends PageTest
         user2Properties.put("last_name", "User2LN");
         this.xwiki.createUser("user2", user2Properties, this.context);
 
-        when(this.authorizationManager.hasAccess(Right.VIEW, user1DocumentReference, user1DocumentReference))
-            .thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user1DocumentReference)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user2DocumentReference)).thenReturn(false);
 
         when(this.ratingsManager.getRatings(anyMap(), eq(0), eq(5), eq(RatingsManager.RatingQueryField.UPDATED_DATE),
@@ -161,8 +156,7 @@ class LikersPageTest extends PageTest
         XWikiDocument likedDoc = this.xwiki.getDocument(likedDocumentReference, this.context);
         this.context.setDoc(likedDoc);
 
-        when(this.authorizationManager.hasAccess(Right.VIEW, user1DocumentReference, user1DocumentReference))
-            .thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user1DocumentReference)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, user2DocumentReference)).thenReturn(false);
 
         when(this.ratingsManager.getRatings(anyMap(), eq(0), eq(1), eq(RatingsManager.RatingQueryField.UPDATED_DATE),

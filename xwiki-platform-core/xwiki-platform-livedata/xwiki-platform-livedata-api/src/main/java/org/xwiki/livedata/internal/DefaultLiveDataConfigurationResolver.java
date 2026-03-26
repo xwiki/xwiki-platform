@@ -116,7 +116,11 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         // Prevent null values (make the configuration explicit).
         mergedConfig.initialize();
 
-        handleLayouts(config.getMeta().getLayouts(), mergedConfig.getMeta());
+        Collection<LiveDataLayoutDescriptor> layout = null;
+        if (config.getMeta() != null) {
+            layout = config.getMeta().getLayouts();
+        }
+        handleLayouts(layout, mergedConfig.getMeta());
         handlePageSizes(mergedConfig);
 
         // Translate using the context locale.

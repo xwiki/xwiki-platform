@@ -19,7 +19,6 @@
  */
 package org.xwiki.activeinstalls2.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.activeinstalls2.internal.XWikiElasticSearchExtension;
@@ -36,7 +35,6 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall Active Installs 2 UI")
     class NestedActiveInstallsIT extends ActiveInstallsIT
     {
     }

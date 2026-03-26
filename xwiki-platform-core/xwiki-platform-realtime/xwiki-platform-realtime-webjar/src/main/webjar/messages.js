@@ -29,16 +29,11 @@ define('xwiki-realtime-messages', {
     'rejectDialog.prompt',
     'rejectDialog.invalid',
     'rejectDialog.ok',
-    'conflictsWarning',
-    'conflictsWarningInfoRt',
-    'conflictsWarningSuggestion',
-    'conflictsWarningInfoLink',
-    'wsErrorConflicts',
     'forbidden',
-    'reloadDialog.prompt',
-    'reloadDialog.reload',
-    'reloadDialog.exit',
     'autoAcceptSave',
-    'join.error'
+    'autoSaveSummary',
+    'join.error',
+    'unsavedChangesRestored',
+    'unsavedChangesRestoreFailed'
   ]
 });

@@ -70,7 +70,7 @@
 // We re-inject the variables from the flamingo theme so they can interract with the content of @lessCode.
 // This way, it's also consistent with the Flamingo Theme preview (See: https://jira.xwiki.org/browse/XWIKI-12672)
 #if ("$!themeObj" != '')
-  #initFromFlamingoTheme()
+  #_initFromFlamingoTheme()
 #end
 
 // ==============================================================================

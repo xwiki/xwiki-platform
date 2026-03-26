@@ -20,6 +20,7 @@
 package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Gives access to the configuration settings of the mentions.
@@ -48,14 +49,27 @@ public interface MentionsConfiguration
 
     /**
      * 
-     * @return the color for the mentions.
+     * @return the background color for the mentions.
      */
     String getMentionsColor();
 
     /**
-     * @return the color for the mentions to the current user.
+     * @return the background color for the mentions to the current user.
      */
     String getSelfMentionsColor();
+
+    /**
+     * The default value is white (@btn-danger-color value from the Iceberg FlamingoTheme)
+     * that is meant to have enough contrast on the saturated red of the background.
+     * @return the foreground color for the mentions to the current user.
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
+    default String getSelfMentionsForeground()
+    {
+        return "#ffffff";
+    }
 
     /**
      * 

@@ -1,21 +1,21 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <!--
@@ -36,14 +36,14 @@
   >
     <template #viewer>
       <input
-        type='checkbox'
-        class='toggleableFilterPreferenceCheckbox'
+        type="checkbox"
+        class="toggleableFilterPreferenceCheckbox"
         ref="input"
       />
       <!-- We keep this section hidden as it is only there to be copied when initializing the toggle. -->
       <span v-show="false">
         <XWikiIcon
-          :icon-descriptor="{name: iconName}"
+          :icon-descriptor="{ name: iconName }"
           ref="icon"
           @ready="iconReady = true"
         />
@@ -60,7 +60,12 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin, XWikiIcon } from "xwiki-livedata";
+import {
+  BaseDisplayer,
+  XWikiIcon,
+  displayerMixin,
+  loadById,
+} from "@xwiki/platform-livedata-ui";
 
 export default {
   name: "displayer-toggle",
@@ -78,32 +83,63 @@ export default {
     return {
       // When this value changes to true following the ready from XWikiIcon, the toggle is initialized.
       iconReady: false,
-      innerChecked: this.entry[`${this.propertyId}_checked`],
-      innerDisabled: this.entry[`${this.propertyId}_disabled`],
-      innerData: {
-        ...this.entry[`${this.propertyId}_data`],
-      },
     };
   },
+  computed: {
+    innerChecked: {
+      get() {
+        return this.entry[`${this.propertyId}_checked`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_checked`] = val;
+      },
+    },
+    innerDisabled: {
+      get() {
+        return this.entry[`${this.propertyId}_disabled`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_disabled`] = val;
+      },
+    },
+    innerData: {
+      get() {
+        return this.entry[`${this.propertyId}_data`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_data`] = val;
+      },
+    },
+  },
   watch: {
-    iconReady: function(val) {
+    innerChecked(checked) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("state", checked, true);
+    },
+    innerDisabled(disabled) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("disabled", disabled);
+    },
+    iconReady: function (val) {
       if (val) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
-        this.$nextTick(() => {
-          this.jQuery(this.$refs.input).bootstrapSwitch({
+        this.$nextTick(async () => {
+          await loadById("xwiki-bootstrap-switch");
+
+          const jQuery = this.jQuery;
+          jQuery(this.$refs.input).bootstrapSwitch({
             size: "mini",
             state: component.innerChecked,
             disabled: component.innerDisabled,
             labelText: this.$refs.icon.$el.outerHTML,
             /*
-             Send a xwiki:livedata:toggle event with the following event data:
-             - the data of the toggle
-             - the new state of the toggle
-             - the disabled status of the toggle
-             - a callback. When the callback is called, the toggle component is updated with the provided data, state,
-                and disabled status.
-            */
+               Send a xwiki:livedata:toggle event with the following event data:
+               - the data of the toggle
+               - the new state of the toggle
+               - the disabled status of the toggle
+               - a callback. When the callback is called, the toggle component is updated with the provided data, state,
+                  and disabled status.
+              */
             onSwitchChange(event, state) {
               const toggleData = component.innerData;
               const disabledVal = component.innerDisabled;
@@ -111,17 +147,16 @@ export default {
                 data: toggleData,
                 checked: state,
                 disabled: disabledVal,
-                callback: function({
+                callback: function ({
                   data = toggleData,
                   checked = state,
                   disabled = disabledVal,
                 }) {
+                  // Writing to computed setters updates `entry` directly —
+                  // the innerChecked/innerDisabled watchers then sync bootstrapSwitch.
                   component.innerData = data;
                   component.innerChecked = checked;
                   component.innerDisabled = disabled;
-                  // The last parameter is skip, preventing to call onSwitchChange again.
-                  this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                  this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
                 },
               });
             },

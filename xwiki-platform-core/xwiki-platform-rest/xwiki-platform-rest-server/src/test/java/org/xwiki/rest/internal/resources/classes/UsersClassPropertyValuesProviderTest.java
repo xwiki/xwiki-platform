@@ -168,7 +168,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         assertEquals("url/to/bob", values.getPropertyValues().get(1).getMetaData().get("url"));
 
         verify(this.allowedValuesQuery, never()).setWiki(any(String.class));
-        verify(this.allowedValuesQuery, times(1)).execute();
+        verify(this.allowedValuesQuery).execute();
 
         verify(filters).clear();
         verify(this.usedValuesQuery).addFilter(documentFilter);
@@ -187,7 +187,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         this.provider.getValues(this.propertyReference, 5, "foo");
 
         verify(this.allowedValuesQuery).setWiki("math");
-        verify(this.allowedValuesQuery, times(1)).execute();
+        verify(this.allowedValuesQuery).execute();
     }
 
     @Test

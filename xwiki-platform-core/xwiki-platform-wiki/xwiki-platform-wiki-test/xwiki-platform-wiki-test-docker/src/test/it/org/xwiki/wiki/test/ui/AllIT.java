@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -32,19 +31,16 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Wiki Manager REST Panels Tests")
     class NestedWikiManagerRestIT extends WikiManagerRestIT
     {
     }
 
     @Nested
-    @DisplayName("Wiki Template Tests")
     class NestedWikiTemplateIT extends WikiTemplateIT
     {
     }
 
     @Nested
-    @DisplayName("Tests using a subwiki")
     class NestedSubWikiIT extends SubWikiIT
     {
     }

@@ -26,7 +26,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -53,14 +52,12 @@ public interface WatchedEntityReference
          * The entity is watched for all events and all formats through a filter placed on an ancestor.
          * @since 16.5.0RC1
          */
-        @Unstable
         WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS(true, false),
 
         /**
          * The entity and its children are watched for all events and all formats.
          * @since 16.5.0RC1
          */
-        @Unstable
         WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS(true, false),
 
         /**
@@ -68,35 +65,30 @@ public interface WatchedEntityReference
          *
          * @since 16.5.0RC1
          */
-        @Unstable
         NOT_SET(false, false),
 
         /**
          * The entity is blocked for all events and formats.
          * @since 16.5.0RC1
          */
-        @Unstable
         BLOCKED_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
          * The entity is ignored for all events and all formats through a filter placed on an ancestor.
          * @since 16.5.0RC1
          */
-        @Unstable
         BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
          * The entity and its children are ignored for all events and all formats.
          * @since 16.5.0RC1
          */
-        @Unstable
         BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
          * There is a filter for the exact location of the entity but it concerns a subset of event types or formats.
          * @since 16.5.0RC1
          */
-        @Unstable
         CUSTOM(false, false);
 
         private final boolean blocked;
@@ -109,7 +101,6 @@ public interface WatchedEntityReference
          * @param blocked {@code true} if the status means the page is ignored.
          * @since 16.5.0RC1
          */
-        @Unstable
         WatchedStatus(boolean watched, boolean blocked)
         {
             this.blocked = blocked;
@@ -120,7 +111,6 @@ public interface WatchedEntityReference
          * @return {@code true} if the status means the page is watched.
          * @since 16.5.0RC1
          */
-        @Unstable
         public boolean isWatched()
         {
             return watched;
@@ -130,7 +120,6 @@ public interface WatchedEntityReference
          * @return {@code true} if the status means the page is ignored.
          * @since 16.5.0RC1
          */
-        @Unstable
         public boolean isBlocked()
         {
             return blocked;
@@ -145,7 +134,6 @@ public interface WatchedEntityReference
      * @throws NotificationException in case of errors
      * @since 16.5.0RC1
      */
-    @Unstable
     default WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
     {
         return WatchedStatus.CUSTOM;
@@ -164,7 +152,6 @@ public interface WatchedEntityReference
      * @throws NotificationException in case of problem for computing the status
      * @since 16.5.0RC1
      */
-    @Unstable
     default Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
         throws NotificationException
     {

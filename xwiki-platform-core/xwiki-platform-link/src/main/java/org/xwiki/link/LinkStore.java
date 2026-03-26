@@ -24,7 +24,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.ReadyIndicator;
 
 /**
@@ -58,7 +57,6 @@ public interface LinkStore
      * @since 16.9.0RC1
      * @return the ready indicator
      */
-    @Unstable
     default ReadyIndicator waitReady()
     {
         /**

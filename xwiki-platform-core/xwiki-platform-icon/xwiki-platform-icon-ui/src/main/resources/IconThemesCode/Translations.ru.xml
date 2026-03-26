@@ -38,13 +38,13 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=Предпросмотр:
 platform.icon.picker.loading=Загрузка
-
-rendering.macro.iconPicker.name=Icon Picker
+rendering.macro.iconPicker.name=Выбор значков
 rendering.macro.iconPicker.description=Выберите значок в наборе значков XWiki.
 rendering.macro.iconPicker.parameter.id.name=Id
 rendering.macro.iconPicker.parameter.id.description=DOM-идентификатор поля ввода, к которому будет применяться средство выбора
 rendering.macro.iconPicker.parameter.class.name=Класс
 rendering.macro.iconPicker.parameter.class.description=Класс CSS, к которым будет применяться средство выбора
 rendering.macro.iconPicker.parameter.prefix.name=Префикс
-rendering.macro.iconPicker.parameter.prefix.description=Префикс для добавления перед именем иконки в поле ввода (по умолчанию: "image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=Префикс для добавления перед именем иконки в поле ввода (по умолчанию: "image:icon:")
+</content>
 </xwikidoc>

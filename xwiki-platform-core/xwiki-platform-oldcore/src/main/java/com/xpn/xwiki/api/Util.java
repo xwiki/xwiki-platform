@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.image.ImageProcessor;
 import com.xpn.xwiki.web.Utils;
@@ -216,5 +218,33 @@ public class Util extends Api
     public String convertToAlphaNumeric(String text)
     {
         return com.xpn.xwiki.util.Util.convertToAlphaNumeric(text);
+    }
+
+    /**
+     * Adds the missing {@code XWiki.} value to the username if it's missing, and also allows to remove the wiki part
+     * if needed.
+     * @param username the username to standardize
+     * @param keepWikiPart {@code true} to keep the wiki part of the reference is given, {@code false} to remove it
+     * @return a username of the format {@code wiki:XWiki.username} if the wiki part is preserved and given, else
+     * {@code XWiki.username}.
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    @Unstable
+    public static String getStandardUsername(String username, boolean keepWikiPart)
+    {
+        String result = username;
+        int indexOfColon = username.indexOf(':');
+        boolean hasWikiPart = (indexOfColon > -1);
+        if (hasWikiPart && !keepWikiPart) {
+            result = username.substring(indexOfColon + 1);
+        }
+        if (!hasWikiPart) {
+            String wikiSpace = "XWiki.";
+            if (!result.startsWith(wikiSpace)) {
+                result = wikiSpace + result;
+            }
+        }
+        return result;
     }
 }

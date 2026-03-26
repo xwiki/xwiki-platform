@@ -20,6 +20,8 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -32,6 +34,7 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.utility.DockerLoggerFactory;
 import org.testcontainers.utility.TestcontainersConfiguration;
+import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
@@ -89,11 +92,23 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
     private static final String SUPERADMIN = "superadmin";
+
+    private static final String SUPERADMIN_PASSWORD = "pass";
+
+    /**
+     * When set to true, keeps the XWiki instance and the started Docker containers (DB, Servlet Engine, optional Blob
+     * Store) running after the tests complete so that the instance can be inspected manually. The process will wait
+     * until a file named "stop.txt" is created in the current directory.
+     */
+    private static final String KEEP_RUNNING_PROPERTY = "xwiki.test.ui.keepRunning";
+
+    private static final String STOP_FILENAME = "stop.txt";
 
     private boolean isVncStarted;
 
@@ -144,6 +159,12 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             // running outside of docker and thus outside of the shared docker network...
             LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
             startDatabase(testConfiguration);
+
+            // Start the Blob Store container (if needed)
+            if (testConfiguration.getBlobStore() != null) {
+                LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
+                startBlobStore(testConfiguration);
+            }
 
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
@@ -327,15 +348,40 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         if (testContext != null) {
             // End the wcag validation process.
             testContext.getUtil().getWCAGUtils().endWCAGValidation();
-
-            // Shutdown the test context
-            shutdownPersistentTestContext(testContext);
         }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
+        // Check if we should keep XWiki running for manual inspection.
+        if (Boolean.getBoolean(KEEP_RUNNING_PROPERTY)
+            && !testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            String url = loadXWikiURL(extensionContext);
+
+            LOGGER.info("XWiki is kept running for manual inspection ({}={}).", KEEP_RUNNING_PROPERTY, true);
+            LOGGER.info("Access XWiki at: {}", url);
+            LOGGER.info("You can log in as [{}] with password [{}]", SUPERADMIN, SUPERADMIN_PASSWORD);
+
+            // Wait for the user to create the file "stop.txt" in the current directory.
+            Path target = Paths.get("").toAbsolutePath().normalize().resolve(STOP_FILENAME);
+            LOGGER.info("Create a file [{}] to stop XWiki.", target);
+
+            // Wait for the user to create the file.
+            StopFileWatcher.waitForFileAndDeleteIfEmpty(target);
+        }
+
+        if (testContext != null) {
+            // Shutdown the test context
+            shutdownPersistentTestContext(testContext);
+        }
+
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            // Stop the Blob Store
+            if (testConfiguration.getBlobStore() != null) {
+                LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
+                stopBlobStore(testConfiguration);
+            }
+
             // Stop the DB
             LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
             stopDatabase(testConfiguration);
@@ -367,11 +413,15 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         AbstractTest.initializeSystem(testContext);
         savePersistentTestContext(extensionContext, testContext);
 
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
         // Set the URLs to access XWiki:
         // - the one used inside the Selenium container
         testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort()));
+            servletEngine.getInternalIP(),
+            servletEngine.getInternalPort()));
+        testContext.getUtil().setDockerBaseUrl(
+            String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT));
 
         // Setup the wcag validation context.
         testContext.getUtil().getWCAGUtils().setupWCAGValidation(
@@ -403,6 +453,18 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private void stopDatabase(TestConfiguration testConfiguration)
     {
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
+        executor.stop(testConfiguration);
+    }
+
+    private void startBlobStore(TestConfiguration testConfiguration) throws Exception
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+        executor.start(testConfiguration);
+    }
+
+    private void stopBlobStore(TestConfiguration testConfiguration)
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
         executor.stop(testConfiguration);
     }
 
@@ -457,7 +519,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         DockerTestUtils.setExtensionInstaller(context, extensionInstaller);
 
         // Install extensions in the running XWiki
-        extensionInstaller.installExtensions(SUPERADMIN, "pass", SUPERADMIN);
+        extensionInstaller.installExtensions(SUPERADMIN, SUPERADMIN_PASSWORD, SUPERADMIN);
     }
 
     private String computeXWikiURLPrefix(String ip, int port)

@@ -36,7 +36,7 @@ define('xwiki-realtime-loader', [
   }
 
   let module = {
-    isForced: window.location.href.indexOf('force=1') >= 0,
+    isForced: globalThis.location.href.includes('force=1'),
   },
 
   allRt = {
@@ -49,13 +49,13 @@ define('xwiki-realtime-loader', [
       this.network = allRt.network;
 
       // Realtime enabled by default.
-      this.realtimeEnabled = window.location.href.indexOf('realtime=false') < 0;
+      this.realtimeEnabled = !globalThis.location.href.includes('realtime=false');
       this.webSocketURL = realtimeConfig.webSocketURL;
 
       const userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
       this.user = {
         // sessionId === <userReference>-encoded(<userName>)%2d<randomNumber>
-        sessionId: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
+        sessionId: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replaceAll('-', '%2d') +
           String(Math.random()).substring(2),
         name: realtimeConfig.user.name,
         reference: userReference,
@@ -124,7 +124,7 @@ define('xwiki-realtime-loader', [
           field: this.info.field,
           realtime: realtimeEnabled
         }));
-        updateWarning();
+        RealtimeContext.detectConcurrentEditing();
       }
     }
 
@@ -136,17 +136,71 @@ define('xwiki-realtime-loader', [
           cmd: 'leave',
           field: this.info.field
         }));
-        updateWarning();
+        RealtimeContext.detectConcurrentEditing();
       }
     }
 
-    displayReloadModal() {
-      // The channel keys have changed while we were offline. We may not have the latest version of the document. The
-      // safest solution is to reload.
-      const content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
-      const buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
-      buttonReload.on('click', window.location.reload.bind(window.location, true)).insertAfter(content.find('button'));
-      displayCustomModal(content[0]);
+    setConcurrentEditing(concurrentEditing) {
+      const show = !this.concurrentEditing;
+      this.concurrentEditing = concurrentEditing;
+      $('.realtime-warning').popover('destroy').remove();
+      if (concurrentEditing) {
+        this._createConcurrentEditingWarning(show);
+      }
+    }
+
+    _createConcurrentEditingWarning(show) {
+      const template = document.querySelector('template#realtime-warning');
+      const popoverToggle = template.content.querySelector('.realtime-warning-' +
+        (this.realtimeEnabled ? 'connected' : 'disconnected')).cloneNode(true);
+      let toolbar = document.querySelector(
+        this.realtimeEnabled ? '.realtime-edit-toolbar-left' : '.buttons:not(.realtime-edit-toolbar)'
+      );
+      toolbar.append(popoverToggle);
+      $(popoverToggle).popover();
+      if (show) {
+        this._showConcurrentEditingWarning(popoverToggle);
+      }
+    }
+
+    _showConcurrentEditingWarning(popoverToggle) {
+      // The warning message is shown when leaving collaboration or when switching to Source mode, in which case there
+      // is a toolbar switch, so it's best to wait a bit for the toolbar layout to settle otherwise the position of the
+      // popover won't match the position of the toggle button. Moreover, we want to prevent quickly showing and hiding
+      // the popover in cases where the user is disconnected for a short while.
+      setTimeout(() => {
+        $(popoverToggle).popover('show');
+      }, 1000);
+      // Auto-hide the warning message after 10 seconds.
+      const autoHideTimeout = setTimeout(() => {
+        $(popoverToggle).popover('hide');
+      }, 10000);
+      $(popoverToggle).one('hide.bs.popover', () => {
+        clearTimeout(autoHideTimeout);
+      });
+    }
+
+    /**
+     * Hides the concurrent editing warning messages and asks the other users is they are editing offline (i.e. outside
+     * the realtime collaboration session), in which case the warning message is displayed again (see
+     * onIsSomeoneOfflineMessage).
+     */
+    static detectConcurrentEditing() {
+      if (Object.values(RealtimeContext.instances).some(instance => instance.concurrentEditing)) {
+        RealtimeContext.clearConcurrentEditing();
+        // Check if someone is editing offline any of the document fields we're editing.
+        const editedFields = RealtimeContext.getEditedFields();
+        if (editedFields.length) {
+          allRt.wChan?.bcast(JSON.stringify({
+            cmd: 'isSomeoneOffline',
+            fields: editedFields
+          }));
+        }
+      }
+    }
+
+    static clearConcurrentEditing() {
+      Object.values(RealtimeContext.instances).forEach(instance => instance.setConcurrentEditing(false));
     }
 
     static getEditedFields() {
@@ -285,7 +339,7 @@ define('xwiki-realtime-loader', [
       $(document).one('xwiki:document:saved.createRt', function() {
         $(document).off('xwiki:document:saveFailed.createRt');
         comment.val(previousComment);
-        window.location.href = module.getEditorURL(window.location.href, info);
+        globalThis.location.href = module.getEditorURL(globalThis.location.href, info);
       });
       $(document).one('xwiki:document:saveFailed.createRt', function() {
         $(document).off('xwiki:document:saved.createRt');
@@ -297,122 +351,8 @@ define('xwiki-realtime-loader', [
 
   getCompatibleEditor = function(type) {
     return Object.keys(availableRt).find((availableType) => {
-      return (availableRt[availableType].info.compatible || []).indexOf(type) !== -1;
+      return (availableRt[availableType].info.compatible || []).includes(type);
     });
-  },
-
-  unload = false;
-  window.addEventListener('beforeunload', function() {
-    unload = true;
-    setTimeout(function() {
-      unload = false;
-    }, 5000);
-  });
-
-  let fullScreen = !!($('body').attr('data-maximized') || $('html').attr('style')),
-
-  // Trigger a resize event to resize the editable area in fullscreen mode.
-  resize = function() {
-    setTimeout(function() {
-      window.dispatchEvent(new Event('resize'));
-    });
-  },
-
-  // Place the warning box at the correct position when in fullscreen mode.
-  getBoxPosition = function() {
-    return fullScreen ? $('.buttons') : $('#hierarchy');
-  },
-
-  moveBox = function() {
-    $('.xwiki-realtime-box').insertAfter(getBoxPosition()).show();
-    $('.xwiki-realtime-box').css('margin-bottom', fullScreen ? '0' : '');
-    resize();
-  };
-
-  // Detect fullscreen mode in CKeditor.
-  // FIXME: Modify the CKEditor to fire the fullscreen events.
-  new MutationObserver(function(mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'data-maximized') {
-        fullScreen = $('body').attr('data-maximized') === 'true';
-        moveBox();
-      }
-    });
-  }).observe($('body')[0], {
-    attributes: true
-  });
-
-  // Detect fullscreen mode in wiki editor.
-  $(document).on('xwiki:fullscreen:exited', function() {
-    fullScreen = false;
-    moveBox();
-  }).on('xwiki:fullscreen:entered', function() {
-    fullScreen = true;
-    moveBox();
-  });
-
-  // Scroll to the warning box when a message is displayed or updated.
-  let scrollToBox = function($box) {
-    moveBox();
-    $box[0].scrollIntoView();
-  },
-
-  warningVisible = false,
-  displayWarning = function(field) {
-    const $after = getBoxPosition();
-    if (unload || warningVisible || !$after.length) {
-      return;
-    }
-    warningVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-warning xwiki-realtime-box box warningmessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.conflictsWarning).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
-    const realtimeContext = RealtimeContext.instances[field];
-    const compatibleEditor = getCompatibleEditor(realtimeContext?.info?.type);
-    if (realtimeContext && !realtimeContext.realtimeEnabled && compatibleEditor) {
-      $('<br/>').appendTo($warning);
-      // The parameter is the edit link but we can't inject it directly because we need to escape the HTML.
-      let suggestion = Messages.get('conflictsWarningSuggestion', '__0__');
-      // The translation message shouldn't contain HTML.
-      suggestion = $('<div></div>').text(suggestion).html();
-      // The link label shouldn't contain HTML.
-      const link = $('<a></a>', {
-        href: module.getEditorURL(window.location.href, availableRt[compatibleEditor].info)
-      }).text(Messages.conflictsWarningInfoLink).prop('outerHTML');
-      // Inject the link and append the suggestion.
-      $warning.append(suggestion.replace('__0__', link));
-    } else if (realtimeContext?.realtimeEnabled) {
-      $('<br/>').appendTo($warning);
-      $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
-    }
-  },
-
-  hideWarning = function() {
-    warningVisible = false;
-    $('.xwiki-realtime-warning').remove();
-    resize();
-  },
-
-  /**
-   * Hides the warning message and asks the other users is they are editing offline (i.e. outside the realtime session),
-   * in which case the warning message is displayed again (see onIsSomeoneOfflineMessage).
-   */
-  updateWarning = function() {
-    if (warningVisible) {
-      hideWarning();
-      // Check if someone is editing offline any of the document fields we're editing.
-      const editedFields = RealtimeContext.getEditedFields();
-      if (editedFields.length) {
-        allRt.wChan?.bcast(JSON.stringify({
-          cmd: 'isSomeoneOffline',
-          fields: editedFields
-        }));
-      }
-    }
   },
 
   tryParse = function(message) {
@@ -438,8 +378,8 @@ define('xwiki-realtime-loader', [
     }
     const channel = allRt.wChan;
     const network = allRt.network;
-    // Whenever someone leaves the edit mode, check if the warning message is still needed.
-    channel.on('leave', updateWarning);
+    // Whenever someone leaves the edit mode, check if the concurrent editing warning message is still needed.
+    channel.on('leave', RealtimeContext.detectConcurrentEditing);
     // Handle incoming messages.
     channel.on('message', function(msg, sender) {
       const data = tryParse(msg);
@@ -451,7 +391,7 @@ define('xwiki-realtime-loader', [
         // Someone is joining the channel while we're editing, check if they are using realtime and if we are.
         case 'join': return onJoinMessage(data, sender, network);
         // Someone has stopped editing a document field. Check if the warning message is still needed.
-        case 'leave': return updateWarning();
+        case 'leave': return RealtimeContext.detectConcurrentEditing();
         // Someone wants to know if we're editing offline to know if the warning message should be displayed.
         case 'isSomeoneOffline': return onIsSomeoneOfflineMessage(data, sender, network);
       }
@@ -476,12 +416,8 @@ define('xwiki-realtime-loader', [
       response.state = 2;
       channel.bcast(JSON.stringify(response));
     // Check if our current editor is realtime compatible, i.e. Object editor can't switch to WYSIWYG.
-    } else if (!getCompatibleEditor(data.type)) {
-      response.state = 0;
-      response.reason = 'invalid';
-      channel.bcast(JSON.stringify(response));
-    // We're editing offline: display the modal.
-    } else {
+    } else if (getCompatibleEditor(data.type)) {
+      // We're editing offline: display the modal.
       const content = getRequestContent(availableRt[data.type].info, function(state) {
         if (state) {
           // Accepted: save and create the realtime session.
@@ -494,6 +430,10 @@ define('xwiki-realtime-loader', [
         $('.xdialog-modal-container').css('z-index', '99999');
       });
       displayCustomModal(content);
+    } else {
+      response.state = 0;
+      response.reason = 'invalid';
+      channel.bcast(JSON.stringify(response));
     }
   },
 
@@ -519,14 +459,14 @@ define('xwiki-realtime-loader', [
     // Someone has started editing the same document field as us.
     } else if (!data.realtime || !realtimeContext.realtimeEnabled) {
       // One of us is editing offline (outside the realtime session).
-      displayWarning(data.field);
+      realtimeContext.setConcurrentEditing(true);
       network.sendto(sender, JSON.stringify({
         cmd: 'displayWarning',
         fields: [data.field]
       }));
     } else {
-      // We're both editing in realtime. Maybe we need to hide the warning message.
-      updateWarning();
+      // We're both editing in realtime. Maybe we need to hide the concurrent editing warning message.
+      RealtimeContext.detectConcurrentEditing();
     }
   },
 
@@ -609,13 +549,16 @@ define('xwiki-realtime-loader', [
     network.on('message', msg => {
       const data = tryParse(msg);
       if (data?.cmd === 'displayWarning') {
-        // Display the warning message only for the fields that we're still editing.
-        data.fields.filter(field => RealtimeContext.instances[field]).forEach(displayWarning);
+        // Some fields are being edited concurrently. Warn about merge conflicts, but only for the fields that we're
+        // still editing.
+        data.fields.forEach(field => RealtimeContext.instances[field]?.setConcurrentEditing(true));
       }
     });
     // On reconnect, join the "all" channel again.
     network.on('reconnect', async () => {
       try {
+        // Hide the concurrent editing warnings.
+        RealtimeContext.clearConcurrentEditing();
         await module.toBeReady();
       } catch (error) {
         console.error(error);
@@ -673,7 +616,7 @@ define('xwiki-realtime-loader', [
       this.setAvailableRt(info);
       // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
       // WYSIWYG editor or the Inplace editor).
-      if (info.field === 'content' && window.XWiki.editor === info.type) {
+      if (info.field === 'content' && globalThis.XWiki.editor === info.type) {
         // The current editor is supported. Check if we can join a realtime session.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
@@ -705,7 +648,6 @@ define('xwiki-realtime-loader', [
     },
 
     toBeReady: function() {
-      hideWarning();
       this.ready = this.ready.then(joinAllUsers);
       return this.ready;
     },

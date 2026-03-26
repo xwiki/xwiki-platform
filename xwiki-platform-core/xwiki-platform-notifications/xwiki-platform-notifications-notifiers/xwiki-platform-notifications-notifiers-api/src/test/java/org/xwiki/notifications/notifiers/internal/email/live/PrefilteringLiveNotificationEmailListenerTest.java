@@ -29,7 +29,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,27 +64,27 @@ class PrefilteringLiveNotificationEmailListenerTest
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
-        verify(this.manager, times(1)).addEvent(event);
+        verify(this.manager).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(true);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
-        verify(this.manager, times(1)).addEvent(event);
+        verify(this.manager).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(false);
         when(this.notificationConfiguration.isEnabled()).thenReturn(false);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
 
         this.listener.onEvent(EVENT, event, null);
-        verify(this.manager, times(1)).addEvent(event);
+        verify(this.manager).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(false);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(false);
 
         this.listener.onEvent(EVENT, event, null);
-        verify(this.manager, times(1)).addEvent(event);
+        verify(this.manager).addEvent(event);
     }
 }

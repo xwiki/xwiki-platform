@@ -1,3 +1,110 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* XWiki: This content was copied from Bootstrap and modified to support other paged media besides paper (such as PDF
+   documents displayed on screen). 
+   Generic styles for all paged media. */
+thead {
+  display: table-header-group;
+}
+
+tr, img {
+  page-break-inside: avoid;
+}
+
+img {
+  max-width: 100% !important;
+}
+
+p, h2, h3 {
+  orphans: 3;
+  widows: 3;
+}
+
+h2, h3 {
+  page-break-after: avoid;
+}
+
+/* XWiki: Limit some styles, that are otherwise hard to overwrite, to the paper paged media. */
+html[data-xwiki-paged-media=paper] {
+  *, *:before, *:after {
+    color: #000 !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  a, a:visited {
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+
+  /* Don't show links that are fragment identifiers,
+   or use the `javascript:` pseudo protocol */
+  a[href^="#"]:after, a[href^="javascript:"]:after {
+    content: "";
+  }
+
+  pre, blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  
+  /* Bootstrap components */
+  .navbar {
+    display: none;
+  }
+  
+  .btn, .dropup > .btn {
+    > .caret {
+      border-top-color: #000 !important;
+    }
+  }
+  
+  .label {
+    border: 1px solid #000;
+  }
+
+  .table {
+    border-collapse: collapse !important;
+
+    td, th {
+      background-color: #fff !important;
+    }
+  }
+  .table-bordered {
+    th, td {
+      border: 1px solid #ddd !important;
+    }
+  }
+} /* XWiki: end paper paged media styles. */
+
+/*-------------------------------------------------------------------*/
+
 #body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
   background-color: #FFF !important;
   background-image: none !important;

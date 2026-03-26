@@ -1,66 +1,91 @@
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
   <div class="xwiki-blocknote">
     <suspense>
       <BlocknoteEditor
+        v-if="editorContent"
         ref="editor"
         :editor-props
         :editor-content
         :container
-        :realtime-server-u-r-l
+        :macros
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
     </suspense>
-    <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />
-    <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
-    <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
-    <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
+    <input
+      v-if="name"
+      ref="valueInput"
+      type="hidden"
+      :name
+      :value
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      name="RequiresConversion"
+      :value="name"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_inputSyntax'"
+      :value="inputSyntax"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_outputSyntax'"
+      :value="outputSyntax"
+      :form
+      :disabled
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-// We shouldn't have to import these styles normally, because they are imported by the BlocknoteEditor component, but
-// for some reason Vite doesn't see this and thus doesn't include them in the generated CSS bundle.
-import "@mantine/core/styles.layer.css";
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-
-import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
-import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
-import {
-  MarkdownToUniAstConverter,
-  UniAst,
-  UniAstToMarkdownConverter,
-  createConverterContext,
-} from "@xwiki/cristal-uniast";
+import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
-import { computed, inject, ref, shallowRef, useTemplateRef } from "vue";
-import { Logic } from "../services/Logic";
+import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
+import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  MacroWithUnknownParamsType,
+  UnknownMacroParamsType,
+} from "@xwiki/platform-macros-api";
+import type { UniAst } from "@xwiki/platform-uniast-api";
 
 //
 // Injected
 //
-const logic = inject<Logic>("logic")!;
 const container = inject<Container>("container")!;
+const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
+  name: "XWiki",
+});
 
 //
 // Props
@@ -70,7 +95,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "markdown/1.2",
+  inputSyntax = "uniast/1.0",
   outputSyntax = "xwiki/2.1",
 } = defineProps<{
   // The key used to submit the edited content.
@@ -98,12 +123,15 @@ const {
 const value = ref(initialValue);
 const dirty = ref(false);
 
-const converterContext = createConverterContext(container);
-const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
-const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+const editorContent = ref();
 
-const editorContent = shallowRef<UniAst | Error>(markdownToUniAst.parseMarkdown(initialValue));
-const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]>({
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+});
+
+const editorProps = shallowRef<
+  InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
+>({
   blockNoteOptions: {
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
     // consistency between edit and view modes.
@@ -113,19 +141,39 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
   lang: getLanguage(),
 });
 
+const macros = {
+  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+  ctx: {
+    openParamsEditor: (
+      macro: MacroWithUnknownParamsType,
+      params: UnknownMacroParamsType,
+      update: (newProps: UnknownMacroParamsType) => void,
+    ) => {
+      // TODO: Open the macro modal.
+      console.debug(
+        "Open macro editor for macro",
+        macro,
+        "with params",
+        params,
+        "and update callback",
+        update,
+      );
+    },
+  },
+};
+
 //
 // Computed
 //
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
-const editorInstance = useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
-const realtimeServerURL = computed(() => {
-  return logic.realtimeServerURL;
-});
+const editorInstance =
+  useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
 
 //
 // Methods
 //
-function updateValue(editorContent?: UniAst | Error): string {
+// eslint-disable-next-line max-statements
+async function updateValue(editorContent?: UniAst | Error): Promise<string> {
   if (!dirty.value) {
     // The value is already up-to-date.
     return value.value;
@@ -137,10 +185,7 @@ function updateValue(editorContent?: UniAst | Error): string {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = uniAstToMarkdown.toMarkdown(editorContent as UniAst);
-  if (newValue instanceof Error) {
-    throw newValue;
-  }
+  const newValue = uniAstProcessor.save(editorContent);
 
   value.value = newValue;
   dirty.value = false;

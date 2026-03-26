@@ -115,7 +115,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         checkRights(extensionDocument);
 
         ResourceReference resourceReference =
-            repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
+            this.repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
 
@@ -166,7 +166,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             response.type(type);
 
             BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String extensionType = this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+            String extensionType =
+                this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
             response.entity(entity.getContent());
             response.header("Content-Disposition",
                 "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");

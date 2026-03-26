@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.requiredrights.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,7 +32,6 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("Required Rights UI")
     class NestedRequiredRightsIT extends RequiredRightsIT
     {
     }

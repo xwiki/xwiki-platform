@@ -57,7 +57,7 @@ public class NotificationWatchButtonElement extends BaseElement
      */
     public boolean isWatched()
     {
-        return watchButton.getText().equals("Followed");
+        return "Followed".equals(watchButton.getText());
     }
 
     /**
@@ -65,7 +65,7 @@ public class NotificationWatchButtonElement extends BaseElement
      */
     public boolean isBlocked()
     {
-        return watchButton.getText().equals("Blocked");
+        return "Blocked".equals(watchButton.getText());
     }
 
     /**
@@ -73,7 +73,7 @@ public class NotificationWatchButtonElement extends BaseElement
      */
     public boolean isNotSet()
     {
-        return watchButton.getText().equals("Not set");
+        return "Not set".equals(watchButton.getText());
     }
 
     /**
@@ -81,6 +81,6 @@ public class NotificationWatchButtonElement extends BaseElement
      */
     public boolean isCustom()
     {
-        return watchButton.getText().equals("Custom");
+        return "Custom".equals(watchButton.getText());
     }
 }

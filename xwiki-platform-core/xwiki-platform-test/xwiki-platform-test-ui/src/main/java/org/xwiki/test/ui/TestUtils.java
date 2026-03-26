@@ -104,6 +104,7 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -246,6 +247,9 @@ public class TestUtils
      */
     private String currentWiki = "xwiki";
 
+    private String dockerBaseUrl;
+    private boolean useDockerBaseUrl;
+
     private RestTestUtils rest;
 
     public TestUtils()
@@ -272,6 +276,30 @@ public class TestUtils
     public void switchExecutor(int index)
     {
         this.currentExecutorIndex = index;
+    }
+
+    /**
+     * Define the base URL to use when accessing the servlet engine from outside (e.g. for using APIs such as
+     * {@link #getInputStream(String, Map)} directly from the test.
+     * @param dockerBaseUrl the base URL built from servlet engine information currently used by the test
+     * @since 18.2.0RC1
+     */
+    public void setDockerBaseUrl(String dockerBaseUrl)
+    {
+        this.dockerBaseUrl = dockerBaseUrl;
+    }
+
+    /**
+     * Use this when needing to rely on a specific URL for accessing a resource when using docker tests and not
+     * relying on selenium API. e.g. when using {@link #getInputStream(String, Map)} APIs directly in tests.
+     * Note that the docker base URL then needs to be properly given.
+     * @param useDockerBaseUrl {@code true} to compute the base URL based on servlet engine information.
+     * @see #setDockerBaseUrl(String) 
+     * @since 18.2.0RC1
+     */
+    public void setUseDockerBaseUrl(boolean useDockerBaseUrl)
+    {
+        this.useDockerBaseUrl = useDockerBaseUrl;
     }
 
     /**
@@ -368,7 +396,7 @@ public class TestUtils
             this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
             this.httpClient.getParams().setAuthenticationPreemptive(true);
         } else {
-            this.httpClient.getState().clearCredentials();
+            this.httpClient.getState().clear();
             this.httpClient.getParams().setAuthenticationPreemptive(false);
         }
 
@@ -1263,24 +1291,13 @@ public class TestUtils
      * @since 15.10.11
      * @since 14.10.22
      */
-    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters)
+        throws Exception
     {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        // Remember the current credentials
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
-
-        try {
-            // Make sure the page is saved with superadmin author
-            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
-
-            // Save the page with the content to execute
-            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
-        } finally {
-            // Restore initial credentials
-            setDefaultCredentials(currentCredentials);
-        }
+        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -1336,9 +1353,11 @@ public class TestUtils
     {
         String baseURL;
 
+        if (this.useDockerBaseUrl && !StringUtils.isEmpty(this.dockerBaseUrl)) {
+            baseURL = this.dockerBaseUrl;
         // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
         // webapp context
-        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
+        } else if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
             baseURL = TestUtils.urlPrefix;
         } else {
             baseURL = TestUtils.urlPrefix + ":"
@@ -1380,7 +1399,7 @@ public class TestUtils
         } else if (!StringUtils.isEmpty(this.currentWiki)) {
             wikiName = this.currentWiki;
         }
-        return getBaseURL() + (wikiName.equals(MAIN_WIKI_NAME) ? "bin/" : "wiki/" + wikiName + '/');
+        return getBaseURL() + (MAIN_WIKI_NAME.equals(wikiName) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1595,7 +1614,9 @@ public class TestUtils
      */
     public void maybeLeaveEditMode()
     {
-        if (StringUtils.isNotEmpty(getEditMode())) {
+        String editMode = getEditMode();
+        List<String> adminModes = List.of("globaladmin", "spaceadmin");
+        if (StringUtils.isNotEmpty(editMode) && !adminModes.contains(editMode)) {
             leaveEditMode();
         }
     }
@@ -1613,10 +1634,16 @@ public class TestUtils
         // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
         // in-place editor where the '#edit' URL fragment is removed).
         String editURL = getDriver().getCurrentUrl();
+        WebElement cancelButton =
+            getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[name='action_cancel']"));
+        // The cancel button can be temporarily disabled, e.g. while the content is being (auto)saved.
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        // We use the shortcut key instead of clicking because the cancel button might not be visible (e.g. when doing
+        // realtime collaboration).
         getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
         getDriver().waitUntilCondition(driver -> {
             String viewURL = driver.getCurrentUrl();
-            return !viewURL.equals(editURL);
+            return !Objects.equals(viewURL, editURL);
         });
     }
 
@@ -1716,6 +1743,7 @@ public class TestUtils
     public void forceGuestUser()
     {
         setSession(null);
+        setDefaultCredentials(null);
     }
 
     public void addObject(String space, String page, String className, Object... properties)
@@ -2086,8 +2114,8 @@ public class TestUtils
 
         // import file
         executeGet(
-            getBaseBinURL() + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
-                + escapeURL(file.getName()),
+            getURL("XWiki", "Import", "import",
+                "historyStrategy=add&importAsBackup=true&ajax&action=import&name=" + escapeURL(file.getName())),
             Status.OK.getStatusCode());
     }
 
@@ -2545,6 +2573,7 @@ public class TestUtils
                 throw new RuntimeException(e);
             }
 
+            RESOURCES_MAP.put(EntityType.SPACE, new ResourceAPI(PagesResource.class, null));
             RESOURCES_MAP.put(EntityType.DOCUMENT, new ResourceAPI(PageResource.class, PageTranslationResource.class));
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
@@ -2905,6 +2934,53 @@ public class TestUtils
         }
 
         /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param syntaxId the syntax id of the page to save
+         * @param title the title of the page to save
+         * @param parentFullPageName the full page name of the parent page to set to the page to save
+         * @param isHidden whether the page to save should be hidden or not
+         *
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
+        {
+            // Remember the current credentials
+            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
+
+            try {
+                this.testUtils.setDefaultCredentials(credentials);
+
+                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+            } finally {
+                // Restore initial credentials
+                this.testUtils.setDefaultCredentials(currentCredentials);
+            }
+        }
+
+        /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param title the title of the page to save
+         * @throws Exception if an error occurs while saving the page
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String title) throws Exception
+        {
+            savePageAs(credentials, reference, content, null, title, null, false);
+        }
+
+        /**
          * Add a new object.
          */
         public void add(org.xwiki.rest.model.jaxb.Object obj) throws Exception
@@ -2922,11 +2998,15 @@ public class TestUtils
         }
 
         /**
-         * @since 15.2RC1
-         * @since 15.1
-         * @since 14.10.6
+         * Add a new object to an existing or new page.
+         *
+         * @param documentReference the document where to add the object
+         * @param className the class name of the object to add
+         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
+         * @since 17.10.1
+         * @since 18.0.0RC1
          */
-        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+        public void addObject(EntityReference documentReference, String className, Object... properties)
             throws Exception
         {
             // Make sure the page exist (object add fail otherwise)
@@ -2937,16 +3017,16 @@ public class TestUtils
             }
 
             // Create the object
-            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            org.xwiki.rest.model.jaxb.Object jaxbObject = object(documentReference, className);
             for (int i = 0; i < properties.length; i += 2) {
                 String name = (String) properties[i + 0];
                 Object value = properties[i + 1];
 
-                rightsObject.withProperties(RestTestUtils.property(name, value));
+                jaxbObject.withProperties(RestTestUtils.property(name, value));
             }
 
             // Add the object
-            add(rightsObject);
+            add(jaxbObject);
         }
 
         /**

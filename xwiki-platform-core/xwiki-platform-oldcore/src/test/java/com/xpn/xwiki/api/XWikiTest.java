@@ -87,6 +87,7 @@ public class XWikiTest
         when(mockRightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
         when(mockitoOldcore.getMockVersioningStore().getXWikiDocumentArchive(any(), any()))
             .thenReturn(new XWikiDocumentArchive());
+        when(mockitoOldcore.getMockContextualAuthorizationManager().hasAccess(any(), any())).thenReturn(true);
 
         xWikiContext.setUser("Redtail");
         this.apiDocument = new Document(new XWikiDocument(DOCUMENT_REFERENCE), xWikiContext);

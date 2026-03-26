@@ -19,12 +19,12 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.FileUtils;
-import org.xwiki.filter.input.DefaultFileInputSource;
+import org.apache.commons.io.IOUtils;
+import org.xwiki.filter.input.DefaultStreamProviderInputSource;
+import org.xwiki.store.blob.Blob;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
@@ -38,24 +38,30 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentContent
 {
-    private final File content;
+    private final Blob content;
 
     private final Charset charset;
 
     /**
-     * @param file the serialized document as XML
-     * @param charset the charset of the file
+     * @param blob the serialized document as XML
+     * @param charset the charset of the blob
      */
-    public XWikiFileDeletedDocumentContent(File file, Charset charset)
+    public XWikiFileDeletedDocumentContent(Blob blob, Charset charset)
     {
-        this.content = file;
+        this.content = blob;
         this.charset = charset;
     }
 
     @Override
     public String getContentAsString() throws IOException
     {
-        return FileUtils.readFileToString(this.content, this.charset);
+        try {
+            return IOUtils.toString(this.content.getStream(), this.charset);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Failed to read the deleted document content.", e);
+        }
     }
 
     @Override
@@ -66,7 +72,7 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
             result = new XWikiDocument();
         }
 
-        result.fromXML(new DefaultFileInputSource(this.content), true);
+        result.fromXML(new DefaultStreamProviderInputSource(this.content), true);
 
         return result;
     }

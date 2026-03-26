@@ -77,8 +77,8 @@ public class CacheKeyFactory
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
 
         if (withContext) {
-            /** Also take into account the request parameters, if any, except parameters which are already
-             * taken into account or that are irrelevant. */
+            // Also take into account the request parameters, if any, except parameters which are already
+            // taken into account or that are irrelevant.
             Request request = container.getRequest();
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);

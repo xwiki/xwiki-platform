@@ -43,6 +43,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,9 +83,9 @@ class SolrSearchIT
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search("\"Test Document\"");
-        searchPage.toggleSpaceFaucet();
-        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
+        searchPage = searchPage.search("\"Test Document\"");
+        searchPage.toggleSpaceFacet();
+        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFacetContent());
     }
 
     @ParameterizedTest
@@ -107,7 +108,7 @@ class SolrSearchIT
             new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
             SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-            searchPage.search(testContent);
+            searchPage = searchPage.search(testContent);
             List<SolrSearchResult> searchResults = searchPage.getSearchResults();
             assertEquals(1, searchResults.size());
             SolrSearchResult searchResult = searchResults.get(0);
@@ -145,7 +146,7 @@ class SolrSearchIT
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search("Content of Page");
+        searchPage = searchPage.search("Content of Page");
         assertEquals(10, searchPage.getSearchResults().size(), "The search should return only 10 results by default.");
 
         searchPage = searchPage.setResultsPerPage(20, true);
@@ -223,23 +224,23 @@ class SolrSearchIT
 
         // Check the search results without search exclusions.
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
-        assertEquals(List.of("One", "Two", "Three", "Child of Three", "Four", "Child of Four"),
+        searchPage = searchPage.search(matchedWord);
+        assertThat("All matched pages should appear in the search results before configuring search exclusions.",
             searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
-            "All matched pages should appear in the search results before configuring search exclusions.");
+            containsInAnyOrder("One", "Two", "Three", "Child of Three", "Four", "Child of Four"));
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
         searchAdminPage.getSearchExclusionsField().sendKeys("Two").waitForSuggestions().selectByVisibleText("Two")
-            .sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
+            .clear().sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
         searchAdminPage.clickSave();
 
         // Check the search results after configuring search exclusions.
         searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
+        searchPage = searchPage.search(matchedWord);
         // Children of excluded pages should also be excluded.
-        assertEquals(List.of("One", "Four", "Child of Four"),
-            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList());
+        assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder("One", "Four", "Child of Four"));
 
         // Refine the search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
@@ -250,8 +251,8 @@ class SolrSearchIT
 
         // Check again the search results.
         searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
-        assertEquals(List.of("One", "Two", "Four", "Child of Four"),
-            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList());
+        searchPage = searchPage.search(matchedWord);
+        assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder("One", "Two", "Four", "Child of Four"));
     }
 }

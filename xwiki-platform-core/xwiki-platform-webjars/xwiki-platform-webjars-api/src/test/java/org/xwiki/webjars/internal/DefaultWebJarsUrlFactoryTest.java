@@ -22,6 +22,7 @@ package org.xwiki.webjars.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.webjars.WebjarPathDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -191,5 +193,23 @@ class DefaultWebJarsUrlFactoryTest
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
             this.webJarsUrlFactory.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
+    }
+
+    @Test
+    void computeURLWithWebjarDescriptor() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
+        InstalledExtension extension = mock(InstalledExtension.class);
+        when(this.installedExtensionRepository.getInstalledExtension("org.webjars:angular", "wiki:math"))
+            .thenReturn(extension);
+        when(extension.getId()).thenReturn(new ExtensionId("angular", "2.1.11"));
+
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("wiki:math", List.of("angular", "2.1.11", "angular.css"));
+        when(this.serializer.serialize(resourceReference))
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
+        assertEquals("/xwiki/angular/2.1.11/angular.css",
+            this.webJarsUrlFactory.url(new WebjarPathDescriptor("angular", "angular.css")));
     }
 }

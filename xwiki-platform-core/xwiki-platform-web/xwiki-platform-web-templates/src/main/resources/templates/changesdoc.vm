@@ -23,22 +23,26 @@
 ##
 
 #if ("$!previousOrigdocVersion" != '')
-  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view',
+    $escapetool.url({'viewer': 'changes', 'rev1': $previousOrigdocVersion, 'rev2': $rev2}))})
   #set ($changesTitle = $escapetool.xml($services.localization.render('core.viewers.diff.previousVersion.origin', [${previousOrigdocVersion}])))
   #set ($previousOrigdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('left')</a>")
 #end
 #if ("$!nextOrigdocVersion" != '')
-  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev2}")})
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view',
+    $escapetool.url({'viewer': 'changes', 'rev1': $nextOrigdocVersion, 'rev2': $rev2}))})
   #set ($changesTitle = $escapetool.xml($services.localization.render('core.viewers.diff.nextVersion.origin', [${nextOrigdocVersion}])))
   #set ($nextOrigdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('right')</a>")
 #end
 #if ("$!previousNewdocVersion" != '')
-  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${previousNewdocVersion}")})
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view',
+    $escapetool.url({'viewer': 'changes', 'rev1': $rev1, 'rev2': $previousNewdocVersion}))})
   #set ($changesTitle = $escapetool.xml($services.localization.render('core.viewers.diff.previousVersion.target', [${previousNewdocVersion}])))
   #set ($previousNewdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('left')</a>")
 #end
 #if ("$!nextNewdocVersion" != '')
-  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view',
+    $escapetool.url({'viewer': 'changes', 'rev1': $rev1, 'rev2': $nextNewdocVersion}))})
   #set ($changesTitle = $escapetool.xml($services.localization.render('core.viewers.diff.nextVersion.target', [${nextNewdocVersion}])))
   #set ($nextNewdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('right')</a>")
 #end
@@ -46,10 +50,12 @@
 #if ("$!previousOrigdocVersion" != '' && "$!previousNewdocVersion" != '')
   ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
   #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
-    #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
+    #set ($previousLink = ${xwiki.getURL($tdoc, 'view',
+      $escapetool.url({'viewer': 'changes', 'rev1': $previousOrigdocVersion, 'rev2': $rev1}))})
     #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$previousOrigdocVersion,$rev1])))
   #else
-    #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${previousNewdocVersion}")})
+    #set ($previousLink = ${xwiki.getURL($tdoc, 'view',
+      $escapetool.url({'viewer': 'changes', 'rev1': $rev2, 'rev2': $previousNewdocVersion}))})
     #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$rev2, $previousNewdocVersion])))
   #end
 #end
@@ -57,10 +63,12 @@
 #if ("$!nextOrigdocVersion" != '' && "$!nextNewdocVersion" != '')
   ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
   #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
-    #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
+    #set ($nextLink = ${xwiki.getURL($tdoc, 'view',
+      $escapetool.url({'viewer': 'changes', 'rev1': $rev2, 'rev2': $nextNewdocVersion}))})
     #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$rev2, $nextNewdocVersion])))
   #else
-    #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev1}")})
+    #set ($nextLink = ${xwiki.getURL($tdoc, 'view',
+      $escapetool.url({'viewer': 'changes', 'rev1': $nextOrigdocVersion, 'rev2': $rev1}))})
     #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$nextOrigdocVersion, $rev1])))
   #end
 #end

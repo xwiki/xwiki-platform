@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.web.Utils;
@@ -63,7 +64,7 @@ public class DateClassTest
     }
 
     @Test
-    public void fromString()
+    public void fromString() throws XWikiException
     {
         DateClass dateClass = new DateClass();
         dateClass.setDateFormat("MMMM yyyy");

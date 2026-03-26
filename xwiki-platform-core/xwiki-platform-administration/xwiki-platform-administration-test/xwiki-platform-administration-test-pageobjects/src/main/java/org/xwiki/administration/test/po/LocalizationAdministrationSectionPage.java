@@ -47,6 +47,14 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         + " and ../input[@id='XWiki.XWikiPreferences_0_languages']]")
     private WebElement supportedLanguagesSelect;
 
+    @FindBy(id = "XWiki.XWikiPreferences_0_dateformat")
+    private WebElement dateFormatInput;
+
+    // Timezone bootstrap select XWiki.XWikiPreferences_0_timezone
+    @FindBy(xpath = "//div[contains(@class, 'bootstrap-select')"
+        + " and ./select[@id='XWiki.XWikiPreferences_0_timezone']]")
+    private WebElement timezoneSelect;
+
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
@@ -78,5 +86,54 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     {
         BootstrapSelect select = new BootstrapSelect(this.supportedLanguagesSelect, getDriver());
         select.selectByValues(supportedLanguages);
+    }
+
+    /**
+     * @return the configured date format, or an empty string if not set
+     * @since 17.10.4
+     * @since 18.2.0RC1
+     */
+    public String getDateFormat()
+    {
+        return this.dateFormatInput.getAttribute("value");
+    }
+
+    /**
+     * Sets the date format to be used in the wiki. The date format should follow the patterns defined in the Java
+     * SimpleDateFormat class (e.g., "yyyy-MM-dd" for a date format like 2024-06-30).
+     *
+     * @param dateFormat the desired date format to be set (e.g., "yyyy-MM-dd")
+     * @since 17.10.4
+     * @since 18.2.0RC1
+     */
+    public void setDateFormat(String dateFormat)
+    {
+        this.dateFormatInput.clear();
+        this.dateFormatInput.sendKeys(dateFormat);
+    }
+
+    /**
+     * Sets the timezone to be used in the wiki. The timezone should be specified using a valid timezone ID (e.g.,
+     * "UTC" for Coordinated Universal Time or "America/New_York" for Eastern Time in the United States).
+     *
+     * @param timezone the desired timezone to be set (e.g., "UTC" or "America/New_York")
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public void setTimezone(String timezone)
+    {
+        BootstrapSelect select = new BootstrapSelect(this.timezoneSelect, getDriver());
+        select.selectByValue(timezone);
+    }
+
+    /**
+     * @return the configured timezone, or "System Default" if the default timezone is used
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public String getTimezone()
+    {
+        BootstrapSelect select = new BootstrapSelect(this.timezoneSelect, getDriver());
+        return select.getDisplayedText();
     }
 }

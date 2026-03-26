@@ -29,12 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -1213,7 +1212,7 @@ public class Document extends Api
     public Map<String, Vector<Object>> getxWikiObjects()
     {
         Map<DocumentReference, List<BaseObject>> map = this.getDoc().getXObjects();
-        Map<String, Vector<Object>> resultmap = new HashMap<String, Vector<Object>>();
+        Map<String, Vector<Object>> resultmap = new HashMap<>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : map.entrySet()) {
             List<BaseObject> objects = entry.getValue();
             if (objects != null) {
@@ -1226,9 +1225,9 @@ public class Document extends Api
     protected Vector<Object> getXObjects(List<BaseObject> objects)
     {
         if (objects == null) {
-            return new Vector<Object>(0);
+            return new Vector<>(0);
         }
-        Vector<Object> result = new Vector<Object>(objects.size());
+        Vector<Object> result = new Vector<>(objects.size());
         for (BaseObject bobj : objects) {
             if (bobj != null) {
                 result.add(newObjectApi(bobj, getXWikiContext()));
@@ -1317,7 +1316,7 @@ public class Document extends Api
      */
     public Vector<Object> getObjects(String classname, String key, String value)
     {
-        Vector<Object> result = new Vector<Object>();
+        Vector<Object> result = new Vector<>();
         if (StringUtils.isBlank(key) || value == null) {
             return getObjects(classname);
         }
@@ -1490,7 +1489,7 @@ public class Document extends Api
         documentProperties.setWithWikiAttachmentsContent(false);
         documentProperties.setWithJRCSRevisions(false);
         documentProperties.setWithRevisions(false);
-        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+        documentProperties.setSensitiveFieldsExcluded(true);
 
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();
@@ -1533,7 +1532,6 @@ public class Document extends Api
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public long getRevisionsCount(RevisionCriteria criteria) throws XWikiException
     {
         return this.doc.getRevisionsCount(criteria, getXWikiContext());
@@ -1573,7 +1571,7 @@ public class Document extends Api
 
     public List<Attachment> getAttachmentList()
     {
-        List<Attachment> apis = new ArrayList<Attachment>();
+        List<Attachment> apis = new ArrayList<>();
         for (XWikiAttachment attachment : this.getDoc().getAttachmentList()) {
             apis.add(new Attachment(this, attachment, getXWikiContext()));
         }
@@ -1741,7 +1739,7 @@ public class Document extends Api
     /**
      * Displays the given field. The display mode will be decided depending on page context (edit or inline context will
      * display in edit, view context in view) This function uses the active object or will find the first object that
-     * has the given field. This function can return html inside and html macro
+     * has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @return the display of the field.
@@ -1757,7 +1755,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro
+     * that has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param mode display mode to use (view, edit, hidden, search)
@@ -1774,7 +1772,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro A given prefix is added to the
+     * that has the given field. This function can return html inside an html macro. A given prefix is added to the
      * field names when these are forms.
      *
      * @param fieldname fieldname to display
@@ -1794,7 +1792,7 @@ public class Document extends Api
 
     /**
      * Displays the given field of the given object The display mode will be decided depending on page context (edit or
-     * inline context will display in edit, view context in view) This function can return html inside and html macro
+     * inline context will display in edit, view context in view). This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param obj object from which to take the field
@@ -1924,7 +1922,7 @@ public class Document extends Api
 
     public List<String> getLinkedPages()
     {
-        return new ArrayList<String>(this.doc.getUniqueLinkedPages(getXWikiContext()));
+        return new ArrayList<>(this.doc.getUniqueLinkedPages(getXWikiContext()));
     }
 
     public Attachment getAttachment(String filename)
@@ -2470,7 +2468,7 @@ public class Document extends Api
 
     public List<XWikiLink> getLinks() throws XWikiException
     {
-        return new ArrayList<XWikiLink>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
+        return new ArrayList<>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
     }
 
     /**
@@ -2573,7 +2571,7 @@ public class Document extends Api
         return this.doc.isCreator(username);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         Object obj;
         if (this.currentObj != null) {
@@ -2584,7 +2582,7 @@ public class Document extends Api
         set(fieldname, value, obj);
     }
 
-    public void set(String fieldname, java.lang.Object value, Object obj)
+    public void set(String fieldname, java.lang.Object value, Object obj) throws XWikiException
     {
         if (obj == null) {
             return;
@@ -3011,7 +3009,7 @@ public class Document extends Api
     public List<Object> addObjectsFromRequest(String className, String prefix) throws XWikiException
     {
         List<BaseObject> objs = getDoc().addObjectsFromRequest(className, prefix, getXWikiContext());
-        List<Object> wrapped = new ArrayList<Object>();
+        List<Object> wrapped = new ArrayList<>();
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
@@ -3049,7 +3047,7 @@ public class Document extends Api
     public List<Object> updateObjectsFromRequest(String className, String prefix) throws XWikiException
     {
         List<BaseObject> objs = getDoc().updateObjectsFromRequest(className, prefix, getXWikiContext());
-        List<Object> wrapped = new ArrayList<Object>();
+        List<Object> wrapped = new ArrayList<>();
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
@@ -3177,7 +3175,7 @@ public class Document extends Api
         XWiki xwiki = getXWikiContext().getWiki();
         FileUploadPlugin fileupload = (FileUploadPlugin) xwiki.getPlugin("fileupload", getXWikiContext());
         List<FileItem> fileuploadlist = fileupload.getFileItems(getXWikiContext());
-        List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
+        List<XWikiAttachment> attachments = new ArrayList<>();
         // adding attachment list to context so we find the names
         this.context.put("addedAttachments", attachments);
         int nb = 0;
@@ -3362,12 +3360,12 @@ public class Document extends Api
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
-        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<>();
         for (String backlinkDocumentName : backlinkDocumentNames) {
             backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
         }
 
-        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> childDocumentReferences = new ArrayList<>();
         for (String childDocumentName : childDocumentNames) {
             childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
         }
@@ -3533,7 +3531,6 @@ public class Document extends Api
      * use more rights than defined in the object, {@code false} otherwise. This property is ignored on translations.
      * @since 16.10.0RC1
      */
-    @Unstable
     public boolean isEnforceRequiredRights()
     {
         return this.doc.isEnforceRequiredRights();
@@ -3545,7 +3542,6 @@ public class Document extends Api
      * more rights than defined in the object. This property is ignored on translations.
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)
     {
         getDoc().setEnforceRequiredRights(enforceRequiredRights);
@@ -3642,7 +3638,6 @@ public class Document extends Api
      * @throws AccessDeniedException when the current author is not allowed to use this API
      * @since 16.1.0RC1
      */
-    @Unstable
     public void setAuthor(UserReference userReference) throws AccessDeniedException
     {
         getContextualAuthorizationManager().checkAccess(Right.PROGRAM);

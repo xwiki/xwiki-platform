@@ -19,12 +19,10 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -46,15 +44,12 @@ public class DefaultLESSResourcesCache extends AbstractCache<String> implements 
      */
     public static final String LESS_FILES_CACHE_ID = "lesscss.skinfiles.cache";
 
-    @Inject
-    private CacheManager cacheManager;
-
     @Override
     public void initialize() throws InitializationException
     {
         try {
             CacheConfiguration configuration = new CacheConfiguration(LESS_FILES_CACHE_ID);
-            CacheFactory cacheFactory = cacheManager.getCacheFactory();
+            CacheFactory cacheFactory = this.cacheManager.getCacheFactory();
             this.cache = cacheFactory.newCache(configuration);
         } catch (ComponentLookupException | CacheException e) {
             throw new InitializationException(

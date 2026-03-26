@@ -36,12 +36,6 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
@@ -58,6 +52,12 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogStandardEditForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogIconSelectForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogUrlSelectForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -439,11 +439,14 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened.
+        linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions();
+        linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+        assertEquals("[[~[~[image:image.gif~]~]>>]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -471,7 +474,7 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
+        editor.getToolBar().insertOrEditLink().setResourceReference("Main.WebHome").createLinkOfNewPage(true).submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
@@ -495,10 +498,10 @@ class ImageIT extends AbstractCKEditorIT
 
         // Verify that the link is still set.
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
-        LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
-        assertEquals("doc", linkSelectorModal.getSelectedResourceType());
-        assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
-        linkSelectorModal.cancel();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        assertEquals(List.of("xwiki:Main.WebHome"),
+            linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions().getValues());
+        linkDialog.cancel();
 
         // Change the caption to ensure that saving again works.
         editor.executeOnEditedContent(
@@ -645,6 +648,8 @@ class ImageIT extends AbstractCKEditorIT
         assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
+        // The inserted image should be selected.
+        textArea.waitUntilWidgetSelected();
 
         assertSourceEquals("[[image:image.gif]]");
     }
@@ -726,7 +731,9 @@ class ImageIT extends AbstractCKEditorIT
         assertIterableEquals(List.of("External"), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
-        
+        // The inserted image should be selected.
+        textArea.waitUntilWidgetSelected();
+
         assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
     }
 
@@ -1112,6 +1119,8 @@ class ImageIT extends AbstractCKEditorIT
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
+        // The inserted image should be selected.
+        this.textArea.waitUntilWidgetSelected();
         assertSourceEquals("12 [[image:childPage@otherImage.gif]]3");
 
         // Move the image using cut & paste.

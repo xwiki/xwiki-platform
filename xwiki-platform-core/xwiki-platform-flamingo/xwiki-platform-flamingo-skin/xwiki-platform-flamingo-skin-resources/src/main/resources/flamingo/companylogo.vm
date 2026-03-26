@@ -30,7 +30,9 @@
 #set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
 #if($themeObj)
   #set($logoname = $themeObj.getValue('logo'))
+  #set($logoalt = $themeObj.getValue('logo-description'))
 #else
+  ## Retrieve the value from the old color theme used.
   #set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
   #set($logoname = $themeObj.getValue('logoImage'))
 #end
@@ -45,12 +47,15 @@
     #set($logourl = $prefdoc.getAttachmentURL($logo.filename))
   #end
 #end
+#if("$!{logoalt}" == '')
+  #set($logoalt = $services.localization.render('core.document.header.logo.image.text'))
+#end
 <div id="companylogo">
   <a href="$!xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)" rel="home" ##
     title="$escapetool.xml($services.localization.render('core.document.header.logo.anchor.text'))" ##
     #if(!$displayPageHeader)class="navbar-brand"#end>##
     <span class="sr-only">$services.localization.render('core.document.header.logo.anchor.text')</span>
     <img src="$!logourl" ##
-      alt="$escapetool.xml($services.localization.render('core.document.header.logo.image.text'))"/>##
+      alt="$escapetool.xml($logoalt)"/>##
   </a>
 </div>

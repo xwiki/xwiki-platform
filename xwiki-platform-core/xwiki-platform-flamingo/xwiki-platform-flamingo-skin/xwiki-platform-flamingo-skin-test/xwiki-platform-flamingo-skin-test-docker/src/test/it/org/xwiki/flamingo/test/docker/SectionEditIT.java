@@ -74,7 +74,7 @@ public class SectionEditIT
     {
         ViewPage result;
         DocumentReference mainPageReference = new DocumentReference(MAIN_PAGENAME, testReference);
-        if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
+        if ("xwiki/1.0".equalsIgnoreCase(syntaxId)) {
             result = setup.createPage(mainPageReference, "1 Section1\nContent1\n\n"
                 + "1 Section2\nContent2\n\n1.1 Section3\nContent3\n\n"
                 + "1 Section4\nContent4", "section test in " + syntaxId, syntaxId);

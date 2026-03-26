@@ -47,9 +47,12 @@ like.newlike.error=Feil når du prøver å like siden.
 like.unlike.success=Siden er ikke lenger likt.
 like.unlike.error=Feil under fjerning av liker.
 like.userprofile.menu=Likte sider
-like.button.title=Antall liker på denne siden: {0}
-like.button.title.like=Klikk for å like siden. Antall likes på denne siden: {0}.
-like.button.title.unlike=Klikk for å slutte å like siden. Antall liker på denne siden: {0}.
+### Missing: like.toggle.hint.like=Like this page.
+### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
+### Missing: like.likers.link.zero={0} Likes
+### Missing: like.likers.link.one={0} Like
+### Missing: like.likers.link.many={0} Likes
+### Missing: like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=Ingen liker denne siden ennå.
 like.likers.number={0} person(er) liker denne siden:
 like.likers.title=De som liker {0}
@@ -63,5 +66,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Hurtigbufferkapasitet
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Antall Liker-informasjon som er lagret i hurtigbufferen. Merk at du må starte XWiki på nytt for at dette valget skal aktiveres.
 XWiki.Like.LikeConfigurationClass_enabled=Aktiver Liker-funksjonen
 XWiki.Like.LikeConfigurationClass_enabled.hint=Fjern merket for å deaktivere Liker-funksjonen og skjule Liker-informasjon.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Antall liker på denne siden: {0}
+like.button.title.like=Klikk for å like siden. Antall likes på denne siden: {0}.
+like.button.title.unlike=Klikk for å slutte å like siden. Antall liker på denne siden: {0}.
+
+#@deprecatedend
 </content>
 </xwikidoc>

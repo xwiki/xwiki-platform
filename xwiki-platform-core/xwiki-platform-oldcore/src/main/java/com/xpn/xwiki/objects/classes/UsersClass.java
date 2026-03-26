@@ -29,6 +29,7 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,6 +46,12 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class UsersClass extends ListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Users";
     private static final long serialVersionUID = 1L;
 
     /** Logging helper object. */
@@ -148,13 +155,21 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty newProperty()
     {
+        // If the property type should ever change, the logic in UsedValuesListQueryBuilder and LiveTableResultsMacros
+        // might need to be updated.
         BaseProperty property = new LargeStringProperty();
         property.setName(getName());
         return property;
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
+
+    @Override
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         prop.setValue(value);
@@ -203,7 +218,7 @@ public class UsersClass extends ListClass
     }
 
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         String value = ppcel.getText();
         return fromString(value);

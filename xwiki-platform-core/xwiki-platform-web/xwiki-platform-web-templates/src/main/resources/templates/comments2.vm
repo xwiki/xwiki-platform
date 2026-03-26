@@ -25,7 +25,7 @@
 #set($commentMap = $collectiontool.getSortedMap())
 #set($keysWithMultipleComments = $collectiontool.getSet())
 #foreach ($comment in $comments)
-#set($key = $comment.date)
+#set($key = $comment.getValue('date'))
 #if($commentMap.containsKey($key))
 #set($discard = $commentMap.get($key).add($comment))
 #set($discard = $keysWithMultipleComments.add($key))

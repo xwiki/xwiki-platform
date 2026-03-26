@@ -24,11 +24,13 @@ import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -39,6 +41,13 @@ import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 public class StringClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "String";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "string";
@@ -80,7 +89,7 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
         property.setValue(value);
@@ -93,6 +102,12 @@ public class StringClass extends PropertyClass
         BaseProperty property = new StringProperty();
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

@@ -26,12 +26,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Provider;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
@@ -55,7 +56,8 @@ public class ExtensionInstallListener extends AbstractEventListener
     public static final String NAME = "org.xwiki.extension.index.internal.ExtensionInstallListener";
 
     @Inject
-    private ExtensionIndexStore store;
+    // Load the store lazily to limit risks of component cycles (listeners are loaded very early)
+    private Provider<ExtensionIndexStore> storeProvider;
 
     @Inject
     private Logger logger;
@@ -73,14 +75,13 @@ public class ExtensionInstallListener extends AbstractEventListener
     {
         // TODO: make that asynchronous
         try {
-            if (event instanceof ExtensionUninstalledEvent) {
-                onUninstalled(((ExtensionEvent) event).getExtensionId(), ((ExtensionEvent) event).getNamespace());
-            } else if (event instanceof ExtensionInstalledEvent) {
-                onInstalled(((ExtensionEvent) event).getExtensionId(), ((ExtensionEvent) event).getNamespace());
-            } else if (event instanceof ExtensionUpgradedEvent) {
-                ExtensionUpgradedEvent extensionUpgradedEvent = (ExtensionUpgradedEvent) event;
-                String namespace = extensionUpgradedEvent.getNamespace();
-                onUpgraded(extensionUpgradedEvent.getExtensionId(), ((Collection<InstalledExtension>) data), namespace);
+            if (event instanceof ExtensionUninstalledEvent extensionEvent) {
+                onUninstalled(extensionEvent.getExtensionId(), extensionEvent.getNamespace());
+            } else if (event instanceof ExtensionInstalledEvent extensionEvent) {
+                onInstalled(extensionEvent.getExtensionId(), extensionEvent.getNamespace());
+            } else if (event instanceof ExtensionUpgradedEvent extensionEvent) {
+                String namespace = extensionEvent.getNamespace();
+                onUpgraded(extensionEvent.getExtensionId(), ((Collection<InstalledExtension>) data), namespace);
             }
         } catch (Exception e) {
             this.logger.error("Failed to update the local extension store", e);
@@ -90,23 +91,29 @@ public class ExtensionInstallListener extends AbstractEventListener
     private void onUpgraded(ExtensionId extensionId, Collection<InstalledExtension> previousExtensions,
         String namespace) throws SolrServerException, IOException
     {
+        ExtensionIndexStore store = this.storeProvider.get();
+
         for (InstalledExtension previousExtension : previousExtensions) {
-            this.store.updateInstalled(previousExtension.getId(), namespace, false);
+            store.updateInstalled(previousExtension.getId(), namespace, false);
         }
 
-        this.store.updateInstalled(extensionId, namespace, true);
-        this.store.commit();
+        store.updateInstalled(extensionId, namespace, true);
+        store.commit();
     }
 
     private void onInstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        this.store.updateInstalled(extensionId, namespace, true);
-        this.store.commit();
+        ExtensionIndexStore store = this.storeProvider.get();
+
+        store.updateInstalled(extensionId, namespace, true);
+        store.commit();
     }
 
     private void onUninstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        this.store.updateInstalled(extensionId, namespace, false);
-        this.store.commit();
+        ExtensionIndexStore store = this.storeProvider.get();
+
+        store.updateInstalled(extensionId, namespace, false);
+        store.commit();
     }
 }

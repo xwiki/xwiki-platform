@@ -20,18 +20,23 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -79,12 +84,10 @@ public class SkinAction extends XWikiAction
     /** The directory where resources are placed in the webapp. */
     private static final String RESOURCES_DIRECTORY = "resources";
 
-    /**
-     * The encoding to use when reading text resources from the filesystem and when sending css/javascript responses.
-     */
-    private static final String ENCODING = "UTF-8";
-
     private static final String DOCDOESNOTEXIST = "docdoesnotexist";
+
+    @Inject
+    private Environment environment;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -169,14 +172,14 @@ public class SkinAction extends XWikiAction
                     && !(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
                     // defaultbaseskin can only be on the filesystem, so don't try to use it as a
                     // skin document.
-                    if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin), context)) {
+                    if (renderSkinFileFromResource(defaultbaseskin, filename, context)) {
                         found = true;
                         break;
                     }
                 }
 
                 // Try in the resources directory.
-                if (renderFileFromFilesystem(getResourceFilePath(filename), context)) {
+                if (renderFileFromResource(getResourcePath(), filename, context)) {
                     found = true;
                     break;
                 }
@@ -203,11 +206,13 @@ public class SkinAction extends XWikiAction
      * @param filename Name of the file.
      * @param skin Name of the skin to search in.
      * @throws IOException if filename is invalid
+     * @deprecated use {@link Environment#getResource(String, String)} or
+     *             {@link Environment#getResourceAsStream(String, String)} instead
      */
+    @Deprecated(since = "18.2.0, 17.10.5")
     public String getSkinFilePath(String filename, String skin) throws IOException
     {
-        String path =
-            URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename).normalize().toString();
+        String path = URI.create(getSkinPath(skin) + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
             LOGGER.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
@@ -216,15 +221,28 @@ public class SkinAction extends XWikiAction
         return path;
     }
 
+    private String getSkinPath(String skin)
+    {
+        return DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER;
+    }
+
+    private String getResourcePath()
+    {
+        return DELIMITER + RESOURCES_DIRECTORY + DELIMITER;
+    }
+
     /**
      * Get the path for the given file in resources.
      *
      * @param filename Name of the file.
      * @throws IOException if filename is invalid
+     * @deprecated use {@link Environment#getResource(String, String)} or
+     *             {@link Environment#getResourceAsStream(String, String)} instead
      */
+    @Deprecated(since = "18.2.0, 17.10.5")
     public String getResourceFilePath(String filename) throws IOException
     {
-        String path = URI.create(DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename).normalize().toString();
+        String path = URI.create(getResourcePath() + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
             LOGGER.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
@@ -260,33 +278,55 @@ public class SkinAction extends XWikiAction
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
-                        && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context));
+                        && renderSkinFileFromResource(doc.getName(), filename, context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response:", e);
         }
 
-        return renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context);
+        return renderSkinFileFromResource(doc.getName(), filename, context);
     }
 
     /**
-     * Tries to serve a file from the filesystem.
+     * Tries to serve a skin file from the environment resources.
      *
+     * @param skinName the name of the skin
      * @param path Path of the file that should be rendered.
      * @param context The current {@link XWikiContext request context}.
      * @return {@code true} if the file was found and its content was successfully sent.
      * @throws XWikiException If the response cannot be sent.
      */
-    private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
+    private boolean renderSkinFileFromResource(String skinName, String path, XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("Rendering filesystem file from path [{}]", path);
+        LOGGER.debug("Rendering filesystem file from path [{}] in skin [{}]", path, skinName);
 
+        // Make sure the skin exist
+        if (this.environment.getResource(SKINS_DIRECTORY, skinName + "/") == null) {
+            LOGGER.debug("No filesystem skin with name [{}] can be found in resources", skinName);
+
+            return false;
+        }
+
+        return renderFileFromResource(getSkinPath(skinName), path, context);
+    }
+
+    /**
+     * Tries to serve a file from the envribment resources.
+     *
+     * @param prefixPath the prefix to search for the resource file
+     * @param path the path of the file that should be rendered.
+     * @param context The current {@link XWikiContext request context}.
+     * @return {@code true} if the file was found and its content was successfully sent.
+     * @throws XWikiException If the response cannot be sent.
+     */
+    private boolean renderFileFromResource(String prefixPath, String path, XWikiContext context) throws XWikiException
+    {
         XWikiResponse response = context.getResponse();
-        try {
-            byte[] data;
-            data = context.getWiki().getResourceContentAsBytes(path);
-            if (data != null && data.length > 0) {
+        try (InputStream input = this.environment.getResourceAsStream(prefixPath, path)) {
+            if (input != null) {
+                // Always force UTF-8, as this is the assumed encoding for text files.
+                String content = IOUtils.toString(input, StandardCharsets.UTF_8);
                 String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
 
                 Date modified = null;
@@ -294,30 +334,27 @@ public class SkinAction extends XWikiAction
                 // Evaluate the file only if it's of a supported type.
                 String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
-                    // Always force UTF-8, as this is the assumed encoding for text files.
-                    String rawContent = new String(data, ENCODING);
-
                     // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
                     DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
                         XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
                     String evaluatedContent =
-                        evaluateVelocity(rawContent, path, superadminUserReference, null, context);
+                        evaluateVelocity(content, path, superadminUserReference, null, context);
 
-                    byte[] newdata = evaluatedContent.getBytes(ENCODING);
                     // If the content contained velocity code, then it should not be cached
-                    if (Arrays.equals(newdata, data)) {
+                    if (Strings.CS.equals(evaluatedContent, content)) {
                         modified = context.getWiki().getResourceLastModificationDate(path);
                     } else {
                         modified = new Date();
-                        data = newdata;
+                        content = evaluatedContent;
                     }
 
-                    response.setCharacterEncoding(ENCODING);
+                    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                 } else {
                     modified = context.getWiki().getResourceLastModificationDate(path);
                 }
 
                 // Write the content to the response's output stream.
+                byte[] data = content.getBytes(StandardCharsets.UTF_8);
                 setupHeaders(response, mimetype, modified, data.length);
                 try {
                     response.getOutputStream().write(data);
@@ -331,6 +368,7 @@ public class SkinAction extends XWikiAction
         } catch (IOException ex) {
             LOGGER.info("Skin file [{}] does not exist or cannot be accessed", path);
         }
+
         return false;
     }
 
@@ -373,10 +411,10 @@ public class SkinAction extends XWikiAction
             XWikiResponse response = context.getResponse();
             // Since object fields are read as unicode strings, the result does not depend on the wiki encoding. Force
             // the output to UTF-8.
-            response.setCharacterEncoding(ENCODING);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
             // Write the content to the response's output stream.
-            byte[] data = content.getBytes(ENCODING);
+            byte[] data = content.getBytes(StandardCharsets.UTF_8);
             setupHeaders(response, mimetype, doc.getDate(), data.length);
             response.getOutputStream().write(data);
 
@@ -439,7 +477,7 @@ public class SkinAction extends XWikiAction
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
                 byte[] data = attachment.getContent(context);
                 // Always force UTF-8, as this is the assumed encoding for text files.
-                String velocityCode = new String(data, ENCODING);
+                String velocityCode = new String(data, StandardCharsets.UTF_8);
 
                 // Evaluate the content with the rights of the document's author.
                 String evaluatedContent =
@@ -447,10 +485,10 @@ public class SkinAction extends XWikiAction
                         doc.getDocumentReference(), context);
 
                 // Prepare the response.
-                response.setCharacterEncoding(ENCODING);
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
                 // Write the content to the response's output stream.
-                data = evaluatedContent.getBytes(ENCODING);
+                data = evaluatedContent.getBytes(StandardCharsets.UTF_8);
                 setupHeaders(response, mimetype, attachment.getDate(), data.length);
                 response.getOutputStream().write(data);
             } else {

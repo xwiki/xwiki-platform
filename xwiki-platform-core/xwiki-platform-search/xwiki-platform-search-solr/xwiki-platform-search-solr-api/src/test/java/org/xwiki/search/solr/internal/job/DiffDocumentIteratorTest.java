@@ -19,9 +19,6 @@
  */
 package org.xwiki.search.solr.internal.job;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,7 +30,13 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link DiffDocumentIterator}.
@@ -85,23 +88,33 @@ public class DiffDocumentIteratorTest
         }
     }
 
+    private ImmutablePair<DocumentReference, DocumentIteratorEntry> entry(String wiki, String space, String document,
+        long docId, String version)
+    {
+        return new ImmutablePair<DocumentReference, DocumentIteratorEntry>(new DocumentReference(wiki, space, document),
+            new DocumentIteratorEntry(new WikiReference(wiki), docId, version));
+    }
+
     @Test
     public void iterate()
     {
-        List<Pair<DocumentReference, String>> previous = new ArrayList<Pair<DocumentReference, String>>();
-        previous.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "B", "M"), "2.3"));
-        previous.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "E", "A"), "5.1"));
-        previous.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("xwiki", "A", "S"), "1.1"));
-        DocumentIterator<String> previousIterator = new DocumentIteratorStub<String>(previous);
+        List<Pair<DocumentReference, DocumentIteratorEntry>> previous =
+            new ArrayList<Pair<DocumentReference, DocumentIteratorEntry>>();
+        previous.add(entry("chess", "B", "M", 2, "2.3"));
+        previous.add(entry("chess", "E", "A", 3, "5.1"));
+        previous.add(entry("xwiki", "A", "S", 4, "1.1"));
+        DocumentIterator<DocumentIteratorEntry> previousIterator =
+            new DocumentIteratorStub<DocumentIteratorEntry>(previous);
 
-        List<Pair<DocumentReference, String>> next = new ArrayList<Pair<DocumentReference, String>>();
-        next.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "B", "L"), "1.2"));
-        next.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "B", "M"), "4.7"));
-        next.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("xwiki", "A", "S"), "1.1"));
-        next.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("xwiki", "B", "P"), "2.4"));
-        DocumentIterator<String> nextIterator = new DocumentIteratorStub<String>(next);
+        List<Pair<DocumentReference, DocumentIteratorEntry>> next =
+            new ArrayList<Pair<DocumentReference, DocumentIteratorEntry>>();
+        next.add(entry("chess", "B", "L", 1, "1.2"));
+        next.add(entry("chess", "B", "M", 2, "4.7"));
+        next.add(entry("xwiki", "A", "S", 4, "1.1"));
+        next.add(entry("xwiki", "B", "P", 5, "2.4"));
+        DocumentIterator<DocumentIteratorEntry> nextIterator = new DocumentIteratorStub<>(next);
 
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(previousIterator, nextIterator);
+        DiffDocumentIterator iterator = new DiffDocumentIterator(previousIterator, nextIterator);
 
         assertEquals(4, iterator.size());
 
@@ -123,15 +136,16 @@ public class DiffDocumentIteratorTest
     @Test
     public void deleteAll()
     {
-        List<Pair<DocumentReference, String>> previous = new ArrayList<Pair<DocumentReference, String>>();
-        previous.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("wiki", "A", "B"), "3.1"));
-        previous.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("wiki", "X", "Y"), "5.2"));
-        DocumentIterator<String> previousIterator = new DocumentIteratorStub<String>(previous);
+        List<Pair<DocumentReference, DocumentIteratorEntry>> previous =
+            new ArrayList<Pair<DocumentReference, DocumentIteratorEntry>>();
+        previous.add(entry("wiki", "A", "B", 1, "3.1"));
+        previous.add(entry("wiki", "X", "Y", 2, "5.2"));
+        DocumentIterator<DocumentIteratorEntry> previousIterator = new DocumentIteratorStub<>(previous);
 
-        List<Pair<DocumentReference, String>> next = Collections.emptyList();
-        DocumentIterator<String> nextIterator = new DocumentIteratorStub<String>(next);
+        List<Pair<DocumentReference, DocumentIteratorEntry>> next = Collections.emptyList();
+        DocumentIterator<DocumentIteratorEntry> nextIterator = new DocumentIteratorStub<>(next);
 
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(previousIterator, nextIterator);
+        DiffDocumentIterator iterator = new DiffDocumentIterator(previousIterator, nextIterator);
 
         List<Pair<DocumentReference, Action>> actualResult = new ArrayList<Pair<DocumentReference, Action>>();
         while (iterator.hasNext()) {
@@ -148,9 +162,9 @@ public class DiffDocumentIteratorTest
     @Test
     public void setRootReference()
     {
-        DocumentIterator<String> previous = mock(DocumentIterator.class, "previous");
-        DocumentIterator<String> next = mock(DocumentIterator.class, "next");
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(previous, next);
+        DocumentIterator<DocumentIteratorEntry> previous = mock(DocumentIterator.class, "previous");
+        DocumentIterator<DocumentIteratorEntry> next = mock(DocumentIterator.class, "next");
+        DiffDocumentIterator iterator = new DiffDocumentIterator(previous, next);
 
         WikiReference rootReference = new WikiReference("foo");
         iterator.setRootReference(rootReference);
@@ -163,9 +177,9 @@ public class DiffDocumentIteratorTest
     @Test
     public void remove()
     {
-        DocumentIterator<String> previous = mock(DocumentIterator.class, "previous");
-        DocumentIterator<String> next = mock(DocumentIterator.class, "next");
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(previous, next);
+        DocumentIterator<DocumentIteratorEntry> previous = mock(DocumentIterator.class, "previous");
+        DocumentIterator<DocumentIteratorEntry> next = mock(DocumentIterator.class, "next");
+        DiffDocumentIterator iterator = new DiffDocumentIterator(previous, next);
         try {
             iterator.remove();
             fail();

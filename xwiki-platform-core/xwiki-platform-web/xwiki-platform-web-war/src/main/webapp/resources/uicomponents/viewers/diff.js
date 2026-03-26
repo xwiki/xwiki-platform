@@ -100,7 +100,7 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
 
   var hideHTMLDiffContext = function(htmlDiff) {
     // Hide all context nodes.
-    htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', true);
+    htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', 'true');
     // Show ellipsis before and after diff blocks.
     htmlDiff.find('[data-xwiki-html-diff-block]').each(function() {
       maybeMarkEllipsis(getPreviousElement(this), true);
@@ -115,7 +115,7 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
       var htmlDiff = toggle.closest('.changes-body').find('.html-diff');
       if (toggle.hasClass('html-diff-context-toggle-show')) {
         // Show all context nodes.
-        htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', false);
+        htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', 'false');
         toggle.removeClass('html-diff-context-toggle-show').addClass('html-diff-context-toggle-hide');
       } else {
         hideHTMLDiffContext(htmlDiff);

@@ -19,8 +19,11 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.FormContainerElement;
@@ -114,6 +117,33 @@ public class ClassEditPage extends EditPage
     public boolean hasProperty(String propertyName)
     {
         return getDriver().hasElement(By.id("xproperty_" + propertyName));
+    }
+
+    /**
+     *
+     * @return the ordered list of property names.
+     * @since 17.9.0RC1
+     */
+    public List<String> getProperties()
+    {
+        return getDriver().findElements(By.className("xproperty")).stream()
+            .map(item -> item.getAttribute("id").substring("xproperty_".length()))
+            .toList();
+    }
+
+    /**
+     * Move one property above the other one.
+     * @param propertyToMove the property to move
+     * @param propertyBefore the property above which to place the first property
+     * @since 17.9.0RC1
+     */
+    public void movePropertyBefore(String propertyToMove, String propertyBefore)
+    {
+        WebElement moveToolSource = getDriver()
+            .findElementWithoutWaiting(By.id("xproperty_" + propertyToMove))
+            .findElement(By.cssSelector(".tool.move"));
+        WebElement target = getDriver().findElementWithoutWaiting(By.id("xproperty_" + propertyBefore));
+        new Actions(getDriver().getWrappedDriver()).dragAndDrop(moveToolSource, target).perform();
     }
 
     private FormContainerElement getForm()

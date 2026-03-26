@@ -19,21 +19,50 @@
  */
 package org.xwiki.annotation.maintainer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.xwiki.annotation.Annotation;
-import org.xwiki.annotation.AnnotationsMockSetup;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.annotation.internal.content.DefaultTextExtractor;
+import org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer;
+import org.xwiki.annotation.internal.content.WhiteSpaceContentAlterer;
+import org.xwiki.annotation.internal.content.filter.WhiteSpaceFilter;
+import org.xwiki.annotation.internal.renderer.PlainTextNormalizingRenderer;
+import org.xwiki.annotation.io.IOService;
+import org.xwiki.annotation.io.IOServiceException;
+import org.xwiki.annotation.io.IOTargetService;
+import org.xwiki.annotation.maintainer.internal.CharacterDiffService;
+import org.xwiki.annotation.maintainer.internal.DefaultAnnotationMaintainer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
+import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
+import org.xwiki.rendering.internal.transformation.DefaultRenderingContext;
+import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.test.page.XWikiSyntax20ComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the annotation maintainer that updates annotations when documents change.
@@ -41,148 +70,149 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.3M1
  */
-@RunWith(Parameterized.class)
-public class AnnotationMaintainerTest extends AbstractComponentTestCase
+@XWikiSyntax20ComponentList
+@ComponentList({
+    PlainTextNormalizingRenderer.class,
+    SpaceNormalizerContentAlterer.class,
+    WhiteSpaceFilter.class,
+    PlainTextStreamParser.class,
+    DefaultLinkLabelGenerator.class,
+    DefaultTextExtractor.class,
+    URLResourceReferenceTypeParser.class,
+    PlainTextRendererFactory.class,
+    DefaultTransformationManager.class,
+    DefaultRenderingConfiguration.class,
+    DefaultRenderingContext.class,
+    DefaultExecution.class,
+    CharacterDiffService.class,
+    WhiteSpaceContentAlterer.class
+})
+@ComponentTest
+class AnnotationMaintainerTest
 {
     /**
      * Document description files to run this test for.
      */
-    private static Collection<String[]> files = new ArrayList<>();
+    private static final List<String> files = List.of(
+        "maintainer/correction/Correction1",
+        "maintainer/correction/Correction2",
+        "maintainer/correction/Correction3",
+        "maintainer/correction/Correction4",
 
-    /**
-     * Mock document to run tests for.
-     */
-    protected String docName;
+        "maintainer/correction/multiple/CorrectionMultiple1",
+        "maintainer/correction/multiple/CorrectionMultiple2",
+        "maintainer/correction/multiple/CorrectionMultiple3",
+        "maintainer/correction/multiple/CorrectionMultiple4",
+        "maintainer/correction/multiple/CorrectionMultiple5",
 
-    /**
-     * The annotation maintainer under test.
-     */
-    protected AnnotationMaintainer annotationMaintainer;
+        "maintainer/endpoint/Beginning1",
+        "maintainer/endpoint/Beginning2",
+        "maintainer/endpoint/Beginning3",
+        "maintainer/endpoint/Beginning4",
+        "maintainer/endpoint/Beginning5",
 
-    /**
-     * The setup for mocking components needed in annotation code.
-     */
-    protected AnnotationsMockSetup setup;
+        "maintainer/endpoint/End1",
+        "maintainer/endpoint/End2",
+        "maintainer/endpoint/End3",
+        "maintainer/endpoint/End4",
+        "maintainer/endpoint/End5",
 
-    static {
-        addFileToTest("maintainer/correction/Correction1");
-        addFileToTest("maintainer/correction/Correction2");
-        addFileToTest("maintainer/correction/Correction3");
-        addFileToTest("maintainer/correction/Correction4");
-
-        addFileToTest("maintainer/correction/multiple/CorrectionMultiple1");
-        addFileToTest("maintainer/correction/multiple/CorrectionMultiple2");
-        addFileToTest("maintainer/correction/multiple/CorrectionMultiple3");
-        addFileToTest("maintainer/correction/multiple/CorrectionMultiple4");
-        addFileToTest("maintainer/correction/multiple/CorrectionMultiple5");
-
-        addFileToTest("maintainer/endpoint/Beginning1");
-        addFileToTest("maintainer/endpoint/Beginning2");
-        addFileToTest("maintainer/endpoint/Beginning3");
-        addFileToTest("maintainer/endpoint/Beginning4");
-        addFileToTest("maintainer/endpoint/Beginning5");
-
-        addFileToTest("maintainer/endpoint/End1");
-        addFileToTest("maintainer/endpoint/End2");
-        addFileToTest("maintainer/endpoint/End3");
-        addFileToTest("maintainer/endpoint/End4");
-        addFileToTest("maintainer/endpoint/End5");
-
-        addFileToTest("maintainer/endpoint/Endpoints1");
-        addFileToTest("maintainer/endpoint/Endpoints2");
-        addFileToTest("maintainer/endpoint/Endpoints3");
-        addFileToTest("maintainer/endpoint/Endpoints4");
+        "maintainer/endpoint/Endpoints1",
+        "maintainer/endpoint/Endpoints2",
+        "maintainer/endpoint/Endpoints3",
+        "maintainer/endpoint/Endpoints4",
 
         // TODO: the following tests, paragraph and altered, need to be reviewed since there are multiple issues with
         // character based diff that cause them to yield different results for a difference of a single letter which can
         // cause a matching point.
-        addFileToTest("maintainer/paragraph/Paragraph1");
-        addFileToTest("maintainer/alter/Altered1");
+        "maintainer/paragraph/Paragraph1",
+        "maintainer/alter/Altered1",
         // TODO: enable when/if fixed: see comment in the file
-        // addFileToTest("maintainer/alter/Altered2");
-        addFileToTest("maintainer/alter/Altered3");
-        addFileToTest("maintainer/alter/Altered4");
+        // "maintainer/alter/Altered2",
+        "maintainer/alter/Altered3",
+        "maintainer/alter/Altered4",
 
         // tests for the uniqueness maintenance
-        addFileToTest("maintainer/uniqueness/Unique1");
-        addFileToTest("maintainer/uniqueness/Unique2");
-        addFileToTest("maintainer/uniqueness/Unique3");
+        "maintainer/uniqueness/Unique1",
+        "maintainer/uniqueness/Unique2",
+        "maintainer/uniqueness/Unique3",
 
-        addFileToTest("maintainer/uniqueness/Duplicate1");
-        addFileToTest("maintainer/uniqueness/Duplicate2");
-        addFileToTest("maintainer/uniqueness/Duplicate3");
-        addFileToTest("maintainer/uniqueness/Duplicate4");
-        addFileToTest("maintainer/uniqueness/Duplicate5");
-        addFileToTest("maintainer/uniqueness/Duplicate6");
-        addFileToTest("maintainer/uniqueness/Duplicate7");
-        addFileToTest("maintainer/uniqueness/Duplicate8");
-        addFileToTest("maintainer/uniqueness/Duplicate9");
+        "maintainer/uniqueness/Duplicate1",
+        "maintainer/uniqueness/Duplicate2",
+        "maintainer/uniqueness/Duplicate3",
+        "maintainer/uniqueness/Duplicate4",
+        "maintainer/uniqueness/Duplicate5",
+        "maintainer/uniqueness/Duplicate6",
+        "maintainer/uniqueness/Duplicate7",
+        "maintainer/uniqueness/Duplicate8",
+        "maintainer/uniqueness/Duplicate9",
 
         // tests for the cases when annotation stays unchanged, regardless of the changes on the content, or the
         // selection of the annotation. Should check that the updater doesn't even run on these annotations
-        addFileToTest("maintainer/unchanged/Unchanged1");
-        addFileToTest("maintainer/unchanged/Unchanged2");
-        addFileToTest("maintainer/unchanged/Unchanged3");
-        addFileToTest("maintainer/unchanged/Unchanged4");
-        addFileToTest("maintainer/unchanged/Unchanged5");
+        "maintainer/unchanged/Unchanged1",
+        "maintainer/unchanged/Unchanged2",
+        "maintainer/unchanged/Unchanged3",
+        "maintainer/unchanged/Unchanged4",
+        "maintainer/unchanged/Unchanged5",
 
-        addFileToTest("maintainer/spaces/Spaces1");
-        addFileToTest("maintainer/spaces/Spaces2");
-        addFileToTest("maintainer/spaces/Spaces3");
-        addFileToTest("maintainer/spaces/Spaces4");
-        addFileToTest("maintainer/spaces/Spaces5");
+        "maintainer/spaces/Spaces1",
+        "maintainer/spaces/Spaces2",
+        "maintainer/spaces/Spaces3",
+        "maintainer/spaces/Spaces4",
+        "maintainer/spaces/Spaces5"
         // TODO: add test cases here for the case when an annotation becomes non-unique on update, but the 2 differ by
         // some spaces (spaceless they are the same, but with normalized spaces they are different. Maintainer will fail
         // in this case)
 
         // TODO: add tests for the case of multiple annotations which are being changed
-    }
+    );
 
     /**
-     * Builds a maintainer test to test the passed document name.
-     *
-     * @param docName the name of the document (and mock file) to test
+     * The annotation maintainer under test.
      */
-    public AnnotationMaintainerTest(String docName)
+    @InjectMockComponents
+    private DefaultAnnotationMaintainer annotationMaintainer;
+
+    @MockComponent
+    private IOTargetService ioTargetService;
+
+    @MockComponent
+    private IOService ioService;
+
+    @MockComponent
+    private SyntaxRegistry syntaxRegistry;
+
+    @BeforeComponent
+    void registerComponents(MockitoComponentManager componentManager) throws Exception
     {
-        this.docName = docName;
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
     }
 
-    /**
-     * Adds a file to the list of files to run tests for.
-     *
-     * @param docName the name of the document / file to test
-     */
-    protected static void addFileToTest(String docName)
+    MockDocument setup(String docName) throws IOServiceException, IOException, ParseException
     {
-        files.add(new String[] {docName});
-    }
+        TestDocumentFactory docFactory = new TestDocumentFactory();
+        MockDocument mDoc = docFactory.getDocument(docName);
+        when(ioService.getAnnotations(docName)).thenReturn(mDoc.getAnnotations());
+        doAnswer(invocationOnMock -> {
+            String documentName = invocationOnMock.getArgument(0);
+            org.xwiki.annotation.MockDocument document = docFactory.getDocument(documentName);
+            Collection<Annotation> annList = invocationOnMock.getArgument(1);
+            for (Annotation ann : annList) {
+                Annotation toUpdate = getAnnotation(ann.getId(), document.getAnnotations());
+                // remove toUpdate and add ann
+                if (toUpdate != null) {
+                    document.getAnnotations().remove(toUpdate);
+                }
+                document.getAnnotations().add(ann);
+            }
+            return null;
+        }).when(ioService).updateAnnotations(eq(docName), any(Collection.class));
 
-    /**
-     * @return list of corpus files to instantiate tests for
-     */
-    @Parameters
-    public static Collection<String[]> data()
-    {
-        return files;
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        annotationMaintainer = getComponentManager().getInstance(AnnotationMaintainer.class);
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        // register the IO mockups
-        setup = new AnnotationsMockSetup(getComponentManager(), new TestDocumentFactory());
-        setup.setupExpectations(docName);
+        when(ioTargetService.getSource(docName)).thenReturn(mDoc.getSource());
+        when(ioTargetService.getSourceSyntax(docName)).thenReturn(mDoc.getSyntax());
+        when(syntaxRegistry.getSyntax("xwiki/2.0")).thenReturn(Optional.of(Syntax.XWIKI_2_0));
+        when(syntaxRegistry.resolveSyntax("xwiki/2.0")).thenReturn(Syntax.XWIKI_2_0);
+        return mDoc;
     }
 
     /**
@@ -191,11 +221,13 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
      * @throws IOException if anything goes wrong mocking the documents
      * @throws MaintainerServiceException if anything goes wrong maintaining the the document annotations
      */
-    @Test
-    public void testUpdate() throws IOException, MaintainerServiceException
+    @ParameterizedTest
+    @FieldSource("files")
+    void testUpdate(String docName) throws IOException, MaintainerServiceException, IOServiceException, ParseException
     {
+
         // ignore the docName ftm, just test the marvelous setup
-        MockDocument doc = ((TestDocumentFactory) setup.getDocFactory()).getDocument(docName);
+        MockDocument doc = setup(docName);
         // TODO: this is not the place to put this code, but it's the most comfortable
         copyOriginalSelections(doc);
 
@@ -233,7 +265,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
      * @param list the list of annotations where to search for the passed annotation
      * @return the found annotation
      */
-    private Annotation getAnnotation(String annId, Collection<Annotation> list)
+    private static Annotation getAnnotation(String annId, Collection<Annotation> list)
     {
         for (Annotation ann : list) {
             if (ann.getId().equals(annId)) {

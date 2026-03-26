@@ -19,24 +19,25 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
-
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.StreamProvider;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.filesystem.internal.AttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.BlobSaveTransactionRunnable;
 import org.xwiki.store.serialization.SerializationStreamProvider;
 import org.xwiki.store.serialization.Serializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
 
 /**
  * A TransactionRunnable for saving attachment archives.
@@ -55,7 +56,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      * @param fileTools a set of tools for getting the file corrisponding to each version of the
      * attachment content and the file for the meta data, as well as temporary
      * and backup files corrisponding to each. Also for getting locks.
-     * @param provider the means to get the files to store each version of the attachment.
+     * @param provider the means to get the blobs to store each version of the attachment.
      * @param serializer an attachment list metadata serializer for serializing the metadata of each
      * version of the attachment.
      * @param context the XWikiContext used to get the revisions of the attachment.
@@ -63,11 +64,11 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      */
     public AttachmentArchiveSaveRunnable(final XWikiAttachmentArchive archive,
         final FilesystemStoreTools fileTools,
-        final AttachmentFileProvider provider,
+        final AttachmentBlobProvider provider,
         final Serializer<List<XWikiAttachment>,
             List<XWikiAttachment>> serializer,
         final XWikiContext context)
-        throws XWikiException
+        throws XWikiException, BlobStoreException
     {
         if (archive instanceof VoidAttachmentVersioningStore.VoidAttachmentArchive) {
             return;
@@ -89,18 +90,18 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
 
             // If the content is not dirty and the file was already saved then we will not update.
             if (attachVer.isContentDirty()
-                || !provider.getAttachmentVersionContentFile(versionName).exists())
+                || !provider.getAttachmentVersionContentBlob(versionName).exists())
             {
                 final StreamProvider contentProvider =
                     new AttachmentContentStreamProvider(attachVer, context);
-                addSaver(contentProvider, fileTools, provider.getAttachmentVersionContentFile(versionName));
+                addSaver(contentProvider, fileTools, provider.getAttachmentVersionContentBlob(versionName));
             }
         }
 
         // Then do the metadata.
         final StreamProvider metaProvider =
             new SerializationStreamProvider<List<XWikiAttachment>>(serializer, attachmentVersions);
-        addSaver(metaProvider, fileTools, provider.getAttachmentVersioningMetaFile());
+        addSaver(metaProvider, fileTools, provider.getAttachmentVersioningMetaBlob());
     }
 
     /**
@@ -112,12 +113,10 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      */
     private void addSaver(final StreamProvider provider,
         final FilesystemStoreTools fileTools,
-        final File saveHere)
+        final Blob saveHere) throws BlobStoreException
     {
-        new FileSaveTransactionRunnable(saveHere,
-            fileTools.getTempFile(saveHere),
-            fileTools.getBackupFile(saveHere),
-            fileTools.getLockForFile(saveHere),
+        new BlobSaveTransactionRunnable(saveHere, fileTools.getTempFile(saveHere), fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere.getPath()),
             provider).runIn(this);
     }
 }

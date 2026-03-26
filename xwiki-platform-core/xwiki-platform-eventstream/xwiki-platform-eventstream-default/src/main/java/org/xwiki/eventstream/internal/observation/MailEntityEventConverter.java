@@ -34,7 +34,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EntityEvent;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.eventstream.events.MailEntityDeleteEvent;
@@ -42,7 +41,6 @@ import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
-import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 /**
  * Convert all mail entity events to remote events and back to local events.
@@ -54,7 +52,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 @Component
 @Singleton
 @Named("mailentity")
-public class MailEntityEventConverter extends AbstractEventConverter
+public class MailEntityEventConverter extends AbstractStreamEventConverter
 {
     private static final Set<Class<? extends Event>> EVENTS =
         new HashSet<>(Arrays.asList(MailEntityAddedEvent.class, MailEntityDeleteEvent.class));
@@ -62,9 +60,6 @@ public class MailEntityEventConverter extends AbstractEventConverter
     private static final String PROP_EVENTID = "eventId";
 
     private static final String PROP_ENTITYID = "entityId";
-
-    @Inject
-    private EventStore store;
 
     @Inject
     private Logger logger;
@@ -122,7 +117,7 @@ public class MailEntityEventConverter extends AbstractEventConverter
 
             String eventId = (String) map.get(PROP_EVENTID);
 
-            Optional<org.xwiki.eventstream.Event> event = this.store.getEvent(eventId);
+            Optional<org.xwiki.eventstream.Event> event = getEvent(eventId);
 
             if (event.isPresent()) {
                 return new DefaultEntityEvent(event.get(), (String) map.get(PROP_ENTITYID));

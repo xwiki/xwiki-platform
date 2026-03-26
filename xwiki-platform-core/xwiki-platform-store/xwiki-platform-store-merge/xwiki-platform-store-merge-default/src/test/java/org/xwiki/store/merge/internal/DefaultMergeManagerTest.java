@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheManager;
@@ -63,7 +62,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -110,7 +108,7 @@ public class DefaultMergeManagerTest
         assertEquals("content\n", result.getMergeResult());
         assertTrue(result.isModified());
         assertFalse(result.hasConflicts());
-        verify(conflictDecisionsManager, times(1)).getConflictDecisionList(documentReference, userReference);
+        verify(conflictDecisionsManager).getConflictDecisionList(documentReference, userReference);
     }
 
     @Test
@@ -270,7 +268,6 @@ public class DefaultMergeManagerTest
     }
 
     @Nested
-    @DisplayName("Merge Documents tests")
     @ComponentList(value = {
         DefaultDiffManager.class,
         DefaultMergeManager.class,

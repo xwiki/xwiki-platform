@@ -368,7 +368,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      */
     public List<String> getFileItemNames(XWikiContext context)
     {
-        List<String> itemnames = new ArrayList<String>();
+        List<String> itemnames = new ArrayList<>();
         List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {
             return itemnames;

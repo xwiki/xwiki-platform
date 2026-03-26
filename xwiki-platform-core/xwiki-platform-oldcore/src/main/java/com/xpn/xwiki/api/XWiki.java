@@ -309,12 +309,7 @@ public class XWiki extends Api
      */
     public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
-        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
-            return null;
-        }
-
-        return doc.newDocument(getXWikiContext());
+        return getDocument(this.xwiki.getDocumentReference(reference, type, getXWikiContext()));
     }
 
     /**
@@ -329,11 +324,11 @@ public class XWiki extends Api
     public Document getDocument(DocumentReference reference) throws XWikiException
     {
         try {
-            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
-                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+            if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
                 return null;
             }
+
+            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
 
             return doc.newDocument(getXWikiContext());
         } catch (Exception ex) {
@@ -498,7 +493,7 @@ public class XWiki extends Api
             if (attachments == null || attachments.isEmpty()) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -529,7 +524,7 @@ public class XWiki extends Api
             if (attachments == null) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -1005,7 +1000,7 @@ public class XWiki extends Api
      */
     public List<Document> wrapDocs(List<?> docs)
     {
-        List<Document> result = new ArrayList<Document>();
+        List<Document> result = new ArrayList<>();
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
@@ -1437,7 +1432,7 @@ public class XWiki extends Api
      */
     public List<String> getWikiNames()
     {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         try {
             result = this.xwiki.getVirtualWikisDatabaseNames(getXWikiContext());

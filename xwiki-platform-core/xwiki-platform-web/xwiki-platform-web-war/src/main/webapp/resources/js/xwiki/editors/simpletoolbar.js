@@ -22,15 +22,7 @@ require(['jquery'], function ($) {
     constructor()
     {
       let self = this;
-      self._insertTagFunction = self._defaultInsertTag;
-      $('textarea').each(function() {
-          self._initTextarea($(this), self);
-      });
-      $(document).on('xwiki:dom:updated', function (event, data) {
-        $(data.elements).find('textarea').each(function() {
-          self._initTextarea($(this), self);
-        });
-      })
+      self._insertTagMap = {};
     }
 
    /**
@@ -40,8 +32,10 @@ require(['jquery'], function ($) {
     * @param insertTagFunction the function used for overriding, which needs to take 4 parameters (see
     * _defaultInsertTag) for the example.
     */
-    setInsertTagFunction(insertTagFunction) {
-      this._insertTagFunction = insertTagFunction;
+    setInsertTagFunction(insertTagFunction, textarea) {
+      if (textarea !== undefined) {
+        this._insertTagMap[textarea.id] = insertTagFunction;
+      }
     }
 
     _defaultInsertTag(textarea, tagOpen, tagClose, sampleText) {
@@ -74,40 +68,75 @@ require(['jquery'], function ($) {
       return text.replace(/\\n/g, '\n');
     }
 
-    _initTextarea(textarea, self) {
+    _initTextarea(configElement, self) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
-      let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
-      for (let item of buttonConfig.toolbarElements) {
-        let button = $('<button></button>');
-        button.attr({
+      let buttonConfig = this._parseConfiguration(configElement);
+      let textarea = configElement.nextAll('textarea:first');
+      let syntax = textarea.data('syntax');
+      if (typeof syntax === 'string' && (syntax.startsWith('xwiki') || syntax === 'confluence/1.0')) {
+        const toolbarElement = buttonConfig.toolbarElements || [];
+        for (let item of toolbarElement) {
+          let button = $('<button></button>');
+          button.attr({
             type: 'button',
             class: 'wikitoolbar-button',
             title: item.speedTip
-        });
-        let image = $('<img />');
-        image.attr({
-          src: item.image,
-          alt: item.speedTip,
-          title: item.speedTip
-        });
-        button.on('click', function () {
-          self._insertTagFunction(textarea[0],
-            self._unescapeLineBreaks(item.tagOpen),
-            self._unescapeLineBreaks(item.tagClose),
-            item.sampleText);
-        });
-        button.append(image);
-        buttonMenu.append(button);
+          });
+          let image = $('<img />');
+          image.attr({
+            src: item.image,
+            alt: item.speedTip,
+            title: item.speedTip
+          });
+          button.on('click', function () {
+            self._getInsertTagFunction(textarea[0], self)(textarea[0],
+              self._unescapeLineBreaks(item.tagOpen),
+              self._unescapeLineBreaks(item.tagClose),
+              item.sampleText);
+          });
+          button.append(image);
+          buttonMenu.append(button);
+        }
+        textarea.before(buttonMenu);
+        configElement.addClass('initialized');
+        $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
       }
-      textarea.before(buttonMenu);
-      $(document).trigger('xwiki:dom:updated', {'elements': [textarea]});
+    }
+
+    _getInsertTagFunction(textarea, self) {
+      if (self._insertTagMap[textarea.id] !== undefined) {
+        return self._insertTagMap[textarea.id];
+      } else {
+        return self._defaultInsertTag;
+      }
+    }
+
+    /**
+     * @returns {Object} the resolved configuration as an unstructured object, or the empty object in case of error.
+     */
+    _parseConfiguration(configElement)
+    {
+      try {
+        return configElement.data('xwiki-simpletoolbar-configuration');
+      } catch (e) {
+        console.error('Error parsing simpletoolbar configuration: ', e);
+        return {};
+      }
     }
   }
 
+  XWiki = window.XWiki || {};
+  XWiki.editors = XWiki.editors || {};
+  XWiki.editors.SimpleToolbar = new SimpleToolbar();
+  $(document).on('xwiki:dom:updated', function (event, data) {
+    $(data.elements).find('.simpletoolbar-configuration').not('.initialized').each(function () {
+      XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
+    });
+  });
   let init = function () {
-    XWiki = window.XWiki || {};
-    XWiki.editors = XWiki.editors || {};
-    XWiki.editors.SimpleToolbar = new SimpleToolbar();
-  };
-  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
+    $(document).find('.simpletoolbar-configuration').not('.initialized').each(function () {
+      XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
+    });
+  }
+  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
 });

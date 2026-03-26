@@ -45,12 +45,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,7 +60,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DeletedDocument;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
@@ -76,12 +80,6 @@ public class DefaultModelBridge implements ModelBridge
      * character).
      */
     private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_/])");
-
-    /**
-     * The reference to the type of object used to create an automatic redirect when renaming or moving a document.
-     */
-    private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE =
-        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "RedirectClass");
 
     @Inject
     private Logger logger;
@@ -148,6 +146,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private Provider<LinkStore> linkStoreProvider;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -246,25 +247,33 @@ public class DefaultModelBridge implements ModelBridge
     public void createRedirect(DocumentReference oldReference, DocumentReference newReference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference redirectClassReference =
-            new DocumentReference(REDIRECT_CLASS_REFERENCE, oldReference.getWikiReference());
         try {
-            if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
-                XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
+            XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
 
-                // Avoid modifying the cached document
-                oldDocument = oldDocument.clone();
+            // Avoid modifying the cached document
+            oldDocument = oldDocument.clone();
 
-                int number = oldDocument.createXObject(redirectClassReference, xcontext);
-                String location = this.defaultEntityReferenceSerializer.serialize(newReference);
-                oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
-                oldDocument.setHidden(true);
-                xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
-                this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
-            } else {
-                this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
-                    oldReference, newReference, redirectClassReference);
+            // Configure the document authors
+            UserReference currentUser =
+                this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE);
+            if (oldDocument.isNew()) {
+                oldDocument.getAuthors().setCreator(currentUser);
+                oldDocument.getAuthors().setContentAuthor(currentUser);
+                oldDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
             }
+            oldDocument.getAuthors().setOriginalMetadataAuthor(currentUser);
+
+            // Add the redirect object
+            BaseObject redirectObjet = oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, xcontext);
+            String location = this.defaultEntityReferenceSerializer.serialize(newReference);
+            redirectObjet.setStringValue("location", location);
+
+            // Make sure the redirect page is hidden by default
+            oldDocument.setHidden(true);
+
+            // Save the redirect page
+            xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
+            this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
         } catch (XWikiException e) {
             this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference, e);
         }
@@ -276,10 +285,8 @@ public class DefaultModelBridge implements ModelBridge
         try {
             XWikiContext xcontext = this.xcontextProvider.get();
             XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-            DocumentReference redirectClassReference =
-                new DocumentReference(REDIRECT_CLASS_REFERENCE, documentReference.getWikiReference());
             // Overwrite silently the redirect pages.
-            return document.getXObject(redirectClassReference) != null;
+            return document.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null;
         } catch (XWikiException e) {
             this.logger.warn("Failed to get document [{}]. Root cause: [{}].", documentReference,
                 ExceptionUtils.getRootCauseMessage(e));

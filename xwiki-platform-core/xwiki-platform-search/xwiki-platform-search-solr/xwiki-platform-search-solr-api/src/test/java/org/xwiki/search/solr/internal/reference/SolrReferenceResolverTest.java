@@ -526,7 +526,7 @@ public class SolrReferenceResolverTest
         String id = this.defaultSolrReferenceResolver.getId(this.documentReference111);
 
         // Assert and verify
-        Assert.assertEquals(this.documentReference111 + "_fr", id);
+        Assert.assertEquals(this.documentReference111 + "_", id);
     }
 
     // getQuery

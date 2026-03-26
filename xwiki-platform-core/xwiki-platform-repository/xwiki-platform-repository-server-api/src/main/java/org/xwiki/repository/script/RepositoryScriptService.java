@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -33,9 +34,15 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.QueryException;
 import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Named("repository")
@@ -61,6 +68,9 @@ public class RepositoryScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
@@ -121,5 +131,24 @@ public class RepositoryScriptService implements ScriptService
     public ExtensionSupportPlans resolveExtensionSupportPlans(Collection<String> supportPlanIds)
     {
         return this.extensionStore.resolveExtensionSupportPlans(supportPlanIds);
+    }
+
+    /**
+     * @param extensionId the identifier of the extension
+     * @param version the version for which to find the object
+     * @return the object holding the extension version metadata
+     * @throws QueryException when failing to get the version object
+     * @throws XWikiException when failing to get the version object
+     * @since 17.9.0RC1
+     */
+    public Object getVersionObject(String extensionId, String version) throws QueryException, XWikiException
+    {
+        XWikiDocument extensionDoc = this.extensionStore.getExistingExtensionDocumentById(extensionId);
+        XWikiContext context = contextProvider.get();
+        // FIXME: add some checks
+        XWikiDocument extensionVersionDocument =
+            this.extensionStore.getExtensionVersionDocument(extensionDoc, version, context);
+        return new Object(this.extensionStore.getExtensionVersionObject(extensionVersionDocument, version),
+            context);
     }
 }

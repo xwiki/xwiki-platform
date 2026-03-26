@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects.classes;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
@@ -29,6 +30,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Unit tests for the {@link NumberClass} class.
@@ -43,7 +45,7 @@ public class NumberClassTest
 
     /** Test the fromString method. */
     @Test
-    public void testFromString()
+    public void testFromString() throws XWikiException
     {
         // Create a default Number property
         NumberClass nc = new NumberClass();
@@ -52,11 +54,14 @@ public class NumberClassTest
         nc.setObject(bc);
 
         // A String value containing non-numeric caracters can not be respresented as a numeric value, so this sould
-        // return null
-        assertNull(nc.fromString("asd"));
+        // throw an exception
+        XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
+        assertEquals("Error number 0 in 0: Error when parsing [asd] to type [long]",  xWikiException.getMessage());
 
-        // A much too long number cannot be represented as a long value, so this should also return null
-        assertNull(nc.fromString("1111111111111111111111111111111111"));
+        // A much too long number cannot be represented as a long value, so this should throw an exception
+        xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("1111111111111111111111111111111111"));
+        assertEquals("Error number 0 in 0: Error when parsing [1111111111111111111111111111111111] to type [long]",
+            xWikiException.getMessage());
 
         BaseProperty p;
 

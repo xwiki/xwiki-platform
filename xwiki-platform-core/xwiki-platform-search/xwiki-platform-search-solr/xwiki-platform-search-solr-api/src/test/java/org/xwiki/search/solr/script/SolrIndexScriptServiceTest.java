@@ -238,7 +238,7 @@ public class SolrIndexScriptServiceTest
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
         // hasProgrammingRights does not really get to be called, since hasWikiAdminRights already failed at this point
-        verify(this.contextualAuthorizationManager, times(0)).checkAccess(Right.PROGRAM);
+        verify(this.contextualAuthorizationManager, never()).checkAccess(Right.PROGRAM);
 
         // Rights check failure.
         verify(this.logger).error(isNull(), any(AccessDeniedException.class));

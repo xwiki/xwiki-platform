@@ -72,6 +72,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 13.4RC1
  */
+@SuppressWarnings({ "checkstyle:MultipleStringLiterals", "checkstyle:ClassFanOutComplexity" })
 @ComponentTest
 class ModelBridgeTest
 {
@@ -231,6 +232,26 @@ class ModelBridgeTest
     }
 
     @Test
+    void updateDocumentEnforceRequiredRightsField() throws Exception
+    {
+        String property = "doc.enforceRequiredRights";
+        Object value = "true";
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+
+        when(this.document.isContentDirty()).thenReturn(true);
+        when(this.document.isEnforceRequiredRights()).thenReturn(false);
+        when(this.document.validate(this.xcontext)).thenReturn(true);
+
+        Optional<Object> update = this.modelBridge.update(property, value, documentReference, null);
+        assertEquals(false, update.get());
+
+        verify(this.document).setEnforceRequiredRights(true);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+    }
+
+    @Test
     void updateDocumentTitleFieldButNotValid() throws Exception
     {
         String property = "doc.title";
@@ -303,7 +324,7 @@ class ModelBridgeTest
         when(this.baseObject.getPropertyNames()).thenReturn(new String[] { "field" });
         when(this.baseObject.get("field")).thenReturn(this.propertyInterface);
 
-        this.modelBridge.updateAll(entry, documentReference, classReference);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
         verify(this.baseClass).fromMap(Collections.singletonMap("field", 55), this.baseObject);
         verify(this.document).setHidden(false);
 
@@ -320,7 +341,8 @@ class ModelBridgeTest
         when(this.document.isNew()).thenReturn(true);
 
         LiveDataException liveDataException = assertThrows(LiveDataException.class,
-            () -> this.modelBridge.updateAll(new HashMap<>(), documentReference, classReference));
+            () -> this.modelBridge.updateAll((Map<String, Object>) new HashMap<String, Object>(), documentReference,
+                classReference, Map.of(), 0));
 
         assertEquals("We do not support updating new documents.", liveDataException.getMessage());
 
@@ -359,10 +381,63 @@ class ModelBridgeTest
         when(this.localSerializer.serialize(classReference)).thenReturn("MyTest.MyClass");
         when(this.htmlConverter.fromHTML("to convert", "xwiki/2.0")).thenReturn("converted value");
 
-        this.modelBridge.updateAll(entry, documentReference, classReference);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
         verify(this.baseClass).fromMap(Collections.singletonMap("field_known", "converted value"), this.baseObject);
         verify(this.document).setHidden(false);
 
         verify(this.authorization).checkAccess(Right.EDIT, documentReference);
+    }
+
+    @Test
+    void updateAllWithCustomClassPerProperty() throws Exception
+    {
+        // The code modifies the passed map so we can't use Map.of() here.
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("customField", "value");
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyTest", "MyDoc");
+        DocumentReference defaultClassReference = new DocumentReference("xwiki", "MyTest", "MyClass");
+        DocumentReference customClassReference = new DocumentReference("xwiki", "MyTest", "CustomClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.getXObject(customClassReference, 0)).thenReturn(this.baseObject);
+        when(this.baseObject.getXClass(this.xcontext)).thenReturn(this.baseClass);
+        when(this.baseObject.getPropertyNames()).thenReturn(new String[] { "customField" });
+        when(this.baseObject.get("customField")).thenReturn(this.propertyInterface);
+
+        Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
+
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+
+        verify(this.baseClass).fromMap(Map.of("customField", "value"), this.baseObject);
+        verify(this.authorization).checkAccess(Right.EDIT, documentReference);
+    }
+
+    @Test
+    void updatePropertyWithHtmlConversionCustomClass() throws Exception
+    {
+        // The code modifies the passed map so we can't use Map.of() here.
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.hidden", "false");
+        entry.put("customField", "<p>value</p>");
+        entry.put("customField_syntax", "xwiki/2.0");
+        entry.put("RequiresHTMLConversion", "MyTest.CustomClass_0_customField");
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyTest", "MyDoc");
+        DocumentReference defaultClassReference = new DocumentReference("xwiki", "MyTest", "MyClass");
+        DocumentReference customClassReference = new DocumentReference("xwiki", "MyTest", "CustomClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.getXObject(customClassReference, 0)).thenReturn(this.baseObject);
+        when(this.baseObject.getXClass(this.xcontext)).thenReturn(this.baseClass);
+        when(this.baseObject.getPropertyNames()).thenReturn(new String[] { "customField" });
+        when(this.baseObject.get("customField")).thenReturn(this.propertyInterface);
+        when(this.localSerializer.serialize(customClassReference)).thenReturn("MyTest.CustomClass");
+        when(this.htmlConverter.fromHTML("<p>value</p>", "xwiki/2.0")).thenReturn("converted value");
+
+        Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
+
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+        verify(this.baseClass)
+            .fromMap(Map.of("customField", "converted value"), this.baseObject);
+        verify(this.document).setHidden(false);
     }
 }

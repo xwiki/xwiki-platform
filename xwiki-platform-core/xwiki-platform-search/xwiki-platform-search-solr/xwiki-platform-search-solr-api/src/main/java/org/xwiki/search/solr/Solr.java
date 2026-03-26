@@ -22,7 +22,6 @@ package org.xwiki.search.solr;
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
-import org.xwiki.stability.Unstable;
 
 /**
  * The central entry point to access a Solr core.
@@ -49,7 +48,6 @@ public interface Solr
      * @throws SolrException when failing to create the solr client
      * @since 16.2.0RC1
      */
-    @Unstable
     default XWikiSolrCore getCore(String name) throws SolrException
     {
         return new DefaultXWikiSolrCore(name, name, getClient(name));

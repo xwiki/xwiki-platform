@@ -19,7 +19,7 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -97,7 +97,7 @@ public abstract class AbstractCKEditorIT
     {
         editor.getToolBar().toggleSourceMode();
         String actualSource = editor.getSourceTextArea().getDomProperty("value");
-        assertTrue(StringUtils.contains(actualSource, expectedSource), "Unexpected source: " + actualSource);
+        assertTrue(Strings.CS.contains(actualSource, expectedSource), "Unexpected source: " + actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }

@@ -279,11 +279,16 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         if (userObj != null) {
             String password = userObj.getStringValue(PASSWORD_FIELD);
             if (!password.startsWith("hash:")) {
-                if (isMain && resetPassword) {
-                    userObj.set(PASSWORD_FIELD, "", context);
-                } else {
-                    // The set method should automatically compute the hash
-                    userObj.set(PASSWORD_FIELD, password, context);
+                try {
+                    if (isMain && resetPassword) {
+                        userObj.set(PASSWORD_FIELD, "", context);
+                    } else {
+                        // The set method should automatically compute the hash
+                        userObj.set(PASSWORD_FIELD, password, context);
+                    }
+                } catch (XWikiException e) {
+                    // Note: this should never happen since it's a standard string field.
+                    this.logger.error("Error while reseting password field for user [{}]", userDoc, e);
                 }
                 result = true;
             } else if (isMain) {

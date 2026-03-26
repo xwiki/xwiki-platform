@@ -61,7 +61,7 @@ public class XWikiRESTServlet extends HttpServlet
         if (this.container == null) {
             // Do the initialization at the beginning of the first request because we need the previous filters to be
             // executed (which is not the case in #init)
-            initializeCountainer(req.getServletContext());
+            initializeContainer(req.getServletContext());
         }
 
         // Only HTTP requests are supported
@@ -100,7 +100,7 @@ public class XWikiRESTServlet extends HttpServlet
         return path.replace("+", "%20");
     }
 
-    private synchronized void initializeCountainer(ServletContext servletContext) throws ServletException
+    private synchronized void initializeContainer(ServletContext servletContext) throws ServletException
     {
         if (this.container != null) {
             return;

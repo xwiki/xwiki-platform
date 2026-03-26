@@ -42,6 +42,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -192,7 +193,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
 
         // We converted the slides to PDF. Now convert each page of the PDF to an image.
         List<String> filenames = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(officeConverterResult.getOutputFile())) {
+        try (PDDocument document = Loader.loadPDF(officeConverterResult.getOutputFile())) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
             int numberOfPages = document.getPages().getCount();
             for (int pageCounter = 0; pageCounter < numberOfPages; ++pageCounter) {

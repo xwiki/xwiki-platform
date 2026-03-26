@@ -109,10 +109,12 @@
       readOnly: true,
       editorFocus: false,
       canUndo: false,
-      exec: function() {
+      exec: function(editor, {preserveSelection = true}) {
         // We want to make sure the selection / caret is visible after this command is executed. In order to do this we
         // save the selection now and restore it at the end.
-        CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
+        if (preserveSelection) {
+          CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
+        }
 
         this.toggleState();
         var maximized = this.state === CKEDITOR.TRISTATE_ON;
@@ -144,11 +146,13 @@
         editor.fire('maximize', this.state);
 
         // Make sure the selection is visible.
-        CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+        if (preserveSelection) {
+          CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+        }
       }
     });
 
-    var beforeModeUnloadListener, modeListener, beforeDestroyListener;
+    var beforeModeUnloadListener, modeChangeListener, beforeDestroyListener;
 
     var enterFullScreenMode = function(editor) {
       // Remove the marker from the old editing area before switching modes (e.g. WYSIWYG to Source).
@@ -157,11 +161,15 @@
       // Mark the new editing area after switching modes (e.g. WYSIWYG to Source). We register this listener with a
       // higher priority in order to make sure it is executed before the listener that restores the selection after the
       // editing mode changed.
-      modeListener = editor.on('mode', updateEditingArea.bind(null, editor), null, null, 5);
+      modeChangeListener = CKEDITOR.plugins.xwikiSource?.addModeChangeHandler(editor,
+        () => updateEditingArea(editor), 6);
 
       // Leave the full-screen mode before destroying the editor in order to clean the full-screen markers.
       // Otherwise, the next editing session might start directly in full-screen mode.
-      beforeDestroyListener = editor.once('beforeDestroy', editor.execCommand.bind(editor, 'maximize'));
+      beforeDestroyListener = editor.once('beforeDestroy', editor.execCommand.bind(editor, 'maximize', {
+        // The editor is being destroyed so there is no need to save and restore the selection.
+        preserveSelection: false
+      }));
 
       // Update the position and height of the editing area when the browser window is resized.
       $(window).on('resize.maximize', updateEditingArea.bind(null, editor));
@@ -173,8 +181,8 @@
     };
 
     var leaveFullScreenMode = function(editor) {
-      [beforeModeUnloadListener, modeListener, beforeDestroyListener].forEach(function(listener) {
-        listener.removeListener();
+      [beforeModeUnloadListener, modeChangeListener, beforeDestroyListener].forEach(function(listener) {
+        listener?.removeListener();
       });
       $(window).off('resize.maximize');
 

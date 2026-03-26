@@ -20,15 +20,12 @@
 
 package org.xwiki.livedata;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Helper interface to represents all live data elements that needs initialization.
  *
  * @version $Id$
  * @since 16.8.0RC1
  */
-@Unstable
 public interface InitializableLiveDataElement
 {
     /**

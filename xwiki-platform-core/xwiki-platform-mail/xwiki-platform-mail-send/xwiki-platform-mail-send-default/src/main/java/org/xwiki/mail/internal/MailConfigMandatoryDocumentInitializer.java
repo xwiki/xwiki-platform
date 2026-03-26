@@ -199,7 +199,7 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
     }
 
     private void setField(String oldPropertyName, String newPropertyName, BaseObject object, XWiki xwiki,
-        XWikiContext xwikiContext)
+        XWikiContext xwikiContext) throws XWikiException
     {
         String oldValue = xwiki.getSpacePreference(oldPropertyName, xwikiContext);
         if (!StringUtils.isEmpty(oldValue)) {

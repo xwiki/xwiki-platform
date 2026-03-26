@@ -25,7 +25,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent an entity with an information about either or not the entity is selected to perform some refactoring.
@@ -82,7 +81,6 @@ public class EntitySelection implements Comparable<EntitySelection>
      * @param targetEntityReference the target reference of the refactoring
      * @since 16.10.0RC1
      */
-    @Unstable
     public EntitySelection(EntityReference sourceEntityReference, EntityReference targetEntityReference)
     {
         this.sourceEntityReference = sourceEntityReference;
@@ -101,7 +99,6 @@ public class EntitySelection implements Comparable<EntitySelection>
      * @return the target reference of the refactoring if any.
      * @since 16.10.0RC1
      */
-    @Unstable
     public Optional<EntityReference> getTargetEntityReference()
     {
         return (targetEntityReference != null) ? Optional.of(targetEntityReference) : Optional.empty();

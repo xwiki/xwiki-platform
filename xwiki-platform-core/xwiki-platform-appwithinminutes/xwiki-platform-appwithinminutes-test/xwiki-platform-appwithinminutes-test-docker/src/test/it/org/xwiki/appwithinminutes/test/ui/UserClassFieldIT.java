@@ -111,18 +111,19 @@ class UserClassFieldIT
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // The suggestions should be case-insensitive. Match the last name.
-        List<SuggestionElement> suggestions = userPicker.sendKeys("mOr").waitForSuggestions().getSuggestions();
+        List<SuggestionElement> suggestions = userPicker.sendKeys("mOr").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(2, suggestions.size());
         assertUserSuggestion(suggestions.get(0), "Thomas Mortagne");
         assertUserSuggestion(suggestions.get(1), "Eduard Moraru", "Enygma2002");
 
         // Match the first name.
-        suggestions = userPicker.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "As").waitForSuggestions().getSuggestions();
+        suggestions =
+            userPicker.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "As").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
         assertUserSuggestion(suggestions.get(0), "Thomas Mortagne");
 
         // Match the alias.
-        suggestions = userPicker.sendKeys(Keys.BACK_SPACE, "20").waitForSuggestions().getSuggestions();
+        suggestions = userPicker.sendKeys(Keys.BACK_SPACE, "20").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
         assertUserSuggestion(suggestions.get(0), "Eduard Moraru", "Enygma2002");
 
@@ -131,20 +132,21 @@ class UserClassFieldIT
         assertTrue(suggestions.isEmpty());
 
         // Default administrator user should be suggested.
-        suggestions = userPicker.clear().sendKeys("admin").waitForSuggestions().getSuggestions();
+        suggestions = userPicker.clear().sendKeys("admin").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
         assertUserSuggestion(suggestions.get(0), ADMIN_NAME, "Admin", ADMIN_AVATAR);
 
         // "a" should bring many suggestions. Also, a single letter should bring suggestions.
-        assertTrue(userPicker.clear().sendKeys("a").waitForSuggestions().getSuggestions().size() > 2);
+        assertTrue(userPicker.clear().sendKeys("a").waitForNonTypedSuggestions().getSuggestions().size() > 2);
 
         // An empty text input brings a default list of suggestions. There should be at least 3 users (the 2 users we
-        // created plus the default administrator).
-        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForSuggestions().getSuggestions().size() > 2);
+        // created plus the default administrator). Note that the default list of suggestions has already been fetched
+        // so we don't need to wait for the remote source.
+        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForNonTypedSuggestions(false).getSuggestions().size() > 2);
 
         // We should be able to close the list of suggestions using the escape key.
         assertTrue(
-            userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ESCAPE).getSuggestions().isEmpty());
+            userPicker.sendKeys("mor").waitForNonTypedSuggestions().sendKeys(Keys.ESCAPE).getSuggestions().isEmpty());
     }
 
     @Test
@@ -155,7 +157,7 @@ class UserClassFieldIT
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
 
         // Use the keyboard.
-        userPicker.sendKeys("mor").waitForSuggestions().sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
+        userPicker.sendKeys("mor").waitForNonTypedSuggestions().sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
@@ -173,18 +175,18 @@ class UserClassFieldIT
         assertEquals(singletonList(""), userPicker.getValues());
 
         // When there is only one suggestion, Enter key should select it.
-        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(1, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), ADMIN_NAME, "Admin", ADMIN_AVATAR);
         assertEquals(singletonList("XWiki.Admin"), userPicker.getValues());
     }
 
-    /*
-    Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
-    behaviour of the query itself: since we don't save the application, the query is performed on the
-    AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
-    multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
+    /**
+     * Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
+     * behaviour of the query itself: since we don't save the application, the query is performed on the
+     * AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
+     * multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
      */
     @Test
     @Order(3)
@@ -198,8 +200,8 @@ class UserClassFieldIT
         SuggestInputElement userPicker = userField.getPicker();
 
         // Select 2 users.
-        userPicker.sendKeys("tmortagne").waitForSuggestions().sendKeys(Keys.ENTER);
-        userPicker.sendKeys("2002").waitForSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
+        userPicker.clear().sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
@@ -210,12 +212,12 @@ class UserClassFieldIT
         selectedUsers.get(0).delete();
 
         // Select another user.
-        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.clear().sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(0), ADMIN_NAME, "Admin", ADMIN_AVATAR);
-        assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        assertEquals(asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValues());
+        assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
+        assertUserSuggestion(selectedUsers.get(1), ADMIN_NAME, "Admin", ADMIN_AVATAR);
+        assertEquals(asList("XWiki.Enygma2002", "XWiki.Admin"), userPicker.getValues());
 
         // Clear the list of selected users.
         userPicker.clearSelectedSuggestions();
@@ -229,7 +231,7 @@ class UserClassFieldIT
     {
         ApplicationClassEditPage editor = goToEditor(testReference);
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
-        userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("thomas").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView().edit();
 
         SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane("user1");
@@ -248,7 +250,7 @@ class UserClassFieldIT
         userPicker = userField.getPicker();
 
         // Select one more user.
-        userPicker.sendKeys("admin").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
@@ -259,12 +261,12 @@ class UserClassFieldIT
         assertUserSuggestion(selectedUsers.get(1), ADMIN_NAME, "Admin", ADMIN_AVATAR);
         assertEquals(asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValues());
 
-        List<SuggestionElement> suggestions = userPicker.sendKeys("XXX").waitForSuggestions().getSuggestions();
+        List<SuggestionElement> suggestions = userPicker.sendKeys("XXX").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
         suggestions.get(0).select();
 
         // We should be able to input free text also.
-        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
+        userPicker.clear().sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
@@ -296,7 +298,7 @@ class UserClassFieldIT
         ApplicationClassEditPage editor = goToEditor(testReference);
         // Create the application class.
         SuggestInputElement userPicker = new SuggestClassFieldEditPane(editor.addField("User").getName()).getPicker();
-        userPicker.sendKeys("thomas").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.sendKeys("thomas").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         editor.clickSaveAndView();
 
         // Create the application entry.
@@ -316,7 +318,7 @@ class UserClassFieldIT
         assertEquals(singletonList("XWiki.tmortagne"), userPicker.getValues());
 
         // Change the selected user.
-        userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForSuggestions().sendKeys(Keys.ENTER);
+        userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         entryEditPage.clickSaveAndView();
 
         // Assert the view mode.

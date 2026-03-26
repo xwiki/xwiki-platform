@@ -27,7 +27,6 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PageClass;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +55,6 @@ public class ImplicitlyAllowedValuesPageQueryBuilderTest
         when(dbListClass.getIdField()).thenReturn("doc.name");
         this.queryBuilder.build(pageClass);
         // The method shouldn't be called once more when the id field is defined
-        verify(dbListClass, times(1)).setIdField("doc.fullName");
+        verify(dbListClass).setIdField("doc.fullName");
     }
 }

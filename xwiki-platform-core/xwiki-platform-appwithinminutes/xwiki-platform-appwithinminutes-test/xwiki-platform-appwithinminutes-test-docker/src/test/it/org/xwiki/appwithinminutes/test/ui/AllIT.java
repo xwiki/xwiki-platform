@@ -19,7 +19,6 @@
  */
 package org.xwiki.appwithinminutes.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,61 +32,51 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall AWM LiveTable test")
     class NestedAppsLiveTableIT extends AppsLiveTableIT
     {
     }
 
     @Nested
-    @DisplayName("Application wizard test")
     class NestedWizardIT extends WizardIT
     {
     }
 
     @Nested
-    @DisplayName("StaticListClassField test")
     class NestedStaticListClassFieldIT extends StaticListClassFieldIT
     {
     }
 
     @Nested
-    @DisplayName("LiveTable Generator test")
     class NestedLiveTableGeneratorIT extends LiveTableGeneratorIT
     {
     }
 
     @Nested
-    @DisplayName("Add entry test")
     class NestedAddEntryIT extends AddEntryIT
     {
     }
 
     @Nested
-    @DisplayName("Document fields test")
     class NestedDocumentFieldsIT extends DocumentFieldsIT
     {
     }
 
     @Nested
-    @DisplayName("Application name test")
     class NestedApplicationNameIT extends ApplicationNameIT
     {
     }
     
     @Nested
-    @DisplayName("User class field test")
     class NestedUserClassFieldIT extends UserClassFieldIT
     {
     }
 
     @Nested
-    @DisplayName("Class Editor tests")
     class NestedClassEditorIT extends ClassEditorIT
     {
     }
 
     @Nested
-    @DisplayName("Without script right test")
     class NestedWithoutScriptRightIT extends WithoutScriptRightIT
     {
     }

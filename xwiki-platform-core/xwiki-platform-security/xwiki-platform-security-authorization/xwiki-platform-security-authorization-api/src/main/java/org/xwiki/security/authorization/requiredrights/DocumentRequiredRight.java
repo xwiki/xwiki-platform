@@ -21,7 +21,6 @@ package org.xwiki.security.authorization.requiredrights;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * A required right set on a document.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.10.0RC1
  */
-@Unstable
 public record DocumentRequiredRight(Right right, EntityType scope)
 {
 }

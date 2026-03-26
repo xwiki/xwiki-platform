@@ -1263,7 +1263,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             return (String) query.uniqueResult()[1];
         });
 
-        this.isMySQLMyISAM = (createTable != null && createTable.equals("MyISAM"));
+        this.isMySQLMyISAM = "MyISAM".equals(createTable);
     }
 
     @Override

@@ -28,6 +28,6 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 17.6.0RC1
  */
 @UITest
-class BlockNoteIT
+class BlockNoteIT extends AbstractBlockNoteIT
 {
 }

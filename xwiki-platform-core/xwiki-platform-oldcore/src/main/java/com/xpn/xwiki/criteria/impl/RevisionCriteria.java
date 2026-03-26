@@ -21,8 +21,6 @@ package com.xpn.xwiki.criteria.impl;
 
 import java.util.Date;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * information about document versions used to retreive a set of document versions.
  *
@@ -170,7 +168,6 @@ public class RevisionCriteria
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public boolean isAllInclusive()
     {
         return this.includeMinorVersions

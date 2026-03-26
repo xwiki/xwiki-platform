@@ -38,13 +38,13 @@ public class XWikiQuery extends XWikiCriteria
 {
     protected boolean distinct = false;
 
-    protected List<String> displayProperties = new ArrayList<String>();
+    protected List<String> displayProperties = new ArrayList<>();
 
-    protected List<String> addProperties = new ArrayList<String>();
+    protected List<String> addProperties = new ArrayList<>();
 
-    protected List<String> groupbyProperties = new ArrayList<String>();
+    protected List<String> groupbyProperties = new ArrayList<>();
 
-    protected List<OrderClause> orderProperties = new ArrayList<OrderClause>();
+    protected List<OrderClause> orderProperties = new ArrayList<>();
 
     public XWikiQuery()
     {
@@ -86,10 +86,10 @@ public class XWikiQuery extends XWikiCriteria
 
     public void reset()
     {
-        displayProperties = new ArrayList<String>();
-        addProperties = new ArrayList<String>();
-        groupbyProperties = new ArrayList<String>();
-        orderProperties = new ArrayList<OrderClause>();
+        displayProperties = new ArrayList<>();
+        addProperties = new ArrayList<>();
+        groupbyProperties = new ArrayList<>();
+        orderProperties = new ArrayList<>();
     }
 
     public void setDistinct(boolean distinct)
@@ -121,7 +121,7 @@ public class XWikiQuery extends XWikiCriteria
 
     public void setDisplayProperty(String property)
     {
-        displayProperties = new ArrayList<String>();
+        displayProperties = new ArrayList<>();
         displayProperties.add(property);
     }
 
@@ -142,7 +142,7 @@ public class XWikiQuery extends XWikiCriteria
 
     public void addOrderProperty(String property, String order)
     {
-        addOrderProperty(property, order.equals("desc") ? OrderClause.DESC : OrderClause.ASC);
+        addOrderProperty(property, "desc".equals(order) ? OrderClause.DESC : OrderClause.ASC);
     }
 
     public void addOrderProperty(String property, int order)

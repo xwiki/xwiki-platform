@@ -248,7 +248,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractSystem
     }
 
     protected void setBaseProperty(String propertyName, Object propertyValue, BaseObject baseObject,
-        BaseClass baseClass)
+        BaseClass baseClass) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -471,6 +471,6 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractSystem
     protected boolean isEmpty(Object value)
     {
         // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-        return value == null || (value instanceof String && (value.equals("") || value.equals(NO_VALUE)));
+        return value == null || ("".equals(value) || NO_VALUE.equals(value));
     }
 }

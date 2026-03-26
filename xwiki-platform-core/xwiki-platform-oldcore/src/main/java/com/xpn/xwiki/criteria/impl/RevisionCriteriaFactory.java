@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.criteria.impl;
 
-import org.xwiki.stability.Unstable;
-
 public class RevisionCriteriaFactory
 {
     public RevisionCriteriaFactory()
@@ -118,7 +116,6 @@ public class RevisionCriteriaFactory
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public RevisionCriteria createRevisionCriteria(boolean includeMinorVersions)
     {
         return new RevisionCriteria("", PeriodFactory.createMaximumPeriod(), RangeFactory.createAllRange(),

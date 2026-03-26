@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import javax.servlet.ServletContext;
@@ -43,8 +44,9 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
- * 
+ * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution Context and the
+ * old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
+ *
  * @version $Id$
  * @since 2.2M2
  * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead
@@ -97,15 +99,19 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         // correctly with a Servlet Context.
         ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         final ServletContext mockServletContext = getMockery().mock(ServletContext.class);
-        environment.setServletContext(mockServletContext);
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/xwiki.cfg");
             will(returnValue(null));
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/resourcecheck/a%61b");
+            will(returnValue(new ByteArrayInputStream("a%61b".getBytes())));
+            allowing(mockServletContext).getRealPath("/");
+            will(returnValue(null));
             allowing(mockServletContext).getAttribute("jakarta.servlet.context.tempdir");
-                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+            will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
+        environment.setServletContext(mockServletContext);
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         getMockery().checking(new Expectations() {{

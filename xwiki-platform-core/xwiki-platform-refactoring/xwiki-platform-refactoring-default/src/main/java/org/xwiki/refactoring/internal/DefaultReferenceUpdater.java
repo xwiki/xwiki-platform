@@ -67,6 +67,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultReferenceUpdater implements ReferenceUpdater
 {
     @Inject

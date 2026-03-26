@@ -27,6 +27,8 @@ import org.xwiki.filter.event.model.WikiSpaceFilter;
  * @version $Id$
  * @since 6.2M1
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface XWikiWikiDocumentFilter extends WikiFilter, WikiSpaceFilter, WikiDocumentFilter
 {
     /**

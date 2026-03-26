@@ -57,6 +57,14 @@ if not defined JETTY_STOP_PORT (
   set JETTY_STOP_PORT=8079
 )
 
+rem Get the directory of this script (always ends with a backslash)
+set "XWIKI_HOME=%~dp0"
+
+rem Create environments folder if missing
+if not exist "%XWIKI_HOME%environments" (
+    mkdir "%XWIKI_HOME%environments"
+)
+
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
 REM For example: "C:\PROGRA~1\YOURKI~1.11\bin\win32"

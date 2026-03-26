@@ -130,10 +130,10 @@ public class FormContainerElement extends BaseElement
     {
         getDriver().scrollTo(fieldElement);
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
-            setCheckBox(fieldElement, value.equals("true"));
+            setCheckBox(fieldElement, "true".equals(value));
         } else if ("select".equals(fieldElement.getTagName())) {
             // if a select uses selectized then we should use a SuggestInputElement.
-            if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("selectized")) {
+            if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("tomselected")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(fieldElement);
                 suggestInputElement.clearSelectedSuggestions();
 
@@ -141,8 +141,7 @@ public class FormContainerElement extends BaseElement
                 // we split the values and add them all.
                 // We reuse the multiple check from selenium.support.ui.Select.
                 if (fieldElement.getAttribute("multiple") != null
-                    && !"false".equals(fieldElement.getAttribute("multiple"))
-                    && value.contains("|")) {
+                    && !"false".equals(fieldElement.getAttribute("multiple")) && value.contains("|")) {
                     for (String singleValue : value.split("\\|")) {
                         suggestInputElement.sendKeys(singleValue).selectTypedText();
                     }
@@ -208,7 +207,7 @@ public class FormContainerElement extends BaseElement
 
         public SelectElement(WebElement select)
         {
-            if (!select.getTagName().toLowerCase().equals("select")) {
+            if (!"select".equalsIgnoreCase(select.getTagName())) {
                 throw new WebDriverException("Can only create a select element from a webelement of tag name select.");
             }
             this.select = select;

@@ -19,15 +19,7 @@
  */
 package org.xwiki.extension.script;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionRewriter;
-import org.xwiki.extension.internal.ExtensionUtils;
-import org.xwiki.extension.wrap.WrappingExtension;
+import org.xwiki.extension.InstallOnRootNamespaceExtensionRewriter;
 
 /**
  * Script oriented helper with various ways of rewriting extensions.
@@ -36,37 +28,7 @@ import org.xwiki.extension.wrap.WrappingExtension;
  * @since 8.4.2
  * @since 9.0RC1
  */
-public class ScriptExtensionRewriter implements ExtensionRewriter
+public class ScriptExtensionRewriter extends InstallOnRootNamespaceExtensionRewriter
 {
     private static final long serialVersionUID = 1L;
-
-    private static final List<String> ROOT_NAMESPACES = Arrays.asList((String) null);
-
-    private Set<String> installOnRootNamespace = new HashSet<>();
-
-    /**
-     * @param type the type of extensions that should be installed on root namespace
-     */
-    public void installExtensionTypeOnRootNamespace(String type)
-    {
-        this.installOnRootNamespace.add(type);
-    }
-
-    // ExtensionRewriter
-
-    @Override
-    public Extension rewrite(Extension extension)
-    {
-        if (this.installOnRootNamespace.contains(extension.getType())) {
-            WrappingExtension<?> wrapper = ExtensionUtils.wrap(extension);
-
-            // Overwrite
-
-            wrapper.setOverwrite(Extension.FIELD_ALLOWEDNAMESPACES, ROOT_NAMESPACES);
-
-            return wrapper;
-        }
-
-        return extension;
-    }
 }

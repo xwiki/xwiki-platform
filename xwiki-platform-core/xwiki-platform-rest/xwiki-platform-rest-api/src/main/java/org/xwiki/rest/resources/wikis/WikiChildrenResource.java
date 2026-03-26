@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Pages;
-import org.xwiki.stability.Unstable;
 
 /**
  * The top level pages in the page hierarchy of a given wiki.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.4.0RC1
  */
 @Path("/wikis/{wikiName}/children")
-@Unstable
 public interface WikiChildrenResource
 {
     /**

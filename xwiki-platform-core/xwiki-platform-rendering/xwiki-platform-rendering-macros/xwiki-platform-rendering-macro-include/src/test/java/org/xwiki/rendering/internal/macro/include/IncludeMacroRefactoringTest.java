@@ -107,14 +107,6 @@ class IncludeMacroRefactoringTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void replaceDocumentReferenceWhenNoReferenceParameterSet() throws Exception
-    {
-        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
-        assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(block, null, null,
-            (DocumentReference) null, false, Map.of()));
-    }
-
-    @Test
     void replaceDocumentReferenceWhenEmptyReferenceParameterSet() throws Exception
     {
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);

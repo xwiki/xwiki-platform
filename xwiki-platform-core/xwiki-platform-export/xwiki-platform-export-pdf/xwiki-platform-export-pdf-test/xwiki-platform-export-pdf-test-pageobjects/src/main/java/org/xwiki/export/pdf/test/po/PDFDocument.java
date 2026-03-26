@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.test.po;
 
 import java.awt.geom.Rectangle2D;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -44,6 +46,8 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDe
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDNamedDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 
@@ -56,6 +60,11 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
  */
 public class PDFDocument implements AutoCloseable
 {
+    /**
+     * Holds recently created PDF documents. This list is normally reset before / after each test execution.
+     */
+    public static final List<byte[]> BLOBS = new ArrayList<>();
+
     private final PDDocument document;
 
     private final PDFImageExtractor imageExtractor;
@@ -89,8 +98,16 @@ public class PDFDocument implements AutoCloseable
             String authHeaderValue = "Basic " + new String(encodedAuth);
             connection.setRequestProperty("Authorization", authHeaderValue);
         }
-        this.document = PDDocument.load(IOUtils.toByteArray(connection));
+        this.document = Loader.loadPDF(IOUtils.toByteArray(connection));
         this.imageExtractor = new PDFImageExtractor();
+        save();
+    }
+
+    private void save() throws IOException
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        this.document.save(outputStream);
+        BLOBS.add(outputStream.toByteArray());
     }
 
     @Override
@@ -301,6 +318,36 @@ public class PDFDocument implements AutoCloseable
     public List<PDFImage> getImagesFromPage(int pageNumber) throws IOException
     {
         return getImagesFromPage(this.document.getPage(pageNumber));
+    }
+
+    /**
+     * Each node from the outline is printed on a new lines, with indentation representing the outline hierarchy.
+     *
+     * @return the outline from this PDF document as text
+     * @since 18.0.0RC1
+     * @since 17.10.1
+     */
+    public String getOutlineText()
+    {
+        PDDocumentOutline root = this.document.getDocumentCatalog().getDocumentOutline();
+        PDOutlineItem item = root.getFirstChild();
+        StringBuilder output = new StringBuilder();
+        while (item != null) {
+            printOutlineItem(item, output, 0);
+            item = item.getNextSibling();
+        }
+        return output.toString();
+    }
+
+    private void printOutlineItem(PDOutlineItem item, StringBuilder output, int level)
+    {
+        output.append(StringUtils.repeat("  ", level));
+        output.append(item.getTitle()).append("\n");
+        PDOutlineItem child = item.getFirstChild();
+        while (child != null) {
+            printOutlineItem(child, output, level + 1);
+            child = child.getNextSibling();
+        }
     }
 
     private List<PDFImage> getImagesFromPage(PDPage page) throws IOException

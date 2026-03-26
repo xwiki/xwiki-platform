@@ -128,7 +128,7 @@ public class Package
 
     private boolean withVersions = true;
 
-    private List<DocumentFilter> documentFilters = new ArrayList<DocumentFilter>();
+    private List<DocumentFilter> documentFilters = new ArrayList<>();
 
     public String getName()
     {
@@ -319,9 +319,9 @@ public class Package
 
     public Package()
     {
-        this.files = new ArrayList<DocumentInfo>();
-        this.customMappingFiles = new ArrayList<DocumentInfo>();
-        this.classFiles = new ArrayList<DocumentInfo>();
+        this.files = new ArrayList<>();
+        this.customMappingFiles = new ArrayList<>();
+        this.classFiles = new ArrayList<>();
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException
@@ -385,7 +385,7 @@ public class Package
         add(doc, DefaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
-            if (!((language == null) || (language.equals("")) || (language.equals(doc.getDefaultLanguage())))) {
+            if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
                 add(doc.getTranslatedDocument(language, context), DefaultAction, context);
             }
         }
@@ -397,7 +397,7 @@ public class Package
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        if ((language == null) || (language.equals(""))) {
+        if ((language == null) || (language.isEmpty())) {
             add(doc, DefaultAction, context);
         } else {
             add(doc.getTranslatedDocument(language, context), DefaultAction, context);
@@ -504,7 +504,7 @@ public class Package
         try {
             zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
 
-            List<XWikiDocument> docsToLoad = new LinkedList<XWikiDocument>();
+            List<XWikiDocument> docsToLoad = new LinkedList<>();
             /*
              * Loop 1: Cycle through the zip input stream and load out all of the documents, when we find the
              * package.xml file we put it aside to so that we only include documents which are in the file.
@@ -954,7 +954,7 @@ public class Package
         List<String> list = (List<String>) context.get(name);
 
         if (list == null) {
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
             context.put(name, list);
         }
 
@@ -1183,7 +1183,7 @@ public class Package
 
         // Add language
         String language = doc.getLanguage();
-        if ((language != null) && (!language.equals(""))) {
+        if ((language != null) && (!language.isEmpty())) {
             fileName.append(".");
             fileName.append(language);
         }
@@ -1459,9 +1459,9 @@ public class Package
      */
     public Object toJSON(XWikiContext wikiContext)
     {
-        Map<String, Object> json = new HashMap<String, Object>();
+        Map<String, Object> json = new HashMap<>();
 
-        Map<String, Object> infos = new HashMap<String, Object>();
+        Map<String, Object> infos = new HashMap<>();
         infos.put("name", this.name);
         infos.put("description", this.description);
         infos.put("licence", this.licence);
@@ -1469,18 +1469,17 @@ public class Package
         infos.put("version", this.version);
         infos.put("backup", this.isBackupPack());
 
-        Map<String, Map<String, List<Map<String, String>>>> files =
-            new HashMap<String, Map<String, List<Map<String, String>>>>();
+        Map<String, Map<String, List<Map<String, String>>>> files = new HashMap<>();
 
         for (DocumentInfo docInfo : this.files) {
-            Map<String, String> fileInfos = new HashMap<String, String>();
+            Map<String, String> fileInfos = new HashMap<>();
             fileInfos.put("defaultAction", String.valueOf(docInfo.getAction()));
             fileInfos.put("language", String.valueOf(docInfo.getLanguage()));
             fileInfos.put("fullName", docInfo.getFullName());
 
             // If the space does not exist in the map of spaces, we create it.
             if (files.get(docInfo.getDoc().getSpace()) == null) {
-                files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
+                files.put(docInfo.getDoc().getSpace(), new HashMap<>());
             }
 
             // If the document name does not exist in the space map of docs, we create it.

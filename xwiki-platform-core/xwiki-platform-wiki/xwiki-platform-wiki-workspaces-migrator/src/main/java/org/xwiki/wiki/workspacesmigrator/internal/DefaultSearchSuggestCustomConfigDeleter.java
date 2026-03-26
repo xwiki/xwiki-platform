@@ -70,7 +70,7 @@ public class DefaultSearchSuggestCustomConfigDeleter implements SearchSuggestCus
                 }
                 // Look if the object is to remove
                 String name = object.getStringValue("name");
-                if (name.equals("platform.workspace.searchSuggestSourceWorkspaces")) {
+                if ("platform.workspace.searchSuggestSourceWorkspaces".equals(name)) {
                     String query = object.getStringValue("query");
                     String engine = object.getStringValue("engine");
                     String url = object.getStringValue("url");
@@ -90,22 +90,22 @@ public class DefaultSearchSuggestCustomConfigDeleter implements SearchSuggestCus
     }
 
     /**
-     * Check if the object is the the config object for SolR.
+     * Check if the object is the config object for SolR.
      */
     private boolean isSolrObject(String query, String engine, String url)
     {
-        return engine != null && engine.equals("solr") && query.equals(
-               "class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:(__INPUT__*)")
-               && url.equals("xwiki:WorkspaceManager.WorkspacesSuggestSolrService");
+        return "solr".equals(engine)
+            && "class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:(__INPUT__*)".equals(
+               query) && "xwiki:WorkspaceManager.WorkspacesSuggestSolrService".equals(url);
     }
 
     /**
-     * Check if the object is the the config object for lucene.
+     * Check if the object is the config object for lucene.
      */
     private boolean isLuceneObject(String query, String engine, String url)
     {
-        return (engine == null || engine.equals("lucene")) && query.equals(
-               "XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass")
-               && url.equals("xwiki:WorkspaceManager.WorkspacesSuggestLuceneService");
+        return (engine == null || "lucene".equals(engine))
+            && "XWiki.XWikiServerClass.wikiprettyname:__INPUT__* AND object:WorkspaceManager.WorkspaceClass".equals(
+               query) && "xwiki:WorkspaceManager.WorkspacesSuggestLuceneService".equals(url);
     }
 }

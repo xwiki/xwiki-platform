@@ -98,6 +98,12 @@ public enum EventProperty
      * 
      * @since 14.7RC1
      */
+    REMOTE_OBSERVATION_ID,
+    /**
+     * The date of the prefiltering of the event.
+     *
+     * @since 17.10.1
+     */
     @Unstable
-    REMOTE_OBSERVATION_ID
+    PREFILTERING_DATE
 }

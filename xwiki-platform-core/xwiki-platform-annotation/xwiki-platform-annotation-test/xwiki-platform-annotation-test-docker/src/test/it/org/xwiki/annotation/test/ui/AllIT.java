@@ -19,7 +19,6 @@
  */
 package org.xwiki.annotation.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -31,13 +30,11 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Annotations Tests")
     class NestedAnnotationsIT extends AnnotationsIT
     {
     }
 
     @Nested
-    @DisplayName("Annotations Administration Tests")
     class NestedAnnotationsAdministrationIT extends AnnotationsAdministrationIT
     {
     }

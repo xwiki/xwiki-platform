@@ -202,7 +202,9 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
 
         // Write nested spaces
         for (EntityReferenceTreeNode child : node.getChildren()) {
-            writeSpace(child, filter, proxyFilter);
+            if (isSpaceEnabled((SpaceReference) child.getReference())) {
+                writeSpace(child, filter, proxyFilter);
+            }
         }
 
         // Extend end space

@@ -62,6 +62,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Named("document")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     /**

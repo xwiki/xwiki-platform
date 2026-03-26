@@ -167,9 +167,6 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeLiveTableColumn(String columnLabel)
     {
         WebElement column = getLiveTableColumn(columnLabel);
-        // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
-        // not really hidden: it is displayed with white color (the page background-color).
-        new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
         getDriver().scrollTo(column.findElement(By.className("delete"))).click();
     }
 

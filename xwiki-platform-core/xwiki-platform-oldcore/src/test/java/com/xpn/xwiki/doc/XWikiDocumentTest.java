@@ -825,8 +825,8 @@ public class XWikiDocumentTest
         assertEquals(0, this.document.getIntValue(CLASS_REFERENCE, "foo"));
         assertEquals(99, this.document.getIntValue(CLASS_REFERENCE, "foo", 99));
 
-        assertEquals(0, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo"));
-        assertEquals(99, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo", 99));
+        assertEquals(0, this.document.getIntValue(new DocumentReference("Wiki", "bar", "bla"), "foo"));
+        assertEquals(99, this.document.getIntValue(new DocumentReference("Wiki", "bar", "bla"), "foo", 99));
     }
 
     @Test

@@ -20,7 +20,6 @@
 package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.xwiki.stability.Unstable;
 
 /**
  * The main entry point to manipulate a Solr core in XWiki.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.2.0RC1
  */
-@Unstable
 public interface XWikiSolrCore
 {
     /**

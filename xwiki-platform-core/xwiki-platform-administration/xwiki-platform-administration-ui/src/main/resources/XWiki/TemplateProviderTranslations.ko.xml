@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>administration.templateProvider.description=설명
 administration.templateProvider.description.hint=새 페이지가 생성될 때 템플릿 제공자에게 표시되는 정보입니다.
-administration.templateProvider.icon=상
+administration.templateProvider.icon=아이콘
 administration.templateProvider.icon.hint=새 페이지가 생성될 때 템플릿 제공자에게 표시되는 아이콘입니다. {0}전체 아이콘 목록{1}에서 하나를 선택합니다.
 administration.templateProvider.creationRestrictions=생성 제한
 administration.templateProvider.creationRestrictions.hint=이 템플릿이 페이지를 생성할 수 있는 위치 목록(하위 항목 포함)

@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +70,7 @@ class JCaptchaResourceReferenceSerializerTest
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("fooType", "barEngine");
         ExtendedURL extendedURL = jCaptchaResourceReferenceSerializer.serialize(jCaptchaResourceReference);
 
-        verify(extendedURLNormalizer, times(1)).normalize(any());
+        verify(extendedURLNormalizer).normalize(any());
         List<String> segments = extendedURL.getSegments();
         assertEquals(3, segments.size());
         assertEquals("jcaptcha", segments.get(0));
@@ -88,7 +87,7 @@ class JCaptchaResourceReferenceSerializerTest
         jCaptchaResourceReference.addParameter("myCustomParam", "someValue");
         ExtendedURL extendedURL = jCaptchaResourceReferenceSerializer.serialize(jCaptchaResourceReference);
 
-        verify(extendedURLNormalizer, times(1)).normalize(any());
+        verify(extendedURLNormalizer).normalize(any());
         List<String> segments = extendedURL.getSegments();
         assertEquals(3, segments.size());
         assertEquals("jcaptcha", segments.get(0));

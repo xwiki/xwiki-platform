@@ -120,7 +120,7 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     onChange(callback) {
-      this._ckeditor.on('change', () => {
+      return this._ckeditor.on('change', () => {
         if (!this._isRemoteChange && !this._ckeditor.readOnly) {
           callback();
         }
@@ -138,8 +138,8 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    async restoreSelection(ranges) {
-      await this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges});
+    restoreSelection(ranges) {
+      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges, async: false});
 
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.
@@ -149,7 +149,10 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     parseInputHTML(html) {
       const fixedHTML = this._ckeditor.dataProcessor.toHtml(html);
-      const doc = new DOMParser().parseFromString(fixedHTML, 'text/html');
+      // We use the DOMParser from the window where the content is being edited in order to make sure the created DOM
+      // nodes are using the same type definitions as the DOM nodes from the edited content (e.g. the same Element and
+      // Text types). This is important because DiffDOM relies on instanceof checks to determine the node types.
+      const doc = new this._ckeditor.window.$.DOMParser().parseFromString(fixedHTML, 'text/html');
       const widgets = this._initializeWidgets(doc.body);
       this._protectWidgets(widgets, doc.body);
       return this._ensureSameContentWrapper(doc.body);
@@ -171,17 +174,32 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     onBeforeDestroy(callback, isAsync) {
-      this._ckeditor.on(isAsync ? 'beforeDestroyAsync' : 'beforeDestroy', callback);
+      return this._ckeditor.on(isAsync ? 'beforeDestroyAsync' : 'beforeDestroy', callback);
     }
 
     /** @inheritdoc */
     onLock(callback) {
       this._lockCallbacks.push(callback);
+      return {
+        removeListener: () => {
+          this._lockCallbacks = this._lockCallbacks.filter(cb => cb !== callback);
+        }
+      };
     }
 
     /** @inheritdoc */
     onUnlock(callback) {
       this._unlockCallbacks.push(callback);
+      return {
+        removeListener: () => {
+          this._unlockCallbacks = this._unlockCallbacks.filter(cb => cb !== callback);
+        }
+      };
+    }
+
+    /** @inheritdoc */
+    isReadOnly() {
+      return this._ckeditor.readOnly;
     }
 
     /** @inheritdoc */
@@ -476,7 +494,7 @@ define('xwiki-ckeditor-realtime-adapter', [
         // document.
         if (!this._focusHandler) {
           this._focusHandler = this._ckeditor.on('focus', () => {
-            this._ckeditor._realtime.lockDocument();
+            this._ckeditor._realtime.editor.lockDocument();
           });
         }
       } else if (status === 0 /* Disconnected */) {
@@ -491,6 +509,41 @@ define('xwiki-ckeditor-realtime-adapter', [
           delete this._focusHandler;
         }
       }
+    }
+
+    /** @inheritdoc */
+    focus() {
+      this._ckeditor.focus();
+    }
+
+    /** @inheritdoc */
+    handleHistory(handler) {
+      const commandListener = this._ckeditor.on('beforeCommandExec', (event) => {
+        if (event.data.name === 'undo' || event.data.name === 'redo') {
+          // Disable the default undo / redo behavior.
+          this._ckeditor.undoManager.enabled = false;
+          handler[event.data.name].call(handler);
+        }
+      });
+
+      const originalOnChange = this._ckeditor.undoManager.onChange;
+      this._ckeditor.undoManager.onChange = () => {
+        // Keep the default behavior disabled.
+        this._ckeditor.undoManager.enabled = false;
+        this._ckeditor.commands.undo.setState(handler.canUndo() ? this._CKEDITOR.TRISTATE_OFF
+          : this._CKEDITOR.TRISTATE_DISABLED);
+        this._ckeditor.commands.redo.setState(handler.canRedo() ? this._CKEDITOR.TRISTATE_OFF
+          : this._CKEDITOR.TRISTATE_DISABLED);
+      };
+
+      return {
+        destroy: () => {
+          commandListener.removeListener();
+          this._ckeditor.undoManager.onChange = originalOnChange;
+        },
+
+        updateState: () => this._ckeditor.undoManager.onChange()
+      };
     }
   }
 

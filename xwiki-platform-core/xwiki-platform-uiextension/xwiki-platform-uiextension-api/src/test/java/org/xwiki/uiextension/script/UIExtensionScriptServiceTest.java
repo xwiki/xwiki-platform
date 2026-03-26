@@ -19,55 +19,53 @@
  */
 package org.xwiki.uiextension.script;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
 import org.xwiki.uiextension.UIExtensionManager;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 
-public class UIExtensionScriptServiceTest
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@ComponentTest
+class UIExtensionScriptServiceTest
 {
-    private ComponentManager contextComponentManager;
+    @InjectMockComponents
+    private UIExtensionScriptService uiExtensionScriptService;
 
-    private List<UIExtension> epExtensions = new ArrayList<UIExtension>();
-
+    @MockComponent
     private UIExtensionManager uiExtensionManager;
 
-    @Rule
-    public MockitoComponentMockingRule<ScriptService> componentManager =
-        new MockitoComponentMockingRule<ScriptService>(UIExtensionScriptService.class);
+    @Mock
+    private ComponentManager contextComponentManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        contextComponentManager = mock(ComponentManager.class);
-        Provider<ComponentManager> componentManagerProvider = componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(contextComponentManager);
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
 
-        this.uiExtensionManager = componentManager.getInstance(UIExtensionManager.class);
-    }
+    @Mock
+    private ComponentManager componentManager;
 
     @Test
-    public void verifyExtensionsAreSortedAlphabeticallyById() throws Exception
+    void verifyExtensionsAreSortedAlphabeticallyById() throws Exception
     {
+        List<UIExtension> epExtensions = new ArrayList<>();
+
         // The UIX are voluntarily added in a wrong order.
         UIExtension uix3 = mock(UIExtension.class, "uix3");
         when(uix3.getId()).thenReturn("id3");
@@ -84,18 +82,17 @@ public class UIExtensionScriptServiceTest
         when(uix2.getExtensionPointId()).thenReturn("epId");
         epExtensions.add(uix2);
 
-        when(contextComponentManager.getInstance(UIExtensionManager.class, "epId"))
+        when(this.contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+        when(this.contextComponentManager.getInstance(UIExtensionManager.class, "epId"))
             .thenThrow(new ComponentLookupException("No specific manager for extension point epId"));
-        when(uiExtensionManager.get("epId")).thenReturn(epExtensions);
-        when(contextComponentManager.getInstance(UIExtensionFilter.class, "sortById")).thenReturn(new SortByIdFilter());
+        when(this.uiExtensionManager.get("epId")).thenReturn(epExtensions);
+        when(this.contextComponentManager.getInstance(UIExtensionFilter.class, "sortById"))
+            .thenReturn(new SortByIdFilter());
 
-        HashMap<String, String> filters = new HashMap<String, String>();
-        filters.put("sortById", "");
-        UIExtensionScriptService service = (UIExtensionScriptService) componentManager.getComponentUnderTest();
-        List<UIExtension> extensions = service.getExtensions("epId", filters);
+        List<UIExtension> extensions = this.uiExtensionScriptService.getExtensions("epId", Map.of("sortById", ""));
 
-        Assert.assertEquals("id1", extensions.get(0).getId());
-        Assert.assertEquals("id2", extensions.get(1).getId());
-        Assert.assertEquals("id3", extensions.get(2).getId());
+        assertEquals("id1", extensions.get(0).getId());
+        assertEquals("id2", extensions.get(1).getId());
+        assertEquals("id3", extensions.get(2).getId());
     }
 }

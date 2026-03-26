@@ -645,8 +645,12 @@ public interface DocumentAccessBridge
     default String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
         boolean isFullURL)
     {
-        return getDocumentURL(entityReference.extractReference(EntityType.DOCUMENT), action, queryString, anchor,
-            isFullURL);
+        EntityReference reference = entityReference.extractReference(EntityType.DOCUMENT);
+        DocumentReference documentReference = null;
+        if (reference != null) {
+            documentReference = new DocumentReference(reference);
+        }
+        return getDocumentURL(documentReference, action, queryString, anchor, isFullURL);
     }
 
     /**
@@ -759,15 +763,6 @@ public interface DocumentAccessBridge
      */
     @Deprecated
     boolean isDocumentEditable(DocumentReference documentReference);
-
-    /**
-     * @return true if the current document's author has programming rights.
-     * @deprecated since 6.1RC1, use
-     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
-     *             instead
-     */
-    @Deprecated
-    boolean hasProgrammingRights();
 
     /**
      * Utility method to retrieve the current user.

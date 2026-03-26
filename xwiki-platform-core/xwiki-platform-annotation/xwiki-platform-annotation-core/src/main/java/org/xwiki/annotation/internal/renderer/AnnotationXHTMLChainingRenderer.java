@@ -52,7 +52,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     /**
      * Map to store the events count to be able to identify an event in the emitted events.
      */
-    private Map<EventType, Integer> eventsCount = new HashMap<EventType, Integer>();
+    private Map<EventType, Integer> eventsCount = new HashMap<>();
 
     /**
      * The annotations XHTML markers printer, used to handle annotations markers rendering and nesting.

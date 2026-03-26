@@ -323,7 +323,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -688,13 +688,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // If we are getting an attachment from the context doc, we can directly load its version from it.
-        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)
+        else if ("download".equals(action) && isContextDoc(xwikidb, spaces, name, context)
             && Locale.ROOT.equals(context.getDoc().getLocale())) {
             attachment = context.getDoc().getAttachment(filename);
 
             // We are getting an attachment from another doc: we can try to load it to retrieve its version
             // in order to avoid cache issues.
-        } else if (action.equals("download")) {
+        } else if ("download".equals(action)) {
             // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
@@ -758,7 +758,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
@@ -861,7 +861,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
                     }
 
                     String anchor = url.getRef();

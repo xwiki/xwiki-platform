@@ -5,7 +5,7 @@
 .source
 Some link [[Space.ExistingPage]] with generated label
 .rendered
-<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span> with generated label</p>
+<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">ExistingPage</span></a></span> with generated label</p>
 .annotation
 0
 XWiki.XWikiGuest
@@ -15,7 +15,7 @@ ExistingPage with
 1
 XWiki.XWikiGuest
 A space with an existing page
-link Space.ExistingPage
+link ExistingPage
 .annotated
 # there's an extra <span class="annotation ID0"></span> here, because the second annotation ends right at the moment where the link ends and the first annotation is opened in order to be continued after the second one closes. But this is ok, there is no issue with this empty span 
-<p>Some <span class="annotation ID1">link&nbsp;</span><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent"><span class="annotation ID1">Space.<span class="annotation ID0">ExistingPage</span></span><span class="annotation ID0"></span></span></a></span><span class="annotation ID0">&nbsp;with</span> generated label</p>
+<p>Some <span class="annotation ID1">link&nbsp;</span><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent"><span class="annotation ID1"><span class="annotation ID0">ExistingPage</span></span><span class="annotation ID0"></span></span></a></span><span class="annotation ID0">&nbsp;with</span> generated label</p>

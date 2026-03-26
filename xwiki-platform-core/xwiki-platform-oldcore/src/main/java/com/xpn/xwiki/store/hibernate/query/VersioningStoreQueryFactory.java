@@ -31,7 +31,6 @@ import javax.persistence.criteria.Subquery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
@@ -45,7 +44,6 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @since 15.10.8
  * @since 16.2.0RC1
  */
-@Unstable
 public final class VersioningStoreQueryFactory<T>
 {
     private static final String FIELD_ID = "id";

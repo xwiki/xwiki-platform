@@ -65,7 +65,7 @@ Example of extension id: ##org.xwiki.contrib:application-filemanager##
       &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
       &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
       &lt;input type="hidden" name="importExtension" value="true" /&gt;
-      &lt;input class="withTip" type="text" name="extensionId" value="extension id..."  size="25" id="importExtensionIdInput"/&gt;
+      &lt;input type="text" name="extensionId" placeholder="extension id..."  size="25" id="importExtensionIdInput"/&gt;
       &lt;select name="repositoryId" id="importRepositoryIdInput"&gt;
         #foreach($repository in $extensionManager.repositories)
           #if ($repository.descriptor.type != 'xwiki')

@@ -98,7 +98,7 @@ $(function () {
         + '<div id="affixTopTarget">'
         + '<p>Testing affix-top class is added</p>'
         + '</div>'
-        + '<div style="height: 1000px; display: block;"/>'
+        + '<div style="height: 1000px; display: block;"></div>'
         + '</div>'
     $(templateHTML).appendTo(document.body)
 

@@ -47,8 +47,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -99,9 +97,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    @Inject
-    private Provider<ContextualAuthorizationManager> authorizationProvider;
 
     @Inject
     private Logger logger;
@@ -544,7 +539,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<Object> result;
         try {
             XWikiContext xcontext = getContext();
-            result = new ArrayList<Object>(
+            result = new ArrayList<>(
                 xcontext.getWiki().getDocument(documentReference, xcontext).getObject(className).getFieldList());
         } catch (Exception ex) {
             result = Collections.emptyList();
@@ -720,7 +715,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<XWikiAttachment> attachments =
             xcontext.getWiki().getDocument(documentReference, xcontext).getAttachmentList();
 
-        List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>(attachments.size());
+        List<AttachmentReference> attachmentReferences = new ArrayList<>(attachments.size());
         for (XWikiAttachment attachment : attachments) {
             attachmentReferences.add(attachment.getReference());
         }
@@ -852,7 +847,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Deprecated
     public List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception
     {
-        List<String> urls = new ArrayList<String>();
+        List<String> urls = new ArrayList<>();
         for (AttachmentReference attachmentReference : getAttachmentReferences(documentReference)) {
             urls.add(getAttachmentURL(attachmentReference, isFullURL));
         }
@@ -883,12 +878,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public boolean isDocumentEditable(DocumentReference documentReference)
     {
         return hasRight(documentReference, "edit");
-    }
-
-    @Override
-    public boolean hasProgrammingRights()
-    {
-        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
     }
 
     @Override

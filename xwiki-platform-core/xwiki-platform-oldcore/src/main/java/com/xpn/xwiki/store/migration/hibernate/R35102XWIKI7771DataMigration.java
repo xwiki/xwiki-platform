@@ -149,7 +149,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
             Statement stmt = connection.createStatement();
             ResultSet lobs = stmt.executeQuery("SELECT " + this.columnName + ", " + this.idColumnName + " FROM "
                 + this.tableName + ";");
-            Map<String, Long> lobsToProcess = new HashMap<String, Long>();
+            Map<String, Long> lobsToProcess = new HashMap<>();
             while (lobs.next()) {
                 // If we're not migrating data created by a version between 3.2 and 3.5, then the data is already OK
                 if (StringUtils.isNumeric(lobs.getString(1))) {

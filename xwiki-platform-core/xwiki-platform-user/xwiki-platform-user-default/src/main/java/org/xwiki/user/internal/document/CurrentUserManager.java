@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserException;
@@ -81,6 +83,37 @@ public class CurrentUserManager implements UserManager
             }
         }
         return exists;
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    {
+        boolean hasAccess;
+
+        // Resolve the current user reference into a real reference.
+        UserReference currentUserReference =
+            this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
+
+        // Resolve CurrentUserReferences instance(s).
+        UserReference resolvedUserReference = user;
+        if (resolvedUserReference == CurrentUserReference.INSTANCE) {
+            resolvedUserReference = currentUserReference;
+        }
+        UserReference resolvedTargetReference = target;
+        if (resolvedTargetReference == CurrentUserReference.INSTANCE) {
+            resolvedTargetReference = currentUserReference;
+        }
+
+        if (resolvedTargetReference == GuestUserReference.INSTANCE
+            || resolvedTargetReference == SuperAdminUserReference.INSTANCE)
+        {
+            // The target is not an actual resource, its metadata can only be read.
+            hasAccess = right == Right.VIEW;
+        } else {
+            hasAccess = this.documentUserManager.hasAccess(right, resolvedUserReference, resolvedTargetReference);
+        }
+
+        return hasAccess;
     }
 
     private XWikiContext getXWikiContext()

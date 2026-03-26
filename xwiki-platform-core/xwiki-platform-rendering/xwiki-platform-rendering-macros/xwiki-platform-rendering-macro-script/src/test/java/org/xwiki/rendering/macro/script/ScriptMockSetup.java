@@ -39,8 +39,6 @@ import org.xwiki.test.jmock.MockingComponentManager;
  */
 public class ScriptMockSetup
 {
-    public DocumentAccessBridge bridge;
-
     public ContextualAuthorizationManager authorizationManager;
 
     public AttachmentReferenceResolver<String> attachmentReferenceResolver;
@@ -59,11 +57,8 @@ public class ScriptMockSetup
     public ScriptMockSetup(Mockery mockery, MockingComponentManager cm) throws Exception
     {
         // Document Access Bridge Mock setup
-        this.bridge = cm.registerMockComponent(mockery, DocumentAccessBridge.class);
-        mockery.checking(new Expectations() {{
-            allowing(bridge).hasProgrammingRights(); will(returnValue(true));
-        }});
-
+        // This mock is required as it's injected in component, but does not need specific mocking.
+        cm.registerMockComponent(mockery, DocumentAccessBridge.class);
         // Contextual Authorization Manager Mock setup
         this.authorizationManager = cm.registerMockComponent(mockery, ContextualAuthorizationManager.class);
         mockery.checking(new Expectations() {{

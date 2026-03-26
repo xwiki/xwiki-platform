@@ -90,6 +90,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     }
 
     @Override
+    @SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS", "checkstyle:MethodLength"})
     protected void validate(Document document)
     {
         // RPD 1
@@ -292,9 +293,9 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
                 ATTR_SELECT, ATTR_UNLOAD);
         for (Element linkElement : linkElements) {
             if (!ListUtils.intersection(getAttributeNames(linkElement), forbiddenAttributes).isEmpty()) {
-                assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers", getAttributeValue(linkElement, ATTR_HREF).equals(
-                    "")
-                    || getAttributeValue(linkElement, ATTR_HREF).equals("#"));
+                assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers",
+                    getAttributeValue(linkElement, ATTR_HREF).isEmpty()
+                    || "#".equals(getAttributeValue(linkElement, ATTR_HREF)));
             }
         }
 
@@ -657,7 +658,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 
         // alt attributes are mandatory in <input type="image">
         for (Element input : getElements(ELEM_INPUT)) {
-            if (getAttributeValue(input, ATTR_TYPE).equals(IMAGE)) {
+            if (IMAGE.equals(getAttributeValue(input, ATTR_TYPE))) {
                 assertTrue(Type.ERROR, "rpd7s1.input", hasAttribute(input, ATTR_ALT));
             }
         }

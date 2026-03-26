@@ -22,9 +22,9 @@ package org.xwiki.mail;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4RC1
  */
-public class MailStatusResultSerializerTest
+class MailStatusResultSerializerTest
 {
     @Test
-    public void serializeErrors() throws Exception
+    void serializeErrors()
     {
         MailStatusResult statusResult = mock(MailStatusResult.class);
         Date date = new Date();
@@ -63,9 +63,9 @@ public class MailStatusResultSerializerTest
 
         assertEquals("Some messages have failed to be sent: "
             + "[[messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batch1], state = [prepare_error], "
-            + "date = [" + date.toString() + "], recipients = [john@doe.com], errorSummary = [errorsummary1], "
+            + "date = [" + date + "], recipients = [john@doe.com], errorSummary = [errorsummary1], "
             + "errorDescription = [errordescription1]][messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], "
-            + "batchId = [batch2], state = [send_error], date = [" + date.toString() + "], recipients = [jane@doe.com], "
+            + "batchId = [batch2], state = [send_error], date = [" + date + "], recipients = [jane@doe.com], "
             + "errorSummary = [errorsummary2], errorDescription = [errordescription2]]]",
             MailStatusResultSerializer.serializeErrors(statusResult));
     }

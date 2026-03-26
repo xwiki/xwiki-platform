@@ -48,7 +48,7 @@ public class TestDocumentFactory extends org.xwiki.annotation.TestDocumentFactor
         String docName) throws IOException
     {
         // test if it's a modified annotation and parse & save as a modified annotation
-        if (currentKey.equals("annotationUpdated") && doc instanceof MockDocument) {
+        if ("annotationUpdated".equals(currentKey) && doc instanceof MockDocument) {
             Annotation ann = parseAnnotation(currentValue, docName);
             ((MockDocument) doc).getUpdatedAnnotations().add(ann);
         } else {

@@ -110,9 +110,9 @@ public class EntityResourceReferenceResolver extends AbstractResourceReferenceRe
     private EntityType computeEntityType(String entityType) throws CreateResourceReferenceException
     {
         EntityType type;
-        if (entityType.equals("page")) {
+        if ("page".equals(entityType)) {
             type = EntityType.DOCUMENT;
-        } else if (entityType.equals("attach")) {
+        } else if ("attach".equals(entityType)) {
             type = EntityType.ATTACHMENT;
         } else {
             throw new CreateResourceReferenceException(String.format("Unknown Entity type [%s]", entityType));
@@ -123,9 +123,9 @@ public class EntityResourceReferenceResolver extends AbstractResourceReferenceRe
     private EntityType computeDefaultEntityType(String action) throws CreateResourceReferenceException
     {
         EntityType type;
-        if (action.equals(ACTION_VIEW)) {
+        if (ACTION_VIEW.equals(action)) {
             type = EntityType.DOCUMENT;
-        } else if (action.equals(ACTION_EXPORT)) {
+        } else if (ACTION_EXPORT.equals(action)) {
             type = EntityType.ATTACHMENT;
         } else {
             throw new CreateResourceReferenceException(String.format("Unknown Entity type for [%s]", action));

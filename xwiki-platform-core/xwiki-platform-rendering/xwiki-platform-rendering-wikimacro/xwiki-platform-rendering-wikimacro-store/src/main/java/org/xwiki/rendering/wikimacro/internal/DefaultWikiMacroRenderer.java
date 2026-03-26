@@ -682,7 +682,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             int previousIndex = 0;
             do {
                 String macroId = matcher.group(2);
-                boolean isInline = matcher.group(1).equals("span");
+                boolean isInline = "span".equals(matcher.group(1));
 
                 replacedBlock.addChild(new RawBlock(rawBlock.getRawContent().substring(previousIndex, matcher.start()),
                     rawBlock.getSyntax()));

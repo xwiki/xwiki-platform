@@ -38,8 +38,6 @@ define('xwiki-realtime-toolbar', [
       // Create the toolbar.
       const toolbarTemplate = document.querySelector('template#realtime-edit-toolbar');
       this._toolbar = toolbarTemplate.content.querySelector('.realtime-edit-toolbar').cloneNode(true);
-      // Inherit some styles from the old toolbar.
-      this._toolbar.classList.add('buttons');
 
       this._dateFormat = moment().toMomentFormatString(realtimeConfig.dateFormat || 'yyyy/MM/dd HH:mm');
 
@@ -48,10 +46,14 @@ define('xwiki-realtime-toolbar', [
         // The old toolbar is moved when editing fullscreen with the standalone editor.
         ' .cke_maximized > .buttons,' +
         ' .inplace-editing-buttons.sticky-buttons > .buttons');
+      // Inherit some styles from the old toolbar.
+      this._toolbar.classList.add(...this._oldToolbar.classList);
       this._oldToolbar.before(this._toolbar);
       this._oldToolbar.hidden = true;
 
-      this._createChangeSummaryModal();
+      if (this._toolbar.querySelector('.realtime-action-summarize')) {
+        this._createChangeSummaryModal();
+      }
       this._createVersionModal();
       this._createLeaveModal();
       this._activateDoneButton();
@@ -61,6 +63,11 @@ define('xwiki-realtime-toolbar', [
 
     _activateDoneButton() {
       this._doneButton = this._toolbar.querySelector('.realtime-action-done');
+      if (this._doneButton.dataset.toggle === 'modal') {
+        // The Done button opens the Summarize & Done modal. This happens when version summary is mandatory.
+        return;
+      }
+      // The Done button saves the document directly.
       this._doneButton.addEventListener('click', event => {
         event.preventDefault();
         // FIXME: We can't rely on the save status to determine whether to save or cancel (e.g. to prevent creating a
@@ -92,7 +99,12 @@ define('xwiki-realtime-toolbar', [
         document.body.appendChild(leaveModal);
       }
 
-      $(leaveModal).find('.modal-footer .btn-primary').off('click.realtime').on('click.realtime', () => {
+      const leaveButton = $(leaveModal).find('.modal-footer .btn-primary');
+      // The autofocus HTML attribute has no effect in Bootstrap modals.
+      $(leaveModal).off('shown.bs.modal.realtime').on('shown.bs.modal.realtime', () => {
+        leaveButton.trigger('focus');
+      });
+      leaveButton.off('click.realtime').on('click.realtime', () => {
         this._config.leave();
       });
     }
@@ -194,13 +206,22 @@ define('xwiki-realtime-toolbar', [
     }
 
     async _saveChangeSummary() {
-      const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
+      // Select the summary tab in order to be able to show validation errors, e.g. when the summary is mandatory.
+      $(this._changeSummaryModal.querySelector('a[aria-controls="realtime-changeSummaryModal-summaryTab"]'))
+        .tab('show');
+
       const changeSummaryTextArea = this._changeSummaryModal.querySelector('textarea[name=summary]');
+      if (!changeSummaryTextArea.reportValidity()) {
+        // The provided change summary is not valid.
+        return;
+      }
+
+      const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
       const minorChangeCheckbox = this._changeSummaryModal.querySelector('input[name="minorChange"]');
       const continueEditing = this._changeSummaryModal.dataset.continue === 'true';
       // Put the change summary and the minor edit checkbox in the form.
       commentInput.value = changeSummaryTextArea.value;
-      if (!xwikiDocument.isNew) {
+      if (!xwikiDocument.isNew && minorChangeCheckbox) {
         const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
         minorEditCheckbox.checked = minorChangeCheckbox.checked;
       }
@@ -250,19 +271,41 @@ define('xwiki-realtime-toolbar', [
     onSaveStatusChange(status) {
       this._setStatus('.realtime-save-status', status);
       // Prevent the user from saving while the document is being saved.
-      this._doneButton.disabled = this._summarizeSubmit.disabled = status === 1;
+      this._disableSaveTriggersIf(status === 1);
+    }
+
+    _disableSaveTriggersIf(condition) {
+      // Disable the Done button only if it doesn't open a modal, which is the case when version summary is mandatory.
+      if (this._doneButton.dataset.toggle !== 'modal') {
+        this._doneButton.disabled = condition;
+      }
+      // The summarize action is not available if version summaries are disabled from the wiki administration.
+      if (this._summarizeSubmit) {
+        this._summarizeSubmit.disabled = condition;
+      }
     }
 
     onCreateVersion(version) {
       if (!this._lastReviewedVersion) {
         this._lastReviewedVersion = version.number;
       }
-      const versions = this._toolbar.querySelectorAll('.realtime-version');
-      const limit = parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
+      // Make sure we don't add the same version twice. This can happen if some of the previous versions were deleted
+      // and their version numbers are being reused.
+      const versions = [...this._toolbar.querySelectorAll('.realtime-version')].filter(existingVersion => {
+        if (JSON.parse(existingVersion.dataset.version).number === version.number) {
+          // The version element is wrapped in a list item element, that we need to remove as well.
+          existingVersion.parentElement.remove();
+          return false;
+        }
+        return true;
+      });
+      // Limit the number of versions shown in the dropdown.
+      const limit = Number.parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
       if (versions.length >= limit) {
-        // The version element is wrapped in a list item element.
+        // The version element is wrapped in a list item element, that we need to remove as well.
         versions[0].parentElement.remove();
       }
+      // Insert the new version.
       const versionWrapper = this._createVersionElement(version);
       this._toolbar.querySelector('.realtime-versions > .divider').before(versionWrapper);
     }
@@ -304,8 +347,9 @@ define('xwiki-realtime-toolbar', [
 
     onConnectionStatusChange(status, userId) {
       this._setStatus('.realtime-connection-status', status);
-      this._doneButton.disabled = this._summarizeSubmit.disabled = status !== 2 /* connected */;
-      if (this._doneButton.disabled) {
+      const notConnected = status !== 2 /* connected */;
+      this._disableSaveTriggersIf(notConnected);
+      if (notConnected) {
         this.onUserListChange([]);
       }
       if (userId) {
@@ -321,7 +365,7 @@ define('xwiki-realtime-toolbar', [
     onUserListChange(users) {
       const usersWrapper = this._toolbar.querySelector('.realtime-users');
       usersWrapper.innerHTML = '';
-      const limit = parseInt(usersWrapper.dataset.limit) || 4;
+      const limit = Number.parseInt(usersWrapper.dataset.limit) || 4;
       users.slice(0, limit).forEach(user => {
         usersWrapper.appendChild(this._displayUser(user, true));
       });
@@ -372,7 +416,7 @@ define('xwiki-realtime-toolbar', [
       } else {
         // We assume that the first and the last names are the most important.
         const firstName = names[0];
-        const lastName = names[names.length - 1];
+        const lastName = names.at(-1);
         return firstName[0].toUpperCase() + lastName[0].toUpperCase();
       }
     }
@@ -384,7 +428,7 @@ define('xwiki-realtime-toolbar', [
     destroy() {
       this._oldToolbar.hidden = false;
       this._toolbar.remove();
-      this._changeSummaryModal.remove();
+      this._changeSummaryModal?.remove();
     }
   }
 

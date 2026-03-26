@@ -26,7 +26,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow to replace references during rename/move refactoring operations.
@@ -63,7 +62,6 @@ public interface ReferenceRenamer
      * @return {@code true} if the given {@link Block} was modified
      * @since 16.10.0RC1
      */
-    @Unstable
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         DocumentReference oldTarget, DocumentReference newTarget, boolean relative,
         Map<EntityReference, EntityReference> updatedEntities)
@@ -101,7 +99,6 @@ public interface ReferenceRenamer
      * @return {@code true} if the given {@link Block} was modified
      * @since 16.10.0RC1
      */
-    @Unstable
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
         Map<EntityReference, EntityReference> updatedEntities)

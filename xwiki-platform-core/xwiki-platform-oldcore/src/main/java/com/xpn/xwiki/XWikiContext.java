@@ -44,7 +44,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -850,6 +849,16 @@ public class XWikiContext extends Hashtable<Object, Object>
         put("mainxwiki", str);
     }
 
+    /**
+     * @return the reference of the main wiki, or null if none is set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public WikiReference getMainWikiReference()
+    {
+        return new WikiReference(getMainXWiki());
+    }
+
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {
@@ -1058,7 +1067,6 @@ public class XWikiContext extends Hashtable<Object, Object>
      *
      * @since 16.10.0RC1
      */
-    @Unstable
     public XWikiDocument getSecureDocument()
     {
         XWikiDocument sdoc = (XWikiDocument) get(XWikiDocument.CKEY_SDOC);

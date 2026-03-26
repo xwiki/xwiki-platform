@@ -151,8 +151,7 @@ done
 
 # Enable debug
 if [ "$DEBUG" = true ] ; then
-  XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-  XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
+  XWIKI_OPTS="$XWIKI_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
 fi
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
@@ -198,6 +197,9 @@ mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 JETTY_BASE=$PRGDIR
 # Also make sure the log directory exists since Jetty won't create it.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
+
+# Make sure the environments folder exist
+mkdir -p environments
 
 # Specify Jetty's home directory to be the directory named "jetty" inside the Jetty base directory.
 JETTY_HOME="$JETTY_BASE/jetty"

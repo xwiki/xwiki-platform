@@ -1,24 +1,8 @@
 //
 // New variables provided by XWiki
 // --------------------------------------------------
-// The equivalent CSS variables to the LESS ones set in this file
-// should be available in: xwiki-platform-flamingo-skin-resources-->cssVariablesInit.css
-@figure-caption-font-size:          90%;
-@figure-caption-color:              @text-muted;
+// This variable declaration is kept here because we don't have a 1 to 1 equivalent in CSS
 @loginFormMaxWidth:                 450px;
-
-// Standard pointer target sizes from WCAG recommendations
-@target-size-minimum:               24px;
-@target-size-recommended:           44px;
-
-// Specific color for links in the breadcrumb (except the last one pointing to the current page)
-// By default it uses the same color as the other links, but the colorTheme can override this value.
-@breadcrumb-link-color:             @link-color;
-
-// Colors used by the menus displayed right under the navbar
-// Their defaults are very close to the navbar defaults.
-// Introducing them makes it easier to customize this element.
-@menu-default-color:              @navbar-default-color;
 // We create a guarded mixin to change the background color alternative differently depending on the
 // initial color. The simple 'if' syntax didn't compile.
 ._menubackground-alt(@a) when (lightness(@a) < 50%) {
@@ -28,22 +12,3 @@
   @menu-default-bg:               darken(desaturate(@a, 20%), 10%);
 }
 ._menubackground-alt(@navbar-default-bg);
-@menu-default-link-color:         @navbar-default-link-color;
-@menu-default-link-hover-color:   @navbar-default-link-hover-color;
-@menu-default-link-hover-bg:      @navbar-default-link-hover-bg;
-@menu-default-link-active-color:  @navbar-default-link-active-color;
-@menu-default-link-active-bg:     @navbar-default-link-active-bg;
-@menu-height:                     1.5lh; // Approximately 28px by default, smaller than navbar-height
-@menu-default-border:             @navbar-default-border;
-
-//
-// Variables of bootstrap overrided by XWiki
-// --------------------------------------------------
-
-@border-width:                   1px;
-@headings-font-weight:           400;
-@nav-tabs-active-link-hover-bg:  @xwiki-page-content-bg;
-
-@border-radius-base:             7px;
-@border-radius-large:            10px;
-@border-radius-small:            5px;

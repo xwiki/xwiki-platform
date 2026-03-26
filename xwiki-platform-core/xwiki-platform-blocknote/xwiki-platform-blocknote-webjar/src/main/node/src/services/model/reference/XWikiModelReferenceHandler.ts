@@ -1,5 +1,5 @@
-/*
- * See the LICENSE file distributed with this work for additional
+/**
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,18 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
-import { ModelReferenceHandler } from "@xwiki/cristal-model-reference-api";
-import { Container, injectable } from "inversify";
 import { absoluteCristalEntityReference } from "./XWikiEntityReference";
+import {
+  DocumentReference,
+  EntityType,
+  SpaceReference,
+} from "@xwiki/platform-model-api";
+import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { ModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 
 @injectable("Singleton")
 export class XWikiModelReferenceHandler implements ModelReferenceHandler {
   public static bind(container: Container): void {
-    container.bind("ModelReferenceHandler").to(XWikiModelReferenceHandler).inSingletonScope().whenNamed("XWiki");
+    container
+      .bind("ModelReferenceHandler")
+      .to(XWikiModelReferenceHandler)
+      .inSingletonScope()
+      .whenNamed("XWiki");
   }
 
-  public createDocumentReference(name: string, space: SpaceReference): DocumentReference {
+  public createDocumentReference(
+    name: string,
+    space: SpaceReference,
+  ): DocumentReference {
     const newSpace = new SpaceReference(space.wiki, ...space.names, name);
     return new DocumentReference("WebHome", newSpace);
   }

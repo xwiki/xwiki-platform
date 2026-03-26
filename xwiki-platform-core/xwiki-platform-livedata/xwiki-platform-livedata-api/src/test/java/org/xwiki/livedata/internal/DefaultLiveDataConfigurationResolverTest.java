@@ -176,6 +176,22 @@ class DefaultLiveDataConfigurationResolverTest
             this.resolver.resolve(this.resolver.resolve(config)));
     }
 
+    /**
+     * Test to avoid regression on XWIKI-23523.
+     * We need to ensure that we can resolve a configuration with meta=null.
+     */
+    @Test
+    void withMetaNull() throws Exception
+    {
+        LiveDataConfiguration config = new LiveDataConfiguration();
+        config.initialize();
+        config.setMeta(null);
+        String expected = FileUtils.readFileToString(new File("src/test/resources/withInitialize.json"),
+            Charset.defaultCharset());
+        assertEquals(this.objectMapper.readValue(expected, LiveDataConfiguration.class),
+            this.resolver.resolve(this.resolver.resolve(config)));
+    }
+
     private static Stream<String[]> getTestData() throws Exception
     {
         return DATA_PROVIDER.getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));

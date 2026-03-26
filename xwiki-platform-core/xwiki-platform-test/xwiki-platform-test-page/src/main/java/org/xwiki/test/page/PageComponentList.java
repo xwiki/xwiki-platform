@@ -27,7 +27,6 @@ import java.lang.annotation.Target;
 import org.xwiki.cache.internal.DefaultCacheControl;
 import org.xwiki.classloader.internal.DefaultClassLoaderManager;
 import org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory;
-import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.display.internal.ConfiguredDocumentDisplayer;
@@ -90,6 +89,7 @@ import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.script.internal.service.DefaultScriptServiceManager;
 import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
+import org.xwiki.security.internal.DefaultSecurityConfiguration;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.template.script.TemplateScriptService;
@@ -101,21 +101,7 @@ import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.internal.XWikiMathTool;
 import org.xwiki.velocity.internal.XWikiNumberTool;
 import org.xwiki.velocity.internal.XWikiVelocityConfiguration;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
-import org.xwiki.xml.internal.html.DefaultHTMLElementSanitizer;
-import org.xwiki.xml.internal.html.HTMLDefinitions;
-import org.xwiki.xml.internal.html.HTMLElementSanitizerConfiguration;
-import org.xwiki.xml.internal.html.MathMLDefinitions;
-import org.xwiki.xml.internal.html.SVGDefinitions;
-import org.xwiki.xml.internal.html.SecureHTMLElementSanitizer;
-import org.xwiki.xml.internal.html.XWikiHTML5TagProvider;
-import org.xwiki.xml.internal.html.filter.AttributeFilter;
-import org.xwiki.xml.internal.html.filter.BodyFilter;
-import org.xwiki.xml.internal.html.filter.FontFilter;
-import org.xwiki.xml.internal.html.filter.LinkFilter;
-import org.xwiki.xml.internal.html.filter.ListFilter;
-import org.xwiki.xml.internal.html.filter.ListItemFilter;
-import org.xwiki.xml.internal.html.filter.SanitizerFilter;
+import org.xwiki.xml.html.DefaultHTMLCleanerComponentList;
 
 import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
 import com.xpn.xwiki.internal.DefaultXWikiStubContextProvider;
@@ -251,24 +237,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultVelocityMacroConfiguration.class,
     IndentVelocityMacroFilter.class,
 
-    // HTML Cleaner
-    DefaultHTMLCleaner.class,
-    ListFilter.class,
-    ListItemFilter.class,
-    FontFilter.class,
-    BodyFilter.class,
-    AttributeFilter.class,
-    LinkFilter.class,
-    SanitizerFilter.class,
-    DefaultHTMLElementSanitizer.class,
-    SecureHTMLElementSanitizer.class,
-    HTMLElementSanitizerConfiguration.class,
-    RestrictedConfigurationSourceProvider.class,
-    HTMLDefinitions.class,
-    MathMLDefinitions.class,
-    SVGDefinitions.class,
-    XWikiHTML5TagProvider.class,
-
     // HTML Macro
     HTMLMacro.class,
     HTMLMacroXHTMLRendererFactory.class,
@@ -317,10 +285,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultCacheControl.class,
 
     // Required rights (needed for Document/Object API)
-    DocumentRequiredRightsReader.class
+    DocumentRequiredRightsReader.class,
+
+    // Security configuration, needed for query limits, e.g., in DBListClass
+    DefaultSecurityConfiguration.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList
+@DefaultHTMLCleanerComponentList
 public @interface PageComponentList
 {
 }

@@ -113,7 +113,7 @@ Caused by: #printThrowable($throwable.cause true)
             #set ($version = $argument.versionConstraint)
           #end
           #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
-          #set ($_extensionName = $argument)
+          #set ($_extensionName = $!escapetool.xml($argument))
         #end
         #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
       #elseif ($argument.listIterator())

@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.test.ui.docker;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.junit5.UITest;
@@ -35,37 +34,31 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("AllDocs Page UI")
     class NestedAllDocsIT extends AllDocsIT
     {
     }
 
     @Nested
-    @DisplayName("Deleted Attachment Page UI")
     class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
     {
     }
 
     @Nested
-    @DisplayName("Orphaned Pages Page UI")
     class NestedOrphanedPagesIT extends OrphanedPagesIT
     {
     }
 
     @Nested
-    @DisplayName("Documents Macro UI")
     class NestedDocumentsMacroIT extends DocumentsMacroIT
     {
     }
 
     @Nested
-    @DisplayName("Pinned Pages UI")
     class NestedPinnedPagesIT extends PinnedPagesIT
     {
     }
 
     @Nested
-    @DisplayName("Document Tree Macro")
     class NestedDocumentTreeMacroIT extends DocumentTreeMacroIT
     {
     }

@@ -79,7 +79,7 @@ public class StandAloneMacroFilter extends AbstractHTMLFilter
             do {
                 child = child.getNextSibling();
             } while (child != null
-                && !(child.getNodeType() == Node.COMMENT_NODE && child.getNodeValue().equals("stopmacro")));
+                && !(child.getNodeType() == Node.COMMENT_NODE && "stopmacro".equals(child.getNodeValue())));
             // See if there's something else inside the paragraph.
             if (child != null && child.getNextSibling() == null) {
                 wrappers.add(paragraph);

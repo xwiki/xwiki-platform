@@ -119,7 +119,7 @@ public class DefaultWikiManager implements WikiManager
     {
         WikiDescriptor newWiki;
         try {
-             newWiki = create(newWikiId, newWikiAlias, failOnExist);
+            newWiki = create(newWikiId, newWikiAlias, failOnExist);
         } catch (WikiManagerException e) {
             throw new WikiManagerException(String.format("Failed to create the new wiki [%s] when copying [%s].",
                 newWikiId, fromWikiId), e);

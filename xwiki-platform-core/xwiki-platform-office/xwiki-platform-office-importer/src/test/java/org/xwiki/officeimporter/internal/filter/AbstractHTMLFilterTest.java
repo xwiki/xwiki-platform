@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -83,7 +84,7 @@ public abstract class AbstractHTMLFilterTest
         Document document = filter(input, cleaningParameters);
         String output = XMLUtils.serialize(document, false);
         output = StringUtils.removeStart(output, "<root>");
-        output = StringUtils.removeEnd(output, "</root>");
+        output = Strings.CS.removeEnd(output, "</root>");
         assertEquals(expectedOuput, output);
         return document;
     }

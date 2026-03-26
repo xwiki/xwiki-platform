@@ -19,7 +19,6 @@
  */
 package org.xwiki.filter.xar.internal;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.filter.event.model.WikiClassFilter;
@@ -32,18 +31,16 @@ import org.xwiki.xar.internal.model.XarClassModel;
  */
 public class XARClassModel extends XarClassModel
 {
-    // Utils
-
-    public static final Map<String, EventParameter> CLASS_PARAMETERS = new HashMap<String, EventParameter>()
-    {
-        {
-            put(ELEMENT_CUSTOMCLASS, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMCLASS));
-            put(ELEMENT_CUSTOMMAPPING, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
-            put(ELEMENT_SHEET_DEFAULTVIEW, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
-            put(ELEMENT_SHEET_DEFAULTEDIT, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
-            put(ELEMENT_DEFAULTSPACE, new EventParameter(WikiClassFilter.PARAMETER_DEFAULTSPACE));
-            put(ELEMENT_NAMEFIELD, new EventParameter(WikiClassFilter.PARAMETER_NAMEFIELD));
-            put(ELEMENT_VALIDATIONSCRIPT, new EventParameter(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
-        }
-    };
+    /**
+     * Parameters to be used when reading a class.
+     */
+    public static final Map<String, EventParameter> CLASS_PARAMETERS = Map.of(
+        ELEMENT_CUSTOMCLASS, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMCLASS),
+        ELEMENT_CUSTOMMAPPING, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMMAPPING),
+        ELEMENT_SHEET_DEFAULTVIEW, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW),
+        ELEMENT_SHEET_DEFAULTEDIT, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT),
+        ELEMENT_DEFAULTSPACE, new EventParameter(WikiClassFilter.PARAMETER_DEFAULTSPACE),
+        ELEMENT_NAMEFIELD, new EventParameter(WikiClassFilter.PARAMETER_NAMEFIELD),
+        ELEMENT_VALIDATIONSCRIPT, new EventParameter(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT)
+    );
 }

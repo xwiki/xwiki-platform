@@ -90,7 +90,9 @@ public class WikiCreator
 
         // Create the wiki
         WikiCreationRequest wikiRequest = new WikiCreationRequest();
+        wikiRequest.setId("wikicreation" + wikiId);
         wikiRequest.setWikiId(wikiId);
+        wikiRequest.setPrettyName(wikiId);
         wikiRequest.setAlias(wikiId);
         wikiRequest.setFailOnExist(failOnExist);
         wikiRequest.setInteractive(false);

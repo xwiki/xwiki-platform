@@ -711,7 +711,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         for (BaseObject removedObject : doc.getXObjectsToRemove()) {
                             deleteXWikiCollection(removedObject, context, false, false);
                         }
-                        doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                        doc.setXObjectsToRemove(new ArrayList<>());
                     }
 
                     if (bclass != null) {
@@ -1116,7 +1116,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (cxml != null) {
                         bclass.fromXML(cxml);
                         doc.setXClass(bclass);
-                        bclass.setDirty(false);
+                        bclass.setDirty(false, true);
                     }
 
                     // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -1175,7 +1175,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             }
                             doc.setXObject(object.getNumber(), object);
                             // The object just been loaded so make sure it's considered clean
-                            object.setDirty(false);
+                            object.setDirty(false, true);
                         }
 
                         // AFAICT this was added as an emergency patch because loading of objects has proven
@@ -1205,7 +1205,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 ((BaseProperty<?>) obj.getField("member")).setDirty(false);
                                 doc.setXObject(obj.getNumber(), obj);
                                 // The object just been loaded so make sure it's considered clean
-                                obj.setDirty(false);
+                                obj.setDirty(false, true);
                             }
                         }
                     }
@@ -1301,7 +1301,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 deleteXWikiCollection(bobj, context, false, false);
                             }
                         }
-                        doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                        doc.setXObjectsToRemove(new ArrayList<>());
                     }
                     for (List<BaseObject> objects : doc.getXObjects().values()) {
                         for (BaseObject obj : objects) {
@@ -1508,13 +1508,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
 
                         String pname = prop.getName();
-                        if (pname != null && !pname.trim().equals("") && !handledProps.contains(pname)) {
+                        if (pname != null && !pname.trim().isEmpty() && !handledProps.contains(pname)) {
                             saveXWikiPropertyInternal(prop, context, false);
                         }
                     }
                 }
 
-                object.setDirty(false);
+                object.setDirty(false, true);
 
                 if (bTransaction) {
                     endTransaction(context, true);

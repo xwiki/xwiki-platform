@@ -70,7 +70,7 @@ import static org.xwiki.model.EntityType.DOCUMENT;
  * @version $Id$
  */
 @ComponentTest
-public class XObjectAverageRatingManagerTest
+class XObjectAverageRatingManagerTest
 {
     @InjectMockComponents
     private XObjectAverageRatingManager averageRatingManager;
@@ -107,9 +107,11 @@ public class XObjectAverageRatingManagerTest
     {
         String managerId = "myRatings";
         when(this.ratingsManager.getIdentifier()).thenReturn(managerId);
-        EntityReference reference = new EntityReference("xwiki:XWiki.Foo", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
         when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("document:xwiki:XWiki.Foo");
         BaseObject averageRating1 = mock(BaseObject.class);
         BaseObject averageRating2 = mock(BaseObject.class);
@@ -158,9 +160,11 @@ public class XObjectAverageRatingManagerTest
     {
         String managerId = "myRatings";
         when(this.ratingsManager.getIdentifier()).thenReturn(managerId);
-        EntityReference reference = new EntityReference("xwiki:XWiki.Foo", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
         when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("document:xwiki:XWiki.Foo");
         BaseObject averageRating1 = mock(BaseObject.class);
         BaseObject averageRating2 = mock(BaseObject.class);
@@ -203,19 +207,19 @@ public class XObjectAverageRatingManagerTest
     @Test
     void saveAverageRatingCreate() throws Exception
     {
-        EntityReference reference = new EntityReference("xwiki:XWiki.Foo", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
         when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("document:xwiki:XWiki.Foo");
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
             .thenReturn(Collections.emptyList());
         XWikiContext context = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(context);
-        when(xWikiDocument.createXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, context))
-            .thenReturn(42);
         BaseObject xObject = mock(BaseObject.class);
-        when(xWikiDocument.getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, 42))
+        when(xWikiDocument.newXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, context))
             .thenReturn(xObject);
         when(xObject.getOwnerDocument()).thenReturn(xWikiDocument);
 
@@ -253,9 +257,11 @@ public class XObjectAverageRatingManagerTest
     @Test
     void saveExistingRating() throws Exception
     {
-        EntityReference reference = new EntityReference("xwiki:XWiki.Foo", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
         when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("document:xwiki:XWiki.Foo");
 
         BaseObject matchingAverageRating = mock(BaseObject.class);
@@ -308,7 +314,7 @@ public class XObjectAverageRatingManagerTest
             expectedAverageVote);
         verify(matchingAverageRating).setDateValue(AverageRatingQueryField.UPDATED_AT.getFieldName(), expectedDate);
         verify(xWiki).saveDocument(xWikiDocument, "Update average rating", true, context);
-        verify(xWikiDocument, never()).createXObject(any(), any());
+        verify(xWikiDocument, never()).newXObject(any(), any());
     }
 
     @Test
@@ -321,9 +327,11 @@ public class XObjectAverageRatingManagerTest
     @Test
     void removeAverageRatingsNotExisting() throws Exception
     {
-        EntityReference reference = new EntityReference("xwiki:Foo.Bar", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
             .thenReturn(Collections.emptyList());
@@ -334,9 +342,11 @@ public class XObjectAverageRatingManagerTest
     @Test
     void removeAverageRatings() throws Exception
     {
-        EntityReference reference = new EntityReference("xwiki:XWiki.Foo", EntityType.DOCUMENT);
+        DocumentReference reference = new DocumentReference("xwiki","XWiki", "Foo");
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
-        when(this.documentAccessBridge.getDocumentInstance(reference)).thenReturn(xWikiDocument);
+        when(xWikiDocument.clone()).thenReturn(xWikiDocument);
+        when(xWikiDocument.getDocumentReference()).thenReturn(reference);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenReturn(xWikiDocument);
         when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("document:xwiki:XWiki.Foo");
 
         BaseObject matchingAverageRating = mock(BaseObject.class);
@@ -418,10 +428,11 @@ public class XObjectAverageRatingManagerTest
     @Test
     void moveAverageRatings() throws Exception
     {
-        EntityReference oldReference = new EntityReference("xwiki:XWiki.Old", EntityType.DOCUMENT);
-        EntityReference newReference = new EntityReference("xwiki:XWiki.New", EntityType.DOCUMENT);
+        DocumentReference oldReference = new DocumentReference("xwiki","XWiki", "Old");
+        DocumentReference newReference = new DocumentReference("xwiki","XWiki", "New");
         XWikiContext context = mock(XWikiContext.class);
         XWikiDocument actualDoc = mock(XWikiDocument.class);
+        when(actualDoc.getDocumentReference()).thenReturn(newReference);
         // Skipped because wrong manager
         BaseObject ratings1 = mock(BaseObject.class);
         // Skiped because wrong entity
@@ -439,7 +450,8 @@ public class XObjectAverageRatingManagerTest
 
         when(this.contextProvider.get()).thenReturn(context);
         when(context.getWiki()).thenReturn(xWiki);
-        when(this.documentAccessBridge.getDocumentInstance(newReference)).thenReturn(actualDoc);
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(newReference))).thenReturn(actualDoc);
+        when(actualDoc.clone()).thenReturn(actualDoc);
         when(actualDoc
             .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
             .thenReturn(asList(ratings1, ratings2, ratings3, ratings4));

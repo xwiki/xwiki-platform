@@ -72,6 +72,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 @Component(roles = UserEventDispatcher.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class UserEventDispatcher
 {
     private static final long BATCH_SIZE = 100;
@@ -217,8 +218,12 @@ public class UserEventDispatcher
         }
 
         try {
+            this.logger.debug("Start dispatching event with id [{}]", event.getId());
+
             return dispatchInContext(event);
         } finally {
+            this.logger.debug("Done dispatching event with id [{}]", event.getId());
+
             // Get rid of current context
             this.ecm.popContext();
         }

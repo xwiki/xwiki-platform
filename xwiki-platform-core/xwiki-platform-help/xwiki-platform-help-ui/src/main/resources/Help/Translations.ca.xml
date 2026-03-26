@@ -44,21 +44,24 @@
 ### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
 ### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 ### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
+help.tipsPanel.WYSIWYGEditorTip=Quan s''edita en mode WYSIWYG, la drecera {0}Alt + 0{1} ({0}.0{1} al macOS) obre un modal d''ajuda amb informació sobre l''ús del teclat per navegar per l''editor.
 ### Missing: help.macroList.title=Available Macros
 ### Missing: help.macroList.id=Id
 ### Missing: help.macroList.name=Name
+help.macroList.categories=Categories
 ### Missing: help.macroList.description=Description
 ### Missing: help.macroList.visibility=Visibility
 
 ###############################################################################
 ## Deprecated
 ## Note: each element should be removed when the last branch using it is no longer supported
-###############################################################################
+############################################################################### 
 
 #@deprecatedstart
 
 ## until 14.6RC1
 ### Missing: help.macroList.category=Category
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

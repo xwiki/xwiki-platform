@@ -66,7 +66,6 @@
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.2.9.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.147.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
@@ -819,40 +818,6 @@
         <artifactId>fast-diff</artifactId>
         <version>1.3.0</version>
         <scope>runtime</scope>
-      </dependency>
-
-      <!-- Docker -->
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-api</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-core</artifactId>
-        <version>${dockerJava.version}</version>
-        <exclusions>
-          <!-- Wrong id -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-transport-httpclient5</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-transport-zerodep</artifactId>
-        <version>${dockerJava.version}</version>
       </dependency>
 
       <!-- Solr -->

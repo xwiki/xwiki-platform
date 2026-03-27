@@ -65,7 +65,6 @@
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "happy-dom": "catalog:",
     "inversify": "catalog:",
     "jquery": "catalog:",
     "typescript": "catalog:",

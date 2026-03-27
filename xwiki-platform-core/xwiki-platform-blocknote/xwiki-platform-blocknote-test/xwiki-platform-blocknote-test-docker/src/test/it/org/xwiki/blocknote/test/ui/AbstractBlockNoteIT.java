@@ -19,8 +19,6 @@
  */
 package org.xwiki.blocknote.test.ui;
 
-import java.util.concurrent.Callable;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.xwiki.test.ui.TestUtils;

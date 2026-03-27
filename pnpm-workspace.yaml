@@ -93,7 +93,7 @@ catalog:
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
   globals: 17.4.0
-  i18next: 25.8.13
+  i18next: 25.10.10
   inversify: 7.11.0
   jiti: 2.6.1
   jquery: 4.0.0

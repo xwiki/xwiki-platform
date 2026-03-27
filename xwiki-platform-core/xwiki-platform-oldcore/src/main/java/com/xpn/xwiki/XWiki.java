@@ -1680,7 +1680,7 @@ public class XWiki implements EventListener
 
     public String getResourceContent(String name) throws IOException
     {
-        if (getEngineContext() != null) {
+        if (getEnvironment() != null) {
             try (InputStream is = getResourceAsStream(name)) {
                 if (is != null) {
                     return IOUtils.toString(is, DEFAULT_ENCODING);
@@ -1694,8 +1694,8 @@ public class XWiki implements EventListener
     public Date getResourceLastModificationDate(String name)
     {
         try {
-            if (getEngineContext() != null) {
-                return Util.getFileLastModificationDate(getEngineContext().getRealPath(name));
+            if (getEnvironment() != null) {
+                return getEnvironment().getResourceLastModified(name);
             }
         } catch (Exception ex) {
             // Probably a SecurityException or the file is not accessible (inside a war)
@@ -1706,7 +1706,7 @@ public class XWiki implements EventListener
 
     public byte[] getResourceContentAsBytes(String name) throws IOException
     {
-        if (getEngineContext() != null) {
+        if (getEnvironment() != null) {
             try (InputStream is = getResourceAsStream(name)) {
                 if (is != null) {
                     return IOUtils.toByteArray(is);

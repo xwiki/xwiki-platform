@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.inject.Named;
@@ -32,7 +33,6 @@ import jakarta.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -325,45 +325,53 @@ public class SkinAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         try (InputStream input = this.environment.getResourceAsStream(prefixPath, path)) {
             if (input != null) {
-                // Always force UTF-8, as this is the assumed encoding for text files.
-                String content = IOUtils.toString(input, StandardCharsets.UTF_8);
-                String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
+                byte[] data = IOUtils.toByteArray(input);
+                if (data != null && data.length > 0) {
+                    String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
 
-                Date modified = null;
+                    Date modified = null;
 
-                // Evaluate the file only if it's of a supported type.
-                String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
-                if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
-                    // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
-                    DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
-                        XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
-                    String evaluatedContent =
-                        evaluateVelocity(content, path, superadminUserReference, null, context);
+                    // Evaluate the file only if it's of a supported type.
+                    String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
+                    if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
+                        // Always force UTF-8, as this is the assumed encoding for text files.
+                        String rawContent = new String(data, StandardCharsets.UTF_8);
 
-                    // If the content contained velocity code, then it should not be cached
-                    if (Strings.CS.equals(evaluatedContent, content)) {
-                        modified = context.getWiki().getResourceLastModificationDate(path);
+                        // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
+                        DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
+                            XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+                        String evaluatedContent =
+                            evaluateVelocity(rawContent, path, superadminUserReference, null, context);
+
+                        byte[] newdata = evaluatedContent.getBytes(StandardCharsets.UTF_8);
+                        // If the content contained velocity code, then it should not be cached
+                        if (Arrays.equals(newdata, data)) {
+                            modified = this.environment.getResourceLastModified(prefixPath, path);
+                        } else {
+                            data = newdata;
+                        }
+
+                        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                     } else {
-                        modified = new Date();
-                        content = evaluatedContent;
+                        modified = this.environment.getResourceLastModified(prefixPath, path);
                     }
 
-                    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                } else {
-                    modified = context.getWiki().getResourceLastModificationDate(path);
-                }
+                    // Use current date by default
+                    if (modified == null) {
+                        modified = new Date();
+                    }
 
-                // Write the content to the response's output stream.
-                byte[] data = content.getBytes(StandardCharsets.UTF_8);
-                setupHeaders(response, mimetype, modified, data.length);
-                try {
-                    response.getOutputStream().write(data);
-                } catch (IOException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
-                }
+                    // Write the content to the response's output stream.
+                    setupHeaders(response, mimetype, modified, data.length);
+                    try {
+                        response.getOutputStream().write(data);
+                    } catch (IOException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
+                    }
 
-                return true;
+                    return true;
+                }
             }
         } catch (IOException ex) {
             LOGGER.info("Skin file [{}] does not exist or cannot be accessed", path);

@@ -25,7 +25,6 @@ import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -112,8 +111,8 @@ public abstract class AbstractCKEditorIT
         this.textArea = this.editor.getRichTextArea();
     }
 
-    protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    protected void waitForSolrIndexing(TestUtils setup) throws Exception
     {
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
     }
 }

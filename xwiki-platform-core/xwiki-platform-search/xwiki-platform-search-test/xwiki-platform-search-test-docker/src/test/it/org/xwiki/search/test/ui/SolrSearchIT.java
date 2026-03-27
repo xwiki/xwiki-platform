@@ -73,14 +73,14 @@ class SolrSearchIT
     private static final String GET_ACTION = "get";
 
     @Test
-    void verifySpaceFaucetEscaping(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void verifySpaceFaucetEscaping(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
 
         String testDocumentLocation = "{{/html}}";
         setup.createPage(testDocumentLocation, "WebHome", "Test Document", testDocumentLocation);
 
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage = searchPage.search("\"Test Document\"");
@@ -90,8 +90,7 @@ class SolrSearchIT
 
     @ParameterizedTest
     @ValueSource(strings = { "de_DE", "fr_FR", "fr_BE" })
-    void verifySearchInLocale(String locale, TestUtils setup, TestConfiguration testConfiguration,
-        TestReference testReference) throws Exception
+    void verifySearchInLocale(String locale, TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -105,7 +104,7 @@ class SolrSearchIT
             setup.deletePage(testReference);
             setup.createPage(testReference, testContent, locale);
 
-            new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+            new SolrTestUtils(setup).waitEmptyQueue();
 
             SolrSearchPage searchPage = SolrSearchPage.gotoPage();
             searchPage = searchPage.search(testContent);
@@ -131,7 +130,7 @@ class SolrSearchIT
     }
 
     @Test
-    void searchLimit(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
+    void searchLimit(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -143,7 +142,7 @@ class SolrSearchIT
             setup.rest().savePage(pageReference, "Content of Page " + i, "Title " + i);
         }
 
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage = searchPage.search("Content of Page");
@@ -170,7 +169,7 @@ class SolrSearchIT
         String testDocumentTitle = "SuggestServiceTestTitle";
         setup.rest().savePage(testReference, "Hello World!", testDocumentTitle);
 
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("outputSyntax", "plain");
@@ -194,8 +193,7 @@ class SolrSearchIT
     }
 
     @Test
-    void searchExclusions(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference)
-        throws Exception
+    void searchExclusions(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -215,7 +213,7 @@ class SolrSearchIT
         setup.rest().savePage(fourChildReference, matchedWord, "Child of Four");
 
         // Wait for the created pages to be indexed.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Reset search exclusions.
         SearchAdministrationPage searchAdminPage = SearchAdministrationPage.gotoPage();

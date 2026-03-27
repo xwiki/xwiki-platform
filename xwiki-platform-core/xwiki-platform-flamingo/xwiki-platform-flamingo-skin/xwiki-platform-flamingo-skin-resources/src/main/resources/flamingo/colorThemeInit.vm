@@ -72,6 +72,11 @@
 ##
 ## Overwrite with the values set in the custom theme
 #if (!$themeObj)
+## This algorithm for detecting the current color theme here is synchronized with the one in
+## org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter.getCurrentColorTheme(boolean, String).
+## Don't customize it only in this file, it can cause LESS compilation cache issues.
+## See https://jira.xwiki.org/browse/XWIKI-21819 .
+##
 ## First, try to take the theme from the request URL
     #set ($themeDocFullName = "$!{request.colorTheme}")
 ## Second, try to take the theme from the preferences (user, space, wiki)

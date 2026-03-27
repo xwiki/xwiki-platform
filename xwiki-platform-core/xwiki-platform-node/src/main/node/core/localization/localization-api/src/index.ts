@@ -16,6 +16,11 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/**
+ * A query expresses the set of translations to be resolved. It can be either an array of full translation keys, or
+ * an array of translation key suffixes plus a separate shared prefix.
  *
  * @since 18.3.0RC1
  * @beta
@@ -29,8 +34,9 @@ type Query =
     };
 
 /**
- * A translator, take a query and returns a translation. Translators are expected to be chained, the next translations
- * received a query where keys resolved by the previous translator are removed.
+ * A translator, take a query and returns translations. Translators are expected to be chained, the next translations
+ * received a query where keys resolved by the previous translator are removed. A translator only return the
+ * translations it can find, leaving the next translator of the chain resolve the unresolved ones.
  * @since 18.3.0RC1
  * @beta
  */
@@ -39,8 +45,7 @@ type Translator = {
 };
 
 /**
- * A resolve translation, in the form of a map with the translation keys are keys and their associated translations
- * as values.
+ * A resolved query, in the form of a map with the translation keys and their associated translation values.
  * @since 18.3.0RC1
  * @beta
  */

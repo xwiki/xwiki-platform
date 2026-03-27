@@ -1451,40 +1451,6 @@ importers:
         specifier: 'catalog:'
         version: 3.1.0(typescript@5.9.3)(vitest@4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2))
 
-  xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-dom:
-    dependencies:
-      '@xwiki/platform-localization-api':
-        specifier: workspace:*
-        version: link:../../localization-api
-    devDependencies:
-      '@microsoft/api-extractor':
-        specifier: 'catalog:'
-        version: 7.57.7(@types/node@24.12.0)
-      '@xwiki/platform-dev-config':
-        specifier: workspace:*
-        version: link:../../../../dev/config
-      '@xwiki/platform-tool-tsconfig':
-        specifier: workspace:*
-        version: link:../../../../tools/tool-tsconfig
-      '@xwiki/platform-tool-viteconfig':
-        specifier: workspace:*
-        version: link:../../../../tools/tool-viteconfig
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.3(jiti@2.6.1)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vite:
-        specifier: 'catalog:'
-        version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
-      vitest-mock-extended:
-        specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2))
-
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-xwiki-rest:
     dependencies:
       '@xwiki/platform-localization-api':

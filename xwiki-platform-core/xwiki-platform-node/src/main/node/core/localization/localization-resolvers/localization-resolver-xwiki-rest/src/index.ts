@@ -23,6 +23,8 @@ import type {
 } from "@xwiki/platform-localization-api";
 
 /**
+ * Initializes a translator that resolves translation keys by sending request to a XWiki REST endpoint.
+ *
  * @param target - the url of the rest endpoint to use to resolve translation
  * @since 18.3.0RC1
  * @beta

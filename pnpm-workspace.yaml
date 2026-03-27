@@ -25,7 +25,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-adapters/localization-adapter-vue
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-default
-  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-dom
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-xwiki-rest
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx

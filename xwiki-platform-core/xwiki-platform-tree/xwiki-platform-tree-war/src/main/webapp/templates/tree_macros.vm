@@ -26,6 +26,7 @@
   'exclusions': $collectiontool.set,
   'finder': false,
   'icons': true,
+  'id': "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}",
   'limit': 15,
   'links': false,
   'openTo': '',
@@ -38,6 +39,9 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
+  <span id="$!{attributes.id}-description" class="sr-only">
+    $escapetool.xml($services.localization.render('tree.macro.description'))
+  </span>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)
@@ -63,7 +67,6 @@
     $entry.key = "$escapedValue"##
   #end
 #end
-
 #macro (getTreeAttributes $options $attributes)
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
@@ -71,6 +74,7 @@
   #if ($macro.options.id)
     #set ($discard = $attributes.put('id', $macro.options.id))
   #end
+  #set ($discard = $attributes.put('aria-describedby', "$!{macro.options.id}-description"))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

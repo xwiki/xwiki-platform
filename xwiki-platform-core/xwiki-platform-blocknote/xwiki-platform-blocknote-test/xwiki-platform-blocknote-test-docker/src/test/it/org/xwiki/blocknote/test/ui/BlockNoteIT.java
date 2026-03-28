@@ -27,7 +27,12 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  * @since 17.6.0RC1
  */
-@UITest
+@UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    }
+)
 class BlockNoteIT extends AbstractBlockNoteIT
 {
 }

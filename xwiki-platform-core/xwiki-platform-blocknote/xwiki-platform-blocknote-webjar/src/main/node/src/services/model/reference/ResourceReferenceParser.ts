@@ -17,38 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Logic } from "./Logic";
-import { container } from "./container";
-import { mockI18n } from "../testUtils";
-import { describe, it, vi } from "vitest";
+/**
+ * Client-side equivalent of ResourceReference from xwiki-rendering-api.
+ *
+ * @since 18.3.0RC1
+ * @beta
+ */
+type ResourceReference = {
+  type: string;
+  typed: boolean;
+  reference: string;
+};
 
-define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
+type ResourceReferenceParserOptions = {
+  type?: string;
+};
 
-container.bind("XWikiMeta").toConstantValue({});
+/**
+ * Client-side equivalent of ResourceReferenceParser from xwiki-rendering-api.
+ *
+ * @since 18.3.0RC1
+ * @beta
+ */
+interface ResourceReferenceParser {
+  parse(
+    serializedReference: string,
+    options?: ResourceReferenceParserOptions,
+  ): ResourceReference;
+}
 
-globalThis.matchMedia = vi.fn().mockImplementation((query) => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
-}));
-
-vi.mock("xwiki-platform-localization-webjar", () => ({
-  resolver: {
-    resolve: () => ({ translations: [] }),
-  },
-}));
-
-describe("Logic", () => {
-  it("should create a BlockNote instance", async () => {
-    mockI18n();
-
-    const host = document.createElement("div");
-    host.name = "test";
-
-    const logic = new Logic(host);
-    await logic.ready;
-  });
-});
+export type {
+  ResourceReference,
+  ResourceReferenceParser,
+  ResourceReferenceParserOptions,
+};

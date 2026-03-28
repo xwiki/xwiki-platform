@@ -37,5 +37,11 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Provides page objects for the Image and Macro wizards. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

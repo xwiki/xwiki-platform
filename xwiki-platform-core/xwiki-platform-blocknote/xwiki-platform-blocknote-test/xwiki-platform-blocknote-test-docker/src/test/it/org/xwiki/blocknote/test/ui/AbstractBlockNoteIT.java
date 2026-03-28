@@ -54,6 +54,4 @@ abstract class AbstractBlockNoteIT
     {
         setup.login("John", "pass");
     }
-
-
 }

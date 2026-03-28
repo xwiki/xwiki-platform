@@ -19,38 +19,19 @@
  */
 import { toCristalEntityReference } from "./XWikiEntityReference";
 import { EntityType } from "@xwiki/platform-model-api";
-import { Container, injectable } from "inversify";
+import { Container, inject, injectable } from "inversify";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "./ResourceReferenceParser";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
   ModelReferenceParserOptions,
 } from "@xwiki/platform-model-reference-api";
 
-type ResourceReference = {
-  type: string;
-  reference: string;
-};
-
 @injectable("Singleton")
 export class XWikiModelReferenceParser implements ModelReferenceParser {
-  // See ResourceType in xwiki-rendering-api.
-  public static readonly RESOURCE_TYPES: string[] = [
-    "unknown",
-    "doc",
-    "page",
-    "space",
-    "url",
-    "interwiki",
-    "path",
-    "mailto",
-    "attach",
-    "pageAttach",
-    "icon",
-    "unc",
-    "user",
-    "data",
-  ];
-
   public static bind(container: Container): void {
     container
       .bind("ModelReferenceParser")
@@ -59,16 +40,20 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
       .whenNamed("XWiki");
   }
 
+  constructor(
+    @inject("ResourceReferenceParser")
+    private readonly resourceReferenceParser: ResourceReferenceParser,
+  ) {}
+
   public parse(
     reference: string,
     options?: ModelReferenceParserOptions,
   ): EntityReference {
     const defaultType =
       options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
-    const resourceReference = this.parseResourceReference(
-      reference,
-      defaultType,
-    );
+    const resourceReference = this.resourceReferenceParser.parse(reference, {
+      type: defaultType,
+    });
     const entityType = this.getEntityType(resourceReference);
     if (entityType) {
       return this.parseEntityReference(resourceReference.reference, entityType);
@@ -82,32 +67,6 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     options?: ModelReferenceParserOptions,
   ): Promise<EntityReference> {
     return this.parse(reference, options);
-  }
-
-  private parseResourceReference(
-    reference: string,
-    defaultType: string,
-  ): ResourceReference {
-    const parts = reference.split(":");
-    if (parts.length > 1) {
-      const type = parts[0];
-      if (XWikiModelReferenceParser.RESOURCE_TYPES.includes(type)) {
-        return {
-          type,
-          reference: parts.slice(1).join(":"),
-        };
-      } else if (parts[1].startsWith("//")) {
-        return {
-          type: "url",
-          reference,
-        };
-      }
-    }
-
-    return {
-      type: defaultType,
-      reference,
-    };
   }
 
   private getEntityType(

@@ -72,8 +72,13 @@ import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
 import { resolver } from "xwiki-platform-localization-webjar";
+import type { ImageWizard } from "../services/image/ImageWizard";
 import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
-import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  BlockOfType,
+  EditorLanguage,
+  ImageUpdateResult,
+} from "@xwiki/platform-editors-blocknote-react";
 import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
@@ -128,6 +133,19 @@ const isLoading = ref(true);
 const editorContent = ref();
 
 const defaultLabel = "Editor";
+
+const imageEdition = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  imageWizard.edit(image, {
+    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
+      update({ type: "update", updatedProps }),
+    cancel: () => update({ type: "aborted" }),
+  });
+};
+
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
 >({
@@ -139,6 +157,9 @@ const editorProps = shallowRef<
   theme: "light",
   lang: getLanguage(),
   label: defaultLabel,
+  overrides: {
+    imageEdition,
+  },
 });
 
 onBeforeMount(async () => {

@@ -40,7 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 18.1.0RC1
  */
-@UITest
+@UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    }
+)
 class RoundTripIT extends AbstractBlockNoteIT
 {
     @Test

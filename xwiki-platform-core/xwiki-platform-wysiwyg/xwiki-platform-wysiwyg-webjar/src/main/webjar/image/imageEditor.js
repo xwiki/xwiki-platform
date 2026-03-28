@@ -618,7 +618,8 @@ define('xwiki-wysiwyg-image-editor', [
       $('#advanced [name="textWrap"]').prop('checked', imageData.textWrap);
 
       //  Override with the style values only if it's a new image.
-      updateAdvancedFromStyle($('#imageStyles')[0].selectize.getValue(), modal);
+      updateAdvancedFromStyle($('#imageStyles')[0]?.selectize.getValue() || '', modal);
+
       // Initial check of the image dimensions on load.
       checkDimensions(modal);
       updateLockStatus(modal);

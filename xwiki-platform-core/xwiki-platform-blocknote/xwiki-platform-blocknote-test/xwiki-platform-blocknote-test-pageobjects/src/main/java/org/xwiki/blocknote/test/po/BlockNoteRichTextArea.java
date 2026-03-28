@@ -20,6 +20,7 @@
 package org.xwiki.blocknote.test.po;
 
 import org.jspecify.annotations.NonNull;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -115,5 +116,16 @@ public class BlockNoteRichTextArea extends BaseElement
     private void focus(WebElement element)
     {
         getDriver().executeScript("arguments[0].focus()", element);
+    }
+
+    /**
+     * Clicks on the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to click, starting from 0
+     * @since 18.3.0RC1
+     */
+    public void clickImage(int index)
+    {
+        this.container.findElements(By.tagName("img")).get(index).click();
     }
 }

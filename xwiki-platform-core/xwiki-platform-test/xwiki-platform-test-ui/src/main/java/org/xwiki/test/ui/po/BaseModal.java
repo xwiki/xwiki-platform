@@ -19,10 +19,16 @@
  */
 package org.xwiki.test.ui.po;
 
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.test.ui.WCAGContext;
+import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
  * The base class for a bootstrap modal.
@@ -32,6 +38,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  */
 public class BaseModal extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseModal.class);
+    
     protected WebElement container;
 
     /**
@@ -51,6 +59,9 @@ public class BaseModal extends BaseElement
         String className = this.container.getAttribute("class");
         className = className.replace("fade", "");
         getDriver().executeScript("arguments[0].setAttribute(\"class\",arguments[1])", this.container, className);
+        // Once we're sure the modal is loaded, we can validate its content in regards to accessibility
+        className = this.container.getAttribute("class").split(" ")[0];
+        validateWCAG(getUtil().getWCAGUtils().getWCAGContext(), true, "." + className);
     }
 
     public String getTitle()
@@ -67,6 +78,42 @@ public class BaseModal extends BaseElement
     {
         this.container.findElement(By.cssSelector(".modal-header .close")).click();
         waitForClosed();
+    }
+
+    public void validateWCAG(WCAGContext wcagContext, boolean checkCache, String cssSelector) {
+        if (!wcagContext.isWCAGEnabled()) {
+            // Block WCAG validation if it is not enabled, in all cases.
+            return;
+        }
+
+        try {
+            long startTime = System.currentTimeMillis();
+            // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
+            // the cache is disabled.
+            XWikiWebDriver driver = this.getDriver();
+            if (!checkCache || wcagContext.isNotCached(driver.getCurrentUrl(), this.getClass().getName())) {
+                AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+                // Only analyze the modal itself
+                axeBuilder.include(cssSelector);
+                Results axeResult = axeBuilder.analyze(driver);
+                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                long stopTime = System.currentTimeMillis();
+                long deltaTime = stopTime - startTime;
+                LOGGER.info("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    driver.getCurrentUrl(), this.getClass().getName(), deltaTime);
+                wcagContext.addWCAGTime(deltaTime);
+            } else {
+                // If the identifying pair is already in the cache, don't perform accessibility validation.
+                LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
+                    driver.getCurrentUrl(), this.getClass().getName());
+            }
+        } catch (Exception e) {
+            if (wcagContext.shouldWCAGStopOnError()) {
+                throw e;
+            } else {
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+            }
+        }
     }
 
     /**

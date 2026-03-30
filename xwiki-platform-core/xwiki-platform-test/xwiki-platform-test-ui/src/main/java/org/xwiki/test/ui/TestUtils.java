@@ -71,6 +71,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.hc.core5.net.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -1227,7 +1228,89 @@ public class TestUtils
      */
     public String getURL(EntityReference reference)
     {
-        return getURL(reference, "view", "");
+        return getBaseURL() + getPath(reference);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference)
+    {
+        return getPath(reference, "view", "");
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference, String action, String queryString)
+    {
+        return getPath(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference, String action, String queryString, String fragment)
+    {
+        Serializable locale = reference.getParameters().get("locale");
+        if (locale != null) {
+            queryString += "&language=" + locale;
+        }
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
+
+        return getPath(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
+            fragment);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(String wikiName, String action, String[] path, String queryString, String fragment)
+    {
+        StringBuilder builder = new StringBuilder(getBaseBinPath(wikiName));
+
+        if (!StringUtils.isEmpty(action)) {
+            builder.append(action).append('/');
+        }
+        List<String> escapedPath = new ArrayList<>();
+        for (String element : path) {
+            escapedPath.add(escapeURL(element));
+        }
+        builder.append(StringUtils.join(escapedPath, '/'));
+
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
+        if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
+            builder.append('?');
+        }
+        if (needToAddSecretToken) {
+            addQueryStringEntry(builder, "form_token", getSecretToken());
+            builder.append('&');
+        }
+        if (!StringUtils.isEmpty(queryString)) {
+            builder.append(queryString);
+        }
+
+        if (!StringUtils.isEmpty(fragment)) {
+            builder.append('#').append(fragment);
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getBaseBinPath(String wiki)
+    {
+        String wikiName = MAIN_WIKI_NAME;
+        if (!StringUtils.isEmpty(wiki)) {
+            wikiName = wiki;
+        } else if (!StringUtils.isEmpty(this.currentWiki)) {
+            wikiName = this.currentWiki;
+        }
+
+        return (MAIN_WIKI_NAME.equals(wikiName) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1243,14 +1326,7 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString, String fragment)
     {
-        Serializable locale = reference.getParameters().get("locale");
-        if (locale != null) {
-            queryString += "&language=" + locale;
-        }
-        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
-        return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
-        fragment);
+        return getBaseURL() + getPath(reference, action, queryString, fragment);
     }
 
     /**
@@ -1371,13 +1447,7 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        String wikiName = MAIN_WIKI_NAME;
-        if (!StringUtils.isEmpty(wiki)) {
-            wikiName = wiki;
-        } else if (!StringUtils.isEmpty(this.currentWiki)) {
-            wikiName = this.currentWiki;
-        }
-        return getBaseURL() + (MAIN_WIKI_NAME.equals(wikiName) ? "bin/" : "wiki/" + wikiName + '/');
+        return getBaseURL() + getBaseBinPath(wiki);
     }
 
     /**
@@ -1403,34 +1473,7 @@ public class TestUtils
      */
     public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
     {
-        StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));
-
-        if (!StringUtils.isEmpty(action)) {
-            builder.append(action).append('/');
-        }
-        List<String> escapedPath = new ArrayList<>();
-        for (String element : path) {
-            escapedPath.add(escapeURL(element));
-        }
-        builder.append(StringUtils.join(escapedPath, '/'));
-
-        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
-        if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
-            builder.append('?');
-        }
-        if (needToAddSecretToken) {
-            addQueryStringEntry(builder, "form_token", getSecretToken());
-            builder.append('&');
-        }
-        if (!StringUtils.isEmpty(queryString)) {
-            builder.append(queryString);
-        }
-
-        if (!StringUtils.isEmpty(fragment)) {
-            builder.append('#').append(fragment);
-        }
-
-        return builder.toString();
+        return getBaseURL() + getPath(wikiName, action, path, queryString, fragment);
     }
 
     /**
@@ -2350,12 +2393,12 @@ public class TestUtils
 
     public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
     {
-        return getInputStream(getBaseURL(), path, queryParams);
+        return getInputStream(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
     }
 
     public String getString(String path, Map<String, ?> queryParams) throws Exception
     {
-        return getString(getBaseURL(), path, queryParams);
+        return getString(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
     }
 
     /**
@@ -2377,12 +2420,13 @@ public class TestUtils
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
     {
-        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+        String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
+            // Ignore the prefix if it's already path of the path
             cleanPrefix = "";
         }
 
-        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
+        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(Strings.CS.removeStart(path, "/"));
 
         if (queryParams != null) {
             for (Map.Entry<String, ?> entry : queryParams.entrySet()) {

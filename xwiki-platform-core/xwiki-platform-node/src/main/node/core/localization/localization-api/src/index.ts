@@ -20,7 +20,7 @@
 
 /**
  * A query expresses the set of translations to be resolved. It can be either an array of full translation keys, or
- * an array of translation key suffixes plus a separate shared prefix.
+ * an array of translation key suffixes plus a separate shared prefix and an optional locale.
  *
  * @since 18.3.0RC1
  * @beta
@@ -31,6 +31,7 @@ type Query =
       // the prefix can be undefined for legacy support
       prefix?: string | undefined;
       keys: string[];
+      locale?: string;
     };
 
 /**

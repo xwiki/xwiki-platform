@@ -51,12 +51,16 @@ export function translatorFactory(target: string): Translator {
       const urlSearchParams = new URLSearchParams();
 
       const cacheKeys = Object.keys(cache);
+      const defaultLocale = () =>
+        document.documentElement.getAttribute("lang") ?? "en";
       if (Array.isArray(query)) {
         const cleanedQuery = query.filter((key) => !cacheKeys.includes(key));
 
         for (const arg of cleanedQuery) {
           urlSearchParams.append("key", arg);
         }
+
+        urlSearchParams.append("locale", defaultLocale());
       } else {
         const filteredKeys = query.keys.filter(
           (key) => !cacheKeys.includes((query.prefix ?? "") + key),
@@ -67,6 +71,11 @@ export function translatorFactory(target: string): Translator {
         }
         for (const arg of filteredKeys) {
           urlSearchParams.append("key", arg);
+        }
+        if (query.locale) {
+          urlSearchParams.append("locale", query.locale);
+        } else {
+          urlSearchParams.append("locale", defaultLocale());
         }
       }
 

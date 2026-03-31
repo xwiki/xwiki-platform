@@ -45,7 +45,7 @@ describe("translatorFactory", () => {
 
     expect(result).toMatchObject({ "a.key": "Hello" });
     expect(fetch).toHaveBeenCalledWith(
-      `${TARGET}?key=a.key`,
+      `${TARGET}?key=a.key&locale=en`,
       expect.objectContaining({ method: "GET" }),
     );
   });
@@ -57,7 +57,7 @@ describe("translatorFactory", () => {
     await translator.resolve({ prefix: "ns.", keys: ["hello"] });
 
     expect(fetch).toHaveBeenCalledWith(
-      "https://example.com/translations?prefix=ns.&key=hello",
+      "https://example.com/translations?prefix=ns.&key=hello&locale=en",
       expect.anything(),
     );
   });
@@ -89,7 +89,7 @@ describe("translatorFactory", () => {
     const result = await translator.resolve(["a.key", "b.key"]);
 
     expect(fetch).toHaveBeenCalledWith(
-      "https://example.com/translations?key=a.key",
+      "https://example.com/translations?key=a.key&locale=en",
       expect.anything(),
     );
 
@@ -146,7 +146,24 @@ describe("translatorFactory", () => {
     const result = await translator.resolve({ keys: ["hello"] });
 
     expect(fetch).toHaveBeenCalledWith(
-      "https://example.com/translations?key=hello",
+      "https://example.com/translations?key=hello&locale=en",
+      expect.anything(),
+    );
+    expect(result).toMatchObject({ hello: "Hi" });
+  });
+
+  it("handles object query with a locale", async () => {
+    vi.stubGlobal("fetch", mockFetch([{ key: "hello", rawSource: "Hi" }]));
+
+    const translator = translatorFactory(TARGET);
+    const result = await translator.resolve({
+      keys: ["world"],
+      prefix: "hello.",
+      locale: "fr",
+    });
+
+    expect(fetch).toHaveBeenCalledWith(
+      "https://example.com/translations?prefix=hello.&key=world&locale=fr",
       expect.anything(),
     );
     expect(result).toMatchObject({ hello: "Hi" });

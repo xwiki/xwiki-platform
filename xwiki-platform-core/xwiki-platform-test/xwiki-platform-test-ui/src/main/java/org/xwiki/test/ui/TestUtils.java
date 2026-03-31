@@ -1318,7 +1318,7 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString)
     {
-        return getURL(reference, action, queryString, null);
+        return getBaseURL() + getPath(reference, action, queryString);
     }
 
     /**

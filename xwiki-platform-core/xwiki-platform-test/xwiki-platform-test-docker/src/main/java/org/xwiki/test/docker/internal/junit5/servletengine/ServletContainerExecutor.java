@@ -174,7 +174,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         if (this.servletContainer != null) {
             String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
-                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb";
+                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb" + this.index;
             int internalPort = 8080;
 
             startContainer(internalHost, internalPort);

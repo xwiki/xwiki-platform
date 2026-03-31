@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -195,11 +194,7 @@ public class WARBuilder
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
         LOGGER.info("Copying resources to WEB-INF/classes ...");
-        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
-        // in target/classes directly.
-        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
-            ? testConfiguration.getOutputDirectory() : "target";
-        File classesDirectory = new File(outputDirectory, "classes");
+        File classesDirectory = new File(testConfiguration.getMavenBuildDirectory(), "classes");
         if (classesDirectory.exists()) {
             copyDirectory(classesDirectory, webInfClassesDirectory);
         }

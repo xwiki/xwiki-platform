@@ -165,13 +165,6 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
      */
     private String getTestResourcePathOnHost()
     {
-        String testClassesDirectory;
-        String mavenBuildDir = System.getProperty("maven.build.dir");
-        if (mavenBuildDir == null) {
-            testClassesDirectory = "target/test-classes";
-        } else {
-            testClassesDirectory = String.format("%s/test-classes", this.testConfiguration.getOutputDirectory());
-        }
-        return testClassesDirectory;
+        return String.format("%s/test-classes", this.testConfiguration.getMavenBuildDirectory());
     }
 }

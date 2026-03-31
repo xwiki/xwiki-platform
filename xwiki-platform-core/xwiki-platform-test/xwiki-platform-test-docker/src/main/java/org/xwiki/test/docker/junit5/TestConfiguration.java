@@ -794,22 +794,30 @@ public class TestConfiguration
     }
 
     /**
-     * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
-     * system property is not defined then construct an output directory name based on the defined configuration so that
-     * we can run different configurations one after another without them overriding each other. The {@code
-     * maven.build.dir} system property is there to allow controlling where the Maven output directory is located when
-     * running from Maven.
+     * @return the output directory where to output files required for running the tests. It's a sub-directory of the
+     *         Maven build directory, which name is based on the defined configuration so that we can run different
+     *         configurations one after another without them overriding each other.
      */
     public String getOutputDirectory()
     {
-        String outputDirectory;
+        return getMavenBuildDirectory() + "/" + getName();
+    }
+
+    /**
+     * @return the output directory where Maven produce files. Assume ./target if the system property
+     *         {@code maven.build.dir} is not set.
+     * @since 17.10.6
+     * @since 18.3.0RC1
+     */
+    public String getMavenBuildDirectory()
+    {
         String mavenBuildDir = System.getProperty("maven.build.dir");
+
         if (mavenBuildDir == null) {
-            outputDirectory = String.format("./target/%s", getName());
+            return "./target";
         } else {
-            outputDirectory = mavenBuildDir;
+            return mavenBuildDir;
         }
-        return outputDirectory;
     }
 
     /**

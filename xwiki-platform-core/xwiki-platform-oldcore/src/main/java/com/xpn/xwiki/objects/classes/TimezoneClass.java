@@ -61,7 +61,7 @@ public class TimezoneClass extends StringClass
      **/
     public TimezoneClass()
     {
-        super();
+        // Nothing to do.
     }
 
     @Override

@@ -34,7 +34,7 @@ public class UnexpectedException extends RuntimeException
      */
     public UnexpectedException()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

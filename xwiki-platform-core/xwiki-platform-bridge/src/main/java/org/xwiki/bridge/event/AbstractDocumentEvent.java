@@ -60,7 +60,6 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      */
     public AbstractDocumentEvent()
     {
-        super();
         this.documentReference = null;
     }
 

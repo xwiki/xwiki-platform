@@ -33,7 +33,7 @@ public class InvalidEntityReferenceException extends RuntimeException
      */
     public InvalidEntityReferenceException()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

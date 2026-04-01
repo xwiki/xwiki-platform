@@ -53,7 +53,7 @@ public class DocumentRolledBackEvent extends AbstractDocumentEvent
      */
     public DocumentRolledBackEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

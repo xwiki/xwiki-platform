@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>17.10.5-SNAPSHOT</version>
+    <version>17.10.5</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>
@@ -235,7 +235,7 @@
             <!-- Include version.properties file -->
             <resource>
               <directory>${basedir}/src/main/filteredResources</directory>
-              <targetPath></targetPath>
+              <targetPath />
               <filtering>true</filtering>
             </resource>
           </webResources>
@@ -294,6 +294,6 @@
   </profiles>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.5</tag>
   </scm>
 </project>

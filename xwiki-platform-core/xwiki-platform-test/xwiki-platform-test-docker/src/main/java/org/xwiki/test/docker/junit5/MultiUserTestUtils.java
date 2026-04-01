@@ -132,7 +132,7 @@ public class MultiUserTestUtils
     {
         WebDriver driver = this.setup.getDriver();
         String currentTabHandle = driver.getWindowHandle();
-        this.hostByTab.put(currentTabHandle, this.setup.getBaseURL());
+        this.hostByTab.put(currentTabHandle, this.setup.getCurrentExecutor().getBrowserHost());
         this.secretTokenByTab.put(currentTabHandle, this.setup.getSecretToken());
     }
 

@@ -46,6 +46,8 @@ public class RealtimeEditToolbar extends BaseElement
 
     private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
 
+    private static final String ATTRIBUTE_VALUE = "value";
+
     /**
      * Waits until the user is connected to the realtime editing session.
      * 

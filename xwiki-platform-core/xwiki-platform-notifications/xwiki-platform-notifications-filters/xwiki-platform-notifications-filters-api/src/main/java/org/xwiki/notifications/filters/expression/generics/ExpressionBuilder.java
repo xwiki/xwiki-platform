@@ -42,7 +42,7 @@ public final class ExpressionBuilder
      */
     private ExpressionBuilder()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

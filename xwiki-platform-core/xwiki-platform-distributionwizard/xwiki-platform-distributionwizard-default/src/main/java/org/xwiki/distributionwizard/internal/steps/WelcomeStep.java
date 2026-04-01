@@ -19,6 +19,9 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.rendering.block.Block;
@@ -57,6 +60,12 @@ public class WelcomeStep extends AbstractStep
 
     @Override
     public boolean isStepDone() throws DistributionWizardException
+    {
+        return false;
+    }
+
+    @Override
+    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
     {
         return false;
     }

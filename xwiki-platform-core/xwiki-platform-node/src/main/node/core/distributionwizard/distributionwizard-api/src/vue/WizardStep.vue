@@ -19,12 +19,16 @@
 -->
 <script setup lang="ts">
 import type { WizardStepProps } from "../WizardStepProps";
+const emit = defineEmits(["validated"]);
 
 defineProps<{ step: WizardStepProps; component: unknown }>();
+function validated() {
+  emit("validated");
+}
 </script>
 
 <template>
-  <component v-if="component" :is="component" />
+  <component v-if="component" :is="component" @validated="validated" />
   <div v-else-if="step.html" v-html="step.html"></div>
   <span v-else>The step is missing proper content.</span>
 </template>

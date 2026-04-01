@@ -21,12 +21,21 @@
 type UIComponent = {
   component: string;
   module: string;
+  callback?: string;
 };
+enum StepState {
+  DISPLAYED,
+  VALIDATED,
+  PROCESSING,
+  PROCESSED,
+}
 type WizardStepProps = {
   title: string;
-  uiComponent: UIComponent;
-  html: string;
+  uiComponent?: UIComponent;
+  html?: string;
   index: number;
+  state?: StepState;
 };
+type StepCallback = () => Promise<boolean>;
 
-export type { WizardStepProps };
+export { type StepCallback, StepState, type WizardStepProps };

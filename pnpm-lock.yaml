@@ -40,8 +40,8 @@ catalogs:
       specifier: 4.0.0
       version: 4.0.0
     '@types/jsdom':
-      specifier: 28.0.0
-      version: 28.0.0
+      specifier: 28.0.1
+      version: 28.0.1
     '@types/lodash-es':
       specifier: 4.17.12
       version: 4.17.12
@@ -356,7 +356,7 @@ importers:
         version: 24.0.4
       '@types/jsdom':
         specifier: 'catalog:'
-        version: 28.0.0
+        version: 28.0.1
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.0
@@ -534,7 +534,7 @@ importers:
         version: 24.0.4
       '@types/jsdom':
         specifier: 'catalog:'
-        version: 28.0.0
+        version: 28.0.1
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.0
@@ -2214,7 +2214,7 @@ importers:
         version: 24.0.4
       '@types/jsdom':
         specifier: 'catalog:'
-        version: 28.0.0
+        version: 28.0.1
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.0
@@ -3406,8 +3406,8 @@ packages:
   '@types/jquery@4.0.0':
     resolution: {integrity: sha512-Z+to+A2VkaHq1DfI2oSwsoCdhCHMpTSgjWzNcbNlRGYzksDBpPUgEcAL+RQjOBJRaLoEAOHXxqDGBVP+BblBwg==}
 
-  '@types/jsdom@28.0.0':
-    resolution: {integrity: sha512-A8TBQQC/xAOojy9kM8E46cqT00sF0h7dWjV8t8BJhUi2rG6JRh7XXQo/oLoENuZIQEpXsxLccLCnknyQd7qssQ==}
+  '@types/jsdom@28.0.1':
+    resolution: {integrity: sha512-GJq2QE4TAZ5ajSoCasn5DOFm8u1mI3tIFvM5tIq3W5U/RTB6gsHwc6Yhpl91X9VSDOUVblgXmG+2+sSvFQrdlw==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -8008,7 +8008,7 @@ snapshots:
 
   '@types/jquery@4.0.0': {}
 
-  '@types/jsdom@28.0.0':
+  '@types/jsdom@28.0.1':
     dependencies:
       '@types/node': 24.12.0
       '@types/tough-cookie': 4.0.5

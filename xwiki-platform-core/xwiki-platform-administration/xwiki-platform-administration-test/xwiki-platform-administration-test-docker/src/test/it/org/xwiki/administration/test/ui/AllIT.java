@@ -73,4 +73,10 @@ public class AllIT
     class NestedPresentationIT extends PresentationIT
     {
     }
+
+    @Nested
+    @DisplayName("User editing")
+    class NestedUserEditIT extends UserEditIT
+    {
+    }
 }

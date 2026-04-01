@@ -513,6 +513,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
     var editUserURL = userDocument.getURL('edit');
     var parameters = {xpage: 'edituser'};
     if (forceLock === true) {
+      parameters.force_token = xm.form_token;
       parameters.force = 1;
     }
     editUserModal.find('.modal-body').first().empty().addClass('loading').load(editUserURL, parameters, function() {

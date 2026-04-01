@@ -23,6 +23,8 @@ import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
+import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
+import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
 import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
@@ -89,6 +91,8 @@ XWikiMacroBlock.bind(container);
 XWikiInlineMacro.bind(container);
 
 DefaultImageWizard.bind(container);
+DefaultMacroWizard.bind(container);
+DefaultBlockNoteMacroWizard.bind(container);
 
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
 @injectable()

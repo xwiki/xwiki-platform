@@ -50,8 +50,9 @@ public class MacroDialogSelectModal extends BaseElement
      *
      * @param value the text to filter (e.g., "Pages")
      * @param expectedCount the expected number of macros listed after filtering
+     * @return the current page object
      */
-    public void filterByText(String value, long expectedCount)
+    public MacroDialogSelectModal filterByText(String value, long expectedCount)
     {
         XWikiWebDriver driver = getDriver();
         WebElement macroSelectorFilter = driver.findElement(By.cssSelector(".macro-textFilter"));
@@ -59,6 +60,7 @@ public class MacroDialogSelectModal extends BaseElement
         macroSelectorFilter.sendKeys(value);
         // Wait until a single macro is proposed.
         driver.waitUntilCondition(webDriver -> countDisplayedMacros() == expectedCount);
+        return this;
     }
 
     /**
@@ -79,7 +81,7 @@ public class MacroDialogSelectModal extends BaseElement
      */
     public MacroDialogEditModal clickSelect()
     {
-        getDriver().findElement(By.cssSelector(".gadget-selector-modal .modal-footer .btn-primary")).click();
+        getDriver().findElement(By.cssSelector("[class*=-selector-modal] .modal-footer .btn-primary")).click();
         return new MacroDialogEditModal().waitUntilReady();
     }
 

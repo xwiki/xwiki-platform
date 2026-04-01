@@ -16,6 +16,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "eslint": "catalog:",
     "globals": "catalog:",
     "publint": "catalog:",
     "vite": "catalog:",

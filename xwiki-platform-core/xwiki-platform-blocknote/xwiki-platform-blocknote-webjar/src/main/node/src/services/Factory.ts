@@ -23,13 +23,15 @@ import { Logic } from "./Logic";
  * Factory class to create and manage BlockNote instances.
  */
 export class Factory {
-  constructor() {
-    // Maps BlockNote instances to their host elements.
-    this._instancesByHost = new WeakMap();
+  /**
+   * Maps BlockNote instances to their host elements.
+   */
+  private readonly instancesByHost: WeakMap<HTMLElement, Logic> = new WeakMap();
 
-    // Map BlockNote instances to their form field names.
-    this._instancesByName = new Map();
-  }
+  /**
+   * Map BlockNote instances to their form field names.
+   */
+  private readonly instancesByName: Map<string, Logic> = new Map();
 
   /**
    * Creates (if it doesn't exist yet) and returns the BlockNote instance associated with the given host element.
@@ -37,35 +39,36 @@ export class Factory {
    * @param element - the HTML Element that will host the created BlockNote editor instance
    * @returns a promise that resolves to the BlockNote instance associated with the given host element
    */
-  async create(element, ...args) {
-    if (!this._instancesByHost.has(element)) {
-      const logic = new Logic(element, ...args);
-      this._instancesByHost.set(element, logic);
+  async create(element: HTMLElement) {
+    let logic = this.instancesByHost.get(element);
+    if (!logic) {
+      logic = new Logic(element);
+      this.instancesByHost.set(element, logic);
       if (logic.name) {
-        this._instancesByName.set(logic.name, logic);
+        this.instancesByName.set(logic.name, logic);
       }
     }
 
-    return await this._instancesByHost.get(element).ready;
+    return await logic.ready;
   }
 
   /**
    * @param hostOrName - the name of a form field or the host element for which to get the BlockNote instance
    * @returns the BlockNote instance associated with the given host element or form field name
    */
-  get(hostOrName) {
+  get(hostOrName: string | HTMLElement): Logic | undefined {
     if (typeof hostOrName === "string") {
-      return this._instancesByName.get(hostOrName);
+      return this.instancesByName.get(hostOrName);
     } else {
-      return this._instancesByHost.get(hostOrName);
+      return this.instancesByHost.get(hostOrName);
     }
   }
 
   /**
    * @returns an array of all BlockNote editor instances created by this factory
    */
-  getAll() {
-    return [...this._instancesByName.values()];
+  getAll(): Logic[] {
+    return Array.from(this.instancesByName.values());
   }
 
   /**
@@ -74,12 +77,14 @@ export class Factory {
    * @param hostOrName - the name of a form field or the host element for which to destroy the BlockNote instance
    * @returns true if the BlockNote instance was destroyed, false otherwise
    */
-  destroy(hostOrName) {
+  destroy(hostOrName: string | HTMLElement): boolean {
     const instance = this.get(hostOrName);
     if (instance) {
       instance.destroy();
-      this._instancesByName.delete(instance.name);
-      this._instancesByHost.delete(instance.host);
+      if (instance.name) {
+        this.instancesByName.delete(instance.name);
+      }
+      this.instancesByHost.delete(instance.host);
       return true;
     }
     return false;
@@ -88,7 +93,7 @@ export class Factory {
   /**
    * @returns the syntax used by BlockNote
    */
-  get syntax() {
+  get syntax(): { type: string; version: string } {
     return {
       type: "uniast",
       version: "1.0",

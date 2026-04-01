@@ -24,6 +24,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 /**
  * Represents the BlockNote rich text area.
@@ -126,6 +127,28 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public void clickImage(int index)
     {
-        this.container.findElements(By.tagName("img")).get(index).click();
+        // The image might not be loaded yet, so wait until it's clickable before clicking on it.
+        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
+        image.click();
+    }
+
+    /**
+     * Double clicks on the macro with the specified index in the rich text area to open the macro edit modal.
+     * 
+     * @param index the index of the macro to double click, starting from 0
+     * @return the opened macro edit modal
+     * @since 18.3.0RC1
+     */
+    public MacroDialogEditModal doubleClickMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        WebElement macro = this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
+            .get(index);
+        getDriver().createActions().doubleClick(macro).perform();
+        return new MacroDialogEditModal().waitUntilReady();
     }
 }

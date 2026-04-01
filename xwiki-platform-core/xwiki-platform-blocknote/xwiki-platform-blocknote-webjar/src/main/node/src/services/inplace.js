@@ -21,12 +21,12 @@
 define("xwiki-blocknote-inline", [
   "jquery",
   "xwiki-blocknote",
+  "css!xwiki-wysiwyg",
   "css!xwiki-blocknote",
 ], function ($, BlockNote) {
   $(document).on("xwiki:actions:edit", function (event, config) {
     if (
-      config &&
-      config.contentType === "org.xwiki.rendering.syntax.SyntaxContent" &&
+      config?.contentType === "org.xwiki.rendering.syntax.SyntaxContent" &&
       config.editMode === "wysiwyg"
     ) {
       createEditor(event.target, config);
@@ -62,7 +62,7 @@ define("xwiki-blocknote-inline", [
       );
       BlockNote.destroy(container);
       container.classList.remove("xwiki-blocknote-wrapper");
-      container.removeAttribute("data-config");
+      delete container.dataset.config;
     });
 
     config.deferred.resolve(config.document);

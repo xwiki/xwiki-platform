@@ -626,7 +626,8 @@ define('xwiki-wysiwyg-macro-editor', [
         syntaxId,
         sourceDocumentReference,
         inlineParameters = {},
-        showInlineParameters = true
+        showInlineParameters = true,
+        inlineParametersSyntax = undefined
       ) {
         let macroId = macroCall.name;
         if (syntaxId) {
@@ -639,8 +640,8 @@ define('xwiki-wysiwyg-macro-editor', [
 
         // Convert inline parameter values, if needed, and load the macro descriptor.
         try {
-          const parameters = showInlineParameters ? await macroService.getMacroParametersFromHTML(macroId,
-            inlineParameters, sourceDocumentReference) : {};
+          const parameters = showInlineParameters ? await macroService.convertMacroParameters(macroId,
+            inlineParameters, sourceDocumentReference, inlineParametersSyntax) : {};
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
              try {
@@ -669,7 +670,10 @@ define('xwiki-wysiwyg-macro-editor', [
     };
     // We need to obey the specified macro identifier in case the user has just changed the macro.
     macroCall.name = input.macroId || macroCall.name;
-    if (!macroEditorAPI) {
+    if (macroEditorAPI) {
+      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.inlineParameters,
+        input.showInlineParameters, input.inlineParametersSyntax);
+    } else {
       // Initialize the macro editor.
       const submitButton = $(this).find('.modal-footer .btn-primary');
       macroEditor.on('ready', function(event) {
@@ -677,10 +681,7 @@ define('xwiki-wysiwyg-macro-editor', [
         submitButton.prop('disabled', false);
       });
       macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId, input.sourceDocumentReference,
-          input.inlineParameters, input.showInlineParameters);
-    } else {
-      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.inlineParameters,
-        input.showInlineParameters);
+          input.inlineParameters, input.showInlineParameters, input.inlineParametersSyntax);
     }
   },
 
@@ -763,14 +764,16 @@ define('xwiki-wysiwyg-macro-editor', [
     syntaxId,
     sourceDocumentReference,
     inlineParameters,
-    showInlineParameters
+    showInlineParameters,
+    inlineParametersSyntax
   ) {
     this.each(function() {
       const macroEditor = $(this);
       if (!macroEditor.data('macroEditorAPI')) {
         const macroEditorAPI = createMacroEditorAPI(macroEditor);
         macroEditor.data('macroEditorAPI', macroEditorAPI);
-        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, inlineParameters, showInlineParameters);
+        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, inlineParameters, showInlineParameters,
+          inlineParametersSyntax);
       }
     });
     return this.data('macroEditorAPI');

@@ -66,8 +66,7 @@ class ImageIT extends AbstractBlockNoteIT
 
             image:missing.png
 
-            after
-            """);
+            after""");
         
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -116,6 +115,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         // Update the image alignment as well.
         imageEditModal.switchToAdvancedTab().selectEndAlignment();
+        imageEditModal.clickInsert();
 
         // Save and check the source.
         page.save();

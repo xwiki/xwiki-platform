@@ -73,6 +73,7 @@ import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
 import { resolver } from "xwiki-platform-localization-webjar";
 import type { ImageWizard } from "../services/image/ImageWizard";
+import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import type {
   BlockOfType,
@@ -174,20 +175,24 @@ onBeforeMount(async () => {
 const macros = {
   list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
-    openParamsEditor: (
+    openParamsEditor: async (
       macro: MacroWithUnknownParamsType,
-      params: UnknownMacroParamsType,
+      parameters: UnknownMacroParamsType,
       update: (newProps: UnknownMacroParamsType) => void,
     ) => {
-      // TODO: Open the macro modal.
-      console.debug(
-        "Open macro editor for macro",
-        macro,
-        "with params",
-        params,
-        "and update callback",
-        update,
-      );
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        update(
+          await macroWizard.insertOrUpdate(macro, parameters, {
+            syntax: outputSyntax,
+            inlineParametersSyntax: inputSyntax,
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to edit the macro", error);
+      }
     },
   },
 };

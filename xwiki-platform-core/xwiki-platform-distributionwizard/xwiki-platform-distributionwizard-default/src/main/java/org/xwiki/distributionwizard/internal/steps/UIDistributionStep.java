@@ -19,8 +19,12 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
+import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
@@ -75,5 +79,11 @@ public class UIDistributionStep extends AbstractStep
         Namespace namespace = wiki == null ? null : new Namespace("wiki", wiki);
         InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
         return  (flavor != null && flavor.isValid(namespace.toString()));
+    }
+
+    @Override
+    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    {
+        return false;
     }
 }

@@ -19,7 +19,9 @@
 -->
 <script setup lang="ts">
 import WizardBreadcrumb from "./WizardBreadcrumb.vue";
+import WizardNextButton from "./WizardNextButton.vue";
 import WizardStep from "./WizardStep.vue";
+import { StepState } from "../WizardStepProps";
 import {
   computed,
   onMounted,
@@ -29,7 +31,7 @@ import {
   watch,
 } from "vue";
 import type { StepsResolverFunction } from "../StepsResolver";
-import type { WizardStepProps } from "../WizardStepProps";
+import type { StepCallback, WizardStepProps } from "../WizardStepProps";
 
 const emit = defineEmits(["closed"]);
 const props = defineProps<{
@@ -38,15 +40,15 @@ const props = defineProps<{
 }>();
 
 const steps = ref<WizardStepProps[]>([]);
-let activeStep = ref<WizardStepProps | undefined>();
+const activeStep = ref<WizardStepProps | undefined>();
 const stepComponent = ref();
+const stepCallback = ref<StepCallback | null>();
 
 const htmlDialog = useTemplateRef("wizardDialog");
 
 const stepIndex = computed(() => {
   return activeStep.value ? activeStep.value.index : 0;
 });
-// TODO: define events to know if next step can be reached
 const hasNextStep = computed(() => stepIndex.value < steps.value.length - 1);
 const hasPreviousStep = computed(() => stepIndex.value > 0);
 const stepNames = computed(() => {
@@ -56,12 +58,11 @@ const stepNames = computed(() => {
   }
   return names;
 });
-const isFinished = true;
 
 onMounted(async () => {
   steps.value = await props.stepResolver();
   if (steps.value.length > 1) {
-    activeStep.value = steps.value[0];
+    activeStep.value = { ...steps.value[0], state: StepState.DISPLAYED };
   }
 });
 onUpdated(() => {
@@ -69,20 +70,37 @@ onUpdated(() => {
     htmlDialog.value?.showModal();
   }
 });
-watch(activeStep, async (newStep, oldStep) => {
+watch(activeStep, async (newStep) => {
   if (newStep && newStep.uiComponent) {
-    console.log("Loading", newStep.uiComponent);
-    stepComponent.value = (await import(newStep.uiComponent.module))[
-      newStep.uiComponent.component
-    ];
+    const asyncModule = await import(newStep.uiComponent.module);
+    stepComponent.value = asyncModule[newStep.uiComponent.component];
+    const callbackName = newStep.uiComponent.callback || "callback";
+    stepCallback.value = asyncModule[callbackName];
   } else {
     stepComponent.value = null;
   }
 });
 
-function nextStep() {
+async function nextStep() {
+  async function processStep() {
+    let loadNextStep = true;
+    if (activeStep.value && stepCallback.value) {
+      loadNextStep = false;
+      activeStep.value.state = StepState.PROCESSING;
+      const processed = await stepCallback.value();
+      if (processed) {
+        activeStep.value.state = StepState.PROCESSED;
+        loadNextStep = true;
+      }
+    }
+    return loadNextStep;
+  }
   if (hasNextStep.value) {
-    activeStep.value = steps.value[stepIndex.value + 1];
+    const loadNextStep = await processStep();
+    if (loadNextStep) {
+      activeStep.value = steps.value[stepIndex.value + 1];
+      activeStep.value.state = StepState.DISPLAYED;
+    }
   }
 }
 
@@ -95,48 +113,50 @@ function finishWizard() {
   htmlDialog.value?.requestClose();
   emit("closed");
 }
+function validate() {
+  if (activeStep.value) {
+    activeStep.value.state = StepState.VALIDATED;
+  }
+}
 </script>
-<script></script>
 
 <template>
   <!-- Should use closedby="none" -->
   <dialog
-    class="wizard-dialog"
+    :class="$style.wizardDialog"
     ref="wizardDialog"
     aria-labelledby="wizard-title"
     v-if="activeStep"
   >
-    <div class="wizard-header">
-      <h2 class="wizard-title">{{ wizardTitle }} - {{ activeStep.title }}</h2>
+    <div :class="$style.wizardHeader">
+      <h2>{{ wizardTitle }} - {{ activeStep.title }}</h2>
       <WizardBreadcrumb :steps="stepNames" :activeStep="activeStep.index" />
     </div>
-    <main class="wizard-content">
-      <WizardStep :step="activeStep" :component="stepComponent"></WizardStep>
+    <main :class="$style.wizardContent">
+      <WizardStep
+        :step="activeStep"
+        :component="stepComponent"
+        @validated="validate"
+      ></WizardStep>
     </main>
-    <div class="wizard-footer">
-      <div class="footer-left">
-        <button class="button" v-if="hasPreviousStep" @click="previousStep">
-          Previous
-        </button>
+    <div :class="$style.wizardFooter">
+      <div :class="$style.footerLeft">
+        <button v-if="hasPreviousStep" @click="previousStep">Previous</button>
       </div>
-      <div class="footer-right">
-        <button class="button primary" v-if="hasNextStep" @click="nextStep">
-          Next
-        </button>
-        <button
-          class="button primary"
-          v-if="isFinished && !hasNextStep"
-          @click="finishWizard"
-        >
-          Finish
-        </button>
+      <div :class="$style.footerRight">
+        <WizardNextButton
+          :step-state="activeStep.state || StepState.DISPLAYED"
+          :has-next-step="hasNextStep"
+          @finish-wizard="finishWizard"
+          @next-step="nextStep"
+        />
       </div>
     </div>
   </dialog>
 </template>
 
-<style scoped>
-.wizard-dialog {
+<style module>
+.wizardDialog {
   width: min(720px, 90vw);
   border: none;
   border-radius: 8px;
@@ -144,19 +164,19 @@ function finishWizard() {
   overflow: hidden;
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 }
-.wizard-header {
+.wizardHeader {
   padding: 24px;
   border-bottom: 1px solid #e5e7eb;
   background: #fafafa;
 }
-.wizard-header h2 {
+.wizardHeader h2 {
   margin: 0 0 16px;
 }
-.wizard-content {
+.wizardContent {
   padding: 28px;
   min-height: 200px;
 }
-.wizard-footer {
+.wizardFooter {
   padding: 16px 24px;
   border-top: 1px solid #e5e7eb;
   display: flex;
@@ -164,30 +184,12 @@ function finishWizard() {
   justify-content: flex-end;
   background: #fafafa;
 }
-.footer-left,
-.footer-right {
+.footerLeft,
+.footerRight {
   flex-basis: 100%;
 }
-.footer-right {
+.footerRight {
   display: flex;
   justify-content: flex-end;
-}
-.button {
-  padding: 10px 18px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
-  color: black;
-  font-weight: 500;
-}
-.primary {
-  color: white;
-  background: #3f79bd;
-  border: 1px solid #3f79bd;
-}
-.primary:hover {
-  background: #326095;
-  border: 1px solid #326095;
 }
 </style>

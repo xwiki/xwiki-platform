@@ -33,6 +33,10 @@ async function fetchSteps(restURL: string): Promise<JSONSteps> {
   return response.json();
 }
 
+/**
+ * Resolve the steps using the given REST API URL.
+ * @param restURL: the URL of the REST API to call for getting step info.
+ */
 export async function XWikiStepsResolver(
   restURL: string,
 ): Promise<WizardStepProps[]> {

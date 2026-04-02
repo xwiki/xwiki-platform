@@ -148,6 +148,9 @@ administration.section.groups.deleteUserFromGroup.loading=Removing member from g
 administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=These rights apply on this page and {0}all its children{1}.
+
 # Other Category
 admin.other=Other
 admin.other.description=Various configurations for extensions.

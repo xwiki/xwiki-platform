@@ -97,7 +97,7 @@ catalog:
   inversify: 7.11.0
   jiti: 2.6.1
   jquery: 4.0.0
-  jsdom: 28.1.0
+  jsdom: 29.0.1
   lodash-es: 4.17.23
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.0

@@ -45,8 +45,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-
 /**
  * A {@link NamingCriterion} based on the opening heading (if present) of the document.
  * 

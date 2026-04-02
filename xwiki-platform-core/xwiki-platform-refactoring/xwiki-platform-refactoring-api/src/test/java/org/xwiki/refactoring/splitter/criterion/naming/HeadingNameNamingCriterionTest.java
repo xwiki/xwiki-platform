@@ -144,7 +144,8 @@ class HeadingNameNamingCriterionTest
                 + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals(768,
+        when(this.docBridge.getLocalReferenceMaxLength()).thenReturn(769);
+        assertEquals(769,
             this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())).toString().length());
         // Test fallback operation
         assertEquals(new DocumentReference("test", "Test", "Test-1"), this.namingCriterion.getDocumentReference(xdom));
@@ -157,7 +158,7 @@ class HeadingNameNamingCriterionTest
     }
 
     @Test
-    void getDocumentName()
+    void getDocumentName() throws Exception
     {
         this.namingCriterion.getParameters()
             .setBaseDocumentReference(new DocumentReference("test", "Parent", "WebHome"));

@@ -28,7 +28,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -76,8 +75,6 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
     @Named("mainPageNameAndNumbering")
     private NamingCriterion mainPageNameAndNumberingNamingCriterion;
 
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * A list containing all the document references generated so far. This is used to avoid name clashes.
@@ -189,7 +186,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
         // Fallback max size in case of issue when accessing the document reference
         var maxSize = 768;
         try {
-            maxSize = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference).getLocalReferenceMaxLength();
+            maxSize = this.docBridge.getTranslatedDocumentInstance(documentReference).getLocalReferenceMaxLength();
         } catch (Exception e) {
             this.logger.warn("Failed to resolve [{}], falling back to a maximum size of [{}]. Cause: [{}]",
                 documentReference, maxSize, getRootCauseMessage(e));

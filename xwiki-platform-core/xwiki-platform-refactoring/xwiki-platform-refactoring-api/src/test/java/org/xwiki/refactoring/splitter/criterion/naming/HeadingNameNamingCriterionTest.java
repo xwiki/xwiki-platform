@@ -157,7 +157,7 @@ class HeadingNameNamingCriterionTest
     }
 
     @Test
-    void getDocumentName() throws Exception
+    void getDocumentName()
     {
         this.namingCriterion.getParameters()
             .setBaseDocumentReference(new DocumentReference("test", "Parent", "WebHome"));

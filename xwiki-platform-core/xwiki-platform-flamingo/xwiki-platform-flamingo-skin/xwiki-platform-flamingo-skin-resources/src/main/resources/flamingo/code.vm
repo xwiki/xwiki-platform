@@ -104,6 +104,9 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
     #end
 
     #set ($lineNumber = $foreach.count)
+    #if("$el.element" == '')
+      #set($el.element = $util.getNewline())
+    #end
 
     #if ($startNewGroup)
       </tbody>
@@ -122,6 +125,9 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
     #set ($lines = $content.split('\n'))
     #foreach ($line in $lines)
       #set ($lineNumber = $foreach.count)
+      #if("$line" == '')
+        #set($line = $util.getNewline())
+      #end
       <tr class="line" id="$lineNumber">
         ## Even though empty we still need the first 2 TD to make the HTML valid
         <td class="author avatar_16 hidden"></td>

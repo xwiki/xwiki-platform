@@ -45,10 +45,8 @@ ul.commentreplies {
   margin-left: -35px;
   width: 30px;
 }
-.commentavatar img {
+.commentavatar img, .annotation-bubble-avatar img {
   border-radius: 7px;
-  max-width: 50px;
-  max-height: 50px;
 }
 .commentthread .commentavatar img {
   max-width: 30px;

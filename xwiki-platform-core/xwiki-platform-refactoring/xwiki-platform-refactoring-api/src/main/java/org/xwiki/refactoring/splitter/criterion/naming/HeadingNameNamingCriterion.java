@@ -75,7 +75,6 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
     @Named("mainPageNameAndNumbering")
     private NamingCriterion mainPageNameAndNumberingNamingCriterion;
 
-
     /**
      * A list containing all the document references generated so far. This is used to avoid name clashes.
      */
@@ -184,14 +183,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
     private DocumentReference maybeTruncate(DocumentReference documentReference)
     {
         // Fallback max size in case of issue when accessing the document reference
-        var maxSize = 768;
-        try {
-            maxSize = this.docBridge.getTranslatedDocumentInstance(documentReference).getLocalReferenceMaxLength();
-        } catch (Exception e) {
-            this.logger.warn("Failed to resolve [{}], falling back to a maximum size of [{}]. Cause: [{}]",
-                documentReference, maxSize, getRootCauseMessage(e));
-        }
-
+        var maxSize = this.docBridge.getLocalReferenceMaxLength();
         var suffixSize = 3;
 
         // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used

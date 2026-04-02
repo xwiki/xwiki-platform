@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.captcha=
-### Missing: captcha.admin.defaultCaptchaName.label=
-### Missing: captcha.admin.defaultCaptchaName.hint=
-### Missing: captcha.admin.configure.title=
-### Missing: captcha.admin.sample.title=
-### Missing: captcha.admin.sample.description=
+  <content>admin.captcha=CAPTCHA
+captcha.admin.defaultCaptchaName.label=Default CAPTCHA
+captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
+captcha.admin.configure.title=Configure {0}
+captcha.admin.sample.title=Sample CAPTCHA
+captcha.admin.sample.description=How the configured CAPTCHA looks like when it will be displayed in a form, for example.
 </content>
 </xwikidoc>

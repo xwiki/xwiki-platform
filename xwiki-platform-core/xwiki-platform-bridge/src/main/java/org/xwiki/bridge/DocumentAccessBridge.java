@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -875,4 +876,18 @@ public interface DocumentAccessBridge
     {
         return null;
     }
+
+    /**
+     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
+     * document) based on the current store limitation.
+     *
+     * @return the maximum authorized length for a document full name.
+     * @since 18.3.0RC1
+     */
+    @Unstable
+    default int getLocalReferenceMaxLength(EntityReference documentReference) throws Exception
+    {
+        return getTranslatedDocumentInstance(documentReference).getLocalReferenceMaxLength();
+    }
+
 }

@@ -149,17 +149,17 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
-            
-            
-
-            
-
-            
-
-            
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method int org.xwiki.bridge.DocumentModelBridge::getLocalReferenceMaxLength()</new>
+                  <justification>ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

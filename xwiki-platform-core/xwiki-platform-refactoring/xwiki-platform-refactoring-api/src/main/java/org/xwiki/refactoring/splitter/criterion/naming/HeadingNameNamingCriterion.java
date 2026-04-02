@@ -189,9 +189,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
         // Fallback max size in case of issue when accessing the document reference
         var maxSize = 768;
         try {
-            DocumentModelBridge translatedDocumentInstance
-                = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
-            maxSize = translatedDocumentInstance.getLocalReferenceMaxLength();
+            maxSize = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference).getLocalReferenceMaxLength();
         } catch (Exception e) {
             this.logger.warn("Failed to resolve [{}], falling back to a maximum size of [{}]. Cause: [{}]",
                 documentReference, maxSize, getRootCauseMessage(e));

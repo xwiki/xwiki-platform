@@ -42,7 +42,7 @@
     "yjs": "catalog:"
   },
   "peerDependencies": {
-    "inversify": "7.x",
+    "inversify": "7.x || 8.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },

@@ -25,6 +25,7 @@ import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
@@ -240,4 +241,14 @@ public interface DocumentModelBridge
     {
         return true;
     }
+
+    /**
+     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
+     * document) based on the current store limitation.
+     *
+     * @return the maximum authorized length for a document full name.
+     * @since 18.3.0RC1
+     */
+    @Unstable
+    int getLocalReferenceMaxLength();
 }

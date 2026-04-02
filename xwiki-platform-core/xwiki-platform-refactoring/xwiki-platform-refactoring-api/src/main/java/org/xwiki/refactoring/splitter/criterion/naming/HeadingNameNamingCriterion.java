@@ -28,6 +28,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -44,6 +45,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * A {@link NamingCriterion} based on the opening heading (if present) of the document.
@@ -72,6 +75,9 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
     @Inject
     @Named("mainPageNameAndNumbering")
     private NamingCriterion mainPageNameAndNumberingNamingCriterion;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * A list containing all the document references generated so far. This is used to avoid name clashes.
@@ -180,10 +186,23 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private DocumentReference maybeTruncate(DocumentReference documentReference)
     {
+        // Fallback max size in case of issue when accessing the document reference
+        var maxSize = 768;
+        try {
+            DocumentModelBridge translatedDocumentInstance
+                = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
+            maxSize = translatedDocumentInstance.getLocalReferenceMaxLength();
+        } catch (Exception e) {
+            this.logger.warn("Failed to resolve [{}], falling back to a maximum size of [{}]. Cause: [{}]",
+                documentReference, maxSize, getRootCauseMessage(e));
+        }
+
+        var suffixSize = 3;
+
         // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used
-        // previously or it exists already.
-        // TODO: The max length should be taken from the store API instead of being hard-coded.
-        int maxLength = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 : 768;
+        // previously, or it exists already.
+        int maxLength = this.documentReferences.contains(documentReference) || exists(documentReference) ?
+            maxSize - suffixSize : maxSize;
 
         // We can only truncate the document name, so we can't do much if the base space reference is already too large.
         // The document name can contain special characters that are escaped when serialized, requiring more length, so

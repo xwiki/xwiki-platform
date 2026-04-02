@@ -199,8 +199,8 @@ catalogs:
       specifier: 16.6.6
       version: 16.6.6
     react-icons:
-      specifier: 5.5.0
-      version: 5.5.0
+      specifier: 5.6.0
+      version: 5.6.0
     reflect-metadata:
       specifier: 0.2.2
       version: 0.2.2
@@ -2087,7 +2087,7 @@ importers:
         version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       react-icons:
         specifier: 'catalog:'
-        version: 5.5.0(react@19.2.4)
+        version: 5.6.0(react@19.2.4)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -5832,8 +5832,8 @@ packages:
       typescript:
         optional: true
 
-  react-icons@5.5.0:
-    resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
+  react-icons@5.6.0:
+    resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
     peerDependencies:
       react: '*'
 
@@ -7066,7 +7066,7 @@ snapshots:
       '@mantine/utils': 6.0.22(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      react-icons: 5.5.0(react@19.2.4)
+      react-icons: 5.6.0(react@19.2.4)
     transitivePeerDependencies:
       - '@floating-ui/dom'
       - '@hocuspocus/provider'
@@ -7095,7 +7095,7 @@ snapshots:
       lodash.merge: 4.6.2
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      react-icons: 5.5.0(react@19.2.4)
+      react-icons: 5.6.0(react@19.2.4)
       use-sync-external-store: 1.6.0(react@19.2.4)
     transitivePeerDependencies:
       - '@floating-ui/dom'
@@ -10927,7 +10927,7 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       typescript: 5.9.3
 
-  react-icons@5.5.0(react@19.2.4):
+  react-icons@5.6.0(react@19.2.4):
     dependencies:
       react: 19.2.4
 

@@ -322,6 +322,10 @@
 &lt;div class="row"&gt;
   #if($isEdit)
     #displayVariablesPanel()
+    ## Always hide both side panel columns
+    #set($showLeftPanels = "0")
+    #set($showRightPanels = "0")
+    &lt;script&gt;document.getElementById("body").classList.add("hidelefthideright");&lt;/script&gt;
   #else
     #displayHiddenVariables()
   #end

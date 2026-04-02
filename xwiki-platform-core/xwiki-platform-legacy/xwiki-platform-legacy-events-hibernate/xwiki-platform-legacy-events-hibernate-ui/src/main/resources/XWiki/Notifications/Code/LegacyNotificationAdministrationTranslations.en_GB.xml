@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: legacy.event.migration.description=
-### Missing: legacy.event.count.store=
-### Missing: legacy.event.count.legacy=
-### Missing: legacy.event.migration.alltime=
-### Missing: legacy.event.migration.since=
-### Missing: legacy.event.migration.start=
+  <content>legacy.event.migration.description=XWiki switched to a new store for events (notifications) in 12.6. Since copying events can be a long process for old wikis with a lot of events and keeping them is not always desired so the choice of doing it is left to the wiki administrator. Not copying them imply that any previous notification will seems to have disappeared. The migration is executed in the background.
+legacy.event.count.store=Number of events in the standard store
+legacy.event.count.legacy=Number of events in the legacy store
+legacy.event.migration.alltime=All time
+legacy.event.migration.since=Since
+legacy.event.migration.start=Start migration
 </content>
 </xwikidoc>

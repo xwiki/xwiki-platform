@@ -9,3 +9,4 @@ org.xwiki.filter.xar.internal.input.XARInputFilterStream
 org.xwiki.filter.xar.internal.input.XARInputFilterStreamFactory
 org.xwiki.filter.xar.internal.output.XAROutputFilterStream
 org.xwiki.filter.xar.internal.output.XAROutputFilterStreamFactory
+org.xwiki.filter.xar.internal.output.XARWikiWriter

@@ -249,5 +249,6 @@ public interface DocumentModelBridge
      * @return the maximum authorized length for a document full name.
      * @since 18.3.0RC1
      */
-    @Unstable int getLocalReferenceMaxLength();
+    @Unstable
+    int getLocalReferenceMaxLength();
 }

@@ -132,7 +132,7 @@ catalog:
   vite-plugin-css-injected-by-js: 4.0.1
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
-  vitest-mock-extended: 3.1.0
+  vitest-mock-extended: 3.1.1
   vue: 3.5.30
   vue-eslint-parser: 10.4.0
   vue-i18n: 11.2.8

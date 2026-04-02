@@ -250,5 +250,8 @@ public interface DocumentModelBridge
      * @since 18.3.0RC1
      */
     @Unstable
-    int getLocalReferenceMaxLength();
+    default int getLocalReferenceMaxLength()
+    {
+        return 768;
+    }
 }

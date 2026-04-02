@@ -149,19 +149,17 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method int org.xwiki.bridge.DocumentModelBridge::getLocalReferenceMaxLength()</new>
-                  <justification>This method is needed to make it easier to get the maximum authorized length for the
-                    full name of a document. We cannot avoid the breakage because no default
-                    implementation makes sense.</justification>
-                  <criticality>highlight</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+            
+            
+
+            
+
+            
+
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

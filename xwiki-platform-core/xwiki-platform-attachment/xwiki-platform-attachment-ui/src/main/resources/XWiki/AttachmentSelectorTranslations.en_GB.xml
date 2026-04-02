@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: attachmentSelector.replace=
-### Missing: attachmentSelector.replace.hint=
-### Missing: rendering.macro.attachmentSelector.parameter.versionSummary.name=
-### Missing: rendering.macro.attachmentSelector.parameter.versionSummary.description=
-### Missing: attachment.attachmentSelector.temporaryUpload.success=
-### Missing: attachment.attachmentSelector.temporaryUpload.failure=
-### Missing: attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle=
+  <content>attachmentSelector.replace=Replace {0}
+attachmentSelector.replace.hint=The effect may not be visible immediately due to browser caching.
+rendering.macro.attachmentSelector.parameter.versionSummary.name=Version Summary
+rendering.macro.attachmentSelector.parameter.versionSummary.description=Whether to allow the user to enter a version summary that will be recorded in the history. An automatic message is used when no version summary is provided or if the version summary input is not displayed.
+attachment.attachmentSelector.temporaryUpload.success=Attachment upload succeeded.
+attachment.attachmentSelector.temporaryUpload.failure=Attachment upload failed.
+attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle=Temporary attachment
 </content>
 </xwikidoc>

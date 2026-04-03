@@ -98,8 +98,9 @@ class CommentsIT
         assertEquals(COMMENT_AUTHOR_GUEST, commentsTab.getCommentAuthorByID(0));
 
         // Reply as anonymous.
-        commentsTab.postCommentAsGuest(COMMENT_CONTENT, COMMENT_AUTHOR_GUEST, true);
-        commentsTab.replyToCommentByID(commentsTab.getCommentID(COMMENT_CONTENT), COMMENT_REPLY);
+        int commentIndex = commentsTab.postCommentAsGuest(COMMENT_CONTENT, COMMENT_AUTHOR_GUEST, true);
+        commentsTab.replyToCommentByID(commentIndex, COMMENT_REPLY);
+        commentsTab.toggleCommentThread(commentIndex);
         assertEquals(COMMENT_REPLY, commentsTab.getCommentContentByID(commentsTab.getCommentID(COMMENT_REPLY)));
         assertEquals(COMMENT_AUTHOR_GUEST, commentsTab.getCommentAuthorByID(commentsTab.getCommentID(COMMENT_REPLY)));
         
@@ -125,6 +126,7 @@ class CommentsIT
         commentsTab.openCommentForm();
         commentIndex = commentsTab.postComment(COMMENT_CONTENT, true);
         commentsTab.replyToCommentByID(commentIndex, COMMENT_REPLY);
+        commentsTab.toggleCommentThread(commentIndex);
         int replyIndex = commentsTab.getCommentID(COMMENT_REPLY);
         assertEquals(USER_NAME, commentsTab.getCommentAuthorByID(replyIndex));
        
@@ -307,6 +309,7 @@ class CommentsIT
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(2);
+        commentsTab.toggleCommentThread(1);
         assertEquals("Comment object 7 at date 66 reply to 1", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
         assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);

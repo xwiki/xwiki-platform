@@ -17,65 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5.blobstore;
+package org.xwiki.test.docker.junit5.solr;
 
 /**
- * The blob store backend to use for the UI tests.
+ * The Solr mode to use for the UI tests.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.3.0RC1
  */
-public enum BlobStore
+public enum SolrMode
 {
     /**
-     * Represents the default blob store (depends if clustering is enabled or not).
-     * @since 18.3.0RC1
+     * Represents the default Solr mode (depends if cluster is enabled or not).
      */
-    DEFAULT(null),
+    DEFAULT,
 
     /**
-     * Represents the filesystem blob store (default in case on single instance).
+     * Represents the embedded Solr mode (default in case on single instance).
      */
-    FILESYSTEM("filesystem"),
+    EMBEDDED,
 
     /**
-     * Represents the S3 blob store using MinIO (default in case of cluster).
+     * Represents the remote Solr mode (default in case of cluster).
      */
-    S3("s3");
+    REMOTE;
 
-    private String endpoint;
-
-    private final String type;
+    private String baseURL;
 
     /**
-     * @param type the type to use in xwiki.properties for store.blobStoreType
+     * @param baseURL see {@link #getBaseURL()}
+     * @since 18.4.0RC1
      */
-    BlobStore(String type)
+    public void setBaseURL(String baseURL)
     {
-        this.type = type;
-    }
-
-    /**
-     * @param endpoint see {@link #getEndpoint()}
-     */
-    public void setEndpoint(String endpoint)
-    {
-        this.endpoint = endpoint;
+        this.baseURL = baseURL;
     }
 
     /**
      * @return the endpoint URL to use to connect to the blob store (only applicable for S3)
+     * @since 18.4.0RC1
      */
-    public String getEndpoint()
+    public String getBaseURL()
     {
-        return this.endpoint;
-    }
-
-    /**
-     * @return the type to use in xwiki.properties for store.blobStoreType
-     */
-    public String getType()
-    {
-        return this.type;
+        return this.baseURL;
     }
 }

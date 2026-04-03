@@ -35,6 +35,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -266,7 +267,7 @@ public @interface UITest
     String remoteSolrTag() default "";
 
     /**
-     * @return the number of instances to run during tests.
+     * @return the instances to run during tests.
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;

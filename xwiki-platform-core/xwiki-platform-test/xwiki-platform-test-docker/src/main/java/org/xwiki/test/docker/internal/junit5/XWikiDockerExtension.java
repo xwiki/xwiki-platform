@@ -41,6 +41,7 @@ import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecuto
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.solr.SolrContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -166,14 +167,13 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
                 // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
                 // container for the database when configuring the JDBC URL, in the case when the servlet container is
                 // running outside of docker and thus outside of the shared docker network...
-                LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
                 startDatabase(testConfiguration);
 
                 // Start the Blob Store container (if needed)
-                if (testConfiguration.getBlobStore() != null) {
-                    LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
-                    startBlobStore(testConfiguration);
-                }
+                startBlobStore(testConfiguration);
+
+                // Start the Solr container (if needed)
+                startSolr(testConfiguration, mavenResolver);
 
                 // Build the XWiki WAR
                 LOGGER.info("(*) Building custom XWiki WAR...");
@@ -194,7 +194,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
                 // Switch the context executor to the new one (so that extensions are provisioned on the right instance)
                 DockerTestUtils.setCurrentXWikiExecutor(index, extensionContext);
 
-                LOGGER.info("(*) Provision extensions for test...");
+                // Install required extensions
                 provisionExtensions(artifactResolver, mavenResolver, extensionContext);
             }
         }
@@ -409,19 +409,18 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
-            // Stop the Blob Store
-            if (testConfiguration.getBlobStore() != null) {
-                LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
-                stopBlobStore(testConfiguration);
-            }
-
-            // Stop the DB
-            LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
-            stopDatabase(testConfiguration);
-
             // Stop the Servlet Engine
             LOGGER.info("(*) Stopping Servlet container(s) [{}]...", testConfiguration.getServletEngine());
             stopServletEngines(extensionContext);
+
+            // Stop the Blob Store
+            stopBlobStore(testConfiguration);
+
+            // Stop the Solr instance
+            stopSolr(testConfiguration);
+
+            // Stop the DB
+            stopDatabase(testConfiguration);
         }
     }
 
@@ -465,26 +464,57 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 
     private void startDatabase(TestConfiguration testConfiguration) throws Exception
     {
+        LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
         executor.start(testConfiguration);
     }
 
     private void stopDatabase(TestConfiguration testConfiguration)
     {
+        LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
+
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
         executor.stop(testConfiguration);
     }
 
     private void startBlobStore(TestConfiguration testConfiguration) throws Exception
     {
-        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
-        executor.start(testConfiguration);
+        if (testConfiguration.getBlobStore() != null) {
+            LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
+
+            BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+            executor.start(testConfiguration);
+        }
     }
 
     private void stopBlobStore(TestConfiguration testConfiguration)
     {
-        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
-        executor.stop(testConfiguration);
+        if (testConfiguration.getBlobStore() != null) {
+            LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
+
+            BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+            executor.stop(testConfiguration);
+        }
+    }
+
+    private void startSolr(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
+    {
+        if (testConfiguration.getSolrMode() != null) {
+            LOGGER.info("(*) Starting Solr [{}]...", testConfiguration.getSolrMode());
+
+            SolrContainerExecutor executor = new SolrContainerExecutor();
+            executor.start(testConfiguration, mavenResolver);
+        }
+    }
+
+    private void stopSolr(TestConfiguration testConfiguration)
+    {
+        if (testConfiguration.getSolrMode() != null) {
+            LOGGER.info("(*) Stopping Solr [{}]...", testConfiguration.getSolrMode());
+
+            SolrContainerExecutor executor = new SolrContainerExecutor();
+            executor.stop(testConfiguration);
+        }
     }
 
     private ServletContainerExecutor getServletContainerExecutor(int index, TestConfiguration testConfiguration,
@@ -517,6 +547,8 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
         ExtensionContext context) throws Exception
     {
+        LOGGER.info("(*) Provision extensions for test...");
+
         // Initialize an extension installer
         ExtensionInstaller extensionInstaller = new ExtensionInstaller(context, artifactResolver, mavenResolver);
         DockerTestUtils.setExtensionInstaller(context, extensionInstaller);

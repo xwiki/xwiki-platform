@@ -30,6 +30,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.tool.extension.ExtensionOverride;
 

@@ -20,15 +20,18 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-const emit = defineEmits(["validated"]);
+const emit = defineEmits(["validateStep"]);
 onMounted(() => {
-  emit("validated");
+  emit("validateStep");
 });
-</script>
-<script lang="ts">
-export function callback() {
+async function stepAnswerCallback() {
+  console.log("Callback de Welcome");
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   return true;
 }
+defineExpose({
+  stepAnswerCallback,
+});
 </script>
 
 <template>

@@ -27,12 +27,19 @@ import {
   onMounted,
   onUpdated,
   ref,
+  shallowRef,
   useTemplateRef,
   watch,
 } from "vue";
 import type { StepsResolverFunction } from "../StepsResolver";
-import type { StepCallback, WizardStepProps } from "../WizardStepProps";
+import type { WizardStepProps } from "../WizardStepProps";
 
+enum DialogState {
+  INITIALIZING,
+  STEPS_LOADED,
+  LOADING_STEP,
+  STEP_DISPLAYED,
+}
 const emit = defineEmits(["closed"]);
 const props = defineProps<{
   stepResolver: StepsResolverFunction;
@@ -41,8 +48,9 @@ const props = defineProps<{
 
 const steps = ref<WizardStepProps[]>([]);
 const activeStep = ref<WizardStepProps | undefined>();
-const stepComponent = ref();
-const stepCallback = ref<StepCallback | null>();
+const stepComponent = shallowRef();
+const stepDialogRef = useTemplateRef<typeof WizardStep>("stepDialogRef");
+const dialogState = ref(DialogState.INITIALIZING);
 
 const htmlDialog = useTemplateRef("wizardDialog");
 
@@ -61,10 +69,15 @@ const stepNames = computed(() => {
 
 onMounted(async () => {
   steps.value = await props.stepResolver();
+  dialogState.value = DialogState.STEPS_LOADED;
   if (steps.value.length > 1) {
     activeStep.value = { ...steps.value[0], state: StepState.DISPLAYED };
   }
 });
+/**
+ * We can only show the modal once the DOM has been initialized, so after the app has been mounted, that's why we call
+ * showModal in this onUpdated.
+ */
 onUpdated(() => {
   if (activeStep.value) {
     htmlDialog.value?.showModal();
@@ -72,22 +85,24 @@ onUpdated(() => {
 });
 watch(activeStep, async (newStep) => {
   if (newStep && newStep.uiComponent) {
+    dialogState.value = DialogState.LOADING_STEP;
     const asyncModule = await import(newStep.uiComponent.module);
     stepComponent.value = asyncModule[newStep.uiComponent.component];
-    const callbackName = newStep.uiComponent.callback || "callback";
-    stepCallback.value = asyncModule[callbackName];
+    dialogState.value = DialogState.STEP_DISPLAYED;
   } else {
     stepComponent.value = null;
   }
 });
+watch(stepDialogRef, () => {});
 
 async function nextStep() {
   async function processStep() {
     let loadNextStep = true;
-    if (activeStep.value && stepCallback.value) {
+    const callback = stepDialogRef.value?.wizardStepCallback;
+    if (activeStep.value && callback) {
       loadNextStep = false;
       activeStep.value.state = StepState.PROCESSING;
-      const processed = await stepCallback.value();
+      const processed = await callback();
       if (processed) {
         activeStep.value.state = StepState.PROCESSED;
         loadNextStep = true;
@@ -113,9 +128,14 @@ function finishWizard() {
   htmlDialog.value?.requestClose();
   emit("closed");
 }
-function validate() {
+function validateStep() {
   if (activeStep.value) {
     activeStep.value.state = StepState.VALIDATED;
+  }
+}
+function invalidateStep() {
+  if (activeStep.value) {
+    activeStep.value.state = StepState.DISPLAYED;
   }
 }
 </script>
@@ -134,10 +154,14 @@ function validate() {
     </div>
     <main :class="$style.wizardContent">
       <WizardStep
+        v-if="dialogState === DialogState.STEP_DISPLAYED"
         :step="activeStep"
         :component="stepComponent"
-        @validated="validate"
-      ></WizardStep>
+        ref="stepDialogRef"
+        @validateStep="validateStep"
+        @invalidateStep="invalidateStep"
+      />
+      <div v-else>LOADING</div>
     </main>
     <div :class="$style.wizardFooter">
       <div :class="$style.footerLeft">
@@ -175,6 +199,8 @@ function validate() {
 .wizardContent {
   padding: 28px;
   min-height: 200px;
+  height: 50vh;
+  overflow-y: auto;
 }
 .wizardFooter {
   padding: 16px 24px;

@@ -40,14 +40,4 @@
   <modules>
     <module>xwiki-platform-observation-test-tests</module>
   </modules>
-  <!-- Work in progress
-  <profiles>
-    <profile>
-      <id>docker</id>
-      <modules>
-        <module>xwiki-platform-observation-test-docker</module>
-      </modules>
-    </profile>
-  </profiles>
-  -->
 </project>

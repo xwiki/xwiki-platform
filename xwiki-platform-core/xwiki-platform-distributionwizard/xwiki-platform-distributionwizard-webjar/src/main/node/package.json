@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "name": "xwiki-platform-distributionwizard-webjar",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint .",
+    "test:unit": "vitest --run --passWithNoTests",
+    "type-check": "tsc --build"
+  },
+  "dependencies": {
+    "@xwiki/platform-distributionwizard-api": "workspace:*",
+    "@xwiki/platform-distributionwizard-steps": "workspace:*",
+    "@xwiki/platform-distributionwizard-xwiki": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "3.x"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/requirejs": "catalog:",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "eslint": "catalog:",
+    "npm-run-all": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1000,6 +1000,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext != null ? xcontext.getAuthorReference() : null;
     }
 
+    @Override
+    public int getLocalReferenceMaxLength()
+    {
+        XWikiContext xWikiContext = this.readonlyContextProvider.get();
+        return xWikiContext.getWiki().getStore().getLimitSize(xWikiContext, XWikiDocument.class, "fullName");
+    }
+
     /**
      * Utility method for checking access rights of the current user on a target document.
      *

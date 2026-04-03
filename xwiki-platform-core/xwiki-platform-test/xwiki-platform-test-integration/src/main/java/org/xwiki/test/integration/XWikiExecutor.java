@@ -242,7 +242,12 @@ public class XWikiExecutor
         }
     }
 
-    private static int resolvePort(int index)
+    /**
+     * @param index the index of the XWiki instance
+     * @return the port on which the XWiki instance with the passed index listens
+     * @since 18.7.0RC1
+     */
+    public static int resolvePort(int index)
     {
         String portString = System.getProperty("xwikiPort" + index);
         return portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);

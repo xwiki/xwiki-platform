@@ -44,6 +44,7 @@ import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.XWikiTempDirUtil;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -98,6 +99,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String JETTY = "jetty";
 
     private static final String MEMORY_LIMIT_OPTION = "-Xmx1024m";
+
+    private static final String NETWORK_ALIAS_PREFIX = "xwikiweb";
 
     private final int index;
 
@@ -162,17 +165,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     {
         XWikiExecutor executor = null;
 
-        int httpPort = 8080 + this.index;
-
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
                 configureTomcat(sourceWARDirectory);
                 break;
             case JETTY:
                 configureJetty(sourceWARDirectory);
-                break;
-            case WILDFLY:
-                configureWildFly(sourceWARDirectory);
                 break;
             case JETTY_STANDALONE:
                 // Resolve and unzip the xwiki-platform-tool-jetty-resources zip artifact and configure Jetty to
@@ -185,31 +183,28 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    testConfiguration.getServletEngine()));
+                    this.testConfiguration.getServletEngine()));
         }
 
         if (this.servletContainer != null) {
-            String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
-                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb" + this.index;
-            int internalPort = 8080;
+            // Use a different alias for each instance, to make easier to target it
+            String dockerInstanceHost = getNetworkAlias(this.index);
+            // All instance use the same internal port, a different external port will be allocated
+            int dockerInstancePort = 8080;
 
-            startContainer(internalHost, internalPort);
+            // Start the instance
+            startContainer(dockerInstanceHost, dockerInstancePort);
 
-            String xwikiIPAddress = this.servletContainer.getHost();
-            httpPort = this.servletContainer.getMappedPort(httpPort);
+            String httpHost = this.servletContainer.getHost();
+            int httpPort = this.servletContainer.getMappedPort(dockerInstancePort);
 
-            executor = new XWikiExecutor(this.index, internalHost, internalPort, internalHost, internalPort,
-                xwikiIPAddress, httpPort);
+            executor = new XWikiExecutor(this.index, dockerInstanceHost, dockerInstancePort, dockerInstanceHost,
+                dockerInstancePort, httpHost, httpPort);
+        } else if (this.jettyStandaloneExecutor != null) {
+            executor = this.jettyStandaloneExecutor.start();
         }
 
         return executor;
-    }
-
-    private void configureWildFly(File sourceWARDirectory) throws Exception
-    {
-        this.servletContainer = createServletContainer();
-        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-            "/opt/jboss/wildfly/standalone/deployments/xwiki");
     }
 
     private void configureJetty(File sourceWARDirectory) throws Exception
@@ -235,6 +230,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         maybeEnableRemoteDebugging(javaOpts);
+
+        // Tell the instance where to find the other members of the cluster (when there are several instances)
+        javaOpts.addAll(RemoteObservationJavaOptions.get(this.index, this.testConfiguration));
+
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
@@ -305,6 +304,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             catalinaOpts.add(ORACLE_TZ_WORKAROUND);
         }
 
+        // Tell the instance where to find the other members of the cluster (when there are several instances)
+        catalinaOpts.addAll(RemoteObservationJavaOptions.get(this.index, this.testConfiguration));
+
         this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
     }
 
@@ -317,6 +319,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isDebug()) {
             options.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005");
         }
+    }
+
+    /**
+     * @param index the index of the XWiki instance
+     * @return the network alias with which the XWiki instance can be reached by the other containers
+     */
+    static String getNetworkAlias(int index)
+    {
+        return NETWORK_ALIAS_PREFIX + index;
     }
 
     private void startContainer(String internalHost, int internalPort) throws Exception
@@ -333,6 +344,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             .waitingFor(
                 Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        // Copy the extension repository of the test inside the container since XWiki cannot access the file system of
+        // the host from there. Note that each instance gets its own copy of the same repository.
+        if (this.testConfiguration.isTestExtensionRepository()) {
+            this.servletContainer.withCopyFileToContainer(
+                MountableFile.forHostPath(TestExtensionRepository.getDirectory(this.testConfiguration).toString()),
+                TestExtensionRepository.CONTAINER_DIRECTORY);
+        }
 
         List<Integer> exposedPorts = new ArrayList<>();
         exposedPorts.add(internalPort);

@@ -17,18 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package org.xwiki.test.docker.junit5.solr;
 
 /**
  * The Solr mode to use for the UI tests.
  *
  * @version $Id$
- * @since 18.3.0RC1
+ * @since 18.7.0RC1
  */
 public enum SolrMode
 {
     /**
-     * Represents the default blob store.
+     * Represents the default Solr mode (depends if cluster is enabled or not).
      */
     DEFAULT,
 
@@ -41,4 +41,24 @@ public enum SolrMode
      * Represents the remote Solr mode (default in case of cluster).
      */
     REMOTE;
+
+    private String baseURL;
+
+    /**
+     * @param baseURL see {@link #getBaseURL()}
+     * @since 18.7.0RC1
+     */
+    public void setBaseURL(String baseURL)
+    {
+        this.baseURL = baseURL;
+    }
+
+    /**
+     * @return the endpoint URL to use to connect to the blob store (only applicable for S3)
+     * @since 18.7.0RC1
+     */
+    public String getBaseURL()
+    {
+        return this.baseURL;
+    }
 }

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.maven.RepositoryUtils;
@@ -37,9 +36,9 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
+import org.xwiki.test.docker.internal.junit5.database.JDBCDriverResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
-import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -210,7 +209,7 @@ public class WARBuilder
     private void copyJDBCDriver(File libDirectory) throws Exception
     {
         LOGGER.info("Copying JDBC driver for database [{}]...", this.testConfiguration.getDatabase());
-        File jdbcDriverFile = getJDBCDriver(this.testConfiguration.getDatabase(), this.artifactResolver);
+        File jdbcDriverFile = JDBCDriverResolver.resolve(this.testConfiguration, this.mavenResolver);
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("... JDBC driver file: {}", jdbcDriverFile);
         }
@@ -266,21 +265,6 @@ public class WARBuilder
         }
     }
 
-    private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
-    {
-        // Note: If the JDBC driver version is specified as "pom" or null then extract the information from the current
-        // POM.
-        Properties pomProperties = this.mavenResolver.getPropertiesFromCurrentPOM();
-        String driverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-            ? this.testConfiguration.getJDBCDriverVersion()
-            : getPropertyForDatabase("version", database, pomProperties);
-        String groupId = getPropertyForDatabase("groupId", database, pomProperties);
-        String artifactId = getPropertyForDatabase("artifactId", database, pomProperties);
-
-        Artifact artifact = new DefaultArtifact(groupId, artifactId, JAR, driverVersion);
-        return resolver.resolveArtifact(artifact).getArtifact().getFile();
-    }
-
     private void maybeAddS3BlobStore(List<Artifact> extraArtifacts) throws Exception
     {
         if (this.testConfiguration.getBlobStore() == BlobStore.S3) {
@@ -289,22 +273,6 @@ public class WARBuilder
             extraArtifacts.add(new DefaultArtifact("org.xwiki.commons", "xwiki-commons-store-blob-s3", JAR,
                 this.mavenResolver.getCommonsVersion()));
         }
-    }
-
-    private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
-    {
-        String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
-        if (value == null) {
-            throw new RuntimeException(
-                String.format("Failed to get JDBC property [%s] for database [%s]. Database may not be supported yet!",
-                    propertyName, database));
-        }
-        return value;
-    }
-
-    private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
-    {
-        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception

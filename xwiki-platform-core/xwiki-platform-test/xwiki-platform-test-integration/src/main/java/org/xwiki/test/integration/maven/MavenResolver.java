@@ -79,6 +79,15 @@ public class MavenResolver
     }
 
     /**
+     * @return the artifact resolver
+     * @since 18.3.0RC1
+     */
+    public ArtifactResolver getArtifactResolver()
+    {
+        return this.artifactResolver;
+    }
+
+    /**
      * @return the Maven Model object for the {@code pom.xml} file in the current directory (i.e. the POM of the module
      * executing functional tests)
      * @throws Exception if an error occurred during reading and parsing of the POM

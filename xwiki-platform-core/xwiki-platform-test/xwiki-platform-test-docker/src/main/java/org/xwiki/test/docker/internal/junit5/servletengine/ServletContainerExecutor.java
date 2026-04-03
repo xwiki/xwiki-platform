@@ -146,8 +146,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     {
         XWikiExecutor executor = null;
 
-        int httpPort = 8080 + this.index;
-
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
                 configureTomcat(sourceWARDirectory);
@@ -169,21 +167,25 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    testConfiguration.getServletEngine()));
+                    this.testConfiguration.getServletEngine()));
         }
 
         if (this.servletContainer != null) {
-            String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
-                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb" + this.index;
-            int internalPort = 8080;
+            // Use a different alias for each instance, to make easier to target it
+            String dockerInstanceHost = "xwikiweb" + this.index;
+            // All instance use the same internal port, a different external port will be allocated
+            int dockerInstancePort = 8080;
 
-            startContainer(internalHost, internalPort);
+            // Start the instance
+            startContainer(dockerInstanceHost, dockerInstancePort);
 
-            String xwikiIPAddress = this.servletContainer.getHost();
-            httpPort = this.servletContainer.getMappedPort(httpPort);
+            String httpHost = this.servletContainer.getHost();
+            int httpPort = this.servletContainer.getMappedPort(dockerInstancePort);
 
-            executor = new XWikiExecutor(this.index, internalHost, internalPort, internalHost, internalPort,
-                xwikiIPAddress, httpPort);
+            executor = new XWikiExecutor(this.index, dockerInstanceHost, dockerInstancePort, dockerInstanceHost,
+                dockerInstancePort, httpHost, httpPort);
+        } else if (this.jettyStandaloneExecutor != null) {
+            executor = this.jettyStandaloneExecutor.start();
         }
 
         return executor;

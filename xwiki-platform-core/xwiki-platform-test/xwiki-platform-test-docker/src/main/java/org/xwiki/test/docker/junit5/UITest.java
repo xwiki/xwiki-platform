@@ -35,6 +35,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;

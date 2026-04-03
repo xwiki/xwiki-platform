@@ -24,10 +24,10 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.environment.internal.DefaultEnvironmentConfiguration;
+import org.xwiki.environment.internal.ServletEnvironmentConfiguration;
 
 /**
- * Overrides the {@link DefaultEnvironmentConfiguration} component in order to take into account the deprecated
+ * Overrides the {@link ServletEnvironmentConfiguration} component in order to take into account the deprecated
  * permanent directory configuration property "container.persistentDirectory" and use it if the newer
  * "environment.permanentDirectory" property isn't set.
  *
@@ -38,7 +38,7 @@ import org.xwiki.environment.internal.DefaultEnvironmentConfiguration;
 @Component
 @Singleton
 @Deprecated(since = "3.5M1")
-public class LegacyEnvironmentConfiguration extends DefaultEnvironmentConfiguration
+public class LegacyEnvironmentConfiguration extends ServletEnvironmentConfiguration
 {
     /**
      * The name of the property for configuring the permanent directory.

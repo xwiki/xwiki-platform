@@ -28,7 +28,7 @@ package org.xwiki.test.docker.junit5.blobstore;
 public enum BlobStore
 {
     /**
-     * Represents the default blob store.
+     * Represents the default blob store (depends if clustering is enabled or not).
      * @since 18.3.0RC1
      * @since 17.10.6
      */

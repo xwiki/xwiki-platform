@@ -47,6 +47,7 @@ import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 
@@ -228,20 +229,31 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
         props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
 
-        // Configure blob store properties
-        props.putAll(getBlobStoreConfigurationProperties());
+        // Configure additional properties (S3, Solr, etc)
+        props.setProperty("xwikiPropertiesAdditionalProperties", getAdditionalProperties());
 
         return props;
     }
 
-    private Properties getBlobStoreConfigurationProperties()
+    private String getAdditionalProperties()
     {
-        Properties props = new Properties();
+        StringBuilder additionalProperties = new StringBuilder();
 
+        // Configure blob store properties
+        additionalProperties.append(getBlobStoreConfigurationProperties());
+
+        // Configure Solr properties
+        additionalProperties.append(getSolrConfigurationProperties());
+
+        return additionalProperties.toString();
+    }
+
+    private String getBlobStoreConfigurationProperties()
+    {
         BlobStore blobStore = this.testConfiguration.getBlobStore();
         if (blobStore == BlobStore.S3) {
             // Configure S3 blob store using additional properties
-            String additionalProperties =
+            return 
                 """
                     store.blobStoreType=%s
                     store.s3.bucketName=%s
@@ -254,11 +266,23 @@ public class ConfigurationFilesGenerator
                     BlobStoreContainerExecutor.getAccessKey(),
                     BlobStoreContainerExecutor.getSecretKey(),
                     blobStore.getEndpoint());
-
-            props.setProperty("xwikiPropertiesAdditionalProperties", additionalProperties);
         }
 
-        return props;
+        return "";
+    }
+
+    private String getSolrConfigurationProperties()
+    {
+        SolrMode solrMode = this.testConfiguration.getSolrMode();
+        if (solrMode == SolrMode.REMOTE) {
+            // Configure Solr remote access using additional properties
+            return 
+                """
+                    solr.type=remote
+                    solr.remote.baseURL=http://xwikisolr:8983/solr/""";
+        }
+
+        return "";
     }
 
     private Properties getDatabaseConfigurationProperties()

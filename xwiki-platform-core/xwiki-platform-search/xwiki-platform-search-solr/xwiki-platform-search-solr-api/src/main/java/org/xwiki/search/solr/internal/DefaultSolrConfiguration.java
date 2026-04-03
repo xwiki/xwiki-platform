@@ -170,6 +170,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         SynchronizeAtStartupMode.FARM;
 
     /**
+     * @since 18.3.0RC1
+     */
+    public static final String CORE_ARTIFACTID_MINIMAL = "xwiki-platform-search-solr-server-core-minimal";
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public static final String CORE_ARTIFACTID_SEARCH = "xwiki-platform-search-solr-server-core-search";
+
+    /**
      * The Solr configuration source.
      */
     @Inject
@@ -195,13 +205,18 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public InputStream getSearchCoreDefaultContent()
     {
-        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-search.zip");
+        return getCoreDefaultContent(CORE_ARTIFACTID_SEARCH);
     }
 
     @Override
     public InputStream getMinimalCoreDefaultContent()
     {
-        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-minimal.zip");
+        return getCoreDefaultContent(CORE_ARTIFACTID_MINIMAL);
+    }
+
+    private InputStream getCoreDefaultContent(String name)
+    {
+        return getClass().getResourceAsStream("/" + name + ".zip");
     }
 
     @Override

@@ -17,29 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.junit5;
+package packagefile.jar.scriptServiceJarExtension;
+
+import org.xwiki.component.annotation.Role;
 
 /**
- * The Solr mode to use for the UI tests.
- *
- * @version $Id$
- * @since 18.3.0RC1
- * @since 17.10.6
+ * Greets people.
  */
-public enum SolrMode
+@Role
+public interface Greeter
 {
     /**
-     * Represents the default blob store.
+     * Greets the specified person.
+     * 
+     * @param name the name of the person to greet
+     * @return the greet message
      */
-    DEFAULT,
-
-    /**
-     * Represents the embedded Solr mode (default in case on single instance).
-     */
-    EMBEDDED,
-
-    /**
-     * Represents the remote Solr mode (default in case of cluster).
-     */
-    REMOTE;
+    String greet(String name);
 }

@@ -65,6 +65,8 @@
       <extension base="xwiki:LinkCollection">
         <attribute name="module" type="string"></attribute>
         <attribute name="component" type="string"></attribute>
+        <attribute name="html" type="string"></attribute>
+        <attribute name="requiredSkinExtensions" type="string"></attribute>
       </extension>
     </complexContent>
   </complexType>

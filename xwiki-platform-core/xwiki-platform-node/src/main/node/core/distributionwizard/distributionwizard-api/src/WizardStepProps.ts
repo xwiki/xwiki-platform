@@ -19,9 +19,10 @@
  */
 
 type UIComponent = {
-  component: string;
-  module: string;
-  callback?: string;
+  component?: string;
+  module?: string;
+  html?: string;
+  requiredSkinExtensions?: string;
 };
 enum StepState {
   DISPLAYED,
@@ -31,8 +32,7 @@ enum StepState {
 }
 type WizardStepProps = {
   title: string;
-  uiComponent?: UIComponent;
-  html?: string;
+  uiComponent: UIComponent;
   index: number;
   state?: StepState;
 };

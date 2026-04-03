@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
+import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.rendering.block.Block;
 
 import jakarta.inject.Named;
@@ -62,6 +63,12 @@ public class WelcomeStep extends AbstractStep
     public boolean isStepDone() throws DistributionWizardException
     {
         return false;
+    }
+
+    @Override
+    public DistributionWizardUIDefinition getUIDefinition()
+    {
+        return this.getDefaultUIDefinition();
     }
 
     @Override

@@ -35,8 +35,8 @@ public interface DistributionWizardStep
     boolean isHidden();
     boolean isOptional();
     boolean isStepDone() throws DistributionWizardException;
-    String getUIComponentModule();
-    String getUIComponentName();
+
+    DistributionWizardUIDefinition getUIDefinition();
 
     boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException;
 }

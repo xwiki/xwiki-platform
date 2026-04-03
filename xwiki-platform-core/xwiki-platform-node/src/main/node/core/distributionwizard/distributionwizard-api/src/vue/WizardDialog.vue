@@ -84,7 +84,7 @@ onUpdated(() => {
   }
 });
 watch(activeStep, async (newStep) => {
-  if (newStep && newStep.uiComponent) {
+  if (newStep?.uiComponent.module && newStep?.uiComponent.component) {
     dialogState.value = DialogState.LOADING_STEP;
     const asyncModule = await import(newStep.uiComponent.module);
     stepComponent.value = asyncModule[newStep.uiComponent.component];

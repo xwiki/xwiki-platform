@@ -19,9 +19,11 @@
  */
 package org.xwiki.distributionwizard.rest.internal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
 
@@ -41,8 +43,15 @@ public class StepResourceHelper
         step.setTitle(wizardStep.getTitle());
         step.setDone(wizardStep.isStepDone());
         UIComponent uiComponent = new UIComponent();
-        uiComponent.setComponent(wizardStep.getUIComponentName());
-        uiComponent.setModule(wizardStep.getUIComponentModule());
+        DistributionWizardUIDefinition uiDefinition = wizardStep.getUIDefinition();
+        if (StringUtils.isEmpty(uiDefinition.html())) {
+            uiComponent.setComponent(uiDefinition.uiComponentName());
+            uiComponent.setModule(uiDefinition.uiModuleName());
+        } else {
+            uiComponent.setHtml(uiDefinition.html());
+            uiComponent.setRequiredSkinExtensions(uiDefinition.requiredSkinExtension());
+        }
+
         step.setUiComponent(uiComponent);
         return step;
     }

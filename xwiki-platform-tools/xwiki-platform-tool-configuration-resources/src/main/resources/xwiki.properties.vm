@@ -94,6 +94,19 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # environment.permanentDirectory = /var/lib/xwiki/data/
 #end
 
+#-# [Since 18.2.1]
+#-# [Since 17.10.6]
+#-# For security reasons, XWiki doesn't allow to access resources which are outside the resource root
+#-# (i.e. the web application folder).
+#-# But in some use cases (like the XWiki Debian packages) some of those resources are actually stored in other
+#-# locations (like /etc/xwiki/) and then the web application folder contains links to those files.
+#-# Tomcat (and probably others too) tend to report the real path of the resource behind the link and not the
+#-# location of the link itself, effectively making the resource identified as being outside the resource root.
+#-# This configuration allows to specify a list of paths under which it's allowed to access resources.
+#-#
+#-# The default is:
+# environment.servlet.allowedRealPaths=/etc/xwiki/
+
 #-------------------------------------------------------------------------------------
 # Rendering
 #-------------------------------------------------------------------------------------

@@ -40,12 +40,13 @@
   #set ($destinationPath = '/')
 #end
 
-#macro (displayDocumentSummary $document $title)
+#macro (displayDocumentSummary $document $titleKey)
+  #set($title = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}")))
+  #set($hint = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}.hint")))
   <div class="col-sm-6">
-    <h5>
-      $services.icon.renderHTML('file-white')
-      <a href="$document.getURL()">$escapetool.xml($services.localization.render($title))</a>
-    </h5>
+    <label>$title</label>
+    <div class="xHint">$hint</div>
+    <a href="$document.getURL()">$services.icon.renderHTML('file-white')$document.plainTitle</a>
     <div>
       $services.localization.render('job.question.OverwriteQuestion.lastAuthor',
         [$xwiki.getUserName($document.authorReference)])
@@ -70,8 +71,8 @@
       $escapetool.xml($services.localization.render('job.question.OverwriteQuestion.message', [$destinationPath]))
     </p>
     <div class="row form-group">
-      #displayDocumentSummary($destinationDocument 'job.question.OverwriteQuestion.destination')
-      #displayDocumentSummary($sourceDocument 'job.question.OverwriteQuestion.source')
+      #displayDocumentSummary($destinationDocument 'destination')
+      #displayDocumentSummary($sourceDocument 'source')
     </div>
     <div>
       <label>

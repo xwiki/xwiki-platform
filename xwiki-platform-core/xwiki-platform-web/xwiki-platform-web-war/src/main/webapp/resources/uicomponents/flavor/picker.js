@@ -255,6 +255,7 @@ require(['jquery'], function($) {
     maybeNextStatus();
   }
 
+  // FIXME: the picker should be initialized on dom updated event too
   $(init);
 
 });

@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
+import { computed, onUpdated, useTemplateRef } from "vue";
 import type { WizardStepProps } from "../WizardStepProps";
 const emit = defineEmits(["validateStep", "invalidateStep"]);
 const stepRef = useTemplateRef<any>("stepRefId");
@@ -32,12 +32,27 @@ function invalidateStep() {
 const wizardStepCallback = computed(() => {
   return stepRef.value.stepAnswerCallback;
 });
+
+onUpdated(() => {
+  const skinExtensions = document.getElementById("skinExtensions");
+  if (skinExtensions && skinExtensions.hasChildNodes()) {
+    while (skinExtensions.hasChildNodes() && skinExtensions.firstChild) {
+      skinExtensions.firstElementChild?.setAttribute("async", "false");
+      document.head.appendChild(skinExtensions.firstChild);
+    }
+  }
+});
 defineExpose({
   wizardStepCallback,
 });
 </script>
 
 <template>
+  <div
+    id="skinExtensions"
+    v-if="step.uiComponent.requiredSkinExtensions"
+    v-html="step.uiComponent.requiredSkinExtensions"
+  ></div>
   <component
     v-if="component"
     :is="component"
@@ -45,7 +60,7 @@ defineExpose({
     @invalidateStep="invalidateStep"
     ref="stepRefId"
   />
-  <div v-else-if="step.html" v-html="step.html"></div>
+  <div v-else-if="step.uiComponent.html" v-html="step.uiComponent.html"></div>
   <span v-else>The step is missing proper content.</span>
 </template>
 

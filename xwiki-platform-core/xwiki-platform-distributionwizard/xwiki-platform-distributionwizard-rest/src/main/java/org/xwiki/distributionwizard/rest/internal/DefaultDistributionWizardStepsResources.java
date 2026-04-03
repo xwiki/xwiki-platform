@@ -22,13 +22,17 @@ package org.xwiki.distributionwizard.rest.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import org.jodconverter.core.util.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
-import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
 import org.xwiki.rest.XWikiResource;
 
 import jakarta.inject.Inject;
@@ -38,6 +42,8 @@ import jakarta.inject.Named;
 @Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepsResources")
 public class DefaultDistributionWizardStepsResources extends XWikiResource implements DistributionWizardStepsResources
 {
+    private static final String REQUIRED_EXTENSION_HEADER = "X-XWIKI-HTML-HEAD";
+
     @Inject
     private DistributionWizardManager distributionWizardManager;
 
@@ -45,15 +51,22 @@ public class DefaultDistributionWizardStepsResources extends XWikiResource imple
     private StepResourceHelper stepResourceHelper;
 
     @Override
-    public Steps getSteps(String wikiId) throws Exception
+    public Response getSteps(String wikiId) throws Exception
     {
         List<DistributionWizardStep> wizardSteps = this.distributionWizardManager.getSteps(wikiId);
+        StringBuilder requiredExtensions = new StringBuilder();
         Steps steps = new Steps();
         List<Step> stepList = new ArrayList<>();
         for (DistributionWizardStep wizardStep : wizardSteps) {
-            stepList.add(this.stepResourceHelper.toStep(wizardStep));
+            Step step = this.stepResourceHelper.toStep(wizardStep);
+            stepList.add(step);
+            if (StringUtils.isNotBlank(step.getUiComponent().getRequiredSkinExtensions())) {
+                requiredExtensions.append(step.getUiComponent().getRequiredSkinExtensions());
+                requiredExtensions.append(' ');
+            }
         }
+
         steps.withStep(stepList);
-        return steps;
+        return Response.ok(steps).header(REQUIRED_EXTENSION_HEADER, requiredExtensions.toString()).build();
     }
 }

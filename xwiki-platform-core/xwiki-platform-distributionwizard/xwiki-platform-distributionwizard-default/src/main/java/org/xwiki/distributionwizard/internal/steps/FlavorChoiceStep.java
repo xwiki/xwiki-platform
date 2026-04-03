@@ -25,12 +25,12 @@ import java.util.Map;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
-import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.platform.flavor.FlavorManager;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.template.TemplateManager;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -38,8 +38,8 @@ import jakarta.inject.Singleton;
 
 @Component
 @Singleton
-@Named("UIDistributionStep")
-public class UIDistributionStep extends AbstractStep
+@Named("FlavorChoiceStep")
+public class FlavorChoiceStep extends AbstractStep
 {
     @Inject
     private FlavorManager flavorManager;
@@ -47,10 +47,16 @@ public class UIDistributionStep extends AbstractStep
     @Inject
     private DistributionManager distributionManager;
 
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
     @Override
     public String getTitle()
     {
-        return "UI Distribution Choice";
+        return "Flavor Choice";
     }
 
     @Override
@@ -76,9 +82,18 @@ public class UIDistributionStep extends AbstractStep
     {
         DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
         String wiki = distributionJob.getRequest().getWiki();
-        Namespace namespace = wiki == null ? null : new Namespace("wiki", wiki);
+        Namespace namespace = new Namespace("wiki", wiki);
         InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
         return  (flavor != null && flavor.isValid(namespace.toString()));
+    }
+
+    @Override
+    public DistributionWizardUIDefinition getUIDefinition()
+    {
+        this.requiredSkinExtensionsRecorder.start();
+        String html = this.templateManager.renderNoException("flavorchoicestep.vm");
+        String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
+        return new DistributionWizardUIDefinition(null, null, html, requiredSkinExtension);
     }
 
     @Override

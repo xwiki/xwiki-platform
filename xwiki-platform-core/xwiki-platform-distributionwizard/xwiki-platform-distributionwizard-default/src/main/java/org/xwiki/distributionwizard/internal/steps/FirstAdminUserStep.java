@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
+import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -83,6 +84,12 @@ public class FirstAdminUserStep extends AbstractStep
         } catch (XWikiException e) {
             throw new DistributionWizardException("Error when trying to compute if the step is done", e);
         }
+    }
+
+    @Override
+    public DistributionWizardUIDefinition getUIDefinition()
+    {
+        return this.getDefaultUIDefinition();
     }
 
     @Override

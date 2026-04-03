@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat11</artifactId>
-    <version>17.10.6</version>
+    <version>17.10.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat11-mariadb</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat ${debian.tomcat.version} - MariaDB</name>

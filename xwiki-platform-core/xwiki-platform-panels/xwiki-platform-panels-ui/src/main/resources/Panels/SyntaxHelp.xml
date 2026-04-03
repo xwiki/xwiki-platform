@@ -123,9 +123,9 @@
 #largepanelheader($services.localization.render('xe.panels.syntax.help'))
 #set ($syntaxDoc = $xwiki.getDocument('XWiki.XWikiSyntax'))
 #if ($syntaxDoc.isNew())
-  #set ($url = 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?xpage=print')
+  #set ($url = 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?xpage=print&amp;pagedMedia=screen')
 #else
-  #set ($url = $xwiki.getURL('XWiki.XWikiSyntax', 'view', 'xpage=print'))
+  #set ($url = $xwiki.getURL('XWiki.XWikiSyntax', 'view', 'xpage=print&amp;pagedMedia=screen'))
 #end
 $services.localization.render('helponsyntax') {{html clean="false"}}&lt;a href="$url" onclick="openURL('$url', '_blank'); return false;"&gt;&lt;span class="nobr"&gt;$services.localization.render('xwikisyntax')&lt;/span&gt;&lt;/a&gt;{{/html}}
 #panelfooter()

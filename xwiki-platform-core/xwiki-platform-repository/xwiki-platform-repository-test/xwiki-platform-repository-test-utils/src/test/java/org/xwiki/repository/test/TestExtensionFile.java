@@ -21,14 +21,14 @@ package org.xwiki.repository.test;
 
 import java.io.File;
 
-import org.xwiki.extension.repository.internal.local.DefaultLocalExtensionFile;
+import org.xwiki.extension.test.FileExtensionFile;
 
 /**
  * 
  * @version $Id$
  * @since 4.2M1
  */
-public class TestExtensionFile extends DefaultLocalExtensionFile
+public class TestExtensionFile extends FileExtensionFile
 {
     public TestExtensionFile(File file)
     {

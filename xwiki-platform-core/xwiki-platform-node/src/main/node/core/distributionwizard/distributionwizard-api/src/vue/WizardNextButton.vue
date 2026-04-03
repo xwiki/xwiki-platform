@@ -67,4 +67,9 @@ const isDisabled = computed(() => {
   background: #326095;
   border: 1px solid #326095;
 }
+.primary[disabled] {
+  cursor: not-allowed;
+  background: #3870af;
+  color: #e38d8d;
+}
 </style>

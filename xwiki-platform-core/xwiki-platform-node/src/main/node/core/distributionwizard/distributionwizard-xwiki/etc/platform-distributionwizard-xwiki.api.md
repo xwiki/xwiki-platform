@@ -6,7 +6,7 @@
 
 import { WizardStepProps } from '@xwiki/platform-distributionwizard-api';
 
-// @public (undocumented)
+// @beta
 export function XWikiStepsResolver(restURL: string): Promise<WizardStepProps[]>;
 
 // (No @packageDocumentation comment for this package)

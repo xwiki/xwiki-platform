@@ -18,17 +18,33 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { computed, useTemplateRef } from "vue";
 import type { WizardStepProps } from "../WizardStepProps";
-const emit = defineEmits(["validated"]);
-
+const emit = defineEmits(["validateStep", "invalidateStep"]);
+const stepRef = useTemplateRef<any>("stepRefId");
 defineProps<{ step: WizardStepProps; component: unknown }>();
-function validated() {
-  emit("validated");
+function validateStep() {
+  emit("validateStep");
 }
+function invalidateStep() {
+  emit("invalidateStep");
+}
+const wizardStepCallback = computed(() => {
+  return stepRef.value.stepAnswerCallback;
+});
+defineExpose({
+  wizardStepCallback,
+});
 </script>
 
 <template>
-  <component v-if="component" :is="component" @validated="validated" />
+  <component
+    v-if="component"
+    :is="component"
+    @validateStep="validateStep"
+    @invalidateStep="invalidateStep"
+    ref="stepRefId"
+  />
   <div v-else-if="step.html" v-html="step.html"></div>
   <span v-else>The step is missing proper content.</span>
 </template>

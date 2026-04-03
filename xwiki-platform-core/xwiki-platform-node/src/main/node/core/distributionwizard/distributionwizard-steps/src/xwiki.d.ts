@@ -17,30 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { WizardStepProps } from "@xwiki/platform-distributionwizard-api";
+export {};
 
-type JSONSteps = {
-  step: WizardStepProps[];
-};
-
-async function fetchSteps(restURL: string): Promise<JSONSteps> {
-  const response = await fetch(restURL, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-  // FIXME: handle fetch error
-  return response.json();
-}
-
-/**
- * Resolve the steps using the given REST API URL.
- * @param restURL - the URL of the REST API to call for getting step info.
- * @beta
- */
-export async function XWikiStepsResolver(
-  restURL: string,
-): Promise<WizardStepProps[]> {
-  const steps = await fetchSteps(restURL);
-  return steps.step;
+// FIXME: copy paste from localization-webjar, should probably be factorized?
+declare global {
+  const XWiki: {
+    contextPath: string;
+    currentWiki: string;
+  };
 }

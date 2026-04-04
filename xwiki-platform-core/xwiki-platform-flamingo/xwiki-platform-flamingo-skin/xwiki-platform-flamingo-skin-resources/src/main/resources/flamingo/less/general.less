@@ -189,7 +189,8 @@ body {
       & .vertical-menu, // In vertical menus (user menu, syntax guide, ...), do not underline the menu items.
       & .jstree-xwiki, // Do not underline links in jstrees
       & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
-      & .xwiki-livedata .cell .breadcrumb // Do not underline links that are in breadcrumbs in livedatas
+      & .breadcrumb, // The breadcrumb contains enough presentation to distinguish it from neighboring text.
+      & nav, & *[role="navigation"] // Navigation nodes are meant to contain anchors. This meaning is most of the time conveyed through the style
       {
         & a {
           .not-inline-link();
@@ -200,6 +201,7 @@ body {
        Those are already different enough from their neighboring text. */
       & a.btn,
       & a.button,
+      & a.search-result-version,
       & .buttonwrapper a {
         .not-inline-link();
       }
@@ -228,8 +230,8 @@ body {
       text-decoration: underline !important;
     }
   }
-
-  &.preference-underlining-no {
+  /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering.*/
+  &.preference-underlining-no:not(:hover):not(:focus) {
     a {
       text-decoration: none;
     }

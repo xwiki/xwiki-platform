@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.Select;
@@ -101,6 +102,12 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
 
     @FindBy(id = "XWiki.XWikiPreferences_0_showinformation")
     private WebElement showInformation;
+
+    @FindBy(id = "XWiki.XWikiPreferences_0_webcopyright")
+    private WebElement copyright;
+
+    @FindBy(id = "XWiki.XWikiPreferences_0_version")
+    private WebElement version;
 
     /**
      * Default constructor.
@@ -188,5 +195,35 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     public void setShowInformation(ShowTabValue value)
     {
         new Select(this.showInformation).selectByValue(value.getValue());
+    }
+
+    /**
+     * @param value the value to set for the "Copyright" option
+     */
+    public void setCopyright(String value)
+    {
+        this.copyright.sendKeys(value);
+    }
+    /**
+     * @return the content of the copyright section in the page footer
+     */
+    public String getCopyright()
+    {
+        return this.getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @param value the value to set for the "Version" option
+     */
+    public void setVersion(String value)
+    {
+        this.version.sendKeys(value);
+    }
+    /**
+     * @return return the content of the version section in the page footer
+     */
+    public String getVersion()
+    {
+        return this.getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 }

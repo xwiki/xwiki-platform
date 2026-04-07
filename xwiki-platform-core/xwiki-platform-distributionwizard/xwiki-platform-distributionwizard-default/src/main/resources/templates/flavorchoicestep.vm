@@ -20,4 +20,6 @@
 #template('extension.vm')
 #template('distribution/macros.vm')
 #template('flavor/macros.vm')
+<form method="post" id="flavorchoicestep">
 #displayFlavorPicker('flavor', "$!request.flavor", true, 'xwiki-flavor-picker-medium', true)
+</form>

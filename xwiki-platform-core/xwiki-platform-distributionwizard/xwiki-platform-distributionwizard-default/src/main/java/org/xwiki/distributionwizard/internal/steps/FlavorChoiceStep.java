@@ -22,6 +22,7 @@ package org.xwiki.distributionwizard.internal.steps;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
@@ -52,6 +53,11 @@ public class FlavorChoiceStep extends AbstractStep
 
     @Inject
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
+    @Inject
+    private Logger logger;
+
+    private DistributionWizardUIDefinition uiDefinition;
 
     @Override
     public String getTitle()
@@ -90,15 +96,19 @@ public class FlavorChoiceStep extends AbstractStep
     @Override
     public DistributionWizardUIDefinition getUIDefinition()
     {
-        this.requiredSkinExtensionsRecorder.start();
-        String html = this.templateManager.renderNoException("flavorchoicestep.vm");
-        String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
-        return new DistributionWizardUIDefinition(null, null, html, requiredSkinExtension);
+        if (uiDefinition == null) {
+            this.requiredSkinExtensionsRecorder.start();
+            String html = this.templateManager.renderNoException("flavorchoicestep.vm");
+            String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
+            this.uiDefinition = new DistributionWizardUIDefinition(null, WEBJAR_NAME, html, requiredSkinExtension);
+        }
+        return uiDefinition;
     }
 
     @Override
     public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
     {
+        this.logger.info("Received data: [{}]", data);
         return false;
     }
 }

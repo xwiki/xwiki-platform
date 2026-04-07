@@ -57,11 +57,13 @@ public class DefaultDistributionWizardStepsResources extends XWikiResource imple
         StringBuilder requiredExtensions = new StringBuilder();
         Steps steps = new Steps();
         List<Step> stepList = new ArrayList<>();
+        int index = 0;
         for (DistributionWizardStep wizardStep : wizardSteps) {
             Step step = this.stepResourceHelper.toStep(wizardStep);
+            step.setIndex(index++);
             stepList.add(step);
-            if (StringUtils.isNotBlank(step.getUiComponent().getRequiredSkinExtensions())) {
-                requiredExtensions.append(step.getUiComponent().getRequiredSkinExtensions());
+            if (wizardStep.getUIDefinition() != null && StringUtils.isNotBlank(wizardStep.getUIDefinition().requiredSkinExtension())) {
+                requiredExtensions.append(wizardStep.getUIDefinition().requiredSkinExtension());
                 requiredExtensions.append(' ');
             }
         }

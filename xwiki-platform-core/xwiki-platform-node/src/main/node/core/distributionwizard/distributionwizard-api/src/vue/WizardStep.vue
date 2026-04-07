@@ -18,11 +18,14 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed, onUpdated, useTemplateRef } from "vue";
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import { loadById } from "../services/require.js";
+import { computed, nextTick, useTemplateRef, watch } from "vue";
 import type { WizardStepProps } from "../WizardStepProps";
 const emit = defineEmits(["validateStep", "invalidateStep"]);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stepRef = useTemplateRef<any>("stepRefId");
-defineProps<{ step: WizardStepProps; component: unknown }>();
+const props = defineProps<{ step: WizardStepProps; component: unknown }>();
 function validateStep() {
   emit("validateStep");
 }
@@ -30,16 +33,26 @@ function invalidateStep() {
   emit("invalidateStep");
 }
 const wizardStepCallback = computed(() => {
-  return stepRef.value.stepAnswerCallback;
+  if (stepRef.value) {
+    return stepRef.value.stepAnswerCallback;
+  } else {
+    return null;
+  }
 });
 
-onUpdated(() => {
-  const skinExtensions = document.getElementById("skinExtensions");
-  if (skinExtensions && skinExtensions.hasChildNodes()) {
-    while (skinExtensions.hasChildNodes() && skinExtensions.firstChild) {
-      skinExtensions.firstElementChild?.setAttribute("async", "false");
-      document.head.appendChild(skinExtensions.firstChild);
-    }
+watch(props, async () => {
+  if (props.step.uiComponent.html) {
+    await nextTick();
+    const jQuery = await loadById("jquery");
+    jQuery(document).trigger("xwiki:dom:updated", { elements: [] });
+    jQuery(document).on("xwiki:distributionWizard:validateStep", function () {
+      console.log("validateStep");
+      validateStep();
+    });
+    jQuery(document).on(
+      "xwiki:distributionWizard:invalidateStep",
+      invalidateStep,
+    );
   }
 });
 defineExpose({
@@ -48,11 +61,6 @@ defineExpose({
 </script>
 
 <template>
-  <div
-    id="skinExtensions"
-    v-if="step.uiComponent.requiredSkinExtensions"
-    v-html="step.uiComponent.requiredSkinExtensions"
-  ></div>
   <component
     v-if="component"
     :is="component"

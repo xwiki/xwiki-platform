@@ -30,10 +30,7 @@ const error = ref();
 
 watch(
   [username, password, password2],
-  (
-    [newUsername, newPassword, newPassword2],
-    [previousUsername, previousPassword, previousPassword2],
-  ) => {
+  ([newUsername, newPassword, newPassword2]) => {
     if (newUsername === "") {
       error.value = "Username is required";
     } else if (newPassword !== newPassword2) {

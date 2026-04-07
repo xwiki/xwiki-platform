@@ -18,24 +18,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-type UIComponent = {
-  component?: string;
-  module?: string;
-  html?: string;
-};
-enum StepState {
-  DISPLAYED,
-  VALIDATED,
-  PROCESSING,
-  PROCESSED,
-}
-type WizardStepProps = {
-  id: string;
-  title: string;
-  uiComponent: UIComponent;
-  index: number;
-  state?: StepState;
-};
-type StepCallback = () => Promise<boolean>;
+import { require } from "./requirejs.js";
 
-export { type StepCallback, StepState, type WizardStepProps };
+/**
+ * Load requirejs modules using an asynchronous call instead of a callback.
+ *
+ * @param ids - an array of ids to load using require js
+ * @returns return the array of resolved requested modules
+ * @since 17.4.0RC1
+ */
+export function loadById(...ids) {
+  let resolveP;
+  const promise = new Promise((resolve) => {
+    resolveP = resolve;
+  });
+  require([...ids], function (...response) {
+    if (ids.length === 1 && response.length > 0) {
+      resolveP(response[0]);
+    } else {
+      resolveP(response);
+    }
+  });
+  return promise;
+}

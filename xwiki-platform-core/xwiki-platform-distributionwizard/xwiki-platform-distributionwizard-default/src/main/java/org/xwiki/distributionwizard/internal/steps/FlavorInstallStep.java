@@ -19,27 +19,60 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.distributionwizard.DistributionWizardStep;
+import java.io.Serializable;
+import java.util.Map;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 
-import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
-public abstract class AbstractStep implements DistributionWizardStep
+@Component
+@Singleton
+@Named("FlavorInstallStep")
+public class FlavorInstallStep extends AbstractStep
 {
-    protected static final String WEBJAR_NAME = "xwiki-platform-distributionwizard-webjar";
-
-    @Inject
-    private ComponentDescriptor componentDescriptor;
-
     @Override
-    public String getHint()
+    public String getTitle()
     {
-        return componentDescriptor.getRoleHint();
+        return "Flavor install";
     }
 
-    protected DistributionWizardUIDefinition getDefaultUIDefinition()
+    @Override
+    public int getIndex()
     {
-        return new DistributionWizardUIDefinition(componentDescriptor.getRoleHint(), WEBJAR_NAME, "", "");
+        return 3;
+    }
+
+    @Override
+    public boolean isHidden()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isOptional()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isStepDone() throws DistributionWizardException
+    {
+        return false;
+    }
+
+    @Override
+    public DistributionWizardUIDefinition getUIDefinition()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    {
+        return false;
     }
 }

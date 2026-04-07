@@ -17,25 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-type UIComponent = {
-  component?: string;
-  module?: string;
-  html?: string;
-};
-enum StepState {
-  DISPLAYED,
-  VALIDATED,
-  PROCESSING,
-  PROCESSED,
-}
-type WizardStepProps = {
-  id: string;
-  title: string;
-  uiComponent: UIComponent;
-  index: number;
-  state?: StepState;
-};
-type StepCallback = () => Promise<boolean>;
-
-export { type StepCallback, StepState, type WizardStepProps };
+// Simply re-export the globally defined require function. This is mainly useful to isolate it is a
+// es-module. Allowing, for instance, to mock its result.
+export const require = window.require;

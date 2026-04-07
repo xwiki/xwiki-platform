@@ -17,6 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  flavorchoicestepCallback,
+  initFlavorListener,
+} from "./flavorchoicestep";
 import { WizardDialog } from "@xwiki/platform-distributionwizard-api";
 
 import {
@@ -34,4 +38,7 @@ createApp(WizardDialog, {
   wizardTitle: "First installation",
 }).mount("#distributionWizard");
 
-export { FirstAdminUserStep, WelcomeStep };
+// FIXME: we should probably have a generic mechanism like for callbacks to initialize only when needed (i.e. when
+//  the step is displayed)
+await initFlavorListener();
+export { FirstAdminUserStep, WelcomeStep, flavorchoicestepCallback };

@@ -93,12 +93,22 @@ watch(activeStep, async (newStep) => {
     stepComponent.value = null;
   }
 });
-watch(stepDialogRef, () => {});
-
 async function nextStep() {
+  async function getCallback() {
+    if (
+      activeStep.value?.uiComponent.html &&
+      activeStep.value?.uiComponent.module
+    ) {
+      const asyncModule = await import(activeStep.value?.uiComponent.module);
+      return asyncModule[activeStep.value.id.toLowerCase() + "Callback"];
+    } else {
+      return stepDialogRef.value?.wizardStepCallback;
+    }
+  }
   async function processStep() {
     let loadNextStep = true;
-    const callback = stepDialogRef.value?.wizardStepCallback;
+    const callback = await getCallback();
+    console.log("Obtained callback", callback);
     if (activeStep.value && callback) {
       loadNextStep = false;
       activeStep.value.state = StepState.PROCESSING;

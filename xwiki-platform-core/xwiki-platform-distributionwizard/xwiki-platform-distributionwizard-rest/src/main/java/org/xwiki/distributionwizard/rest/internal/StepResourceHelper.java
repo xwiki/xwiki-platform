@@ -38,20 +38,16 @@ public class StepResourceHelper
         Step step = new Step();
         step.setId(wizardStep.getHint());
         step.setHidden(wizardStep.isHidden());
-        step.setIndex(wizardStep.getIndex());
         step.setOptional(wizardStep.isOptional());
         step.setTitle(wizardStep.getTitle());
         step.setDone(wizardStep.isStepDone());
         UIComponent uiComponent = new UIComponent();
         DistributionWizardUIDefinition uiDefinition = wizardStep.getUIDefinition();
-        if (StringUtils.isEmpty(uiDefinition.html())) {
+        if (uiDefinition != null) {
             uiComponent.setComponent(uiDefinition.uiComponentName());
             uiComponent.setModule(uiDefinition.uiModuleName());
-        } else {
             uiComponent.setHtml(uiDefinition.html());
-            uiComponent.setRequiredSkinExtensions(uiDefinition.requiredSkinExtension());
         }
-
         step.setUiComponent(uiComponent);
         return step;
     }

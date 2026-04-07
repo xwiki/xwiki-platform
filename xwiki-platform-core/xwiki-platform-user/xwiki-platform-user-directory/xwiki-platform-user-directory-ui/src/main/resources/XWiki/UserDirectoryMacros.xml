@@ -103,70 +103,52 @@
 #end
 
 ##
-## Build and display the resulting livetable, nothing else.
+## Build and display the resulting live data, nothing else.
 ##
 #macro (displayUserDirectoryLiveTable)
-  {{html clean="false"}}
-  #set ($columnsProperties = {})
-  #foreach ($column in $columns)
-    #set ($columnProperties = {
-      'type': 'text',
-      'html': false,
-      'sortable': true,
-      'filterable': true,
-      'displayName': $xwikiUsersClass.get($column).translatedPrettyName
-    })
-    #set ($classPropertyType = $xwikiUsersClass.get($column).classType)
-    #if ($column == '_avatar')
-      #set ($discard = $columnProperties.putAll({
-        'html': true,
-        'sortable': false,
-        'filterable': false,
-        'link': 'view'
-      }))
-    #elseif ($column == 'doc.name')
-      #set ($columnProperties.link = 'view')
-    #elseif ($classPropertyType.endsWith('List'))
-      #set ($columnProperties.type = 'list')
-    #elseif ($classPropertyType.endsWith('Number'))
-      #set ($columnProperties.type = 'number')
-    #elseif ($classPropertyType.endsWith('Password'))
-      #set ($discard = $columnProperties.putAll({
-        'sortable': false,
-        'filterable': false
-      }))
-    #elseif ($classPropertyType.endsWith('TextArea') || $classPropertyType.endsWith('Email') || $classPropertyType.endsWith('Groups') || $classPropertyType == 'String')
-      #set ($columnProperties.html = true)
-    #end
-    #set ($discard = $columnsProperties.put($column, $columnProperties))
-  #end
-  ##
-  ## Allow other applications to provide a different data source for the user directory livetable. For example, some application might define a different membership relation.
+  ## The 'active' column is fetched but not displayed (needed for hideDisabledProfiles filter logic).
+  ## All other column defaults from liveTableLiveDataConfiguration.json are correct:
+  ## - doc.name: displayer link (already configured)
+  ## - _avatar: displayer html (already configured)
+  ## - Password type: sortable/filterable false (already configured)
+  #set ($liveDataConfig = {
+    'meta': {
+      'propertyDescriptors': [
+        {'id': 'active', 'visible': false, 'sortable': false, 'filterable': false}
+      ]
+    }
+  })
+  ## Allow other applications to provide a different data source for the user directory. For example, some application
+  ## might define a different membership relation.
   #set ($userDirectoryLivetableResultsReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'UserDirectoryLivetableResultsOverride'))
   #if (!$xwiki.exists($userDirectoryLivetableResultsReference))
     ## If no override is present, use the default data source.
     #set ($userDirectoryLivetableResultsReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'UserDirectoryLivetableResults'))
   #end
   ## Note that we specify the class name even though we use a custom results page (which hard-codes it) because the class
-  ## name is needed by the live table filters, to have a proper drop down list for Static List fields for instance
+  ## name is needed by the live data filters, to have a proper drop down list for Static List fields for instance
   ## (see XWIKI-9660).
-  #set ($options = {
+  #set ($sourceParamsMap = {
     'className': $services.model.serialize($xwikiUsersClassReference, 'local'),
-    'resultPage' : "$services.model.serialize($userDirectoryLivetableResultsReference)",
-    'translationPrefix' : 'xe.userdirectory.',
-    'tagCloud' : true,
-    'rowCount': 10,
-    'outputOnlyHtml': true
+    'resultPage': "$services.model.serialize($userDirectoryLivetableResultsReference)",
+    'translationPrefix': 'xe.userdirectory.'
   })
   ## Add a filter for subwikis
   #if ($xcontext.database != $xcontext.mainWikiName &amp;&amp; "$!services.wiki" != '' &amp;&amp; "$!services.wiki.user" != '')
     #set ($userScope = $services.wiki.user.getUserScope($services.wiki.currentWikiId))
     #if ($userScope == 'GLOBAL_ONLY')
-      #set ($discard = $options.put('extraParams', 'userScope=global'))
+      #set ($discard = $sourceParamsMap.put('userScope', 'global'))
     #else
-      #set ($discard = $options.put('extraParams', 'userScope=local'))
+      ## Default to the requested user scope, falling back to local.
+      #set ($requestedUserScope = "$!request.userScope")
+      #if ($requestedUserScope == 'global')
+        #set ($discard = $sourceParamsMap.put('userScope', 'global'))
+      #else
+        #set ($discard = $sourceParamsMap.put('userScope', 'local'))
+      #end
     #end
     #if ($userScope == 'LOCAL_AND_GLOBAL')
+      {{html clean="false"}}
       &lt;form class='xform third' action=''&gt;
         &lt;dl&gt;
           &lt;dt&gt;
@@ -175,32 +157,38 @@
           &lt;/dt&gt;
           &lt;dd&gt;
             &lt;select name='userScope' id='userScopeFilter'&gt;
-              &lt;option value='local'&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
-              &lt;option value='global'&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
+              &lt;option value='local' #if($requestedUserScope != 'global')selected="selected"#end&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
+              &lt;option value='global' #if($requestedUserScope == 'global')selected="selected"#end&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
             &lt;/select&gt;
           &lt;/dd&gt;
         &lt;/dl&gt;
       &lt;/form&gt;
+      {{/html}}
     #end
   #end
-  ## We can't filter the values of the 'disabled' user profile property directly from the 'extraParams' live table
-  ## results option because we can't express 'not equal' (we need to say: include only the user profiles for which the
-  ## value of the 'disabled' property is not equal to 1). An user profile that doesn't have any value set for the
-  ## 'disabled' property is enabled.
-  ## We don't hide the disabled user profiles when the active and disabled columns are present because the user can use
-  ## the live table filters to achieve this.
+  ## We can't filter the values of the 'disabled' user profile property directly from the source parameters because we
+  ## can't express 'not equal' (we need to say: include only the user profiles for which the value of the 'disabled'
+  ## property is not equal to 1). A user profile that doesn't have any value set for the 'disabled' property is enabled.
+  ## We don't hide the disabled user profiles when the active column is present because the user can use the live data
+  ## filters to achieve this.
   #set ($hideDisabledProfilesValue = $configuration.getValue('hideDisabledProfiles'))
   #if (!$columns.contains('active')
       &amp;&amp; ($hideDisabledProfilesValue == 1 || ("$!hideDisabledProfilesValue" == '' &amp;&amp;
       $configuration.xWikiClass.get('hideDisabledProfiles').getValue('defaultValue') == 1)))
-    #set ($options.extraParams = "$!options.extraParams&amp;hideDisabledProfiles=true")
+    #set ($discard = $sourceParamsMap.put('hideDisabledProfiles', 'true'))
   #end
-  ## We need to know which users are disabled or inactive in order to display them differently.
-  #set ($discard = $columns.add('active'))
-  #set ($discard = $columnsProperties.putIfAbsent('active', {'type': 'hidden'}))
-  ## Display the computed livetable.
-  #livetable('userdirectory' $columns $columnsProperties $options)
-  {{/html}}
+  ## We fetch the 'active' column to support the hideDisabledProfiles filter, but don't display it.
+  #set ($displayColumns = $collectiontool.orderedSet)
+  #set ($discard = $displayColumns.addAll($columns))
+  #set ($discard = $displayColumns.add('active'))
+  #set ($sourceParameters = $escapetool.url($sourceParamsMap))
+  {{liveData
+    id='userdirectory'
+    source='liveTable'
+    sourceParameters="$sourceParameters"
+    properties="$stringtool.join($displayColumns, ',')"
+    limit=10
+  }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 
 ## xredirect value used to come back to the current URL when performing actions
@@ -430,29 +418,6 @@
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
-   * Mark disabled and inactive user profiles.
-   */
-  var maybeMarkDisabled = function(row, rowData) {
-    // We use the abstract comparison (!=) because the property value might come as a string.
-    if (rowData &amp;&amp; rowData.active_value != 1) {
-      row.find('td.doc_name').addClass('user disabled');
-    }
-  };
-  // Update the markers when the live table rows are refreshed.
-  $(document).on('xwiki:livetable:userdirectory:newrow', function(event, data) {
-    maybeMarkDisabled($(data.row), data.data);
-  });
-  // Initialize the markers. We need this because the 'newrow' event might have been already triggered.
-  var usersLiveTable = window['livetable_userdirectory'];
-  if (usersLiveTable) {
-    $('table#userdirectory tr[data-index]').each(function() {
-      var row = $(this);
-      var rowData = usersLiveTable.fetchedRows[row.data('index')];
-      maybeMarkDisabled(row, rowData);
-    });
-  }
-
-  /**
    * Live preview when the User Directory settings are modified.
    */
   $('form.user-directory-settings').on('change', function(event) {
@@ -464,36 +429,22 @@
     }
     var url = configDocument.getURL('get', 'customize=true');
     var data = $(this).serialize();
-    var oldLiveTableContainer = $('.xwiki-livetable-container').addClass('loading');
-    // We can't use load() here because the live table has in-line script tags that have to be evaluated.
+    var oldLiveDataContainer = $('#userdirectory.liveData').addClass('loading');
     $.get(url, data).then(html =&gt; {
-      var newLiveTableContainer = $('&lt;div/&gt;').html(html).find('.xwiki-livetable-container');
-      oldLiveTableContainer.replaceWith(newLiveTableContainer);
-      $(document).trigger('xwiki:dom:updated', {elements: newLiveTableContainer.toArray()});
+      var newLiveDataContainer = $('&lt;div/&gt;').html(html).find('.liveData');
+      oldLiveDataContainer.replaceWith(newLiveDataContainer);
+      $(document).trigger('xwiki:dom:updated', {elements: newLiveDataContainer.toArray()});
     });
   });
 
   /**
-   * User scope filtering (for sub-wikis).
+   * User scope filtering (for sub-wikis): reload the page with the selected user scope as a URL parameter.
    */
   $('#userScopeFilter').on('change', function(event) {
     var value = $(this).val();
-    // The live table is recreated when an user directory setting is changed (live preview) so we can't cache the
-    // reference to the live table instance.
-    var usersLiveTable = window['livetable_userdirectory'];
-    var url = usersLiveTable.getUrl;
-    if (url.search('userScope=') &gt;= 0) {
-      // Replace the old value.
-      if (value === 'local') {
-        url = url.replace('userScope=global', 'userScope=local');
-      } else {
-        url = url.replace('userScope=local', 'userScope=global');
-      }
-    } else {
-      url = url + '&amp;userScope=' + value;
-    }
-    usersLiveTable.getUrl = url;
-    usersLiveTable.refresh();
+    var url = new URL(window.location.href);
+    url.searchParams.set('userScope', value);
+    window.location.href = url.toString();
   });
 });</code>
     </property>

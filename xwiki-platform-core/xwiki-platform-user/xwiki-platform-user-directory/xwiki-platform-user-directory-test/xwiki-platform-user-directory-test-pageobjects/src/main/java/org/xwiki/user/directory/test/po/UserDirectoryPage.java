@@ -19,7 +19,7 @@
  */
 package org.xwiki.user.directory.test.po;
 
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 public class UserDirectoryPage extends ViewPage
@@ -30,10 +30,8 @@ public class UserDirectoryPage extends ViewPage
         return new UserDirectoryPage();
     }
 
-    public LiveTableElement getUserDirectoryLiveTable()
+    public LiveDataElement getUserDirectoryLiveData()
     {
-        LiveTableElement lt = new LiveTableElement("userdirectory");
-        lt.waitUntilReady();
-        return lt;
+        return new LiveDataElement("userdirectory");
     }
 }

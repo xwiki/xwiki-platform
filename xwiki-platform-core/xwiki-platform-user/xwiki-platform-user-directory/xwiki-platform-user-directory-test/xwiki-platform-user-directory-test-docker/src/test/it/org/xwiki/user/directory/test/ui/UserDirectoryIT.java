@@ -20,14 +20,11 @@
 package org.xwiki.user.directory.test.ui;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.directory.test.po.UserDirectoryPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the User Directory feature.
@@ -68,29 +65,29 @@ class UserDirectoryIT
         UserDirectoryPage page = UserDirectoryPage.gotoPage();
 
         // Verify that the user directory is empty when there's no user in the wiki
-        LiveTableElement liveTableElement = page.getUserDirectoryLiveTable();
-        assertEquals(0, liveTableElement.getRowCount());
+        TableLayoutElement tableLayout = page.getUserDirectoryLiveData().getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(0);
 
-        // Add a user and verify it's visible in the livetable
+        // Add a user and verify it's visible in the live data
         setup.createUserAndLogin("test", "testtest", "first_name", "John", "last_name", "Doe");
 
         // Go back to the user directory page since the user creation navigated to another page
         page = UserDirectoryPage.gotoPage();
-        liveTableElement = page.getUserDirectoryLiveTable();
-        assertEquals(1, liveTableElement.getRowCount());
-        assertTrue(liveTableElement.hasRow("User ID", "test"));
-        assertTrue(liveTableElement.hasRow("First Name", "John"));
-        assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
+        tableLayout = page.getUserDirectoryLiveData().getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("User ID", "test");
+        tableLayout.assertRow("First Name", "John");
+        tableLayout.assertRow("Last Name", "Doe");
 
-        // Log out to verify the livetable works in guest view too
+        // Log out to verify the live data works in guest view too
         setup.forceGuestUser();
         // Create a new instance of the page to ensure that we wait for it to be fully loaded.
         page = new UserDirectoryPage();
-        liveTableElement = page.getUserDirectoryLiveTable();
-        assertEquals(1, liveTableElement.getRowCount());
-        assertTrue(liveTableElement.hasRow("User ID", "test"));
-        assertTrue(liveTableElement.hasRow("First Name", "John"));
-        assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
+        tableLayout = page.getUserDirectoryLiveData().getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("User ID", "test");
+        tableLayout.assertRow("First Name", "John");
+        tableLayout.assertRow("Last Name", "Doe");
 
         logCaptureConfiguration.registerExcludes(
             "Exception in macro #displayCheckedIfWatched called at",

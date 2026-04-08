@@ -65,12 +65,18 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Enable Responsiveness for phones
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-#template('meta.vm')
+    #template('meta.vm')
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Add all HTML tags contributed by UIX for the "org.xwiki.platform.html.head" UIXP.
+    ## ---------------------------------------------------------------------------------------------------------------
+    #foreach($uix in $services.uix.getExtensions("org.xwiki.platform.html.head", {'sortByParameter' : 'order'}))
+        $services.rendering.render($uix.execute(), 'xhtml/1.0')
+    #end
 <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
 #template("stylesheets.vm")
 #template("javascript.vm")
 </head>
-<body>
+<body id="body">
     <script type="module">
         import "xwiki-platform-distributionwizard-webjar"
     </script>

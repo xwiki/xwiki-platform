@@ -29,10 +29,9 @@ import {
   ref,
   shallowRef,
   useTemplateRef,
-  watch,
 } from "vue";
-import type { StepsResolverFunction } from "../StepsResolver";
-import type { WizardStepProps } from "../WizardStepProps";
+import type { DistributionWizardResolverFunctions } from "../StepsResolver";
+import type { WizardStepProps, WizardStepSummary } from "../WizardStepProps";
 
 enum DialogState {
   INITIALIZING,
@@ -42,11 +41,11 @@ enum DialogState {
 }
 const emit = defineEmits(["closed"]);
 const props = defineProps<{
-  stepResolver: StepsResolverFunction;
+  stepResolverFunctions: DistributionWizardResolverFunctions;
   wizardTitle: string;
 }>();
 
-const steps = ref<WizardStepProps[]>([]);
+const steps = ref<WizardStepSummary[]>([]);
 const activeStep = ref<WizardStepProps | undefined>();
 const stepComponent = shallowRef();
 const stepDialogRef = useTemplateRef<typeof WizardStep>("stepDialogRef");
@@ -54,9 +53,7 @@ const dialogState = ref(DialogState.INITIALIZING);
 
 const htmlDialog = useTemplateRef("wizardDialog");
 
-const stepIndex = computed(() => {
-  return activeStep.value ? activeStep.value.index : 0;
-});
+const stepIndex = ref<number>(0);
 const hasNextStep = computed(() => stepIndex.value < steps.value.length - 1);
 const hasPreviousStep = computed(() => stepIndex.value > 0);
 const stepNames = computed(() => {
@@ -68,12 +65,25 @@ const stepNames = computed(() => {
 });
 
 onMounted(async () => {
-  steps.value = await props.stepResolver();
+  steps.value = await props.stepResolverFunctions.stepsResolverFunction();
   dialogState.value = DialogState.STEPS_LOADED;
   if (steps.value.length > 1) {
-    activeStep.value = { ...steps.value[0], state: StepState.DISPLAYED };
+    await loadStep(steps.value[0].id);
   }
 });
+async function loadStep(stepId: string) {
+  dialogState.value = DialogState.LOADING_STEP;
+  const loadedStep =
+    await props.stepResolverFunctions.stepResolverFunction(stepId);
+  if (loadedStep?.uiComponent.module && loadedStep?.uiComponent.component) {
+    const asyncModule = await import(loadedStep.uiComponent.module);
+    stepComponent.value = asyncModule[loadedStep.uiComponent.component];
+  } else {
+    stepComponent.value = null;
+  }
+  activeStep.value = { ...loadedStep, state: StepState.DISPLAYED };
+  dialogState.value = DialogState.STEP_DISPLAYED;
+}
 /**
  * We can only show the modal once the DOM has been initialized, so after the app has been mounted, that's why we call
  * showModal in this onUpdated.
@@ -81,16 +91,6 @@ onMounted(async () => {
 onUpdated(() => {
   if (activeStep.value) {
     htmlDialog.value?.showModal();
-  }
-});
-watch(activeStep, async (newStep) => {
-  if (newStep?.uiComponent.module && newStep?.uiComponent.component) {
-    dialogState.value = DialogState.LOADING_STEP;
-    const asyncModule = await import(newStep.uiComponent.module);
-    stepComponent.value = asyncModule[newStep.uiComponent.component];
-    dialogState.value = DialogState.STEP_DISPLAYED;
-  } else {
-    stepComponent.value = null;
   }
 });
 async function nextStep() {
@@ -108,7 +108,6 @@ async function nextStep() {
   async function processStep() {
     let loadNextStep = true;
     const callback = await getCallback();
-    console.log("Obtained callback", callback);
     if (activeStep.value && callback) {
       loadNextStep = false;
       activeStep.value.state = StepState.PROCESSING;
@@ -123,15 +122,15 @@ async function nextStep() {
   if (hasNextStep.value) {
     const loadNextStep = await processStep();
     if (loadNextStep) {
-      activeStep.value = steps.value[stepIndex.value + 1];
-      activeStep.value.state = StepState.DISPLAYED;
+      stepIndex.value++;
+      await loadStep(steps.value[stepIndex.value].id);
     }
   }
 }
 
-function previousStep() {
+async function previousStep() {
   if (hasPreviousStep.value) {
-    activeStep.value = steps.value[stepIndex.value - 1];
+    await loadStep(steps.value[stepIndex.value - 1].id);
   }
 }
 function finishWizard() {
@@ -160,18 +159,17 @@ function invalidateStep() {
   >
     <div :class="$style.wizardHeader">
       <h2>{{ wizardTitle }} - {{ activeStep.title }}</h2>
-      <WizardBreadcrumb :steps="stepNames" :activeStep="activeStep.index" />
+      <WizardBreadcrumb :steps="stepNames" :activeStep="stepIndex" />
     </div>
     <main :class="$style.wizardContent">
+      <!-- FIXME: handle dialog step loading knowing that it could break the watcher in WizardStep -->
       <WizardStep
-        v-if="dialogState === DialogState.STEP_DISPLAYED"
         :step="activeStep"
         :component="stepComponent"
         ref="stepDialogRef"
         @validateStep="validateStep"
         @invalidateStep="invalidateStep"
       />
-      <div v-else>LOADING</div>
     </main>
     <div :class="$style.wizardFooter">
       <div :class="$style.footerLeft">

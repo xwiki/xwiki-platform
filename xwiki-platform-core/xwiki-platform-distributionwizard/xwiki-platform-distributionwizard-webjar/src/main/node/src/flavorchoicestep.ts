@@ -21,19 +21,23 @@
 import { loadById } from "./services/require.js";
 
 async function flavorchoicestepCallback(): Promise<boolean> {
-  const form = document.querySelector("#flavorchoicestep");
+  const form: HTMLFormElement | null =
+    document.querySelector("#flavorchoicestep");
   if (form) {
-    // @ts-expect-error expected type
-    const params = new FormData(form);
+    const params: FormData = new FormData(form);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body: any = {
+      flavor: params.get("flavor"),
+    };
     const restURL = `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(
       XWiki.currentWiki,
     )}/step/FlavorChoiceStep`;
     const response = await fetch(restURL, {
       method: "POST",
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
-      body: params,
+      body: JSON.stringify(body),
     });
     return response.status >= 200 && response.status < 300;
   } else {

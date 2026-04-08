@@ -26,6 +26,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
@@ -34,7 +35,7 @@ import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
 public interface DistributionWizardStepResources
 {
     @GET
-    Step getStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId) throws Exception;
+    Response getStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId) throws Exception;
 
     @POST
     void answerStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId,

@@ -25,8 +25,6 @@ onMounted(() => {
   emit("validateStep");
 });
 async function stepAnswerCallback() {
-  console.log("Callback de Welcome");
-  await new Promise((resolve) => setTimeout(resolve, 2000));
   return true;
 }
 defineExpose({

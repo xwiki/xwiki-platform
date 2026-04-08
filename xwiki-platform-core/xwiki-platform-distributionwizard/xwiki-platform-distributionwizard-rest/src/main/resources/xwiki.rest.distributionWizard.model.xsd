@@ -37,23 +37,30 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="step" type="distributionWizard:Step" minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="step" type="distributionWizard:StepSummary" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="StepSummary">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <attribute name="id" type="string"></attribute>
+        <attribute name="title" type="string"></attribute>
+        <attribute name="index" type="int"></attribute>
+        <attribute name="originalIndex" type="int"></attribute>
+        <attribute name="optional" type="boolean"></attribute>
+        <attribute name="hidden" type="boolean"></attribute>
+        <attribute name="done" type="boolean"></attribute>
       </extension>
     </complexContent>
   </complexType>
 
   <complexType name="Step">
     <complexContent>
-      <extension base="xwiki:LinkCollection">
+      <extension base="distributionWizard:StepSummary">
         <sequence>
-          <element name="id" type="string"></element>
-          <element name="title" type="string"></element>
-          <element name="index" type="int"></element>
-          <element name="optional" type="boolean"></element>
-          <element name="hidden" type="boolean"></element>
-          <element name="done" type="boolean"></element>
-          <element name="html" type="string"></element>
           <element name="uiComponent" type="distributionWizard:UIComponent"></element>
         </sequence>
       </extension>

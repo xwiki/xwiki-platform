@@ -107,6 +107,7 @@ public class FirstAdminUserStep extends AbstractStep
                 throw new DistributionWizardException(String.format("Error while registering first admin user code "
                     + "[%s]", result));
             }
+            // FIXME: the user should be logged in too
         } catch (XWikiException e) {
             throw new DistributionWizardException("Unhandled error while registering first admin user", e);
         } catch (WikiManagerException e) {

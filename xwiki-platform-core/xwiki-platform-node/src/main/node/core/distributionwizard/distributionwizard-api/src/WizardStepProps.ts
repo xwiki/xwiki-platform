@@ -29,13 +29,17 @@ enum StepState {
   PROCESSING,
   PROCESSED,
 }
+type WizardStepSummary = {
+  id: string;
+  title: string;
+  index: number;
+};
 type WizardStepProps = {
   id: string;
   title: string;
   uiComponent: UIComponent;
-  index: number;
+  originalIndex: number;
   state?: StepState;
 };
-type StepCallback = () => Promise<boolean>;
 
-export { type StepCallback, StepState, type WizardStepProps };
+export { StepState, type WizardStepProps, type WizardStepSummary };

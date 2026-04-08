@@ -25,6 +25,7 @@ import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
+import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
 import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
 
 import jakarta.inject.Singleton;
@@ -33,22 +34,15 @@ import jakarta.inject.Singleton;
 @Singleton
 public class StepResourceHelper
 {
-    public Step toStep(DistributionWizardStep wizardStep) throws DistributionWizardException
+    public StepSummary toStepSummary(DistributionWizardStep wizardStep) throws DistributionWizardException
     {
-        Step step = new Step();
-        step.setId(wizardStep.getHint());
-        step.setHidden(wizardStep.isHidden());
-        step.setOptional(wizardStep.isOptional());
-        step.setTitle(wizardStep.getTitle());
-        step.setDone(wizardStep.isStepDone());
-        UIComponent uiComponent = new UIComponent();
-        DistributionWizardUIDefinition uiDefinition = wizardStep.getUIDefinition();
-        if (uiDefinition != null) {
-            uiComponent.setComponent(uiDefinition.uiComponentName());
-            uiComponent.setModule(uiDefinition.uiModuleName());
-            uiComponent.setHtml(uiDefinition.html());
-        }
-        step.setUiComponent(uiComponent);
-        return step;
+        StepSummary stepSummary = new StepSummary();
+        stepSummary.setId(wizardStep.getHint());
+        stepSummary.setHidden(wizardStep.isHidden());
+        stepSummary.setOptional(wizardStep.isOptional());
+        stepSummary.setTitle(wizardStep.getTitle());
+        stepSummary.setDone(wizardStep.isStepDone());
+        stepSummary.setOriginalIndex(wizardStep.getIndex());
+        return stepSummary;
     }
 }

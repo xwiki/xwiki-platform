@@ -17,8 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#template('distribution/macros.vm')
-#template('flavor/macros.vm')
-<form method="post" id="flavorchoicestep">
-#displayFlavorPicker('flavor', "$!request.flavor", true, 'xwiki-flavor-picker-medium', true)
-</form>
+#template('extension.vm')
+#set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
+#set ($jobStatus = $NULL)
+#if ($selectedFlavor)
+#displayExtension($selectedFlavor)
+#else
+No flavor selected
+#end

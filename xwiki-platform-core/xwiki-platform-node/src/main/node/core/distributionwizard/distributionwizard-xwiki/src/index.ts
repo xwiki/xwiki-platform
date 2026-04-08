@@ -17,6 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { XWikiStepsResolver } from "./XWikiStepsResolver";
+import type {
+  WizardStepProps,
+  WizardStepSummary,
+} from "@xwiki/platform-distributionwizard-api";
 
-export { XWikiStepsResolver };
+type JSONSteps = {
+  step: WizardStepSummary[];
+};
+
+async function fetchSteps(restURL: string): Promise<JSONSteps> {
+  const response = await fetch(restURL, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  // FIXME: handle fetch error
+  return response.json();
+}
+
+/**
+ * Resolve the steps using the given REST API URL.
+ * @param restURL - the URL of the REST API to call for getting step info.
+ * @beta
+ */
+async function XWikiStepsResolver(
+  restURL: string,
+): Promise<WizardStepSummary[]> {
+  const steps = await fetchSteps(restURL);
+  return steps.step;
+}
+
+async function XWikiStepResolver(restURL: string): Promise<WizardStepProps> {
+  const response = await fetch(restURL, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  // FIXME: handle fetch error
+  return response.json();
+}
+
+export { XWikiStepResolver, XWikiStepsResolver };

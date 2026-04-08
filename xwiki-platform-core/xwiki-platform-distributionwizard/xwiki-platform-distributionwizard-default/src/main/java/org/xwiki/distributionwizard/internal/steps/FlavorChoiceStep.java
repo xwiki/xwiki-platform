@@ -22,15 +22,19 @@ package org.xwiki.distributionwizard.internal.steps;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.platform.flavor.FlavorManager;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 import org.xwiki.template.TemplateManager;
 
 import jakarta.inject.Inject;
@@ -42,6 +46,8 @@ import jakarta.inject.Singleton;
 @Named("FlavorChoiceStep")
 public class FlavorChoiceStep extends AbstractStep
 {
+    private static final String FLAVOR_KEY = "flavor";
+
     @Inject
     private FlavorManager flavorManager;
 
@@ -49,13 +55,13 @@ public class FlavorChoiceStep extends AbstractStep
     private DistributionManager distributionManager;
 
     @Inject
+    private ExtensionManager extensionManager;
+
+    @Inject
     private TemplateManager templateManager;
 
     @Inject
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
-
-    @Inject
-    private Logger logger;
 
     private DistributionWizardUIDefinition uiDefinition;
 
@@ -86,11 +92,12 @@ public class FlavorChoiceStep extends AbstractStep
     @Override
     public boolean isStepDone()
     {
+        // TODO: handle automatic flavor choice
         DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
         String wiki = distributionJob.getRequest().getWiki();
         Namespace namespace = new Namespace("wiki", wiki);
         InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
-        return  (flavor != null && flavor.isValid(namespace.toString()));
+        return (flavor != null && flavor.isValid(namespace.toString()));
     }
 
     @Override
@@ -108,7 +115,25 @@ public class FlavorChoiceStep extends AbstractStep
     @Override
     public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
     {
-        this.logger.info("Received data: [{}]", data);
+        if (data.containsKey(FLAVOR_KEY)) {
+            // FIXME: handle no flavor
+            String selectedFlavor = (String) data.get(FLAVOR_KEY);
+            // FIXME: would be cleaner and more robust with a regex and checks
+            String[] splittedFlavor = selectedFlavor.split(":::");
+            String flavorId = splittedFlavor[0];
+            String flavorVersion = splittedFlavor[1];
+            try {
+                Extension flavorExtension =
+                    this.extensionManager.resolveExtension(new ExtensionId(flavorId, flavorVersion));
+                DistributionJob job = this.distributionManager.getCurrentDistributionJob();
+                job.setProperty("flavor.selected", flavorExtension);
+            } catch (ResolveException e) {
+                throw new DistributionWizardException(
+                    String.format("Error while resolving extension for the selected flavor: [%s]", selectedFlavor), e);
+            }
+
+            return true;
+        }
         return false;
     }
 }

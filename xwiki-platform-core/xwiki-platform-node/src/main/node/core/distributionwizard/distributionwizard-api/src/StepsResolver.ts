@@ -17,6 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { WizardStepProps } from "./WizardStepProps";
+import type { WizardStepProps, WizardStepSummary } from "./WizardStepProps";
 
-export type StepsResolverFunction = () => Promise<WizardStepProps[]>;
+export type DistributionWizardResolverFunctions = {
+  stepsResolverFunction: () => Promise<WizardStepSummary[]>;
+  stepResolverFunction: (stepId: string) => Promise<WizardStepProps>;
+};

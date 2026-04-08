@@ -27,14 +27,26 @@ import {
   FirstAdminUserStep,
   WelcomeStep,
 } from "@xwiki/platform-distributionwizard-steps";
-import { XWikiStepsResolver } from "@xwiki/platform-distributionwizard-xwiki";
+import {
+  XWikiStepResolver,
+  XWikiStepsResolver,
+} from "@xwiki/platform-distributionwizard-xwiki";
 import { createApp } from "vue";
+import type { DistributionWizardResolverFunctions } from "@xwiki/platform-distributionwizard-api";
 
-createApp(WizardDialog, {
-  stepResolver: () =>
+const xwikiStepResolverFunctions: DistributionWizardResolverFunctions = {
+  stepsResolverFunction: () =>
     XWikiStepsResolver(
       `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(XWiki.currentWiki)}/steps/`,
     ),
+  stepResolverFunction: (stepId: string) =>
+    XWikiStepResolver(
+      `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(XWiki.currentWiki)}/step/${encodeURIComponent(stepId)}`,
+    ),
+};
+
+createApp(WizardDialog, {
+  stepResolverFunctions: xwikiStepResolverFunctions,
   wizardTitle: "First installation",
 }).mount("#distributionWizard");
 

@@ -44,11 +44,11 @@ watch(props, async () => {
   if (props.step.uiComponent.html) {
     await nextTick();
     const jQuery = await loadById("jquery");
-    jQuery(document).trigger("xwiki:dom:updated", { elements: [] });
-    jQuery(document).on("xwiki:distributionWizard:validateStep", function () {
-      console.log("validateStep");
-      validateStep();
+    jQuery(document).trigger("xwiki:dom:updated", {
+      elements: jQuery("#wizard-step-html").toArray(),
     });
+    console.log("Wizard step dom:updated event triggered");
+    jQuery(document).on("xwiki:distributionWizard:validateStep", validateStep);
     jQuery(document).on(
       "xwiki:distributionWizard:invalidateStep",
       invalidateStep,
@@ -68,7 +68,11 @@ defineExpose({
     @invalidateStep="invalidateStep"
     ref="stepRefId"
   />
-  <div v-else-if="step.uiComponent.html" v-html="step.uiComponent.html"></div>
+  <div
+    v-else-if="step.uiComponent.html"
+    v-html="step.uiComponent.html"
+    id="wizard-step-html"
+  ></div>
   <span v-else>The step is missing proper content.</span>
 </template>
 

@@ -37,7 +37,7 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
-    <!-- Put back .prod.js for vue -->
+    <!-- FIXME: Put back .prod.js for vue -->
     <xwiki.extension.javascript.modules.importmap>
       {
       "xwiki-platform-distributionwizard-webjar": "org.xwiki.platform:xwiki-platform-distributionwizard-webjar/index.es.js",

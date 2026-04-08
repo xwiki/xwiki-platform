@@ -23,9 +23,17 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.platform.flavor.FlavorManager;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
+import org.xwiki.template.TemplateManager;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -34,6 +42,20 @@ import jakarta.inject.Singleton;
 @Named("FlavorInstallStep")
 public class FlavorInstallStep extends AbstractStep
 {
+    @Inject
+    private FlavorManager flavorManager;
+
+    @Inject
+    private DistributionManager distributionManager;
+
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
+    private DistributionWizardUIDefinition uiDefinition;
+
     @Override
     public String getTitle()
     {
@@ -61,13 +83,23 @@ public class FlavorInstallStep extends AbstractStep
     @Override
     public boolean isStepDone() throws DistributionWizardException
     {
-        return false;
+        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
+        String wiki = distributionJob.getRequest().getWiki();
+        Namespace namespace = new Namespace("wiki", wiki);
+        InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
+        return (flavor != null && flavor.isValid(namespace.toString()));
     }
 
     @Override
     public DistributionWizardUIDefinition getUIDefinition()
     {
-        return null;
+        if (this.uiDefinition == null) {
+            this.requiredSkinExtensionsRecorder.start();
+            String html = this.templateManager.renderNoException("flavorinstallstep.vm");
+            String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
+            this.uiDefinition = new DistributionWizardUIDefinition(null, WEBJAR_NAME, html, requiredSkinExtension);
+        }
+        return this.uiDefinition;
     }
 
     @Override

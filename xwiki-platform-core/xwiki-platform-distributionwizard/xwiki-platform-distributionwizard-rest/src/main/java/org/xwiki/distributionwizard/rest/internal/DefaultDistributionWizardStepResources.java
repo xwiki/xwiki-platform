@@ -24,12 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepResources;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
+import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
 import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
 import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
 import org.xwiki.rest.XWikiResource;
@@ -41,6 +45,8 @@ import jakarta.inject.Named;
 @Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepResources")
 public class DefaultDistributionWizardStepResources extends XWikiResource implements DistributionWizardStepResources
 {
+    private static final String REQUIRED_EXTENSION_HEADER = "X-XWIKI-HTML-HEAD";
+
     @Inject
     private DistributionWizardManager distributionWizardManager;
 
@@ -48,10 +54,30 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
     private StepResourceHelper stepResourceHelper;
 
     @Override
-    public Step getStep(String wikiId, String stepId) throws Exception
+    public Response getStep(String wikiId, String stepId) throws Exception
     {
         DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
-        return this.stepResourceHelper.toStep(wizardStep);
+
+        StepSummary stepSummary = this.stepResourceHelper.toStepSummary(wizardStep);
+        UIComponent uiComponent = new UIComponent();
+        DistributionWizardUIDefinition uiDefinition = wizardStep.getUIDefinition();
+        String requiredSkinExtension = "";
+        if (uiDefinition != null) {
+            uiComponent.setComponent(uiDefinition.uiComponentName());
+            uiComponent.setModule(uiDefinition.uiModuleName());
+            uiComponent.setHtml(uiDefinition.html());
+            requiredSkinExtension = uiDefinition.requiredSkinExtension();
+        }
+
+        Step step = new Step()
+            .withId(stepSummary.getId())
+            .withTitle(stepSummary.getTitle())
+            .withHidden(stepSummary.isHidden())
+            .withOriginalIndex(stepSummary.getOriginalIndex())
+            .withOptional(stepSummary.isOptional())
+            .withDone(stepSummary.isDone())
+            .withUiComponent(uiComponent);
+        return Response.ok(step).header(REQUIRED_EXTENSION_HEADER, requiredSkinExtension).build();
     }
 
     @Override

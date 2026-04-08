@@ -20,13 +20,14 @@
 import WizardBreadcrumb from "./vue/WizardBreadcrumb.vue";
 import WizardDialog from "./vue/WizardDialog.vue";
 import WizardStep from "./vue/WizardStep.vue";
-import type { StepsResolverFunction } from "./StepsResolver";
-import type { WizardStepProps } from "./WizardStepProps";
+import type { DistributionWizardResolverFunctions } from "./StepsResolver";
+import type { WizardStepProps, WizardStepSummary } from "./WizardStepProps";
 
 export {
-  type StepsResolverFunction,
+  type DistributionWizardResolverFunctions,
   WizardBreadcrumb,
   WizardDialog,
   WizardStep,
   type WizardStepProps,
+  type WizardStepSummary,
 };

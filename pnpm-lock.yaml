@@ -21,6 +21,9 @@ catalogs:
     '@eslint/js':
       specifier: 9.39.2
       version: 9.39.2
+    '@jridgewell/remapping':
+      specifier: 2.3.5
+      version: 2.3.5
     '@mantine/core':
       specifier: 8.3.14
       version: 8.3.14
@@ -2195,6 +2198,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig:
     dependencies:
+      '@jridgewell/remapping':
+        specifier: 'catalog:'
+        version: 2.3.5
       vite:
         specifier: 'catalog:'
         version: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)

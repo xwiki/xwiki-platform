@@ -46,7 +46,7 @@
   <div class="col-sm-6">
     <label>$title</label>
     <div class="xHint">$hint</div>
-    <a href="$document.getURL()">$services.icon.renderHTML('file-white')$document.plainTitle</a>
+    <a href="$document.getURL()">$services.icon.renderHTML('file-white')&nbsp;$escapetool.xml($document.plainTitle)</a>
     <div>
       $services.localization.render('job.question.OverwriteQuestion.lastAuthor',
         [$xwiki.getUserName($document.authorReference)])

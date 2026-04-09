@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -40,4 +41,7 @@ public interface DistributionWizardStepResources
     @POST
     void answerStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId,
         Map<String, Serializable> data) throws Exception;
+
+    @PUT
+    void processStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId) throws Exception;
 }

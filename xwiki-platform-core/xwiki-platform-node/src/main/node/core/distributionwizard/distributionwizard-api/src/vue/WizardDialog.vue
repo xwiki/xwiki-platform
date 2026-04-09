@@ -55,26 +55,22 @@ const htmlDialog = useTemplateRef("wizardDialog");
 
 const stepIndex = ref<number>(0);
 const hasNextStep = computed(() => stepIndex.value < steps.value.length - 1);
-const hasPreviousStep = computed(() => stepIndex.value > 0);
-const stepNames = computed(() => {
-  let names = [];
-  for (let step of steps.value) {
-    names.push(step.title);
-  }
-  return names;
-});
 
 onMounted(async () => {
   steps.value = await props.stepResolverFunctions.stepsResolverFunction();
   dialogState.value = DialogState.STEPS_LOADED;
   if (steps.value.length > 1) {
-    await loadStep(steps.value[0].id);
+    await loadStep(steps.value[0]);
   }
 });
-async function loadStep(stepId: string) {
+async function loadStep(step: WizardStepSummary) {
   dialogState.value = DialogState.LOADING_STEP;
-  const loadedStep =
-    await props.stepResolverFunctions.stepResolverFunction(stepId);
+  if (step.needsManualStart) {
+    await props.stepResolverFunctions.startStepFunction(step.id);
+  }
+  const loadedStep = await props.stepResolverFunctions.stepResolverFunction(
+    step.id,
+  );
   if (loadedStep?.uiComponent.module && loadedStep?.uiComponent.component) {
     const asyncModule = await import(loadedStep.uiComponent.module);
     stepComponent.value = asyncModule[loadedStep.uiComponent.component];
@@ -105,16 +101,28 @@ async function nextStep() {
       return stepDialogRef.value?.wizardStepCallback;
     }
   }
+  async function handleCallback(
+    step: WizardStepProps,
+    callback: () => Promise<boolean>,
+  ): Promise<boolean> {
+    let loadNextStep = false;
+    step.state = StepState.PROCESSING;
+    const processed = await callback();
+    if (processed) {
+      step.state = StepState.PROCESSED;
+      loadNextStep = true;
+    } else {
+      step.state = StepState.PROCESS_ERROR;
+    }
+    return loadNextStep;
+  }
   async function processStep() {
     let loadNextStep = true;
-    const callback = await getCallback();
-    if (activeStep.value && callback) {
-      loadNextStep = false;
-      activeStep.value.state = StepState.PROCESSING;
-      const processed = await callback();
-      if (processed) {
-        activeStep.value.state = StepState.PROCESSED;
-        loadNextStep = true;
+
+    if (activeStep.value && activeStep.value.needsInput) {
+      const callback = await getCallback();
+      if (callback) {
+        loadNextStep = await handleCallback(activeStep.value, callback);
       }
     }
     return loadNextStep;
@@ -123,16 +131,11 @@ async function nextStep() {
     const loadNextStep = await processStep();
     if (loadNextStep) {
       stepIndex.value++;
-      await loadStep(steps.value[stepIndex.value].id);
+      await loadStep(steps.value[stepIndex.value]);
     }
   }
 }
 
-async function previousStep() {
-  if (hasPreviousStep.value) {
-    await loadStep(steps.value[stepIndex.value - 1].id);
-  }
-}
 function finishWizard() {
   htmlDialog.value?.requestClose();
   emit("closed");
@@ -159,7 +162,7 @@ function invalidateStep() {
   >
     <div :class="$style.wizardHeader">
       <h2>{{ wizardTitle }} - {{ activeStep.title }}</h2>
-      <WizardBreadcrumb :steps="stepNames" :activeStep="stepIndex" />
+      <WizardBreadcrumb :steps="steps" :activeStep="stepIndex" />
     </div>
     <main :class="$style.wizardContent">
       <!-- FIXME: handle dialog step loading knowing that it could break the watcher in WizardStep -->
@@ -172,9 +175,6 @@ function invalidateStep() {
       />
     </main>
     <div :class="$style.wizardFooter">
-      <div :class="$style.footerLeft">
-        <button v-if="hasPreviousStep" @click="previousStep">Previous</button>
-      </div>
       <div :class="$style.footerRight">
         <WizardNextButton
           :step-state="activeStep.state || StepState.DISPLAYED"

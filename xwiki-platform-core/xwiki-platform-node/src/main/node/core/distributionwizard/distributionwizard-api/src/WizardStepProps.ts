@@ -28,18 +28,23 @@ enum StepState {
   VALIDATED,
   PROCESSING,
   PROCESSED,
+  PROCESS_ERROR,
 }
 type WizardStepSummary = {
   id: string;
   title: string;
   index: number;
+  dependsOnPreviousStep: boolean;
+  needsManualStart: boolean;
 };
+// FIXME: this should extends WizardStepSummary
 type WizardStepProps = {
   id: string;
   title: string;
   uiComponent: UIComponent;
   originalIndex: number;
   state?: StepState;
+  needsInput: boolean;
 };
 
 export { StepState, type WizardStepProps, type WizardStepSummary };

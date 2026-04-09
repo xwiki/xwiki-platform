@@ -19,9 +19,17 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
+import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
+import org.xwiki.template.TemplateManager;
 
 import jakarta.inject.Inject;
 
@@ -32,14 +40,82 @@ public abstract class AbstractStep implements DistributionWizardStep
     @Inject
     private ComponentDescriptor componentDescriptor;
 
+    @Inject
+    private DistributionManager distributionManager;
+
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
+    private DistributionWizardUIDefinition uiDefinition;
+
+    protected DistributionJob getDistributionJob()
+    {
+        return this.distributionManager.getCurrentDistributionJob();
+    }
+
+    protected DistributionWizardUIDefinition createUIDefinition()
+    {
+        return new DistributionWizardUIDefinition(componentDescriptor.getRoleHint(), WEBJAR_NAME, "", "");
+    }
+
+    protected DistributionWizardUIDefinition renderTemplate(String templateName)
+    {
+        this.requiredSkinExtensionsRecorder.start();
+        String html = this.templateManager.renderNoException(templateName);
+        String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
+        return new DistributionWizardUIDefinition(null, WEBJAR_NAME, html, requiredSkinExtension);
+    }
+
+    protected void invalidateUI()
+    {
+        this.uiDefinition = null;
+    }
+
     @Override
     public String getHint()
     {
         return componentDescriptor.getRoleHint();
     }
 
-    protected DistributionWizardUIDefinition getDefaultUIDefinition()
+    @Override
+    public DistributionWizardUIDefinition getUIDefinition()
     {
-        return new DistributionWizardUIDefinition(componentDescriptor.getRoleHint(), WEBJAR_NAME, "", "");
+        if (uiDefinition == null) {
+            uiDefinition = createUIDefinition();
+        }
+        return uiDefinition;
+    }
+
+    @Override
+    public boolean needsManualStart()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean dependsOnPreviousStep()
+    {
+        return false;
+    }
+
+    @Override
+    public void processStep() throws DistributionWizardException
+    {
+        // do nothing
+    }
+
+    @Override
+    public boolean needsInput()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    {
+        return false;
     }
 }

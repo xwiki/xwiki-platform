@@ -28,6 +28,7 @@ import {
   WelcomeStep,
 } from "@xwiki/platform-distributionwizard-steps";
 import {
+  XWikiStartStepResolver,
   XWikiStepResolver,
   XWikiStepsResolver,
 } from "@xwiki/platform-distributionwizard-xwiki";
@@ -41,6 +42,10 @@ const xwikiStepResolverFunctions: DistributionWizardResolverFunctions = {
     ),
   stepResolverFunction: (stepId: string) =>
     XWikiStepResolver(
+      `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(XWiki.currentWiki)}/step/${encodeURIComponent(stepId)}`,
+    ),
+  startStepFunction: (stepId: string) =>
+    XWikiStartStepResolver(
       `${XWiki.contextPath}/rest/distributionWizard/${encodeURIComponent(XWiki.currentWiki)}/step/${encodeURIComponent(stepId)}`,
     ),
 };

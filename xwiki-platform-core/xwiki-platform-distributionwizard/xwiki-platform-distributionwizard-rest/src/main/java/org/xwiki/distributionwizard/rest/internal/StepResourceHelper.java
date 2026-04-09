@@ -38,11 +38,12 @@ public class StepResourceHelper
     {
         StepSummary stepSummary = new StepSummary();
         stepSummary.setId(wizardStep.getHint());
-        stepSummary.setHidden(wizardStep.isHidden());
-        stepSummary.setOptional(wizardStep.isOptional());
         stepSummary.setTitle(wizardStep.getTitle());
         stepSummary.setDone(wizardStep.isStepDone());
         stepSummary.setOriginalIndex(wizardStep.getIndex());
+        stepSummary.setDependsOnPreviousStep(wizardStep.dependsOnPreviousStep());
+        stepSummary.setNeedsInput(wizardStep.needsInput());
+        stepSummary.setNeedsManualStart(wizardStep.needsManualStart());
         return stepSummary;
     }
 }

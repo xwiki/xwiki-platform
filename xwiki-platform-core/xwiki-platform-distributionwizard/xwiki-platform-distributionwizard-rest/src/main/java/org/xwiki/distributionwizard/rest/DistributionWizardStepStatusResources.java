@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,10 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { WizardStepProps, WizardStepSummary } from "./WizardStepProps";
+package org.xwiki.distributionwizard.rest;
 
-export type DistributionWizardResolverFunctions = {
-  stepsResolverFunction: () => Promise<WizardStepSummary[]>;
-  stepResolverFunction: (stepId: string) => Promise<WizardStepProps>;
-  startStepFunction: (stepId: string) => Promise<boolean>;
-};
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
+
+@Path("/distributionWizard/{wikiId}/step/{stepId}/status")
+public interface DistributionWizardStepStatusResources
+{
+    @GET
+    StepSummary getStep(@PathParam("wikiId") String wikiId, @PathParam("stepId") String stepId) throws Exception;
+}

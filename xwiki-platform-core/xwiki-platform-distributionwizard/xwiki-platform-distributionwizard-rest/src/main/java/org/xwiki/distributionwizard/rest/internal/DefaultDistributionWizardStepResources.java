@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
@@ -72,10 +73,11 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
         Step step = new Step()
             .withId(stepSummary.getId())
             .withTitle(stepSummary.getTitle())
-            .withHidden(stepSummary.isHidden())
             .withOriginalIndex(stepSummary.getOriginalIndex())
-            .withOptional(stepSummary.isOptional())
             .withDone(stepSummary.isDone())
+            .withDependsOnPreviousStep(stepSummary.isDependsOnPreviousStep())
+            .withNeedsInput(stepSummary.isNeedsInput())
+            .withNeedsManualStart(stepSummary.isNeedsManualStart())
             .withUiComponent(uiComponent);
         return Response.ok(step).header(REQUIRED_EXTENSION_HEADER, requiredSkinExtension).build();
     }
@@ -84,6 +86,21 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
     public void answerStep(String wikiId, String stepId, Map<String, Serializable> data) throws Exception
     {
         DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
-        wizardStep.handleAnswer(data);
+        if (wizardStep.needsInput()) {
+            wizardStep.handleAnswer(data);
+        } else {
+            throw new WebApplicationException("This step doesn't take inputs", Response.Status.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public void processStep(String wikiId, String stepId) throws Exception
+    {
+        DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
+        if (wizardStep.needsManualStart()) {
+            wizardStep.processStep();
+        } else {
+            throw new WebApplicationException("This step doesn't start manually.", Response.Status.BAD_REQUEST);
+        }
     }
 }

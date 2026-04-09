@@ -50,8 +50,9 @@
         <attribute name="title" type="string"></attribute>
         <attribute name="index" type="int"></attribute>
         <attribute name="originalIndex" type="int"></attribute>
-        <attribute name="optional" type="boolean"></attribute>
-        <attribute name="hidden" type="boolean"></attribute>
+        <attribute name="dependsOnPreviousStep" type="boolean"></attribute>
+        <attribute name="needsManualStart" type="boolean"></attribute>
+        <attribute name="needsInput" type="boolean"></attribute>
         <attribute name="done" type="boolean"></attribute>
       </extension>
     </complexContent>

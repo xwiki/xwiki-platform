@@ -19,19 +19,12 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.DistributionManager;
-import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.platform.flavor.FlavorManager;
-import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
-import org.xwiki.template.TemplateManager;
+import org.xwiki.distributionwizard.internal.FlavorHelper;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -43,18 +36,7 @@ import jakarta.inject.Singleton;
 public class FlavorInstallStep extends AbstractStep
 {
     @Inject
-    private FlavorManager flavorManager;
-
-    @Inject
-    private DistributionManager distributionManager;
-
-    @Inject
-    private TemplateManager templateManager;
-
-    @Inject
-    private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
-
-    private DistributionWizardUIDefinition uiDefinition;
+    private FlavorHelper flavorHelper;
 
     @Override
     public String getTitle()
@@ -69,42 +51,38 @@ public class FlavorInstallStep extends AbstractStep
     }
 
     @Override
-    public boolean isHidden()
+    public boolean dependsOnPreviousStep()
     {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean isOptional()
+    public boolean needsManualStart()
     {
-        return false;
+        return true;
+    }
+
+    @Override
+    public void processStep() throws DistributionWizardException
+    {
+        this.invalidateUI();
+        try {
+            Job installJob = this.flavorHelper.startSelectedFlavorInstallation();
+            getDistributionJob().setProperty("installJobStatus", installJob.getStatus());
+        } catch (JobException e) {
+            throw new DistributionWizardException("Error while starting installation job", e);
+        }
     }
 
     @Override
     public boolean isStepDone() throws DistributionWizardException
     {
-        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
-        String wiki = distributionJob.getRequest().getWiki();
-        Namespace namespace = new Namespace("wiki", wiki);
-        InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
-        return (flavor != null && flavor.isValid(namespace.toString()));
+        return this.flavorHelper.isFlavorInstalled();
     }
 
     @Override
-    public DistributionWizardUIDefinition getUIDefinition()
+    protected DistributionWizardUIDefinition createUIDefinition()
     {
-        if (this.uiDefinition == null) {
-            this.requiredSkinExtensionsRecorder.start();
-            String html = this.templateManager.renderNoException("flavorinstallstep.vm");
-            String requiredSkinExtension = this.requiredSkinExtensionsRecorder.stop();
-            this.uiDefinition = new DistributionWizardUIDefinition(null, WEBJAR_NAME, html, requiredSkinExtension);
-        }
-        return this.uiDefinition;
-    }
-
-    @Override
-    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
-    {
-        return false;
+        return renderTemplate("flavorinstallstep.vm");
     }
 }

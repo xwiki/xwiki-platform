@@ -32,8 +32,10 @@ public interface DistributionWizardStep
     String getHint();
     String getTitle();
     int getIndex();
-    boolean isHidden();
-    boolean isOptional();
+    boolean dependsOnPreviousStep();
+    boolean needsManualStart();
+    boolean needsInput();
+    void processStep() throws DistributionWizardException;
     boolean isStepDone() throws DistributionWizardException;
 
     DistributionWizardUIDefinition getUIDefinition();

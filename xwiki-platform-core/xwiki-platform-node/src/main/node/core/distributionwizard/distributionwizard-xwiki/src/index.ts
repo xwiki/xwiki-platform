@@ -58,4 +58,12 @@ async function XWikiStepResolver(restURL: string): Promise<WizardStepProps> {
   return response.json();
 }
 
-export { XWikiStepResolver, XWikiStepsResolver };
+async function XWikiStartStepResolver(restURL: string): Promise<boolean> {
+  const response = await fetch(restURL, {
+    method: "PUT",
+  });
+  // FIXME: handle fetch error
+  return response.status >= 200 && response.status < 300;
+}
+
+export { XWikiStartStepResolver, XWikiStepResolver, XWikiStepsResolver };

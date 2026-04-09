@@ -18,5 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import FirstAdminUserStep from "./vue/FirstAdminUserStep.vue";
+import ReportStep from "./vue/ReportStep.vue";
 import WelcomeStep from "./vue/WelcomeStep.vue";
-export { FirstAdminUserStep, WelcomeStep };
+export { FirstAdminUserStep, ReportStep, WelcomeStep };

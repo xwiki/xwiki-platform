@@ -24,11 +24,8 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
-import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -64,15 +61,9 @@ public class FirstAdminUserStep extends AbstractStep
     }
 
     @Override
-    public boolean isHidden()
+    public boolean needsInput()
     {
-        return false;
-    }
-
-    @Override
-    public boolean isOptional()
-    {
-        return false;
+        return true;
     }
 
     @Override
@@ -87,27 +78,25 @@ public class FirstAdminUserStep extends AbstractStep
     }
 
     @Override
-    public DistributionWizardUIDefinition getUIDefinition()
-    {
-        return this.getDefaultUIDefinition();
-    }
-
-    @Override
     public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
     {
         XWikiContext context = this.contextProvider.get();
         String username = String.valueOf(data.get("username"));
         try {
+            // create user
             int result = context.getWiki().createUser(username, data, context);
             if (result == 1) {
+                // assign the user to own the wiki
                 WikiDescriptor wikiDescriptor = this.wikiDescriptorManager.getCurrentWikiDescriptor();
                 wikiDescriptor.setOwnerId("XWiki." + username);
                 this.wikiDescriptorManager.saveDescriptor(wikiDescriptor);
+                // login the user
+                context.getWiki().getAuthService()
+                    .checkAuth(username, String.valueOf(data.get("password")), "true", context);
             } else {
-                throw new DistributionWizardException(String.format("Error while registering first admin user code "
+                throw new DistributionWizardException(String.format("Error while registering first admin. Error code: "
                     + "[%s]", result));
             }
-            // FIXME: the user should be logged in too
         } catch (XWikiException e) {
             throw new DistributionWizardException("Unhandled error while registering first admin user", e);
         } catch (WikiManagerException e) {

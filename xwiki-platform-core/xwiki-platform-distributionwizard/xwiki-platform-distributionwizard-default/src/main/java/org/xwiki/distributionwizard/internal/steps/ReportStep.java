@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,10 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { WizardStepProps, WizardStepSummary } from "./WizardStepProps";
+package org.xwiki.distributionwizard.internal.steps;
 
-export type DistributionWizardResolverFunctions = {
-  stepsResolverFunction: () => Promise<WizardStepSummary[]>;
-  stepResolverFunction: (stepId: string) => Promise<WizardStepProps>;
-  startStepFunction: (stepId: string) => Promise<boolean>;
-};
+import org.xwiki.component.annotation.Component;
+import org.xwiki.distributionwizard.DistributionWizardException;
+
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
+@Component
+@Singleton
+@Named("ReportStep")
+public class ReportStep extends AbstractStep
+{
+    @Override
+    public String getTitle()
+    {
+        return "Report";
+    }
+
+    @Override
+    public int getIndex()
+    {
+        return 4;
+    }
+
+    @Override
+    public boolean isStepDone() throws DistributionWizardException
+    {
+        return false;
+    }
+}

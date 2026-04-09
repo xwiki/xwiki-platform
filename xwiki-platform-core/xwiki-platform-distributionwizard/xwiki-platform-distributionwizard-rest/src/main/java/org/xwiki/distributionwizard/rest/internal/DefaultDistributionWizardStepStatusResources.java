@@ -17,39 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.distributionwizard.internal.steps;
-
-import java.io.Serializable;
-import java.util.Map;
+package org.xwiki.distributionwizard.rest.internal;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.distributionwizard.DistributionWizardException;
-import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.distributionwizard.DistributionWizardManager;
+import org.xwiki.distributionwizard.DistributionWizardStep;
+import org.xwiki.distributionwizard.rest.DistributionWizardStepStatusResources;
+import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
+import org.xwiki.rest.XWikiResource;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 @Component
-@Singleton
-@Named("WelcomeStep")
-public class WelcomeStep extends AbstractStep
+@Named("org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepStatusResources")
+public class DefaultDistributionWizardStepStatusResources extends XWikiResource implements
+    DistributionWizardStepStatusResources
 {
-    @Override
-    public String getTitle()
-    {
-        return "Welcome";
-    }
+    @Inject
+    private DistributionWizardManager distributionWizardManager;
+
+    @Inject
+    private StepResourceHelper stepResourceHelper;
 
     @Override
-    public int getIndex()
+    public StepSummary getStep(String wikiId, String stepId) throws Exception
     {
-        return 0;
-    }
-
-    @Override
-    public boolean isStepDone() throws DistributionWizardException
-    {
-        return false;
+        DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
+        return this.stepResourceHelper.toStepSummary(wizardStep);
     }
 }

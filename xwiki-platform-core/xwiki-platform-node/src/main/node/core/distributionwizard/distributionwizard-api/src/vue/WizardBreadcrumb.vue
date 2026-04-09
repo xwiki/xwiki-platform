@@ -18,20 +18,25 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-defineProps<{ steps: string[]; activeStep: number }>();
+import type { WizardStepSummary } from "../WizardStepProps";
+
+defineProps<{ steps: WizardStepSummary[]; activeStep: number }>();
 </script>
 
 <template>
   <nav aria-label="Wizard steps">
     <ol class="wizard-breadcrumb">
       <li
-        v-for="(stepName, index) in steps"
+        v-for="(stepSummary, index) in steps"
         class="step"
-        :class="{ active: activeStep === index }"
+        :class="{
+          active: activeStep === index,
+          'might-disappear': stepSummary.dependsOnPreviousStep,
+        }"
         :key="index"
       >
         <span class="step-counter">{{ index + 1 }}</span>
-        <span class="step-label">{{ stepName }}</span>
+        <span class="step-label">{{ stepSummary.title }}</span>
       </li>
     </ol>
   </nav>
@@ -72,5 +77,8 @@ defineProps<{ steps: string[]; activeStep: number }>();
 .step.active .step-counter {
   background: #3f79bd;
   color: white;
+}
+.step.might-disappear .step-counter {
+  border: 1px dashed grey;
 }
 </style>

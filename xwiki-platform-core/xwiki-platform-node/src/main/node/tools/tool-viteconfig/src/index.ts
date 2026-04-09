@@ -33,6 +33,16 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { UserConfig } from "vite";
 
+/**
+ * Vite plugin to resolve sourcemap chains during the bundle step.
+ * When reexporting components from packages built in a previous step, Vite
+ * will minify the results of this previous build which might already be
+ * minified. In this scenario, this plugin will attempt to find the sourcemaps
+ * from the previous build and apply them to this build's sourcemaps, so that
+ * the sources can still be derived from the newly minified files.
+ * @param buildOutDir the directory that contains sourcemaps to flatten
+ * @return the Vite plugin for {buildOutDir}
+ */
 function flattenSourceMaps(buildOutDir: string) {
   return {
     name: "flatten-sourcemaps",

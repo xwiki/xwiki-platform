@@ -64,8 +64,8 @@ titre&lt;/span&gt;&lt;/h1&gt;|(((
 (% style="color:blue" %)
 = titre =
 )))
-|Titres en syntaxe wiki|1.1.1 Titre en *gras*|(((
-=== Titre en **gras** ===
+|Titres en syntaxe wiki|1.1 Titre en *gras*|(((
+== Titre en **gras** ==
 )))
 
 
@@ -92,7 +92,7 @@ titre&lt;/span&gt;&lt;/h1&gt;|(((
 (% style="color:blue" %)
 = titre =
 )))
-|Titres en syntaxe wiki|{{{=== Titre en **gras** ===}}}|(((
-=== Titre en **gras** ===
+|Titres en syntaxe wiki|{{{== Titre en **gras** ==}}}|(((
+== Titre en **gras** ==
 )))</content>
 </xwikidoc>

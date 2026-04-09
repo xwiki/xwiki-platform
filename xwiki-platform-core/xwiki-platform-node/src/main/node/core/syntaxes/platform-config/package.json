@@ -15,7 +15,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
     }
   },
   "files": [

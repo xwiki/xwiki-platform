@@ -17,6 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { MarkdownSyntaxConfig } from "./config";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { Container } from "inversify";
 
-export * from "./componentInit";
-export * from "./config";
+/**
+ * @since 18.3.0RC1
+ * @beta
+ */
+export class ComponentInit {
+  constructor(container: Container) {
+    container.bind(SYNTAX_CONFIG_COMPONENT_GROUP_NAME).to(MarkdownSyntaxConfig);
+  }
+}

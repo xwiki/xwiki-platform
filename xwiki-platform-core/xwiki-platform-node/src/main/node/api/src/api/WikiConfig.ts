@@ -19,7 +19,6 @@
  */
 
 import type { Storage } from "./storage";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * @since 18.0.0RC1
@@ -76,14 +75,6 @@ interface WikiConfig {
    */
   editor?: string;
 
-  /**
-   * List of supported syntaxes, along with their configuration
-   *
-   * @since 18.2.0
-   * @beta
-   */
-  syntaxes: SyntaxConfig[];
-
   setConfig(
     name: string,
     baseURL: string,
@@ -93,7 +84,6 @@ interface WikiConfig {
     designSystem: string,
     offline: boolean,
     editor: string,
-    syntaxes: SyntaxConfig[],
   ): void;
 
   // TODO get rid of any

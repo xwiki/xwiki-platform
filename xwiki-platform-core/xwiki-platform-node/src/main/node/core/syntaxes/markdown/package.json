@@ -37,7 +37,8 @@
   "dependencies": {
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
-    "@xwiki/platform-tool-viteconfig": "workspace:*"
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "inversify": "catalog:"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

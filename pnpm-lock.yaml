@@ -762,9 +762,6 @@ importers:
       '@xwiki/platform-configuration-api':
         specifier: workspace:*
         version: link:../core/configuration/configuration-api
-      '@xwiki/platform-syntaxes-config':
-        specifier: workspace:*
-        version: link:../core/syntaxes/platform-config
       vue-router:
         specifier: 'catalog:'
         version: 5.0.3(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))
@@ -2527,6 +2524,9 @@ importers:
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
+      inversify:
+        specifier: 'catalog:'
+        version: 7.11.0(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'

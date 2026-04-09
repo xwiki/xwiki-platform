@@ -40,7 +40,6 @@
   "dependencies": {
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-configuration-api": "workspace:*",
-    "@xwiki/platform-syntaxes-config": "workspace:*",
     "vue-router": "catalog:"
   },
   "peerDependencies": {

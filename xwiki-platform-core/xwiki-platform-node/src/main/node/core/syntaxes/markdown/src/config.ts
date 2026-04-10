@@ -71,7 +71,7 @@ export class MarkdownSyntaxConfig implements SyntaxConfig {
         lcrAlignment: false,
       },
       tables: {
-        basicTables: false, // TODO: change before merge
+        basicTables: true,
         blockInTableCells: false,
         colRows: false,
         colSpan: false,

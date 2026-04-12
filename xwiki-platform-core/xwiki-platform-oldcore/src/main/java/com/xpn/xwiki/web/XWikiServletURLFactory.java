@@ -903,7 +903,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
         if (filename != null) {
-            attachment = rdoc.getAttachment(filename);
+            if (rdoc != null) {
+                attachment = rdoc.getAttachment(filename);
+            } else {
+                // Fallback: the requested revision doesn't exist for this document (e.g., when the context doc is
+                // the default locale document but the revision belongs to a translation). Use the attachment from the
+                // current document state so a proper download URL is generated.
+                attachment = doc.getAttachment(filename);
+            }
         }
 
         return attachment;
@@ -914,7 +921,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
+        if (rdoc != null && context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
                 List<DeletedAttachment> deleted = context.getWiki().getAttachmentRecycleBinStore()

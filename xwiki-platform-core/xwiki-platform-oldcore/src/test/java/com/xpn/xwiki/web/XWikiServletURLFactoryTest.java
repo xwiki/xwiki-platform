@@ -55,6 +55,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -712,6 +713,34 @@ class XWikiServletURLFactoryTest
         xwikiContext.setDoc(new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage")));
         URL url = this.urlFactory.createAttachmentURL("file", "space", "page", "download", null, xwikiContext);
         assertEquals("http://127.0.0.1/xwiki/bin/download/space/page/file", url.toString());
+    }
+
+    /**
+     * Verify that a proper download URL is generated when the requested revision does not exist for the context
+     * document (e.g., when viewing a translated document revision whose number is not present in the original default
+     * locale document). See XWIKI-24206.
+     */
+    @Test
+    void createAttachmentURLWhenViewRevAndRevisionNotInContextDoc() throws XWikiException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        xwikiContext.put("rev", "2.1");
+
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(document, "file");
+        attachment.setVersion("1.2");
+        document.setAttachment(attachment);
+        xwikiContext.setDoc(document);
+
+        // Simulate that revision "2.1" doesn't exist for the context (default locale) document.
+        // This is the case when viewing a translated document revision that was never saved in the original.
+        doReturn(null).when(this.oldcore.getSpyXWiki()).getDocument(any(XWikiDocument.class), eq("2.1"),
+            any(XWikiContext.class));
+
+        // The attachment should be resolved from the current document, producing a working downloadrev URL.
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
+            xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/downloadrev/currentspace/currentpage/file?rev=1.2", url.toString());
     }
 
     @Test

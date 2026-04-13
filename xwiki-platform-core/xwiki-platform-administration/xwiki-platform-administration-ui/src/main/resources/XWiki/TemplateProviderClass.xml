@@ -84,7 +84,7 @@
       <separators>,</separators>
       <size>1</size>
       <sort>none</sort>
-      <sql>select distinct doc.web from XWikiDocument doc</sql>
+      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -149,7 +149,7 @@
       <classname/>
       <customDisplay/>
       <disabled>0</disabled>
-      <displayType>checkbox</displayType>
+      <displayType>input</displayType>
       <idField/>
       <multiSelect>1</multiSelect>
       <name>spaces</name>
@@ -159,9 +159,9 @@
       <relationalStorage>0</relationalStorage>
       <separator>,</separator>
       <separators>,</separators>
-      <size>10</size>
+      <size>30</size>
       <sort>none</sort>
-      <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -224,7 +224,7 @@
       <separators>,</separators>
       <size>1</size>
       <sort>none</sort>
-      <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

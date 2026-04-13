@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
@@ -75,6 +76,10 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     @Named("secure")
     private QueryManager secureQueryManager;
 
+    @Inject
+    @Named("viewableAllowedDBListPropertyValue")
+    private QueryFilter viewableValueFilter;
+
     @Override
     public Query build(DBListClass dbListClass) throws QueryException
     {
@@ -98,6 +103,13 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
         Query query = this.secureQueryManager.createQuery(statement, Query.HQL);
         query.setWiki(documentReference.getWikiReference().getName());
+        // When the SQL selects doc.fullName as its first column, it is following the convention established by
+        // ImplicitlyAllowedValuesDBListQueryBuilder: the first column is a document reference used solely to check
+        // the current user's view right, and the remaining columns carry the actual property values. Apply the same
+        // filter so that inaccessible entries are removed from the results.
+        if (dbListClass.getSql() != null && dbListClass.getSql().contains("doc.fullName")) {
+            query.addFilter(this.viewableValueFilter);
+        }
         return query;
     }
 

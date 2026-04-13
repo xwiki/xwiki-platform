@@ -21,8 +21,10 @@ package org.xwiki.mail.internal;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,6 +54,15 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 public class DatabaseMailStatusStore implements MailStatusStore
 {
     private static final String ID_PARAMETER_NAME = "id";
+
+    private static final String MESSAGE_ID_FIELD = "messageId";
+
+    private static final String MAIL_STATUS_ALIAS = "mailStatus";
+
+    private static final String STATE_FIELD = "state";
+
+    private static final Set<String> MAIL_STATUS_FIELDS = Set.of("batchId", "date", "errorDescription",
+        "errorSummary", MESSAGE_ID_FIELD, "recipients", STATE_FIELD, "type", "wiki");
 
     @Inject
     private Logger logger;
@@ -107,6 +118,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
         String sortField, boolean sortAscending) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        // Pre-validate to get the normalized map: computeSelectQueryString() also validates internally, but we need
+        // the normalized map here to pass to query.setProperties() with the correct (normalized) parameter names.
+        Map<String, Object> validatedFilterMap = validateFilterMap(filterMap);
 
         final XWikiContext xwikiContext = this.contextProvider.get();
         // Load from the main wiki
@@ -114,10 +128,10 @@ public class DatabaseMailStatusStore implements MailStatusStore
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
         // Compute the Query string based on the passed filter map
-        final String queryString = computeSelectQueryString(filterMap, sortField, sortAscending);
+        final String queryString = computeSelectQueryString(validatedFilterMap, sortField, sortAscending);
 
         // Log query and parameters
-        logQuery(queryString, filterMap);
+        logQuery(queryString, validatedFilterMap);
 
         try {
             List<MailStatus> mailStatuses =
@@ -129,7 +143,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     if (count > 0) {
                         query.setMaxResults(count);
                     }
-                    query.setProperties(filterMap);
+                    query.setProperties(validatedFilterMap);
 
                     return query.list();
                 });
@@ -156,6 +170,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
     public long count(final Map<String, Object> filterMap) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        // Pre-validate to get the normalized map: computeCountQueryString() also validates internally, but we need
+        // the normalized map here to pass to query.setProperties() with the correct (normalized) parameter names.
+        Map<String, Object> validatedFilterMap = validateFilterMap(filterMap);
 
         final XWikiContext xwikiContext = this.contextProvider.get();
         // Count in the main wiki
@@ -163,12 +180,12 @@ public class DatabaseMailStatusStore implements MailStatusStore
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
         // Compute the Query string based on the passed filter map
-        final String queryString = computeCountQueryString(filterMap);
+        final String queryString = computeCountQueryString(validatedFilterMap);
 
         try {
             return store.executeRead(xwikiContext, session -> {
                 Query<Long> query = session.createQuery(queryString, Long.class);
-                query.setProperties(filterMap);
+                query.setProperties(validatedFilterMap);
                 return query.uniqueResult();
             });
         } catch (Exception e) {
@@ -206,23 +223,29 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     protected String computeQueryString(String prefix, Map<String, Object> filterMap, String sortField,
-        boolean sortAscending)
+        boolean sortAscending) throws MailStoreException
     {
+        // Validation here ensures this protected method is safe when called directly (e.g., from subclasses or tests)
+        // without prior validation. When called from load() or count(), the map is already validated, but re-validating
+        // a normalized map is a no-op.
+        Map<String, Object> validatedFilterMap = validateFilterMap(filterMap);
         StringBuilder queryBuilder = new StringBuilder(prefix);
-        if (!filterMap.isEmpty()) {
+        if (!validatedFilterMap.isEmpty()) {
             queryBuilder.append(" where");
-            Iterator<String> iterator = filterMap.keySet().iterator();
+            Iterator<String> iterator = validatedFilterMap.keySet().iterator();
             while (iterator.hasNext()) {
                 String filterKey = iterator.next();
-                queryBuilder.append(" mail_").append(filterKey).append(" like ").append(':').append(filterKey);
+                queryBuilder.append(' ').append(MAIL_STATUS_ALIAS).append('.').append(filterKey).append(" like ")
+                    .append(':').append(filterKey);
                 if (iterator.hasNext()) {
                     queryBuilder.append(" and");
                 }
             }
         }
-        if (sortField != null) {
+        String validatedSortField = validateSortField(sortField);
+        if (validatedSortField != null) {
             queryBuilder.append(" order by ");
-            queryBuilder.append(sortField);
+            queryBuilder.append(MAIL_STATUS_ALIAS).append('.').append(validatedSortField);
             if (!sortAscending) {
                 queryBuilder.append(" desc");
             }
@@ -230,16 +253,50 @@ public class DatabaseMailStatusStore implements MailStatusStore
         return queryBuilder.toString();
     }
 
-    protected String computeCountQueryString(Map<String, Object> filterMap)
+    protected String computeCountQueryString(Map<String, Object> filterMap) throws MailStoreException
     {
-        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()), filterMap, null,
-            false);
+        return computeQueryString(String.format("select count(*) from %s as %s", MailStatus.class.getName(),
+            MAIL_STATUS_ALIAS), filterMap, null, false);
     }
 
     protected String computeSelectQueryString(Map<String, Object> filterMap, String sortField, boolean sortAscending)
+        throws MailStoreException
     {
-        return computeQueryString(String.format("from %s", MailStatus.class.getName()), filterMap, sortField,
-            sortAscending);
+        return computeQueryString(String.format("from %s as %s", MailStatus.class.getName(), MAIL_STATUS_ALIAS),
+            filterMap, sortField, sortAscending);
+    }
+
+    private String validateSortField(String sortField)
+    {
+        if (sortField != null && MAIL_STATUS_FIELDS.contains(sortField)) {
+            return sortField;
+        }
+        return null;
+    }
+
+    private Map<String, Object> validateFilterMap(Map<String, Object> filterMap) throws MailStoreException
+    {
+        Map<String, Object> validatedFilterMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : filterMap.entrySet()) {
+            String filterKey = normalizeFilterKey(entry.getKey());
+            if (!MAIL_STATUS_FIELDS.contains(filterKey)) {
+                throw new MailStoreException(String.format("Unsupported mail status filter field [%s]", entry
+                    .getKey()));
+            }
+            validatedFilterMap.put(filterKey, entry.getValue());
+        }
+        return validatedFilterMap;
+    }
+
+    private String normalizeFilterKey(String filterKey)
+    {
+        if (ID_PARAMETER_NAME.equals(filterKey)) {
+            return MESSAGE_ID_FIELD;
+        }
+        if ("status".equals(filterKey)) {
+            return STATE_FIELD;
+        }
+        return filterKey;
     }
 
     private void logQuery(String queryString, Map<String, Object> filterMap)

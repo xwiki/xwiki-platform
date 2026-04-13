@@ -19,6 +19,7 @@
  */
 package org.xwiki.job.store.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Singleton;
@@ -29,6 +30,7 @@ import jakarta.inject.Named;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.internal.JobStatusFolderResolver;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 /**
  * Computes normalized identifiers for relational tables and blob stores.
@@ -52,6 +54,9 @@ public class JobStatusIdentifierSerializer
     @Named("version3")
     private JobStatusFolderResolver folderResolver;
 
+    @Inject
+    private RemoteObservationManagerConfiguration remoteObservationManagerConfiguration;
+
     /**
      * @param jobId the identifier segments
      * @return the normalized key derived from the escaped identifier (used as blob locator), maximum length
@@ -59,7 +64,12 @@ public class JobStatusIdentifierSerializer
      */
     public String getBlobKey(List<String> jobId)
     {
-        String escapedId = String.join(DELIMITER, this.folderResolver.getFolderSegments(jobId));
+        // Add the node ID as first segment to the job ID to guarantee that the blob key is unique.
+        List<String> augmentedJobId = new ArrayList<>(jobId.size() + 1);
+        augmentedJobId.add(this.remoteObservationManagerConfiguration.getId());
+        augmentedJobId.addAll(jobId);
+
+        String escapedId = String.join(DELIMITER, this.folderResolver.getFolderSegments(augmentedJobId));
         return normalize(escapedId);
     }
 

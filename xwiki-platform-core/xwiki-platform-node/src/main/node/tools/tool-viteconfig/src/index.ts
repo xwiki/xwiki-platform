@@ -40,8 +40,8 @@ import type { UserConfig } from "vite";
  * minified. In this scenario, this plugin will attempt to find the sourcemaps
  * from the previous build and apply them to this build's sourcemaps, so that
  * the sources can still be derived from the newly minified files.
- * @param buildOutDir the directory that contains sourcemaps to flatten
- * @return the Vite plugin for {buildOutDir}
+ * @param buildOutDir - the directory that contains sourcemaps to flatten
+ * @returns the Vite plugin for {@link buildOutDir}
  */
 function flattenSourceMaps(buildOutDir: string) {
   return {

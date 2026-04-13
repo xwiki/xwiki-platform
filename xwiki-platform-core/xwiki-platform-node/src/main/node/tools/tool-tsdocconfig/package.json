@@ -1,0 +1,19 @@
+{
+  "name": "@xwiki/platform-tool-tsdocconfig",
+  "version": "18.3.0-SNAPSHOT",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsdocconfig",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "files": [
+    "*.json"
+  ]
+}

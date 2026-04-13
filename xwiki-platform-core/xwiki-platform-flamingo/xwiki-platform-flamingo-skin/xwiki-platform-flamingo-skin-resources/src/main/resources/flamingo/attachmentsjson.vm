@@ -27,6 +27,50 @@
     #set ($offset = 0)
   #end
   #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
+  #if ("$!{request.rev}" != '')
+    ##
+    ## When viewing a historical document revision, the HQL query is not revision-aware (it queries the current
+    ## attachment table). Load the document explicitly at the requested revision instead, since the liveTable
+    ## source uses a simulated request context that does not call handleRevision() and thus $doc is always the
+    ## current document regardless of the rev parameter.
+    ##
+    #set ($revDoc = $xwiki.getDocument($doc.documentReference, $request.rev))
+    #set ($allAttachments = $revDoc.getAttachmentList())
+    #set ($totalrows = $allAttachments.size())
+    #if ($offset < $totalrows)
+      #set ($endOffset = $mathtool.min($mathtool.add($offset, $limit), $totalrows))
+      #set ($pagedAttachments = $allAttachments.subList($offset, $endOffset))
+    #else
+      #set ($pagedAttachments = [])
+    #end
+    #set ($results = {
+      "totalrows": $totalrows,
+      "returnedrows": $pagedAttachments.size(),
+      "offset": $mathtool.add($offset, 1),
+      "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
+      "rows": []
+    })
+    #foreach ($attachment in $pagedAttachments)
+      #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachment.getReference()))
+      #set ($row = {
+        'doc_viewable': $hasAccess
+      })
+      #if ($hasAccess)
+        #set ($attachmentReference = $attachment.getReference())
+        #set ($discard = $row.putAll({
+          'id': $attachment.filename,
+          'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
+          'mimeType': "#displayAttachmentMimeType($attachment)",
+          'filesize': "#displayAttachmentSize($attachment.longSize)",
+          'date': $xwiki.formatDate($attachment.date),
+          'author': "#displayUserNameWithAvatar($attachment.author)",
+          'actions': ''
+        }))
+      #end
+      #set ($discard = $results.rows.add($row))
+    #end
+    #jsonResponse($results)
+  #else
   ##
   ## Apply live table filters.
   ##
@@ -115,4 +159,5 @@
     #set ($discard = $results.rows.add($row))
   #end
   #jsonResponse($results)
+  #end## rev
 #end

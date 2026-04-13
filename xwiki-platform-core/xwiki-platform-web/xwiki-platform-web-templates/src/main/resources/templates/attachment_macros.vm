@@ -263,13 +263,17 @@
       }
     }
   })
-  #set ($sourceParameters = $escapetool.url({
+  #set ($liveDataSourceConfig = {
     'template': 'xpart.vm',
     'translationPrefix': 'core.viewers.attachments.livetable.',
     'className': 'XWiki.AllAttachments',
     "\$doc": "$attachmentsDoc",
     'vm': 'attachmentsjson.vm'
-  }))
+  })
+#if ("$!{request.rev}" != '')
+  #set ($discard = $liveDataSourceConfig.put('rev', $request.rev))
+#end
+#set ($sourceParameters = $escapetool.url($liveDataSourceConfig))
 {{liveData
   id="$liveDataId"
   properties="mimeType,filename,filesize,date,author,actions"

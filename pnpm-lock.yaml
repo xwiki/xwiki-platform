@@ -699,9 +699,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../tools/tool-viteconfig
@@ -748,9 +754,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -797,9 +809,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -839,9 +857,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -870,9 +894,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -910,9 +940,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -950,9 +986,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -984,9 +1026,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1021,9 +1069,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1051,9 +1105,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../tools/tool-viteconfig
@@ -1088,9 +1148,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../tools/tool-viteconfig
@@ -1125,9 +1191,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1158,9 +1230,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1191,9 +1269,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1258,9 +1342,15 @@ importers:
       '@xwiki/platform-livedata-componentstore':
         specifier: workspace:*
         version: link:../livedata-componentstore
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1319,9 +1409,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1362,9 +1458,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-viteconfig
@@ -1398,9 +1500,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1426,9 +1534,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1460,9 +1574,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-viteconfig
@@ -1490,9 +1610,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1530,9 +1656,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1570,9 +1702,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1600,9 +1738,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1634,9 +1778,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-viteconfig
@@ -1674,9 +1824,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-viteconfig
@@ -1714,9 +1870,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1754,9 +1916,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1779,9 +1947,15 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.57.7(@types/node@24.12.0)
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)
@@ -1852,9 +2026,15 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1889,9 +2069,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -1989,9 +2175,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../tools/tool-viteconfig
@@ -2110,9 +2302,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../tools/tool-viteconfig
@@ -2140,6 +2338,8 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.2.5(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-apiextractorconfig: {}
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-eslintconfig:
     dependencies:
@@ -2196,6 +2396,8 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsdocconfig: {}
+
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig:
     dependencies:
       '@jridgewell/remapping':
@@ -2208,6 +2410,9 @@ importers:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.3(jiti@2.6.1)

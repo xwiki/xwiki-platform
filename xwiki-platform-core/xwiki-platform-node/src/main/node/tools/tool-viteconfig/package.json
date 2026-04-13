@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "eslint": "catalog:"
   }
 }

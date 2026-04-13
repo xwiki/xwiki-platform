@@ -223,6 +223,12 @@ Object.extend(XWiki, {
         if (new URLSearchParams(window.location.search).get('minify') === 'false') {
           parameters.append('minify', 'false');
         }
+        // Include the document revision when viewing a specific revision, so the loaded tab content reflects the
+        // correct document state (e.g., attachments at revision 1.1 instead of the current version).
+        const rev = new URLSearchParams(window.location.search).get('rev');
+        if (rev) {
+          parameters.append('rev', rev);
+        }
 
         new Ajax.Request(
           window.docgeturl,

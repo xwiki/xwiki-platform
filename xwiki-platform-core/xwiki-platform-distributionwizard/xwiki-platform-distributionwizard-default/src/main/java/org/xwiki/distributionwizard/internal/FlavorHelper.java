@@ -21,6 +21,7 @@ package org.xwiki.distributionwizard.internal;
 
 import java.util.Optional;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
@@ -28,16 +29,19 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.script.ScriptExtensionRewriter;
+import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.platform.flavor.FlavorManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -57,6 +61,9 @@ public class FlavorHelper
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    protected DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private JobExecutor jobExecutor;
@@ -118,6 +125,10 @@ public class FlavorHelper
 
         // Allow overwritting a few things in extensions descriptors
         installRequest.setRewriter(new ScriptExtensionRewriter());
+        installRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        installRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
+        installRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+            this.documentAccessBridge.getCurrentUserReference());
         return this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
     }
 }

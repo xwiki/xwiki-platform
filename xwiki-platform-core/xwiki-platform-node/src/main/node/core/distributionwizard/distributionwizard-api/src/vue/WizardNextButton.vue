@@ -46,6 +46,14 @@ const isDisabled = computed(() => {
     Next
   </button>
   <div v-else-if="props.stepState === StepState.PROCESSING">PROCESSING</div>
+  <button
+    v-else-if="!props.hasNextStep"
+    class="button primary"
+    @click="$emit('finishWizard')"
+    :disabled="isDisabled"
+  >
+    Finish
+  </button>
 </template>
 
 <style scoped>

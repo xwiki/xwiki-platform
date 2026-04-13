@@ -17,20 +17,7 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts">
-import { onMounted } from "vue";
-
-const emit = defineEmits(["validateStep"]);
-onMounted(() => {
-  emit("validateStep");
-});
-async function stepAnswerCallback() {
-  return true;
-}
-defineExpose({
-  stepAnswerCallback,
-});
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="welcome-message">Welcome to XWiki !</div>

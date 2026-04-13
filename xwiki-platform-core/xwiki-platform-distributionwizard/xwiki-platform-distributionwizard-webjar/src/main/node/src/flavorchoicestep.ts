@@ -45,7 +45,7 @@ async function flavorchoicestepCallback(): Promise<boolean> {
   }
 }
 
-async function initFlavorListener(): Promise<void> {
+async function flavorchoicestepInit(): Promise<void> {
   const jQuery = await loadById("jquery");
 
   jQuery(document).on(
@@ -63,4 +63,4 @@ async function initFlavorListener(): Promise<void> {
     },
   );
 }
-export { flavorchoicestepCallback, initFlavorListener };
+export { flavorchoicestepCallback, flavorchoicestepInit };

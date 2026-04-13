@@ -19,8 +19,10 @@
 -->
 <script setup lang="ts">
 import type { WizardStepSummary } from "../WizardStepProps";
-
-defineProps<{ steps: WizardStepSummary[]; activeStep: number }>();
+const props = defineProps<{ steps: WizardStepSummary[]; activeStep: number }>();
+const stepMightDisappear = (step: WizardStepSummary) => {
+  return step.dependsOnPreviousStep && props.activeStep < step.index;
+};
 </script>
 
 <template>
@@ -31,7 +33,7 @@ defineProps<{ steps: WizardStepSummary[]; activeStep: number }>();
         class="step"
         :class="{
           active: activeStep === index,
-          'might-disappear': stepSummary.dependsOnPreviousStep,
+          'might-disappear': stepMightDisappear(stepSummary),
         }"
         :key="index"
       >

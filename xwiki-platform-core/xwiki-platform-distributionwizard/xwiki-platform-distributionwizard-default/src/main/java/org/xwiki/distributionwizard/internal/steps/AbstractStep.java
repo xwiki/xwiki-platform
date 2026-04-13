@@ -28,6 +28,7 @@ import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 import org.xwiki.template.TemplateManager;
 
@@ -104,7 +105,7 @@ public abstract class AbstractStep implements DistributionWizardStep
     @Override
     public void processStep() throws DistributionWizardException
     {
-        // do nothing
+        completeJobStep();
     }
 
     @Override
@@ -118,4 +119,26 @@ public abstract class AbstractStep implements DistributionWizardStep
     {
         return false;
     }
+
+    @Override
+    public boolean isSkippable()
+    {
+        return false;
+    }
+
+    protected void completeJobStep() throws DistributionWizardException
+    {
+        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
+        DistributionStep currentStep = distributionJob.getCurrentStep();
+        if (getJobStepId().equals(currentStep.getId())) {
+            currentStep.setState(DistributionStep.State.COMPLETED);
+            distributionJob.getStatus().answered();
+        } else {
+            throw new DistributionWizardException(
+                String.format("Current job step id [%s] doesn't match UI step id [%s].",
+                    currentStep.getId(), getJobStepId()));
+        }
+    }
+
+    protected abstract String getJobStepId();
 }

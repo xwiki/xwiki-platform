@@ -208,6 +208,7 @@ require([
   var notifyJobDone = function(job) {
     var jobUI = $(this);
     jobUI.find('.ui-progress').replaceWith(job.message);
+    jobUI.trigger('job:progress:finished');
   };
 
   var notifyConnectionFailure = function() {

@@ -44,6 +44,7 @@ public class StepResourceHelper
         stepSummary.setDependsOnPreviousStep(wizardStep.dependsOnPreviousStep());
         stepSummary.setNeedsInput(wizardStep.needsInput());
         stepSummary.setNeedsManualStart(wizardStep.needsManualStart());
+        stepSummary.setSkippable(wizardStep.isSkippable());
         return stepSummary;
     }
 }

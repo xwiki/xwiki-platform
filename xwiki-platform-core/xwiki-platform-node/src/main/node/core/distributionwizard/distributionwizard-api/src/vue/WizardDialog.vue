@@ -39,7 +39,6 @@ enum DialogState {
   LOADING_STEP,
   STEP_DISPLAYED,
 }
-const emit = defineEmits(["closed"]);
 const props = defineProps<{
   stepResolverFunctions: DistributionWizardResolverFunctions;
   wizardTitle: string;
@@ -64,20 +63,45 @@ onMounted(async () => {
   }
 });
 async function loadStep(step: WizardStepSummary) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function initStep(stepId: string, asyncModule: any) {
+    let init = asyncModule[stepId.toLowerCase() + "Init"];
+    if (typeof init === "function") {
+      await init();
+    }
+  }
+  async function loadModule(loadedStep: WizardStepProps) {
+    if (loadedStep.uiComponent.module) {
+      return import(loadedStep.uiComponent.module);
+    } else {
+      return null;
+    }
+  }
+  async function handledLoadedStep(loadedStep: WizardStepProps) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let asyncModule: any = await loadModule(loadedStep);
+    if (asyncModule) {
+      if (loadedStep.uiComponent.component) {
+        stepComponent.value = asyncModule[loadedStep.uiComponent.component];
+      } else {
+        stepComponent.value = null;
+        await initStep(step.id, asyncModule);
+      }
+    }
+    const stepState = loadedStep.skippable
+      ? StepState.VALIDATED
+      : StepState.DISPLAYED;
+    activeStep.value = { ...loadedStep, state: stepState };
+  }
   dialogState.value = DialogState.LOADING_STEP;
+  // This needs to be done before loading the step info, as the html of the step might depend on it.
   if (step.needsManualStart) {
     await props.stepResolverFunctions.startStepFunction(step.id);
   }
   const loadedStep = await props.stepResolverFunctions.stepResolverFunction(
     step.id,
   );
-  if (loadedStep?.uiComponent.module && loadedStep?.uiComponent.component) {
-    const asyncModule = await import(loadedStep.uiComponent.module);
-    stepComponent.value = asyncModule[loadedStep.uiComponent.component];
-  } else {
-    stepComponent.value = null;
-  }
-  activeStep.value = { ...loadedStep, state: StepState.DISPLAYED };
+  await handledLoadedStep(loadedStep);
   dialogState.value = DialogState.STEP_DISPLAYED;
 }
 /**
@@ -90,13 +114,10 @@ onUpdated(() => {
   }
 });
 async function nextStep() {
-  async function getCallback() {
-    if (
-      activeStep.value?.uiComponent.html &&
-      activeStep.value?.uiComponent.module
-    ) {
-      const asyncModule = await import(activeStep.value?.uiComponent.module);
-      return asyncModule[activeStep.value.id.toLowerCase() + "Callback"];
+  async function getCallback(step: WizardStepProps) {
+    if (step.uiComponent.html && step.uiComponent.module) {
+      const asyncModule = await import(step.uiComponent.module);
+      return asyncModule[step.id.toLowerCase() + "Callback"];
     } else {
       return stepDialogRef.value?.wizardStepCallback;
     }
@@ -116,19 +137,19 @@ async function nextStep() {
     }
     return loadNextStep;
   }
-  async function processStep() {
+  async function processStep(step: WizardStepProps) {
     let loadNextStep = true;
 
-    if (activeStep.value && activeStep.value.needsInput) {
-      const callback = await getCallback();
+    if (step.needsInput) {
+      const callback = await getCallback(step);
       if (callback) {
-        loadNextStep = await handleCallback(activeStep.value, callback);
+        loadNextStep = await handleCallback(step, callback);
       }
     }
     return loadNextStep;
   }
-  if (hasNextStep.value) {
-    const loadNextStep = await processStep();
+  if (hasNextStep.value && activeStep.value) {
+    const loadNextStep = await processStep(activeStep.value);
     if (loadNextStep) {
       stepIndex.value++;
       await loadStep(steps.value[stepIndex.value]);
@@ -138,7 +159,7 @@ async function nextStep() {
 
 function finishWizard() {
   htmlDialog.value?.requestClose();
-  emit("closed");
+  window.location.reload();
 }
 function validateStep() {
   if (activeStep.value) {

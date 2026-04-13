@@ -53,6 +53,7 @@
         <attribute name="dependsOnPreviousStep" type="boolean"></attribute>
         <attribute name="needsManualStart" type="boolean"></attribute>
         <attribute name="needsInput" type="boolean"></attribute>
+        <attribute name="skippable" type="boolean"></attribute>
         <attribute name="done" type="boolean"></attribute>
       </extension>
     </complexContent>

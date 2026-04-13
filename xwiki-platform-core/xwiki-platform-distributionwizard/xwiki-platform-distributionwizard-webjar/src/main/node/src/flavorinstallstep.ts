@@ -17,40 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+// @ts-expect-error this is a JavaScript file, it is expected to not have types.
+import { loadById } from "./services/require.js";
 
-type UIComponent = {
-  component?: string;
-  module?: string;
-  html?: string;
-};
-enum StepState {
-  DISPLAYED,
-  VALIDATED,
-  PROCESSING,
-  PROCESSED,
-  PROCESS_ERROR,
+async function flavorinstallstepInit(): Promise<void> {
+  const jQuery = await loadById("jquery");
+
+  jQuery(document).on("job:progress:finished", function () {
+    jQuery(document).trigger("xwiki:distributionWizard:validateStep");
+  });
 }
-type WizardStepSummary = {
-  id: string;
-  title: string;
-  index: number;
-  dependsOnPreviousStep: boolean;
-  needsManualStart: boolean;
-};
-// FIXME: this should extends WizardStepSummary
-type WizardStepProps = {
-  id: string;
-  title: string;
-  uiComponent: UIComponent;
-  originalIndex: number;
-  state?: StepState;
-  needsInput: boolean;
-  skippable: boolean;
-};
-
-export {
-  StepState,
-  type UIComponent,
-  type WizardStepProps,
-  type WizardStepSummary,
-};
+export { flavorinstallstepInit };

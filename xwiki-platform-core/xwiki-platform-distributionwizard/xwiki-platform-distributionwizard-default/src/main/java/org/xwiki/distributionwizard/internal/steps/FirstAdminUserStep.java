@@ -93,6 +93,7 @@ public class FirstAdminUserStep extends AbstractStep
                 // login the user
                 context.getWiki().getAuthService()
                     .checkAuth(username, String.valueOf(data.get("password")), "true", context);
+                completeJobStep();
             } else {
                 throw new DistributionWizardException(String.format("Error while registering first admin. Error code: "
                     + "[%s]", result));
@@ -103,5 +104,11 @@ public class FirstAdminUserStep extends AbstractStep
             throw new DistributionWizardException("Error while setting user as owner of the wiki descriptor", e);
         }
         return true;
+    }
+
+    @Override
+    protected String getJobStepId()
+    {
+        return org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep.ID;
     }
 }

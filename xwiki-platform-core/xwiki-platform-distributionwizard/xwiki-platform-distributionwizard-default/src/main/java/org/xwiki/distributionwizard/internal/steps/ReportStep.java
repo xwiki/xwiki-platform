@@ -21,6 +21,7 @@ package org.xwiki.distributionwizard.internal.steps;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
+import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -46,5 +47,23 @@ public class ReportStep extends AbstractStep
     public boolean isStepDone() throws DistributionWizardException
     {
         return false;
+    }
+
+    @Override
+    public boolean needsManualStart()
+    {
+        return true;
+    }
+
+    @Override
+    protected String getJobStepId()
+    {
+        return ReportDistributionStep.ID;
+    }
+
+    @Override
+    public boolean isSkippable()
+    {
+        return true;
     }
 }

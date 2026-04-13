@@ -101,4 +101,11 @@ public class FlavorChoiceStep extends AbstractStep
         }
         return false;
     }
+
+    @Override
+    protected String getJobStepId()
+    {
+        // This step doesn't match a job step.
+        return null;
+    }
 }

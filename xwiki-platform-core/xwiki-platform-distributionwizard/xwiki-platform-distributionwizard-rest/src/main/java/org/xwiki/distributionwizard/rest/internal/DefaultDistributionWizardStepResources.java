@@ -78,6 +78,7 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
             .withDependsOnPreviousStep(stepSummary.isDependsOnPreviousStep())
             .withNeedsInput(stepSummary.isNeedsInput())
             .withNeedsManualStart(stepSummary.isNeedsManualStart())
+            .withSkippable(stepSummary.isSkippable())
             .withUiComponent(uiComponent);
         return Response.ok(step).header(REQUIRED_EXTENSION_HEADER, requiredSkinExtension).build();
     }

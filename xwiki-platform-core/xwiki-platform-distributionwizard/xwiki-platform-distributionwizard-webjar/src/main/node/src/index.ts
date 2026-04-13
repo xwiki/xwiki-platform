@@ -19,12 +19,14 @@
  */
 import {
   flavorchoicestepCallback,
-  initFlavorListener,
+  flavorchoicestepInit,
 } from "./flavorchoicestep";
+import { flavorinstallstepInit } from "./flavorinstallstep";
 import { WizardDialog } from "@xwiki/platform-distributionwizard-api";
 
 import {
   FirstAdminUserStep,
+  ReportStep,
   WelcomeStep,
 } from "@xwiki/platform-distributionwizard-steps";
 import {
@@ -55,7 +57,11 @@ createApp(WizardDialog, {
   wizardTitle: "First installation",
 }).mount("#distributionWizard");
 
-// FIXME: we should probably have a generic mechanism like for callbacks to initialize only when needed (i.e. when
-//  the step is displayed)
-await initFlavorListener();
-export { FirstAdminUserStep, WelcomeStep, flavorchoicestepCallback };
+export {
+  FirstAdminUserStep,
+  ReportStep,
+  WelcomeStep,
+  flavorchoicestepCallback,
+  flavorchoicestepInit,
+  flavorinstallstepInit,
+};

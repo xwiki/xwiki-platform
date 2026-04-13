@@ -17,6 +17,13 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#if (!$services.distributionwizard.shouldBeDisplayed())
+    #set ($redirectURL = $request.xredirect)
+    #if ("$!redirectURL" == '')
+        #set ($redirectURL = $xwiki.getURL($services.model.resolveDocument('', 'default')))
+    #end
+    $response.sendRedirect($redirectURL)
+#else
 ## Following was taken back from headerhtml.vm; not sure if we shouldn't have a common template for this..
 <!DOCTYPE html>
 <!-- FIXME: we should refactor htmlheader to reuse all that properly -->
@@ -84,3 +91,4 @@
     </div>
 </body>
 </html>
+#end

@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.internal.FlavorHelper;
+import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 
@@ -69,9 +70,16 @@ public class FlavorInstallStep extends AbstractStep
         try {
             Job installJob = this.flavorHelper.startSelectedFlavorInstallation();
             getDistributionJob().setProperty("installJobStatus", installJob.getStatus());
+            completeJobStep();
         } catch (JobException e) {
             throw new DistributionWizardException("Error while starting installation job", e);
         }
+    }
+
+    @Override
+    protected String getJobStepId()
+    {
+        return FlavorDistributionStep.ID;
     }
 
     @Override

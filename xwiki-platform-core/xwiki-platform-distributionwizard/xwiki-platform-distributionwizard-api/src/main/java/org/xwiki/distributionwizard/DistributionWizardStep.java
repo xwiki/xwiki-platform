@@ -35,6 +35,7 @@ public interface DistributionWizardStep
     boolean dependsOnPreviousStep();
     boolean needsManualStart();
     boolean needsInput();
+    boolean isSkippable();
     void processStep() throws DistributionWizardException;
     boolean isStepDone() throws DistributionWizardException;
 

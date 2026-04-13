@@ -32,6 +32,8 @@ import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.job.event.status.JobStatus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -83,6 +85,9 @@ public class DefaultDistributionWizardManager implements DistributionWizardManag
     @Override
     public boolean shouldBeDisplayed()
     {
-        return this.distributionManager.canDisplayDistributionWizard();
+        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
+        boolean isJobDone = distributionJob != null && distributionJob.getStatus() != null
+            && distributionJob.getStatus().getState() == JobStatus.State.FINISHED;
+        return this.distributionManager.canDisplayDistributionWizard() && !isJobDone;
     }
 }

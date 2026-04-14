@@ -36,7 +36,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
  * Computes normalized identifiers for relational tables and blob stores.
  *
  * @version $Id$
- * @since 18.2.0RC1
+ * @since 18.3.0RC1
  */
 @Component(roles = JobStatusIdentifierSerializer.class)
 @Singleton

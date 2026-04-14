@@ -59,6 +59,8 @@ class AttachmentValidationIT
 
     private static final String IMAGE_FILE_NAME = "image.gif";
 
+    private static final String DISGUISED_FILE_NAME = "fake.gif";
+
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
@@ -120,6 +122,49 @@ class AttachmentValidationIT
         assertEquals(expectedMap, mapResult);
         // Check that no image are saved to the document after the various upload tries.
         page.reloadPage();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
+    @Test
+    void validateDisguisedAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.createPage(testReference, "");
+        // Only allow images to be uploaded on this space.
+        AttachmentRestrictionAdministrationSectionPage administrationSectionPage =
+            AttachmentRestrictionAdministrationSectionPage.goToPage(testReference.getLastSpaceReference());
+        administrationSectionPage.setAllowedMimetypes("image/*");
+        administrationSectionPage.save();
+
+        // Navigate back to the test page to upload.
+        setup.createPage(testReference, "");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        // Upload a text file disguised as a GIF image (extension is .gif but content is text/plain).
+        // The client-side validation uses the browser-reported MIME type (image/gif from the .gif extension), which
+        // matches image/*, so the client-side check passes and the file is sent to the server. The server uses Tika
+        // to detect the real MIME type from the file content (text/plain) and rejects it, causing a generic upload
+        // error. The server-side content-based MIME detection is verified through the REST API below.
+        upload(attachmentsPane, testConfiguration, DISGUISED_FILE_NAME);
+        WebElement error = getNotificationError(setup);
+        assertEquals("An error occurred while uploading " + DISGUISED_FILE_NAME, error.getText());
+
+        cleanNotification(setup, error);
+
+        // Check if the same validation is applied when uploading through the REST API.
+        PutMethod putMethod = restUploadImage(setup, testReference, DISGUISED_FILE_NAME);
+        assertEquals(415, putMethod.getStatusCode());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> mapResult = objectMapper.readValue(putMethod.getResponseBodyAsStream(), Map.class);
+        assertEquals(Map.of(
+            "message", "Invalid mimetype [text/plain]",
+            "translationKey", "attachment.validation.mimetype.rejected",
+            "translationParameters", List.of(List.of("image/*"), List.of())
+        ), mapResult);
+
+        // Check that no attachment was saved.
+        ViewPage page = setup.gotoPage(testReference);
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
     }

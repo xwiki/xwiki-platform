@@ -17,10 +17,32 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import type {
+  Resolver,
+  TranslationsWithMissed,
+} from "@xwiki/platform-localization-api";
+const translationModule = "xwiki-platform-localization-webjar";
+const translations = ref<TranslationsWithMissed>();
+onMounted(async () => {
+  const resolver: Resolver = (await import(translationModule)).resolver;
+  translations.value = await resolver.resolve({
+    prefix: "platform.extension.distributionWizard.",
+    keys: ["welcomeStepDescription", "welcomeStepStepsHint"],
+  });
+  console.log("Obtained translations", translations.value);
+});
+</script>
 
 <template>
-  <div class="welcome-message">Welcome to XWiki !</div>
+  <div class="welcome-message">
+    {{
+      translations?.translations[
+        "platform.extension.distributionWizard.welcomeStepDescription"
+      ]
+    }}
+  </div>
 </template>
 
 <style scoped></style>

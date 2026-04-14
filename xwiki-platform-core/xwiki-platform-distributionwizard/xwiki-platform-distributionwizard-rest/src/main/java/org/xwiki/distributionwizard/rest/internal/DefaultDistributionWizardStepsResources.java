@@ -58,7 +58,9 @@ public class DefaultDistributionWizardStepsResources extends XWikiResource imple
             stepList.add(stepSummary);
         }
 
-        steps.withStep(stepList);
+        steps.withSteps(stepList);
+        // FIXME
+        steps.setWizardTitle("First installation");
         return Response.ok(steps).build();
     }
 }

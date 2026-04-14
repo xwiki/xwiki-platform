@@ -17,35 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DialogState } from "@xwiki/platform-distributionwizard-api";
 import type {
+  WizardDialogProps,
   WizardStepProps,
-  WizardStepSummary,
 } from "@xwiki/platform-distributionwizard-api";
 
-type JSONSteps = {
-  step: WizardStepSummary[];
-};
-
-async function fetchSteps(restURL: string): Promise<JSONSteps> {
+async function XWikiStepsResolver(restURL: string): Promise<WizardDialogProps> {
   const response = await fetch(restURL, {
     headers: {
       Accept: "application/json",
     },
   });
-  // FIXME: handle fetch error
-  return response.json();
-}
-
-/**
- * Resolve the steps using the given REST API URL.
- * @param restURL - the URL of the REST API to call for getting step info.
- * @beta
- */
-async function XWikiStepsResolver(
-  restURL: string,
-): Promise<WizardStepSummary[]> {
-  const steps = await fetchSteps(restURL);
-  return steps.step;
+  if (response.ok) {
+    return {
+      ...(await response.json()),
+      stepIndex: -1,
+      state: DialogState.STEPS_LOADED,
+    };
+  } else {
+    throw new Error(response.status + ":" + response.statusText);
+  }
 }
 
 async function XWikiStepResolver(restURL: string): Promise<WizardStepProps> {

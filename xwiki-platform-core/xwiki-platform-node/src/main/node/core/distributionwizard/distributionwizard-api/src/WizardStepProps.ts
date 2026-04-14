@@ -37,20 +37,32 @@ type WizardStepSummary = {
   dependsOnPreviousStep: boolean;
   needsManualStart: boolean;
 };
-// FIXME: this should extends WizardStepSummary
-type WizardStepProps = {
-  id: string;
-  title: string;
+type WizardStepProps = WizardStepSummary & {
   uiComponent: UIComponent;
   originalIndex: number;
   state?: StepState;
   needsInput: boolean;
   skippable: boolean;
 };
+enum DialogState {
+  INITIALIZING,
+  STEPS_LOADED,
+  LOADING_STEP,
+  STEP_DISPLAYED,
+}
+
+type WizardDialogProps = {
+  wizardTitle: string;
+  steps: WizardStepSummary[];
+  state: DialogState;
+  stepIndex: number;
+};
 
 export {
+  DialogState,
   StepState,
   type UIComponent,
+  type WizardDialogProps,
   type WizardStepProps,
   type WizardStepSummary,
 };

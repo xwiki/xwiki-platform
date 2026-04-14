@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { WizardDialogProps, WizardStepProps } from "./WizardStepProps";
+package org.xwiki.distributionwizard;
 
-export type DistributionWizardResolverFunctions = {
-  stepsResolverFunction: () => Promise<WizardDialogProps>;
-  stepResolverFunction: (stepId: string) => Promise<WizardStepProps>;
-  startStepFunction: (stepId: string) => Promise<boolean>;
-};
+public enum DistributionWizardGoal
+{
+    INSTALL,
+    UPGRADE
+}

@@ -1055,6 +1055,10 @@ importers:
         version: 4.0.18(@types/node@24.12.0)(happy-dom@20.8.7)(jiti@2.6.1)(jsdom@28.1.0)(sugarss@5.0.1(postcss@8.5.8))(yaml@2.8.2)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard/distributionwizard-api:
+    dependencies:
+      '@xwiki/platform-localization-api':
+        specifier: workspace:*
+        version: link:../../localization/localization-api
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -1091,6 +1095,10 @@ importers:
         version: 3.2.5(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/distributionwizard/distributionwizard-steps:
+    dependencies:
+      '@xwiki/platform-localization-api':
+        specifier: workspace:*
+        version: link:../../localization/localization-api
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'

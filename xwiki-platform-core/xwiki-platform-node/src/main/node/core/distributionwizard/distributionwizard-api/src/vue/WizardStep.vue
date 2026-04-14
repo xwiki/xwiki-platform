@@ -25,7 +25,10 @@ import type { WizardStepProps } from "../WizardStepProps";
 const emit = defineEmits(["validateStep", "invalidateStep"]);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stepRef = useTemplateRef<any>("stepRefId");
-const props = defineProps<{ step: WizardStepProps; component: unknown }>();
+const props = defineProps<{
+  step: WizardStepProps;
+  component: unknown;
+}>();
 function validateStep() {
   emit("validateStep");
 }
@@ -47,7 +50,6 @@ watch(props, async () => {
     jQuery(document).trigger("xwiki:dom:updated", {
       elements: jQuery("#wizard-step-html").toArray(),
     });
-    console.log("Wizard step dom:updated event triggered");
     jQuery(document).on("xwiki:distributionWizard:validateStep", validateStep);
     jQuery(document).on(
       "xwiki:distributionWizard:invalidateStep",

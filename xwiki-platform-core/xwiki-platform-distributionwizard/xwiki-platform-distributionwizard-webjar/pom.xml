@@ -59,5 +59,10 @@
       <artifactId>vue</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

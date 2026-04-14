@@ -26,10 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.internal.FlavorHelper;
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionManager;
-import org.xwiki.extension.ResolveException;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -44,9 +40,6 @@ public class FlavorChoiceStep extends AbstractStep
 
     @Inject
     private FlavorHelper flavorHelper;
-
-    @Inject
-    private ExtensionManager extensionManager;
 
     @Override
     public String getTitle()
@@ -82,21 +75,8 @@ public class FlavorChoiceStep extends AbstractStep
     public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
     {
         if (data.containsKey(FLAVOR_KEY)) {
-            // FIXME: handle no flavor
             String selectedFlavor = (String) data.get(FLAVOR_KEY);
-            // FIXME: would be cleaner and more robust with a regex and checks
-            String[] splittedFlavor = selectedFlavor.split(":::");
-            String flavorId = splittedFlavor[0];
-            String flavorVersion = splittedFlavor[1];
-            try {
-                Extension flavorExtension =
-                    this.extensionManager.resolveExtension(new ExtensionId(flavorId, flavorVersion));
-                this.flavorHelper.selectFlavor(flavorExtension);
-            } catch (ResolveException e) {
-                throw new DistributionWizardException(
-                    String.format("Error while resolving extension for the selected flavor: [%s]", selectedFlavor), e);
-            }
-
+            this.flavorHelper.handleFlavorAnswer(selectedFlavor);
             return true;
         }
         return false;

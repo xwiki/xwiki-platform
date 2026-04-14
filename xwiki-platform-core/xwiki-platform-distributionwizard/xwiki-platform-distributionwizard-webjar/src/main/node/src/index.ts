@@ -54,7 +54,6 @@ const xwikiStepResolverFunctions: DistributionWizardResolverFunctions = {
 
 createApp(WizardDialog, {
   stepResolverFunctions: xwikiStepResolverFunctions,
-  wizardTitle: "First installation",
 }).mount("#distributionWizard");
 
 export {

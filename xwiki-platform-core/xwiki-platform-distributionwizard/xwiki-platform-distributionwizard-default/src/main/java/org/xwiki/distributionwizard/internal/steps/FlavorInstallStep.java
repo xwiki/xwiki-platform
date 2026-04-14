@@ -67,12 +67,14 @@ public class FlavorInstallStep extends AbstractStep
     public void processStep() throws DistributionWizardException
     {
         this.invalidateUI();
-        try {
-            Job installJob = this.flavorHelper.startSelectedFlavorInstallation();
-            getDistributionJob().setProperty("installJobStatus", installJob.getStatus());
-            completeJobStep();
-        } catch (JobException e) {
-            throw new DistributionWizardException("Error while starting installation job", e);
+        if (!this.flavorHelper.isNoFlavorSelected()) {
+            try {
+                Job installJob = this.flavorHelper.startSelectedFlavorInstallation();
+                getDistributionJob().setProperty("installJobStatus", installJob.getStatus());
+                completeJobStep();
+            } catch (JobException e) {
+                throw new DistributionWizardException("Error while starting installation job", e);
+            }
         }
     }
 
@@ -85,7 +87,7 @@ public class FlavorInstallStep extends AbstractStep
     @Override
     public boolean isStepDone() throws DistributionWizardException
     {
-        return this.flavorHelper.isFlavorInstalled();
+        return this.flavorHelper.isNoFlavorSelected() || this.flavorHelper.isFlavorInstalled();
     }
 
     @Override

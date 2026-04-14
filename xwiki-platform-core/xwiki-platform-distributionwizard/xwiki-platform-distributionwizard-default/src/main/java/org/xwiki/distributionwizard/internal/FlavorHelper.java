@@ -20,13 +20,18 @@
 package org.xwiki.distributionwizard.internal;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
@@ -51,13 +56,19 @@ import jakarta.inject.Singleton;
 @Singleton
 public class FlavorHelper
 {
+    public static final String NO_FLAVOR_SELECTION = "noFlavor";
     private static final String FLAVOR_SELECTED_KEY = "flavor.selected";
+    private static final Pattern FLAVOR_EXTENSION_REGEX =
+        Pattern.compile("^(?<flavorId>\\w+)(:::)(?<flavorVersion>\\w+)$");
 
     @Inject
     private FlavorManager flavorManager;
 
     @Inject
     private DistributionManager distributionManager;
+
+    @Inject
+    private ExtensionManager extensionManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -73,6 +84,34 @@ public class FlavorHelper
         DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
         String wiki = distributionJob.getRequest().getWiki();
         return new Namespace("wiki", wiki);
+    }
+
+    public void handleFlavorAnswer(String selectedFlavor) throws DistributionWizardException
+    {
+        DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
+        if (NO_FLAVOR_SELECTION.equals(selectedFlavor)) {
+            distributionJob.setProperty(FLAVOR_SELECTED_KEY, NO_FLAVOR_SELECTION);
+        } else {
+            Matcher matcher = FLAVOR_EXTENSION_REGEX.matcher(selectedFlavor);
+            if (matcher.matches()) {
+                ExtensionId extensionId =
+                    new ExtensionId(matcher.group("flavorId"), matcher.group("flavorVersion"));
+                try {
+                    Extension flavorExtension = this.extensionManager.resolveExtension(extensionId);
+                    distributionJob.setProperty(FLAVOR_SELECTED_KEY, flavorExtension);
+                } catch (ResolveException e) {
+                    throw new DistributionWizardException(
+                        String.format("Error while resolving extension [%s] for the selected flavor: [%s]",
+                            extensionId, selectedFlavor),
+                        e);
+                }
+            } else {
+                throw new DistributionWizardException(
+                    String.format("The selected flavor [%s] doesn't match the expected format "
+                        + "[<flavorId>:::<flavorVersion>]", selectedFlavor));
+            }
+
+        }
     }
 
     public boolean isFlavorInstalled()
@@ -93,10 +132,15 @@ public class FlavorHelper
         }
     }
 
-    public void selectFlavor(Extension flavor)
+    public boolean isNoFlavorSelected()
     {
         DistributionJob distributionJob = this.distributionManager.getCurrentDistributionJob();
-        distributionJob.setProperty(FLAVOR_SELECTED_KEY, flavor);
+        Object property = distributionJob.getProperty(FLAVOR_SELECTED_KEY);
+        if (property instanceof String selectedFlavor) {
+            return NO_FLAVOR_SELECTION.equals(selectedFlavor);
+        } else {
+            return false;
+        }
     }
 
     public Job startSelectedFlavorInstallation() throws DistributionWizardException, JobException

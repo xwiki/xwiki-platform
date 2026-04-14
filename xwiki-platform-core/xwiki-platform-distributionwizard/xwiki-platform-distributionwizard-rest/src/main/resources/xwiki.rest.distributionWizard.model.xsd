@@ -37,7 +37,8 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="step" type="distributionWizard:StepSummary" minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="wizardTitle" type="string"></element>
+          <element name="steps" type="distributionWizard:StepSummary" minOccurs="0" maxOccurs="unbounded"></element>
         </sequence>
       </extension>
     </complexContent>

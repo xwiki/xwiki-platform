@@ -92,6 +92,27 @@ public class CreatePagePage extends BaseElement
         this.pageTypePicker.selectTemplateByValue(template);
     }
 
+    /**
+     * @param template the value of the template option
+     * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
+     *         {@code src} attribute
+     * @since 18.3RC1
+     */
+    public String getTemplateIcon(String template)
+    {
+        return this.pageTypePicker.getTemplateIcon(template);
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the description text displayed for the specified template option
+     * @since 18.3.0RC1
+     */
+    public String getTemplateDescription(String template)
+    {
+        return this.pageTypePicker.getTemplateDescription(template);
+    }
+
     public void setType(String type)
     {
         this.pageTypePicker.selectByValue(type);

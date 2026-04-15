@@ -82,4 +82,38 @@ public class PageTypePicker extends XWikiSelectWidget
         }
         throw new RuntimeException("Failed to find template [" + template + "]");
     }
+
+    /**
+     * @param template the value of the template option
+     * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
+     *         {@code src} attribute, or an empty string if no icon is displayed
+     * @since 18.3RC1
+     */
+    public String getTemplateIcon(String template)
+    {
+        WebElement option = getOptionByValue(template);
+        WebElement iconSpan = option.findElement(By.className("xwiki-select-option-icon"));
+        List<WebElement> iconImages = iconSpan.findElements(By.tagName("img"));
+        if (iconImages.isEmpty()) {
+            return "";
+        }
+        String src = iconImages.getFirst().getAttribute("src");
+        String fileName = src.substring(src.lastIndexOf('/') + 1);
+        return fileName.contains(".") ? fileName.substring(0, fileName.indexOf('.')) : fileName;
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the description text displayed for the specified template option, or an empty string if none
+     * @since 18.3.0RC1
+     */
+    public String getTemplateDescription(String template)
+    {
+        WebElement option = getOptionByValue(template);
+        List<WebElement> hints = option.findElements(By.className("xHint"));
+        if (hints.isEmpty()) {
+            return "";
+        }
+        return hints.getFirst().getText();
+    }
 }

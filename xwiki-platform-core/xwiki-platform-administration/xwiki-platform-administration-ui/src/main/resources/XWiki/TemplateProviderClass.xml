@@ -84,7 +84,7 @@
       <separators>,</separators>
       <size>1</size>
       <sort>none</sort>
-      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
+      <sql>select distinct doc.fullName as permissionCheck, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -161,7 +161,7 @@
       <separators>,</separators>
       <size>30</size>
       <sort>none</sort>
-      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
+      <sql>select distinct doc.fullName as permissionCheck, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -224,7 +224,7 @@
       <separators>,</separators>
       <size>1</size>
       <sort>none</sort>
-      <sql>select distinct doc.fullName, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
+      <sql>select distinct doc.fullName as permissionCheck, doc.web from XWikiDocument doc where doc.name = 'WebHome' order by doc.web</sql>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

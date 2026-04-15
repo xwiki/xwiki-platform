@@ -103,11 +103,13 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
         Query query = this.secureQueryManager.createQuery(statement, Query.HQL);
         query.setWiki(documentReference.getWikiReference().getName());
-        // When the SQL selects doc.fullName as its first column, it is following the convention established by
-        // ImplicitlyAllowedValuesDBListQueryBuilder: the first column is a document reference used solely to check
-        // the current user's view right, and the remaining columns carry the actual property values. Apply the same
-        // filter so that inaccessible entries are removed from the results.
-        if (dbListClass.getSql() != null && dbListClass.getSql().contains("doc.fullName")) {
+        // The custom HQL query should pass "doc.fullName as permissionCheck" as the first select row, whenever it
+        // needs that the current user has "view" rights on the returned documents. This is used to filter out
+        // inaccessible documents and not propose them. Note that the "doc.fullName as permissionCheck" column
+        // results will be filtered out by the QueryFilter and if you need to return doc.fullName results, you
+        // should select 2 columns, as in:
+        //   select doc.fullName as permissionCheck, doc.fullName, ...
+        if (dbListClass.getSql() != null && dbListClass.getSql().contains("doc.fullName as permissionCheck")) {
             query.addFilter(this.viewableValueFilter);
         }
         return query;

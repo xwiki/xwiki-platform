@@ -43,7 +43,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -263,8 +262,6 @@ public class EditIT
      * page.
      */
     @Test
-    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
@@ -272,38 +269,28 @@ public class EditIT
         ViewPage viewPage = setup.gotoPage(reference);
         WikiEditPage editWiki = viewPage.editWiki();
 
-        try {
-            // Prevent from leaving the page so that we can check the UI before moving out of the page
-            setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+        // Change the default timeout of done event so that we can see it.
+        setup.getDriver()
+            .executeJavascript("XWiki.widgets.Notification.prototype.defaultOptions.done.timeout = 30");
 
-            // Change the default timeout of done event so that we can see it.
-            setup.getDriver()
-                .executeJavascript("XWiki.widgets.Notification.prototype.defaultOptions.done.timeout = 30");
+        // For new timeouts to be taken into account we need to reset the listeners:
+        // first we stop observing save event, it will remove the existing listeners
+        setup.getDriver()
+            .executeJavascript("document.stopObserving('xwiki:actions:save')");
+        // then we create back the AjaxSaveAndContinue instance with the right timeout, and also override
+        // maybeRedirect to prevent actual page navigation so we can check the UI state after save.
+        // Note: Firefox 125+ only shows the beforeunload dialog for synchronous user-gesture-triggered
+        // navigation, not for async AJAX-triggered navigation, so the beforeunload dialog approach is unreliable.
+        setup.getDriver().executeJavascript(
+            "var saveAndContinue = new XWiki.actionButtons.AjaxSaveAndContinue();"
+                + "saveAndContinue.maybeRedirect = function(isContinue) { return true; };");
 
-            // For new timeouts to be taken into account we need to reset the listeners:
-            // first we stop observing save event, it will remove the existing listeners
-            setup.getDriver()
-                .executeJavascript("document.stopObserving('xwiki:actions:save')");
-            // then we create back the AjaxSaveAndContinue instance, it will create back the messages with the right
-            // timeout, and will also create the listener.
-            setup.getDriver().executeJavascript("new XWiki.actionButtons.AjaxSaveAndContinue()");
+        editWiki.clickSaveAndView(false);
 
-            editWiki.clickSaveAndView(false);
-
-            // An alert should appear to ask the user if he wants to leave the page.
-            setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
-
-            // We dismiss it so we can stay on the page and check the UI.
-            setup.getDriver().switchTo().alert().dismiss();
-
-            // Check that the saving message is displayed.
-            editWiki.waitForNotificationSuccessMessage("Saved");
-            // The form should remain disabled since we normally should be driven to another page.
-            assertFalse(editWiki.isEnabled());
-        } finally {
-            // Now allow to leave the page.
-            setup.getDriver().executeJavascript("window.onbeforeunload = null;");
-        }
+        // Check that the saving message is displayed.
+        editWiki.waitForNotificationSuccessMessage("Saved");
+        // The form should remain disabled since we normally should be driven to another page.
+        assertFalse(editWiki.isEnabled());
 
         // Go back to the editor to reset the status
         viewPage = setup.gotoPage(reference);

@@ -27,7 +27,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -123,7 +125,7 @@ class ObjectEditorIT
         objectEditPane.setPropertyValue("number", "48");
 
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
 
         objectEditPage.clickSaveAndContinue();
 
@@ -138,7 +140,7 @@ class ObjectEditorIT
         assertFalse(objectEditPane.isEditLinkDisplayed());
 
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
         objectEditPage.deleteObject(NUMBER_CLASS, 1);
 
         // State should be same as before adding
@@ -160,7 +162,7 @@ class ObjectEditorIT
         // Delete the saved object
         objectEditPage.deleteObject(NUMBER_CLASS, 0);
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
 
         objectEditPage.clickSaveAndContinue();
 
@@ -652,5 +654,11 @@ class ObjectEditorIT
         assertFalse(objectEditPane.isDeprecatedPropertyObfuscated("stringTest"));
         assertEquals("My value 42", objectEditPane.getDeprecatedPropertyValue("stringTest"));
         assertTrue(objectEditPane.isDeprecatedPropertyObfuscated("mypass"));
+    }
+
+    private void dismissBeforeUnloadAlert(TestUtils testUtils)
+    {
+        Alert alert = testUtils.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+        alert.dismiss();
     }
 }

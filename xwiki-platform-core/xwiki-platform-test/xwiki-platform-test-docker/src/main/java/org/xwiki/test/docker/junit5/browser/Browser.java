@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5.browser;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.openqa.selenium.Capabilities;
@@ -63,7 +64,7 @@ public enum Browser
 
     Browser(Capabilities capabilities)
     {
-        this.capabilities = capabilities.merge(buildCommonCapabilities());
+        this.capabilities = buildCommonCapabilities().merge(capabilities);
     }
 
     /**
@@ -98,6 +99,11 @@ public enum Browser
         if (options.getProfile() == null) {
             options.setProfile(new FirefoxProfile());
         }
+        // Firefox 149+ does not apply the legacy string value to beforeunload when BiDi is enabled, so we need to
+        // set the beforeUnload handler explicitly in order to keep the prompt open for tests that interact with it.
+        options.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR,
+            Map.of("default", UnexpectedAlertBehaviour.IGNORE.toString(), "beforeUnload",
+                UnexpectedAlertBehaviour.IGNORE.toString()));
         options.enableBiDi();
         options.addPreference("dom.disable_beforeunload", false);
         // Workaround for https://github.com/mozilla/geckodriver/issues/2212

@@ -252,6 +252,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-rest-default</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
       <version>4.11</version>

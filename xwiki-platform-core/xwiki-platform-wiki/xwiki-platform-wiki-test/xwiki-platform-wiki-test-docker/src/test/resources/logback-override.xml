@@ -35,6 +35,30 @@
     </encoder>
   </appender>
 
+  <appender name="job" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="org.xwiki.logging.logback.internal.JobMDCEventEvaluator"/>
+      <OnMatch>NEUTRAL</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
+    </filter>
+    <discriminator class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
+      <Key>jobCleanId</Key>
+      <DefaultValue>no-job</DefaultValue>
+    </discriminator>
+    <!-- xwiki.job.log.dir is initialized from the permanent directory by the job configuration component. -->
+    <timeout>300000</timeout>
+    <maxAppenderCount>1000</maxAppenderCount>
+    <sift>
+      <appender name="job-${jobCleanId}" class="ch.qos.logback.core.FileAppender">
+        <file>${xwiki.job.log.dir:-logs/jobs}/job-${jobCleanId}.log</file>
+        <append>true</append>
+        <encoder>
+          <pattern>%d [%t] %-5p %-30.30c{2} [jobType=%mdc{jobType} isolated=%mdc{jobIsolated} jobId=%mdc{jobId}] - %m %n</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
   <logger name="org.xwiki" level="info"/>
 
   <!-- Old code is using the com.xpn.xwiki package and is logging too much stuff at INFO level, which is why we use
@@ -98,6 +122,7 @@
        the logs will end up the container's logs, for example in catalina.out in Tomcat.
   -->
   <root level="warn">
+    <appender-ref ref="job"/>
     <appender-ref ref="stdout"/>
   </root>
 </configuration>

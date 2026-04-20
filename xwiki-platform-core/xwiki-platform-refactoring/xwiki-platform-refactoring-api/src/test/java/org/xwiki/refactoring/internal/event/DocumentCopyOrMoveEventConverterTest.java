@@ -30,6 +30,7 @@ import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.EventConverterManager;
 import org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager;
+import org.xwiki.observation.remote.internal.converter.EventConverters;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.test.annotation.ComponentList;
@@ -41,12 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Validate {@link DocumentCopyOrMoveEventConverter};
- * 
+ * Validate {@link DocumentCopyOrMoveEventConverter}.
+ *
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({DocumentCopyOrMoveEventConverter.class, DefaultEventConverterManager.class})
+@ComponentList({ DocumentCopyOrMoveEventConverter.class, DefaultEventConverterManager.class, EventConverters.class })
 class DocumentCopyOrMoveEventConverterTest
 {
     @InjectComponentManager

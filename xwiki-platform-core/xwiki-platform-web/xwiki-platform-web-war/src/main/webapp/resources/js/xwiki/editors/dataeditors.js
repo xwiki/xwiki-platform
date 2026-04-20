@@ -121,7 +121,7 @@
         // Disable the leave confirmation during Save & View navigation while preserving the dirty state for Save &
         // Continue until the save has actually completed.
         $(document).on('xwiki:actions:save', function (event, data) {
-          if (!data?.['continue']) {
+          if (!data?.continue) {
             self.submitInProgress = true;
           }
         });

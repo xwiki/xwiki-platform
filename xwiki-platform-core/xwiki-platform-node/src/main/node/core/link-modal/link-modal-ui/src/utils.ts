@@ -17,31 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ImageFilePanel } from "../images/ImageFilePanel";
-import type { EditorType } from "../../blocknote";
-<<<<<<< HEAD
-=======
-import type { LinkEditionContext } from "../../misc/linkEditionCtx";
-import type React from "react";
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
+import { ref } from "vue";
+import type { Ref } from "vue";
 
-export type FilePanelProps = {
-  editor: EditorType;
-  blockId: string;
-};
-
-export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
-  const block = editor.getBlock(blockId);
-
-  if (!block) {
-    throw new Error(
-      "Assertion failed: provided blockId was not found in editor (file panel)",
-    );
-  }
-
-  if (block.type === "image") {
-    return <ImageFilePanel currentBlock={block} />;
-  }
-
-  throw new Error(`Assertion failed: unkown block type: ${block.type}`);
-};
+/**
+ * Create a correctly-typed Vue 3 references
+ *
+ * Required because of fundamental incompatibility between ES6's private fields and Vue's reactivity
+ *
+ * Functionally equivalent to ref()
+ *
+ * @see https://stackoverflow.com/a/68731963
+ *
+ * @param value - The value to wrap in a Vue reference
+ *
+ * @returns A Vue reference
+ */
+export function typedRef<T>(value: T): Ref<T> {
+  return ref(value) as Ref<T>;
+}

@@ -22,6 +22,10 @@ import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
 import { useCallback } from "react";
 import type { BlockOfType } from "../../blocknote";
+<<<<<<< HEAD
+=======
+import type { LinkEditionContext } from "../../misc/linkEditionCtx";
+>>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;

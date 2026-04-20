@@ -21,6 +21,10 @@
 import { EntityType } from "@xwiki/platform-model-api";
 import type {
   Link,
+<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
+=======
+  LinkSuggestService,
+>>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts
   LinkSuggestServiceProvider,
   LinkType,
 } from "@xwiki/platform-link-suggest-api";
@@ -28,8 +32,41 @@ import type {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
+<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
+=======
+import type {
+  ModelReferenceHandler,
+  ModelReferenceHandlerProvider,
+  ModelReferenceParser,
+  ModelReferenceParserProvider,
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+  RemoteURLSerializer,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
+import type { Container } from "inversify";
+
+/**
+ * @since 18.0.0RC1
+ * @beta
+ */
+type LinkEditionContext = {
+  linkSuggestService: LinkSuggestService | null;
+  modelReferenceParser: ModelReferenceParser;
+  modelReferenceSerializer: ModelReferenceSerializer;
+  modelReferenceHandler: ModelReferenceHandler;
+  remoteURLParser: RemoteURLParser;
+  remoteURLSerializer: RemoteURLSerializer;
+  attachmentsService: AttachmentsService;
+  documentService: DocumentService;
+};
+>>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
@@ -52,6 +89,48 @@ type LinkSuggestion = {
  * @beta
  */
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
+
+function createLinkEditionContext(container: Container): LinkEditionContext {
+  const linkSuggestService = container
+    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
+    .get();
+
+  const modelReferenceParser = container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const modelReferenceSerializer = container
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+    .get()!;
+
+  const modelReferenceHandler = container
+    .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+    .get()!;
+
+  const remoteURLParser = container
+    .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
+  const attachmentsService =
+    container.get<AttachmentsService>("AttachmentsService");
+
+  const documentService = container.get<DocumentService>("DocumentService")!;
+
+  return {
+    linkSuggestService: linkSuggestService ?? null,
+    modelReferenceParser,
+    modelReferenceSerializer,
+    modelReferenceHandler,
+    remoteURLParser,
+    remoteURLSerializer,
+    attachmentsService,
+    documentService,
+  };
+}
 
 /**
  * Build a function returning an array of link suggestions from a string.
@@ -132,5 +211,10 @@ function queryEqualityOperator(query: string) {
   };
 }
 
+<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
 export { createLinkSuggestor };
 export type { LinkSuggestion, LinkSuggestor, LinkType };
+=======
+export { createLinkEditionContext, createLinkSuggestor };
+export type { LinkEditionContext, LinkSuggestion, LinkSuggestor };
+>>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts

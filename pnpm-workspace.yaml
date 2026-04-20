@@ -27,6 +27,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-api

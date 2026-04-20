@@ -68,8 +68,7 @@ class XWikiHibernateAttachmentStoreTest
         when(mockHibernateStore.getCurrentSession()).thenReturn(this.mockSession);
         when(mockHibernateStore.getSessionFactory()).thenReturn(mock(SessionFactory.class));
 
-        @SuppressWarnings("unchecked")
-        Query<Long> mockQuery = mock(Query.class);
+        Query<Long> mockQuery = mock();
         when(this.mockSession.createQuery(anyString(), eq(Long.class))).thenReturn(mockQuery);
         when(mockQuery.setParameter(anyString(), any())).thenReturn(mockQuery);
         when(mockQuery.uniqueResult()).thenReturn(null);

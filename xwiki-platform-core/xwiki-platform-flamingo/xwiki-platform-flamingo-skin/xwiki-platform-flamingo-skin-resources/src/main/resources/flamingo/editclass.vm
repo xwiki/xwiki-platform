@@ -165,7 +165,12 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #classSwitcher()
 ##
 ##
-<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock xform">
+## Mark this as a custom form so actionButtons.js still emits the standard save events (needed by the client-side
+## dirty-state handling) but doesn't replace the native Save & View submission with the generic AJAX save path.
+## The generic AJAX path currently submits action_save / action_saveandcontinue unless a custom submit value is
+## configured, while the class editor needs action_propupdate.
+## Further, PropUpdateAction doesn't return error/success messages in the format expected by the AJAX save path.
+<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock xform" data-custom-form="true">
 <div id="xwikieditcontent" class="clear">
 ##
 ##

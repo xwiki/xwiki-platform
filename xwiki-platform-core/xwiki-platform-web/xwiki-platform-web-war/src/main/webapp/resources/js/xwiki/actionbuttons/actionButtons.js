@@ -80,6 +80,11 @@ var XWiki = (function(XWiki) {
       $$('input[name=action_save]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
       }.bind(this));
+      // Bind also on propupdate which is used in the class editor. This is a custom form, but we still bind the
+      // button here to have the same save events.
+      $$('input[name=action_propupdate]').each(function(item) {
+        item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
+      }.bind(this));
       $$('input[name=action_saveandcontinue]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save', true));
       }.bind(this));

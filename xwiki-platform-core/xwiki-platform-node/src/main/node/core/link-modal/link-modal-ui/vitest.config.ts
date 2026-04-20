@@ -17,31 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ImageFilePanel } from "../images/ImageFilePanel";
-import type { EditorType } from "../../blocknote";
-<<<<<<< HEAD
-=======
-import type { LinkEditionContext } from "../../misc/linkEditionCtx";
-import type React from "react";
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
 
-export type FilePanelProps = {
-  editor: EditorType;
-  blockId: string;
-};
+import localConfig from "./vite.config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { mergeConfig } from "vitest/config";
 
-export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
-  const block = editor.getBlock(blockId);
-
-  if (!block) {
-    throw new Error(
-      "Assertion failed: provided blockId was not found in editor (file panel)",
-    );
-  }
-
-  if (block.type === "image") {
-    return <ImageFilePanel currentBlock={block} />;
-  }
-
-  throw new Error(`Assertion failed: unkown block type: ${block.type}`);
-};
+export default mergeConfig(defaultConfig, localConfig);

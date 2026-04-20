@@ -1,0 +1,58 @@
+<!--
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<script setup lang="ts">
+import { translations } from "../../translations";
+import LinkConfig from "../LinkConfig.vue";
+import { useI18n } from "vue-i18n";
+import type { LinkData, LinkEmailConfig } from "../../data/linkType";
+
+defineProps<{ linkData: LinkData }>();
+
+const model = defineModel<LinkEmailConfig>({
+  required: true,
+});
+
+const { t } = useI18n({ messages: translations });
+</script>
+
+<template>
+  <LinkConfig :link-data>
+    <template #config>
+      <x-text-field
+        :label="t('link-modal.target-types.email.address')"
+        type="email"
+        v-model="model.address"
+        required
+      />
+    </template>
+
+    <template #options>
+      <x-text-field
+        :label="t('link-modal.target-types.email.subject')"
+        v-model="model.messageSubject"
+      />
+
+      <x-text-field
+        :label="t('link-modal.target-types.email.body')"
+        v-model="model.messageBody"
+      />
+    </template>
+  </LinkConfig>
+</template>

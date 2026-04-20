@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-editors-blocknote-headless",
-  "version": "18.6.0-SNAPSHOT",
+  "name": "@xwiki/link-modal-ui",
+  "version": "18.3.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/link-modal/link-modal-ui",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -40,18 +40,15 @@
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
-    "@xwiki/platform-collaboration-api": "workspace:*",
+    "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
-    "@xwiki/platform-editors-blocknote-react": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-icons": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
-    "@xwiki/platform-macros-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
-    "@xwiki/platform-uniast-api": "workspace:*",
     "lodash-es": "catalog:",
     "vue-i18n": "catalog:"
   },
@@ -63,15 +60,13 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
-    "@xwiki/link-modal-ui": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
-    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
     "vitest-mock-extended": "catalog:",

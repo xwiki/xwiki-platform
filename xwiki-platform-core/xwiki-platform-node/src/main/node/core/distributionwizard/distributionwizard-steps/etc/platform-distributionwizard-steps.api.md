@@ -10,10 +10,25 @@ import { DefineComponent } from 'vue';
 import { PublicProps } from 'vue';
 
 // @public (undocumented)
-export const FirstAdminUserStep: DefineComponent<    {}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {}, HTMLFormElement>;
+export const FirstAdminUserStep: DefineComponent<    {}, {
+stepAnswerCallback: typeof stepAnswerCallback;
+}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
+validateStep: (...args: any[]) => void;
+invalidateStep: (...args: any[]) => void;
+}, string, PublicProps, Readonly<{}> & Readonly<{
+onValidateStep?: ((...args: any[]) => any) | undefined;
+onInvalidateStep?: ((...args: any[]) => any) | undefined;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {}, any>;
+
+// @public (undocumented)
+export const ReportStep: DefineComponent<    {}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {}, HTMLDivElement>;
 
 // @public (undocumented)
 export const WelcomeStep: DefineComponent<    {}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, true, {}, HTMLDivElement>;
+
+// Warnings were encountered during analysis:
+//
+// dist/vue/FirstAdminUserStep.vue.d.ts:3:5 - (ae-forgotten-export) The symbol "stepAnswerCallback" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

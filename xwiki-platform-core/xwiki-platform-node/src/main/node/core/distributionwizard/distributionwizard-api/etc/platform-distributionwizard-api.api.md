@@ -14,7 +14,11 @@ import { GlobalDirectives } from 'vue';
 import { PublicProps } from 'vue';
 
 // @public (undocumented)
-export type StepsResolverFunction = () => Promise<WizardStepProps[]>;
+export type DistributionWizardResolverFunctions = {
+    stepsResolverFunction: () => Promise<WizardDialogProps>;
+    stepResolverFunction: (stepId: string) => Promise<WizardStepProps>;
+    startStepFunction: (stepId: string) => Promise<boolean>;
+};
 
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props" needs to be exported by the entry point index.d.ts
 //
@@ -24,11 +28,7 @@ export const WizardBreadcrumb: DefineComponent<__VLS_Props, {}, {}, {}, {}, Comp
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props_2" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const WizardDialog: DefineComponent<__VLS_Props_2, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
-closed: (...args: any[]) => void;
-}, string, PublicProps, Readonly<__VLS_Props_2> & Readonly<{
-onClosed?: ((...args: any[]) => any) | undefined;
-}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
+export const WizardDialog: DefineComponent<__VLS_Props_2, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<__VLS_Props_2> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 wizardDialog: HTMLDialogElement;
 stepDialogRef: CreateComponentPublicInstanceWithMixins<Readonly<{
 step: WizardStepProps;
@@ -61,6 +61,14 @@ wizardStepCallback: ComputedRef<any>;
 }, {}, {}, {}, {}> | null;
 }, any>;
 
+// @public (undocumented)
+export type WizardDialogProps = {
+    title: string;
+    steps: WizardStepSummary[];
+    state: DialogState;
+    stepIndex: number;
+};
+
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props_3" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -77,17 +85,28 @@ stepRefId: unknown;
 }, any>;
 
 // @public (undocumented)
-export type WizardStepProps = {
-    title: string;
+export type WizardStepProps = WizardStepSummary & {
     uiComponent: UIComponent;
-    index: number;
+    originalIndex: number;
     state?: StepState;
+    needsInput: boolean;
+    skippable: boolean;
+};
+
+// @public (undocumented)
+export type WizardStepSummary = {
+    id: string;
+    title: string;
+    index: number;
+    dependsOnPreviousStep: boolean;
+    needsManualStart: boolean;
 };
 
 // Warnings were encountered during analysis:
 //
-// dist/WizardStepProps.d.ts:34:5 - (ae-forgotten-export) The symbol "UIComponent" needs to be exported by the entry point index.d.ts
-// dist/WizardStepProps.d.ts:36:5 - (ae-forgotten-export) The symbol "StepState" needs to be exported by the entry point index.d.ts
+// dist/WizardStepProps.d.ts:40:5 - (ae-forgotten-export) The symbol "UIComponent" needs to be exported by the entry point index.d.ts
+// dist/WizardStepProps.d.ts:42:5 - (ae-forgotten-export) The symbol "StepState" needs to be exported by the entry point index.d.ts
+// dist/WizardStepProps.d.ts:55:5 - (ae-forgotten-export) The symbol "DialogState" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

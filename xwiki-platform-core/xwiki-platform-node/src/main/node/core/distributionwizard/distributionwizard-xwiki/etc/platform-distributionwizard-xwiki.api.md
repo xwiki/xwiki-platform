@@ -4,10 +4,17 @@
 
 ```ts
 
+import { WizardDialogProps } from '@xwiki/platform-distributionwizard-api';
 import { WizardStepProps } from '@xwiki/platform-distributionwizard-api';
 
-// @beta
-export function XWikiStepsResolver(restURL: string): Promise<WizardStepProps[]>;
+// @public (undocumented)
+export function XWikiStartStepResolver(restURL: string): Promise<boolean>;
+
+// @public (undocumented)
+export function XWikiStepResolver(restURL: string): Promise<WizardStepProps>;
+
+// @public (undocumented)
+export function XWikiStepsResolver(restURL: string): Promise<WizardDialogProps>;
 
 // (No @packageDocumentation comment for this package)
 

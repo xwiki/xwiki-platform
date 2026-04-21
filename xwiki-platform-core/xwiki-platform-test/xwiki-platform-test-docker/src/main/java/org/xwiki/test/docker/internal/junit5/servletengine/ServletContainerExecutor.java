@@ -104,7 +104,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public ServletContainerExecutor(int index, TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
@@ -140,7 +139,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
      * @return the executor used to interact with the started XWiki instance
      * @throws Exception if an error occurred during the build or start
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public XWikiExecutor start(File sourceWARDirectory) throws Exception
     {

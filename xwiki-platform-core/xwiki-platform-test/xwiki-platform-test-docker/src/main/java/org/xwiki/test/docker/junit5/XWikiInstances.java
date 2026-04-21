@@ -26,8 +26,7 @@ import org.xwiki.test.integration.XWikiExecutor;
  * created for each one to access access information (base URL, etc).
  * 
  * @version $Id$
-     * @since 18.3.0RC1
-     * @since 17.10.6
+ * @since 18.3.0RC1
  */
 public @interface XWikiInstances
 {

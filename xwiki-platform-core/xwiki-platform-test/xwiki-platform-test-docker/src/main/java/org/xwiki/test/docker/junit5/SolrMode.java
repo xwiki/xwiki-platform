@@ -24,7 +24,6 @@ package org.xwiki.test.docker.junit5;
  *
  * @version $Id$
  * @since 18.3.0RC1
- * @since 17.10.6
  */
 public enum SolrMode
 {

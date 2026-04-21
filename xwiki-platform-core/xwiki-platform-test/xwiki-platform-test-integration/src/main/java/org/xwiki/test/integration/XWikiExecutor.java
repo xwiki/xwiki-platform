@@ -163,7 +163,6 @@ public class XWikiExecutor
      * @param browserHost the host to use to access XWiki with Selenium
      * @param browserPort the port to use to access XWiki with Selenium
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public XWikiExecutor(int index, String browserHost, int browserPort)
     {
@@ -220,7 +219,6 @@ public class XWikiExecutor
      * @param httpClientHost the host to use for direct HTTP requests
      * @param httpClientPort the port to use for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public XWikiExecutor(int index, String internalHost, int internalPort, String browserHost,
         int browserPort, String httpClientHost, int httpClientPort)
@@ -253,7 +251,6 @@ public class XWikiExecutor
     /**
      * @return the index of the executor
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public int getIndex()
     {
@@ -263,7 +260,6 @@ public class XWikiExecutor
     /**
      * @return the internalHost
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getInternalHost()
     {
@@ -273,7 +269,6 @@ public class XWikiExecutor
     /**
      * @return the internalPort
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public int getInternalPort()
     {
@@ -283,7 +278,6 @@ public class XWikiExecutor
     /**
      * @param browserHost the host to use to access XWiki with Selenium
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public void setBrowserHost(String browserHost)
     {
@@ -293,7 +287,6 @@ public class XWikiExecutor
     /**
      * @return the host to use to access XWiki with Selenium
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getBrowserHost()
     {
@@ -303,7 +296,6 @@ public class XWikiExecutor
     /**
      * @return the host to use for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public int getBrowserPort()
     {
@@ -313,7 +305,6 @@ public class XWikiExecutor
     /**
      * @return the host to use for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getHttpClientHost()
     {
@@ -323,7 +314,6 @@ public class XWikiExecutor
     /**
      * @return the port to use for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public int getHttpClientPort()
     {
@@ -333,7 +323,6 @@ public class XWikiExecutor
     /**
      * @return the base URL used of the XWiki instance ({@code http://host:port/xwiki/}) with the Selenium
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getBrowserBaseURL()
     {
@@ -343,7 +332,6 @@ public class XWikiExecutor
     /**
      * @return the base URL of the XWiki instance ({@code http://host:port/xwiki/}) for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getHttpClientBaseURL()
     {
@@ -355,7 +343,6 @@ public class XWikiExecutor
      * @return the base URL of the XWiki instance ({@code http://host:port/xwiki/} or {@code http://host:port/},
      *         depending on {@code withContext} for direct HTTP requests
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public String getHttpClientBaseURL(boolean withContext)
     {

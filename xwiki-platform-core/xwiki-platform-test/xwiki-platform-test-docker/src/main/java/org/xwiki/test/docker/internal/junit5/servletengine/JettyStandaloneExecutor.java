@@ -75,7 +75,6 @@ public class JettyStandaloneExecutor
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public JettyStandaloneExecutor(int index, TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver)
@@ -100,7 +99,6 @@ public class JettyStandaloneExecutor
      * @return the executor used to start Jetty
      * @throws Exception when an error occurs
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public XWikiExecutor start() throws Exception
     {

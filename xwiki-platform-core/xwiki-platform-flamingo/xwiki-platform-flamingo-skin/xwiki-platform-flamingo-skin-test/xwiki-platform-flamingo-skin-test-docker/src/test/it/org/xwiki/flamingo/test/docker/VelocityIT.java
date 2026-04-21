@@ -180,13 +180,13 @@ public class VelocityIT
         assertTrue(viewPage.getContent().isEmpty(), "File in parent directory call should not display anything.");
 
         viewPage = testUtils.createPage(testReference, "{{velocity}}"
-                + String.format(templateCode, "../WEB-INF/version.properties")
+                + String.format(templateCode, "../WEB-INF/web.xml")
                 + "{{/velocity}}",
             "TestTemplate");
         assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory call should not display anything.");
 
         viewPage = testUtils.createPage(testReference, "{{velocity}}"
-                + String.format(templateCode, "/chw/../../WEB-INF/../WEB-INF/lib/../version.properties")
+                + String.format(templateCode, "/chw/../../WEB-INF/../WEB-INF/lib/../web.xml")
                 + "{{/velocity}}",
             "TestTemplate");
         assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory, with not normalized path call should "

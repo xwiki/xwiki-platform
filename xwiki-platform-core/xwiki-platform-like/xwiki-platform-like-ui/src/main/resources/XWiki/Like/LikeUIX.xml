@@ -541,7 +541,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     </property>
     <property>
       <content>{{velocity}}
-{{html wiki="true"}}
+{{html clean="false"}}
 #if ($services.like.displayButton($doc))
   ## We want to be sure that the async rendering framework invalidate cache if the document is modified.
   #set ($discard = $services.async.useEntity($doc))

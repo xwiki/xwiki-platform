@@ -821,4 +821,46 @@ class RenamePageIT
                 "xwiki:XWiki." + userLogin),
             p3Content);
     }
+
+    @Order(12)
+    @Test
+    void convertTerminalPageToNestedPage(TestUtils setup) throws Exception
+    {
+        DocumentReference sourceParent = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "WebHome");
+        DocumentReference sourceTerminal = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "4");
+        DocumentReference targetParent = new DocumentReference("xwiki", Arrays.asList("1", "2", "3"), "WebHome");
+        DocumentReference targetNested = new DocumentReference("xwiki", Arrays.asList("1", "2", "3", "4"), "WebHome");
+        DocumentReference childPage =
+            new DocumentReference("xwiki", Arrays.asList("1", "2", "3", "4", "child"), "WebHome");
+
+        setup.rest().delete(sourceParent);
+        setup.rest().delete(sourceTerminal);
+        setup.rest().delete(targetParent);
+        setup.rest().delete(targetNested);
+        setup.rest().delete(childPage);
+
+        setup.createPage(targetParent, "", "");
+        setup.createPage(sourceParent, "", "");
+        setup.createPage(sourceTerminal, "Content of terminal page", "4");
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        ViewPage vp = setup.gotoPage(sourceTerminal);
+        RenamePage renamePage = vp.rename();
+        renamePage.setTerminal(false);
+        renamePage.getDocumentPicker().setParent("1.2.3");
+        renamePage.getDocumentPicker().setName("4");
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        assertTrue(setup.pageExists(Arrays.asList("1", "2", "3", "4"), "WebHome"),
+            "Page 1.2.3.4.WebHome doesn't exist!");
+        assertFalse(setup.pageExists(Arrays.asList("a", "b", "c"), "4"), "Page a.b.c.4 still exists!");
+
+        setup.createPage(childPage, "Child page content", "child");
+        ViewPage childVP = setup.gotoPage(childPage);
+        String breadcrumb = childVP.getBreadcrumbContent();
+        assertTrue(breadcrumb.endsWith("/4/child"),
+            "Expected breadcrumb to end with /4/child but was [" + breadcrumb + "]");
+    }
 }

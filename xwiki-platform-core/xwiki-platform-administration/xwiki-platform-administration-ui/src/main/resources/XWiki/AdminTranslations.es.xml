@@ -139,7 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=¡El usuario seleccionad
 administration.section.users.deleteUser.newAuthor.programming=programando
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Extension Rights
-### Missing: admin.usersgroups.pageextensionrights=Extension Rights: Page
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group

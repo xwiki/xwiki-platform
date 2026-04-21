@@ -139,7 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=Выбранный по�
 administration.section.users.deleteUser.newAuthor.programming=программирование
 administration.section.users.deleteUser.newAuthor.script=скрипт
 admin.usersgroups.extensionrights=Права расширений: Страница и дочерние
-admin.usersgroups.pageextensionrights=Права расширений: Страница
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Исключение участника из группы

@@ -192,7 +192,11 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       #set ($dir = 'desc')
     #end
   #end
-  #set ($selectSql = "select datt.id from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
+  ## Notes:
+  ## - The $order has already been checked for sanitation above in the call to checkOrderBySafe.
+  ## - It's used to ensure it works for all DBs since some DBs may need that a column in the ORDER BY clause be listed
+  ##   in the selected columns.
+  #set ($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
   #set ($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
   #set ($selectQuery = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset))
   #set ($countQuery = $services.query.hql($countSql).bindValues($params))

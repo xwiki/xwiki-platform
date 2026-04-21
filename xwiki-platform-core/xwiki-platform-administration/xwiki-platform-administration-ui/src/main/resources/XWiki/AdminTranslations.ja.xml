@@ -139,7 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=選択したユーザー
 administration.section.users.deleteUser.newAuthor.programming=プログラミング
 administration.section.users.deleteUser.newAuthor.script=スクリプト
 admin.usersgroups.extensionrights=拡張機能の権限
-### Missing: admin.usersgroups.pageextensionrights=Extension Rights: Page
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group

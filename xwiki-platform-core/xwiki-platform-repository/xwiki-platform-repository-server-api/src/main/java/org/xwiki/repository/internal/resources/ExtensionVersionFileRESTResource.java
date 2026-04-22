@@ -60,6 +60,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.repository.Resources;
+import org.xwiki.repository.internal.RepositoryConfiguration;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
 
@@ -84,6 +85,9 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
     @Inject
     private ExtensionRepositoryManager extensionRepositoryManager;
 
+    @Inject
+    private RepositoryConfiguration repositoryConfiguration;
+
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
         @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion,
@@ -97,7 +101,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         if (repositoryId != null) {
             response =
                 downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
-        } else if (repositoryType != null && repositoryURI != null) {
+        } else if (repositoryType != null && repositoryURI != null
+            && this.repositoryConfiguration.isAllowedCustomRepository()) {
             response = downloadRemoteExtension(
                 new ExtensionResourceReference(extensionId, extensionVersion, repositoryType, new URI(repositoryURI)));
         } else {

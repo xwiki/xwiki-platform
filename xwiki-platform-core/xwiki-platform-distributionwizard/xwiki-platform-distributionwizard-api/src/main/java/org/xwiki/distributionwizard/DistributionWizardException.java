@@ -19,13 +19,31 @@
  */
 package org.xwiki.distributionwizard;
 
+import org.xwiki.stability.Unstable;
+
+/**
+ * Any exception thrown by DW API.
+ *
+ * @version $Id$
+ * @since 18.4.0RC1
+ */
+@Unstable
 public class DistributionWizardException extends Exception
 {
+    /**
+     * Default constructor with a single message.
+     * @param message cause of the exception.
+     */
     public DistributionWizardException(String message)
     {
         super(message);
     }
 
+    /**
+     * Default constructor with message and root cause.
+     * @param message cause of the exception.
+     * @param cause root cause of the exception.
+     */
     public DistributionWizardException(String message, Throwable cause)
     {
         super(message, cause);

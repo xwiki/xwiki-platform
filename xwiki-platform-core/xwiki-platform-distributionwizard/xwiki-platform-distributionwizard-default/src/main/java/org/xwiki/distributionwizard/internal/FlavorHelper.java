@@ -39,14 +39,12 @@ import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.script.ScriptExtensionRewriter;
-import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.platform.flavor.FlavorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -58,8 +56,9 @@ public class FlavorHelper
 {
     public static final String NO_FLAVOR_SELECTION = "noFlavor";
     private static final String FLAVOR_SELECTED_KEY = "flavor.selected";
+    // FIXME: check the regex
     private static final Pattern FLAVOR_EXTENSION_REGEX =
-        Pattern.compile("^(?<flavorId>\\w+)(:::)(?<flavorVersion>\\w+)$");
+        Pattern.compile("^(?<flavorId>.+)(:::)(?<flavorVersion>.+)$");
 
     @Inject
     private FlavorManager flavorManager;
@@ -119,6 +118,12 @@ public class FlavorHelper
         Namespace namespace = getNamespace();
         InstalledExtension flavor = this.flavorManager.getFlavorExtension(namespace);
         return (flavor != null && flavor.isValid(namespace.toString()));
+    }
+
+    public InstalledExtension getInstalledFlavor()
+    {
+        Namespace namespace = getNamespace();
+        return this.flavorManager.getFlavorExtension(namespace);
     }
 
     public Optional<Extension> getSelectedFlavor()

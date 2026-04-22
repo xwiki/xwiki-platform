@@ -34,7 +34,9 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
-public record DistributionWizardUIDefinition(String uiComponentName, String uiModuleName, String html,
+public record DistributionWizardUIDefinition(String uiComponentName,
+                                             String uiModuleName,
+                                             String html,
                                              String requiredSkinExtension)
 {
 }

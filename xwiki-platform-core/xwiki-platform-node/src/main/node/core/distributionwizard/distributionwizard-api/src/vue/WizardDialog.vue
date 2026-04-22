@@ -100,7 +100,7 @@ async function loadStep(step: WizardStepSummary) {
   }
   wizardProps.value.state = DialogState.LOADING_STEP;
   // This needs to be done before loading the step info, as the html of the step might depend on it.
-  if (step.needsManualStart) {
+  if (step.startsOnDisplay) {
     await props.stepResolverFunctions.startStepFunction(step.id);
   }
   const loadedStep = await props.stepResolverFunctions.stepResolverFunction(

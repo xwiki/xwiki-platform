@@ -35,11 +35,10 @@ type WizardStepSummary = {
   title: string;
   index: number;
   dependsOnPreviousStep: boolean;
-  needsManualStart: boolean;
+  startsOnDisplay: boolean;
 };
 type WizardStepProps = WizardStepSummary & {
   uiComponent: UIComponent;
-  originalIndex: number;
   state?: StepState;
   needsInput: boolean;
   skippable: boolean;

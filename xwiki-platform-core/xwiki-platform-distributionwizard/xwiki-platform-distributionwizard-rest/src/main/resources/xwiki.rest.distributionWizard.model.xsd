@@ -50,9 +50,8 @@
         <attribute name="id" type="string"></attribute>
         <attribute name="title" type="string"></attribute>
         <attribute name="index" type="int"></attribute>
-        <attribute name="originalIndex" type="int"></attribute>
         <attribute name="dependsOnPreviousStep" type="boolean"></attribute>
-        <attribute name="needsManualStart" type="boolean"></attribute>
+        <attribute name="startsOnDisplay" type="boolean"></attribute>
         <attribute name="needsInput" type="boolean"></attribute>
         <attribute name="skippable" type="boolean"></attribute>
         <attribute name="done" type="boolean"></attribute>

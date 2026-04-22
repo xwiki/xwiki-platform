@@ -28,26 +28,16 @@ import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.rendering.block.Block;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 @Component
 @Singleton
 @Named("WelcomeStep")
+@Priority(0)
 public class WelcomeStep extends AbstractStep
 {
-    @Override
-    public String getTitle()
-    {
-        return "Welcome";
-    }
-
-    @Override
-    public int getIndex()
-    {
-        return 0;
-    }
-
     @Override
     public boolean isStepDone() throws DistributionWizardException
     {
@@ -55,7 +45,7 @@ public class WelcomeStep extends AbstractStep
     }
 
     @Override
-    public boolean needsManualStart()
+    public boolean startsOnDisplay()
     {
         return true;
     }
@@ -68,6 +58,12 @@ public class WelcomeStep extends AbstractStep
 
     @Override
     public boolean isSkippable()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isRedoable()
     {
         return true;
     }

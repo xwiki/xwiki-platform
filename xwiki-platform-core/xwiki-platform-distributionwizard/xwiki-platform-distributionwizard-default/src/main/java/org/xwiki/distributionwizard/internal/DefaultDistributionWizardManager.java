@@ -19,11 +19,9 @@
  */
 package org.xwiki.distributionwizard.internal;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -56,15 +54,30 @@ public class DefaultDistributionWizardManager implements DistributionWizardManag
         try {
             List<DistributionWizardStep> instanceList = componentManager.getInstanceList(DistributionWizardStep.class);
             List<DistributionWizardStep> resultList = new ArrayList<>();
+            List<String> previousStepIds = new ArrayList<>();
             for (DistributionWizardStep step : instanceList) {
                 if (!step.isStepDone()) {
+                    checkStepDependency(step, previousStepIds);
                     resultList.add(step);
                 }
+                previousStepIds.add(step.getHint());
             }
-            resultList.sort(Comparator.comparingInt(DistributionWizardStep::getIndex));
+            // FIXME: handle dependent steps
             return resultList;
         } catch (ComponentLookupException e) {
             throw new DistributionWizardException("Error while loading the list of steps", e);
+        }
+    }
+
+    private void checkStepDependency(DistributionWizardStep step, List<String> stepIds)
+        throws DistributionWizardException
+    {
+        Optional<String> previousStepOpt = step.dependsOnPreviousStep();
+        if (previousStepOpt.isPresent()) {
+            if (!stepIds.contains(previousStepOpt.get())) {
+                throw new DistributionWizardException(String.format("Step [%s] depends on [%s] but that one is "
+                    + "missing.", step.getHint(), previousStepOpt.get()));
+            }
         }
     }
 

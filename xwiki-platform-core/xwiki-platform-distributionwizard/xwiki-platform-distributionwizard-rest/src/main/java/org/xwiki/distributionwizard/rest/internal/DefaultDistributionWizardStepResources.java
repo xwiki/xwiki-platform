@@ -20,8 +20,6 @@
 package org.xwiki.distributionwizard.rest.internal;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
@@ -32,10 +30,8 @@ import org.xwiki.distributionwizard.DistributionWizardManager;
 import org.xwiki.distributionwizard.DistributionWizardStep;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.rest.DistributionWizardStepResources;
-import org.xwiki.distributionwizard.rest.DistributionWizardStepsResources;
 import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
-import org.xwiki.distributionwizard.rest.model.jaxb.Steps;
 import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
 import org.xwiki.rest.XWikiResource;
 
@@ -73,7 +69,6 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
         Step step = new Step()
             .withId(stepSummary.getId())
             .withTitle(stepSummary.getTitle())
-            .withOriginalIndex(stepSummary.getOriginalIndex())
             .withDone(stepSummary.isDone())
             .withDependsOnPreviousStep(stepSummary.isDependsOnPreviousStep())
             .withNeedsInput(stepSummary.isNeedsInput())
@@ -83,12 +78,13 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
         return Response.ok(step).header(REQUIRED_EXTENSION_HEADER, requiredSkinExtension).build();
     }
 
+    // FIXME: handle exceptions
     @Override
     public void answerStep(String wikiId, String stepId, Map<String, Serializable> data) throws Exception
     {
         DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
         if (wizardStep.needsInput()) {
-            wizardStep.handleAnswer(data);
+            wizardStep.processStep(data);
         } else {
             throw new WebApplicationException("This step doesn't take inputs", Response.Status.BAD_REQUEST);
         }
@@ -98,8 +94,8 @@ public class DefaultDistributionWizardStepResources extends XWikiResource implem
     public void processStep(String wikiId, String stepId) throws Exception
     {
         DistributionWizardStep wizardStep = this.distributionWizardManager.getStep(wikiId, stepId);
-        if (wizardStep.needsManualStart()) {
-            wizardStep.processStep();
+        if (wizardStep.startsOnDisplay()) {
+            wizardStep.processStep(Map.of());
         } else {
             throw new WebApplicationException("This step doesn't start manually.", Response.Status.BAD_REQUEST);
         }

@@ -19,9 +19,7 @@
  */
 package org.xwiki.distributionwizard;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 

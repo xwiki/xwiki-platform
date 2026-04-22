@@ -19,6 +19,10 @@
  */
 package org.xwiki.distributionwizard.internal.steps;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Optional;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
@@ -27,6 +31,7 @@ import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -34,37 +39,26 @@ import jakarta.inject.Singleton;
 @Component
 @Singleton
 @Named("FlavorInstallStep")
+@Priority(30)
 public class FlavorInstallStep extends AbstractStep
 {
     @Inject
     private FlavorHelper flavorHelper;
 
     @Override
-    public String getTitle()
+    public Optional<String> dependsOnPreviousStep()
     {
-        return "Flavor install";
+        return Optional.of("FlavorChoiceStep");
     }
 
     @Override
-    public int getIndex()
-    {
-        return 3;
-    }
-
-    @Override
-    public boolean dependsOnPreviousStep()
+    public boolean startsOnDisplay()
     {
         return true;
     }
 
     @Override
-    public boolean needsManualStart()
-    {
-        return true;
-    }
-
-    @Override
-    public void processStep() throws DistributionWizardException
+    public void processStep(Map<String, Serializable> input) throws DistributionWizardException
     {
         this.invalidateUI();
         if (!this.flavorHelper.isNoFlavorSelected()) {
@@ -88,6 +82,16 @@ public class FlavorInstallStep extends AbstractStep
     public boolean isStepDone() throws DistributionWizardException
     {
         return this.flavorHelper.isNoFlavorSelected() || this.flavorHelper.isFlavorInstalled();
+    }
+
+    @Override
+    public Map<String, Serializable> getStepDoneInformation() throws DistributionWizardException
+    {
+        if (flavorHelper.isFlavorInstalled()) {
+            return Map.of("flavorInstalled", flavorHelper.getInstalledFlavor().getId());
+        } else {
+            return Map.of("flavor.selected", "noFlavor");
+        }
     }
 
     @Override

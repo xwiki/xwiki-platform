@@ -27,6 +27,7 @@ import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
 import org.xwiki.distributionwizard.internal.FlavorHelper;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -34,6 +35,7 @@ import jakarta.inject.Singleton;
 @Component
 @Singleton
 @Named("FlavorChoiceStep")
+@Priority(20)
 public class FlavorChoiceStep extends AbstractStep
 {
     private static final String FLAVOR_KEY = "flavor";
@@ -42,21 +44,11 @@ public class FlavorChoiceStep extends AbstractStep
     private FlavorHelper flavorHelper;
 
     @Override
-    public String getTitle()
-    {
-        return "Flavor Choice";
-    }
-
-    @Override
-    public int getIndex()
-    {
-        return 2;
-    }
-
-    @Override
     public boolean isStepDone()
     {
-        return flavorHelper.isFlavorInstalled() || flavorHelper.getSelectedFlavor().isPresent();
+        return flavorHelper.isFlavorInstalled()
+            || flavorHelper.getSelectedFlavor().isPresent()
+            || flavorHelper.isNoFlavorSelected();
     }
 
     @Override
@@ -72,14 +64,32 @@ public class FlavorChoiceStep extends AbstractStep
     }
 
     @Override
-    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    public void processStep(Map<String, Serializable> data) throws DistributionWizardException
     {
         if (data.containsKey(FLAVOR_KEY)) {
             String selectedFlavor = (String) data.get(FLAVOR_KEY);
             this.flavorHelper.handleFlavorAnswer(selectedFlavor);
-            return true;
+        } else {
+            throw new DistributionWizardException("Missing flavor information");
         }
-        return false;
+    }
+
+    @Override
+    public boolean isRedoable()
+    {
+        return !flavorHelper.isFlavorInstalled();
+    }
+
+    @Override
+    public Map<String, Serializable> getStepDoneInformation() throws DistributionWizardException
+    {
+        if (flavorHelper.isFlavorInstalled()) {
+            return Map.of("flavorInstalled", flavorHelper.getInstalledFlavor().getId());
+        } else if (flavorHelper.isNoFlavorSelected()) {
+            return Map.of("flavor.selected", "noFlavor");
+        } else {
+            return Map.of("flavor.selected", flavorHelper.getSelectedFlavor().get().getId());
+        }
     }
 
     @Override

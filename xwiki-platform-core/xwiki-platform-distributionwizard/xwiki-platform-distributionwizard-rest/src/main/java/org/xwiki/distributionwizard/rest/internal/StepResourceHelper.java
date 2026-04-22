@@ -19,31 +19,33 @@
  */
 package org.xwiki.distributionwizard.rest.internal;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.distributionwizard.DistributionWizardStep;
-import org.xwiki.distributionwizard.DistributionWizardUIDefinition;
-import org.xwiki.distributionwizard.rest.model.jaxb.Step;
 import org.xwiki.distributionwizard.rest.model.jaxb.StepSummary;
-import org.xwiki.distributionwizard.rest.model.jaxb.UIComponent;
+import org.xwiki.localization.ContextualLocalizationManager;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Component(roles = StepResourceHelper.class)
 @Singleton
 public class StepResourceHelper
 {
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     public StepSummary toStepSummary(DistributionWizardStep wizardStep) throws DistributionWizardException
     {
         StepSummary stepSummary = new StepSummary();
         stepSummary.setId(wizardStep.getHint());
-        stepSummary.setTitle(wizardStep.getTitle());
+        String titleLocalizationKey =
+            String.format("distributionWizard.step.%s.title", wizardStep.getHint().toLowerCase());
+        stepSummary.setTitle(this.localizationManager.getTranslationPlain(titleLocalizationKey));
         stepSummary.setDone(wizardStep.isStepDone());
-        stepSummary.setOriginalIndex(wizardStep.getIndex());
-        stepSummary.setDependsOnPreviousStep(wizardStep.dependsOnPreviousStep());
+        stepSummary.setDependsOnPreviousStep(wizardStep.dependsOnPreviousStep().isPresent());
         stepSummary.setNeedsInput(wizardStep.needsInput());
-        stepSummary.setNeedsManualStart(wizardStep.needsManualStart());
+        stepSummary.setNeedsManualStart(wizardStep.startsOnDisplay());
         stepSummary.setSkippable(wizardStep.isSkippable());
         return stepSummary;
     }

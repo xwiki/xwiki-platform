@@ -32,6 +32,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
@@ -40,6 +41,7 @@ import jakarta.inject.Singleton;
 @Component
 @Singleton
 @Named("FirstAdminUserStep")
+@Priority(10)
 public class FirstAdminUserStep extends AbstractStep
 {
     @Inject
@@ -47,18 +49,6 @@ public class FirstAdminUserStep extends AbstractStep
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Override
-    public String getTitle()
-    {
-        return "First admin setup";
-    }
-
-    @Override
-    public int getIndex()
-    {
-        return 1;
-    }
 
     @Override
     public boolean needsInput()
@@ -78,7 +68,7 @@ public class FirstAdminUserStep extends AbstractStep
     }
 
     @Override
-    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    public void processStep(Map<String, Serializable> data) throws DistributionWizardException
     {
         XWikiContext context = this.contextProvider.get();
         String username = String.valueOf(data.get("username"));
@@ -103,7 +93,17 @@ public class FirstAdminUserStep extends AbstractStep
         } catch (WikiManagerException e) {
             throw new DistributionWizardException("Error while setting user as owner of the wiki descriptor", e);
         }
-        return true;
+    }
+
+    @Override
+    public Map<String, Serializable> getStepDoneInformation() throws DistributionWizardException
+    {
+        try {
+            WikiDescriptor wikiDescriptor = this.wikiDescriptorManager.getCurrentWikiDescriptor();
+            return Map.of("ownerId", wikiDescriptor.getOwnerId());
+        } catch (WikiManagerException e) {
+            throw new DistributionWizardException("Error while getting wiki descriptor", e);
+        }
     }
 
     @Override

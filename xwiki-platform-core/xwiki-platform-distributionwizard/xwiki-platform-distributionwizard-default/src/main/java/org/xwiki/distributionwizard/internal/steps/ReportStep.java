@@ -23,26 +23,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.distributionwizard.DistributionWizardException;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 @Component
 @Singleton
 @Named("ReportStep")
+@Priority(40)
 public class ReportStep extends AbstractStep
 {
-    @Override
-    public String getTitle()
-    {
-        return "Report";
-    }
-
-    @Override
-    public int getIndex()
-    {
-        return 4;
-    }
-
     @Override
     public boolean isStepDone() throws DistributionWizardException
     {
@@ -50,7 +40,7 @@ public class ReportStep extends AbstractStep
     }
 
     @Override
-    public boolean needsManualStart()
+    public boolean startsOnDisplay()
     {
         return true;
     }

@@ -21,6 +21,7 @@ package org.xwiki.distributionwizard.internal.steps;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.distributionwizard.DistributionWizardException;
@@ -91,31 +92,37 @@ public abstract class AbstractStep implements DistributionWizardStep
     }
 
     @Override
-    public boolean needsManualStart()
+    public boolean startsOnDisplay()
     {
         return false;
     }
 
     @Override
-    public boolean dependsOnPreviousStep()
+    public Optional<String> dependsOnPreviousStep()
     {
-        return false;
+        return Optional.empty();
     }
 
     @Override
-    public void processStep() throws DistributionWizardException
+    public void processStep(Map<String, Serializable> input) throws DistributionWizardException
     {
         completeJobStep();
     }
 
     @Override
-    public boolean needsInput()
+    public Map<String, Serializable> getStepDoneInformation() throws DistributionWizardException
+    {
+        return Map.of();
+    }
+
+    @Override
+    public boolean isRedoable()
     {
         return false;
     }
 
     @Override
-    public boolean handleAnswer(Map<String, Serializable> data) throws DistributionWizardException
+    public boolean needsInput()
     {
         return false;
     }

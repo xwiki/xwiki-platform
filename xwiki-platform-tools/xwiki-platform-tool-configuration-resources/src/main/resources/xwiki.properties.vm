@@ -700,6 +700,16 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
+# Repository
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.3.0 and 17.10.8]
+#-# Indicate if the REST API allows passing a custom repository type and URI to resolve extensions.
+#-# 
+#-# This is disabled by default for security reasons.
+# repository.rest.allowCustomRepository=false
+
+#-------------------------------------------------------------------------------------
 # Extension Manager - Security
 #-------------------------------------------------------------------------------------
 

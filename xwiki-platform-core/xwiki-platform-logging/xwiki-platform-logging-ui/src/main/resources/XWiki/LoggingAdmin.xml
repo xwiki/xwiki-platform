@@ -39,6 +39,11 @@
   <content>(% class="noitems" %)
 {{translation key="logging.admin.intro" /}}
 
+{{info}}
+{{translation key="logging.admin.temporary.warning" /}}
+{{/info}}
+
+
 {{velocity}}
 #set($logging = $services.logging)
 ##

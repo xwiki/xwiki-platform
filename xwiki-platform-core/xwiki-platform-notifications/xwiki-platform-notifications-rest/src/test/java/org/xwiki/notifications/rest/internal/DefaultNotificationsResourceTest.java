@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManage
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -54,6 +57,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -132,7 +136,7 @@ class DefaultNotificationsResourceTest
         String userId = "XWiki.Admin";
         XWikiUser wikiUser = mock();
         when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
-        DocumentReference userIdDocReference = mock();
+        DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
         when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
         String maxCountString = String.valueOf(limit);
@@ -150,7 +154,9 @@ class DefaultNotificationsResourceTest
         String userId = "XWiki.Admin";
         XWikiUser wikiUser = mock();
         when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
-
+        DocumentReference userIdDocReference = mock("userIdDocReference");
+        when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
+        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
         String maxCountString = String.valueOf(limit);
         WebApplicationException exception = assertThrows(WebApplicationException.class,
             () -> this.notificationsResource.getNotifications(
@@ -161,6 +167,23 @@ class DefaultNotificationsResourceTest
         assertThat(exception.getResponse().getEntity().toString(), containsString("Invalid limit value: " + limit));
     }
 
+    @Test
+    void getNotificationsWrongUser() throws Exception
+    {
+        String userId = "XWiki.Admin";
+        XWikiUser wikiUser = mock();
+        DocumentReference wikiUserRef = mock("wikiUserRef");
+        when(wikiUser.getUserReference()).thenReturn(wikiUserRef);
+        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+        DocumentReference userIdDocReference = mock("userIdDocReference");
+        when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
+        Response response = this.notificationsResource.getNotifications(
+                null, userId, null, true, null, null, null, null, null, "10", null,
+                null, null, null, null, null, null, null, null, null
+        );
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+    }
+
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
     void getNotificationsCountLimitErrors(int limit) throws Exception
@@ -168,6 +191,9 @@ class DefaultNotificationsResourceTest
         String userId = "XWiki.Admin";
         XWikiUser wikiUser = mock();
         when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+        DocumentReference userIdDocReference = mock("userIdDocReference");
+        when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
+        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
 
         String maxCountString = String.valueOf(limit);
         WebApplicationException exception = assertThrows(WebApplicationException.class,

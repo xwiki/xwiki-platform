@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.attachments;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -29,6 +30,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
@@ -39,6 +41,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 /**
  * @version $Id$
@@ -47,6 +50,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl")
 public class AttachmentResourceImpl extends BaseAttachmentsResource implements AttachmentResource
 {
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
     @Override
     public Response getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
         throws XWikiRestException
@@ -60,7 +66,25 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
+            String ofilename = Util.encodeURI(xwikiAttachment.getFilename(), getXWikiContext())
+                .replaceAll("\\+", "%20");
+            // The inline attribute of Content-Disposition tells the browser that they should display
+            // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
+            // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
+            // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
+            // Save dialog box (exe, zip, xar, etc).
+            String dispType = "inline";
+            // If the mimetype is not authorized to be displayed inline,
+            // let's force its content disposition to download.
+            if (attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment.getAttachment())) {
+                dispType = "attachment";
+            }
+            return Response
+                .ok()
+                .type(xwikiAttachment.getMimeType())
+                .entity(xwikiAttachment.getContent())
+                .header("Content-Disposition", dispType + "; filename*=utf-8''" + ofilename)
+                .build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

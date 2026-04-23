@@ -46,6 +46,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -477,17 +478,10 @@ public class DownloadAction extends XWikiAction
         // Save dialog box (exe, zip, xar, etc).
         String dispType = "inline";
 
-        // Determine whether the user who attached the file has Programming Rights or not.
-        boolean hasPR = false;
-        String author = attachment.getAuthor();
-        try {
-            hasPR = context.getWiki().getRightService().hasAccessLevel("programming", author, "XWiki.XWikiPreferences",
-                context);
-        } catch (Exception e) {
-            hasPR = false;
-        }
+        XWikiAttachmentSecurityManager attachmentSecurityManager =
+            Utils.getComponent(XWikiAttachmentSecurityManager.class);
         // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if (shouldBeDownloaded(hasPR, request, mimetype)) {
+        if (attachmentSecurityManager.shouldBeDownloaded(attachment)) {
             dispType = ATTACHMENT;
         }
         // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
@@ -516,50 +510,5 @@ public class DownloadAction extends XWikiAction
             return false;
         }
         return start == null || end == null || end >= start;
-    }
-
-    /**
-     * Check if an attachment should be downloaded or can be displayed inline.
-     * Attachments should be downloaded if:
-     * <ul>
-     *     <li>the request contains a force-download parameter with the value 1</li>
-     *     <li>or the mimetype is part of the forceDownload property list</li>
-     *     <li>or no custom whitelist exists and a custom blacklist exists and contains the mimetype and the attachment
-     *     has not been added by a user with programming rights</li>
-     *     <li>or the whitelist (default or custom) does not contains the mimetype and the attachment has not been added
-     *     by a user with programming rights</li>
-     * </ul>
-     *
-     * Note that in the case of the request does not contain a force-downloaded parameter with the value 1 and the
-     * mimetype is not part of the forceDownload property list, but the attachment has been added by a user with
-     * programming right, then the attachment is always displayed inline.
-     *
-     * @param hasPR a boolean indicating if the attachment has been added by someone with programming rights.
-     * @param request the current download request.
-     * @param mimeType the mimetype of the attachment.
-     * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
-     */
-    private boolean shouldBeDownloaded(boolean hasPR, XWikiRequest request, String mimeType)
-    {
-        boolean result;
-        ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-
-        boolean whiteListExists = configuration.containsKey(WHITELIST_PROPERTY);
-        boolean blackListExists = configuration.containsKey(BLACKLIST_PROPERTY);
-        List<String> blackList = configuration.getProperty(BLACKLIST_PROPERTY, Collections.emptyList());
-        List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
-        List<String> forceDownloadList = configuration.getProperty(FORCE_DOWNLOAD_PROPERTY, Collections.emptyList());
-
-        if ("1".equals(request.getParameter("force-download")) || forceDownloadList.contains(mimeType)) {
-            result = true;
-        } else if (hasPR) {
-            result = false;
-        } else if (blackListExists && !whiteListExists) {
-            result = blackList.contains(mimeType);
-        } else {
-            result = !whiteList.contains(mimeType);
-        }
-
-        return result;
     }
 }

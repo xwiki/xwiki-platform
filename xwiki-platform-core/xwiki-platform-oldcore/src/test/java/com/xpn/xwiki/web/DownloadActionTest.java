@@ -37,6 +37,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
@@ -116,6 +117,9 @@ class DownloadActionTest
     @MockComponent
     private ResourceReferenceManager resourceReferenceManager;
 
+    @MockComponent
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
     private DocumentReference documentReference;
 
     /**
@@ -150,12 +154,13 @@ class DownloadActionTest
     }
 
     // Helpers for the tests
-    private void createAttachment(Date d, String name) throws IOException
+    private XWikiAttachment createAttachment(Date d, String name) throws IOException
     {
         XWikiAttachment filetxt = new XWikiAttachment(this.document, name);
         filetxt.setContent(new ByteArrayInputStream(this.fileContent));
         filetxt.setDate(d);
         this.document.getAttachmentList().add(filetxt);
+        return filetxt;
     }
 
     private void setRequestExpectations(String uri, String id, String forceDownload, String range, long modifiedSince,
@@ -371,114 +376,6 @@ class DownloadActionTest
     }
 
     @Test
-    void downloadWhenForce() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename*=utf-8''file.txt");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    void downloadWhenMimeTypeBlacklisted() throws Exception
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-        this.oldcore.getConfigurationSource().setProperty(DownloadAction.BLACKLIST_PROPERTY,
-            Arrays.asList("application/x-bzip", "image/png"));
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "attachment; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    void downloadWhenMimeTypeBlacklistedAndAttachmentAddedByPRUser() throws Exception
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-        this.oldcore.getConfigurationSource().setProperty(DownloadAction.BLACKLIST_PROPERTY,
-            Arrays.asList("application/x-bzip", "image/png"));
-        // Consider PR rights
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
-            any(XWikiContext.class))).thenReturn(true);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "inline; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    void downloadWhenMimeTypeForcedDownloadAndAttachmentAddedByPRUser() throws Exception
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-        this.oldcore.getConfigurationSource().setProperty(DownloadAction.FORCE_DOWNLOAD_PROPERTY,
-            Arrays.asList("application/x-bzip", "image/png"));
-        // Consider PR rights
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
-            any(XWikiContext.class))).thenReturn(true);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "attachment; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    void downloadWhenMimeTypeNotWhitelisted() throws Exception
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-        this.oldcore.getConfigurationSource().setProperty(DownloadAction.WHITELIST_PROPERTY,
-            Collections.singletonList("application/x-bzip"));
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "attachment; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    void downloadWhenMimeTypeNotWhitelistedButAddedByPRUser() throws Exception
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-        this.oldcore.getConfigurationSource().setProperty(DownloadAction.WHITELIST_PROPERTY,
-            Collections.singletonList("application/x-bzip"));
-        // Consider PR rights
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
-            any(XWikiContext.class))).thenReturn(true);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "inline; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
     void downloadWithRealDate() throws XWikiException, IOException
     {
         Date d = new Date(411757300000l);
@@ -510,10 +407,10 @@ class DownloadActionTest
     void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
     {
         Date d = new Date();
-        createAttachment(d, "file name.txt");
+        XWikiAttachment attachment = createAttachment(d, "file name.txt");
         when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
-
+        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
@@ -525,11 +422,11 @@ class DownloadActionTest
     void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
     {
         Date d = new Date();
-        createAttachment(d, "file\u021B.txt");
+        XWikiAttachment attachment = createAttachment(d, "file\u021B.txt");
 
         when(this.engineContext.getMimeType("file\u021B.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
-
+        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
@@ -816,7 +713,7 @@ class DownloadActionTest
             new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page")), EntityResourceAction.VIEW));
 
         // Note: we don't give PR and the attachment is not an authorized mime type.
-
+        when(attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(action.render(xcontext));
 
         // This is the test, we verify what is set in the response
@@ -882,6 +779,7 @@ class DownloadActionTest
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
         when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
         doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
+        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
 
         assertNull(action.render(xcontext));
 

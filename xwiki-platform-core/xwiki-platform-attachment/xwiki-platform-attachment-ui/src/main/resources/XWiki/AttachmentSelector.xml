@@ -472,6 +472,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   function uploadTemporaryAttachment() {
     // Require jquery locally until we are able to fully migrate this code away from prototype.
     const form = this.property.up('form');
+    const propertyReferenceInput = this.property.querySelector('input[type="hidden"].property-reference');
     require(['jquery'], function ($) {
       const data = new FormData();
       const uploadedFile = $('#attachfile')[0].files[0];
@@ -510,7 +511,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           .prop('type', 'hidden')
           .prop('name', 'uploadedFiles')
           .prop('value', response.fileName))
-        $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
+        propertyReferenceInput.value = response.fileName;
         this.updateAttachment(response.fileName, response.url);
         this.dialog.closeDialog();
       }.bind(this)).fail(function  () {

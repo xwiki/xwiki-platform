@@ -174,7 +174,7 @@ type BlockNoteViewWrapperProps = {
   /**
    * Intercept link edition mechanism (i.e. inserting or editing a link)
    *
-   * @since 18.3.0RC1
+   * @since 18.4.0RC1
    * @beta
    */
   linkEditionHandler: LinkEditionHandler;

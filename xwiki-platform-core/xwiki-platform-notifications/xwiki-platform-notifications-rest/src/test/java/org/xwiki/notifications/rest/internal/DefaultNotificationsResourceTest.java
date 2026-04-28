@@ -49,7 +49,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -122,10 +121,9 @@ class DefaultNotificationsResourceTest
     void getNotificationsRSSGuestUserId() throws Exception
     {
         String userId = "XWiki.Admin";
-        when(this.wiki.checkAuth(this.context)).thenReturn(null);
+        when(this.context.getUserReference()).thenReturn(null);
         assertNull(this.notificationsResource.getNotificationsRSS(null, userId, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null));
-        verify(this.wiki).checkAuth(this.context);
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
@@ -134,11 +132,9 @@ class DefaultNotificationsResourceTest
     void getgetNotificationsRSSLimitErrors(int limit) throws Exception
     {
         String userId = "XWiki.Admin";
-        XWikiUser wikiUser = mock();
-        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
-        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
+        when(this.context.getUserReference()).thenReturn(userIdDocReference);
         String maxCountString = String.valueOf(limit);
         WebApplicationException exception = assertThrows(WebApplicationException.class,
             () -> this.notificationsResource.getNotificationsRSS(null, userId,
@@ -152,11 +148,9 @@ class DefaultNotificationsResourceTest
     void getNotificationsLimitErrors(int limit) throws Exception
     {
         String userId = "XWiki.Admin";
-        XWikiUser wikiUser = mock();
-        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
-        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
+        when(this.context.getUserReference()).thenReturn(userIdDocReference);
         String maxCountString = String.valueOf(limit);
         WebApplicationException exception = assertThrows(WebApplicationException.class,
             () -> this.notificationsResource.getNotifications(
@@ -171,10 +165,8 @@ class DefaultNotificationsResourceTest
     void getNotificationsWrongUser() throws Exception
     {
         String userId = "XWiki.Admin";
-        XWikiUser wikiUser = mock();
         DocumentReference wikiUserRef = mock("wikiUserRef");
-        when(wikiUser.getUserReference()).thenReturn(wikiUserRef);
-        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+        when(this.context.getUserReference()).thenReturn(wikiUserRef);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
         Response response = this.notificationsResource.getNotifications(
@@ -189,11 +181,9 @@ class DefaultNotificationsResourceTest
     void getNotificationsCountLimitErrors(int limit) throws Exception
     {
         String userId = "XWiki.Admin";
-        XWikiUser wikiUser = mock();
-        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
-        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
+        when(this.context.getUserReference()).thenReturn(userIdDocReference);
 
         String maxCountString = String.valueOf(limit);
         WebApplicationException exception = assertThrows(WebApplicationException.class,
@@ -209,18 +199,15 @@ class DefaultNotificationsResourceTest
     void getNotificationsRSSUserId() throws Exception
     {
         String userId = "XWiki.Admin";
-        XWikiUser wikiUser = mock(XWikiUser.class);
-        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
         DocumentReference userIdDocReference = mock(DocumentReference.class);
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
 
-        when(wikiUser.getUserReference()).thenReturn(mock(DocumentReference.class));
+        when(this.context.getUserReference()).thenReturn(mock(DocumentReference.class));
         assertNull(this.notificationsResource.getNotificationsRSS(null, userId, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null));
-        verify(this.wiki).checkAuth(this.context);
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
-        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
+        when(this.context.getUserReference()).thenReturn(userIdDocReference);
 
         String useUserPreferences = "false";
         String untilDate = "0";

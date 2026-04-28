@@ -46,10 +46,11 @@ import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -83,14 +84,18 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private DefaultNotificationParametersFactory notificationParametersFactory;
 
     @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @Inject
     private RSSFeedRenderer rssFeedRenderer;
 
     private boolean hasAccess(String userId) throws XWikiException
     {
         if (!StringUtils.isEmpty(userId)) {
             DocumentReference userDoc = this.documentReferenceResolver.resolve(userId);
-            XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
-            return xWikiUser != null && xWikiUser.getUserReference().equals(userDoc);
+            DocumentReference loggedInUserRef = getXWikiContext().getUserReference();
+            return loggedInUserRef != null && loggedInUserRef.equals(userDoc)
+                || this.contextualAuthorizationManager.hasAccess(Right.ADMIN, userDoc);
         }
         return true;
     }

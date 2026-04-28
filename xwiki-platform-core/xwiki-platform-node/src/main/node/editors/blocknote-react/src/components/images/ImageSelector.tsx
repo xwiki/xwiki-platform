@@ -40,12 +40,11 @@ import {
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
-import type { LinkSuggestion } from "../../misc/linkSuggest";
+import type { LinkSuggestion } from "../SearchBox";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
-<<<<<<< HEAD
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
 } from "@xwiki/platform-model-reference-api";
@@ -53,11 +52,6 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
-=======
-  LinkEditionContext,
-  LinkSuggestion,
-} from "../../misc/linkEditionCtx";
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
 
 export type ImageSelectorProps = {
   currentSelection?: string;

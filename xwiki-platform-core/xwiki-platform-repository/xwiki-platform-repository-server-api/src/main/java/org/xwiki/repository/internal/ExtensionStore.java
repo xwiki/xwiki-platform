@@ -212,6 +212,8 @@ public class ExtensionStore implements Initializable, Disposable
             value = (T) property.getValue();
             if (value instanceof String stringValue) {
                 value = (T) StringUtils.defaultIfEmpty(stringValue, (String) def);
+            } else if (value instanceof Collection collectionValue) {
+                value = collectionValue.isEmpty() ? def : (T) collectionValue;
             } else if (value == null) {
                 value = def;
             }

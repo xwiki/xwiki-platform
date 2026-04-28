@@ -31,6 +31,8 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.DownloadAction;
 
@@ -81,13 +83,35 @@ public class XWikiAttachmentSecurityManager
      * @param attachment the attachment to check if it should be downloaded or provided inline.
      * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
      */
+    public boolean shouldBeDownloaded(Attachment attachment)
+    {
+        if (attachment != null) {
+            DocumentReference authorReference = attachment.getAuthorReference();
+            boolean hasPR = this.authorizationManager.hasAccess(Right.PROGRAM, authorReference,
+                this.contextProvider.get().getWikiReference());
+            String mimeType = attachment.getMimeType();
+            return shouldBeDownloaded(mimeType, hasPR);
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Same as {@link #shouldBeDownloaded(Attachment)}: wrap the given attachment to call it.
+     *
+     * @param attachment the attachment to test if it should be downloaded or displayed inline.
+     * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
+     * @see #shouldBeDownloaded(Attachment)
+     */
     public boolean shouldBeDownloaded(XWikiAttachment attachment)
     {
-        DocumentReference authorReference = attachment.getAuthorReference();
-        boolean hasPR = this.authorizationManager.hasAccess(Right.PROGRAM, authorReference,
-            this.contextProvider.get().getWikiReference());
-        String mimeType = attachment.getMimeType(this.contextProvider.get());
-        return shouldBeDownloaded(mimeType, hasPR);
+        if (attachment != null) {
+            XWikiContext context = this.contextProvider.get();
+            Document attachmentDoc = new Document(attachment.getDoc(), context);
+            return shouldBeDownloaded(new Attachment(attachmentDoc, attachment, context));
+        } else {
+            return true;
+        }
     }
 
     private boolean shouldBeDownloaded(String mimeType, boolean hasPR)

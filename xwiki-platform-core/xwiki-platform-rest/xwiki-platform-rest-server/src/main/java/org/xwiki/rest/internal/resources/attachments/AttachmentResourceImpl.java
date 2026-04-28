@@ -75,7 +75,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
             String dispType = "inline";
             // If the mimetype is not authorized to be displayed inline,
             // let's force its content disposition to download.
-            if (attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment.getAttachment())) {
+            if (attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment)) {
                 dispType = "attachment";
             }
             return Response

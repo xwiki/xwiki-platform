@@ -22,33 +22,69 @@ import type {
   DocumentReference,
 } from "@xwiki/platform-model-api";
 
+/**
+ * Parameters for a link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkData = {
   displayText: string;
   newTab?: boolean;
   target: LinkTarget;
 };
 
+/**
+ * Target of a link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkTarget =
   | { type: "page"; config: LinkPageConfig }
   | { type: "attachment"; config: LinkAttachmentConfig }
   | { type: "url"; config: LinkUrlConfig }
   | { type: "email"; config: LinkEmailConfig };
 
+/**
+ * Configuration for a page link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkPageConfig = {
   ref: DocumentReference | null;
   queryString?: string;
   anchor?: string;
 };
 
+/**
+ * Configuration for an attachment link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkAttachmentConfig = {
   ref: AttachmentReference | null;
   queryString?: string;
 };
 
+/**
+ * Configuration for an URL link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkUrlConfig = {
   url: string;
 };
 
+/**
+ * Configuration for an e-mail link
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 type LinkEmailConfig = {
   address: string;
   messageSubject?: string;

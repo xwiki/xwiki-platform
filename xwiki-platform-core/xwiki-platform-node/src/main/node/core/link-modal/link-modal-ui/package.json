@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/link-modal-ui",
+  "name": "@xwiki/platform-link-modal-ui",
   "version": "18.4.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -61,7 +61,9 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",

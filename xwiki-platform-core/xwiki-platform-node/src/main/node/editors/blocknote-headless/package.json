@@ -63,8 +63,8 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
-    "@xwiki/link-modal-ui": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

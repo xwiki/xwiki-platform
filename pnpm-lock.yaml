@@ -1715,9 +1715,15 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
@@ -3024,12 +3030,12 @@ importers:
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
-      '@xwiki/link-modal-ui':
-        specifier: workspace:*
-        version: link:../../core/link-modal/link-modal-ui
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-link-modal-ui':
+        specifier: workspace:*
+        version: link:../../core/link-modal/link-modal-ui
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../tools/tool-apiextractorconfig

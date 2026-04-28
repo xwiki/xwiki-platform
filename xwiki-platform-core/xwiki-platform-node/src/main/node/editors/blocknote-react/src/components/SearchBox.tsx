@@ -71,7 +71,7 @@ type SearchBoxProps = {
 };
 
 /**
- * @since 18.3.0RC-1
+ * @since 18.4.0RC-1
  * @beta
  */
 type LinkSuggestion = {

@@ -53,7 +53,12 @@ export type BlockNoteViewWrapperProps = {
     } | false;
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
+<<<<<<< HEAD
     depsContainer: Container;
+=======
+    linkEditionHandler: LinkEditionHandler;
+    linkEditionCtx: LinkEditionContext;
+>>>>>>> 357cbef0fc (update)
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
@@ -142,6 +147,22 @@ export type InlineMacroInvocation = {
     } | {
         type: "none";
     };
+};
+
+// @beta
+export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
+
+// @beta
+export type LinkEditionHandlerProps = {
+    current: {
+        title: string;
+        url: string;
+    };
+    onSubmit: (link: {
+        title: string;
+        url: string;
+    }) => void;
+    mode: "createNew" | "editExisting";
 };
 
 // @beta

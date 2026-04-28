@@ -23,6 +23,17 @@ import { EntityType } from "@xwiki/platform-model-api";
 import type { LinkTarget } from "./data/linkType";
 import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 
+/**
+ * Parse a link target from an URL
+ *
+ * @param url - URL to parse
+ * @param remoteURLParser - Remote URL parser
+ *
+ * @returns The parsed link target
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
 export function parseLinkTarget(
   url: string,
   remoteURLParser: RemoteURLParser,

@@ -135,7 +135,7 @@ public class SSXListenerTest
         ObjectPropertyReference objPropertyReference = 
                 new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));
         LESSObjectPropertyResourceReference lessObjectPropertyResourceReference = 
-                new LESSObjectPropertyResourceReference(objPropertyReference, null, null);
+                new LESSObjectPropertyResourceReference(objPropertyReference, null, null, null);
         when(lessResourceReferenceFactory.createReferenceForXObjectProperty(eq(objPropertyReference)))
                 .thenReturn(lessObjectPropertyResourceReference);
 

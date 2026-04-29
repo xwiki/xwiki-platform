@@ -20,20 +20,28 @@
 package org.xwiki.localization.macro;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
-import org.xwiki.localization.TranslationBundle;
+import javax.script.ScriptContext;
+
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.Initialized;
 import org.xwiki.rendering.test.integration.Scope;
 import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.script.internal.ScriptExecutionContextInitializer;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -58,8 +66,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("entranslationmessage"
-                    + Arrays.toString(parameters)) : new WordBlock("entranslationmessage");
+                return parameters.length > 0 ? new WordBlock("entranslationmessage" + Arrays.toString(parameters))
+                    : new WordBlock("entranslationmessage");
             }
 
             @Override
@@ -98,8 +106,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("frtranslationmessage"
-                    + Arrays.toString(parameters)) : new WordBlock("frtranslationmessage");
+                return parameters.length > 0 ? new WordBlock("frtranslationmessage" + Arrays.toString(parameters))
+                    : new WordBlock("frtranslationmessage");
             }
 
             @Override
@@ -135,5 +143,16 @@ public class IntegrationTests extends RenderingTest
 
         when(localizationManager.getTranslation("unexisting.translation", Locale.ENGLISH)).thenReturn(null);
         when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
+
+        ContextualAuthorizationManager contextualAuthorizationManager =
+            this.getComponentManager().registerMockComponent(ContextualAuthorizationManager.class);
+        when(contextualAuthorizationManager.hasAccess(any(), any())).thenReturn(true);
+
+        ExecutionContext executionContext = new ExecutionContext();
+        ExecutionContextManager executionContextManager = componentManager.getInstance(ExecutionContextManager.class);
+        executionContextManager.initialize(executionContext);
+        ScriptContext scriptContext =
+            (ScriptContext) executionContext.getProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
+        scriptContext.setAttribute("someScriptParameter", List.of("sparm1", 2), ScriptContext.GLOBAL_SCOPE);
     }
 }

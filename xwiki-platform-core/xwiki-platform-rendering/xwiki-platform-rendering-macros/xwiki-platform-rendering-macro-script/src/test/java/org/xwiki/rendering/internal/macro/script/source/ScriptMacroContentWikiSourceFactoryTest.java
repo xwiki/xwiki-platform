@@ -23,6 +23,8 @@ import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.rendering.internal.macro.script.DefaultScriptMacroTools;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.macro.source.MacroContentWikiSource;
@@ -31,6 +33,7 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -47,6 +50,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList(DefaultScriptMacroTools.class)
 class ScriptMacroContentWikiSourceFactoryTest
 {
     @InjectMockComponents
@@ -58,20 +62,20 @@ class ScriptMacroContentWikiSourceFactoryTest
     @MockComponent
     private ContextualAuthorizationManager authorization;
 
+    @MockComponent
+    private ConverterManager converterManager;
+
     @Test
     void getContent() throws MacroExecutionException, AccessDeniedException
     {
         MacroTransformationContext context = new MacroTransformationContext();
         MacroContentSourceReference reference = new MacroContentSourceReference("script", "variable");
 
-        MacroExecutionException exception =
-            assertThrows(MacroExecutionException.class, () -> this.factory.getContent(reference, context));
-        assertEquals("No script context could be found in the current context", exception.getMessage());
-
         ScriptContext scriptContext = new SimpleScriptContext();
         when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContext);
 
-        exception = assertThrows(MacroExecutionException.class, () -> this.factory.getContent(reference, context));
+        MacroExecutionException exception =
+            assertThrows(MacroExecutionException.class, () -> this.factory.getContent(reference, context));
         assertEquals("No script context value could be found for name [variable]", exception.getMessage());
 
         context.getTransformationContext().setRestricted(true);
@@ -80,6 +84,7 @@ class ScriptMacroContentWikiSourceFactoryTest
         assertEquals("Script binding is not supported in a restricted context", exception.getMessage());
 
         context.getTransformationContext().setRestricted(false);
+        when(this.converterManager.convert(String.class, "value")).thenReturn("value");
 
         scriptContext.setAttribute("variable", "value", ScriptContext.ENGINE_SCOPE);
 

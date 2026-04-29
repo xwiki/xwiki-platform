@@ -22,18 +22,14 @@ package org.xwiki.rendering.internal.macro.script.source;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.script.ScriptMacroTools;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.macro.source.MacroContentWikiSource;
 import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Get content from a script binding.
@@ -48,40 +44,20 @@ import org.xwiki.security.authorization.Right;
 public class ScriptMacroContentWikiSourceFactory implements MacroContentWikiSourceFactory
 {
     @Inject
-    private ScriptContextManager scriptContextManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
+    private ScriptMacroTools scriptMacroTools;
 
     @Override
     public MacroContentWikiSource getContent(MacroContentSourceReference reference, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // Script binding is not allowed in restricted context
-        if (context.getTransformationContext().isRestricted()) {
-            throw new MacroExecutionException("Script binding is not supported in a restricted context");
-        }
-
-        // Current author must have script right
-        try {
-            this.authorization.checkAccess(Right.SCRIPT);
-        } catch (AccessDeniedException e) {
-            throw new MacroExecutionException("Current author must have script right to access a script binding", e);
-        }
-
-        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
-
-        if (scriptContext == null) {
-            throw new MacroExecutionException("No script context could be found in the current context");
-        }
-
-        Object value = scriptContext.getAttribute(reference.getReference());
+        // Get the value from the script context
+        String value = this.scriptMacroTools.getScriptValue(reference.getReference(), context, String.class);
 
         if (value == null) {
             throw new MacroExecutionException(
                 "No script context value could be found for name [" + reference.getReference() + "]");
         }
 
-        return new MacroContentWikiSource(reference, value.toString(), null);
+        return new MacroContentWikiSource(reference, value, null);
     }
 }

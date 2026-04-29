@@ -15,9 +15,9 @@ body {
 
 div.suggestItems {
   position: absolute;
-  border: 1px solid $theme.borderColor;
+  border: 1px solid var(--xwiki-border-color);
   border-top: none;
-  background: $theme.pageContentBackgroundColor;
+  background: var(--xwiki-page-content-bg);
   z-index: 100013;
   text-align:left;
 }

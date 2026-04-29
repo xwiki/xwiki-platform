@@ -19,17 +19,20 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Default implementation for {@link org.xwiki.lesscss.resources.LESSResourceReferenceFactory}.
@@ -52,7 +55,11 @@ public class DefaultLESSResourceReferenceFactory implements LESSResourceReferenc
 
     @Inject
     private DocumentAccessBridge bridge;
-    
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer;
+
     @Override
     public LESSResourceReference createReferenceForSkinFile(String fileName)
     {
@@ -62,6 +69,7 @@ public class DefaultLESSResourceReferenceFactory implements LESSResourceReferenc
     @Override
     public LESSResourceReference createReferenceForXObjectProperty(ObjectPropertyReference objectPropertyReference)
     {
-        return new LESSObjectPropertyResourceReference(objectPropertyReference, entityReferenceSerializer, bridge);
+        return new LESSObjectPropertyResourceReference(objectPropertyReference, this.entityReferenceSerializer,
+            this.bridge,  this.userReferenceDocumentReferenceSerializer);
     }
 }

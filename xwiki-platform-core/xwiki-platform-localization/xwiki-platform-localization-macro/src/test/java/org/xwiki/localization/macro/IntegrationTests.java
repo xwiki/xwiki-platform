@@ -20,6 +20,7 @@
 package org.xwiki.localization.macro;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.jmock.Expectations;
@@ -30,6 +31,7 @@ import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;

@@ -24,6 +24,8 @@
 #if($xcontext.getAction() != 'edit')
   $response.sendRedirect($doc.getURL('edit',"editor=object"))
 #end
+## Include xwikivars to ensure variables are available
+#template('xwikivars.vm')
 ## Macros
 ##
 #*

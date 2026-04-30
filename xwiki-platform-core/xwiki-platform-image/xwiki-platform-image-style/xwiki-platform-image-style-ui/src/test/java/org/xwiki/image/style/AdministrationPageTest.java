@@ -50,8 +50,7 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @ComponentList({
-    ModelScriptService.class,
-    TranslationMacro.class
+    ModelScriptService.class
 })
 class AdministrationPageTest extends PageTest
 {

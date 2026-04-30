@@ -50,7 +50,7 @@
     Release Date: $doc.display("releaseDate")
     Released by:
     #foreach ($releaseManager in $object.getProperty('releaseManagers').getValue().split(','))
-      {{useravatar username="$releaseManager" width="100"/}}
+      {{useravatar username="$services.rendering.escape($releaseManager, 'xwiki/2.1')" width="100"/}}
     #end
   {{/box}}
 {{/velocity}}

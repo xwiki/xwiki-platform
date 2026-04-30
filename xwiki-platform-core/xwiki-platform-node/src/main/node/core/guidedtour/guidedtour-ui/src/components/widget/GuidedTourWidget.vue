@@ -131,10 +131,10 @@ function onCloseGuidedTourWidget(buttonClicked: boolean) {
     state.isWidgetCollapsed = !state.isWidgetCollapsed;
   }
 }
-onMounted(async () => {
+onMounted(() => {
   // TODO: Split these into two Async components, so they can load independently (The links can show up earlier than the tasks, etc...)
   state.waitingLoadAsync = 0;
-  await guidedTourManager
+  guidedTourManager
     .getTours()
     .then((tours) => {
       // In order for the progress to be reactive, we need to preserve the original tours array. Thus, the elements need to be pushed into the old array.
@@ -148,7 +148,7 @@ onMounted(async () => {
       state.toursLoadError = e;
       state.waitingLoadAsync++;
     });
-  await guidedTourManager
+  guidedTourManager
     .getUsefulLinks()
     .then((usefulLinks) => {
       state.usefulLinks = usefulLinks;

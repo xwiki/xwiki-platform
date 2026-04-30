@@ -39,7 +39,7 @@ const util = {
     customSkipAll.classList.add("driver-xwiki-skip-all-button");
     function onSkipAll() {
       guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
-      guidedTourManager.activeTask?.destroy();
+      guidedTourManager.activeDriverTask?.destroy();
     }
     customSkipAll.onclick = onSkipAll;
     customSkipAll.innerHTML = "Skip All"; // TODO: Add translation.
@@ -139,17 +139,30 @@ function XWikiDriverConfig(
       popDOM.previousButton.classList.add("btn", "btn-sm"); // TODO: Make this an <a> instead of <button>
       // To ensure the order is consistent, re-build the entire modal.
       popDOM.wrapper.insertBefore(popDOM.progress, popDOM.title);
-      // guidedtour.markStepDone or markStepShown(step)
     },
     onDestroyed: function (_element, _step, _options) {
       console.debug("onDestroyed", _element, _step, _options);
       // TODO: Add back the commented code, when you find a way to reliably detect whether a task was skipped.
       // The state is empty when this function is called.
-      // const status =
-      //   (options.state.activeIndex ?? -1 >= task.steps!.length)
-      //     ? TourTaskStatus.DONE
-      //     : TourTaskStatus.SKIPPED;
-      // guidedTourManager.setTaskStatus(task, status);
+      const status =
+        Number.parseInt(
+          guidedTourManager.getStorageKey(
+            guidedTourManager.getTaskStepStorageKey(task),
+          ) ?? "-1",
+        ) +
+          1 >=
+        task.steps!.length
+          ? TourTaskStatus.DONE
+          : TourTaskStatus.SKIPPED;
+      guidedTourManager.setTaskStatus(task, status);
+      // TODO: See if this is needed.
+      // TODO: Maybe move this to guidedTourManager.setTaskStatus(task, status) ?
+      guidedTourManager.setStorageKey(
+        guidedTourManager.getActiveTaskStorageKey(),
+        undefined,
+      );
+      guidedTourManager.activeTask = undefined;
+      guidedTourManager.activeDriverTask = undefined;
     },
 
     // TODO: Remove this linter disable and refactor the function.
@@ -159,15 +172,16 @@ function XWikiDriverConfig(
           "No next step. We're probably in the last step attempting to go next.",
         );
         guidedTourManager.setTaskStatus(task, TourTaskStatus.DONE);
-        // guidedTourManager.activeTask!.destroy();
-        guidedTourManager.activeTask!.moveNext();
+        // guidedTourManager.activeDriverTask!.destroy();
+        guidedTourManager.activeDriverTask!.moveNext();
         return;
       } else {
         // FIXME: Refactor this
         const nextStep = task.steps![options.state.activeIndex! + 1];
         if (task.steps![options.state.activeIndex!].path == nextStep.path) {
           // FIXME: Is getActiveIndex() needed, or should I use options.activeIndex instead?
-          const activeIndex = guidedTourManager.activeTask!.getActiveIndex()!;
+          const activeIndex =
+            guidedTourManager.activeDriverTask!.getActiveIndex()!;
           if (nextStep.element !== undefined) {
             const targetedElement = await util.waitForElement(nextStep.element);
             if (targetedElement) {
@@ -185,17 +199,18 @@ function XWikiDriverConfig(
                     _step,
                     options,
                   );
-                  // guidedTourManager.activeTask?.moveNext();
+                  // guidedTourManager.activeDriverTask?.moveNext();
                 },
               );
             } else {
               if (
-                activeIndex == guidedTourManager.activeTask!.getActiveIndex()
+                activeIndex ==
+                guidedTourManager.activeDriverTask!.getActiveIndex()
               ) {
                 // The task is still at the step we expect.
                 // We had an error, so the task is probably broken, so skip it.
                 guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
-                guidedTourManager.activeTask!.destroy();
+                guidedTourManager.activeDriverTask!.destroy();
                 return;
               } else {
                 // The task moved to some previous step while we were waiting, so no need to do anything.
@@ -203,12 +218,14 @@ function XWikiDriverConfig(
               }
             }
           }
-          if (activeIndex == guidedTourManager.activeTask!.getActiveIndex()) {
-            guidedTourManager.activeTask!.moveNext();
+          if (
+            activeIndex == guidedTourManager.activeDriverTask!.getActiveIndex()
+          ) {
+            guidedTourManager.activeDriverTask!.moveNext();
             return;
           } else {
             console.debug(
-              `Tried to move from ${activeIndex} to next , but the step is actually now ${guidedTourManager.activeTask!.getActiveIndex()}`,
+              `Tried to move from ${activeIndex} to next , but the step is actually now ${guidedTourManager.activeDriverTask!.getActiveIndex()}`,
             );
             return;
           }
@@ -223,12 +240,12 @@ function XWikiDriverConfig(
     },
     onPrevClick: async (_highlightedElement, _step, options) => {
       // Cache the current step index, so we can check later (after async operations) if we are in the same step we started in.
-      const activeIndex = guidedTourManager.activeTask!.getActiveIndex()!;
+      const activeIndex = guidedTourManager.activeDriverTask!.getActiveIndex()!;
       if (options.state.activeIndex == 0) {
         console.debug(
           "No previous step. We're probably in the first step attempting to go back.",
         );
-        guidedTourManager.activeTask!.movePrevious();
+        guidedTourManager.activeDriverTask!.movePrevious();
         return;
       } else {
         const prevStep = task.steps![options.state.activeIndex! - 1];
@@ -247,19 +264,26 @@ function XWikiDriverConfig(
                   options,
                 );
                 console.warn("Calling callback for prev step move (hopefully)");
-                // guidedTourManager.activeTask?.movePrevious();
+                // guidedTourManager.activeDriverTask?.movePrevious();
               },
             );
           } else {
-            if (activeIndex == guidedTourManager.activeTask!.getActiveIndex()) {
+            if (
+              activeIndex ==
+              guidedTourManager.activeDriverTask!.getActiveIndex()
+            ) {
               // The task is still at the step we expect.
               // We had an error, so the task is probably broken, so skip it.
               console.error(
                 `Failed to find ${prevStep.element} element in the page when going back to step ${prevStep.order}`,
                 prevStep,
               );
+              new XWiki.widgets.Notification(
+                "Failed to find targeted element. Skipping the task.",
+                "error",
+              );
               guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
-              guidedTourManager.activeTask!.destroy();
+              guidedTourManager.activeDriverTask!.destroy();
               return; // TODO: Make this complicated stuff a promise, and resolve it only when we get here, so the caller can just .then() it to decide what to do next.
             } else {
               // The task moved to some previous step while we were waiting, so no need to do anything.
@@ -268,7 +292,7 @@ function XWikiDriverConfig(
           }
         }
         if (task.steps![options.state.activeIndex!].path == prevStep.path) {
-          guidedTourManager.activeTask!.movePrevious();
+          guidedTourManager.activeDriverTask!.movePrevious();
           return;
         } else {
           console.debug(
@@ -279,6 +303,7 @@ function XWikiDriverConfig(
         }
       }
     },
+    // overlayClickBehavior: () => {},
   };
 }
 
@@ -333,8 +358,10 @@ function bindReflexEvents(
           // The localStorage item should theoretically be set to the same value in the moveNext(), so no harm done
           // Fire onNext ?
           // document.fire('arrowRightPress');
-          // guidedTourManager.activeTask?.emit
-          if (step.order != guidedTourManager.activeTask?.getActiveIndex()) {
+          // guidedTourManager.activeDriverTask?.emit
+          if (
+            step.order != guidedTourManager.activeDriverTask?.getActiveIndex()
+          ) {
             // FIXME: This might not work.
             element.removeEventListener("click", callback);
             callbackFn();
@@ -409,17 +436,7 @@ function bindReflexEvents(
 //     }
 //   });
 // }
-/* = {
-      // name    : tourName,
-      // storage : window.localStorage,
-      //overlayClickBehavior: () => {},
-    }*/
-
 /*
-      console.info(jsonData)
-      tour.setSteps(jsonData.steps);
-      console.info(jsonData.steps, window.localStorage.getItem(tour.getConfig().name + '_current_step'));
-      console.info(tour);
 
       // Look if the tour should be started regardless of its status on the local storage
       var getQueryStringParameterByName = function (name) {
@@ -478,40 +495,6 @@ require(['jquery', 'xwiki-meta', 'guidedtour-utils'], function ($, xm, utils) {
   // TODO: Make use of _redirect_to localStorage key somewhere in the code.
 
   /**
-   * Create a tour from a JSON file
-   *\/
-  var createTour = function (jsonData) {
-    // Add stylesheet only when needed
-    loadCss();
-    let tourName = utils.escapeTourName('tour_' + jsonData.name);
-    console.debug('tourInProgress: ', window.guidedTourInProgress, tourName);
-    //debugger;
-    if (window.guidedTourInProgress) {
-      console.debug(`Another Tour already in progress. Don't start ${tourName}`);
-      return;
-    }
-    if (window.localStorage.getItem(tourName + '_current_step') >= jsonData.steps.length) {
-      window.localStorage.setItem(tourName + '_end', 'yes');
-      window.guidedTourInProgress = false;
-      console.debug(`Fixed tour done status for ${tourName}. (had step ${window.localStorage.getItem(tourName + '_current_step')} >= ${jsonData.steps.length})`)
-      return;
-    }
-
-    // Require 'bootstrap-tour' only when needed
-    require(['guidedtour-driverjs-patch'], function(driver) {
-      //const driver = window.driver.js.driver;
-      if (window.guidedTourInProgress) {
-        console.debug(`Another Tour already in progress. Don't start ${tourName}`);
-        return;
-      }
-      //console.debug(driver);
-      //debugger;
-
-      // Create the tour
-      let tour     = driver(/* Tour stuff *\/);
-  };
-
-  /**
    * Load asynchronously the list of steps concerning the current page.
    * It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
    * everywhere.
@@ -525,17 +508,6 @@ window.guidedTourInProgress = false;
     if ($(window).innerWidth() <= 768) {
       // return; // This is so annoying when debugging.
     }
-
-    $.getJSON(new XWiki.Document('TourJson', 'TourCode').getURL('get'), {
-      xpage: 'plain',
-      outputSyntax: 'plain',
-      tourDoc: xm.document
-    }).done(function(json) {
-      for (var i = 0; i < json.tours.length; ++i) {
-        var tour = json.tours[i];
-        let tourName = utils.escapeTourName('tour_' + tour.name);
-        tour.steps = tour.steps.map(step => {
-          step['popover'] = {title: step['title'], description: step['content']};
           if (step['element'] == '') {
             if (false == step['backdrop']) {
               step['element'] = 'body'; // FIXME: This is NOT FULL PROOF, this should be changed (eg. I want to highlight a random element without a backdrop).
@@ -544,42 +516,12 @@ window.guidedTourInProgress = false;
               delete step.element;
             }
           }
-          return step;
-        });
         if (tour.steps.length > 0) {
-          createTour(tour);
+          createTour(tour); // Gave a driver object, but didn't start it.
         }
       }
-      window.guidedTours = json;
-      let createTourWrapper = function(event) {
-        const tourId = event.currentTarget.dataset['id'];
-        console.debug(json)
-        console.debug(event, json.tours, 'at', tourId);
-        let tour = json.tours.filter(el => el.name == tourId);
-        console.debug(tour.length > 0 && tour[0].steps.length > 0)
-        if (tour.length > 0 && tour[0].steps.length > 0) {
-          tour = tour[0];
-          // Reset the tour progress to restart it.
-          window.localStorage.setItem(utils.escapeTourName('tour_' + tour.name) + '_current_step', 1);
-          window.localStorage.removeItem(utils.escapeTourName('tour_' + tour.name) + '_end');
-          createTour(tour);
-        } else {
-          // TODO: Add translation string.
-          new XWiki.widgets.Notification(`Couldn't find tour ${tourId}. I think it wasn't fetched...`, 'error');
-        }
-      }
-      $('.guidedtour-widget').on('click', '.guidedtour-task', createTourWrapper);
-    });
-  });
-});
 
 // FIXME: From old TourJS.xml
-
-define('guidedtour-widget', ['jquery', 'guidedtour-utils'], function($, utils) {
-  const guidedTourFloaterTemplate = `bababooey`;
-
-  // Create widget. Bind Events.
-  $(guidedTourFloaterTemplate).appendTo($(document.body));
 
   // Helper to bind click events, TODO: could be deleted.
   function bindFloaterClickEvent(selector, callback) {
@@ -606,10 +548,6 @@ define('guidedtour-widget', ['jquery', 'guidedtour-utils'], function($, utils) {
     console.info('Opened settings menu');
   });
 
-  // Load localStorage state.
-  if (window.localStorage.getItem('TourFloaterCollapsed') == 'true') {
-    document.querySelector('.guidedtour-widget').classList.add('collapsed');
-  }
   if (window.localStorage.getItem('guidedtour-widget-position-x')) {
     // FIXME: Could be XSS i think, if someone edits this key. But that's how the right side panel works too.
     // FIXME: Clamp the allowed values, so the widget is always visible on the screen. Maybe set the value as percentage of screen width? In the dragging functions I mean.

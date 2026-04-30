@@ -46,7 +46,8 @@ export class GuidedTourManager implements GuidedTourManagerApi {
   // @ts-expect-error xm is any
   private xm: Promise;
 
-  activeTask?: Driver;
+  activeDriverTask?: Driver;
+  activeTask?: TourTask;
 
   async getCSRFToken(): Promise<string> {
     return (this.xm instanceof Promise ? await this.xm : this.xm).form_token;
@@ -92,14 +93,129 @@ export class GuidedTourManager implements GuidedTourManagerApi {
 
   async startTask(task: TourTask): Promise<void> {
     const steps = await this.getSteps(task.tourId!, task.id);
-    const rememberstepIndex = Number.parseInt(
-      window.sessionStorage.getItem(this.getSessionStorageKey(task)) ?? "0",
+    const rememberStepIndex = Number.parseInt(
+      window.sessionStorage.getItem(this.getTaskStepStorageKey(task)) ?? "0",
     );
-    this.setupStep(steps[rememberstepIndex]);
+    this.setupStep(steps[rememberStepIndex]);
     // Should have a way to preserve this across the page loads (aka. localStorage)
-    const tour = driver(getDriverConfigForSteps(steps, task, this));
-    this.activeTask = tour;
-    tour.drive();
+    const driverTour = driver(getDriverConfigForSteps(steps, task, this));
+    // TODO: Cache the steps list in session storage, to not refetch them if a tour spans multiple pages.
+    this.setStorageKey(
+      this.getActiveTaskStorageKey(),
+      this.getStorageKeyPrefix(task),
+    );
+
+    this.activeTask = task;
+    this.activeDriverTask = this.wrapTask(driverTour);
+    this.activeDriverTask.drive(rememberStepIndex);
+  }
+
+  wrapTask(task: Driver): Driver {
+    const _drive = task.drive;
+    const _moveNext = task.moveNext;
+    const _movePrevious = task.movePrevious;
+    const _destroy = task.destroy;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const guidedTourManager = this;
+    task.drive = function (stepIndex: number = 0) {
+      _drive(stepIndex);
+      guidedTourManager.setStorageKey(
+        guidedTourManager.getTaskStepStorageKey(guidedTourManager.activeTask!),
+        stepIndex.toString(),
+      );
+    }.bind(task);
+
+    task.moveNext = function (expectPageRefresh: boolean = false) {
+      let newStep = undefined;
+      // Cache the active task, since _moveNext() will destroy it if we're on the last step.
+      const activeTask = guidedTourManager.activeTask!;
+      if (!expectPageRefresh) {
+        // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
+        // stay in place until the page reloads. The session storage key is still set, so we'll recover
+        _moveNext();
+        newStep =
+          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+      } else {
+        newStep =
+          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+        newStep = newStep !== undefined ? newStep + 1 : undefined;
+        console.log(
+          "Not advancing the tour since we expect a refresh. Session storage is being set to",
+          newStep,
+        );
+      }
+      guidedTourManager.setStorageKey(
+        guidedTourManager.getTaskStepStorageKey(activeTask),
+        newStep?.toString() ?? undefined,
+      );
+    }.bind(task);
+
+    task.movePrevious = function (expectPageRefresh: boolean = false) {
+      if (guidedTourManager.activeTask?.steps) {
+        // TODO: Try to determine automatically whether the task is expecting a page refresh.
+      }
+      const activeTask = guidedTourManager.activeTask!;
+      let newStep = undefined;
+      if (!expectPageRefresh) {
+        // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
+        // stay in place until the page reloads. The session storage key is still set, so we'll recover
+        _movePrevious();
+        newStep =
+          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+      } else {
+        newStep =
+          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+        newStep = newStep !== undefined ? newStep - 1 : undefined;
+        console.log(
+          "Not advancing the tour since we expect a refresh. Session storage is being set to",
+          newStep,
+        );
+      }
+      guidedTourManager.setStorageKey(
+        guidedTourManager.getTaskStepStorageKey(activeTask),
+        newStep?.toString() ?? undefined,
+      );
+    }.bind(task);
+
+    task.destroy = function () {
+      const currentStep = task.getActiveIndex();
+      console.info(`Trying to see if, on destroy, `);
+      if (currentStep != task.getConfig().steps?.length) {
+        guidedTourManager.setStorageKey(
+          guidedTourManager.getTaskStepStorageKey(
+            guidedTourManager.activeTask!,
+          ),
+          task.getActiveIndex()!.toString(),
+        );
+      } else {
+        // Delete the current step storage key.
+        guidedTourManager.setStorageKey(
+          guidedTourManager.getTaskStepStorageKey(
+            guidedTourManager.activeTask!,
+          ),
+          undefined,
+        );
+      }
+      _destroy();
+    }.bind(task);
+
+    return task;
+  }
+
+  getActiveTaskStorageKey(): string {
+    return "guidedtour_activeTask";
+  }
+
+  getTaskStepStorageKey(task: TourTask): string {
+    return this.getStorageKeyPrefix(task) + "_currentStep";
+  }
+
+  setStorageKey(key: string, stepIndex?: string) {
+    if (stepIndex === undefined) {
+      window.sessionStorage.removeItem(key);
+    } else {
+      window.sessionStorage.setItem(key, stepIndex);
+    }
   }
 
   async resetTask(task: TourTask): Promise<void> {
@@ -158,10 +274,40 @@ export class GuidedTourManager implements GuidedTourManagerApi {
           const toursMap = new Map<string, TourTour>();
           data.forEach((t) => toursMap.set(t.id, t));
           this._cache.toursMap = toursMap;
+          this.initExistingTask();
           return data;
         });
     }
     return this._cache.tours;
+  }
+
+  async initExistingTask() {
+    // FIXME: This should be moved somewhere else, but idk where. `GuidedTourWidget.vue` ? idk
+    const existingActiveTask = this.getStorageKey(
+      this.getActiveTaskStorageKey(),
+    );
+    if (existingActiveTask) {
+      // FIXME: I shouldn't parse this here, but have it already available somehow more easily.
+      // Also, this parsing is not robust to pages which containt the `__` separator present in the item value.
+      const parsedIds = this.parseStorageKeyPrefix(existingActiveTask);
+      if (parsedIds !== undefined) {
+        const task = await this.getTask(
+          parsedIds["tourId"],
+          parsedIds["taskId"],
+        );
+        if (task !== undefined) {
+          this.startTask(task);
+        } else {
+          console.error(
+            "Tried to get task for ",
+            parsedIds,
+            ", it didn't work.",
+          );
+        }
+      } else {
+        console.error("No good task parsing value:", parsedIds);
+      }
+    }
   }
 
   async getTours(): Promise<TourTour[]> {
@@ -183,8 +329,8 @@ export class GuidedTourManager implements GuidedTourManagerApi {
   }
 
   async getTasks(tourId: string): Promise<TourTask[]> {
-    console.error("FIXME: DON'T USE THIS getTasks(tourId) METHOD!!!");
     if (this._cache.toursMap == undefined) {
+      console.error("FIXME: DON'T USE THIS getTasks(tourId) METHOD!!!");
       await this.getTours();
     }
     const toursMap = this._cache.toursMap;
@@ -292,23 +438,38 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     }
   }
 
-  getSessionStorageKey(task: TourTask): string {
-    return `${task.tourId}__${task.id}_currentStep`;
+  parseStorageKeyPrefix(
+    key: string,
+  ): { taskId: string; tourId: string } | undefined {
+    const regexp = RegExp(/^guidedtour_(.*)__(.*)$/, "g");
+    const matches = key.matchAll(regexp).next();
+    const len = 0;
+    if (matches.value === undefined || matches.value?.length != 3) {
+      console.error(
+        `Error parsing "${key}": Found ${len} matches, but I wanted exactly 2.`,
+      );
+      return undefined;
+    }
+    // Also unescape the ids
+    const result = {
+      taskId: matches.value[1].replaceAll("_|", "_"),
+      tourId: matches.value[2].replaceAll("_|", "_"),
+    };
+    console.info("Results of parsing:", result);
+    return result;
+  }
+
+  getStorageKeyPrefix(task: TourTask): string {
+    return `guidedtour_${task.tourId!.replaceAll("_", "_|")}__${task.id!.replaceAll("_", "_|")}`;
+  }
+
+  getStorageKey(key: string) {
+    return window.sessionStorage.getItem(key);
   }
 
   async markTaskDone(task: TourTask, skipped: boolean): Promise<void> {
     await fetch("");
     // TODO: Either refetch, or mark the task as completed locally (might lead to desync)
     task.status = skipped ? TourTaskStatus.SKIPPED : TourTaskStatus.DONE;
-  }
-
-  markStepDone(step: TourStep, task: TourTask): Promise<void> {
-    // if (step.isLast)
-    // Mark entire task as done
-    window.sessionStorage.setItem(
-      this.getSessionStorageKey(task),
-      (step.order + 1).toString(),
-    );
-    return Promise.resolve();
   }
 }

@@ -43,10 +43,6 @@
           $emit('toggleCollapseTour', tour);
         "
       >
-        <!-- @click="
-        console.log('clicked', tour);
-        $emit('toggleCollapseTour', tour);
-      " -->
         <template v-slot:pre-btns>
           <!-- This is just for show, it shouldn't do anything. -->
           <i class="fa-solid fa-chevron-right chevron always-show" />

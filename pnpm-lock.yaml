@@ -16,8 +16,8 @@ catalogs:
       specifier: 0.47.1
       version: 0.47.1
     '@eslint/config-helpers':
-      specifier: 0.5.2
-      version: 0.5.2
+      specifier: 0.5.5
+      version: 0.5.5
     '@eslint/js':
       specifier: 9.39.2
       version: 9.39.2
@@ -2345,7 +2345,7 @@ importers:
     dependencies:
       '@eslint/config-helpers':
         specifier: 'catalog:'
-        version: 0.5.2
+        version: 0.5.5
       '@eslint/js':
         specifier: 'catalog:'
         version: 9.39.2
@@ -2977,16 +2977,16 @@ packages:
     resolution: {integrity: sha512-gBrxN88gOIf3R7ja5K9slwNayVcZgK6SOUORm2uBzTeIEfeVaIhOpCtTox3P6R7o2jLFwLFTLnC7kU/RGcYEgw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/config-helpers@0.5.2':
-    resolution: {integrity: sha512-a5MxrdDXEvqnIq+LisyCX6tQMPF/dSJpCfBgBauY+pNZ28yCtSsTvyTYrMhaI+LK26bVyCJfJkT0u8KIj2i1dQ==}
+  '@eslint/config-helpers@0.5.5':
+    resolution: {integrity: sha512-eIJYKTCECbP/nsKaaruF6LW967mtbQbsw4JTtSVkUQc9MneSkbrgPJAbKl9nWr0ZeowV8BfsarBmPpBzGelA2w==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@eslint/core@0.17.0':
     resolution: {integrity: sha512-yL/sLrpmtDaFEiUj1osRP4TI2MDz1AddJL+jZ7KSqvBuliN4xqYY54IfdN8qD8Toa6g1iloph1fxQNkjOxrrpQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/core@1.1.0':
-    resolution: {integrity: sha512-/nr9K9wkr3P1EzFTdFdMoLuo1PmIxjmwvPozwoSodjNBdefGujXQUF93u1DDZpEaTuDvMsIQddsd35BwtrW9Xw==}
+  '@eslint/core@1.2.1':
+    resolution: {integrity: sha512-MwcE1P+AZ4C6DWlpin/OmOA54mmIZ/+xZuJiQd4SyB29oAJjN30UW9wkKNptW2ctp4cEsvhlLY/CsQ1uoHDloQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@eslint/eslintrc@3.3.3':
@@ -6735,6 +6735,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -7560,15 +7561,15 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
 
-  '@eslint/config-helpers@0.5.2':
+  '@eslint/config-helpers@0.5.5':
     dependencies:
-      '@eslint/core': 1.1.0
+      '@eslint/core': 1.2.1
 
   '@eslint/core@0.17.0':
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/core@1.1.0':
+  '@eslint/core@1.2.1':
     dependencies:
       '@types/json-schema': 7.0.15
 

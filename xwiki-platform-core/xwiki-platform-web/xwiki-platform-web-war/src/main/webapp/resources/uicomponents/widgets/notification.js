@@ -163,6 +163,13 @@ widgets.Notification = Class.create({
 widgets.Notification.container = null;
 
 /**
+ *
+ * Indicates how the text parameter is interpreted by XWiki.widgets.Notification.
+ * Callers can check for the presence of this method to decide whether to escape their input:
+ * When this method is available, the text parameter is treated as plain text and must not be escaped.
+ * When this method is missing (before 18.4.0RC1/17.10.9), the text parameter is interpreted as HTML and may need to be
+ * escaped.
+ * The returned value is always the "plain" string.
  * @return {string} the expected format of the text property
  * @since 18.4.0RC1
  * @since 17.10.9

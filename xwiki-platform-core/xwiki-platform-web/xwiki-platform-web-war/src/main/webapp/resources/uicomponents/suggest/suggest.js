@@ -593,7 +593,7 @@ var XWiki = (function(XWiki){
                 backgroundImage: "url(" + this.iconImage.src + ")"
               });
               this.sourceHeader.setStyle({
-                textIndent:(this.iconImage.width + 6) + 'px'
+                textIndent:(this.iconImage.width + 8) + 'px'
               });
             }.bind({
               sourceHeader:sourceHeader,

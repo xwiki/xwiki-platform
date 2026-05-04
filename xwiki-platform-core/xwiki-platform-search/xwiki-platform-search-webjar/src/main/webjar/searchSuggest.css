@@ -27,6 +27,4 @@ ul.xlist li.showAllResults button.xitemcontainer {
   padding: 4px 8px;
   font-size: 1em;
   color: var(--link-color);
-  border-top: 1px solid var(--xwiki-border-color);
-  border-bottom: 1px solid var(--xwiki-border-color);
 }

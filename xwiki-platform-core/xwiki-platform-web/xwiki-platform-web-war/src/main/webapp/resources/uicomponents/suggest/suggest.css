@@ -59,7 +59,7 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
 }
 
 div.suggestItems ul.xlist.suggestList > li.xitem .value{
-  font-size: 1.3em;
+  font-size: 1.2em;
 }
 
 div.suggestItems * {
@@ -118,9 +118,15 @@ div.suggestItemInfo {
 }
 
 div.resultContainer div.sourceName {
-  background-position:3px 3px;
-  background-repeat:no-repeat;
-  font-weight: var(--font-weight-semibold)
+  background-position: 3px 8px;
+  background-repeat: no-repeat;
+  font-weight: var(--font-weight-semibold);
+  border-top: 1px solid var(--xwiki-border-color);
+  padding: 5px 0;
+}
+
+ul.xlist li.showAllResults {
+  border-top: 1px solid var(--xwiki-border-color);
 }
 
 .horizontalLayout div.resultContainer div.sourceName {

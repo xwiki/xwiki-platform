@@ -19,15 +19,15 @@
  */
 package org.xwiki.security.authorization;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.security.authorization.internal.XWikiCachingRightService;
-import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Abstract class that should be inherited when writing tests for comparing the result of different right service
@@ -36,8 +36,7 @@ import org.junit.Assert;
  * @version $Id$
  * @since 4.2
  */
-@AllComponents
-public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
+public abstract class AbstractLegacyWikiTest extends AbstractWikiTest
 {
     /**
      * Instance of the original implementation for reference.
@@ -49,12 +48,9 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
      */
     private XWikiCachingRightService cachingImpl;
 
-    @Before
-    @Override
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUpLegacyImpl()
     {
-        super.setUp();
-
         this.legacyImpl = new XWikiRightServiceImpl();
         this.cachingImpl = new XWikiCachingRightService();
     }
@@ -71,11 +67,11 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation: " + message,
-            this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertTrue(this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Old implementation: " + message);
 
-        Assert.assertTrue("Caching implementation: " + message,
-            this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertTrue(this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Caching implementation: " + message);
     }
 
     /**
@@ -90,89 +86,89 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
     {
         setContext(ctx);
 
-        Assert.assertFalse("Old implementation: " + message,
-            this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertFalse(this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Old implementation: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message,
-            this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertFalse(this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertAdminRightsTrue(String message, XWikiContext ctx) throws Exception
+    protected void assertAdminRightsTrue(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+        assertTrue(this.legacyImpl.hasAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertTrue("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+        assertTrue(this.cachingImpl.hasAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertAdminRightsFalse(String message, XWikiContext ctx) throws Exception
+    protected void assertAdminRightsFalse(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertFalse("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+        assertFalse(this.legacyImpl.hasAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+        assertFalse(this.cachingImpl.hasAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertAdminRightsFalseExpectedDifference(String message, XWikiContext ctx) throws Exception
+    protected void assertAdminRightsFalseExpectedDifference(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasAdminRights(ctx));
+        assertTrue(this.legacyImpl.hasAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasAdminRights(ctx));
+        assertFalse(this.cachingImpl.hasAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertWikiAdminRightsTrue(String message, XWikiContext ctx) throws Exception
+    protected void assertWikiAdminRightsTrue(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+        assertTrue(this.legacyImpl.hasWikiAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertTrue("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+        assertTrue(this.cachingImpl.hasWikiAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertWikiAdminRightsFalse(String message, XWikiContext ctx) throws Exception
+    protected void assertWikiAdminRightsFalse(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertFalse("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+        assertFalse(this.legacyImpl.hasWikiAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+        assertFalse(this.cachingImpl.hasWikiAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
      * @param message A message explaining the assertion.
      * @param ctx The context.
      */
-    protected void assertWikiAdminRightsFalseExpectedDifference(String message, XWikiContext ctx) throws Exception
+    protected void assertWikiAdminRightsFalseExpectedDifference(String message, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation: " + message, this.legacyImpl.hasWikiAdminRights(ctx));
+        assertTrue(this.legacyImpl.hasWikiAdminRights(ctx), "Old implementation: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message, this.cachingImpl.hasWikiAdminRights(ctx));
+        assertFalse(this.cachingImpl.hasWikiAdminRights(ctx), "Caching implementation: " + message);
     }
 
     /**
@@ -187,11 +183,11 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
     {
         setContext(ctx);
 
-        Assert.assertFalse("Old implementation is is expected to differ: " + message,
-            this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertFalse(this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Old implementation is is expected to differ: " + message);
 
-        Assert.assertTrue("Caching implementation: " + message,
-            this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertTrue(this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Caching implementation: " + message);
     }
 
     /**
@@ -206,11 +202,11 @@ public abstract class AbstractLegacyWikiTestCase extends AbstractWikiTestCase
     {
         setContext(ctx);
 
-        Assert.assertTrue("Old implementation is expected to differ: " + message,
-            this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertTrue(this.legacyImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Old implementation is expected to differ: " + message);
 
-        Assert.assertFalse("Caching implementation: " + message,
-            this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx));
+        assertFalse(this.cachingImpl.hasAccessLevel(accessLevel, userName, documentName, ctx),
+            "Caching implementation: " + message);
     }
 
     /**

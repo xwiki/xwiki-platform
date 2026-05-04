@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class RightsFilterListenerTest
+class RightsFilterListenerTest
 {
     @MockComponent
     private AuthorizationManager authorization;
@@ -87,7 +87,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noRight()
+    void noRight()
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -100,7 +100,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noChange() throws XWikiException
+    void noChange() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, oldcore.getXWikiContext());
@@ -114,7 +114,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newEmptyRightObject() throws XWikiException
+    void newEmptyRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -128,7 +128,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newAllowedRightObject() throws XWikiException
+    void newAllowedRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -144,7 +144,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newDeniedRightObject() throws XWikiException, AccessDeniedException
+    void newDeniedRightObject() throws XWikiException, AccessDeniedException
     {
         XWikiDocument document = createTestDocument();
         BaseObject rightObject =

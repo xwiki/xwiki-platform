@@ -19,10 +19,12 @@
  */
 package org.xwiki.observation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.filter.RegexEventFilter;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.observation.event.AbstractDocumentEvent}.
@@ -30,28 +32,28 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
  * @version $Id$
  */
 @Deprecated
-public class DocumentEventTest
+class DocumentEventTest
 {
     @Test
-    public void testMatchesWithEmptyConstructor()
+    void matchesWithEmptyConstructor()
     {
         DocumentSaveEvent event = new DocumentSaveEvent();
-        Assert.assertTrue(event.matches(new DocumentSaveEvent("whatever")));
+        assertTrue(event.matches(new DocumentSaveEvent("whatever")));
     }
     
     @Test
-    public void testMatchesWithDocumentNameConstructor()
+    void matchesWithDocumentNameConstructor()
     {
         DocumentSaveEvent event = new DocumentSaveEvent("document");
-        Assert.assertTrue(event.matches(new DocumentSaveEvent("document")));
-        Assert.assertFalse(event.matches(new DocumentSaveEvent("wrong")));
+        assertTrue(event.matches(new DocumentSaveEvent("document")));
+        assertFalse(event.matches(new DocumentSaveEvent("wrong")));
     }
     
     @Test
-    public void testMatchesWithRegexFilter()
+    void matchesWithRegexFilter()
     {
         DocumentSaveEvent event = new DocumentSaveEvent(new RegexEventFilter(".*Doc.*"));
-        Assert.assertTrue(event.matches(new DocumentSaveEvent("some.Document")));
-        Assert.assertFalse(event.matches(new DocumentSaveEvent("some.document")));
+        assertTrue(event.matches(new DocumentSaveEvent("some.Document")));
+        assertFalse(event.matches(new DocumentSaveEvent("some.document")));
     }
 }

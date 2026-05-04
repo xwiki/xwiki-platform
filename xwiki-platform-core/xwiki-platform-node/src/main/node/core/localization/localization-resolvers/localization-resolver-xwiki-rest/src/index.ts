@@ -31,8 +31,6 @@ import type {
  */
 export function translatorFactory(target: string): Translator {
   const cache = {};
-  // TODO: move inflight requests here, prevent calling twice the same query at the same time
-  // and remove from the consumer.
   const inflightRequests = new Map<string, Promise<Translations>>();
   return {
     // eslint-disable-next-line max-statements

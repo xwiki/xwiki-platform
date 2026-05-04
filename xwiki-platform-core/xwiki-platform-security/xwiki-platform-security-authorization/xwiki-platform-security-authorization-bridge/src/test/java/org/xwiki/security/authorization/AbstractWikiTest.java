@@ -20,13 +20,14 @@
 
 package org.xwiki.security.authorization;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -37,40 +38,38 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @since 4.2
  */
+@ComponentTest
 @AllComponents
-public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
+public abstract class AbstractWikiTest
 {
-    /**
-     * An execution context.
-     */
+    private MockitoComponentManager componentManager;
+
     private ExecutionContext executionContext;
 
-    @Before
-    @Override
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
-        super.setUp();
+        this.componentManager = componentManager;
 
         this.executionContext = new ExecutionContext();
-        Execution execution = getComponentManager().getInstance(Execution.class);
+        Execution execution = this.componentManager.getInstance(Execution.class);
         execution.setContext(this.executionContext);
-        Utils.setComponentManager(getComponentManager());
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
+        Utils.setComponentManager(this.componentManager);
 
         // Get rid of annoying listeners we don't need
-        getComponentManager().unregisterComponent(EventListener.class, "XObjectEventGeneratorListener");
-        getComponentManager().unregisterComponent(EventListener.class, "AttachmentEventGeneratorListener");
-        getComponentManager().unregisterComponent(EventListener.class, "XClassPropertyEventGeneratorListener");
-        getComponentManager().unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
-        getComponentManager().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
-        getComponentManager().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
-        getComponentManager().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
-        getComponentManager().unregisterComponent(EventListener.class, "XClassMigratorListener");
+        this.componentManager.unregisterComponent(EventListener.class, "XObjectEventGeneratorListener");
+        this.componentManager.unregisterComponent(EventListener.class, "AttachmentEventGeneratorListener");
+        this.componentManager.unregisterComponent(EventListener.class, "XClassPropertyEventGeneratorListener");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
+        this.componentManager.unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
+        this.componentManager.unregisterComponent(EventListener.class, "XClassMigratorListener");
+    }
+
+    protected MockitoComponentManager getComponentManager()
+    {
+        return this.componentManager;
     }
 
     protected void setContext(XWikiContext ctx)
@@ -84,7 +83,7 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
      */
     protected LegacyTestWiki newTestWiki(String filename, boolean legacymock) throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), filename, legacymock);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), filename, legacymock);
         setContext(testWiki.getXWikiContext());
         return testWiki;
     }

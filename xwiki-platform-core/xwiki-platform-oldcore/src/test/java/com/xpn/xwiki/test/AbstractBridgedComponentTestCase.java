@@ -44,15 +44,15 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution Context and the
+ * Extension of {@link AbstractComponentTestCase} that sets up a bridge between the new Execution Context and the
  * old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
  *
  * @version $Id$
  * @since 2.2M2
- * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead
+ * @deprecated since 5.2M1 use {@link MockitoOldcoreRule} instead
  */
 @Deprecated
-public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
+public abstract class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;
 

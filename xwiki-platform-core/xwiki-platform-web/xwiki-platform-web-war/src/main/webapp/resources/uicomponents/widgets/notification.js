@@ -108,7 +108,8 @@ widgets.Notification = Class.create({
   createElement : function() {
     if (!this.element) {
       // The notification container is already an ARIA "alert", those notifications do not need extra semantics.
-      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type}).update(this.text);
+      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type});
+      this.element.textContent = this.text;
       if (this.options.icon) {
         this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
       }
@@ -160,6 +161,13 @@ widgets.Notification = Class.create({
 
 /** The container for all the notifications. */
 widgets.Notification.container = null;
+
+/**
+ * @return {string} the expected format of the text property
+ * @since 18.4.0RC1
+ * @since 17.10.9
+ */
+widgets.Notification.textFormat = () => "plain"
 
 /** Returns the container for all the notifications. The container is created the first time this function is called. */
 widgets.Notification.getContainer = function() {

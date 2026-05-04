@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* eslint-disable max-statements */
-import { driver, getDriverConfigForSteps } from "./driverjsMain";
+import { SessionStorageManager } from "./SessionStorageManager";
+import { driver, getDriverConfigForSteps, wrapTask } from "./driverjsMain";
 // import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 // @ts-expect-error this is a JavaScript file, it is expected to not have types.
 import { XWiki } from "./services/xwiki.js";
@@ -91,131 +92,28 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     return Promise.resolve(usefulLinks);
   }
 
-  async startTask(task: TourTask): Promise<void> {
+  async startTask(task: TourTask, remember = true): Promise<void> {
     const steps = await this.getSteps(task.tourId!, task.id);
-    const rememberStepIndex = Number.parseInt(
-      window.sessionStorage.getItem(this.getTaskStepStorageKey(task)) ?? "0",
-    );
-    this.setupStep(steps[rememberStepIndex]);
+    let stepindex = 0;
+    if (remember) {
+      stepindex = Number.parseInt(
+        window.sessionStorage.getItem(
+          SessionStorageManager.getTaskStepStorageKey(task),
+        ) ?? "0",
+      );
+    }
+    this.setupStep(steps[stepindex]);
     // Should have a way to preserve this across the page loads (aka. localStorage)
     const driverTour = driver(getDriverConfigForSteps(steps, task, this));
     // TODO: Cache the steps list in session storage, to not refetch them if a tour spans multiple pages.
-    this.setStorageKey(
-      this.getActiveTaskStorageKey(),
-      this.getStorageKeyPrefix(task),
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getActiveTaskStorageKey(),
+      SessionStorageManager.getStorageKeyPrefix(task),
     );
 
     this.activeTask = task;
-    this.activeDriverTask = this.wrapTask(driverTour);
-    this.activeDriverTask.drive(rememberStepIndex);
-  }
-
-  wrapTask(task: Driver): Driver {
-    const _drive = task.drive;
-    const _moveNext = task.moveNext;
-    const _movePrevious = task.movePrevious;
-    const _destroy = task.destroy;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const guidedTourManager = this;
-    task.drive = function (stepIndex: number = 0) {
-      _drive(stepIndex);
-      guidedTourManager.setStorageKey(
-        guidedTourManager.getTaskStepStorageKey(guidedTourManager.activeTask!),
-        stepIndex.toString(),
-      );
-    }.bind(task);
-
-    task.moveNext = function (expectPageRefresh: boolean = false) {
-      let newStep = undefined;
-      // Cache the active task, since _moveNext() will destroy it if we're on the last step.
-      const activeTask = guidedTourManager.activeTask!;
-      if (!expectPageRefresh) {
-        // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
-        // stay in place until the page reloads. The session storage key is still set, so we'll recover
-        _moveNext();
-        newStep =
-          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
-      } else {
-        newStep =
-          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
-        newStep = newStep !== undefined ? newStep + 1 : undefined;
-        console.log(
-          "Not advancing the tour since we expect a refresh. Session storage is being set to",
-          newStep,
-        );
-      }
-      guidedTourManager.setStorageKey(
-        guidedTourManager.getTaskStepStorageKey(activeTask),
-        newStep?.toString() ?? undefined,
-      );
-    }.bind(task);
-
-    task.movePrevious = function (expectPageRefresh: boolean = false) {
-      if (guidedTourManager.activeTask?.steps) {
-        // TODO: Try to determine automatically whether the task is expecting a page refresh.
-      }
-      const activeTask = guidedTourManager.activeTask!;
-      let newStep = undefined;
-      if (!expectPageRefresh) {
-        // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
-        // stay in place until the page reloads. The session storage key is still set, so we'll recover
-        _movePrevious();
-        newStep =
-          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
-      } else {
-        newStep =
-          guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
-        newStep = newStep !== undefined ? newStep - 1 : undefined;
-        console.log(
-          "Not advancing the tour since we expect a refresh. Session storage is being set to",
-          newStep,
-        );
-      }
-      guidedTourManager.setStorageKey(
-        guidedTourManager.getTaskStepStorageKey(activeTask),
-        newStep?.toString() ?? undefined,
-      );
-    }.bind(task);
-
-    task.destroy = function () {
-      const currentStep = task.getActiveIndex();
-      console.info(`Trying to see if, on destroy, `);
-      if (currentStep != task.getConfig().steps?.length) {
-        guidedTourManager.setStorageKey(
-          guidedTourManager.getTaskStepStorageKey(
-            guidedTourManager.activeTask!,
-          ),
-          task.getActiveIndex()!.toString(),
-        );
-      } else {
-        // Delete the current step storage key.
-        guidedTourManager.setStorageKey(
-          guidedTourManager.getTaskStepStorageKey(
-            guidedTourManager.activeTask!,
-          ),
-          undefined,
-        );
-      }
-      _destroy();
-    }.bind(task);
-
-    return task;
-  }
-
-  getActiveTaskStorageKey(): string {
-    return "guidedtour_activeTask";
-  }
-
-  getTaskStepStorageKey(task: TourTask): string {
-    return this.getStorageKeyPrefix(task) + "_currentStep";
-  }
-
-  setStorageKey(key: string, stepIndex?: string) {
-    if (stepIndex === undefined) {
-      window.sessionStorage.removeItem(key);
-    } else {
-      window.sessionStorage.setItem(key, stepIndex);
-    }
+    this.activeDriverTask = wrapTask(driverTour, this);
+    this.activeDriverTask.drive(stepindex);
   }
 
   async resetTask(task: TourTask): Promise<void> {
@@ -283,20 +181,21 @@ export class GuidedTourManager implements GuidedTourManagerApi {
 
   async initExistingTask() {
     // FIXME: This should be moved somewhere else, but idk where. `GuidedTourWidget.vue` ? idk
-    const existingActiveTask = this.getStorageKey(
-      this.getActiveTaskStorageKey(),
+    const existingActiveTask = SessionStorageManager.getStorageKey(
+      SessionStorageManager.getActiveTaskStorageKey(),
     );
     if (existingActiveTask) {
       // FIXME: I shouldn't parse this here, but have it already available somehow more easily.
       // Also, this parsing is not robust to pages which containt the `__` separator present in the item value.
-      const parsedIds = this.parseStorageKeyPrefix(existingActiveTask);
+      const parsedIds =
+        SessionStorageManager.parseStorageKeyPrefix(existingActiveTask);
       if (parsedIds !== undefined) {
         const task = await this.getTask(
           parsedIds["tourId"],
           parsedIds["taskId"],
         );
         if (task !== undefined) {
-          this.startTask(task);
+          this.startTask(task, true);
         } else {
           console.error(
             "Tried to get task for ",
@@ -364,15 +263,22 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     return tour.status;
   }
 
-  isInEditMode() {
+  static isInEditMode() {
     return XWiki.editor != "";
   }
 
   async setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void> {
-    // FIXME: Workaround for vue reactive elements not detecting changes unless the tours array is modified directly,
-    // and the task vue component not updating unless the task object is modified directly.
     task.status = status;
     this.computeTourStatus((await this.getTour(task.tourId!))!);
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getTaskStepStorageKey(task),
+      undefined,
+    );
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getActiveTaskStorageKey(),
+      undefined,
+    );
+    // TODO: Some synchronisation with the server, to set the JSON.
     // TODO: Some other checks for the status, and persistence.
     // guidedTourManager.markStepDone(activeDriverTask.getActiveStep() as TourStep, task as TourTask);
     // if (window.localStorage.getItem(activeDriverTask.getConfig().name + '_current_step') == activeDriverTask.getConfig().steps?.length.toString()) {
@@ -409,10 +315,6 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     return Promise.resolve(tourSteps);
   }
 
-  // private getStepsMapKey(tourId: string, taskId: string): string {
-  //   return `${tourId}#<>#${taskId}`;
-  // }
-
   async fetchSteps(tourId: string, taskId: string): Promise<TourStep[]> {
     const maybeCached = (await this.getTask(taskId, tourId))!.steps;
     if (undefined == maybeCached) {
@@ -430,46 +332,14 @@ export class GuidedTourManager implements GuidedTourManagerApi {
         if (step.element == "") {
           step.element = undefined;
         }
+        // FIXME: The path computed here is not an actual URL.
+        step.path =
+          (step.targetAction ?? "") + step.targetPage + step.queryParameters;
       });
       (await this.getTask(taskId, tourId))!.steps = data; //.set(this.getStepsMapKey(tourId, taskId), data);
       return data;
     } else {
       return maybeCached;
     }
-  }
-
-  parseStorageKeyPrefix(
-    key: string,
-  ): { taskId: string; tourId: string } | undefined {
-    const regexp = RegExp(/^guidedtour_(.*)__(.*)$/, "g");
-    const matches = key.matchAll(regexp).next();
-    const len = 0;
-    if (matches.value === undefined || matches.value?.length != 3) {
-      console.error(
-        `Error parsing "${key}": Found ${len} matches, but I wanted exactly 2.`,
-      );
-      return undefined;
-    }
-    // Also unescape the ids
-    const result = {
-      taskId: matches.value[1].replaceAll("_|", "_"),
-      tourId: matches.value[2].replaceAll("_|", "_"),
-    };
-    console.info("Results of parsing:", result);
-    return result;
-  }
-
-  getStorageKeyPrefix(task: TourTask): string {
-    return `guidedtour_${task.tourId!.replaceAll("_", "_|")}__${task.id!.replaceAll("_", "_|")}`;
-  }
-
-  getStorageKey(key: string) {
-    return window.sessionStorage.getItem(key);
-  }
-
-  async markTaskDone(task: TourTask, skipped: boolean): Promise<void> {
-    await fetch("");
-    // TODO: Either refetch, or mark the task as completed locally (might lead to desync)
-    task.status = skipped ? TourTaskStatus.SKIPPED : TourTaskStatus.DONE;
   }
 }

@@ -32,7 +32,6 @@
       ['task-' + task!.status]: true,
       'guidedtour-task': true,
     }"
-    @vue:unmounted="onStartTask"
     id="task.id"
     @click="onStartTask"
   >
@@ -44,7 +43,7 @@
       </button>
     </template>
     <template v-slot:item-title>
-      {{ task!.title }}
+      {{ task.title }}
     </template>
     <template v-slot:post-btns>
       <button
@@ -64,7 +63,7 @@
 <script setup lang="ts">
 import GuidedTourWidgetItem from "./GuidedTourWidgetItem.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
-import { inject, reactive, ref, toRefs } from "vue";
+import { inject, reactive, ref, toRefs, watch } from "vue";
 import type {
   GuidedTourManagerApi,
   TourTask,
@@ -78,7 +77,7 @@ import type {
 // };
 // import XWiki from "../../services/xwiki.js";
 const { task, tourId } = defineProps<{
-  task?: TourTask;
+  task: TourTask;
   tourId: string;
 }>();
 
@@ -86,26 +85,36 @@ console.info("In task setup.", task?.status, task);
 const state = reactive({
   isWaitingAsync: false,
 });
-// const isWaitingAsync: Ref<boolean> = ref<boolean>(false);
 const { isWaitingAsync } = toRefs(state);
 const guidedTourManager: GuidedTourManagerApi = inject("GuidedTourManager")!;
-
+const emit = defineEmits(["taskStatusChanged"]);
 async function onResetTask() {
   console.info("You clicked to reset this task:", task);
   isWaitingAsync.value = true;
-  // TODO: Would need some kind of setter defined in XWiki, so saving the state to the server is handled here.
   await guidedTourManager.setTaskStatus(task!, TourTaskStatus.TODO);
-  // await guidedTourManager.getTask(task, TourTaskStatus.TODO);onResetTour
+  emit("taskStatusChanged", task);
   isWaitingAsync.value = false;
-  // new XWiki.notification("Task reset! You can start it again to retake the tour.", "success");
+  // new XWiki.widgets.Notification("Task reset! You can start it again to retake the tour.", "success");
 }
+
+watch(
+  () => task,
+  (newTask, oldTask) => {
+    console.warn("Task changed:", task, newTask, oldTask);
+    if (newTask.status != oldTask.status) {
+      console.warn("Sending taskStatusChanged.");
+      emit("taskStatusChanged", task);
+    }
+  },
+);
 
 async function onSkipTask() {
   console.info("You clicked to skip this task:", task);
   isWaitingAsync.value = true;
   await guidedTourManager.setTaskStatus(task!, TourTaskStatus.SKIPPED);
+  emit("taskStatusChanged", task);
   isWaitingAsync.value = false;
-  // new XWiki.notification("Task reset! You can start it again to retake the tour.", "success");
+  // new XWiki.widgets.Notification("Task reset! You can start it again to retake the tour.", "success");
 }
 
 async function onStartTask() {
@@ -113,7 +122,7 @@ async function onStartTask() {
   isWaitingAsync.value = true;
   const steps = await guidedTourManager.getSteps(tourId, task!.id);
   isWaitingAsync.value = false;
-  guidedTourManager.startTask(task!);
+  guidedTourManager.startTask(task!, false);
   console.log("Fetched steps:", steps);
   // driver(getDriverConfigForSteps(steps));
 }

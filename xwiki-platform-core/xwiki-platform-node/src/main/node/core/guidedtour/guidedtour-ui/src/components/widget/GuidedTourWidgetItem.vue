@@ -18,11 +18,17 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <template v-if="props.loading">
+  <template
+    v-if="
+      props.loading ||
+      props.waiting === undefined ||
+      props.loading === undefined
+    "
+  >
     <div class="guidedtour-widget-item loading" />
   </template>
   <template v-else>
-    <div class="guidedtour-widget-item" v-bind="attrs">
+    <div class="guidedtour-widget-item" v-bind="$attrs">
       <span class="pre-btns">
         <slot name="pre-btns" />
       </span>
@@ -33,7 +39,7 @@
         <i
           class="fa-solid fa-circle-notch fa-spin"
           style="--fa-animation-timing: ease-in-out"
-          v-show="props.waiting.value"
+          v-show="props.waiting!.value"
         />
       </slot>
       <span class="post-btns">
@@ -44,23 +50,18 @@
 </template>
 
 <script setup lang="ts">
-import { useAttrs } from "vue";
 import type { Ref } from "vue";
 
-const attrs = useAttrs();
+defineOptions({
+  inheritAttrs: false,
+});
 
 const props = defineProps<{
-  loading: boolean;
-  waiting: Ref<boolean>;
+  loading?: boolean;
+  waiting?: Ref<boolean>;
 }>();
 
-console.debug(
-  "Widget item:",
-  props,
-  props.waiting,
-  props.loading,
-  props.waiting.value,
-);
+console.debug("Widget item:", props, props.waiting, props.loading);
 </script>
 
 <style>

@@ -56,8 +56,9 @@ export interface GuidedTourManagerApi {
   /**
    * Start the task.
    * @param task - The task to start.
+   * @param remember - Whether to resume the task, or to start it anew.
    */
-  startTask(task: TourTask): Promise<void>;
+  startTask(task: TourTask, remember: boolean): Promise<void>;
   /**
    * Get all steps of a tour.
    */

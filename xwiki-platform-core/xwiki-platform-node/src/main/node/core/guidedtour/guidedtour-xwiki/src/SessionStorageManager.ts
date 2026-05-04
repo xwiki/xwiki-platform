@@ -1,0 +1,67 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import type { TourTask } from "@xwiki/platform-guidedtour-api";
+
+export class SessionStorageManager {
+  static parseStorageKeyPrefix(
+    key: string,
+  ): { taskId: string; tourId: string } | undefined {
+    const regexp = RegExp(/^guidedtour_(.*)__(.*)$/, "g");
+    const matches = key.matchAll(regexp).next();
+    const len = 0;
+    if (matches.value === undefined || matches.value?.length != 3) {
+      console.error(
+        `Error parsing "${key}": Found ${len} matches, but I wanted exactly 2.`,
+      );
+      return undefined;
+    }
+    // Also unescape the ids
+    const result = {
+      taskId: matches.value[1].replaceAll("_|", "_"),
+      tourId: matches.value[2].replaceAll("_|", "_"),
+    };
+    console.info("Results of parsing:", result);
+    return result;
+  }
+
+  static getStorageKeyPrefix(task: TourTask): string {
+    return `guidedtour_${task.tourId!.replaceAll("_", "_|")}__${task.id!.replaceAll("_", "_|")}`;
+  }
+
+  static getStorageKey(key: string) {
+    return window.sessionStorage.getItem(key);
+  }
+
+  static getActiveTaskStorageKey(): string {
+    return "guidedtour_activeTask";
+  }
+
+  static getTaskStepStorageKey(task: TourTask): string {
+    return this.getStorageKeyPrefix(task) + "_currentStep";
+  }
+
+  static setStorageKey(key: string, stepIndex?: string) {
+    if (stepIndex === undefined) {
+      window.sessionStorage.removeItem(key);
+    } else {
+      window.sessionStorage.setItem(key, stepIndex);
+    }
+  }
+}

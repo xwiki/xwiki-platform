@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { SessionStorageManager } from "./SessionStorageManager";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { driver } from "driver.js";
 import type { GuidedTourManager } from "./GuidedTourManager";
 import type { TourStep, TourTask } from "@xwiki/platform-guidedtour-api";
-import type { Config, DriveStep } from "driver.js";
+import type { Config, DriveStep, Driver } from "driver.js";
 
 /* eslint-disable max-statements */
 const util = {
@@ -72,18 +73,46 @@ const util = {
     probeInterval = 500,
     maxIntervals = 6,
   ): Promise<Element | undefined> {
+    return util.retryWithCallback(
+      () => {
+        const queriedElement = document.querySelector(selector);
+        if (queriedElement && util.isElementVisible(queriedElement)) {
+          return queriedElement;
+        } else {
+          return undefined;
+        }
+      },
+      probeInterval,
+      maxIntervals,
+      selector,
+    );
+  },
+  /**
+   *
+   * @param callbackFn - The function to run to test if our goal has been achieved. Should return truthy if achieved, false otherwise (if we still need to wait)
+   * @param probeInterval - time (in ms) to wait after a failed check for the specified element
+   * @param maxIntervals - how many probe intervals to wait until rejecting
+   * @param consoleName - For debugging, to display in console
+   * @returns undefined for timeout, the return value of callbackFn if successful.
+   */
+  async retryWithCallback<T>(
+    callbackFn: () => T | undefined,
+    probeInterval = 500,
+    maxIntervals = 6,
+    consoleName = "something",
+  ) {
     // TODO: Could maybe use MutationObservers here?
-    console.debug(`waiting for ${selector!}...`);
+    console.debug(`waiting for ${consoleName}...`);
     for (let i = 0; i < maxIntervals; i += 1) {
-      const queriedElement = document.querySelector(selector);
-      if (queriedElement && util.isElementVisible(queriedElement)) {
-        return queriedElement;
+      const retValue = callbackFn();
+      if (retValue) {
+        return retValue;
       }
-      console.debug(`(${i}/${maxIntervals}) waiting for ${selector}...`);
+      console.debug(`(${i}/${maxIntervals}) waiting for ${consoleName}...`);
       await new Promise((resolve) => setTimeout(resolve, probeInterval));
     }
     console.debug(
-      `Failed to find element <${selector}> in the page after waiting ${probeInterval * maxIntervals} (${probeInterval} * ${maxIntervals}) ms.`,
+      `Failed to confirm ${consoleName} after waiting ${probeInterval * maxIntervals} (${probeInterval} * ${maxIntervals}) ms.`,
     );
     return undefined;
   },
@@ -146,8 +175,8 @@ function XWikiDriverConfig(
       // The state is empty when this function is called.
       const status =
         Number.parseInt(
-          guidedTourManager.getStorageKey(
-            guidedTourManager.getTaskStepStorageKey(task),
+          SessionStorageManager.getStorageKey(
+            SessionStorageManager.getTaskStepStorageKey(task),
           ) ?? "-1",
         ) +
           1 >=
@@ -157,8 +186,8 @@ function XWikiDriverConfig(
       guidedTourManager.setTaskStatus(task, status);
       // TODO: See if this is needed.
       // TODO: Maybe move this to guidedTourManager.setTaskStatus(task, status) ?
-      guidedTourManager.setStorageKey(
-        guidedTourManager.getActiveTaskStorageKey(),
+      SessionStorageManager.setStorageKey(
+        SessionStorageManager.getActiveTaskStorageKey(),
         undefined,
       );
       guidedTourManager.activeTask = undefined;
@@ -199,7 +228,6 @@ function XWikiDriverConfig(
                     _step,
                     options,
                   );
-                  // guidedTourManager.activeDriverTask?.moveNext();
                 },
               );
             } else {
@@ -257,14 +285,13 @@ function XWikiDriverConfig(
               prevStep,
               guidedTourManager,
               async () => {
+                console.warn("Calling callback for prev step move (hopefully)");
                 // FIXME: This recursion should be guarded better, lest there be an infinite recursion.
                 await options.config.onPrevClick!(
                   _highlightedElement,
                   _step,
                   options,
                 );
-                console.warn("Calling callback for prev step move (hopefully)");
-                // guidedTourManager.activeDriverTask?.movePrevious();
               },
             );
           } else {
@@ -328,8 +355,159 @@ function getDriverConfigForSteps(
   return config;
 }
 
-export { XWikiDriverConfig, driver, getDriverConfigForSteps };
+function wrapTask(task: Driver, guidedTourManager: GuidedTourManager): Driver {
+  const _drive = task.drive;
+  const _moveNext = task.moveNext;
+  const _movePrevious = task.movePrevious;
+  const _destroy = task.destroy;
+  task.drive = function (stepIndex: number = 0) {
+    _drive(stepIndex);
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getTaskStepStorageKey(
+        guidedTourManager.activeTask!,
+      ),
+      stepIndex.toString(),
+    );
+  }.bind(task);
 
+  task.moveNext = function () {
+    let expectPageRefresh: boolean = false;
+    // Cache the active task, since _moveNext() will destroy it if we're on the last step.
+    const activeTask = guidedTourManager.activeTask!;
+    // FIXME: This default should be changed maybe...
+    const currentStepIndex =
+      guidedTourManager.activeDriverTask?.getActiveIndex() ?? 1000000;
+    const newStepIndex: number = currentStepIndex + 1;
+    if (newStepIndex >= activeTask.steps!.length) {
+      // No next step to go to.
+      expectPageRefresh = false;
+    } else {
+      const currentStep =
+        guidedTourManager.activeTask!.steps![currentStepIndex];
+      const newStep = guidedTourManager.activeTask!.steps![newStepIndex];
+      console.info("Comparing these paths:");
+      console.info(currentStep);
+      console.info(newStep);
+
+      expectPageRefresh = currentStep.path != newStep.path;
+    }
+    // FIXME: This is just so the tours work for the branch merge, it should be removed.
+    expectPageRefresh = false;
+    console.debug(
+      "newStepIndex",
+      newStepIndex,
+      "expectPageRefresh",
+      expectPageRefresh,
+    );
+    let newStep;
+    if (!expectPageRefresh) {
+      // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
+      // stay in place until the page reloads. The session storage key is still set, so we'll recover
+      _moveNext();
+      newStep =
+        guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+    } else {
+      newStep =
+        guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+      newStep = newStep !== undefined ? newStep + 1 : undefined;
+      console.log(
+        "Not advancing the tour since we expect a refresh. Session storage is being set to",
+        newStep,
+      );
+    }
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getTaskStepStorageKey(activeTask),
+      newStep?.toString() ?? undefined,
+    );
+  }.bind(task);
+
+  task.movePrevious = function () {
+    let expectPageRefresh: boolean = false;
+    // Cache the active task, since _moveNext() will destroy it if we're on the last step.
+    const activeTask = guidedTourManager.activeTask!;
+    // FIXME: This default should be changed maybe...
+    const currentStepIndex =
+      guidedTourManager.activeDriverTask?.getActiveIndex() ?? -1000000;
+    let newStepIndex: number | undefined = currentStepIndex - 1;
+    if (newStepIndex < 0) {
+      // No prev step to go to.
+      newStepIndex = undefined;
+      expectPageRefresh = false;
+    } else {
+      const currentStep =
+        guidedTourManager.activeTask!.steps![currentStepIndex];
+      const newStep = guidedTourManager.activeTask!.steps![newStepIndex];
+      console.info("Comparing these paths:");
+      console.info(currentStep);
+      console.info(newStep);
+
+      expectPageRefresh = currentStep.path != newStep.path;
+    }
+    // FIXME: This is just so the tours work for the branch merge, it should be removed.
+    expectPageRefresh = false;
+    console.debug(
+      "newStepIndex",
+      newStepIndex,
+      "expectPageRefresh",
+      expectPageRefresh,
+    );
+    let newStep;
+    if (!expectPageRefresh) {
+      // If the page is supposed to refresh/redirect, driver won't try to advance to the next step, but will instead
+      // stay in place until the page reloads. The session storage key is still set, so we'll recover
+      _movePrevious();
+      newStep =
+        guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+    } else {
+      newStep =
+        guidedTourManager.activeDriverTask?.getActiveIndex() ?? undefined;
+      newStep = newStep !== undefined ? newStep - 1 : undefined;
+      console.log(
+        "Not advancing the tour since we expect a refresh. Session storage is being set to",
+        newStep,
+      );
+    }
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getTaskStepStorageKey(activeTask),
+      newStep?.toString() ?? undefined,
+    );
+  }.bind(task);
+
+  task.destroy = function () {
+    const currentStep = task.getActiveIndex();
+    console.info(`Trying to see if, on destroy, `);
+    if (currentStep != task.getConfig().steps?.length) {
+      SessionStorageManager.setStorageKey(
+        SessionStorageManager.getTaskStepStorageKey(
+          guidedTourManager.activeTask!,
+        ),
+        task.getActiveIndex()!.toString(),
+      );
+    } else {
+      // Delete the current step storage key.
+      SessionStorageManager.setStorageKey(
+        SessionStorageManager.getTaskStepStorageKey(
+          guidedTourManager.activeTask!,
+        ),
+        undefined,
+      );
+    }
+    _destroy();
+  }.bind(task);
+
+  return task;
+}
+
+export { XWikiDriverConfig, driver, getDriverConfigForSteps, wrapTask };
+
+/**
+ * Adds a callback that triggers when the HTML element is interacted with.
+ *
+ * @param element - The element which should be interacted with in order to proceed.
+ * @param step - The current step. Used to confirm that the active step is the expected one.
+ * @param guidedTourManager - The guidedTourManager Api instance.
+ * @param callbackFn - A callback to execute once the element is interacted with.
+ */
 function bindReflexEvents(
   element: Element,
   step: TourStep,
@@ -349,20 +527,11 @@ function bindReflexEvents(
       new Promise((resolve) => setTimeout(resolve, msTimeout))
         .then(() => {
           console.debug("sloip awoked");
-          // Increment the local storage step. (For cases when clicking the element leads to a redirect.)
-          // window.localStorage.setItem(tour.getConfig().name + '_current_step', 1 + activeIndex);
-          // if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
-          //   window.localStorage.setItem(tour.getConfig().name + '_end', 'yes');
-          //   window.guidedTourInProgress = false;
-          // }
-          // The localStorage item should theoretically be set to the same value in the moveNext(), so no harm done
-          // Fire onNext ?
-          // document.fire('arrowRightPress');
-          // guidedTourManager.activeDriverTask?.emit
           if (
             step.order != guidedTourManager.activeDriverTask?.getActiveIndex()
           ) {
             // FIXME: This might not work.
+            console.debug("Removing reflex listener on ", element);
             element.removeEventListener("click", callback);
             callbackFn();
           }
@@ -370,13 +539,8 @@ function bindReflexEvents(
         })
         .catch(console.error);
     } else {
-      // Increment the local storage step. (For cases when clicking the element leads to a redirect.)
-      // window.localStorage.setItem(tour.getConfig().name + '_current_step', 1 + activeIndex);
-      // if (window.localStorage.getItem(tour.getConfig().name + '_current_step') == tour.getConfig().steps.length) {
-      //   window.localStorage.setItem(tour.getConfig().name + '_end', 'yes');
-      //   window.guidedTourInProgress = false;
-      // }
       // FIXME: This might not work.
+      console.debug("Removing reflex listener on ", element);
       element.removeEventListener("click", callback);
       callbackFn();
       /* The localStorage item should theoretically be set to the same value in the moveNext(), so no harm done
@@ -388,6 +552,7 @@ function bindReflexEvents(
       });*/
     }
   };
+  console.debug("Adding reflex listener on ", element);
   element.addEventListener("click", callback);
 }
 
@@ -522,7 +687,25 @@ window.guidedTourInProgress = false;
       }
 
 // FIXME: From old TourJS.xml
-
+tour.drive = function (stepIndex) {
+      // TODO: Check precondition for next step;
+      // TODO: Check if the next step is on the right page (to account for href redirects, etc);
+      // TODO: Wait for next step element to appear;
+      // TODO: Set the right localStorage stuff;
+      console.info('custom drive() here:', tour, stepIndex, this);
+      originalDrive(stepIndex);
+      /**if (!(window.localStorage.getItem(tour.getConfig().name + '_end') === 'yes')) {
+        let localStorageStepIndex = window.localStorage.getItem(tour.getConfig().name + '_current_step') - 1;
+        console.info(tour, localStorageStepIndex);
+        console.info("I want " + tour.getConfig().steps[localStorageStepIndex].path + ", got " + window.location.pathname)
+        if (tour.getConfig().steps[localStorageStepIndex].path == window.location.pathname &amp;&amp; !window.guidedTourInProgress) {
+          window.guidedTourInProgress = true;
+          originalDrive(stepIndex);
+        }
+      } else {
+        window.guidedTourInProgress = false;
+      }**\/
+    };
   // Helper to bind click events, TODO: could be deleted.
   function bindFloaterClickEvent(selector, callback) {
     $('.guidedtour-widget ' + selector).on('click', (event) => {

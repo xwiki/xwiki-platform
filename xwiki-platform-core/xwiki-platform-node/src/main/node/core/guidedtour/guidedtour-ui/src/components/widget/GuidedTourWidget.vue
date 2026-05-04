@@ -45,9 +45,9 @@
             state.waitingLoadAsync < 2
           "
         >
-          <GuidedTourWidgetTour />
-          <GuidedTourWidgetTour />
-          <GuidedTourWidgetTour />
+          <GuidedTourWidgetItem />
+          <GuidedTourWidgetItem />
+          <GuidedTourWidgetItem />
         </template>
         <template v-else-if="state.tours.length > 0">
           <GuidedTourWidgetTour
@@ -64,7 +64,7 @@
         </template>
         <div v-else>
           <template v-if="state.tours.length == 0">
-            <GuidedTourWidgetTour />
+            <GuidedTourWidgetItem />
           </template>
           <template v-else-if="state.toursLoadError.length > 0">{{
             state.toursLoadError
@@ -96,6 +96,7 @@
 // FIXME: This should be injected from somewhere else, but I have no idea from where.
 import DriverCss from "./DriverCss.vue";
 import GuidedTourWidgetHeader from "./GuidedTourWidgetHeader.vue";
+import GuidedTourWidgetItem from "./GuidedTourWidgetItem.vue";
 import GuidedTourWidgetTour from "./GuidedTourWidgetTour.vue";
 import GuidedTourWidgetUsefulLink from "./GuidedTourWidgetUsefulLink.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";

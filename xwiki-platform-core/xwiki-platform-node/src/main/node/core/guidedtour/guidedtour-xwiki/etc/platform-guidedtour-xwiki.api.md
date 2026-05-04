@@ -24,23 +24,15 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     fetchSteps(tourId: string, taskId: string): Promise<TourStep[]>;
     fetchTours(): Promise<TourTour[]>;
     // (undocumented)
-    getActiveTaskStorageKey(): string;
-    // (undocumented)
     getCSRFToken(): Promise<string>;
     // (undocumented)
     getSandboxSpace(): Promise<string>;
     // (undocumented)
     getSteps(tourId: string, taskId: string): Promise<TourStep[]>;
     // (undocumented)
-    getStorageKey(key: string): string | null;
-    // (undocumented)
-    getStorageKeyPrefix(task: TourTask): string;
-    // (undocumented)
     getTask(taskId: string, tourId?: string): Promise<TourTask | undefined>;
     // (undocumented)
     getTasks(tourId: string): Promise<TourTask[]>;
-    // (undocumented)
-    getTaskStepStorageKey(task: TourTask): string;
     // (undocumented)
     getTour(tourId: string): Promise<TourTour | undefined>;
     // (undocumented)
@@ -50,28 +42,17 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     // (undocumented)
     initExistingTask(): Promise<void>;
     // (undocumented)
-    isInEditMode(): boolean;
-    // (undocumented)
-    markTaskDone(task: TourTask, skipped: boolean): Promise<void>;
-    // (undocumented)
-    parseStorageKeyPrefix(key: string): {
-        taskId: string;
-        tourId: string;
-    } | undefined;
+    static isInEditMode(): boolean;
     // (undocumented)
     resetTask(task: TourTask): Promise<void>;
     // (undocumented)
     saveTaskStatus(tourId: string, taskId: string, status: TourTaskStatus): Promise<void>;
     // (undocumented)
-    setStorageKey(key: string, stepIndex?: string): void;
-    // (undocumented)
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
     // (undocumented)
     setupStep(step: TourStep): void;
     // (undocumented)
-    startTask(task: TourTask): Promise<void>;
-    // (undocumented)
-    wrapTask(task: Driver): Driver;
+    startTask(task: TourTask, remember?: boolean): Promise<void>;
 }
 
 // @beta

@@ -12,7 +12,7 @@ export interface GuidedTourManagerApi {
     getTours(): Promise<TourTour[]>;
     getUsefulLinks(): Promise<string[]>;
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
-    startTask(task: TourTask): Promise<void>;
+    startTask(task: TourTask, remember: boolean): Promise<void>;
 }
 
 // @beta

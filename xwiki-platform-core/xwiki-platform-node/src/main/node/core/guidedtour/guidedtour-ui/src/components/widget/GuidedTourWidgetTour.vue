@@ -27,11 +27,11 @@
 <template>
   <template v-if="tour">
     <section
-      :id="tour!.id"
+      :id="props.tour.value.id"
       class="guidedtour-tour"
       :class="{
-        ['tour-' + tour.status]: true,
-        collapsed: tour.isCollapsed,
+        ['tour-' + props.tour.value.status]: true,
+        collapsed: props.tour.value.isCollapsed,
       }"
     >
       <GuidedTourWidgetItem
@@ -39,8 +39,8 @@
         :waiting="ref(false)"
         class="guidedtour-tour-header"
         @click="
-          console.log('clicked', tour);
-          $emit('toggleCollapseTour', tour);
+          console.log('clicked', props.tour.value);
+          $emit('toggleCollapseTour', props.tour.value);
         "
       >
         <template v-slot:pre-btns>
@@ -48,11 +48,11 @@
           <i class="fa-solid fa-chevron-right chevron always-show" />
         </template>
         <template v-slot:item-title>
-          <span class="tour-title">{{ tour.title }}</span>
+          <span class="tour-title">{{ props.tour.value.title }}</span>
         </template>
         <template v-slot:post-btns>
           <button
-            v-if="tour!.status == TourTaskStatus.TODO"
+            v-if="tour.value.status == TourTaskStatus.TODO"
             class="post-btn"
             @click.stop="onSkipTour"
           >
@@ -70,14 +70,15 @@
               v-for="task in state.tasks"
               :key="task.id"
               :task="task"
-              :tour-id="tour!.id"
+              :tour-id="props.tour.value.id"
+              @taskStatusChanged="onTaskStatusChanged"
             />
           </template>
           <template #fallback>
             <!-- Have some placeholders loading -->
-            <GuidedTourWidgetItem :loading="true" :waiting="ref(false)" />
-            <GuidedTourWidgetItem :loading="true" :waiting="ref(false)" />
-            <GuidedTourWidgetItem :loading="true" :waiting="ref(false)" />
+            <GuidedTourWidgetItem />
+            <GuidedTourWidgetItem />
+            <GuidedTourWidgetItem />
           </template>
         </Suspense>
       </div>
@@ -100,8 +101,10 @@ import type {
   TourTour,
 } from "@xwiki/platform-guidedtour-api";
 import type { Ref } from "vue";
-const props = defineProps<{ tour?: Ref<TourTour> }>();
-const tour = props.tour; // reactive read-only ref
+const props = defineProps<{ tour: Ref<TourTour> }>();
+function onTaskStatusChanged(task: TourTask) {
+  console.warn("Caught event for", task);
+}
 defineEmits(["toggleCollapseTour"]);
 const guidedTourManager: GuidedTourManagerApi = inject("GuidedTourManager")!;
 console.info("In tour setup.");
@@ -110,20 +113,20 @@ const state = reactive({
 });
 
 function onSkipTour() {
-  console.warn("Unimplemented onSkipTour");
+  for (let task of state.tasks) {
+    guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
+  }
 }
 
 function onResetTour() {
-  console.warn("Unimplemented onResetTour");
+  for (let task of state.tasks) {
+    guidedTourManager.setTaskStatus(task, TourTaskStatus.TODO);
+  }
 }
 
 onMounted(async () => {
-  if (tour === undefined) {
-    // We're in a placeholder element.
-    return;
-  }
-  const tasks = await guidedTourManager.getTasks(tour!.value.id);
-  state.tasks = tasks ?? [];
+  const tasks = await guidedTourManager.getTasks(props.tour.value.id);
+  state.tasks = tasks ?? ([] as TourTask[]);
   if (!tasks) {
     console.error("No tasks");
   }

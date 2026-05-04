@@ -21,7 +21,7 @@
 /**
  * A translation query, as an array of keys. A prefix can also be provided to reduce the query size. The prefix is
  * concatenated before each key.
- * @since 18.2.0RC1
+ * @since 18.4.0RC1
  * @beta
  */
 type TranslationQuery = { prefix: string; keys: string[] };

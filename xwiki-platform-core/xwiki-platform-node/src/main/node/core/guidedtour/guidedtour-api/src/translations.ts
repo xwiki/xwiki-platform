@@ -22,7 +22,7 @@
 /**
  * The translations result. It's a map of translation keys as keys, and their translation values in the requested locale
  * as values.
- * @since 18.2.0RC1
+ * @since 18.4.0RC1
  * @beta
  */
 type Translations = { [p: string]: string };

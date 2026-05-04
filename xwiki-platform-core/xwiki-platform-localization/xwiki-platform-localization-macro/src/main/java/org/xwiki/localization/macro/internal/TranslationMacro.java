@@ -43,6 +43,7 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.script.ScriptMacroTools;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -99,6 +100,9 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
     @Named("plain/1.0")
     private Parser plainParser;
 
+    @Inject
+    private ScriptMacroTools scripts;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -121,9 +125,9 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
 
         List<Block> blocks;
         if (translation != null) {
-            Block block =
-                parameters.getParameters() != null ? translation.render(locale, (Object[]) parameters.getParameters())
-                    : translation.render(locale);
+            Object[] translationParameters = getTranslationParameters(parameters, context);
+            Block block = translationParameters != null ? translation.render(locale, translationParameters)
+                : translation.render(locale);
 
             if (block instanceof CompositeBlock) {
                 blocks = block.getChildren();
@@ -133,12 +137,11 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
 
             if (!context.getCurrentMacroBlock().isInline()) {
                 // Make the content standalone
-                blocks = Arrays.<Block> asList(new GroupBlock(blocks));
+                blocks = Arrays.<Block>asList(new GroupBlock(blocks));
             }
         } else if (content != null) {
-            blocks =
-                this.macroContentParser.parse(content, context, false, context.getCurrentMacroBlock().isInline())
-                    .getChildren();
+            blocks = this.macroContentParser.parse(content, context, false, context.getCurrentMacroBlock().isInline())
+                .getChildren();
         } else {
             try {
                 blocks = this.plainParser.parse(new StringReader(parameters.getKey())).getChildren();
@@ -152,6 +155,22 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         }
 
         return blocks;
+    }
+
+    private Object[] getTranslationParameters(TranslationMacroParameters parameters, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        // Try the parameters
+        if (parameters.getParameters() != null) {
+            return parameters.getParameters();
+        }
+
+        // Try the script parameters
+        if (parameters.getScriptParameters() != null) {
+            return this.scripts.getScriptValue(parameters.getScriptParameters(), context, Object[].class);
+        }
+
+        return null;
     }
 
     @Override

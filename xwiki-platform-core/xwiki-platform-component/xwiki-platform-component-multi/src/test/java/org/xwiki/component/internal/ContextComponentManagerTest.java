@@ -19,12 +19,11 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.jmock.Expectations;
-import org.jmock.States;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -33,38 +32,55 @@ import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ContextComponentManager} which indirectly test
  * {@link org.xwiki.component.internal.WikiComponentManager} and
  * {@link org.xwiki.component.internal.UserComponentManager} (and their ancillary classes).
- * 
+ *
  * @version $Id$
  * @since 2.1RC1
  */
-public class ContextComponentManagerTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+class ContextComponentManagerTest
 {
-    /**
-     * Mock document access bridge.
-     */
-    private DocumentAccessBridge mockDocumentAccessBridge;
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
-    private WikiDescriptorManager mockWikiDescriptorManager;
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
-    private Provider<DocumentReference> mockCurrentDocumentReferenceProvider;
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
-    private Provider<SpaceReference> mockCurrentSpaceReferenceProvider;
+    @MockComponent
+    @Named("current")
+    private Provider<DocumentReference> currentDocumentReferenceProvider;
 
-    public static interface Role
+    @MockComponent
+    @Named("current")
+    private Provider<SpaceReference> currentSpaceReferenceProvider;
+
+    public interface Role
     {
     }
 
@@ -72,121 +88,70 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     {
     }
 
-    @Override
-    protected void registerComponents() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        super.registerComponents();
-
-        // Document Access Bridge Mock
-        this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
-        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
-        this.mockCurrentDocumentReferenceProvider = registerMockComponent(DocumentReference.TYPE_PROVIDER, "current");
-        this.mockCurrentSpaceReferenceProvider = registerMockComponent(SpaceReference.TYPE_PROVIDER, "current");
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        ecm.initialize(new ExecutionContext());
 
         // Enabled component registration events
         QueueComponentEventManager eventManager = new QueueComponentEventManager();
-        eventManager
-            .setObservationManager(getComponentManager().<ObservationManager>getInstance(ObservationManager.class));
+        eventManager.setObservationManager(this.componentManager.getInstance(ObservationManager.class));
         eventManager.shouldQueue(false);
-        getComponentManager().setComponentEventManager(eventManager);
+        this.componentManager.setComponentEventManager(eventManager);
     }
 
     @Test
-    public void testRegisterComponentInUserComponentManager() throws Exception
+    void testRegisterComponentInUserComponentManager() throws Exception
     {
-        final States state = getMockery().states("test");
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user1"));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki", "space", "document"));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                when(state.isNot("otheruser"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user1")));
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-            }
-        });
-
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
 
         // Lookup not yet registered component (and feel the caches with null CMs)
-
-        try {
-            contextCM.getInstance(Role.class);
-            Assert.fail("Should have raised an exception");
-        } catch (ComponentLookupException expected) {
-            // No need to assert the message, we just want to ensure an exception is raised.
-        }
+        assertThrows(ComponentLookupException.class, () -> contextCM.getInstance(Role.class));
 
         // Register component for the current user
-        ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "user");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager userCM = this.componentManager.getInstance(ComponentManager.class, "user");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         userCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        Assert.assertNotNull(contextCM.getInstance(Role.class));
+        assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
-        state.become("otheruser");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user2")));
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-            }
-        });
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user2"));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki", "space", "document"));
 
-        try {
-            contextCM.getInstance(Role.class);
-            Assert.fail("Should have raised an exception");
-        } catch (ComponentLookupException expected) {
-            // No need to assert the message, we just want to ensure an exception is raised.
-        }
+        assertThrows(ComponentLookupException.class, () -> contextCM.getInstance(Role.class));
     }
 
     @Test
-    public void testRegisterComponentInDocumentComponentManager() throws Exception
+    void testRegisterComponentInDocumentComponentManager() throws Exception
     {
-        final States state = getMockery().states("test");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space1", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki1", "space1", "document1"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                when(state.isNot("otherdocument"));
-                will(returnValue("wiki1"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                when(state.isNot("otherdocument"));
-                will(returnValue(new SpaceReference("space1", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                when(state.isNot("otherdocument"));
-                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                when(state.isNot("otherdocument"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
-
-        ComponentManager documentCM = getComponentManager().getInstance(ComponentManager.class, "document");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager documentCM = this.componentManager.getInstance(ComponentManager.class, "document");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
 
@@ -194,52 +159,34 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         documentCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getInstance(Role.class));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
-        state.become("otherdocument");
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki2"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
-            }
-        });
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki2");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space2", new WikiReference("wiki2")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki2", "space2", "document2"));
 
-        try {
-            contextCM.getInstance(Role.class);
-            Assert.fail("Should have raised an exception");
-        } catch (ComponentLookupException expected) {
-            // No need to assert the message, we just want to ensure an exception is raised.
-        }
+        assertThrows(ComponentLookupException.class, () -> contextCM.getInstance(Role.class));
     }
 
     @Test
-    public void testDeleteDocument() throws Exception
+    void testDeleteDocument() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki", "space", "document"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
-        ComponentManager documentCM = getComponentManager().getInstance(ComponentManager.class, "document");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager documentCM = this.componentManager.getInstance(ComponentManager.class, "document");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
 
@@ -247,42 +194,30 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         documentCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
 
-        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
 
         observationManager.notify(new DocumentDeletedEvent(new DocumentReference("wiki", "space", "document")), null,
             null);
 
-        Assert.assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
+        assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
     }
 
     @Test
-    public void testRegisterComponentInSpaceComponentManager() throws Exception
+    void testRegisterComponentInSpaceComponentManager() throws Exception
     {
-        final States state = getMockery().states("test");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space1", new WikiReference("wiki1")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki1", "space1", "document1"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                when(state.isNot("otherspace"));
-                will(returnValue("wiki1"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                when(state.isNot("otherspace"));
-                will(returnValue(new SpaceReference("space1", new WikiReference("wiki1"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                when(state.isNot("otherspace"));
-                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                when(state.isNot("otherspace"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
-
-        ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "space");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager userCM = this.componentManager.getInstance(ComponentManager.class, "space");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
 
@@ -290,219 +225,166 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         userCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getInstance(Role.class));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
-        state.become("otherspace");
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki2"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
-            }
-        });
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki2");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space2", new WikiReference("wiki2")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki2", "space2", "document2"));
 
-        try {
-            contextCM.getInstance(Role.class);
-            Assert.fail("Should have raised an exception");
-        } catch (ComponentLookupException expected) {
-            // No need to assert the message, we just want to ensure an exception is raised.
-        }
+        assertThrows(ComponentLookupException.class, () -> contextCM.getInstance(Role.class));
     }
 
     @Test
-    public void testRegisterComponentInWikiComponentManager() throws Exception
+    void testRegisterComponentInWikiComponentManager() throws Exception
     {
-        final States state = getMockery().states("test");
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                when(state.isNot("otherwiki"));
-                will(returnValue("wiki1"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new SpaceReference("space1", new WikiReference("wiki1"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space1", new WikiReference("wiki1")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki1", "space1", "document1"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
         // Register in the current wiki.
-        ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager wikiCM = this.componentManager.getInstance(ComponentManager.class, "wiki");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         wikiCM.registerComponent(cd);
 
         // Verify we can lookup the component from the context CM.
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
 
         // Now verify that we cannot look it up anymore if there's another wiki in the context
-        state.become("otherwiki");
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki2");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space2", new WikiReference("wiki2")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki2", "space2", "document2"));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki2"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
-            }
-        });
-
-        try {
-            contextCM.getInstance(Role.class);
-            Assert.fail("Should have raised an exception");
-        } catch (ComponentLookupException expected) {
-            // No need to assert the message, we just want to ensure an exception is raised.
-        }
+        assertThrows(ComponentLookupException.class, () -> contextCM.getInstance(Role.class));
     }
 
     @Test
-    public void testDeleteWiki() throws ComponentLookupException, Exception
+    void testDeleteWiki() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki", "space", "document"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
         // Register in the current wiki.
-        ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        ComponentManager wikiCM = this.componentManager.getInstance(ComponentManager.class, "wiki");
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         wikiCM.registerComponent(cd);
 
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getComponentDescriptor(Role.class, "default"));
 
-        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
 
         observationManager.notify(new WikiDeletedEvent("wiki"), null, null);
 
-        Assert.assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
+        assertNull(contextCM.getComponentDescriptor(Role.class, "default"));
     }
 
     @Test
-    public void testRegisterComponentInRootComponentManager() throws Exception
+    void testRegisterComponentInRootComponentManager() throws Exception
     {
-        final States state = getMockery().states("test");
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                when(state.isNot("otherwiki"));
-                will(returnValue("wiki"));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-                allowing(mockDocumentAccessBridge).getCurrentUserReference();
-                when(state.isNot("otherwiki"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-            }
-        });
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.currentSpaceReferenceProvider.get())
+            .thenReturn(new SpaceReference("space", new WikiReference("wiki")));
+        when(this.currentDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("wiki", "space", "document"));
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("wiki", "XWiki", "user"));
 
         // Register in the current wiki.
-        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<>();
         cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
-        getComponentManager().registerComponent(cd);
+        this.componentManager.registerComponent(cd);
 
         // Verify we can lookup the component from the context CM.
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        Assert.assertNotNull(contextCM.getInstance(Role.class));
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        assertNotNull(contextCM.getInstance(Role.class));
     }
 
     @Test
-    public void testCreateDocumentComponentManager() throws Exception
+    void testCreateDocumentComponentManager() throws Exception
     {
-        ComponentManagerManager manager = getComponentManager().getInstance(ComponentManagerManager.class);
+        ComponentManagerManager manager = this.componentManager.getInstance(ComponentManagerManager.class);
 
-        NamespacedComponentManager componentManager =
+        NamespacedComponentManager componentManagerResult =
             (NamespacedComponentManager) manager.getComponentManager("document:wiki1:space1.space2.document1", true);
 
-        assertNotNull(componentManager);
-        assertEquals("document:wiki1:space1.space2.document1", componentManager.getNamespace());
-        assertEquals("space:wiki1:space1.space2", ((NamespacedComponentManager)componentManager.getParent()).getNamespace());
-        assertEquals("space:wiki1:space1", ((NamespacedComponentManager)componentManager.getParent().getParent()).getNamespace());
-        assertEquals("wiki:wiki1", ((NamespacedComponentManager)componentManager.getParent().getParent().getParent()).getNamespace());
+        assertNotNull(componentManagerResult);
+        assertEquals("document:wiki1:space1.space2.document1", componentManagerResult.getNamespace());
+        assertEquals("space:wiki1:space1.space2",
+            ((NamespacedComponentManager) componentManagerResult.getParent()).getNamespace());
+        assertEquals("space:wiki1:space1",
+            ((NamespacedComponentManager) componentManagerResult.getParent().getParent()).getNamespace());
+        assertEquals("wiki:wiki1",
+            ((NamespacedComponentManager) componentManagerResult.getParent().getParent().getParent()).getNamespace());
     }
 
     // Failures
 
     @Test
-    public void testRegisterComponentInContextComponentManagerThrowsException() throws Exception
+    void testRegisterComponentInContextComponentManagerThrowsException() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
-        try {
-            contextCM.registerComponent(new DefaultComponentDescriptor<Role>());
-            Assert.fail("Should have thrown an exception error");
-        } catch (RuntimeException expected) {
-            Assert.assertEquals("The Context Component Manager should only be used for read access. Write operations "
-                + "should be done against specific Component Managers.", expected.getMessage());
-        }
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> contextCM.registerComponent(new DefaultComponentDescriptor<Role>()));
+        assertEquals(
+            "The Context Component Manager should only be used for read access. Write operations "
+                + "should be done against specific Component Managers.",
+            exception.getMessage());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRegisterComponentInstance() throws ComponentLookupException, Exception
+    @Test
+    void testRegisterComponentInstance() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
 
-        contextCM.registerComponent(null, null);
+        assertThrows(RuntimeException.class, () -> contextCM.registerComponent(null, null));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRegisterComponentDesciptor() throws ComponentLookupException, Exception
+    @Test
+    void testRegisterComponentDescriptor() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
 
-        contextCM.registerComponent(null);
+        assertThrows(RuntimeException.class, () -> contextCM.registerComponent(null));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testSetComponentEventManager() throws ComponentLookupException, Exception
+    @Test
+    void testSetComponentEventManager() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
 
-        contextCM.setComponentEventManager(null);
+        assertThrows(RuntimeException.class, () -> contextCM.setComponentEventManager(null));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testSetParent() throws ComponentLookupException, Exception
+    @Test
+    void testSetParent() throws Exception
     {
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+        ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
 
-        contextCM.setParent(null);
+        assertThrows(RuntimeException.class, () -> contextCM.setParent(null));
     }
 }

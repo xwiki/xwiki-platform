@@ -17,5 +17,6 @@
         "^build"
       ]
     }
-  }
+  },
+  "analytics": false
 }

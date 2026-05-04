@@ -367,19 +367,20 @@ public class ModelFactory
                 List allowedValueList = listClass.getList(xwikiContext);
 
                 if (!allowedValueList.isEmpty()) {
-                    Formatter f = new Formatter();
-                    for (int i = 0; i < allowedValueList.size(); i++) {
-                        if (i != allowedValueList.size() - 1) {
-                            f.format("%s,", allowedValueList.get(i).toString());
-                        } else {
-                            f.format("%s", allowedValueList.get(i).toString());
+                    try (Formatter f = new Formatter()) {
+                        for (int i = 0; i < allowedValueList.size(); i++) {
+                            if (i != allowedValueList.size() - 1) {
+                                f.format("%s,", allowedValueList.get(i).toString());
+                            } else {
+                                f.format("%s", allowedValueList.get(i).toString());
+                            }
                         }
-                    }
 
-                    Attribute attribute = this.objectFactory.createAttribute();
-                    attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
-                    attribute.setValue(f.toString());
-                    property.getAttributes().add(attribute);
+                        Attribute attribute = this.objectFactory.createAttribute();
+                        attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
+                        attribute.setValue(f.toString());
+                        property.getAttributes().add(attribute);
+                    }
                 }
             }
 

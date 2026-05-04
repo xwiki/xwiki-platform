@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @AllComponents
-public class XWikiDocumentRenderingTest
+class XWikiDocumentRenderingTest
 {
     private static final String DOCWIKI = "xwiki";
 
@@ -93,7 +93,7 @@ public class XWikiDocumentRenderingTest
     private XWiki xwiki;
 
     @BeforeEach
-    public void setup() throws Exception
+    void setup() throws Exception
     {
         this.xwiki = this.oldcore.getSpyXWiki();
 
@@ -149,7 +149,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedContentWithCurrentDocumentVariableIsInjectedBeforeRendering() throws Exception
+    void getRenderedContentWithCurrentDocumentVariableIsInjectedBeforeRendering() throws Exception
     {
         // Verifies we can access the doc variable from a groovy macro.
         this.document.setContent("{{groovy}}print(doc);{{/groovy}}");
@@ -158,7 +158,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedTitleWhenTitleIsSet()
+    void getRenderedTitleWhenTitleIsSet()
     {
         // Plain title
         this.document.setTitle("title");
@@ -192,33 +192,53 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedTitleInHTMLWhenExtractedFromContent()
+    void getRenderedTitleInHTMLWhenExtractedFromContent()
     {
         // Configure XWiki to extract title from content
         this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
-        this.document.setContent(
-            "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = header 1=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("header 1", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        this.document.setContent(
-            "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = **header 1**=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("<strong>header 1</strong>",
             this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        this.document.setContent(
-            "content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = [[Space.Page]]=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("<span class=\"wikiexternallink\"><a href=\"Space.Page\">"
                 + "<span class=\"wikigeneratedlinkcontent\">Space.Page</span></a></span>",
             this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = #set($var ~= "value")=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("#set($var = \"value\")",
             this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        this.document.setContent("content not in section\n"
-            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = {{groovy}}print "value"{{/groovy}}=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("value", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n=== header 3===");
@@ -232,33 +252,49 @@ public class XWikiDocumentRenderingTest
         this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
         this.document.setRestricted(true);
 
-        this.document.setContent("content not in section\n"
-            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = {{groovy}}print "value"{{/groovy}}=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertThat(this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()),
             startsWith("<span class=\"xwikirenderingerror\">Failed to execute the [groovy] macro."));
     }
 
     @Test
-    public void getRenderedTitleInPlainWhenExtractedFromContent()
+    void getRenderedTitleInPlainWhenExtractedFromContent()
     {
-        this.document.setContent(
-            "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = **header 1**=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("Page", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
 
         // Configure XWiki to extract title from content
         this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
-        this.document.setContent(
-            "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = **header 1**=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("header 1", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
 
-        this.document.setContent("content not in section\n"
-            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = {{groovy}}print "value"{{/groovy}}=
+            header 1 content
+            == header 2==
+            header 2 content""");
         assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void getRenderedTitleWhenNoTitleAndNoContentSet()
+    void getRenderedTitleWhenNoTitleAndNoContentSet()
     {
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
@@ -267,7 +303,7 @@ public class XWikiDocumentRenderingTest
      * Make sure title extracted from content is protected from cycles
      */
     @Test
-    public void getRenderedTitleWhenRecursive()
+    void getRenderedTitleWhenRecursive()
     {
         // Configure XWiki to extract title from content
         this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
@@ -278,7 +314,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedTitleWhenMatchingTitleHeaderDepth()
+    void getRenderedTitleWhenMatchingTitleHeaderDepth()
     {
         // Configure XWiki to extract title from content
         this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
@@ -292,7 +328,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedTitleWhenNotMatchingTitleHeaderDepth()
+    void getRenderedTitleWhenNotMatchingTitleHeaderDepth()
     {
         this.document.setContent("=== level3");
 
@@ -303,7 +339,7 @@ public class XWikiDocumentRenderingTest
      * See XWIKI-5277 for details.
      */
     @Test
-    public void getRenderedContentCleansVelocityMacroCache() throws Exception
+    void getRenderedContentCleansVelocityMacroCache() throws Exception
     {
         // Make sure we start not in the rendering engine since this is what happens in real: a document is
         // called by a template thus outside of the rendering engine.
@@ -332,7 +368,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedContentWithAndWithoutTranslations() throws Exception
+    void getRenderedContentWithAndWithoutTranslations() throws Exception
     {
         this.document.setContent("**bold**");
         this.document.setSyntax(Syntax.XWIKI_2_0);
@@ -358,7 +394,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedContentIsForcingCurrentDocumentAsTheSecurityDocument() throws Exception
+    void getRenderedContentIsForcingCurrentDocumentAsTheSecurityDocument() throws Exception
     {
         // Remove whatever security document there is, to prove that a new security document is forced (it's set as
         // the current document).
@@ -412,7 +448,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedContentTextWithSourceSyntaxSpecified()
+    void getRenderedContentTextWithSourceSyntaxSpecified()
     {
         this.document.setSyntax(Syntax.XWIKI_1_0);
 
@@ -421,7 +457,7 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
-    public void getRenderedContentTextRights() throws Exception
+    void getRenderedContentTextRights() throws Exception
     {
         XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
         otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));

@@ -93,7 +93,6 @@ import static org.mockito.Mockito.when;
     TestNoScriptMacro.class,
     // Various classes to prevent errors in the displayed document
     ModelScriptService.class,
-    TranslationMacro.class,
     WarningMessageMacro.class,
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,

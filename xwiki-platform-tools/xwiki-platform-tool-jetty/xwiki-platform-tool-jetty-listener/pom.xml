@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Lifecycle Listener</name>
   <description>Includes a lifecycle listener that notifies users that they should open the wiki in a browser after the server started.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

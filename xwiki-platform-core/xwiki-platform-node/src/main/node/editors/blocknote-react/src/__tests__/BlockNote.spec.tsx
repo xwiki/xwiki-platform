@@ -23,7 +23,7 @@ import type { BlockOfType, BlockType } from "../blocknote";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} label={"Editor"} />,
   );
 
   await expect(component).toBeVisible();
@@ -35,6 +35,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
       macros={false}
+      label={"Editor"}
     />,
   );
 
@@ -44,7 +45,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} label={"Editor"} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -66,6 +67,7 @@ test("Image insertion UI can be overriden", async ({ mount }) => {
     <BlockNoteForTest
       content={[buildImage(SMALL_IMG_DATA_URL)]}
       macros={false}
+      label={"Editor"}
       overrides={{
         // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
         imageEdition: (image) => {

@@ -224,7 +224,7 @@
       <backdrop>1</backdrop>
     </property>
     <property type="LargeString">
-      <content>So ye wants to edit a page, eh? Ye've come to the right place, lad.</content>
+      <content>dadada</content>
     </property>
     <property type="String">
       <element/>
@@ -857,9 +857,7 @@
       <backdrop/>
     </property>
     <property type="LargeString">
-      <content>YeahHA!!!!aAAA
-
-I knew ye had it in ye! Go on, edit all the pages on this wiki. Make me proud! :)</content>
+      <content>YeahHA!!!!aAAA</content>
     </property>
     <property type="String">
       <element>.realtime-action-done</element>

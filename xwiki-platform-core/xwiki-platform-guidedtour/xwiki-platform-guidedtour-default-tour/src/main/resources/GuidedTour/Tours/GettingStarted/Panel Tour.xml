@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.7" reference="GuidedTour.Tours.GettingStarted.PanelTour" locale="">
+<xwikidoc version="1.7" reference="GuidedTour.Tours.GettingStarted.Panel Tour" locale="">
   <web>GuidedTour.Tours.GettingStarted</web>
   <name>Panel Tour</name>
   <language/>
@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>GuidedTour.Tours.GettingStarted.PanelTour</name>
+    <name>GuidedTour.Tours.GettingStarted.Panel Tour</name>
     <number>0</number>
     <className>XWiki.GuidedTour.StepClass</className>
     <guid>c0c5c208-ad71-4b5e-b4b8-d7e6406454aa</guid>
@@ -249,7 +249,7 @@
     </property>
   </object>
   <object>
-    <name>GuidedTour.Tours.GettingStarted.PanelTour</name>
+    <name>GuidedTour.Tours.GettingStarted.Panel Tour</name>
     <number>1</number>
     <className>XWiki.GuidedTour.StepClass</className>
     <guid>f36ca481-ca61-4f9f-8882-03f5f64f1235</guid>
@@ -460,7 +460,7 @@
     </property>
   </object>
   <object>
-    <name>GuidedTour.Tours.GettingStarted.PanelTour</name>
+    <name>GuidedTour.Tours.GettingStarted.Panel Tour</name>
     <number>2</number>
     <className>XWiki.GuidedTour.StepClass</className>
     <guid>aab273a8-0cd2-4b8b-8d1e-11807ea8e47c</guid>
@@ -673,7 +673,7 @@ Use the side panel, if you want.</content>
     </property>
   </object>
   <object>
-    <name>GuidedTour.Tours.GettingStarted.PanelTour</name>
+    <name>GuidedTour.Tours.GettingStarted.Panel Tour</name>
     <number>0</number>
     <className>XWiki.GuidedTour.TaskClass</className>
     <guid>d7230d08-ca60-4d26-91e6-213c7f48bfc7</guid>

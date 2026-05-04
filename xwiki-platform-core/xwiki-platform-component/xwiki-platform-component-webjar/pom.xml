@@ -18,38 +18,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo-skin</artifactId>
+    <artifactId>xwiki-platform-component</artifactId>
     <version>18.4.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
-  <artifactId>xwiki-platform-flamingo-skin-designsystem-webjar</artifactId>
-  <name>XWiki Platform - Flamingo - Skin - Design System</name>
+  <artifactId>xwiki-platform-component-webjar</artifactId>
+  <name>XWiki Platform - Component - Front - WebJar</name>
+  <description>XWiki Platform - Component - Front - API</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Flamingo Design System</xwiki.extension.name>
+    <xwiki.extension.name>Client-Side Component Manager WebJar</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>webjar</xwiki.extension.category>
-    <!-- Vite is already taking care of minification and bundling in an efficient way. -->
-    <xwiki.minification.skip>true</xwiki.minification.skip>
-    <!-- TODO: Move to a shared location as part of XWIKI-24047. -->
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <xwiki.extension.javascript.modules.importmap>{
-        "_xwiki-platform-flamingo-skin-designsystem-webjar": "!org.xwiki.platform:xwiki-platform-flamingo-skin-designsystem-webjar/index.es.js"
-    }</xwiki.extension.javascript.modules.importmap>
+      "@xwiki/platform-component-annotation-default": "org.xwiki.platform:xwiki-platform-component-webjar/index.es.js",
+      "@xwiki/platform-component-manager-default": "org.xwiki.platform:xwiki-platform-component-webjar/index.es.js",
+      "@xwiki/platform-component-manager-api": "org.xwiki.platform:xwiki-platform-component-webjar/index.es.js"
+      }
+    </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-webjar</artifactId>
+      <artifactId>xwiki-platform-component-front-api</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

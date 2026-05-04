@@ -3,7 +3,7 @@
 div.suggestItems.searchSuggest {
   border-top: 1px solid var(--xwiki-border-color);
   border-radius: var(--border-radius-base);
-  box-shadow:0 0 12px rgba(0,0,0,0.5),0 0 2px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.175);
   overflow: hidden;
 }
 

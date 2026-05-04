@@ -59,11 +59,11 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
 }
 
 div.suggestItems ul.xlist.suggestList > li.xitem .value{
-  font-size: 1.2em;
+  font-size: 1rem; /*Using REM to have consistent typography*/
 }
 
 div.suggestItems * {
-  line-height:1.6em;
+  line-height:1.5rem; /*Using REM to have consistent spacing*/
 }
 
 div.suggestItems em {

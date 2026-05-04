@@ -42,7 +42,7 @@ public class CleanPagesQuestion
      */
     public CleanPagesQuestion(Collection<DocumentReference> pages)
     {
-        this.pages = new HashMap<DocumentReference, Boolean>(pages.size());
+        this.pages = new HashMap<>(pages.size());
 
         for (DocumentReference page : pages) {
             this.pages.put(page, true);

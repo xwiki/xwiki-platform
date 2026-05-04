@@ -63,7 +63,7 @@ public class XWikiValidator extends AbstractHTML5Validator
 
             // Verify that no heading contains an empty id.
             assertTrue(Type.ERROR, "A " + element.tagName() + " heading with empty id (\"H\") has been found",
-                id == null || !id.equals("H"));
+                !"H".equals(id));
         }
     }
 

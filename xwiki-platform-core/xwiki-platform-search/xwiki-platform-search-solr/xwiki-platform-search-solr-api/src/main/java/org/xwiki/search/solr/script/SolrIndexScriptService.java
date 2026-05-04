@@ -313,7 +313,7 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void checkAccessToWikiIndex(List<EntityReference> references) throws AccessDeniedException
     {
-        Set<EntityReference> representatives = new HashSet<EntityReference>();
+        Set<EntityReference> representatives = new HashSet<>();
         for (EntityReference reference : references) {
             EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
             if (!representatives.contains(wikiReference)) {

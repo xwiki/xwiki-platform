@@ -95,7 +95,7 @@ public class SecurityReference extends EntityReference
      */
     public Deque<SecurityReference> getReversedSecurityReferenceChain()
     {
-        Deque<SecurityReference> referenceList = new LinkedList<SecurityReference>();
+        Deque<SecurityReference> referenceList = new LinkedList<>();
         SecurityReference reference = this;
         do {
             referenceList.push(reference);

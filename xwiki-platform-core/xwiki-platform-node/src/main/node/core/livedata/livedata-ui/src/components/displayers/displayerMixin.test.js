@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,23 +20,22 @@
 
 import displayerMixin from "./displayerMixin.js";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 const TestComponent = {
-  render() {
-  },
+  render() {},
   title: "test component",
   mixins: [displayerMixin],
 };
 
 describe("displayerMixin.js", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
-  describe("computed", function() {
+  describe("computed", function () {
     it("value()", () => {
       const wrapper = initWrapper(TestComponent, {});
       expect(wrapper.vm.value).toBe("red");
@@ -49,7 +48,9 @@ describe("displayerMixin.js", () => {
           },
         },
       });
-      expect(wrapper.vm.propertyDescriptor).toBe("returnPropertyDescriptor color");
+      expect(wrapper.vm.propertyDescriptor).toBe(
+        "returnPropertyDescriptor color",
+      );
     });
     it("config()", () => {
       const wrapper = initWrapper(TestComponent, {

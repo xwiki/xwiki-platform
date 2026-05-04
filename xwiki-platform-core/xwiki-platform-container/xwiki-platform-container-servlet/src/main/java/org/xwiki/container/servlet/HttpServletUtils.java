@@ -254,7 +254,7 @@ public final class HttpServletUtils
             BasicHeader cacheControlHeader = new BasicHeader(HEADER_CACHE_CONTROL, headerValue);
             for (HeaderElement element : cacheControlHeader.getElements()) {
                 // no-cache
-                if (element.getName().equals("no-cache")) {
+                if ("no-cache".equals(element.getName())) {
                     return false;
                 }
             }

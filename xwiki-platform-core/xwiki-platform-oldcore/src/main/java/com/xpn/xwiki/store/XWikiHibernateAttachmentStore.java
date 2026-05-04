@@ -403,7 +403,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     private AttachmentVersioningStore getAttachmentVersioningStore(String storeType)
     {
-        if (storeType != null && !storeType.equals(HINT)) {
+        if (storeType != null && !HINT.equals(storeType)) {
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {

@@ -274,7 +274,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);
 
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                if (xmlReader.getLocalName().equals("luceneMatchVersion")) {
+                if ("luceneMatchVersion".equals(xmlReader.getLocalName())) {
                     return Version.parse(xmlReader.getElementText());
                 }
             }
@@ -300,7 +300,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);
 
             for (xmlReader.nextTag(); xmlReader.hasNext(); xmlReader.next()) {
-                if (xmlReader.isStartElement() && xmlReader.getLocalName().equals("fieldType")
+                if (xmlReader.isStartElement() && "fieldType".equals(xmlReader.getLocalName())
                     && SolrSchemaUtils.SOLR_TYPENAME_CVERSION.equals(xmlReader.getAttributeValue(null, "name"))) {
                     String version = xmlReader.getAttributeValue(null, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
                     if (version != null) {
@@ -420,7 +420,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             // Move old cores to the new location
             for (File file : oldHome.listFiles()) {
                 // We don't care about the "xwiki" core since it needs to be recreated anyway
-                if (file.isDirectory() && !file.getName().equals("xwiki") && !file.getName().equals("META-INF")) {
+                if (file.isDirectory() && !"xwiki".equals(file.getName()) && !"META-INF".equals(file.getName())) {
                     // Move the folder in the new location
                     FileUtils.moveDirectoryToDirectory(file, this.solrHomePath.toFile(), false);
                 }

@@ -90,7 +90,7 @@
     const scrollSize = `scroll${dimension[0].toUpperCase()}${dimension.substring(1)}`;
 
     this.$element
-      .one('bsTransitionEnd', $.proxy(complete, this))
+      .one('bsTransitionEnd', complete.bind(this))
       .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
   }
 
@@ -128,7 +128,7 @@
 
     this.$element
       [dimension](0)
-      .one('bsTransitionEnd', $.proxy(complete, this))
+      .one('bsTransitionEnd', complete.bind(this))
       .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
   }
 
@@ -139,10 +139,10 @@
   Collapse.prototype.getParent = function () {
     return $(document).find(this.options.parent)
       .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
-      .each($.proxy(function (i, element) {
+      .each((i, element) => {
         var $element = $(element)
         this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
-      }, this))
+      })
       .end()
   }
 

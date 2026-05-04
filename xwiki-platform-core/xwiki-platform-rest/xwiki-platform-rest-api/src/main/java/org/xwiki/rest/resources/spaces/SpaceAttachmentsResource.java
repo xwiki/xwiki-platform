@@ -35,6 +35,9 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/attachments")
 public interface SpaceAttachmentsResource
 {
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @GET Attachments getAttachments(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

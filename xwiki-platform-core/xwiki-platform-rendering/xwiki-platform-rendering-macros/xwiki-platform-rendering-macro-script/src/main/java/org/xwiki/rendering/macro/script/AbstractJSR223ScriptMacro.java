@@ -309,7 +309,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         Map<String, ScriptEngine> scriptEngines =
             (Map<String, ScriptEngine>) executionContext.getProperty(EXECUTION_CONTEXT_ENGINE_KEY);
         if (scriptEngines == null) {
-            scriptEngines = new HashMap<String, ScriptEngine>();
+            scriptEngines = new HashMap<>();
             executionContext.setProperty(EXECUTION_CONTEXT_ENGINE_KEY, scriptEngines);
         }
         ScriptEngine engine = scriptEngines.get(engineName);

@@ -19,7 +19,6 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -64,23 +63,20 @@ public class DocumentEventListener extends AbstractEventListener
     /**
      * The events to match.
      */
-    public static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentCreatedEvent());
-            add(new DocumentUpdatedEvent());
-            add(new DocumentDeletedEvent());
-            add(new CommentAddedEvent());
-            add(new CommentDeletedEvent());
-            add(new CommentUpdatedEvent());
-            add(new AttachmentAddedEvent());
-            add(new AttachmentDeletedEvent());
-            add(new AttachmentUpdatedEvent());
-            add(new AnnotationAddedEvent());
-            add(new AnnotationDeletedEvent());
-            add(new AnnotationUpdatedEvent());
-        }
-    };
+    public static final List<Event> LISTENER_EVENTS = List.of(
+        new DocumentCreatedEvent(),
+        new DocumentUpdatedEvent(),
+        new DocumentDeletedEvent(),
+        new CommentAddedEvent(),
+        new CommentDeletedEvent(),
+        new CommentUpdatedEvent(),
+        new AttachmentAddedEvent(),
+        new AttachmentDeletedEvent(),
+        new AttachmentUpdatedEvent(),
+        new AnnotationAddedEvent(),
+        new AnnotationDeletedEvent(),
+        new AnnotationUpdatedEvent()
+    );
 
     private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
 

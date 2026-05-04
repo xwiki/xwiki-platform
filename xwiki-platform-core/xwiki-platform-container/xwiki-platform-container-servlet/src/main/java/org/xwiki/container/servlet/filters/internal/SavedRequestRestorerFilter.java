@@ -168,7 +168,7 @@ public class SavedRequestRestorerFilter implements Filter
                 return super.getParameterMap();
             } else {
                 // First put the saved (old) request data in the map, so that the new data overrides it.
-                Map<String, String[]> map = new HashMap<String, String[]>(this.savedRequest.getParameterMap());
+                Map<String, String[]> map = new HashMap<>(this.savedRequest.getParameterMap());
                 map.putAll(super.getParameterMap());
                 return Collections.unmodifiableMap(map);
             }

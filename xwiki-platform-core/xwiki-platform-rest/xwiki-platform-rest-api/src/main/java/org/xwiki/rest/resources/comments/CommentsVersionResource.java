@@ -35,6 +35,8 @@ import org.xwiki.rest.model.jaxb.Comments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/comments")
 public interface CommentsVersionResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Comments getCommentsVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

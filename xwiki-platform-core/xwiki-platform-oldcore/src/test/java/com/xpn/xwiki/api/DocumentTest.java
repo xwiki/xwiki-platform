@@ -40,6 +40,7 @@ import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -118,6 +119,9 @@ class DocumentTest
 
     @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
+
+    @MockComponent
+    private GeneralMailConfiguration generalMailConfiguration;
 
     @MockComponent
     private SkinManager skinManager;
@@ -675,6 +679,7 @@ class DocumentTest
         Skin skin = mock();
         when(this.skinManager.getCurrentSkin(anyBoolean())).thenReturn(skin);
         when(skin.getOutputSyntax()).thenReturn(Syntax.HTML_5_0);
+        when(generalMailConfiguration.shouldObfuscate()).thenReturn(true);
 
         XWikiDocument classDocument =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("Wiki", "XWiki", "TestClass"),
@@ -706,7 +711,7 @@ class DocumentTest
         assertEquals(
             """
                 <?xml version='1.1' encoding='UTF-8'?>
-                <xwikidoc version="1.6" reference="Space.Page" locale="">
+                <xwikidoc version="1.7" reference="Space.Page" locale="">
                   <web>Space</web>
                   <name>Page</name>
                   <language/>
@@ -770,7 +775,7 @@ class DocumentTest
                         <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
                       </secret>
                     </class>
-                    <property>
+                    <property type="String">
                       <name>John</name>
                     </property>
                   </object>

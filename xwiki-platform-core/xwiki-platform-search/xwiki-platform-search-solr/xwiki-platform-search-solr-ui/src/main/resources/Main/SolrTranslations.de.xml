@@ -182,7 +182,7 @@ solr.sortBy.attsize_sort=Dateigröße
 solr.sortBy.attdate_sort=Hochgeladen am
 solr.sortBy.attauthor_display_sort=Hochgeladen von
 solr.options=Anzeigen:
-solr.options.highlight=Hervorheben
+solr.options.highlight=Hervorhebung
 solr.options.facet=Filter
 
 ## Used to indicate where deprecated keys end

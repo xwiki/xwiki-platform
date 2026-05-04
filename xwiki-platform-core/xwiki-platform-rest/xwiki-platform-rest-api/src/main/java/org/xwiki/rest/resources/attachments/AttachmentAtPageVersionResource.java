@@ -33,6 +33,8 @@ import org.xwiki.rest.XWikiRestException;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/attachments/{attachmentName}")
 public interface AttachmentAtPageVersionResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

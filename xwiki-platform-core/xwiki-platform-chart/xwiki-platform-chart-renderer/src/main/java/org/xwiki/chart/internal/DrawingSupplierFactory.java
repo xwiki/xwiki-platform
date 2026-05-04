@@ -53,7 +53,7 @@ public class DrawingSupplierFactory
 
         String colorParam = parameters.get(COLORS_PARAM);
         if (colorParam != null) {
-            List<Color> colors = new ArrayList<Color>();
+            List<Color> colors = new ArrayList<>();
             for (String colorAsString : colorParam.split(",")) {
                 if (colorAsString.length() == 6) {
                     int red = Integer.parseInt(colorAsString.substring(0, 2), 16);

@@ -128,7 +128,10 @@ public class ImportmapMojo extends AbstractMojo
             throw new MojoExecutionException("Unable to resolve jar for dependency [%s]".formatted(artifact));
         }
         try {
-            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, artifact.getVersion(), path))) {
+            // We need to use the base version instead of the version because the version can contain a timestamp
+            // when the artifact has a snaapshot version and is fetched remotely (i.e., not found directly in the
+            // target directory of the module in the current repository).
+            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, artifact.getBaseVersion(), path))) {
                 throw new MojoExecutionException("Unable to find path [%s] in jar [%s]".formatted(path, jar));
             }
         } catch (IOException e) {

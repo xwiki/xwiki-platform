@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-api</artifactId>
   <name>XWiki Platform - User - API</name>
@@ -48,6 +48,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

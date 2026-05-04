@@ -91,7 +91,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         SyndContent entryDescription = new SyndContentImpl();
 
         // The users contained in the CompositeEvent are already stored in a Set, they are therefore necessarily unique
-        List<SyndPerson> eventAuthors = new ArrayList<SyndPerson>();
+        List<SyndPerson> eventAuthors = new ArrayList<>();
 
         // Convert every author of the CompositeEvent to a SyndPerson and add it to the new entry
         for (DocumentReference author : eventNotification.getUsers()) {

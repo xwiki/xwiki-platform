@@ -544,7 +544,14 @@
     getHtmlToInsert: function(item) {
       // Schedule the command execution after the AutoComplete panel is closed.
       this.maybeScheduleCommand(item);
-      return item.outputHTML || '';
+      if (item.outputHTML) {
+        return item.outputHTML;
+      } else if (this.outputTemplate) {
+        const encodedItem = encodeItem(item);
+        return this.outputTemplate.output(encodedItem);
+      } else {
+        return '';
+      }
     },
 
     /**
@@ -871,10 +878,7 @@
           command: {
             name: 'xwiki-macro',
             data: {
-              name: 'code',
-              parameters: {
-                language: 'none'
-              },
+              name: 'code'
             }
           }
         },

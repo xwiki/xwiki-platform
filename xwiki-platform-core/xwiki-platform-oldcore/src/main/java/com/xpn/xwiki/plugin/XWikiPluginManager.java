@@ -37,14 +37,13 @@ public class XWikiPluginManager
     /** Log helper for logging messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPluginManager.class);
 
-    private Vector<String> plugins = new Vector<String>();
+    private Vector<String> plugins = new Vector<>();
 
-    private Vector<String> pluginClassNames = new Vector<String>();
+    private Vector<String> pluginClassNames = new Vector<>();
 
-    private Map<String, XWikiPluginInterface> plugins_classes = new HashMap<String, XWikiPluginInterface>();
+    private Map<String, XWikiPluginInterface> plugins_classes = new HashMap<>();
 
-    private Map<String, Vector<XWikiPluginInterface>> functionList =
-        new HashMap<String, Vector<XWikiPluginInterface>>();
+    private Map<String, Vector<XWikiPluginInterface>> functionList = new HashMap<>();
 
     public XWikiPluginManager()
     {

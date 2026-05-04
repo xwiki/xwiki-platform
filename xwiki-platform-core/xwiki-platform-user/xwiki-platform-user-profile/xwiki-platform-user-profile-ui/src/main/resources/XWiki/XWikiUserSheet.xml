@@ -49,16 +49,19 @@
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
-  #if(!$uix.parameters.containsKey('isActive') || $uix.parameters.get('isActive') != 'false')
-    #if (!$uix.parameters.containsKey('id'))
+  ## We only call this once
+  #set ($uixParameters = $collectiontool.map)
+  #set ($discard = $uixParameters.putAll($uix.parameters))
+  #if(!$uixParameters.containsKey('isActive') || $uixParameters.get('isActive') != 'false')
+    #if (!$uixParameters.containsKey('id'))
       ## when no id is explicitly provided, we use the id of the UIX.
-      #set ($discard = $uix.parameters.put('id', $uix.id))
+      #set ($discard = $uixParameters.put('id', $uix.id))
     #end
-    #if ($uix.parameters.containsKey('icon'))
-      #set ($discard = $uix.parameters.put('glyphicon', $uix.parameters.get('icon')))
+    #if ($uixParameters.containsKey('icon'))
+      #set ($discard = $uixParameters.put('glyphicon', $uixParameters.get('icon')))
     #end
-    #set ($discard = $uix.parameters.put('uix', $uix))
-    #set($discard = $categories.add($uix.parameters))
+    #set ($discard = $uixParameters.put('uix', $uix))
+    #set($discard = $categories.add($uixParameters))
   #end
 #end
 #########################

@@ -75,7 +75,7 @@ public class DefaultUIExtensionManager implements UIExtensionManager
         ComponentManager componentManager = this.contextComponentManagerProvider.get();
 
         // Look for a specific UI extension manager for the given extension point
-        if (StringUtils.isNotEmpty(extensionPointId) && !extensionPointId.equals("default")
+        if (StringUtils.isNotEmpty(extensionPointId) && !"default".equals(extensionPointId)
             && componentManager.hasComponent(UIExtensionManager.class, extensionPointId)) {
             try {
                 UIExtensionManager manager = componentManager.getInstance(UIExtensionManager.class, extensionPointId);

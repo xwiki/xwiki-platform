@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor-test</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Page Objects</name>
@@ -36,11 +36,19 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used for the Image and Macro (select/edit) modals. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Used by the Page Picker modal on the Link dialog. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-tree-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used by the CKEditor administration section. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>

@@ -33,46 +33,47 @@ import org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 
 /**
- * Default implementation of {@link org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter}.
+ * Default implementation of {@link LESSColorThemeConverter}.
  *
- * @since 7.0RC1
  * @version $Id$
+ * @since 7.0RC1
  */
 @Component
 @Singleton
 public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
-        implements LESSColorThemeConverter, Initializable
+    implements LESSColorThemeConverter, Initializable
 {
     private static final ColorTheme EMPTY_COLOR_THEME = new ColorTheme();
-    
+
     @Inject
-    private ColorThemeCache cache;
+    private ColorThemeCache colorThemeCache;
 
     @Inject
     private CachedLESSColorThemeConverter cachedLESSColorThemeConverter;
-    
+
     @Inject
     private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
     @Override
     public void initialize() throws InitializationException
     {
-        super.cache = cache;
-        super.compiler = cachedLESSColorThemeConverter;
+        super.cache = this.colorThemeCache;
+        super.compiler = this.cachedLESSColorThemeConverter;
     }
 
     @Override
     public ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
-        return super.getResult(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true, force);
+        return super.getResult(this.lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true,
+            force);
     }
 
     @Override
     public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
         throws LESSCompilerException
     {
-        return super.getResult(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true, skin,
-            force);
+        return super.getResult(this.lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true,
+            skin, force);
     }
 
     @Override

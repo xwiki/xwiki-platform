@@ -18,19 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Logic } from "./Logic";
+import { container } from "./container";
 import { mockI18n } from "../testUtils";
 import { describe, it, vi } from "vitest";
 
-// eslint-disable-next-line no-undef
 define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
 
-global.matchMedia = vi.fn().mockImplementation((query) => ({
+container.bind("XWikiMeta").toConstantValue({});
+
+globalThis.matchMedia = vi.fn().mockImplementation((query) => ({
   matches: false,
   media: query,
   onchange: null,
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
+}));
+
+vi.mock("xwiki-platform-localization-webjar", () => ({
+  resolver: {
+    resolve: () => ({ translations: [] }),
+  },
 }));
 
 describe("Logic", () => {

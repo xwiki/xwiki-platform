@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.parser.ParseException;
@@ -55,20 +56,27 @@ public abstract class AbstractReader
         } else if (type == Boolean.class) {
             value = StringUtils.isNotEmpty(source) ? Boolean.parseBoolean(source) : null;
         } else if (type == Syntax.class) {
-            if (StringUtils.isNotEmpty(source)) {
-                try {
-                    value = Syntax.valueOf(source);
-                } catch (ParseException e) {
-                    throw new FilterException(String.format("Failed to create Syntax istance for [%s]", source), e);
-                }
-            } else {
-                value = null;
-            }
+            value = getSyntax(source);
         } else if (type == Integer.class) {
             value = StringUtils.isNotEmpty(source) ? Integer.parseInt(source) : null;
         }
 
         return (T) value;
+    }
+
+    private static @Nullable Object getSyntax(String source) throws FilterException
+    {
+        Object value;
+        if (StringUtils.isNotEmpty(source)) {
+            try {
+                value = Syntax.valueOf(source);
+            } catch (ParseException e) {
+                throw new FilterException(String.format("Failed to create Syntax istance for [%s]", source), e);
+            }
+        } else {
+            value = null;
+        }
+        return value;
     }
 
     protected Locale toLocale(String value)

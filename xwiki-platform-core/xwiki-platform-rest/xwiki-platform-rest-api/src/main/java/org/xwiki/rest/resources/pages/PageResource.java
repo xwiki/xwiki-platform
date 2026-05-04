@@ -40,6 +40,26 @@ import org.xwiki.rest.model.jaxb.Page;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}")
 public interface PageResource
 {
+    /**
+     * Return all the metadata and content for a given page resource.
+     *
+     * @param wikiName the wiki storing the page
+     * @param spaceNames the space where the page is located in
+     * @param pageName the name of the page
+     * @param withPrettyNames also return the pretty name for various document information
+     *  (like the author display name, etc), disabled by default
+     * @param withObjects (since 7.3M1) also return the objects, disabled by default
+     * @param withClass (since 7.3M1) also return the class, disabled by default
+     * @param withAttachments (since 7.3M1) also return the attachments metadata, disabled by default
+     * @param checkRights (since 18.1.0RC1) also return whether the user has the listed rights on the page,
+     *  empty by default
+     * @param supportedSyntaxes (since 18.2.0RC1) also return an HTML rendered version of the content
+     *  if set and the page's syntax is not in the list, empty by default
+     * @return the metadata and content of the page
+     * @throws XWikiRestException if the user is not authorized
+     */
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber"})
     @GET Page getPage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,
@@ -48,9 +68,12 @@ public interface PageResource
             @QueryParam("objects") @DefaultValue("false") Boolean withObjects,
             @QueryParam("class") @DefaultValue("false") Boolean withClass,
             @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments,
-            @QueryParam("checkRight") List<String> checkRights
+            @QueryParam("checkRight") List<String> checkRights,
+            @QueryParam("supportedSyntax") List<String> supportedSyntaxes
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @PUT Response putPage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,
@@ -59,6 +82,8 @@ public interface PageResource
             Page page
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @DELETE void deletePage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,

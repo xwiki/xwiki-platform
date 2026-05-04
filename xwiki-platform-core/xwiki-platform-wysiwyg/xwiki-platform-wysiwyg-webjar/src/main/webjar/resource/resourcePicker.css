@@ -1,0 +1,54 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+.resourcePicker {
+  .ts-wrapper.single .ts-control::after {
+    /* Hide Tom Select's dropdown caret, for single selection, because we already have a dropdown caret for selecting
+      the resource type. */
+    display: none;
+  }
+
+  .ts-control {
+    /* Restore the border removed by CKEditor dialog's CSS reset. */
+    border: 1px solid var(--input-border);
+    /* Match the height from Bootstrap 3. */
+    min-height: 32px;
+    /* Match the left & right padding from CKEditor dialog. */
+    padding: 0 6px;
+  }
+
+  /* The dropdown caret is hidden (see above) so we don't need to leave space. */
+  .ts-control:not(.rtl) {
+    padding-right: 6px !important;
+  }
+  .ts-control.rtl {
+    padding-left: 6px !important;
+  }
+
+  /* Restore the rounded border (there are some hidden elements before). */
+  > .input-group > .ts-wrapper > .ts-control {
+    border-bottom-left-radius: var(--border-radius-base) !important;
+    border-top-left-radius: var(--border-radius-base) !important;
+  }
+
+  img.icon {
+    /* Overcome CKEditor's CSS reset. */
+    vertical-align: middle;
+  }
+}

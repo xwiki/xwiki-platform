@@ -84,7 +84,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     @Override
     public Collection<WikiDescriptor> getTemplates() throws WikiTemplateManagerException
     {
-        List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
+        List<WikiDescriptor> result = new ArrayList<>();
 
         try {
             Query query = this.queryManager.createQuery(

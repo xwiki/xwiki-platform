@@ -60,7 +60,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
 
     protected String currentWiki;
 
-    protected Stack<String> currentSpaces = new Stack<String>();
+    protected Stack<String> currentSpaces = new Stack<>();
 
     protected EntityReference currentReference;
 

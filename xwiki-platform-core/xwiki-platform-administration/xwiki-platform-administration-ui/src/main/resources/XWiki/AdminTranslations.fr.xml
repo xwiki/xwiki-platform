@@ -139,6 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=L''utilisateur sélectio
 administration.section.users.deleteUser.newAuthor.programming=de programmation
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Droits des extensions
+admin.usersgroups.extensionrights.space=Droits des extensions : Page &amp; Enfants
+admin.usersgroups.extensionrights.page=Droits des extensions : Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Membre en cours de suppression du groupe

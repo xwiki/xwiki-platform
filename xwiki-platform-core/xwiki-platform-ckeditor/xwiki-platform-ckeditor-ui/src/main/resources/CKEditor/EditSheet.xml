@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="CKEditor.EditSheet" locale="">
+<xwikidoc version="1.7" reference="CKEditor.EditSheet" locale="">
   <web>CKEditor</web>
   <name>EditSheet</name>
   <language/>
@@ -77,7 +77,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -121,24 +120,11 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>XWiki.locale = document.documentElement.getAttribute('lang') || '';
-
-require.config({
-  config: {
-    l10n: {
-      // We need to specify the language because this URL can be used after the page is loaded and thus after the
-      // context language changes on the server session (e.g. if the user opens another page in another browser tab with
-      // a different language specified). We take the current language from the page HTML, rather than using Velocity,
-      // in order to avoid having the current language cached.
-      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=' +
-        encodeURIComponent(XWiki.locale))
-    }
-  }
-});
 
 define('xwiki-ckeditor', [
   'jquery',
@@ -157,7 +143,7 @@ define('xwiki-ckeditor', [
   // (e.g. between the filebrowser and filetools plugins).
   var getUploadURL = function(document, initiator) {
     return document.getURL('get', $.param({
-      sheet: 'CKEditor.FileUploader',
+      sheet: 'XWiki.WYSIWYG.FileUploader',
       outputSyntax: 'plain',
       // The syntax and language are important especially when the upload request creates a new document.
       syntax: document.syntax,
@@ -197,7 +183,7 @@ define('xwiki-ckeditor', [
         // We use the source document to compute the link label generator URL because we want the link references to be
         // resolved relative to the edited document (as they were inserted).
         labelGenerator: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.LinkLabelGenerator',
+          sheet: 'XWiki.WYSIWYG.LinkLabelGenerator',
           outputSyntax: 'plain',
           language: XWiki.locale
         }))
@@ -303,13 +289,13 @@ define('xwiki-ckeditor', [
   return $.Deferred().resolve(ckeditor).promise();
 });</code>
     </property>
-    <property>
+    <property type="String">
       <name>CKEditor Module</name>
     </property>
-    <property>
+    <property type="Integer">
       <parse>0</parse>
     </property>
-    <property>
+    <property type="String">
       <use>onDemand</use>
     </property>
   </object>
@@ -353,7 +339,6 @@ define('xwiki-ckeditor', [
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -397,10 +382,10 @@ define('xwiki-ckeditor', [
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge'], function($, ckeditorPromise) {
   // Make sure we don't create the editors twice because this file can be loaded twice (by RequireJS, for in-place
   // editing, and as a JSX resource, for standalone editing).
@@ -441,13 +426,13 @@ define('xwiki-ckeditor', [
   });
 });</code>
     </property>
-    <property>
+    <property type="String">
       <name>CKEditor Loader</name>
     </property>
-    <property>
+    <property type="Integer">
       <parse>0</parse>
     </property>
-    <property>
+    <property type="String">
       <use>onDemand</use>
     </property>
   </object>
@@ -491,7 +476,6 @@ define('xwiki-ckeditor', [
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -553,10 +537,10 @@ define('xwiki-ckeditor', [
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>a.cke_button_disabled &gt; span.cke_button_icon.loading {
   background-image: url(@xwiki-icon-spinner) !important;
   background-position: 0 0 !important;
@@ -585,10 +569,6 @@ body &gt; .modal-backdrop {
 /* The modal can be nested inside the body while the backdrop is always a direct child of body. */
 body .modal {
   z-index: 10050;
-}
-/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
-body &gt; .selectize-dropdown {
-  z-index: 10051;
 }
 
 /**
@@ -660,12 +640,6 @@ body[data-maximized] .xdialog-modal-container {
   cursor: default;
 }
 
-.resourcePicker .glyphicon {
-  font-family: 'Glyphicons Halflings';
-  line-height: 1;
-  position: relative;
-}
-
 .resourcePicker .caret {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
@@ -695,22 +669,6 @@ body[data-maximized] .xdialog-modal-container {
 /* Overwrite the CKEditor style reset. */
 .resourcePicker .dropdown-menu li * {
   cursor: pointer;
-}
-
-.resourcePicker .resource-hint.breadcrumb a,
-.resourcePicker .resource-hint.breadcrumb li.ellipsis {
-  font-size: smaller;
-}
-.resourcePicker .resource-hint.breadcrumb li.ellipsis {
-  color: inherit;
-}
-
-.resourcePicker .resourceDisplay {
-  box-sizing: border-box;
-}
-.resourcePicker .resourceDisplay.loading {
-  background-image: url(@xwiki-icon-spinner);
-  background-repeat: no-repeat;
 }
 
 td.cke_dialog_contents_body {
@@ -1120,16 +1078,148 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
   border: 0;
 }</code>
     </property>
-    <property>
+    <property type="String">
       <contentType>LESS</contentType>
     </property>
-    <property>
-      <name/>
+    <property type="String">
+      <name>LESS</name>
     </property>
-    <property>
+    <property type="Integer">
       <parse>0</parse>
     </property>
-    <property>
+    <property type="String">
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>0b22dabb-07f8-440b-a29e-eecf6d1b3e24</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property type="String">
+      <cache>long</cache>
+    </property>
+    <property type="LargeString">
+      <code>/**
+ * Overwrite CKEditor's CSS reset in order to fix the icon theme
+ */
+/* Fixes for Font Awesome */
+.cke_reset_all .fa {
+  font-family: var(--fa-family ,var(--fa-style-family, "Font Awesome 7 Free"));
+  font-weight: var(--fa-style, 900);
+}
+/* The icons with '-o' suffix need to have a normal font-weight. */
+.cke_reset_all .fa.fa-file-o,
+.cke_reset_all .fa.fa-envelope-o {
+  font-weight: 400;
+}</code>
+    </property>
+    <property type="String">
+      <contentType>CSS</contentType>
+    </property>
+    <property type="String">
+      <name>CSS</name>
+    </property>
+    <property type="Integer">
+      <parse>0</parse>
+    </property>
+    <property type="String">
       <use>onDemand</use>
     </property>
   </object>
@@ -1193,7 +1283,6 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1224,7 +1313,6 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1249,29 +1337,29 @@ This redefinition allows for a more consistent behaviour of the `.sr-only` class
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content/>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.requirejs.module.xwiki-ckeditor</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters>id=xwiki-ckeditor
-path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value, 'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead', "wiki:$xcontext.database").version.value}))</parameters>
+path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value}))</parameters>
     </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>
@@ -1335,7 +1423,6 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1366,7 +1453,6 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1391,171 +1477,29 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content/>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.requirejs.module.fusejs</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters>id=fuse
 path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')</parameters>
     </property>
-    <property>
-      <scope>wiki</scope>
-    </property>
-  </object>
-  <object>
-    <name>CKEditor.EditSheet</name>
-    <number>2</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>4f627a23-ece1-4be2-bcd2-1fcacff217b7</guid>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <async_cached>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <name>async_cached</name>
-        <number>3</number>
-        <prettyName>Cached</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </async_cached>
-      <async_context>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>async_context</name>
-        <number>4</number>
-        <prettyName>Context elements</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator>, </separator>
-        <separators>|, </separators>
-        <size>5</size>
-        <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </async_context>
-      <async_enabled>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <name>async_enabled</name>
-        <number>2</number>
-        <prettyName>Asynchronous rendering</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </async_enabled>
-      <content>
-        <disabled>0</disabled>
-        <editor>Text</editor>
-        <name>content</name>
-        <number>1</number>
-        <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
-        <rows>25</rows>
-        <size>120</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>5</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>6</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>parameters</name>
-        <number>7</number>
-        <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>8</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <async_cached>0</async_cached>
-    </property>
-    <property>
-      <async_context/>
-    </property>
-    <property>
-      <async_enabled>0</async_enabled>
-    </property>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
-    </property>
-    <property>
-      <name>org.xwiki.platform.requirejs.module.bootstrap3-typeahead</name>
-    </property>
-    <property>
-      <parameters>id=bootstrap3-typeahead
-path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead.min')</parameters>
-    </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>
@@ -1619,7 +1563,6 @@ path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1650,7 +1593,6 @@ path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1675,29 +1617,29 @@ path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content/>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.requirejs.module.fast-diff</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters>id=fast-diff
 path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
     </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>
@@ -1761,7 +1703,6 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1792,7 +1733,6 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1817,30 +1757,30 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content/>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.requirejs.module.ckeditor</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters>id=ckeditor
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'ckeditor')
 exports=CKEDITOR</parameters>
     </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>
@@ -1904,7 +1844,6 @@ exports=CKEDITOR</parameters>
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1935,7 +1874,6 @@ exports=CKEDITOR</parameters>
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1960,31 +1898,30 @@ exports=CKEDITOR</parameters>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="Integer">
       <async_cached>0</async_cached>
     </property>
-    <property>
+    <property type="StringList">
       <async_context/>
     </property>
-    <property>
+    <property type="Integer">
       <async_enabled>0</async_enabled>
     </property>
-    <property>
+    <property type="LargeString">
       <content/>
     </property>
-    <property>
+    <property type="String">
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
-    <property>
+    <property type="String">
       <name>org.xwiki.platform.requirejs.module.xwiki-ckeditor-plugins</name>
     </property>
-    <property>
+    <property type="LargeString">
       <parameters>id=xwiki-ckeditor-plugins
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins', 'webjar.bundle.min')
-bundles=resource, resourcePicker, entityResourcePicker, entityResourceSuggester, entityResourceDisplayer, modal, l10n, macroWizard, imageWizard
 deps=jquery, ckeditor</parameters>
     </property>
-    <property>
+    <property type="String">
       <scope>wiki</scope>
     </property>
   </object>

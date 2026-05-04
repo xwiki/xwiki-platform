@@ -77,6 +77,7 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultResetPasswordManager implements ResetPasswordManager
 {
     protected static final String XWIKI_SPACE = "XWiki";

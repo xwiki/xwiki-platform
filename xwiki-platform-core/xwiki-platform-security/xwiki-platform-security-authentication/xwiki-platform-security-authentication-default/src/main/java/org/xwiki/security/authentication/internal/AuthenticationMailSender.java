@@ -68,6 +68,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component(roles = AuthenticationMailSender.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class AuthenticationMailSender
 {
     private static final String XWIKI_SPACE = "XWiki";

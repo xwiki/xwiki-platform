@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,11 +47,14 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PasswordProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -319,8 +323,15 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
         assertEquals(0, documentObject.getNumber());
         assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
 
-        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(6, documentObject.getFieldList().size());
         assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals("value", documentObject.getStringValue("unexisting"));
+        assertEquals(List.of("value1", "value2", "value3"), documentObject.getListValue("property2"));
+        assertEquals(new Date(1772530649000L), documentObject.getDateValue("mydate"));
+        assertEquals(1, documentObject.getIntValue("myboolean"));
+        PropertyInterface myProperty = documentObject.get("mypass");
+        assertInstanceOf(PasswordProperty.class, myProperty);
+        assertEquals("somevalue", ((PasswordProperty) myProperty).getValue());
     }
 
     @Test
@@ -467,8 +478,9 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
         assertEquals(0, documentObject.getNumber());
         assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
 
-        assertEquals(1, documentObject.getFieldList().size());
+        assertEquals(2, documentObject.getFieldList().size());
         assertEquals(1, documentObject.getIntValue("prop1"));
+        assertEquals("value", documentObject.getStringValue("unknown"));
     }
 
     @Test

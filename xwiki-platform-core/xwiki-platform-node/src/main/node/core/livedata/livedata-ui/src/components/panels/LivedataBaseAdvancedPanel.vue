@@ -51,20 +51,29 @@
       <!-- Panel header buttons -->
       <div class="actions">
         <!-- Collapse panel button -->
-        <span class="action collapse-button" @click="collapsed = !collapsed">
+        <button
+          class="action collapse-button btn btn-default"
+          @click="collapsed = !collapsed"
+        >
           <XWikiIcon
             v-if="!collapsed"
             :icon-descriptor="{ name: 'arrow_in' }"
           />
           <XWikiIcon v-else :icon-descriptor="{ name: 'arrow_out' }" />
-        </span>
+          <span class="sr-only">{{
+            $t("panel.heading.actions.collapse.hint")
+          }}</span>
+        </button>
         <!-- Close panel button -->
-        <span
-          class="action close-button"
+        <button
+          class="action close-button btn btn-default"
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
           <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
-        </span>
+          <span class="sr-only">{{
+            $t("panel.heading.actions.close.hint")
+          }}</span>
+        </button>
       </div>
     </div>
 
@@ -151,5 +160,7 @@ export default {
   align-items: center;
   padding: 0 15px;
   cursor: pointer;
+  border: none;
+  background: none;
 }
 </style>

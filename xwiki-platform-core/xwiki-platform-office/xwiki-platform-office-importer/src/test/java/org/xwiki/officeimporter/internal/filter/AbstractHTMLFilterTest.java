@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base class for HTML filter tests.
- * 
+ *
  * @version $Id$
  * @since 7.4.6
  * @since 8.2.2
@@ -60,7 +60,7 @@ public abstract class AbstractHTMLFilterTest
 
     protected Document filter(String content)
     {
-        return filter(content, Collections.<String, String>emptyMap());
+        return filter(content, Collections.emptyMap());
     }
 
     protected Document filter(String content, Map<String, String> cleaningParameters)
@@ -73,17 +73,12 @@ public abstract class AbstractHTMLFilterTest
         return document;
     }
 
-    protected Document filterAndAssertOutput(String input, String expectedOuput)
-    {
-        return filterAndAssertOutput(input, Collections.<String, String>emptyMap(), expectedOuput);
-    }
-
-    protected Document filterAndAssertOutput(String input, Map<String, String> cleaningParameters, String expectedOuput)
+    protected Document assertFilteredOutput(String input, Map<String, String> cleaningParameters, String expectedOuput)
     {
         Document document = filter(input, cleaningParameters);
         String output = XMLUtils.serialize(document, false);
-        output = StringUtils.removeStart(output, "<root>");
-        output = StringUtils.removeEnd(output, "</root>");
+        output = Strings.CS.removeStart(output, "<root>");
+        output = Strings.CS.removeEnd(output, "</root>");
         assertEquals(expectedOuput, output);
         return document;
     }

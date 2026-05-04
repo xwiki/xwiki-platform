@@ -213,16 +213,19 @@ body {
       }
     }
 
-    // Helper classes for easier content customization. Note that those only work for this preference.
+    // Helper classes for easier content customization.
+    // Note that this does not override the underlining preference system.
+    // The users with the `Yes` and `No` preferences will still have the links the way they asked for.
     // This class can either be used on a common parent or the links themselves.
-    #xwikicontent .force-no-underline a,
-    #xwikicontent a.force-no-underline {
-      text-decoration: none;
+    // The use of !important here was agreed on.
+    .force-no-underline a,
+    a.force-no-underline {
+      text-decoration: none !important;
     }
 
     .force-underline a,
     a.force-underline {
-      text-decoration: underline;
+      text-decoration: underline !important;
     }
   }
 

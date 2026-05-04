@@ -105,7 +105,7 @@ export class XWikiUniAstProcessor implements UniAstProcessor {
       const call = JSON.parse(macroNode.call.params.call as string);
       let output = macroNode.call.params.output;
       if (typeof output === "string") {
-        output = JSON.parse(output as string);
+        output = JSON.parse(output);
       }
       macroNode.call = call;
       macroNode.output = output;

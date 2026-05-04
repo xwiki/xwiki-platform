@@ -162,7 +162,7 @@ public class DefaultContainer implements Container
     @Override
     public void setRequest(Request request)
     {
-        Stack<Request> stack = new Stack<Request>();
+        Stack<Request> stack = new Stack<>();
         stack.push(request);
         this.request.set(stack);
     }
@@ -176,7 +176,7 @@ public class DefaultContainer implements Container
     @Override
     public void setResponse(Response response)
     {
-        Stack<Response> stack = new Stack<Response>();
+        Stack<Response> stack = new Stack<>();
         stack.push(response);
         this.response.set(stack);
     }
@@ -190,7 +190,7 @@ public class DefaultContainer implements Container
     @Override
     public void setSession(Session session)
     {
-        Stack<Session> stack = new Stack<Session>();
+        Stack<Session> stack = new Stack<>();
         stack.push(session);
         this.session.set(stack);
     }

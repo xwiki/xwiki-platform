@@ -58,8 +58,8 @@ vi.mock("../../services/require.js", () => {
  * }
  * ```
  *
- * @param mountConfiguration mount parameters merged over the default configuration
- * @returns {{options: string}|{}|*} an initialized FilterList Vue component
+ * @param mountConfiguration - mount parameters merged over the default configuration
+ * @returns an initialized FilterList Vue component
  */
 function initWrapper(mountConfiguration = {}) {
   // Define an empty xwikiSelectize to prevent the component mount to fail.

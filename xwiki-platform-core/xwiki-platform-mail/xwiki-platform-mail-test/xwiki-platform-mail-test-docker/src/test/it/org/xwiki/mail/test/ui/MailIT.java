@@ -218,9 +218,8 @@ class MailIT
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
-        String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort());
+        // The base URL used in generated emails
+        String requestURLPrefix = setup.getCurrentExecutor().getBrowserBaseURL() + "bin/view";
 
         // Step 5: Send a template email (with an attachment) to a single email address
         sendTemplateMailToEmail(setup, requestURLPrefix);

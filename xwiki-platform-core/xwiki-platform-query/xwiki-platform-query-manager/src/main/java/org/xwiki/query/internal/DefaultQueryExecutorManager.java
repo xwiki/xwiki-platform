@@ -82,7 +82,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
         List<ComponentDescriptor<QueryExecutor>> executors =
             this.componentManagerProvider.get().getComponentDescriptorList((Type) QueryExecutor.class);
 
-        Set<String> executorNames = new HashSet<String>(executors.size());
+        Set<String> executorNames = new HashSet<>(executors.size());
         for (ComponentDescriptor<QueryExecutor> executor : executors) {
             executorNames.add(executor.getRoleHint());
         }

@@ -16,11 +16,15 @@
   "dependencies": {
     "@xwiki/platform-livedata-ui": "workspace:*",
     "@xwiki/platform-livedata-xwiki": "workspace:*",
+    "@xwiki/platform-localization-api": "workspace:*",
     "vue-i18n": "catalog:",
     "vue3-touch-events": "catalog:"
   },
   "peerDependencies": {
-    "vue": "3.x"
+    "jquery": "4.x",
+    "vue": "3.x",
+    "vue-i18n": "11.x",
+    "xwiki-platform-localization-webjar": "*"
   },
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
@@ -45,6 +49,7 @@
     "vite": "catalog:",
     "vitest": "catalog:",
     "vue": "catalog:",
-    "vue-tsc": "catalog:"
+    "vue-tsc": "catalog:",
+    "xwiki-platform-localization-webjar": "workspace:*"
   }
 }

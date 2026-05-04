@@ -25,6 +25,9 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.internal.MapCache;
 import org.xwiki.model.EntityType;
@@ -34,6 +37,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -42,6 +47,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserException;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -50,6 +56,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -86,6 +94,16 @@ class DocumentUserManagerTest
 
     @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
+
+    @Captor
+    private ArgumentCaptor<DocumentUserReference> documentUserReferenceCaptor;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -221,5 +239,25 @@ class DocumentUserManagerTest
         this.userCache.invalidate(wikiReference);
 
         assertTrue(this.userManager.hasUsers(wikiReference));
+    }
+
+    @Test
+    void hasAccess()
+    {
+        when(this.documentUserReferenceSerializer.serialize(this.documentUserReferenceCaptor.capture()))
+            .then((Answer<DocumentReference>)
+                invocationOnMock -> this.documentUserReferenceCaptor.getValue().getReference());
+
+        Right mockRight = mock(Right.class);
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user1");
+        DocumentReference targetReference = new DocumentReference("xwiki", "XWiki", "user2");
+
+        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(false);
+        assertFalse(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
+
+        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(true);
+        assertTrue(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
     }
 }

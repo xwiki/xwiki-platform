@@ -94,6 +94,19 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # environment.permanentDirectory = /var/lib/xwiki/data/
 #end
 
+#-# [Since 18.2.1]
+#-# [Since 17.10.6]
+#-# For security reasons, XWiki doesn't allow to access resources which are outside the resource root
+#-# (i.e. the web application folder).
+#-# But in some use cases (like the XWiki Debian packages) some of those resources are actually stored in other
+#-# locations (like /etc/xwiki/) and then the web application folder contains links to those files.
+#-# Tomcat (and probably others too) tend to report the real path of the resource behind the link and not the
+#-# location of the link itself, effectively making the resource identified as being outside the resource root.
+#-# This configuration allows to specify a list of paths under which it's allowed to access resources.
+#-#
+#-# The default is:
+# environment.servlet.allowedRealPaths=/etc/xwiki/
+
 #-------------------------------------------------------------------------------------
 # Rendering
 #-------------------------------------------------------------------------------------
@@ -685,6 +698,16 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xalan:serializer
 # extension.ignoredDependencies=xml-apis:xml-apis
 # extension.ignoredDependencies=xerces:xmlParserAPIs
+
+#-------------------------------------------------------------------------------------
+# Repository
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.3.0 and 17.10.8]
+#-# Indicate if the REST API allows passing a custom repository type and URI to resolve extensions.
+#-# 
+#-# This is disabled by default for security reasons.
+# repository.rest.allowCustomRepository=false
 
 #-------------------------------------------------------------------------------------
 # Extension Manager - Security
@@ -1820,6 +1843,17 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# which provides much better performance in particular for large installations and allows more flexible queries.
 #-# You can change this back to "database" to restore the old behavior.
 # rest.keywordSearchSource=solr
+
+#-# [Since 18.2.0, 17.10.5]
+#-# The list of query types allowed in REST API search queries (the "type" parameter).
+#-# Supported values: solr, hql, xwql
+#-# By default only "solr" is allowed. Enabling "hql" or "xwql" allows running arbitrary database queries via the
+#-# REST API, which can disclose sensitive information even to guest users and can produce expensive queries,
+#-# impacting the availability of the instance.
+#-# Set this to a comma-separated list of allowed types, e.g. "solr,hql" to also allow HQL queries.
+#-#
+#-# Default is "solr".
+# rest.allowedQueryTypes=solr
 
 #-------------------------------------------------------------------------------------
 # WYSIWYG API

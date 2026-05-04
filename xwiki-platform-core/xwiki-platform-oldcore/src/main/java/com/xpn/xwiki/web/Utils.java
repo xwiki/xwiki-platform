@@ -467,7 +467,7 @@ public class Utils
     public static Map<String, String[]> parseParameters(byte[] data, String encoding)
         throws UnsupportedEncodingException
     {
-        Map<String, String[]> map = new HashMap<String, String[]>();
+        Map<String, String[]> map = new HashMap<>();
 
         if (data != null && data.length > 0) {
             int ix = 0;

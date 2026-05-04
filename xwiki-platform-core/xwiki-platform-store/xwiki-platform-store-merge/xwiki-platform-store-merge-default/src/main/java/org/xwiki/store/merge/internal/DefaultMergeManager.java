@@ -649,7 +649,7 @@ public class DefaultMergeManager implements MergeManager
         List<Character> characters;
 
         if (str != null) {
-            characters = new ArrayList<Character>(str.length());
+            characters = new ArrayList<>(str.length());
 
             for (char c : str.toCharArray()) {
                 characters.add(c);

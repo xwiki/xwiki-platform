@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.Classes;
 @Path("/wikis/{wikiName}/classes")
 public interface ClassesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Classes getClasses(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

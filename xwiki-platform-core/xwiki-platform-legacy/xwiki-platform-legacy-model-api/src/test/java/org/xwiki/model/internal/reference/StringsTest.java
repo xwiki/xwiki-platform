@@ -19,31 +19,40 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReferenceResolver;
 import org.xwiki.model.reference.ObjectReferenceResolver;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-public class StringsTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+public class StringsTest
 {
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @Test
-    public void testLookup() throws ComponentLookupException, Exception
+    void testLookup()
     {
-        getComponentManager().getInstance(AttachmentReferenceResolver.class, "default");
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "default");
-        getComponentManager().getInstance(EntityReferenceResolver.class, "default");
-        getComponentManager().getInstance(EntityReferenceSerializer.class, "default");
-        getComponentManager().getInstance(ObjectPropertyReferenceResolver.class, "default");
-        getComponentManager().getInstance(ObjectReferenceResolver.class, "default");
-        getComponentManager().getInstance(AttachmentReferenceResolver.class, "explicit");
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "explicit");
-        getComponentManager().getInstance(EntityReferenceResolver.class, "explicit");
-        getComponentManager().getInstance(EntityReferenceSerializer.class, "local");
-        getComponentManager().getInstance(EntityReferenceResolver.class, "relative");
+        assertDoesNotThrow(() -> this.componentManager.getInstance(AttachmentReferenceResolver.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(DocumentReferenceResolver.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(EntityReferenceResolver.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(EntityReferenceSerializer.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(ObjectPropertyReferenceResolver.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(ObjectReferenceResolver.class, "default"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(AttachmentReferenceResolver.class, "explicit"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(DocumentReferenceResolver.class, "explicit"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(EntityReferenceResolver.class, "explicit"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(EntityReferenceSerializer.class, "local"));
+        assertDoesNotThrow(() -> this.componentManager.getInstance(EntityReferenceResolver.class, "relative"));
     }
 }

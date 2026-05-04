@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-notifications-webjar</artifactId>
@@ -74,6 +74,11 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap-switch</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -217,7 +217,7 @@ public class SolrQueryExecutor extends AbstractQueryExecutor
      */
     private String[] toStringArray(Iterable iterable)
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         for (Object obj : iterable) {
             args.add(String.valueOf(obj));
         }

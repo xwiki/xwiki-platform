@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blocknote</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-blocknote-webjar</artifactId>
@@ -71,6 +71,19 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue-i18n</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Used for the Image and Macro wizards. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-wysiwyg-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

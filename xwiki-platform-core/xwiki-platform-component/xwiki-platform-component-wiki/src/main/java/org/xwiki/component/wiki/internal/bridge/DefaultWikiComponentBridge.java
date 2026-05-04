@@ -138,7 +138,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     @Override
     public Map<String, XDOM> getHandledMethods(DocumentReference reference) throws WikiComponentException
     {
-        Map<String, XDOM> handledMethods = new HashMap<String, XDOM>();
+        Map<String, XDOM> handledMethods = new HashMap<>();
         XWikiDocument componentDocument = this.getDocument(reference);
         if (componentDocument.getObjectNumbers(METHOD_CLASS) > 0) {
             for (BaseObject method : componentDocument.getObjects(METHOD_CLASS)) {
@@ -154,7 +154,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     @Override
     public List<Class< ? >> getDeclaredInterfaces(DocumentReference reference) throws WikiComponentException
     {
-        List<Class< ? >> interfaces = new ArrayList<Class< ? >>();
+        List<Class< ? >> interfaces = new ArrayList<>();
         XWikiDocument componentDocument = this.getDocument(reference);
         if (componentDocument.getObjectNumbers(INTERFACE_CLASS) > 0) {
             for (BaseObject iface : componentDocument.getObjects(INTERFACE_CLASS)) {
@@ -175,7 +175,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     @Override
     public Map<String, ComponentDescriptor> getDependencies(DocumentReference reference) throws WikiComponentException
     {
-        Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+        Map<String, ComponentDescriptor> dependencies = new HashMap<>();
         XWikiDocument componentDocument = this.getDocument(reference);
         if (componentDocument.getObjectNumbers(DEPENDENCY_CLASS) > 0) {
             for (BaseObject dependency : componentDocument.getObjects(DEPENDENCY_CLASS)) {

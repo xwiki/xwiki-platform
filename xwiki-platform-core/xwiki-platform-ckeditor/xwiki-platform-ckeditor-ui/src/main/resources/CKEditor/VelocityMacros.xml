@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="CKEditor.VelocityMacros" locale="">
+<xwikidoc version="1.7" reference="CKEditor.VelocityMacros" locale="">
   <web>CKEditor</web>
   <name>VelocityMacros</name>
   <language/>
@@ -124,11 +124,9 @@
     'xwiki-version': $services.extension.core.getCoreExtension(
       'org.xwiki.platform:xwiki-platform-tree-webjar').version.value,
     'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff',
-      "wiki:$xcontext.database").version.value,
-    'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
       "wiki:$xcontext.database").version.value
   }))
-  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-plugins' 'webjar.bundle.min.css' true)
+  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-wysiwyg-webjar' 'webjar.bundle.min.css')
   ## Tree styles needed for the document/attachment tree picker.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -234,29 +232,6 @@
     &lt;/dt&gt;
     &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc 'advanced' $action)&lt;/dd&gt;
   &lt;/dl&gt;
-#end
-
-#**
- * Deprecated. Use #initRequiredSkinExtensions() from display_macros.vm instead.
-*#
-#macro (ckeditor_initRequiredSkinExtensions)
-  #set ($requiredSkinExtensions = $collectiontool.orderedMap)
-  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
-  ## (they are aready available on the edit page so there's no need to load them).
-  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
-    #set ($discard = $requiredSkinExtensions.put($pluginName, $xwiki.get($pluginName).importString))
-  #end
-#end
-
-#**
- * Deprecated. Use #getRequiredSkinExtensions() from display_macros.vm instead.
-*#
-#macro (ckeditor_getRequiredSkinExtensions)
-  #foreach ($entry in $requiredSkinExtensions.entrySet())
-    #set ($importString = $xwiki.get($entry.key).importString)
-    ## Remove the always used skin extensions, keep only those that have been requested by the macro parameter pickers.
-    $!stringtool.removeStart($importString, $entry.value).trim()##
-  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

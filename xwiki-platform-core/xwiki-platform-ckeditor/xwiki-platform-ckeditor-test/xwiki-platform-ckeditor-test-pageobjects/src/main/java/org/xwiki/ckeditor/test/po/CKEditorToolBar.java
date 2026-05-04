@@ -23,9 +23,9 @@ import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
 /**
  * Represents the CKEditor tool bar.

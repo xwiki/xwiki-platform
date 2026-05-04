@@ -361,8 +361,8 @@ public class BaseAttachmentsResource extends XWikiResource
     {
         Attachments attachments = this.objectFactory.createAttachments();
 
-        RangeIterable<com.xpn.xwiki.api.Attachment> attachmentsRange =
-            new RangeIterable<com.xpn.xwiki.api.Attachment>(doc.getAttachmentList(), start, number);
+        RangeIterable<com.xpn.xwiki.api.Attachment> attachmentsRange = new RangeIterable<>(doc.getAttachmentList(),
+            start, number);
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : attachmentsRange) {
             attachments.getAttachments().add(
                 this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(), xwikiAttachment, withPrettyNames, false));

@@ -75,7 +75,7 @@ public class XWikiValidationStatus
         getErrorObjects().add(className);
         getPropertyErrors().add(propName);
 
-        if ((validationMessage != null) && (!validationMessage.trim().equals(""))) {
+        if ((validationMessage != null) && (!validationMessage.trim().isEmpty())) {
             getErrors().add(validationMessage);
         } else {
             ScriptContextManager scriptManager = Utils.getComponent(ScriptContextManager.class);

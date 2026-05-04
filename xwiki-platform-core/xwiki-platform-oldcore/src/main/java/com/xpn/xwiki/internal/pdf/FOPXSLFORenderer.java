@@ -73,6 +73,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Component
 @Singleton
 @Named("fop")
+// FanOut complexity of 28 on a max of 20
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class FOPXSLFORenderer implements XSLFORenderer, Initializable
 {
     /**

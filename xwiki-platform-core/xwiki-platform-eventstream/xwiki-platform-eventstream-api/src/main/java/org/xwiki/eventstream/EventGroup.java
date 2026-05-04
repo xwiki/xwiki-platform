@@ -33,7 +33,7 @@ import java.util.Set;
 public class EventGroup
 {
     /** The events inside this group. */
-    private Set<Event> events = new LinkedHashSet<Event>();
+    private Set<Event> events = new LinkedHashSet<>();
 
     /** Default constructor that creates an empty event group. */
     public EventGroup()
@@ -91,7 +91,7 @@ public class EventGroup
      */
     public Set<Event> getEvents()
     {
-        Set<Event> clone = new LinkedHashSet<Event>(this.events.size(), 1f);
+        Set<Event> clone = new LinkedHashSet<>(this.events.size(), 1f);
         clone.addAll(this.events);
         return Collections.unmodifiableSet(clone);
     }

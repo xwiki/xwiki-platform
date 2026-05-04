@@ -183,14 +183,14 @@ public class XWikiDocumentFilterUtils
         // Input
         xarProperties.setSourceType(getSourceType(entityClass));
         xarProperties.setSource(source);
-        BeanInputFilterStream<XARInputProperties> xarReader =
-            ((BeanInputFilterStreamFactory<XARInputProperties>) this.xarInputFilterStreamFactory)
-                .createInputFilterStream(xarProperties);
 
         // Convert
-        xarReader.read(filterStream.getFilter());
-
-        xarReader.close();
+        try (BeanInputFilterStream<XARInputProperties> xarReader =
+            ((BeanInputFilterStreamFactory<XARInputProperties>) this.xarInputFilterStreamFactory)
+                .createInputFilterStream(xarProperties))
+        {
+            xarReader.read(filterStream.getFilter());
+        }
 
         return filterStream.getEntity();
     }
@@ -308,42 +308,44 @@ public class XWikiDocumentFilterUtils
             xarProperties.setTarget(target);
         }
         xarProperties.setVerbose(false);
-        BeanOutputFilterStream<XAROutputProperties> xarFilter =
+        try (BeanOutputFilterStream<XAROutputProperties> xarFilter =
             ((BeanOutputFilterStreamFactory<XAROutputProperties>) this.xarOutputFilterStreamFactory)
-                .createOutputFilterStream(xarProperties);
-        XARFilter filter = (XARFilter) xarFilter.getFilter();
+                .createOutputFilterStream(xarProperties))
+        {
+            XARFilter filter = (XARFilter) xarFilter.getFilter();
 
-        BeanEntityEventGenerator<Object, DocumentInstanceInputProperties> generator = this.componentManager
-            .getInstance(new DefaultParameterizedType(null, EntityEventGenerator.class, getClass(entity)));
+            BeanEntityEventGenerator<Object, DocumentInstanceInputProperties> generator = this.componentManager
+                .getInstance(new DefaultParameterizedType(null, EntityEventGenerator.class, getClass(entity)));
 
-        // Spaces and document events
-        FilterEventParameters documentParameters = null;
-        DocumentReference documentReference = null;
-        if (entity instanceof XWikiDocument) {
-            documentReference = ((XWikiDocument) entity).getDocumentReference();
-            for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
-                filter.beginWikiSpace(spaceReference.getName(), FilterEventParameters.EMPTY);
+            // Spaces and document events
+            FilterEventParameters documentParameters = null;
+            DocumentReference documentReference = null;
+            if (entity instanceof XWikiDocument) {
+                documentReference = ((XWikiDocument) entity).getDocumentReference();
+                for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
+                    filter.beginWikiSpace(spaceReference.getName(), FilterEventParameters.EMPTY);
+                }
+
+                documentParameters = new FilterEventParameters();
+                documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE,
+                    ((XWikiDocument) entity).getDefaultLocale());
+                filter.beginWikiDocument(documentReference.getName(), documentParameters);
             }
 
-            documentParameters = new FilterEventParameters();
-            documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, ((XWikiDocument) entity).getDefaultLocale());
-            filter.beginWikiDocument(documentReference.getName(), documentParameters);
-        }
+            // Document Locale events
+            generator.write(entity, xarFilter, documentProperties);
 
-        // Document Locale events
-        generator.write(entity, xarFilter, documentProperties);
+            // Document and spaces events
+            if (documentParameters != null) {
+                filter.endWikiDocument(documentReference.getName(), documentParameters);
 
-        // Document and spaces events
-        if (documentParameters != null) {
-            filter.endWikiDocument(documentReference.getName(), documentParameters);
-
-            documentReference = ((XWikiDocument) entity).getDocumentReference();
-            for (EntityReference reference =
-                documentReference.getParent(); reference instanceof SpaceReference; reference = reference.getParent()) {
-                filter.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
+                documentReference = ((XWikiDocument) entity).getDocumentReference();
+                for (EntityReference reference = documentReference.getParent();
+                    reference instanceof SpaceReference; reference = reference.getParent())
+                {
+                    filter.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
+                }
             }
         }
-
-        xarFilter.close();
     }
 }

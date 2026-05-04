@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,7 +20,7 @@
 
 import { mount } from "@vue/test-utils";
 import $ from "jquery";
-import sinon from "sinon";
+import { stub } from "sinon";
 
 /**
  * Generic Vue component initializer for the displayers tests. Calls `mount()` from
@@ -59,20 +59,20 @@ import sinon from "sinon";
  *
  *
  *
- * @param displayer the Vue displayer component to initialize
- * @param props the props value to pass to the component (merged to the default props parameter)
- * @param logic a mock of `Logic.js`
- * @param editBus a mock of the editBus Vue component
- * @param mocks additional mocks such as the `$t` translation operation.
+ * @param displayer - the Vue displayer component to initialize
+ * @param props - the props value to pass to the component (merged to the default props parameter)
+ * @param logic - a mock of `Logic.js`
+ * @param editBus - a mock of the editBus Vue component
+ * @param mocks - additional mocks such as the `$t` translation operation.
  * @returns an initialized Vue component
  */
+// eslint-disable-next-line max-statements
 export function initWrapper(displayer, { props, logic, editBus, mocks }) {
   global.xcontext = { locale: "en" };
   global.XWiki = {
     EntityType: {},
     Model: {
-      resolve() {
-      },
+      resolve() {},
     },
     Document: class {
       getURL() {
@@ -87,21 +87,25 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
   }
 
   // Mocks daterangepicker
-  global.$.fn.daterangepicker = sinon.stub();
+  global.$.fn.daterangepicker = stub();
   global.$.fn.daterangepicker.resolves({
-    show: () => {
-    },
+    show: () => {},
+  });
+
+  // Mocks $t
+  global.$.fn.$t = stub();
+  global.$.fn.$t.resolves({
+    show: () => {},
   });
 
   // Mock $.data
-  global.$.fn.data = sinon.stub(global.$.fn, "data");
+  global.$.fn.data = stub(global.$.fn, "data");
   global.$.fn.data.resolves({
-    show: () => {
-    },
+    show: () => {},
   });
 
   // Mock fetch.
-  global.fetch = sinon.stub(global, "fetch");
+  global.fetch = stub(global, "fetch");
   global.fetch.resolves({
     json: async () => {
       return { icons: [] };
@@ -125,23 +129,29 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
       entry: {
         color: "red",
         age: "13",
-      }, ...props,
-    }, global: {
+      },
+      ...props,
+    },
+    global: {
       provide: {
         jQuery: $,
         logic: {
           isEditable() {
             return true;
-          }, getDisplayerDescriptor() {
+          },
+          getDisplayerDescriptor() {
             return {
               actions: ["jump", "dance"],
             };
-          }, isActionAllowed(action) {
+          },
+          isActionAllowed(action) {
             return action === "jump" || action === "view";
-          }, getActionDescriptor(action) {
+          },
+          getActionDescriptor(action) {
             return {
               jump: {
-                name: "jump", icon: {
+                name: "jump",
+                icon: {
                   iconSetName: "Font Awesome",
                   cssClass: "fa fa-table",
                   iconSetType: "FONT",
@@ -149,23 +159,29 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
                 },
               },
             }[action];
-          }, getEditBus() {
+          },
+          getEditBus() {
             return {
-              start() {
-              }, isEditable() {
+              start() {},
+              isEditable() {
                 return true;
-              }, onAnyEvent: () => {
-              }, ...editBus,
+              },
+              onAnyEvent: () => {},
+              ...editBus,
             };
-          }, footnotes: {
-            put() {
-            }, reset() {
-            }, list() {
+          },
+          footnotes: {
+            put() {},
+            reset() {},
+            list() {
               return [];
             },
-          }, isContentTrusted: () => true, ...logic,
+          },
+          isContentTrusted: () => true,
+          ...logic,
         },
-      }, mocks: { $t: (key) => key, ...mocks },
+      },
+      mocks: { $t: (key) => key, ...mocks },
     },
   });
 }

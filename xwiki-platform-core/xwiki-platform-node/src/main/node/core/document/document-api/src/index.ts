@@ -145,6 +145,18 @@ interface DocumentService {
     change: DocumentChange,
     page: DocumentReference,
   ): Promise<void>;
+
+  /**
+   * Unregister a document change listener.
+   * @param change - the kind of change
+   * @param listener - the listener to unregister
+   * @since 18.2.0RC1
+   * @beta
+   */
+  removeDocumentChangeListener(
+    change: DocumentChange,
+    listener: (page: DocumentReference) => Promise<void>,
+  ): void;
 }
 
 /**

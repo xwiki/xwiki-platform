@@ -218,7 +218,7 @@ public class XWikiPatch
         if (!isDiff()) {
             origText.clear();
             origText.addAll(
-                new ArrayList<String>(Arrays.asList(ToString.stringToArray(getContent()))));
+                new ArrayList<>(Arrays.asList(ToString.stringToArray(getContent()))));
         } else {
             try {
                 XWikiPatchUtils.patch(origText, getContent());

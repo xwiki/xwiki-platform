@@ -57,7 +57,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> 
      */
     public XWikiAttachmentList(XWikiDocument document)
     {
-        super(new ArrayList<XWikiAttachment>());
+        super(new ArrayList<>());
 
         this.document = document;
     }

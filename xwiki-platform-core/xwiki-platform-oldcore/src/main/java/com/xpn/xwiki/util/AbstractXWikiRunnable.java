@@ -46,7 +46,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXWikiRunnable.class);
 
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     /**
      * A reference to the Execution component to be used in {@link #cleanupExecutionContext()} when this thread is

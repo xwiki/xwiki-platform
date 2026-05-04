@@ -56,8 +56,8 @@ public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
         // same as filtering only that on encountering the first space in a series of whitespace, only print the first
         // one
         StringBuffer buffer = new StringBuffer();
-        Map<Integer, Integer> initialToAltered = new HashMap<Integer, Integer>();
-        Map<Integer, Integer> alteredToInitial = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> initialToAltered = new HashMap<>();
+        Map<Integer, Integer> alteredToInitial = new HashMap<>();
 
         // number of refused chars
         int removedChars = 0;

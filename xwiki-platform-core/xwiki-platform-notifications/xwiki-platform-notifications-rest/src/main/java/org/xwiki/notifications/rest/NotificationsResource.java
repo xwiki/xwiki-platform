@@ -42,6 +42,7 @@ public interface NotificationsResource
      * @throws Exception if an error occurs
      */
     @GET
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response getNotifications(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -74,6 +75,7 @@ public interface NotificationsResource
      */
     @GET
     @Path("/count")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response getNotificationsCount(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -104,6 +106,7 @@ public interface NotificationsResource
      */
     @GET
     @Path("/rss")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     String getNotificationsRSS(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -138,6 +141,7 @@ public interface NotificationsResource
      * @since 9.11.8
      */
     @POST
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response postNotifications(
         @FormParam("useUserPreferences") String useUserPreferences,
         @FormParam("userId") String userId,

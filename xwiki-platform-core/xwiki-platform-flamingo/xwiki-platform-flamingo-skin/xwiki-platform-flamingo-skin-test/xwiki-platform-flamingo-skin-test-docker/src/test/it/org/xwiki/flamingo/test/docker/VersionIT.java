@@ -859,8 +859,8 @@ class VersionIT
 
         // Diff summary.
         DocumentDiffSummary diffSummary = rawChanges.getDiffSummary();
-        assertThat(List.of("Page properties", "Attachments", "Objects", "Class properties"),
-            containsInAnyOrder(diffSummary.getItems().toArray()));
+        assertThat(diffSummary.getItems(),
+            containsInAnyOrder("Page properties", "Attachments", "Objects", "Class properties"));
         assertEquals("(4 modified, 0 added, 0 removed)", diffSummary.getPagePropertiesSummary());
         assertEquals("(0 modified, 1 added, 0 removed)", diffSummary.getAttachmentsSummary());
         assertEquals("(0 modified, 2 added, 0 removed)", diffSummary.getObjectsSummary());
@@ -871,13 +871,13 @@ class VersionIT
         assertEquals(List.of("age"), diffSummary.toggleClassPropertiesDetails().getAddedClassProperties());
 
         // Diff details.
-        assertThat(List.of("Page properties", "SmallAttachment.txt", "XWiki.JavaScriptExtension[0]",
-            "XWiki.XWikiComments[0]", "age"), containsInAnyOrder(rawChanges.getChangedEntities().toArray()));
+        assertThat(rawChanges.getChangedEntities(),
+            containsInAnyOrder("Page properties", "SmallAttachment.txt", "XWiki.JavaScriptExtension[0]",
+                "XWiki.XWikiComments[0]", "age"));
 
         // Page properties changes.
         EntityDiff pageProperties = rawChanges.getEntityDiff("Page properties");
-        assertThat(List.of("Title", "Parent", "Author", "Content"),
-            containsInAnyOrder(pageProperties.getPropertyNames().toArray()));
+        assertThat(pageProperties.getPropertyNames(), containsInAnyOrder("Title", "Parent", "Author", "Content"));
         assertDiff(pageProperties.getDiff("Title"), "-<del>T</del>est",
             "+<ins>Compar</ins>e<ins> ver</ins>s<ins>ions </ins>t<ins>est</ins>");
         assertDiff(pageProperties.getDiff("Parent"), "+Sandbox.WebHome");
@@ -888,16 +888,15 @@ class VersionIT
 
         // Attachment changes.
         EntityDiff attachmentDiff = rawChanges.getEntityDiff("SmallAttachment.txt");
-        assertThat(List.of("Author", "Size", "Content"),
-            containsInAnyOrder(attachmentDiff.getPropertyNames().toArray()));
+        assertThat(attachmentDiff.getPropertyNames(), containsInAnyOrder("Author", "Size", "Content"));
         assertDiff(attachmentDiff.getDiff("Author"), "+XWiki.superadmin");
         assertDiff(attachmentDiff.getDiff("Size"), "+27 bytes");
         assertDiff(attachmentDiff.getDiff("Content"), "+This is a small attachment.");
 
         // Object changes.
         EntityDiff jsxDiff = rawChanges.getEntityDiff("XWiki.JavaScriptExtension[0]");
-        assertThat(List.of("Caching policy", "Name", "Use this extension", "Code"),
-            containsInAnyOrder(jsxDiff.getPropertyNames().toArray()));
+        assertThat(jsxDiff.getPropertyNames(),
+            containsInAnyOrder("Caching policy", "Name", "Use this extension", "Code"));
         assertDiff(jsxDiff.getDiff("Caching policy"), "+long");
         assertDiff(jsxDiff.getDiff("Name"), "+Code snippet");
         assertDiff(jsxDiff.getDiff("Use this extension"), "+onDemand");
@@ -905,16 +904,15 @@ class VersionIT
 
         // Comment changes.
         EntityDiff commentDiff = rawChanges.getEntityDiff("XWiki.XWikiComments[0]");
-        assertThat(List.of("Author", "Date", "Comment"),
-            containsInAnyOrder(commentDiff.getPropertyNames().toArray()));
+        assertThat(commentDiff.getPropertyNames(), containsInAnyOrder("Author", "Date", "Comment"));
         assertDiff(commentDiff.getDiff("Author"), "+XWiki.Alice");
         assertEquals(2, commentDiff.getDiff("Date").size());
         assertDiff(commentDiff.getDiff("Comment"), "+first line", "+line in between", "+second line");
 
         // Class property changes.
         EntityDiff ageDiff = rawChanges.getEntityDiff("age");
-        assertThat(List.of("Name", "Number", "Pretty Name", "Size", "Number Type"),
-            containsInAnyOrder(ageDiff.getPropertyNames().toArray()));
+        assertThat(ageDiff.getPropertyNames(),
+            containsInAnyOrder("Name", "Number", "Pretty Name", "Size", "Number Type"));
         assertDiff(ageDiff.getDiff("Name"), "+age");
         assertDiff(ageDiff.getDiff("Number"), "+1");
         assertDiff(ageDiff.getDiff("Pretty Name"), "+age");
@@ -1105,7 +1103,8 @@ class VersionIT
 
     @Test
     @Order(12)
-    void diffAfterXClassChange(TestUtils testUtils, TestReference testReference) throws Exception
+    void diffAfterXClassChange(TestUtils testUtils, TestReference testReference)
+        throws Exception
     {
         String className = "XClassTest";
         DocumentReference xclassReference = new DocumentReference(className, testReference.getLastSpaceReference());
@@ -1239,20 +1238,51 @@ class VersionIT
         assertEquals("-<del>my</del>value", stringTestDiff.get(1));
         assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
 
+        testUtils.setUseDockerBaseUrl(true);
+        String xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("viewer", "xml"));
+        assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
+                + "      <stringTest>anothervalue</stringTest>\n"
+                + "    </property>"),
+            "Current source is: " + xmlViewerContent);
+        // We shouldn't have any occurrence of the password field
+        assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
+            "Current source is: " + xmlViewerContent);
+        testUtils.setUseDockerBaseUrl(false);
+
         // modify the xclass
         classPage = testUtils.gotoPage(xclassReference);
         classEditPage = classPage.editClass();
         classEditPage.deleteProperty("mypass");
         classEditPage.clickSaveAndView();
 
+        // v6.1
+        testUtils.rest().savePage(testReference, "Some content 4", "Test title");
+
         viewPage = testUtils.gotoPage(testReference);
         historyPane = viewPage.openHistoryDocExtraPane();
-        assertEquals(5, historyPane.getNumberOfVersions());
-        assertEquals("5.1", historyPane.getCurrentVersion());
+        assertEquals(6, historyPane.getNumberOfVersions());
+        assertEquals("6.1", historyPane.getCurrentVersion());
+
+        // diff 1.1 -> 6.1
+        comparePage = historyPane.compare("1.1", "6.1");
+        changesPane = comparePage.getChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 4</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
 
         // diff 1.1 -> 5.1
-        comparePage = historyPane.compare("1.1", "5.1");
-        changesPane = comparePage.getChangesPane();
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
         rawChanges = changesPane.getRawChanges();
         contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
         assertEquals(3, contentDiff.size());
@@ -1261,8 +1291,7 @@ class VersionIT
         assertEquals("+Some content<ins> 3</ins>", contentDiff.get(2));
 
         objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
-        // FIXME
-        //assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
         stringTestDiff = objectEntityDiff.getDiff("stringTest");
         assertEquals(2, stringTestDiff.size());
         assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
@@ -1347,5 +1376,59 @@ class VersionIT
         assertEquals("@@ -1,1 +1,1 @@", stringTestDiff.get(0));
         assertEquals("-<del>my</del>value", stringTestDiff.get(1));
         assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
+
+        // modify the xclass to create a string property with same name than the password property
+        classPage = testUtils.gotoPage(xclassReference);
+        classEditPage = classPage.editClass();
+        classEditPage.addProperty("mypass", "String");
+        classEditPage.clickSaveAndView();
+
+        viewPage = testUtils.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        // one more version for the class migration
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.1", historyPane.getCurrentVersion());
+        assertEquals(String.format("Migrated property [mypass] from class [%s]",
+                testUtils.serializeLocalReference(xclassReference)),
+            historyPane.getCurrentVersionComment());
+
+        // diff 6.1 -> 7.1
+        comparePage = historyPane.compare("6.1", "7.1");
+        changesPane = comparePage.getChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        assertTrue(objectEntityDiff.isDiffObfuscated("mypass"));
+
+        viewPage = testUtils.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        // diff 1.1 -> 7.1
+        comparePage = historyPane.compare("1.1", "7.1");
+        changesPane = comparePage.getChangesPane();
+        rawChanges = changesPane.getRawChanges();
+        contentDiff = rawChanges.getEntityDiff("Page properties").getDiff("Content");
+        assertEquals(3, contentDiff.size());
+        assertEquals("@@ -1,1 +1,1 @@", contentDiff.get(0));
+        assertEquals("-Some content", contentDiff.get(1));
+        assertEquals("+Some content<ins> 4</ins>", contentDiff.get(2));
+
+        objectEntityDiff = rawChanges.getEntityDiff(objectIdInDiff);
+        // The password property is not displayed at all in the diff, because we're hiding added properties with
+        // empty values in the diff.
+        assertEquals(List.of("stringTest"), objectEntityDiff.getPropertyNames());
+        stringTestDiff = objectEntityDiff.getDiff("stringTest");
+        assertEquals(2, stringTestDiff.size());
+        assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
+        assertEquals("+anothervalue", stringTestDiff.get(1));
+
+        testUtils.setUseDockerBaseUrl(true);
+        xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("rev", "6.1", "viewer", "xml"));
+        assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
+                + "      <stringTest>anothervalue</stringTest>\n"
+                + "    </property>"),
+            "Current source is: " + xmlViewerContent);
+        // We shouldn't have any occurrence of the password field
+        assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
+            "Current source is: " + xmlViewerContent);
+        testUtils.setUseDockerBaseUrl(false);
     }
 }

@@ -48,6 +48,8 @@ public class ObjectPropertyAtPageVersionResourceImpl extends XWikiResource imple
         ObjectPropertyAtPageVersionResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Property getObjectProperty(String wikiName, String spaceName, String pageName, String version,
             String className, Integer objectNumber, String propertyName, Boolean withPrettyNames) throws
             XWikiRestException

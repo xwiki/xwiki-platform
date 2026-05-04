@@ -119,7 +119,7 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
         if (documentNameListString != null) {
             String[] documentNameList = documentNameListString.split(JOIN_SEPARATOR);
 
-            documents = new LinkedHashSet<DocumentReference>(documentNameList.length);
+            documents = new LinkedHashSet<>(documentNameList.length);
             for (String documentName : documentNameList) {
                 documents.add(this.resolver.resolve(documentName.trim(), preferencesReference));
             }
@@ -135,7 +135,7 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
         Set<DocumentReference> documents = getDocuments();
 
         Map<DocumentReference, XWikiPreferencesDocumentTranslationBundle> newBundles =
-            new LinkedHashMap<DocumentReference, XWikiPreferencesDocumentTranslationBundle>(documents.size());
+            new LinkedHashMap<>(documents.size());
         for (DocumentReference document : documents) {
             newBundles.put(document, this.parent.getDocumentTranslationBundle(document));
         }

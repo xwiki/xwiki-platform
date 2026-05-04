@@ -20,13 +20,17 @@
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
+import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
+import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
+import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
 import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
+import { DefaultResourceReferenceParser } from "./model/reference/DefaultResourceReferenceParser";
 import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
 import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
 import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
@@ -60,6 +64,8 @@ XWikiModelReferenceSerializer.bind(container);
 DefaultModelReferenceHandlerProvider.bind(container);
 XWikiModelReferenceHandler.bind(container);
 
+DefaultResourceReferenceParser.bind(container);
+
 DefaultRemoteURLParserProvider.bind(container);
 XWikiRemoteURLParser.bind(container);
 DefaultRemoteURLSerializerProvider.bind(container);
@@ -83,6 +89,10 @@ DefaultUniAstIterator.bind(container);
 XWikiUniAstProcessor.bind(container);
 XWikiMacroBlock.bind(container);
 XWikiInlineMacro.bind(container);
+
+DefaultImageWizard.bind(container);
+DefaultMacroWizard.bind(container);
+DefaultBlockNoteMacroWizard.bind(container);
 
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
 @injectable()

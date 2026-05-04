@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -117,20 +118,29 @@ public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
         private void processColumn(String tableName, String columnName, Connection connection)
             throws SQLException
         {
-            String command = "ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s(%d)";
-            PreparedStatement getCurrentColumnType = connection.prepareStatement(
-                "select DATA_TYPE from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME=?");
-            getCurrentColumnType.setString(1, tableName);
-            getCurrentColumnType.setString(2, columnName);
-            ResultSet result = getCurrentColumnType.executeQuery();
-            if (!result.next()) {
-                return;
+            try (PreparedStatement prepareStatement = connection.prepareStatement(
+                "select DATA_TYPE from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME=?"))
+            {
+                prepareStatement.setString(1, tableName);
+                prepareStatement.setString(2, columnName);
+                processColumn(prepareStatement, tableName, columnName, connection);
             }
-            String currentColumnType = result.getString(1);
-            result.close();
-            getCurrentColumnType.close();
-            connection.createStatement().execute(
-                String.format(command, tableName, columnName, currentColumnType, 1 << 30));
+        }
+
+        private void processColumn(PreparedStatement prepareStatement, String tableName, String columnName,
+            Connection connection) throws SQLException
+        {
+            String command = "ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s(%d)";
+            String currentColumnType;
+            try (ResultSet result = prepareStatement.executeQuery()) {
+                if (!result.next()) {
+                    return;
+                }
+                currentColumnType = result.getString(1);
+            }
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(String.format(command, tableName, columnName, currentColumnType, 1 << 30));
+            }
         }
     }
 }

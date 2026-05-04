@@ -39,7 +39,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,24 +77,16 @@ class EnvironmentSkinTest
     {
         String relativePath = "o;ne/t?w&o/../t=hr#e e";
         String fullPath = "/skins/test/" + relativePath;
-        when(this.environment.getResource(fullPath)).thenReturn(new URL("http://resourceURL"));
+        when(this.environment.getResource("/skins/test/", relativePath)).thenReturn(new URL("http://resourceURL"));
 
         Resource<?> resource = this.skin.getLocalResource(relativePath);
         assertEquals(fullPath, resource.getPath());
     }
 
     @Test
-    void getLocalResourceWithBreakInAttempt()
-    {
-        assertNull(this.skin.getLocalResource("one/../../two"));
-        assertEquals("Direct access to skin file [/skins/two] refused. Possible break-in attempt!",
-            this.logCapture.getMessage(0));
-    }
-
-    @Test
     void exists() throws Exception
     {
-        when(this.environment.getResource("/skins/test/skin.properties"))
+        when(this.environment.getResource("/skins/test/", "skin.properties"))
             .thenReturn(new URL("http://resourceURL"), (URL) null);
         assertTrue(this.skin.exists());
         assertFalse(this.skin.exists());

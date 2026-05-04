@@ -49,7 +49,7 @@ public class EntityReferenceSet
         public EntityReferenceEntry add(String name, Map<String, Serializable> entityParameters)
         {
             if (this.children == null) {
-                this.children = new HashMap<String, EntityReferenceEntry>();
+                this.children = new HashMap<>();
             }
 
             EntityReferenceEntry entry = this.children.get(name);
@@ -175,7 +175,7 @@ public class EntityReferenceSet
         {
             if (!entityParameters.isEmpty()) {
                 if (this.parameters == null) {
-                    this.parameters = new ArrayList<Map<String, Serializable>>();
+                    this.parameters = new ArrayList<>();
                 }
 
                 this.parameters.add(entityParameters);
@@ -377,7 +377,7 @@ public class EntityReferenceSet
             return Collections.emptySet();
         }
 
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
 
         for (Map<String, Serializable> map : parameters) {
             set.addAll(map.keySet());

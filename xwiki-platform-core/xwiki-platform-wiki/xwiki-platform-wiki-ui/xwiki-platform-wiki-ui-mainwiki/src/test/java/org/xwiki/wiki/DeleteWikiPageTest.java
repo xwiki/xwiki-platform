@@ -48,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RenderingScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
-    TranslationMacro.class,
     TestNoScriptMacro.class,
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class

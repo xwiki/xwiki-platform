@@ -23,11 +23,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.tree.test.po.TreeElement;
 
 /**
  * Represents the actions possible on the Administration Import Page.
@@ -120,6 +122,21 @@ public class ImportAdministrationSectionPage extends ViewPage
             "//div[@id='packagecontainer']/div[contains(@class, 'infomessage')]"));
     }
 
+    /**
+     * Click the import button and wait for an error message to appear.
+     *
+     * @return the text of the error message
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public String importPackageWithExpectedError()
+    {
+        this.importPackageLink.click();
+        By errorLocator = By.cssSelector("#packagecontainer div.errormessage");
+        getDriver().waitUntilElementIsVisible(errorLocator);
+        return getDriver().findElement(errorLocator).getText();
+    }
+
     public ViewPage clickImportedPage(String pageName)
     {
         getDriver().waitUntilElementIsVisible(By.linkText(pageName));
@@ -161,5 +178,77 @@ public class ImportAdministrationSectionPage extends ViewPage
         importAsBackup.click();
 
         return importAsBackup.isSelected();
+    }
+
+    /**
+     * @return the filename of the selected package as displayed in the package header
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public String getPackageFileName()
+    {
+        return getDriver().findElement(getMetadataSelector("filename")).getText();
+    }
+
+    /**
+     * @return the name of the selected package as read from its package descriptor, or empty if not set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public Optional<String> getPackageName()
+    {
+        return getOptionalMetadataText("name");
+    }
+
+    /**
+     * @return the version of the selected package as read from its package descriptor, or empty if not set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public Optional<String> getPackageVersion()
+    {
+        return getOptionalMetadataText("version");
+    }
+
+    /**
+     * @return the author of the selected package as read from its package descriptor, or empty if not set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public Optional<String> getPackageAuthor()
+    {
+        return getOptionalMetadataText("author");
+    }
+
+    /**
+     * @return the license of the selected package as read from its package descriptor, or empty if not set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public Optional<String> getPackageLicense()
+    {
+        return getOptionalMetadataText("licence");
+    }
+
+    private Optional<String> getOptionalMetadataText(String metadataName)
+    {
+        List<WebElement> elements =
+            getDriver().findElementsWithoutWaiting(getMetadataSelector(metadataName));
+        return elements.isEmpty() ? Optional.empty() : Optional.of(elements.get(0).getText());
+    }
+
+    private static By getMetadataSelector(String metadataName)
+    {
+        return By.cssSelector(".packageinfos .%s".formatted(metadataName));
+    }
+
+    /**
+     * @return the tree listing the documents contained in the selected package
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public TreeElement getPackageTree()
+    {
+        return new TreeElement(getDriver().findElement(By.id("package")));
     }
 }

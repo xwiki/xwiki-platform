@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
@@ -238,5 +239,55 @@ class CopyPageIT
         // Verify that the title of the copy has been updated (independent from the name of the copy).
         assertEquals("My copy", viewPage.getDocumentTitle());
         assertEquals(PAGE_CONTENT, viewPage.getContent());
+    }
+
+    @Test
+    void copyPagePreservingChildren(TestUtils setup) throws Exception
+    {
+        String sourceSpaceName = "CopyWithChildren";
+        String childSpaceName = "ChildSpace";
+        String targetSpaceName = "CopyWithChildrenCopy";
+
+        DocumentReference sourceReference = new DocumentReference("xwiki", sourceSpaceName, "WebHome");
+        DocumentReference childReference =
+            new DocumentReference("xwiki", Arrays.asList(sourceSpaceName, childSpaceName), "WebHome");
+        DocumentReference targetReference = new DocumentReference("xwiki", targetSpaceName, "WebHome");
+        DocumentReference targetChildReference =
+            new DocumentReference("xwiki", Arrays.asList(targetSpaceName, childSpaceName), "WebHome");
+
+        // Clean-up: delete pages that may already exist
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(childReference);
+        setup.rest().delete(targetReference);
+        setup.rest().delete(targetChildReference);
+
+        // Create the parent and child source pages
+        setup.rest().savePage(sourceReference, PAGE_CONTENT, "Source");
+        setup.rest().savePage(childReference, PAGE_CONTENT, "Child");
+
+        // Navigate to the source page and start the copy
+        ViewPage viewPage = setup.gotoPage(sourceReference);
+        viewPage.copy();
+        CopyPage copyPage = new CopyPage();
+
+        // Verify that the preserve children checkbox is present and checked by default
+        assertTrue(copyPage.isDeepCopy());
+
+        // Set the target space name
+        copyPage.getDocumentPicker().toggleLocationAdvancedEdit().setName(targetSpaceName);
+
+        // Click copy button and wait for completion
+        CopyOrRenameOrDeleteStatusPage copyStatusPage = copyPage.clickCopyButton().waitUntilFinished();
+
+        // Check successful copy confirmation
+        assertEquals(COPY_SUCCESSFUL, copyStatusPage.getInfoMessage());
+
+        // Verify the parent page was copied
+        assertTrue(setup.pageExists(Arrays.asList(targetSpaceName), "WebHome"),
+            String.format("Target page [%s.WebHome] should have been copied", targetSpaceName));
+
+        // Verify the child page was preserved during the copy
+        assertTrue(setup.pageExists(Arrays.asList(targetSpaceName, childSpaceName), "WebHome"),
+            String.format("Child page [%s.%s.WebHome] should have been copied", targetSpaceName, childSpaceName));
     }
 }

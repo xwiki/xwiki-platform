@@ -1396,6 +1396,121 @@ describe("MarkdownToUniAstConverter", () => {
       },
     });
   });
+
+  test("parse nested lists", async () => {
+    const input = ["1. A", "   1. B", "   2. C", "2. D", "3. E"].join("\n");
+
+    await testTwoWayConversion({
+      startingFrom: input,
+      convertsBackTo: input,
+      withUniAst: {
+        blocks: [
+          {
+            items: [
+              {
+                checked: undefined,
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "A",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                  {
+                    items: [
+                      {
+                        checked: undefined,
+                        content: [
+                          {
+                            content: [
+                              {
+                                content: "B",
+                                styles: {},
+                                type: "text",
+                              },
+                            ],
+                            styles: {},
+                            type: "paragraph",
+                          },
+                        ],
+                        number: 1,
+                        styles: {},
+                      },
+                      {
+                        checked: undefined,
+                        content: [
+                          {
+                            content: [
+                              {
+                                content: "C",
+                                styles: {},
+                                type: "text",
+                              },
+                            ],
+                            styles: {},
+                            type: "paragraph",
+                          },
+                        ],
+                        number: 2,
+                        styles: {},
+                      },
+                    ],
+                    styles: {},
+                    type: "list",
+                  },
+                ],
+                number: 1,
+                styles: {},
+              },
+              {
+                checked: undefined,
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "D",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                ],
+                number: 2,
+                styles: {},
+              },
+              {
+                checked: undefined,
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "E",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                ],
+                number: 3,
+                styles: {},
+              },
+            ],
+            styles: {},
+            type: "list",
+          },
+        ],
+      },
+    });
+  });
 });
 
 const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {

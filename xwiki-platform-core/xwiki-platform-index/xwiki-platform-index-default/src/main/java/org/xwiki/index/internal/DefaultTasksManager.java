@@ -66,6 +66,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
+// FanOut complexity of 22 on a max of 20
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultTasksManager implements TaskManager, Initializable, Disposable, Runnable
 {
     private static final String MBEAN_NAME = "name=index";

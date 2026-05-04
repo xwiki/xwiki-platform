@@ -98,8 +98,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     /**
      * The cache of bundles by wiki.
      */
-    private Map<String, XWikiPreferencesWikiTranslationBundle> wikiBundlesCache =
-        new ConcurrentHashMap<String, XWikiPreferencesWikiTranslationBundle>();
+    private Map<String, XWikiPreferencesWikiTranslationBundle> wikiBundlesCache = new ConcurrentHashMap<>();
 
     /**
      * The cache of bundles by document id.

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -252,9 +252,15 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-rest-default</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.10.4</version>
+      <version>4.11</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>
@@ -265,11 +271,10 @@
       <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Temporary dependency until we migrate recommended extensions to jQuery 3.x -->
+    <!-- Temporary dependency until we migrate recommended extensions to jQuery 4.x -->
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery-migrate</artifactId>
-      <version>3.6.0</version>
       <optional>true</optional>
     </dependency>
     <!-- Inject the legacy event migrator in the administration -->

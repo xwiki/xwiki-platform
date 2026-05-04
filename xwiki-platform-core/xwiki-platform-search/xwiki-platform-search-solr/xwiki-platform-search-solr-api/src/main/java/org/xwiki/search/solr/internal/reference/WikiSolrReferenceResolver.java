@@ -68,7 +68,7 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference wikiReference) throws SolrIndexerException
     {
-        List<EntityReference> result = new ArrayList<EntityReference>();
+        List<EntityReference> result = new ArrayList<>();
 
         // Ignore the wiki reference because it is not indexable.
 

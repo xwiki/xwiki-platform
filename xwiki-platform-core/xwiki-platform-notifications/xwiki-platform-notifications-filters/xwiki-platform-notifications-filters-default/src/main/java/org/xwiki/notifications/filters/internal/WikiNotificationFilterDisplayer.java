@@ -98,7 +98,7 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
         try {
             // Extract the supported displayer filters from the given baseObject
             //noinspection unchecked
-            supportedFilters = new HashSet<String>(
+            supportedFilters = new HashSet<>(
                     baseObject.getListValue(WikiNotificationFilterDisplayerDocumentInitializer.SUPPORTED_FILTERS));
 
             componentHint = generateComponentHint();

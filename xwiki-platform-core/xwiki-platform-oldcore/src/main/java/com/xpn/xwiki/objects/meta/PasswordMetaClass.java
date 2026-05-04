@@ -50,11 +50,6 @@ public class PasswordMetaClass extends StringMetaClass
     public static final String CLEAR = "Clear";
 
     /**
-     * Indicates that the password should be stored encrypted.
-     */
-    public static final String ENCRYPTED = "Encrypted";
-
-    /**
      * Indicates that the password hash should be store instead of the pass itself.
      */
     public static final String HASH = "Hash";

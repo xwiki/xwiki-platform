@@ -86,6 +86,7 @@ public class ScopeNotificationFilterPreferencesGetter
         return new ScopeNotificationFilterPreferencesHierarchy(results);
     }
 
+    @SuppressWarnings("checkstyle:CyclomaticComplexity")
     private boolean matchAllCriteria(NotificationFilterPreference pref, String eventType, NotificationFormat format,
         boolean onlyGivenType, boolean onlyGivenFormat)
     {

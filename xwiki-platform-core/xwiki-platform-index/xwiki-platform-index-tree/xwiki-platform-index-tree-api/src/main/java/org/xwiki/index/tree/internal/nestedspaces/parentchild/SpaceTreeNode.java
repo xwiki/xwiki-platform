@@ -86,8 +86,8 @@ public class SpaceTreeNode extends org.xwiki.index.tree.internal.nestedspaces.Sp
     @Override
     protected int getChildDocumentsCount(SpaceReference spaceReference) throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        List<String> constraints = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
 
         // Include only the documents that either don't have a parent document or that have a parent document in a
         // different space. Note that in Oracle the empty string is stored as null.

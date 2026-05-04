@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -68,6 +68,12 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
     </dependency>
@@ -96,8 +102,8 @@
     </dependency>
     <!-- Used by the suggest filter. -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tom-select</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

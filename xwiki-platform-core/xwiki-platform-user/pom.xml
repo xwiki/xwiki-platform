@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user</artifactId>
   <name>XWiki Platform - User - Parent POM</name>
@@ -39,6 +39,7 @@
     <module>xwiki-platform-user-profile</module>
     <module>xwiki-platform-user-script</module>
     <module>xwiki-platform-user-resource</module>
+    <module>xwiki-platform-user-rest</module>
   </modules>
   <profiles>
     <profile>

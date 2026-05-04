@@ -78,7 +78,7 @@ public class DefaultUserBridge implements UserBridge
 
         Collection<DocumentReference> groupRefs = getGroupsReferencesFor(wikiReference, userRef);
 
-        Collection<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>(groupRefs.size());
+        Collection<GroupSecurityReference> groups = new ArrayList<>(groupRefs.size());
         for (DocumentReference groupRef : groupRefs) {
             GroupSecurityReference group = factory.newGroupReference(groupRef);
             groups.add(group);

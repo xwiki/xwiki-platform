@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
@@ -61,7 +61,7 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
 
         // Remove potential trailing "/" since the documentation in xwiki.cfg says it should contain a trailing "/" but
         // getEntityPathPrefix should return the prefix without "/"...
-        prefix = StringUtils.removeEnd(prefix, "/");
+        prefix = Strings.CS.removeEnd(prefix, "/");
 
         return prefix;
     }

@@ -222,8 +222,7 @@ require([
   'jquery',
   'xwiki-meta',
   'xwiki-l10n!xwiki-panels-applications-config-messages',
-  'jquery-ui',
-  'jquery-ui-touch-punch'
+  'jquery-ui'
 ], function($, xm, l10n) {
 
   /**

@@ -33,8 +33,9 @@ import org.xwiki.xar.internal.model.XarAttachmentModel;
  */
 public class XARAttachmentModel extends XarAttachmentModel
 {
-    // Utils
-
+    /**
+     * The map of parameters to be used when reading attachments.
+     */
     public static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = new HashMap<>();
 
     static {

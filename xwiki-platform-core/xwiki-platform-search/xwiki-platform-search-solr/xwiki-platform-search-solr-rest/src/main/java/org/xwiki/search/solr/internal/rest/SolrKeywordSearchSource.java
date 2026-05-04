@@ -33,6 +33,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -249,7 +250,7 @@ public class SolrKeywordSearchSource implements KeywordSearchSource
     private String getEscapedAbsoluteReferenceForWiki(String keywords, String wikiName)
     {
         String absoluteReference;
-        if (!StringUtils.startsWith(keywords, wikiName + WIKI_SEPARATOR)) {
+        if (!Strings.CS.startsWith(keywords, wikiName + WIKI_SEPARATOR)) {
             absoluteReference = wikiName + WIKI_SEPARATOR + keywords;
         } else {
             absoluteReference = keywords;

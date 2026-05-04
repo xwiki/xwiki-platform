@@ -181,7 +181,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       button.removeAttr('hidden');
       popover.attr('open','open');
     } else {
-      buttonContainer.addClass('closed');
+      buttonContainer.addClass('hint-closed');
     }
 
     button.on('click', function() {

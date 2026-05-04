@@ -99,6 +99,12 @@ public class TestConfiguration
 
     private String blobStoreTag;
 
+    private SolrMode solrMode;
+
+    private String remoteSolrTag;
+
+    private XWikiInstances xwikiInstances;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -130,8 +136,11 @@ public class TestConfiguration
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
-        mergeBlobStore(testConfiguration.getBlobStore());
+        mergeBlobStore(testConfiguration.blobStore);
         mergeBlobStoreTag(testConfiguration.getBlobStoreTag());
+        mergeSolrMode(testConfiguration.solrMode);
+        mergeRemoteSolrTag(testConfiguration.getRemoteSolrTag());
+        mergeXWikiInstances(testConfiguration.getXWikiInstances());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -366,13 +375,10 @@ public class TestConfiguration
 
     private void mergeBlobStore(BlobStore blobStore) throws DockerTestException
     {
-        if (getBlobStore() != null) {
-            if (blobStore != null && !getBlobStore().equals(blobStore)) {
-                throw new DockerTestException(
-                    String.format("Cannot merge blob store [%s] since it was already specified as [%s]", blobStore,
-                        getBlobStore()));
-            } else {
-                this.blobStore = getBlobStore();
+        if (this.blobStore != null && this.blobStore != BlobStore.DEFAULT) {
+            if (blobStore != null && blobStore != BlobStore.DEFAULT && this.blobStore != blobStore) {
+                throw new DockerTestException(String.format(
+                    "Cannot merge blob store [%s] since it was already specified as [%s]", blobStore, getBlobStore()));
             }
         } else {
             this.blobStore = blobStore;
@@ -389,6 +395,40 @@ public class TestConfiguration
             }
         } else {
             this.blobStoreTag = blobStoreTag;
+        }
+    }
+
+    private void mergeSolrMode(SolrMode solrMode) throws DockerTestException
+    {
+        if (this.solrMode != null && this.solrMode != SolrMode.DEFAULT) {
+            if (solrMode != null && solrMode != SolrMode.DEFAULT && this.solrMode != solrMode) {
+                throw new DockerTestException(String.format(
+                    "Cannot merge solr mode [%s] since it was already specified as [%s]", solrMode, getBlobStore()));
+            }
+        } else {
+            this.solrMode = solrMode;
+        }
+    }
+
+    private void mergeRemoteSolrTag(String remoteSolrTag) throws DockerTestException
+    {
+        if (getRemoteSolrTag() != null) {
+            if (remoteSolrTag != null && !getRemoteSolrTag().equals(remoteSolrTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge remote solr tag [%s] since it was already specified as [%s]",
+                        remoteSolrTag, getRemoteSolrTag()));
+            }
+        } else {
+            this.remoteSolrTag = remoteSolrTag;
+        }
+    }
+
+    private void mergeXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        // Select the configuration with the biggest number of instances.
+        if (getXWikiInstances() == null
+            || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
+            setXWikiInstances(xwikiInstances);
         }
     }
 
@@ -754,22 +794,29 @@ public class TestConfiguration
     }
 
     /**
-     * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
-     * system property is not defined then construct an output directory name based on the defined configuration so that
-     * we can run different configurations one after another without them overriding each other. The {@code
-     * maven.build.dir} system property is there to allow controlling where the Maven output directory is located when
-     * running from Maven.
+     * @return the output directory where to output files required for running the tests. It's a sub-directory of the
+     *         Maven build directory, which name is based on the defined configuration so that we can run different
+     *         configurations one after another without them overriding each other.
      */
     public String getOutputDirectory()
     {
-        String outputDirectory;
+        return getMavenBuildDirectory() + "/" + getName();
+    }
+
+    /**
+     * @return the output directory where Maven produce files. Assume ./target if the system property
+     *         {@code maven.build.dir} is not set.
+     * @since 18.3.0RC1
+     */
+    public String getMavenBuildDirectory()
+    {
         String mavenBuildDir = System.getProperty("maven.build.dir");
+
         if (mavenBuildDir == null) {
-            outputDirectory = String.format("./target/%s", getName());
+            return "./target";
         } else {
-            outputDirectory = mavenBuildDir;
+            return mavenBuildDir;
         }
-        return outputDirectory;
     }
 
     /**
@@ -872,6 +919,10 @@ public class TestConfiguration
      */
     public BlobStore getBlobStore()
     {
+        if (this.blobStore == BlobStore.DEFAULT) {
+            return isCluster() ? BlobStore.S3 : BlobStore.FILESYSTEM;
+        }
+
         return this.blobStore;
     }
 
@@ -900,5 +951,72 @@ public class TestConfiguration
     public void setBlobStoreTag(String blobStoreTag)
     {
         this.blobStoreTag = blobStoreTag;
+    }
+
+    /**
+     * @return the mode to use
+     * @since 18.3.0RC1
+     */
+    public SolrMode getSolrMode()
+    {
+        if (this.solrMode == SolrMode.DEFAULT) {
+            return isCluster() ? SolrMode.REMOTE : SolrMode.EMBEDDED;
+        }
+
+        return this.solrMode;
+    }
+
+    /**
+     * @param solrMode the Solr mode to use
+     * @since 18.3.0RC1
+     */
+    public void setSolrMode(SolrMode solrMode)
+    {
+        this.solrMode = solrMode;
+    }
+
+    /**
+     * @return the docker image tag to use for the remote solr container (if not specified, uses the "latest" tag)
+     * @since 18.3.0RC1
+     */
+    public String getRemoteSolrTag()
+    {
+        return this.remoteSolrTag;
+    }
+
+    /**
+     * @param remoteSolrTag see {@link #getRemoteSolrTag()}
+     * @since 18.3.0RC1
+     */
+    public void setRemoteSolrTag(String remoteSolrTag)
+    {
+        this.remoteSolrTag = remoteSolrTag;
+    }
+
+    /**
+     * @return the XWiki instances configuration
+     * @since 18.3.0RC1
+     */
+    public XWikiInstances getXWikiInstances()
+    {
+        return this.xwikiInstances;
+    }
+
+    /**
+     * @param xwikiInstances see {@link #getXWikiInstances()}
+     * @since 18.3.0RC1
+     */
+    public void setXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        this.xwikiInstances = xwikiInstances;
+    }
+
+    /**
+     * @return true if the test configuration is for a cluster setup (i.e. more than 1 XWiki instance), false otherwise
+     * @since 18.3.0RC1
+     */
+    public boolean isCluster()
+    {
+        return getXWikiInstances().value() > 1;
     }
 }

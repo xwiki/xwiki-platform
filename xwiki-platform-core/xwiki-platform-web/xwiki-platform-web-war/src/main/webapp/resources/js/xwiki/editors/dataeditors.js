@@ -18,18 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'jquery-ui': $services.webjars.url('jquery-ui', "jquery-ui#if ($services.debug.minify).min#{end}.js")
-})
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
 
-(function(icons, paths) {
+(function(icons) {
   "use strict";
-  require.config({
-    paths
-  });
   define('dataeditors-translations', {
     prefix: 'core.editors.',
     keys: [
@@ -66,6 +60,7 @@
           deletedXObjects: {} // objects deleted but not removed yet
         };
         this.editedDocument = XWiki.currentDocument;
+        this.submitInProgress = false;
         this.unsavedChanges = false;
 
         $('.xclass').each(function() {
@@ -105,7 +100,12 @@
           }
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+
+        $(document).on('xwiki:document:saveFailed', function () {
+          self.submitInProgress = false;
         });
 
         // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
@@ -115,7 +115,15 @@
           $('input[name=addedObjects]').remove();
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+        // Disable the leave confirmation during Save & View navigation while preserving the dirty state for Save &
+        // Continue until the save has actually completed.
+        $(document).on('xwiki:actions:save', function (event, data) {
+          if (!data?.continue) {
+            self.submitInProgress = true;
+          }
         });
         // We want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
         // to create a property or an object.
@@ -136,6 +144,10 @@
         // We cannot use jQuery style to listen on event for this one as apparently it's not working
         // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
         window.onbeforeunload = function(event) {
+          if (self.submitInProgress) {
+            self.submitInProgress = false;
+            return;
+          }
           if (Object.keys(self.editorStatus.addedXObjects).length > 0
             || Object.keys(self.editorStatus.deletedXObjects).length > 0
             || self.unsavedChanges) {
@@ -803,7 +815,7 @@
     }
 
     function init() {
-      XWiki = window.XWiki || {};
+      const XWiki = globalThis.XWiki = globalThis.XWiki || {};
       XWiki.editors = XWiki.editors || {};
       XWiki.editors.XDataEditors = new XDataEditors();
       initSwitchClassListener();
@@ -812,4 +824,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $paths]));
+}).apply(']]#', $jsontool.serialize([$icons]));

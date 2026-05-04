@@ -19,7 +19,14 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.mail.EmailAddressObfuscator;
 import org.xwiki.mail.GeneralMailConfiguration;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -35,9 +42,18 @@ import com.xpn.xwiki.web.Utils;
 public class EmailClass extends StringClass
 {
     /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Email";
+
+    /**
      * Constant defining the field name.
      **/
     protected static final String XCLASSNAME = "email";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailClass.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -54,7 +70,7 @@ public class EmailClass extends StringClass
      **/
     public EmailClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Email", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     /**
@@ -62,7 +78,6 @@ public class EmailClass extends StringClass
      **/
     public EmailClass()
     {
-        super();
         setValidationRegExp(DEFAULT_EMAIL_VALIDATION_REGEXP);
     }
 
@@ -75,5 +90,32 @@ public class EmailClass extends StringClass
     {
         GeneralMailConfiguration generalMailConfiguration = Utils.getComponent(GeneralMailConfiguration.class);
         return generalMailConfiguration.shouldObfuscate();
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
+
+    /**
+     * Use {@link EmailAddressObfuscator} to obfuscate email addresses.
+     * If the value cannot be properly parsed, then this returns {@code null}.
+     *
+     * @param value the value to be obfuscated
+     * @return the output of {@link EmailAddressObfuscator#obfuscate(InternetAddress)} or {@code null} if the given
+     * value cannot be parsed to an email address.
+     */
+    @Override
+    public Object getObfuscatedValue(Object value)
+    {
+        EmailAddressObfuscator emailAddressObfuscator = Utils.getComponent(EmailAddressObfuscator.class);
+        try {
+            InternetAddress address = InternetAddress.parse(String.valueOf(value))[0];
+            return emailAddressObfuscator.obfuscate(address);
+        } catch (AddressException e) {
+            LOGGER.debug("Invalid email address value when trying to obfuscate [{}] falling back on null.", value);
+            return null;
+        }
     }
 }

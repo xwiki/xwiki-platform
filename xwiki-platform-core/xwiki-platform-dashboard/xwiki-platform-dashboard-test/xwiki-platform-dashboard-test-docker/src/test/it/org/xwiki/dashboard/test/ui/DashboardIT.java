@@ -22,13 +22,13 @@ package org.xwiki.dashboard.test.ui;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
-import org.xwiki.ckeditor.test.po.MacroDialogSelectModal;
 import org.xwiki.like.test.po.DashboardEditPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;

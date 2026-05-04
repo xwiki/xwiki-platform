@@ -36,12 +36,16 @@ import org.xwiki.rest.model.jaxb.Tags;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/tags")
 public interface PageTagsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Tags getPageTags(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @PUT Response setTags(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

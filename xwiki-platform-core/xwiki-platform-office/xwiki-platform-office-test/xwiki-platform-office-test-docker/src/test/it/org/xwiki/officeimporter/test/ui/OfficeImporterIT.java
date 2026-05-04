@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -109,7 +109,7 @@ class OfficeImporterIT
         String testName = info.getTestMethod().get().getName();
         // Test word file
         ViewPage resultPage = importFile(testName, "msoffice.97-2003/Test.doc");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "This is a test document."));
         deletePage(testName);
 
         // Test power point file
@@ -123,13 +123,13 @@ class OfficeImporterIT
 
         // Test excel file
         resultPage = importFile(testName, "msoffice.97-2003/Test.xls");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "Sheet1"));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "Sheet2"));
         deletePage(testName);
 
         // Test ODT file
         resultPage = importFile(testName, "ooffice.3.0/Test.odt");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "This is a test document."));
         WikiEditPage wikiEditPage = resultPage.editWiki();
         String regex = "(?<imageName>Test_[\\w]+\\.png)";
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -153,13 +153,13 @@ class OfficeImporterIT
 
         // Test ODS file
         resultPage = importFile(testName, "ooffice.3.0/Test.ods");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "Sheet1"));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "Sheet2"));
         deletePage(testName);
 
         // Test ODT file with accents
         resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+();@=.odt");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
         regex = "(?<imageName>Test_accents & é\\$ù !-_\\.\\+\\(\\);\\\\@=_\\w+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -191,7 +191,7 @@ class OfficeImporterIT
     {
         String testName = info.getTestMethod().get().getName();
         ViewPage resultPage = importFile(testName, "ToSplit.odt", true);
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "Introduction"));
 
         // See children
         verifyChild(testName, "First Part", "Hello, this is the first part of my story!");
@@ -212,7 +212,7 @@ class OfficeImporterIT
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), expectedName));
         assertTrue(child.exists());
         assertEquals(expectedName, child.getDocumentTitle());
-        assertTrue(StringUtils.contains(child.getContent(), expectedContent));
+        assertTrue(Strings.CS.contains(child.getContent(), expectedContent));
     }
 
     /**

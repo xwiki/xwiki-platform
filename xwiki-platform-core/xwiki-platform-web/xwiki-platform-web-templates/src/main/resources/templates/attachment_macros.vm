@@ -248,35 +248,60 @@
 
 ## Display a liveData with attachments from the specified document.
 #macro (showAttachmentsLiveData $attachmentsDoc $liveDataId)
-  #set ($liveDataConfig = {
-    'meta': {
-      'propertyDescriptors': [
-        { 'id': 'mimeType', 'displayer': 'html'},
-        { 'id': 'filename', 'displayer': 'html' },
-        { 'id': 'filesize', 'displayer': 'html' },
-        { 'id': 'date', 'filter': 'date'},
-        { 'id': 'author', 'displayer': 'html' },
-        { 'id': 'actions', 'displayer': 'html' }
-      ],
-      'entryDescriptor': {
-        'idProperty': 'id'
+#if ("$!{request.rev}" != '')
+    #set ($liveDataConfig = {
+      'meta': {
+        'propertyDescriptors': [
+          { 'id': 'mimeType', 'displayer': 'html', 'sortable': false, 'filterable': false },
+          { 'id': 'filename', 'displayer': 'html', 'sortable': false, 'filterable': false },
+          { 'id': 'filesize', 'displayer': 'html', 'sortable': false, 'filterable': false },
+          { 'id': 'date', 'filter': 'date', 'sortable': false, 'filterable': false },
+          { 'id': 'author', 'displayer': 'html', 'sortable': false, 'filterable': false }
+        ],
+        'entryDescriptor': {
+          'idProperty': 'id'
+        }
       }
-    }
-  })
-  #set ($sourceParameters = $escapetool.url({
+    })
+    #set ($liveDataProperties = 'mimeType,filename,filesize,date,author')
+#else
+    #set ($liveDataConfig = {
+      'meta': {
+        'propertyDescriptors': [
+          { 'id': 'mimeType', 'displayer': 'html'},
+          { 'id': 'filename', 'displayer': 'html' },
+          { 'id': 'filesize', 'displayer': 'html' },
+          { 'id': 'date', 'filter': 'date'},
+          { 'id': 'author', 'displayer': 'html' },
+          { 'id': 'actions', 'displayer': 'html', 'sortable': false, 'filterable': false }
+        ],
+        'entryDescriptor': {
+          'idProperty': 'id'
+        }
+      }
+    })
+    #set ($liveDataProperties = 'mimeType,filename,filesize,date,author,actions')
+#end
+  #set ($liveDataSourceConfig = {
     'template': 'xpart.vm',
     'translationPrefix': 'core.viewers.attachments.livetable.',
     'className': 'XWiki.AllAttachments',
     "\$doc": "$attachmentsDoc",
     'vm': 'attachmentsjson.vm'
-  }))
+  })
+#if ("$!{request.rev}" != '')
+    #set ($discard = $liveDataSourceConfig.put('rev', $request.rev))
+#end
+#set ($sourceParameters = $escapetool.url($liveDataSourceConfig))
 {{liveData
   id="$liveDataId"
-  properties="mimeType,filename,filesize,date,author,actions"
+  properties="$liveDataProperties"
   source='liveTable'
   sourceParameters="$sourceParameters"
   limit=5
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 
+#if ("$!{request.rev}" == '')
 {{html clean="false"}}#deleteAttachmentModal(){{/html}}
+#end
 #end

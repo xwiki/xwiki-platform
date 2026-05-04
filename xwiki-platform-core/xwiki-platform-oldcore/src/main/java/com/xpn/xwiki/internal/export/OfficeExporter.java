@@ -85,7 +85,7 @@ public class OfficeExporter extends PdfExportImpl
         String inputFileName = "export_input.html";
         String outputFileName = "export_output." + type.getExtension();
 
-        Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
+        Map<String, InputStream> inputStreams = new HashMap<>();
         // We assume that the HTML was generated using the XWiki encoding.
         Charset charset = Charset.forName(context.getWiki().getEncoding());
         inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));

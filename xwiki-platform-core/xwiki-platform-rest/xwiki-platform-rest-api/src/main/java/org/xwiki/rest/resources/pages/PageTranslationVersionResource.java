@@ -35,6 +35,8 @@ import org.xwiki.rest.model.jaxb.Page;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}/history/{version}")
 public interface PageTranslationVersionResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Page getPageTranslationVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

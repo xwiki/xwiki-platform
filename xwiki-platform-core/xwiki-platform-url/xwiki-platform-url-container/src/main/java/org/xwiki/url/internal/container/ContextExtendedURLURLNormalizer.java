@@ -20,6 +20,7 @@
 package org.xwiki.url.internal.container;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -70,7 +71,10 @@ public class ContextExtendedURLURLNormalizer implements URLNormalizer<ExtendedUR
 
         List<String> segments = new ArrayList<>();
         if (StringUtils.isNotEmpty(contextPath)) {
-            segments.add(contextPath);
+            // handle multi-level context paths
+            // otherwise the URL segment delimiter get encoded inside ExtendedURL#encodeSegment(String value)
+            String[] pathSegments = contextPath.split(URL_SEGMENT_DELIMITER);
+            segments.addAll(Arrays.asList(pathSegments));
         }
         segments.addAll(partialURL.getSegments());
 

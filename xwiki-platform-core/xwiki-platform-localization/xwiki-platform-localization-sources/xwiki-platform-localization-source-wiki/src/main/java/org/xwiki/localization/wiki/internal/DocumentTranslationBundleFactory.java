@@ -493,7 +493,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     private ComponentDescriptor<TranslationBundle> createComponentDescriptor(DocumentReference documentReference)
     {
-        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
+        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<>();
 
         descriptor.setImplementation(ComponentDocumentTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);

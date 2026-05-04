@@ -630,7 +630,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
         // Read in the key type and any hidden stuff
         s.defaultReadObject();
 
-        rights = new ArrayList<Object>(Right.size());
+        rights = new ArrayList<>(Right.size());
 
         // Read the keys and values, and put the mappings in the HashMap
         for (int i = 0; i < s.readInt(); i++) {

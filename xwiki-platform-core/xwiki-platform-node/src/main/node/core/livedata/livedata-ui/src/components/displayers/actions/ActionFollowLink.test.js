@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { config, mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
-import _ from "lodash-es";
 import ActionFollowLink from "./ActionFollowLink.vue";
-import sinon from "sinon";
+import { config, mount } from "@vue/test-utils";
+import _ from "lodash-es";
+import { stub } from "sinon";
+import { describe, expect, it } from "vitest";
 
 config.global.mocks = {
-  $t: tKey => tKey,
+  $t: (tKey) => tKey,
 };
 
 function initWrapper() {
@@ -34,7 +34,7 @@ function initWrapper() {
   });
 
   // Mock fetch.
-  global.fetch = sinon.stub(global, "fetch");
+  global.fetch = stub(global, "fetch");
   global.fetch.resolves({
     json: async () => {
       return { icons: [] };
@@ -46,8 +46,7 @@ function initWrapper() {
       displayer: {
         href: "https://link/",
       },
-      closePopover: () => {
-      },
+      closePopover: () => {},
     },
     global: {
       mocks: {
@@ -61,7 +60,9 @@ describe("ActionFollowLink.vue", () => {
   it("Renders and click", async () => {
     const wrapper = initWrapper();
     const actionSpan = wrapper.find("a > span");
-    expect(actionSpan.attributes("title")).toBe("livedata.displayer.actions.followLink");
+    expect(actionSpan.attributes("title")).toBe(
+      "livedata.displayer.actions.followLink",
+    );
     expect(actionSpan.attributes("class")).toBe("livedata-base-action btn");
     expect(wrapper.attributes("href")).toBe("https://link/");
   });

@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -60,7 +61,7 @@ public class XarObjectPropertySerializerManager
             } else {
                 // In previous versions the class type was the full Java class name of the property class
                 // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
-                String simpleType = StringUtils.removeEnd(StringUtils.substringAfterLast(type, "."), "Class");
+                String simpleType = Strings.CS.removeEnd(StringUtils.substringAfterLast(type, "."), "Class");
 
                 if (componentManager.hasComponent(XarObjectPropertySerializer.class, simpleType)) {
                     return getInstance(simpleType, componentManager);

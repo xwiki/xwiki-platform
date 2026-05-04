@@ -135,7 +135,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         String originalWiki = xcontext.getWikiId();
         try {
             if (!local) {
-                Set<String> wikiNames = new HashSet<String>();
+                Set<String> wikiNames = new HashSet<>();
                 // Add the list of all subwikis
                 wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
 

@@ -135,7 +135,7 @@
         'sortable': false,
         'filterable': false
       }))
-    #elseif ($classPropertyType.endsWith('TextArea') || $classPropertyType.endsWith('Email') || $classPropertyType.endsWith('Groups'))
+    #elseif ($classPropertyType.endsWith('TextArea') || $classPropertyType.endsWith('Email') || $classPropertyType.endsWith('Groups') || $classPropertyType == 'String')
       #set ($columnProperties.html = true)
     #end
     #set ($discard = $columnsProperties.put($column, $columnProperties))

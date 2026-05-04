@@ -675,7 +675,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     // visible floating save bar would hide the element.
     public WebElement scrollTo(WebElement element)
     {
-        executeScript("arguments[0].scrollIntoView();", element);
+        executeScript("arguments[0].scrollIntoView({behavior: 'instant'});", element);
         return element;
     }
 

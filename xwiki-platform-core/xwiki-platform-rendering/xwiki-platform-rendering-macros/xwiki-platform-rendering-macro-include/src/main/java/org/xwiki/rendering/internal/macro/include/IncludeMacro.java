@@ -263,7 +263,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     // TODO: Add support for any kind of macro including content linked to a reference
     private boolean isRecursive(MacroMarkerBlock parentMacro, EntityReference completeReference)
     {
-        if (parentMacro.getId().equals("include")) {
+        if ("include".equals(parentMacro.getId())) {
             IncludeMacroParameters macroParameters = getParameters(parentMacro.getParameters());
 
             return completeReference.equals(this.macroEntityReferenceResolver.resolve(macroParameters.getReference(),

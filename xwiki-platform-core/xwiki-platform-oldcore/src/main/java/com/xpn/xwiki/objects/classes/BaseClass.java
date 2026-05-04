@@ -266,7 +266,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> enabledProperties = new ArrayList<PropertyClass>(allProperties.size());
+        List<PropertyClass> enabledProperties = new ArrayList<>(allProperties.size());
 
         for (PropertyClass property : allProperties) {
             if (property != null && !property.isDisabled()) {
@@ -294,7 +294,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledProperties = new ArrayList<PropertyClass>();
+        List<PropertyClass> disabledProperties = new ArrayList<>();
 
         for (PropertyClass property : allProperties) {
             if (property != null && property.isDisabled()) {
@@ -323,7 +323,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
+        List<PropertyClass> disabledObjectProperties = new ArrayList<>(disabledProperties.size());
 
         for (PropertyClass property : disabledProperties) {
             try {
@@ -355,7 +355,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<BaseProperty> deprecatedObjectProperties = new ArrayList<BaseProperty>();
+        List<BaseProperty> deprecatedObjectProperties = new ArrayList<>();
 
         for (BaseProperty property : objectProperties) {
             if (safeget(property.getName()) == null) {
@@ -873,7 +873,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        textAreaClass.setRestricted(restricted);
+        if (textAreaClass.isRestricted() != restricted) {
+            textAreaClass.setRestricted(restricted);
+            result = true;
+        }
 
         return result;
     }
@@ -1270,7 +1273,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
@@ -1448,7 +1451,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 
@@ -1491,7 +1494,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseClass oldClass = (BaseClass) oldObject;
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();

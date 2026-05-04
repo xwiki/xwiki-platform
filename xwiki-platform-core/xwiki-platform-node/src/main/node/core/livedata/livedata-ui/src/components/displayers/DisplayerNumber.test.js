@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,13 +20,13 @@
 
 import DisplayerNumber from "./DisplayerNumber.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 describe("DisplayerNumber.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", () => {
@@ -55,6 +55,6 @@ describe("DisplayerNumber.vue", () => {
 
     const inputElement = wrapper.find("input").element;
     expect(inputElement.value).toBe("42");
-    expect(inputElement).toBe(document.activeElement)
+    expect(inputElement).toBe(document.activeElement);
   });
 });

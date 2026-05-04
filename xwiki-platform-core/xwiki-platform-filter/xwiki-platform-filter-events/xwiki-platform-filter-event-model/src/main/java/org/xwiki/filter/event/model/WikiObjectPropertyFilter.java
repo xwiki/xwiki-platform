@@ -22,6 +22,7 @@ package org.xwiki.filter.event.model;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
+import org.xwiki.stability.Unstable;
 
 /**
  * Object property related events.
@@ -36,6 +37,13 @@ public interface WikiObjectPropertyFilter
      * @since 9.0RC1
      */
     String PARAMETER_TYPE = "type";
+
+    /**
+     * Hold the object property type information, when the class type is not available. The type is given as a String.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    String PARAMETER_OBJECTPROPERTY_TYPE = "objectPropertyType";
 
     /**
      * @param name the name of the property

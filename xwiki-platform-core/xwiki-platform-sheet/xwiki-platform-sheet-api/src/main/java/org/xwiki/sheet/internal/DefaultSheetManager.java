@@ -129,7 +129,7 @@ public class DefaultSheetManager implements SheetManager
         if (sheets.isEmpty()) {
 
             // (3) Look for class sheets.
-            sheets = new ArrayList<DocumentReference>();
+            sheets = new ArrayList<>();
             for (DocumentReference classReference : modelBridge.getXObjectClassReferences(document)) {
                 sheets.addAll(getClassSheets(classReference, action));
             }
@@ -155,7 +155,7 @@ public class DefaultSheetManager implements SheetManager
             logger.warn("Failed to get class sheets for [{}]. Reason: [{}]", classStringReference, e.getMessage());
             return Collections.emptyList();
         }
-        List<DocumentReference> sheetReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> sheetReferences = new ArrayList<>();
         for (DocumentReference sheetReference : classSheetBinder.getSheets(classDocument)) {
             if (matchSheet(sheetReference, action)) {
                 sheetReferences.add(sheetReference);
@@ -172,7 +172,7 @@ public class DefaultSheetManager implements SheetManager
      */
     private List<DocumentReference> getDocumentSheets(DocumentModelBridge document, String action)
     {
-        List<DocumentReference> sheets = new ArrayList<DocumentReference>();
+        List<DocumentReference> sheets = new ArrayList<>();
         for (DocumentReference sheetReference : documentSheetBinder.getSheets(document)) {
             if (matchSheet(sheetReference, action)) {
                 sheets.add(sheetReference);

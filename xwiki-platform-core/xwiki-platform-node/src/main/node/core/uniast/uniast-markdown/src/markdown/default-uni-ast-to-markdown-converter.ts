@@ -124,15 +124,20 @@ export class DefaultUniAstToMarkdownConverter
     }
 
     const contents: string[] = [];
-    for (const item of listItem.content) {
-      const md = await this.blockToMarkdown(item);
-      const lines = md.split("\n");
+
+    for (let i = 0; i < listItem.content.length; i++) {
+      const md = await this.blockToMarkdown(listItem.content[i]);
+
       contents.push(
-        lines
-          .map((line, i) => (i > 0 ? " ".repeat(prefix.length) : "") + line)
-          .join("\n"),
+        ...md.split("\n").map(
+          (line, j) =>
+            // Don't indent the very first line, but indent every following one
+            // If the list item contains multiple blocks, these will use the same indentation
+            (i > 0 || j > 0 ? " ".repeat(prefix.length) : "") + line,
+        ),
       );
     }
+
     return `${prefix}${contents.join("\n")}`;
   }
 

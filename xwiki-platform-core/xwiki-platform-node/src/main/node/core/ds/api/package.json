@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-dsapi",
-  "version": "18.2.0-SNAPSHOT",
+  "version": "18.4.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -15,11 +15,17 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.umd.js"
+      }
     }
   },
-  "main": "./src/index.ts",
+  "main": "./dist/index.es.js",
   "files": [
     "dist",
     "src",
@@ -47,28 +53,14 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "happy-dom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
     "vue": "catalog:"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/index.es.js"
-        },
-        "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.umd.js"
-        }
-      }
-    },
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts"
   }
 }

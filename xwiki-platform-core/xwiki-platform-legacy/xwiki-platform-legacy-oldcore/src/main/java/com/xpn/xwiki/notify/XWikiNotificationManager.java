@@ -34,10 +34,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Deprecated
 public class XWikiNotificationManager
 {
-    private Vector<XWikiNotificationRule> generalrules = new Vector<XWikiNotificationRule>();
+    private Vector<XWikiNotificationRule> generalrules = new Vector<>();
 
-    private Map<String, Vector<XWikiNotificationRule>> namedrules =
-        new HashMap<String, Vector<XWikiNotificationRule>>();
+    private Map<String, Vector<XWikiNotificationRule>> namedrules = new HashMap<>();
 
     public XWikiNotificationManager()
     {
@@ -83,7 +82,7 @@ public class XWikiNotificationManager
         synchronized (namedrules) {
             Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
             if (vnamedrules == null) {
-                vnamedrules = new Vector<XWikiNotificationRule>();
+                vnamedrules = new Vector<>();
                 namedrules.put(name, vnamedrules);
             }
             vnamedrules.add(rule);

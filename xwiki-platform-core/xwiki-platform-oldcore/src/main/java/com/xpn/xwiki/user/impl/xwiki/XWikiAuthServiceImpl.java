@@ -90,7 +90,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Each wiki has its own authenticator.
      */
-    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<String, XWikiAuthenticator>();
+    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<>();
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {

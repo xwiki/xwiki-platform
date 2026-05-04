@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
 
@@ -78,23 +80,17 @@ public class Property extends Element
     }
 
     /**
+     * Returns the {@link BaseProperty#getObfuscatedValue()} or {@link BaseProperty#getValue()} if the user has
+     * programming rights.
      * @return the actual value of the property, as a String, Number or List.
      */
     public java.lang.Object getValue()
     {
-        BaseProperty baseProperty = getBaseProperty();
-
-        com.xpn.xwiki.objects.classes.PropertyClass propertyClass = baseProperty.getPropertyClass(getXWikiContext());
-
-        // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
-        // API level, so that java code using core classes will still have access, regardless or rights.
-        if (propertyClass != null && "Password".equals(propertyClass.getClassType())) {
-            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-                return null;
-            }
+        if (getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+            return getProperty().getValue();
+        } else {
+            return getBaseProperty().getObfuscatedValue();
         }
-
-        return getBaseProperty().getValue();
     }
 
     /**
@@ -102,6 +98,7 @@ public class Property extends Element
      * @return {@code false} if the property is never sensitive, {@code true} otherwise.
      * @since 18.0.0RC1
      */
+    @Unstable
     public boolean isSensitive()
     {
         return getBaseProperty().isSensitive(getXWikiContext());

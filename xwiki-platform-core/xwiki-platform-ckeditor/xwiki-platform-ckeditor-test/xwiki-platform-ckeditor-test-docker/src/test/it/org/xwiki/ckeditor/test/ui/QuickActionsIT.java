@@ -29,14 +29,13 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -75,12 +74,12 @@ class QuickActionsIT extends AbstractCKEditorIT
     private WYSIWYGEditPage editPage;
 
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void beforeAll(TestUtils setup) throws Exception
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
 
         // The mentions quick action is implemented with a global JSX provided by the mentions macro page, which has to
         // be saved with programming rights, otherwise the global JSX is not registered. Programming rights are
@@ -498,7 +497,7 @@ class QuickActionsIT extends AbstractCKEditorIT
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{code language=\"none\"}}{{/code}}");
+        assertSourceEquals("{{code}}{{/code}}");
     }
 
     @Test

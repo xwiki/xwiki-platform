@@ -88,6 +88,11 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     private Set<String> excludedPropertyTypes;
 
     /**
+     * @see #isSensitiveFieldsExcluded()
+     */
+    private boolean sensitiveFieldsExcluded;
+
+    /**
      * @return Indicates if events should be generated for history
      */
     @PropertyName("With revisions")
@@ -304,5 +309,28 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setExcludedPropertyTypes(Set<String> excludedPropertyTypes)
     {
         this.excludedPropertyTypes = excludedPropertyTypes;
+    }
+
+    /**
+     * @return {@code true} if sensitive properties of an object shouldn't generate events.
+     * @since 18.2.0RC1
+     */
+    @PropertyName("Sensitive fields excluded")
+    @PropertyDescription("Any property which is flagged as sensitive will be excluded when generating the events for "
+        + "objects.")
+    @Unstable
+    public boolean isSensitiveFieldsExcluded()
+    {
+        return sensitiveFieldsExcluded;
+    }
+
+    /**
+     * @param sensitiveFieldsExcluded {@code true} if sensitive properties of an object shouldn't generate events.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public void setSensitiveFieldsExcluded(boolean sensitiveFieldsExcluded)
+    {
+        this.sensitiveFieldsExcluded = sensitiveFieldsExcluded;
     }
 }

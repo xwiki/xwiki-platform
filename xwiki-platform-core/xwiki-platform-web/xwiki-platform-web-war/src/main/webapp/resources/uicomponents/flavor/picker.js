@@ -32,8 +32,8 @@ require(['jquery'], function($) {
   }
 
   var updatePicker = function () {
-    updateFlavors();
     updateProgress();
+    updateFlavors();
   }
 
   var updateProgress = function () {
@@ -256,6 +256,6 @@ require(['jquery'], function($) {
   }
 
   $(init);
-
+  $(document).on('xwiki:dom:updated', init);
 });
 

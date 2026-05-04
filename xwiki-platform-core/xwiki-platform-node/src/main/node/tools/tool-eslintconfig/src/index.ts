@@ -59,6 +59,12 @@ const eslintConfig: Config[] = defineConfig([
   },
   // eslint-disable-next-line import/no-named-as-default-member
   tseslint.configs.recommended,
+  {
+    rules: {
+      // This rule is safe to disable since TypeScript is checking it already.
+      "no-undef": "off",
+    },
+  },
   pluginVue.configs["flat/essential"],
   {
     files: ["**/*.vue"],

@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * Validate {@link ScriptQuery}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest

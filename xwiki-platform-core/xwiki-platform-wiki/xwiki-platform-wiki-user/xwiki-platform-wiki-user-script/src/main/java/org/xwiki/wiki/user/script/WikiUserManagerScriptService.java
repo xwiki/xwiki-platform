@@ -383,7 +383,7 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     private Collection<MemberCandidacy> filterAuthorizedCandidacies(Collection<MemberCandidacy> candidacies)
     {
-        Collection<MemberCandidacy> authorizedCandidacies = new ArrayList<MemberCandidacy>();
+        Collection<MemberCandidacy> authorizedCandidacies = new ArrayList<>();
 
         for (MemberCandidacy candidacy : candidacies) {
             if (canSeeCandidacy(candidacy)) {

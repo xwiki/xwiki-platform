@@ -370,7 +370,7 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilContentEditable()
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
-            () -> getRootEditableElement(false).getDomAttribute("contenteditable").equals("true")));
+            () -> "true".equals(getRootEditableElement(false).getDomAttribute("contenteditable"))));
         this.cachedRefreshCounter = getRefreshCounter();
     }
 

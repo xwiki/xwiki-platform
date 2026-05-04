@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -26,8 +26,8 @@ import { nextTick } from "vue";
 /**
  * Vue Component initializer for LiveDataAdvancedPanelProperties component.
  *
- * @param provide (optional) an object that is merged on top of the default provide parameter.
- * @returns {*} a wrapper for the LiveDataAdvancedPanelProperties component
+ * @param provide - (optional) an object that is merged on top of the default provide parameter.
+ * @returns a wrapper for the LiveDataAdvancedPanelProperties component
  */
 function initWrapper({ provide } = {}) {
   global.XWiki = { contextPath: "http://localhost/" };
@@ -44,28 +44,31 @@ function initWrapper({ provide } = {}) {
 
     global: {
       // renderStubDefaultSlot: true,
-      provide: _.merge({
-        logic: {
-          openedPanels: ["propertiesPanel"],
-          uniqueArrayHas(uniqueArray, item) {
-            return uniqueArray.includes(item);
-          },
-          data: {
-            query: {
-              properties: ["id"],
+      provide: _.merge(
+        {
+          logic: {
+            openedPanels: ["propertiesPanel"],
+            uniqueArrayHas(uniqueArray, item) {
+              return uniqueArray.includes(item);
+            },
+            data: {
+              query: {
+                properties: ["id"],
+              },
+            },
+            isPropertyVisible() {
+              return propertyIsVisible;
+            },
+            setPropertyVisible(propertyId, visible) {
+              propertyIsVisible = visible;
+            },
+            getPropertyDescriptors() {
+              return [{ id: "id", name: "Property Name" }];
             },
           },
-          isPropertyVisible() {
-            return propertyIsVisible;
-          },
-          setPropertyVisible(propertyId, visible) {
-            propertyIsVisible = visible;
-          },
-          getPropertyDescriptors() {
-            return [{ id: "id", name: "Property Name" }];
-          },
         },
-      }, provide),
+        provide,
+      ),
       stubs: {
         XWikiIcon: {
           name: "XWikiIcon",
@@ -75,6 +78,15 @@ function initWrapper({ provide } = {}) {
           template: "<i>{{ iconDescriptor.name }}</i>",
         },
       },
+      mocks: {
+        $t: (key) => {
+          const map = {
+            "livedata.panel.heading.actions.collapse.hint": "Collapse",
+            "livedata.panel.heading.actions.close.hint": "Close",
+          };
+          return map[key] || "unexpected key";
+        },
+      },
     },
   });
 }
@@ -82,12 +94,16 @@ function initWrapper({ provide } = {}) {
 describe("LivedataAdvancedPanelProperties.vue", () => {
   it("Displays the title and the icon", async () => {
     const wrapper = initWrapper();
-    expect(wrapper.find(".panel-heading .title").text()).toBe("list-bullets Properties");
+    expect(wrapper.find(".panel-heading .title").text()).toBe(
+      "list-bullets Properties",
+    );
   });
 
   it("Displays the properties", async () => {
     const wrapper = initWrapper();
-    expect(wrapper.find(".property .property-name").text()).toBe("Property Name");
+    expect(wrapper.find(".property .property-name").text()).toBe(
+      "Property Name",
+    );
   });
 
   it("Toggles the visibility on click", async () => {

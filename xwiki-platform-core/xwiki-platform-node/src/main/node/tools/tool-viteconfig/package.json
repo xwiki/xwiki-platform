@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-tool-viteconfig",
-  "version": "18.2.0-SNAPSHOT",
+  "version": "18.4.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -25,10 +25,12 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
+    "@jridgewell/remapping": "catalog:",
     "vite": "catalog:"
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "eslint": "catalog:"
   }
 }

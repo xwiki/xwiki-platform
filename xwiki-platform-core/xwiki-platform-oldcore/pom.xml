@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -36,7 +36,6 @@
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -804,26 +803,14 @@
                 **/objects/classes/LevelsClass.java,
                 **/objects/classes/ListClass.java,
                 **/objects/classes/ListItem.java,
-                **/objects/classes/NumberClass.java,
-                **/objects/classes/PasswordClass.java,
-                **/objects/classes/PropertyClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,
-                **/objects/classes/TextAreaClass.java,
-                **/objects/DBStringListProperty.java,
-                **/objects/DoubleProperty.java,
                 **/objects/ElementComparator.java,
                 **/objects/ElementInterface.java,
-                **/objects/FloatProperty.java,
-                **/objects/IntegerProperty.java,
-                **/objects/LargeStringProperty.java,
                 **/objects/ListProperty.java,
-                **/objects/LongProperty.java,
                 **/objects/NumberProperty.java,
-                **/objects/ObjectDiff.java,
                 **/objects/ObjectInterface.java,
                 **/objects/PropertyInterface.java,
-                **/objects/StringListProperty.java,
                 **/pdf/impl/PdfExportImpl.java,
                 **/pdf/impl/PdfURLFactory.java,
                 **/plugin/packaging/DocumentFilter.java,

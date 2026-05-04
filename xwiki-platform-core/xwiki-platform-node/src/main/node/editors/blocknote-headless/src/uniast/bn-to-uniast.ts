@@ -237,11 +237,9 @@ export class BlockNoteToUniAstConverter {
         };
 
       case "quote":
-        dontExpectChildren();
-
         return {
           type: "quote",
-          content: [
+          content: provideTypeInference<Block[]>([
             {
               type: "paragraph",
               content: block.content.map((item) =>
@@ -249,7 +247,7 @@ export class BlockNoteToUniAstConverter {
               ),
               styles: {},
             },
-          ],
+          ]).concat(this.convertBlocks(block.children)),
           styles: this.convertBlockStyles(block.props),
         };
 
@@ -287,9 +285,7 @@ export class BlockNoteToUniAstConverter {
       }
 
       case "divider":
-        // TODO: support dividers
-        // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-756
-        throw new Error("TODO: add support for BlockNote dividers to UniAst");
+        return { type: "break" };
 
       default:
         assertUnreachable(block);

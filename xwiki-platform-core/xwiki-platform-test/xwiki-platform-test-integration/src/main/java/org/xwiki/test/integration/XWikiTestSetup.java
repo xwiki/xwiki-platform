@@ -51,7 +51,7 @@ import junit.framework.Test;
 @Deprecated
 public class XWikiTestSetup extends TestSetup
 {
-    private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
+    private List<XWikiExecutor> executors = new ArrayList<>();
 
     public XWikiTestSetup(Test test) throws Exception
     {

@@ -38,6 +38,8 @@ import org.xwiki.rest.model.jaxb.Attachment;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/metadata")
 public interface AttachmentMetadataResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET
     Attachment getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") @Encoded String spaceName,
         @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName,

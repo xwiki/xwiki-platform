@@ -149,7 +149,7 @@ public class TempResourceAction extends XWikiAction
         Matcher matcher = URI_PATTERN.matcher(uri);
         File result = null;
         if (matcher.find()) {
-            List<String> pathSegments = new ArrayList<String>();
+            List<String> pathSegments = new ArrayList<>();
             // Add all the path segments.
             pathSegments.add("temp");
             // temp/module

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Rights
+#########################
+
+## Make sure Tomcat is able to write in the data folder
+if [ ! 'tomcat' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R tomcat:tomcat /var/lib/xwiki/data
+fi
+
+#########################
+# Restart Tomcat
+#########################
+
+# Need to reload systemd for the injected tomcat service configuration to be taken into account
+systemctl daemon-reload

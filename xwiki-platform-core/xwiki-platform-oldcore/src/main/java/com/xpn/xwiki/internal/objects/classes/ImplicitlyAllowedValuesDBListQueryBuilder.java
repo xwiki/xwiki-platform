@@ -293,6 +293,6 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
     private String getTemplateName(String className)
     {
-        return StringUtils.removeEnd(className, "Class") + "Template";
+        return Strings.CS.removeEnd(className, "Class") + "Template";
     }
 }

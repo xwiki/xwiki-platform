@@ -41,7 +41,7 @@
             </div>
           </li>`,
         feed: function (opts, callback) {
-          require(['xwiki-iconService'], function (iconService) {
+          require(['xwiki-wysiwyg-icon-service'], function (iconService) {
             iconService.getIconThemes().then(function (iconThemes) {
               // Retreive the list of available icons from the current icon theme that match the query.
               iconService.getIcons(iconThemes.currentIconTheme, opts.query).then(function (icons) {

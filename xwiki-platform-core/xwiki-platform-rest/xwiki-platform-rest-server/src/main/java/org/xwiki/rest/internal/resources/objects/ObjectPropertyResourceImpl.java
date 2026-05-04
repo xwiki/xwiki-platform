@@ -96,6 +96,8 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
     }
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response updateObjectProperty(String wikiName, String spaceName, String pageName, String className,
         Integer objectNumber, String propertyName, Boolean minorRevision, Property property) throws XWikiRestException
     {

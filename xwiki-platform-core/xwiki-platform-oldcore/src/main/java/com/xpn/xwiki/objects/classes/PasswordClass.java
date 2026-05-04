@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,33 +39,51 @@ import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+/**
+ * Define a property field to hold a password.
+ *
+ * @version $Id$
+ */
 public class PasswordClass extends StringClass
 {
-    private static final long serialVersionUID = 1L;
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Password";
 
-    private static final String XCLASSNAME = "password";
-
-    protected static Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
 
     protected static final String DEFAULT_STORAGE = PasswordMetaClass.HASH;
 
     protected static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
 
-    protected static final String DEFAULT_CRYPT_ALGORITHM = "AES";
-
     protected static final String HASH_IDENTIFIER = "hash";
-
-    protected static final String CRYPT_IDENTIFIER = "crypt";
 
     protected static final String SEPARATOR = ":";
 
     protected static final String FORM_PASSWORD_PLACEHODLER = "********";
 
+    private static final long serialVersionUID = 1L;
+
+    // "password" is used for both the field type and the xclass name:
+    // we use a single constant to comply with checkstyle here.
+    private static final String PASSWORD_FIELD_TYPE = "password";
+    private static final String XCLASSNAME = PASSWORD_FIELD_TYPE;
+
+    /**
+     * Default constructor with a metaclass.
+     * @param wclass the metaclass value.
+     */
     public PasswordClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Password", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
+    /**
+     * Empty constructor with a null metaclass.
+     */
     public PasswordClass()
     {
         this(null);
@@ -73,12 +92,11 @@ public class PasswordClass extends StringClass
     @Override
     public BaseProperty fromString(String value) throws XWikiException
     {
-        if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
+        if (FORM_PASSWORD_PLACEHODLER.equals(value)) {
             return null;
         }
         BaseProperty property = newProperty();
-        if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)
-            || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
+        if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             property.setValue(value);
         } else {
             property.setValue(getProcessedPassword(value));
@@ -94,7 +112,8 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         ElementInterface prop = object.safeget(name);
         if (prop != null) {
@@ -103,7 +122,8 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
@@ -114,7 +134,7 @@ public class PasswordClass extends StringClass
             input.setValue(FORM_PASSWORD_PLACEHODLER);
         }
 
-        input.setType("password");
+        input.setType(PASSWORD_FIELD_TYPE);
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
@@ -132,7 +152,7 @@ public class PasswordClass extends StringClass
             Object value = st.getValue();
             if (value != null) {
                 String type = value.toString().trim();
-                if (!type.equals("")) {
+                if (!type.isEmpty()) {
                     return type;
                 }
             }
@@ -155,22 +175,10 @@ public class PasswordClass extends StringClass
     public String getHashAlgorithm()
     {
         BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
-        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().equals("")) {
+        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().isEmpty()) {
             return alg.getValue().toString();
         }
         return DEFAULT_HASH_ALGORITHM;
-    }
-
-    /**
-     * @return The encryption algorithm configured for this XProperty.
-     */
-    public String getCryptAlgorithm()
-    {
-        BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
-        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().equals("")) {
-            return alg.getValue().toString();
-        }
-        return DEFAULT_CRYPT_ALGORITHM;
     }
 
     /**
@@ -219,41 +227,31 @@ public class PasswordClass extends StringClass
             if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
                 result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
                         getSaltFromPassword(storedPassword));
-            } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
-                result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
             }
         }
         return result;
     }
 
+    /**
+     * Process the given password to hash or encrypt it depending on the storage type and the defined algorithm.
+     * @param password the password to be hashed or encrypted.
+     * @return a hashed or encrypted password
+     */
     public String getProcessedPassword(String password)
     {
         String storageType = getStorageType();
         String result = password;
-        if (storageType.equals(PasswordMetaClass.HASH)) {
+        if (PasswordMetaClass.HASH.equals(storageType)) {
             result = getPasswordHash(result);
-        } else if (storageType.equals(PasswordMetaClass.ENCRYPTED)) {
-            result = getPasswordCrypt(result);
         }
         return result;
     }
 
-    public String getPasswordCrypt(String password)
-    {
-        return getPasswordCrypt(password, getCryptAlgorithm());
-    }
-
-    public String getPasswordCrypt(String password, String algorithmName)
-    {
-        // TODO Write me!
-        return password;
-    }
-
     /**
      * @param password the password to hash.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>} is
-     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
-     *         salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>}
+     * is the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
+     * salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
      */
     public String getPasswordHash(String password)
     {
@@ -263,9 +261,9 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a random
-     *         64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
-     *         hashing algorithm.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a
+     * random 64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
+     * hashing algorithm.
      */
     public String getPasswordHash(String password, String algorithmName)
     {
@@ -275,14 +273,15 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @param salt the string to pad the password with before hashing. If {@code null}, a random 64 character salt will
-     *            be used. To disable salting, use an empty ({@code ""}) salt string.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>} is
-     *         the salted hash of the given password, using the given hashing algorithm.
+     * @param providedSalt the string to pad the password with before hashing. If {@code null}, a random 64 character
+     * salt will be used. To disable salting, use an empty ({@code ""}) salt string.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>}
+     * is the salted hash of the given password, using the given hashing algorithm.
      * @since 6.3M2
      */
-    public String getPasswordHash(String password, String algorithmName, String salt)
+    public String getPasswordHash(String password, String algorithmName, String providedSalt)
     {
+        String salt = providedSalt;
         // If no salt given, let's generate one.
         if (salt == null) {
             salt = randomSalt();
@@ -305,7 +304,7 @@ public class PasswordClass extends StringClass
             sb.append(algorithmName);
             sb.append(SEPARATOR);
             // Backward compatibility concern : let's keep unsalted password the way they are.
-            if (!salt.equals("")) {
+            if (!salt.isEmpty()) {
                 sb.append(salt);
                 sb.append(SEPARATOR);
             }
@@ -328,11 +327,14 @@ public class PasswordClass extends StringClass
         return password;
     }
 
+    /**
+     * @return a random salt built using {@link SecureRandom}.
+     */
     public static String randomSalt()
     {
         StringBuilder salt = new StringBuilder();
         SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[32];
+        byte[] bytes = new byte[32];
         random.nextBytes(bytes);
         for (byte temp : bytes) {
             String s = Integer.toHexString(Byte.valueOf(temp));
@@ -361,5 +363,11 @@ public class PasswordClass extends StringClass
     public boolean isSensitive(XWikiContext context)
     {
         return true;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

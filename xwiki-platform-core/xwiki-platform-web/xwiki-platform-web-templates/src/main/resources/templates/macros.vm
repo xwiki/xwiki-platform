@@ -1734,9 +1734,6 @@ $Msz MB##
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapedTitle"/>
   #elseif ($filterType == 'suggest' && $xproperty)
-    #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
-      {'type': 'text/css', 'rel': 'stylesheet'}))
-    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
     #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
@@ -2620,9 +2617,6 @@ $string##
  * Pulls all the JavaScript and CSS resources needed by pickers.
  *#
 #macro (picker_import)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-    {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
 #end
 
 #**
@@ -2943,9 +2937,6 @@ Recursive title display detected!##
  * @param $parameters the parameters (most of them are treated as HTML attributes)
  *#
 #macro (suggestInput $parameters $optionsDisplayerMacroName)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-    {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
   #set ($discard = $parameters.put('size', 1))
   #set ($attributes = [])
   ## Note: Remove placeholder since it's not valid to have it on an HTML SELECT element.
@@ -3039,6 +3030,9 @@ Recursive title display detected!##
     #set ($discard = $parameters.putIfAbsent('title',
       $services.localization.render('core.widgets.suggest.classPicker.single.title')))
   #end
+  #set ($discard = $parameters.putIfAbsent('data-xwiki-selectize', {}))
+  ## Display all the available classes when opening the dropdown.
+  #set ($discard = $parameters.get('data-xwiki-selectize').putIfAbsent('maxOptions', $NULL))
   #suggestInput($parameters 'classPicker_displayOptions')
 #end
 

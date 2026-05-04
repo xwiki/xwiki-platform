@@ -120,7 +120,7 @@ public class LegacyEventLoader
      */
     private List<Event> convertActivitiesToEvents(List<LegacyEvent> events)
     {
-        List<Event> result = new ArrayList<Event>(events.size());
+        List<Event> result = new ArrayList<>(events.size());
         for (LegacyEvent e : events) {
             result.add(eventConverter.convertLegacyActivityToEvent(e));
         }

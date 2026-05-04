@@ -19,13 +19,13 @@
  */
 package org.xwiki.ckeditor.test.po;
 
-import java.util.NoSuchElementException;
-import java.util.Objects;
-
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.xpath;
 
 /**
  * Page object for the CKEditor link dialog used to insert or edit links.
@@ -36,93 +36,67 @@ import static org.openqa.selenium.By.cssSelector;
  */
 public class LinkDialog extends CKEditorDialog
 {
-    private static final By DROPDOWN_ITEM_SELECTOR = cssSelector(".dropdown-menu .dropdown-item");
-
     /**
-     * Set the given value on the resource value search field.
+     * Set the given value on the resource search field.
      *
      * @param value the value to use to search for a resource (i.e., page or attachment)
      * @return the current page object
      */
-    public LinkDialog setResourceValue(String value)
+    public LinkDialog setResourceReference(String value)
     {
-        return setResourceValue(value, true);
-    }
-
-    /**
-     * Set the given value on the resource value search field.
-     *
-     * @param value the value to use to search for a resource (i.e., page or attachment)
-     * @param wait when {@code true}, wait for the dropdown to be shown before continuing
-     * @return the current page object
-     */
-    public LinkDialog setResourceValue(String value, boolean wait)
-    {
-        WebElement resourcePicker = getResourcePicker();
-        WebElement element = resourcePicker.findElement(cssSelector(" input.resourceReference"));
-        element.clear();
-        element.sendKeys(value);
-        if (wait) {
-            getDriver().waitUntilElementsAreVisible(resourcePicker, new By[] {DROPDOWN_ITEM_SELECTOR}, true);
+        WebElement resourceReferenceInput = getResourceReferenceInput();
+        if (SuggestInputElement.isAvailable(getDriver(), resourceReferenceInput)) {
+            new SuggestInputElement(resourceReferenceInput).clear().sendKeys(value).waitForSuggestions();
+        } else {
+            resourceReferenceInput.clear();
+            resourceReferenceInput.sendKeys(value);
         }
         return this;
     }
 
     /**
-     * @return the resource type currently selected in the resource picker (e.g., {@code "doc"})
+     * @return the text input that holds the resource reference
      */
-    public String getSelectedResourceType()
+    private WebElement getResourceReferenceInput()
     {
-        return getResourceDisplay().getDomAttribute("data-resourcetype");
+        WebElement resourcePicker = getResourcePicker();
+        return resourcePicker.findElement(cssSelector("input.resourceReference"));
     }
 
     /**
-     * @return the resource reference currently selected in the resource picker (e.g., {@code "Sandbox.WebHome"})
+     * @return the suggest input element to use to search for and select resources
+     * @since 18.2.0RC1
      */
-    public String getSelectedResourceReference()
+    public SuggestInputElement getResourceSuggestInput()
     {
-        return getResourceDisplay().getDomAttribute("data-resourcereference");
-    }
-
-    private WebElement getResourceDisplay()
-    {
-        return getResourcePicker().findElement(cssSelector(".resourceDisplay"));
+        return new SuggestInputElement(getResourceReferenceInput());
     }
 
     /**
-     * Click on one of the choices proposed in the dropdown after using {@link #setResourceValue(String)}, based on its
-     * hint and label.
-     *
-     * @param hint the hint of the resource (e.g, {@code "ParentSpace / ChildSpace"} for a page)
-     * @param label the label of the resource (e.g., {@code "PageName"} for a page, or the attachment name for an
-     *            attachment)
-     * @return the current page object
-     * @throws NoSuchElementException in case of issue when looking for the item by its hint and label
+     * @return the resource currently selected in the resource picker, e.g.: {@code "doc:Space.Page"} or
+     *         {@code "attach:Space.Page@image.png}
+     * @since 18.2.0RC1
      */
-    public LinkDialog selectPageItem(String hint, String label)
+    public String getSelectedResource()
     {
-        getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
-            .filter(element -> Objects.equals(element.findElement(cssSelector(".resource-hint")).getText(), hint)
-                && Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), label))
-            .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s / %s not found", hint, label)))
-            .click();
-        return this;
+        return getResourcePickerInput().getDomAttribute(ATTRIBUTE_VALUE);
+    }
+
+    private WebElement getResourcePickerInput()
+    {
+        return getResourcePicker().findElement(xpath("preceding-sibling::input"));
     }
 
     public LinkDialog createLinkOfNewPage(boolean exactReference)
     {
-        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create new page...";
-        getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
-            .filter(element ->
-                Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), resourceLabelName))
-            .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s not found", resourceLabelName)))
-            .click();
+        String label = (exactReference) ? "Create with exact reference..." : "Create new page...";
+        getResourceSuggestInput().selectByVisibleText(label);
         return this;
     }
 
-    public LinkPickerModal openDocumentPicker()
+    public LinkPickerModal openLinkPickerModal()
     {
-        getContainer().findElement(By.cssSelector("button.resourceType")).click();
+        getResourcePicker().findElement(By.cssSelector("button.resourceType")).click();
         return new LinkPickerModal(By.cssSelector(".entity-resource-picker-modal.modal"));
     }
 
@@ -145,5 +119,21 @@ public class LinkDialog extends CKEditorDialog
     private WebElement getResourcePicker()
     {
         return getContainer().findElement(cssSelector(".resourcePicker"));
+    }
+
+    @Override
+    public void submit()
+    {
+        //maybeBlurSuggestInput();
+
+        super.submit();
+    }
+
+    private void maybeBlurSuggestInput()
+    {
+        WebElement resourceReferenceInput = getResourceReferenceInput();
+        if (SuggestInputElement.isAvailable(getDriver(), resourceReferenceInput)) {
+            new SuggestInputElement(resourceReferenceInput).sendKeys(Keys.TAB);
+        }
     }
 }

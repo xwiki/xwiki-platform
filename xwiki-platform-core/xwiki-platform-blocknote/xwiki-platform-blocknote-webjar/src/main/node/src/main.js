@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Factory } from "./services/Factory";
+import { container } from "./services/container";
 import "./services/inplace";
 
 const factory = new Factory();
 
-// eslint-disable-next-line no-undef
 define("xwiki-blocknote", [], () => factory);
 
 function init(event, data) {
@@ -34,8 +34,10 @@ function init(event, data) {
     .forEach((host) => factory.create(host));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-require(["jquery", "xwiki-events-bridge"], ($) => {
+requirejs(["jquery", "xwiki-meta", "xwiki-events-bridge"], ($, xwikiMeta) => {
+  // Expose the xwiki-meta RequireJS module as a component.
+  container.bind("XWikiMeta").toConstantValue(xwikiMeta);
+
   $(document).on(
     "xwiki:actions:beforePreview xwiki:actions:beforeSave",
     // eslint-disable-next-line max-statements

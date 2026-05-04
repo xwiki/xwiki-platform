@@ -71,7 +71,7 @@ class ConfigurationResolverTestDataProvider
         StringBuilder input = new StringBuilder();
         while (linesIterator.hasNext()) {
             String line = linesIterator.next();
-            if (!line.equals("---")) {
+            if (!"---".equals(line)) {
                 input.append(line.trim());
             } else {
                 break;

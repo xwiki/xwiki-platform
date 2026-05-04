@@ -65,7 +65,7 @@ public class PropUpdateAction extends XWikiAction
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames
-        Map<String, String> fieldsToRename = new HashMap<String, String>();
+        Map<String, String> fieldsToRename = new HashMap<>();
 
         for (PropertyClass originalProperty : (Collection<PropertyClass>) bclass.getFieldList()) {
             PropertyClass newProperty = originalProperty.clone();

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -25,11 +25,10 @@ import { describe, expect, it } from "vitest";
 /**
  * Vue Component initializer for LiveDataAdvancedPanelFilter component.
  *
- * @param provide (optional) an object that is merged on top of the default provide parameter.
- * @returns {*} a wrapper for the LiveDataAdvancedPanelFilter component
+ * @param provide - (optional) an object that is merged on top of the default provide parameter.
+ * @returns a wrapper for the LiveDataAdvancedPanelFilter component
  */
 function initWrapper({ provide } = {}) {
-
   return mount(LivedataAdvancedPanelFilter, {
     props: {
       panel: {
@@ -40,25 +39,28 @@ function initWrapper({ provide } = {}) {
       },
     },
     global: {
-      provide: _.merge({
-        logic: {
-          openedPanels: ["filterPanel"],
-          uniqueArrayHas(uniqueArray, item) {
-            return uniqueArray.includes(item);
-          },
-          getUnfilteredProperties() {
-            return [];
-          },
-          getFilterableProperties() {
-            return ["id"];
-          },
-          data: {
-            query: {
-              filters: [],
+      provide: _.merge(
+        {
+          logic: {
+            openedPanels: ["filterPanel"],
+            uniqueArrayHas(uniqueArray, item) {
+              return uniqueArray.includes(item);
+            },
+            getUnfilteredProperties() {
+              return [];
+            },
+            getFilterableProperties() {
+              return ["id"];
+            },
+            data: {
+              query: {
+                filters: [],
+              },
             },
           },
         },
-      }, provide),
+        provide,
+      ),
       stubs: {
         XWikiIcon: {
           props: {
@@ -66,7 +68,8 @@ function initWrapper({ provide } = {}) {
           },
           template: "<i>{{ iconDescriptor.name }}</i>",
         },
-      }, mocks: {
+      },
+      mocks: {
         $t: (key) => key,
       },
     },
@@ -81,8 +84,12 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
 
   it("Displays no message when filterable properties exist", async () => {
     const wrapper = initWrapper();
-    expect(wrapper.find(".text-muted").text()).toBe("livedata.panel.filter.noneFilterable");
-    expect(wrapper.find(".text-muted").attributes("style")).toBe("display: none;");
+    expect(wrapper.find(".text-muted").text()).toBe(
+      "livedata.panel.filter.noneFilterable",
+    );
+    expect(wrapper.find(".text-muted").attributes("style")).toBe(
+      "display: none;",
+    );
   });
 
   it("Displays a message when no filterable properties exist", async () => {

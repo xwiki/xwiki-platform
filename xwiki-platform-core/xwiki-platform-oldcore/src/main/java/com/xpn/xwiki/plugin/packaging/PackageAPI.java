@@ -178,7 +178,7 @@ public class PackageAPI extends Api
     public List<DocumentInfoAPI> getFiles()
     {
         List<DocumentInfo> files = this.pack.getFiles();
-        ArrayList<DocumentInfoAPI> apiFiles = new ArrayList<DocumentInfoAPI>(files.size());
+        ArrayList<DocumentInfoAPI> apiFiles = new ArrayList<>(files.size());
 
         for (DocumentInfo docInfo : files) {
             apiFiles.add(new DocumentInfoAPI(docInfo, getXWikiContext()));

@@ -108,7 +108,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private static final List<Right> UNMODIFIABLE_VALUES = Collections.unmodifiableList(VALUES);
 
     /** List of all rights, as strings. */
-    private static final List<String> ALL_RIGHTS = new LinkedList<String>();
+    private static final List<String> ALL_RIGHTS = new LinkedList<>();
 
     /** List of all rights, as strings. */
     private static final List<String> UNMODIFIABLE_ALL_RIGHTS = Collections.unmodifiableList(ALL_RIGHTS);
@@ -244,6 +244,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param impliedByRights Rights that imply the new right we are adding.
      * @since 12.6
      */
+    // Error because of the usage of 8 parameters in private constructor. This is not easy to improve to avoid
+    // duplicated code
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly, Set<Right> impliedByRights)
@@ -485,7 +488,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     @Override
     public Set<EntityType> getTargetedEntityType()
     {
-        List<EntityType> levels = new ArrayList<EntityType>();
+        List<EntityType> levels = new ArrayList<>();
         for (Map.Entry<EntityType, Set<Right>> entry : ENABLED_RIGHTS.entrySet()) {
             if (entry.getValue().contains(this)) {
                 levels.add(entry.getKey());

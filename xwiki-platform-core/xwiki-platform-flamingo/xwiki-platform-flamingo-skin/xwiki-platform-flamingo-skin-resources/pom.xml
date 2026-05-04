@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -106,6 +106,15 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
+    <!-- Required by flamingo.js to support resizing the panel columns with drag & drop. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui-touch-punch</artifactId>
+    </dependency>
     <!-- Loaded from javascript.vm by default because it's still used in many JavaScript modules from the XWiki WAR. -->
     <dependency>
       <groupId>org.webjars</groupId>
@@ -167,8 +176,8 @@
     </dependency>
     <dependency>
       <!-- Used by the Database List, List of Users, List of Groups and Page property displayers and filters. -->
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tom-select</artifactId>
     </dependency>
     <!-- Refactoring -->
     <dependency>

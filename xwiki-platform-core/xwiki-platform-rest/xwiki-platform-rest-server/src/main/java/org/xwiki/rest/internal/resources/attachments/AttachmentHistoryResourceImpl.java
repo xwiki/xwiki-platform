@@ -65,12 +65,12 @@ public class AttachmentHistoryResourceImpl extends XWikiResource implements Atta
             Attachments attachments = new Attachments();
 
             Version[] versions = xwikiAttachment.getVersions();
-            List<Version> versionList = new ArrayList<Version>();
+            List<Version> versionList = new ArrayList<>();
             for (Version version : versions) {
                 versionList.add(version);
             }
 
-            RangeIterable<Version> ri = new RangeIterable<Version>(versionList, start, limit);
+            RangeIterable<Version> ri = new RangeIterable<>(versionList, start, limit);
 
             for (Version version : ri) {
                 com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =

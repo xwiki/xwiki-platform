@@ -72,6 +72,7 @@ import com.xpn.xwiki.api.Attachment;
  * @since 9.6RC1
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
     private static final String EVENTS = "events";

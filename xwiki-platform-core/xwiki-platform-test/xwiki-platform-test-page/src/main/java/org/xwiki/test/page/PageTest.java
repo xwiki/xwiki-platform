@@ -82,6 +82,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @PageComponentList
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class PageTest
 {
     @InjectMockitoOldcore

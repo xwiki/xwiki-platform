@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.Objects;
 @Path("/wikis/{wikiName}/classes/{className}/objects")
 public interface AllObjectsForClassNameResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Objects getObjects(
             @PathParam("wikiName") String wikiName,
             @PathParam("className") String className,

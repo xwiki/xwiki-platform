@@ -187,9 +187,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         observation.notify(new SchedulerJobsInitializingEvent(), null);
 
         try {
-            String initialDb = !xcontext.getWikiId().equals("") ? xcontext.getWikiId() : xcontext.getMainXWiki();
+            String initialDb = !"".equals(xcontext.getWikiId()) ? xcontext.getWikiId() : xcontext.getMainXWiki();
 
-            List<String> wikiServers = new ArrayList<String>();
+            List<String> wikiServers = new ArrayList<>();
             try {
                 wikiServers = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
             } catch (Exception e) {
@@ -241,7 +241,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     {
         boolean jobNeedsUpdate = false;
         String cUser = job.getStringValue("contextUser");
-        if (cUser.equals("")) {
+        if ("".equals(cUser)) {
             // The context user has not been filled yet.
             // We can suppose it's the first scheduling. Let's assume it's the context user
             cUser = context.getUser();
@@ -249,14 +249,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             jobNeedsUpdate = true;
         }
         String cLang = job.getStringValue("contextLang");
-        if (cLang.equals("")) {
+        if ("".equals(cLang)) {
             cLang = context.getLanguage();
             job.setStringValue("contextLang", cLang);
             jobNeedsUpdate = true;
         }
         String iDb = context.getWikiId();
         String cDb = job.getStringValue("contextDatabase");
-        if (cDb.equals("") || !cDb.equals(iDb)) {
+        if ("".equals(cDb) || !iDb.equals(cDb)) {
             cDb = context.getWikiId();
             job.setStringValue("contextDatabase", cDb);
             jobNeedsUpdate = true;
@@ -457,7 +457,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                     LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
                     getScheduler().scheduleJob(trigger);
                     LOGGER.info("XWiki Job Status: [{}]", object.getStringValue("status"));
-                    if (object.getStringValue("status").equals("Paused")) {
+                    if ("Paused".equals(object.getStringValue("status"))) {
                         getScheduler().pauseJob(new JobKey(xjob));
                         saveStatus("Paused", object, context);
                     } else {

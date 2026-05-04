@@ -226,8 +226,6 @@ public class EditRightsPane extends BaseElement
     }
 
     /**
-     * Click on a right button until it gets in the wanted state.
-     * 
      * @param entityName the target user or group name
      * @param right the target right
      * @param wantedState the wanted state for the right
@@ -240,8 +238,25 @@ public class EditRightsPane extends BaseElement
     }
 
     /**
-     * Click on a right button until it gets in the wanted state.
-     * 
+     * Click on a right button, until it gets in the wanted state.
+     * This variant accepts a string for the right name, useful for custom/extension rights that are not part of the
+     * {@link Right} enum.
+     *
+     * @param entityName the target user or group name
+     * @param rightName the actual name of the right displayed in the header of the column
+     * @param wantedState the wanted state for the right
+     * @since 18.2.0RC1
+     */
+    public void setRight(String entityName, String rightName, State wantedState)
+    {
+        while (getRight(entityName, rightName) != wantedState) {
+            clickRight(entityName, rightName);
+        }
+    }
+
+    /**
+     * Click on a right button, until it gets in the wanted state.
+     *
      * @param right the target right
      * @param wantedState the wanted state for the right
      */

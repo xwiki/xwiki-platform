@@ -63,6 +63,106 @@
     'editorplaceholder': $services.localization.render('ckeditor.content.placeholder'),
     'htmlSyntax': $htmlSyntax,
     'stylesSet': "#if ($isHTML5)html5#{else}html4#end",
+    'toolbarGroups': [
+      {'name': 'format'},
+      {'name': 'basicstyles', 'groups': ['basicstyles', 'cleanup']},
+      {'name': 'paragraph',   'groups': ['list', 'indent', 'align', 'bidi']},
+      {'name': 'links'},
+      {'name': 'insert'},
+      {'name': 'forms'},
+      {'name': 'styles',      'groups': ['styles', 'blocks']},
+      {'name': 'colors'},
+      {'name': 'editing',     'groups': ['find', 'selection', 'spellchecker']},
+      {'name': 'clipboard',   'groups': ['clipboard', 'undo']},
+      {'name': 'document',    'groups': ['mode', 'document', 'doctools']},
+      {'name': 'tools'},
+      {'name': 'others'},
+      {'name': 'about'}
+    ],
+    'toolbarMenus': {
+      'basicStyles': {
+        'toolbar': 'basicstyles,70',
+        'groups': [
+          {'id': 'basicStyles', 'items': ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript']},
+          {'id': 'removeFormat', 'items': ['removeFormat']}
+        ]
+      },
+      'lists': {
+        'toolbar': 'list',
+        'groups': [
+          {'id': 'lists', 'items': ['bulletedlist', 'numberedlist']},
+          {'id': 'indent', 'items': ['indent', 'outdent']}
+        ]
+      },
+      'insert': {
+        'icon': 'insert',
+        'toolbar': 'insert',
+        'groups': [
+          {'id': 'insert', 'items': ['image', 'table', 'horizontalrule', 'specialchar', 'officeImporter']},
+          {'id': 'macros', 'items': ['infoBox', 'successBox', 'warningBox', 'errorBox', 'toc', 'include', 'code']},
+          {'id': 'otherMacros', 'items': ['xwiki-macro']}
+        ]
+      }
+    },
+    'toolbarMenuItems': {
+      'bold': {'label': 'basicstyles.bold'},
+      'italic': {'label': 'basicstyles.italic'},
+      'strike': {'label': 'basicstyles.strike'},
+      'underline': {'label': 'basicstyles.underline'},
+      'subscript': {'label': 'basicstyles.subscript'},
+      'superscript': {'label': 'basicstyles.superscript'},
+
+      'removeFormat': {'label': 'removeformat.toolbar'},
+
+      'indent': {'label': 'indent.indent'},
+      'outdent': {'label': 'indent.outdent'},
+
+      'image': {'label': 'common.image'},
+      'table': {'label': 'table.toolbar'},
+      'officeImporter': {'label': 'xwiki-office.importer.title', 'icon': 'pastefromword'},
+
+      'infoBox': {
+        'command': 'xwiki-macro-insert',
+        'data': {
+          'name': 'info',
+          'content': $services.localization.render('ckeditor.plugin.slash.action.info.defaultContent')
+        }
+      },
+      'successBox': {
+        'command': 'xwiki-macro-insert',
+        'data': {
+          'name': 'success',
+          'content': $services.localization.render('ckeditor.plugin.slash.action.success.defaultContent')
+        }
+      },
+      'warningBox': {
+        'command': 'xwiki-macro-insert',
+        'data': {
+          'name': 'warning',
+          'content': $services.localization.render('ckeditor.plugin.slash.action.warning.defaultContent')
+        }
+      },
+      'errorBox': {
+        'command': 'xwiki-macro-insert',
+        'data': {
+          'name': 'error',
+          'content': $services.localization.render('ckeditor.plugin.slash.action.error.defaultContent')
+        }
+      },
+      'toc': {
+        'command': 'xwiki-macro-insert',
+        'data': {'name': 'toc'}
+      },
+      'include': {
+        'command': 'xwiki-macro',
+        'data': {'name': 'include'}
+      },
+      'code': {
+        'command': 'xwiki-macro',
+        'data': {'name': 'code'}
+      },
+      'xwiki-macro': {'label': 'xwiki-toolbar.otherMacros'}
+    },
     'xwiki-office': {
       'enabled': $services.officemanager.isConnected()
     },

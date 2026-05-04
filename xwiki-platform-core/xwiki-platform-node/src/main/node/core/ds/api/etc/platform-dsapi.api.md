@@ -8,11 +8,13 @@ import { ButtonHTMLAttributes } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComputedOptions } from 'vue';
 import { DefineComponent } from 'vue';
+import { DialogHTMLAttributes } from 'vue';
 import { FormHTMLAttributes } from 'vue';
 import { HTMLAttributes } from 'vue';
 import { ImgHTMLAttributes } from 'vue';
 import { InputHTMLAttributes } from 'vue';
 import { MethodOptions } from 'vue';
+import { SelectHTMLAttributes } from 'vue';
 import { TreeNode } from '@xwiki/platform-fn-utils';
 
 // @beta
@@ -24,21 +26,22 @@ export type AbstractElements = {
     XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
     XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
     XCard: DefineComponent<CardProps & HTMLAttributes>;
-    XCheckbox: DefineComponent<CheckboxProps & HTMLAttributes>;
-    XDialog: DefineComponent<DialogProps & HTMLAttributes>;
-    XDivider: DefineComponent<DividerProps & HTMLAttributes>;
+    XCheckbox: DefineComponent<CheckboxProps & InputHTMLAttributes>;
+    XDialog: DefineComponent<DialogProps & DialogHTMLAttributes>;
+    XDivider: DefineComponent<HTMLAttributes>;
+    XDropdown: DefineComponent<DropdownProps & HTMLAttributes>;
     XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
     XForm: DefineComponent<FormProps & FormHTMLAttributes>;
-    XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
+    XImg: DefineComponent<ImgHTMLAttributes>;
     XLoad: DefineComponent<LoadProps & HTMLAttributes>;
-    XMenu: DefineComponent<MenuProps & HTMLAttributes>;
+    XMenu: DefineComponent<HTMLAttributes>;
     XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
     XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
-    XSelect: DefineComponent<SelectProps & HTMLAttributes>;
+    XSelect: DefineComponent<SelectProps & SelectHTMLAttributes>;
     XTab: DefineComponent<TabProps & HTMLAttributes>;
-    XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
+    XTabGroup: DefineComponent<TabGroupProps & HTMLAttributes>;
     XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
-    XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+    XTextField: DefineComponent<TextFieldProps & InputHTMLAttributes>;
     XTree: DefineComponent<TreeProps<DisplayableTreeNode & any> & HTMLAttributes>;
 };
 
@@ -88,6 +91,7 @@ export type BtnProps = {
     variant?: "default" | "primary" | "success" | "neutral" | "warning" | "danger" | "text";
     size?: "small";
     pill?: boolean;
+    disabled?: boolean;
 };
 
 // @beta (undocumented)
@@ -104,9 +108,9 @@ export type CheckboxProps = {
 
 // @beta (undocumented)
 export type DialogProps = {
-    width?: "auto";
+    title: string;
+    width?: string | number | undefined;
     modelValue?: boolean;
-    logo?: string;
 };
 
 // @beta
@@ -118,7 +122,10 @@ export type DisplayableTreeNode = TreeNode<{
 }>;
 
 // @beta (undocumented)
-export type DividerProps = unknown;
+export type DropdownProps = {
+    disabled?: boolean;
+    btnProps?: BtnProps;
+};
 
 // @beta (undocumented)
 export type FileInputModel = File | File[] | null | undefined;
@@ -135,9 +142,6 @@ export type FormProps = {
 };
 
 // @beta (undocumented)
-export type ImgProps = unknown;
-
-// @beta (undocumented)
 export type LoadProps = unknown;
 
 // @beta (undocumented)
@@ -148,11 +152,6 @@ export type MenuItemProps = {
 
 // @beta (undocumented)
 export type MenuLabelProps = unknown;
-
-// @beta (undocumented)
-export type MenuProps = {
-    disabled?: boolean;
-};
 
 // @beta
 export type SelectProps = {

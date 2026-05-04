@@ -36,7 +36,6 @@ public class FlavorQuery extends ExtensionQuery
      */
     public FlavorQuery()
     {
-        super();
         init();
     }
 

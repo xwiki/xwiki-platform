@@ -82,6 +82,8 @@ public interface LiveDataEntriesResource
      * @throws Exception if retrieving the live data entries fails
      */
     @GET
+    // The GET request to retrieve, sort and filter the live data entries has many request parameters.
+    @SuppressWarnings("checkstyle:ParameterNumber")
     Entries getEntries(
         @PathParam("sourceId") String sourceId,
         @QueryParam("namespace") @DefaultValue("") String namespace,

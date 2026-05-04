@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,13 +20,13 @@
 
 import DisplayerLink from "./DisplayerLink.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 describe("DisplayerLink.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", () => {
@@ -61,7 +61,7 @@ describe("DisplayerLink.vue", () => {
     const wrapperHttpLink = initWrapper(DisplayerLink, {
       props: {
         entry: {
-          color: "yellow<script>console.log(\"hello\")</script>",
+          color: 'yellow<script>console.log("hello")</script>',
           colorHref: "http://test.com",
         },
       },
@@ -70,12 +70,12 @@ describe("DisplayerLink.vue", () => {
     expect(wrapperHttpLink.text()).toMatch("yellow");
     expect(wrapperHttpLink.find("a").element.href).toBe("http://test.com/");
 
-    sinon.restore();
+    restore();
     const wrapperJavascriptLink = initWrapper(DisplayerLink, {
       props: {
         entry: {
-          color: "yellow<script>console.log(\"hello\")</script>",
-          colorHref: "javascript:console.log(\"world\")",
+          color: 'yellow<script>console.log("hello")</script>',
+          colorHref: 'javascript:console.log("world")',
         },
       },
       logic,
@@ -138,7 +138,7 @@ describe("DisplayerLink.vue", () => {
 
     const inputElement = wrapper.find("input").element;
     expect(inputElement.value).toBe("red");
-    expect(inputElement).toBe(document.activeElement)
+    expect(inputElement).toBe(document.activeElement);
   });
 
   it("Send events after the end of the edit", async () => {
@@ -152,8 +152,7 @@ describe("DisplayerLink.vue", () => {
         },
       },
       editBus: {
-        start() {
-        },
+        start() {},
         save(entry, propertyId, v) {
           values.push({ [propertyId]: v });
         },
@@ -167,10 +166,12 @@ describe("DisplayerLink.vue", () => {
     await inputField.setValue("blue");
     await wrapper.find(".edit > div").trigger("keydown.enter");
 
-    expect(values).toMatchObject([{
-      color: {
-        color: "blue",
+    expect(values).toMatchObject([
+      {
+        color: {
+          color: "blue",
+        },
       },
-    }]);
+    ]);
   });
 });

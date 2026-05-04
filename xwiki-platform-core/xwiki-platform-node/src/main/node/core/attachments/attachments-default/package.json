@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-attachments-default",
-  "version": "18.2.0-SNAPSHOT",
+  "version": "18.4.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -55,7 +55,10 @@
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "pinia": "catalog:",

@@ -91,7 +91,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        List<Event> events = new LinkedList<Event>();
+        List<Event> events = new LinkedList<>();
         events.add(new ScriptEvaluatingEvent());
         events.add(new ScriptEvaluatedEvent());
         return events;

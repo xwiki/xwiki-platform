@@ -69,6 +69,10 @@ public class WikiReader
 
     private XarPackage xarPackage = new XarPackage();
 
+    /**
+     * Define the properties to be used for reading.
+     * @param properties the properties to be used.
+     */
     public void setProperties(XARInputProperties properties)
     {
         this.properties = properties;
@@ -76,11 +80,22 @@ public class WikiReader
         this.documentReader.setProperties(properties);
     }
 
+    /**
+     * @return the xar package read.
+     */
     public XarPackage getXarPackage()
     {
         return this.xarPackage;
     }
 
+    /**
+     * Read the source stream given in the properties and filter it with the given filters.
+     *
+     * @param filter a filter that might be used to process the events
+     * @param proxyFilter the proxy filter where to send the events
+     * @throws IOException in case of problem when reading the stream
+     * @throws FilterException in case of problem when processing the stream
+     */
     public void read(Object filter, XARInputFilter proxyFilter) throws IOException, FilterException
     {
         InputStream stream;
@@ -111,38 +126,57 @@ public class WikiReader
         }
     }
 
+    /**
+     * Read the given stream and filter it with the given filters.
+     *
+     * @param stream the stream to be read
+     * @param filter a filter that might be used to process the events
+     * @param proxyFilter the proxy filter where to send the events
+     * @throws IOException in case of problem when reading the stream
+     */
     public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws IOException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
-        for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
+        for (ZipArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
             if (entry.isDirectory() || entry.getName().startsWith("META-INF")) {
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
                 continue;
             } else if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
-                // The entry is the manifest (package.xml). Read this differently.
-                try {
-                    this.xarPackage.readDescriptor(zis);
-                } catch (Exception e) {
-                    if (this.properties.isVerbose()) {
-                        this.logger.warn(LOG_DESCRIPTOR_FAILREAD, "Failed to read XAR descriptor from entry [{}]: {}",
-                            entry.getName(), ExceptionUtils.getRootCauseMessage(e));
-                    }
-                }
+                readPackage(zis, entry);
             } else {
-                try {
-                    this.documentReader.read(zis, filter, proxyFilter);
-                } catch (SkipEntityException skip) {
-                    if (this.properties.isVerbose()) {
-                        this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", skip.getEntityReference());
-                    }
-                } catch (Exception e) {
-                    if (this.properties.isVerbose()) {
-                        this.logger.warn(LOG_DOCUMENT_FAILREAD, "Failed to read XAR XML document from entry [{}]: {}",
-                            entry.getName(), ExceptionUtils.getRootCauseMessage(e), e);
-                    }
-                }
+                readDocument(filter, proxyFilter, zis, entry);
+            }
+        }
+    }
+
+    private void readDocument(Object filter, XARInputFilter proxyFilter, ZipArchiveInputStream zis,
+        ZipArchiveEntry entry)
+    {
+        try {
+            this.documentReader.read(zis, filter, proxyFilter);
+        } catch (SkipEntityException skip) {
+            if (this.properties.isVerbose()) {
+                this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", skip.getEntityReference());
+            }
+        } catch (Exception e) {
+            if (this.properties.isVerbose()) {
+                this.logger.warn(LOG_DOCUMENT_FAILREAD, "Failed to read XAR XML document from entry [{}]: {}",
+                    entry.getName(), ExceptionUtils.getRootCauseMessage(e), e);
+            }
+        }
+    }
+
+    private void readPackage(ZipArchiveInputStream zis, ZipArchiveEntry entry)
+    {
+        // The entry is the manifest (package.xml). Read this differently.
+        try {
+            this.xarPackage.readDescriptor(zis);
+        } catch (Exception e) {
+            if (this.properties.isVerbose()) {
+                this.logger.warn(LOG_DESCRIPTOR_FAILREAD, "Failed to read XAR descriptor from entry [{}]: {}",
+                    entry.getName(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

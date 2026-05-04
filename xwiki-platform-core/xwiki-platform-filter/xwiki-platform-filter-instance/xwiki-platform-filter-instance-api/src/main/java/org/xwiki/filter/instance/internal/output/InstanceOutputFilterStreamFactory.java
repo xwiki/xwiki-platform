@@ -102,7 +102,7 @@ public class InstanceOutputFilterStreamFactory extends
                 "Failed to get regsitered instance of OutputInstanceFilterStreamFactory components", e);
         }
 
-        Set<Class< ? >> filters = new HashSet<Class< ? >>();
+        Set<Class< ? >> filters = new HashSet<>();
         filters.addAll(super.getFilterInterfaces());
         for (OutputInstanceFilterStreamFactory factory : factories) {
             filters.addAll(factory.getFilterInterfaces());

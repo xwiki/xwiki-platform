@@ -63,7 +63,7 @@ public class DocumentReferenceResolverFilter implements QueryFilter
     {
         String defaultDocumentName =
             this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> documentReferences = new ArrayList<>();
         for (Object result : results) {
             String reference = (String) ((Object[]) result)[0];
             boolean terminal = toBoolean(((Object[]) result)[1]);

@@ -19,11 +19,11 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.text.StringUtils;
-
-import java.io.Serializable;
 
 /**
  * A Legacy Event Status is the equivalent of {@link EventStatus} for {@link LegacyEvent}.
@@ -95,8 +95,8 @@ public class LegacyEventStatus implements Serializable
     {
         if (other instanceof LegacyEventStatus) {
             LegacyEventStatus o = (LegacyEventStatus) other;
-            return StringUtils.equals(activityEvent.getEventId(), o.activityEvent.getEventId())
-                    && StringUtils.equals(entityId, o.entityId) && isRead == o.isRead();
+            return Strings.CS.equals(activityEvent.getEventId(), o.activityEvent.getEventId())
+                && Strings.CS.equals(entityId, o.entityId) && isRead == o.isRead();
         }
 
         return false;

@@ -45,7 +45,7 @@ public class DocumentOrSpaceReferenceResolverFilter extends DocumentReferenceRes
     @Override
     public List<?> filterResults(@SuppressWarnings("rawtypes") List results)
     {
-        List<EntityReference> entityReferences = new ArrayList<EntityReference>();
+        List<EntityReference> entityReferences = new ArrayList<>();
         for (Object result : results) {
             String reference = (String) ((Object[]) result)[0];
             boolean isDocument = toBoolean(((Object[]) result)[1]);

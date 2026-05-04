@@ -25,17 +25,28 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.4.0-SNAPSHOT</version>
   </parent>
-  <packaging>webjar</packaging>
+  <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-localization-webjar</artifactId>
   <name>XWiki Platform - Localization - WebJar</name>
   <description>A JavaScript API to load localization messages.</description>
   <properties>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>webjar</xwiki.extension.category>
+    <xwiki.extension.javascript.modules.importmap>{
+      "xwiki-platform-localization-webjar": "org.xwiki.platform:xwiki-platform-localization-webjar/index.es.js"
+    }</xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
+    <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-node</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>pom</type>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>

@@ -351,7 +351,8 @@ public class DefaultAsyncContext implements AsyncContext
         ContextUse contextUse = getContextUse();
 
         if (contextUse != null) {
-            contextUse.rights.add(new RightEntry(right, userReference, entityReference, allowed));
+            contextUse.rights.add(new RightEntry(right, this.factory.getReference(userReference),
+                this.factory.getReference(entityReference), allowed));
         }
     }
 

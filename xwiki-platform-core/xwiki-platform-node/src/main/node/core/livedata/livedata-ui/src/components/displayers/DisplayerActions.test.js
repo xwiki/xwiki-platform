@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,13 +20,13 @@
 
 import DisplayerActions from "./DisplayerActions.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 describe("DisplayerActions.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", () => {

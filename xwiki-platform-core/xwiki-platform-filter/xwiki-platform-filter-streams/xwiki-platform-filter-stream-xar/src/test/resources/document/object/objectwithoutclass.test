@@ -2,7 +2,7 @@
 .inputexpect|xwiki+xar/1.1
 .#------------------------------------------------------------------------------
 <?xml version='1.1' encoding='UTF-8'?>
-<xwikidoc version="1.6" reference="space.page" locale="">
+<xwikidoc version="1.7" reference="space.page" locale="">
   <web>space</web>
   <name>page</name>
   <language/>
@@ -18,6 +18,22 @@
     <className>space.class</className>
     <property>
       <property1>value</property1>
+    </property>
+    <property type="StringList">
+      <property2>
+        <value>value1</value>
+        <value>value2</value>
+        <value>value3</value>
+      </property2>
+    </property>
+    <property type="Password">
+      <mypass>somevalue</mypass>
+    </property>
+    <property type="Date">
+      <mydate>2026-03-03 09:37:29.0</mydate>
+    </property>
+    <property type="Integer">
+      <myboolean>1</myboolean>
     </property>
   </object>
 </xwikidoc>
@@ -82,6 +98,68 @@
                 <entry>
                   <string>type</string>
                   <null/>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="property2">
+            <p>
+              <value t="java.util.ArrayList">
+                <string>value1</string>
+                <string>value2</string>
+                <string>value3</string>
+              </value>
+              <parameters>
+                <entry>
+                  <string>objectPropertyType</string>
+                  <string>StringList</string>
+                </entry>
+                <entry>
+                  <string>type</string>
+                  <string>StringList</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="mypass" value="somevalue">
+            <p>
+              <parameters>
+                <entry>
+                  <string>objectPropertyType</string>
+                  <string>Password</string>
+                </entry>
+                <entry>
+                  <string>type</string>
+                  <string>Password</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="mydate">
+            <p>
+              <value t="java.util.Date">2026-03-03 09:37:29.0 UTC</value>
+              <parameters>
+                <entry>
+                  <string>objectPropertyType</string>
+                  <string>Date</string>
+                </entry>
+                <entry>
+                  <string>type</string>
+                  <string>Date</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="myboolean" value="1">
+            <p>
+              <parameters>
+                <entry>
+                  <string>objectPropertyType</string>
+                  <string>Integer</string>
+                </entry>
+                <entry>
+                  <string>type</string>
+                  <string>Integer</string>
                 </entry>
               </parameters>
             </p>

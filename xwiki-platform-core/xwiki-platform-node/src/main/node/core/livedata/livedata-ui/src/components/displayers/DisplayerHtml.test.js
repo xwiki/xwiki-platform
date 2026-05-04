@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,13 +20,13 @@
 
 import DisplayerHtml from "./DisplayerHtml.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import sinon from "sinon";
 
 describe("DisplayerHtml.vue", () => {
-  afterEach(function() {
+  afterEach(function () {
     // completely restore all fakes created through the sandbox
-    sinon.restore();
+    restore();
   });
 
   it("Renders an entry in view mode", () => {
@@ -44,20 +44,23 @@ describe("DisplayerHtml.vue", () => {
     const htmlWrapper = wrapper.find(".html-wrapper");
     expect(htmlWrapper.classes()).toContain("html-wrapper");
     expect(htmlWrapper.text()).toBe("some content");
-    expect(htmlWrapper.find("strong")).not.toBeUndefined;
+    expect(htmlWrapper.find("strong")).not.toBeUndefined();
   });
 
   it("Renders an entry in view mode with untrusted content", () => {
     const wrapper = initWrapper(DisplayerHtml, {
       props: {
         entry: {
-          color: "<strong>some content<script>console.log(\"hello world\")</script></strong>",
+          color:
+            '<strong>some content<script>console.log("hello world")</script></strong>',
         },
       },
       logic: {
         isContentTrusted: () => false,
       },
     });
-    expect(wrapper.find(".html-wrapper > *").html()).toBe("<strong>some content</strong>");
+    expect(wrapper.find(".html-wrapper > *").html()).toBe(
+      "<strong>some content</strong>",
+    );
   });
 });

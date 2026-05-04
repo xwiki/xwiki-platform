@@ -137,6 +137,9 @@ class LiveDataIT
 
     private static final String TRUE = "True";
 
+    private static final Map<String, Object> PICK_FROM_SUGGESTIONS =
+        Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true);
+
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
@@ -148,14 +151,13 @@ class LiveDataIT
         TestLocalReference testLocalReference) throws Exception
     {
         testUtils.setCurrentWiki(wikiReference.getName());
-
+        // Login as super admin because guest user cannot remove pages.
+        testUtils.loginAsSuperAdmin();
         DocumentReference testReference = new DocumentReference(testLocalReference, wikiReference);
 
         // Make sure an icon theme is configured.
         testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
 
-        // Login as super admin because guest user cannot remove pages.
-        testUtils.loginAsSuperAdmin();
         testUtils.createUser("U1", "U1", null);
         testUtils.createUser("U2", "U2", null);
         // Wipes the test space.
@@ -238,7 +240,7 @@ class LiveDataIT
         tableLayout.waitUntilReady();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
-        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY);
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         // Reload to test if the empty filter is displayed again.
         testUtils.getDriver().navigate().refresh();
         tableLayout.waitUntilReady();
@@ -301,10 +303,10 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
 
-        // Take the focus on the is active filter.
+        // Take the focus on the "Is active" filter.
         suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
-        suggestInputElement.sendKeys(Boolean.TRUE.toString());
-        suggestInputElement.waitForNonTypedSuggestions();
+        suggestInputElement.click().waitForSuggestions().sendKeys(Boolean.TRUE.toString())
+            .waitForNonTypedSuggestions(false);
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -324,9 +326,8 @@ class LiveDataIT
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
         suggestInputElement = new SuggestInputElement(isActiveFilter);
-        suggestInputElement.clear();
-        suggestInputElement.sendKeys(Boolean.FALSE.toString());
-        suggestInputElement.waitForNonTypedSuggestions();
+        suggestInputElement.clear().waitForSuggestions().sendKeys(Boolean.FALSE.toString())
+            .waitForNonTypedSuggestions(false);
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -335,20 +336,24 @@ class LiveDataIT
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
 
-        suggestInputElement.clear().hideSuggestions();
+        suggestInputElement.clearSelectedSuggestions().hideSuggestions();
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
 
         // Switch to another language to assert that the text is still correctly translated.
         try {
+            String currentUrl = testUtils.getDriver().getCurrentUrl();
+            testUtils.loginAsSuperAdmin();
             testUtils.setWikiPreference("default_language", "fr");
-            testUtils.getDriver().navigate().refresh();
+            testUtils.gotoPage(currentUrl);
+            liveDataElement = new LiveDataElement("test");
             liveDataElement.waitUntilReady();
-            assertEquals(List.of(
-                    "(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne fonctionnera pas normalement pour ces pages."),
+            assertEquals(List.of("(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne "
+                    + "fonctionnera pas normalement pour ces pages."),
                 liveDataElement.getFootnotesText());
         } finally {
+            testUtils.loginAsSuperAdmin();
             testUtils.setWikiPreference("default_language", "en");
         }
     }
@@ -404,7 +409,7 @@ class LiveDataIT
     void asyncAction(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.loginAsSuperAdmin();
-        testUtils.deletePage(testReference.getLastSpaceReference(), true);
+        testUtils.deletePage(testReference.getLastSpaceReference());
 
         List<String> properties = List.of(NAME_COLUMN, ACTIONS_COLUMN);
         createClassNameLiveDataPage(testUtils, testReference, properties, """
@@ -474,20 +479,17 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(3);
 
         // Filter by Option1 should return only Doc1.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("myList", "Option1 Option2");
         // Filter by Option3 should return only Doc2.
-        tableLayout.filterColumn("myList", "Option3", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option3", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("myList", "Option3");
         // Filter by (empty) should return only Doc3.
         // Note: we must explicitly use the suggestion as otherwise this would be treated as a text filter as it would
         // select the typed value and not the suggestion that contains the special treatment of this filter.
-        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
     }
@@ -542,28 +544,24 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(4);
 
         // Filter by Option1 should return Doc1 and Doc4.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(2);
         tableLayout.assertRow("myList", "Option1 Option2");
         tableLayout.assertRow("doc.name", "Doc4");
 
         // Filter by Option3 should return Doc2 and Doc4.
-        tableLayout.filterColumn("myList", "Option3", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option3", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(2);
         tableLayout.assertRow("myList", "Option3");
         tableLayout.assertRow("doc.name", "Doc4");
 
         // Filter by (empty) should return only Doc3.
-        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc3");
 
         // Filter by Option100 should return only Doc4.
-        tableLayout.filterColumn("myList", "Option100", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option100", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc4");
     }
@@ -628,8 +626,7 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(3);
 
         // Filter by Option1 should return only Doc1.
-        tableLayout.filterColumn("myList", "Option1", true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn("myList", "Option1", true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow("doc.name", "Doc1");
 
@@ -708,8 +705,7 @@ class LiveDataIT
         suggestInputElement.click().waitForNonTypedSuggestions();
         assertTrue(suggestInputElement.getSuggestions().stream().anyMatch(s -> s.getLabel().equals(CHOICE_A)));
         // Filter by Choice A should return only Lynda.
-        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true,
-            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_A, true, PICK_FROM_SUGGESTIONS);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
@@ -794,7 +790,7 @@ class LiveDataIT
 
         // Remove the required rights filter to edit the value (the edit action of the page object doesn't like when
         // the row disappears after an edit).
-        new SuggestInputElement(tableLayout.getFilter(ENFORCE_REQUIRED_RIGHTS_COLUMN)).clear().hideSuggestions();
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, null, true);
         tableLayout.waitUntilRowCountEqualsTo(1);
 
         // Edit the enforceRequiredRights column.

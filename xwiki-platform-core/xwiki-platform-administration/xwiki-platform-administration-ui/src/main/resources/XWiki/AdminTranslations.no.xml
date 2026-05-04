@@ -139,6 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=Den valgte brukeren har 
 administration.section.users.deleteUser.newAuthor.programming=programmering
 administration.section.users.deleteUser.newAuthor.script=skript
 admin.usersgroups.extensionrights=Utvidelsesrettigheter
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
@@ -154,6 +156,10 @@ administration.section.analytics.status.hint=Bestem om sporing i Google Analytic
 # Social category
 admin.social=Sosial
 admin.social.description=Konfigurasjon for sosiale funksjoner.
+
+# Network category
+### Missing: admin.network=Network
+### Missing: admin.network.description=Network related features.
 
 # Configurable Class
 ### Missing: XWiki.ConfigurableClass_displayInSection=Display in section

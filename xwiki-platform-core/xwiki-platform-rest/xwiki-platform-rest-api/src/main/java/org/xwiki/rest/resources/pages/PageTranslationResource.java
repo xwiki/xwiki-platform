@@ -38,6 +38,8 @@ import org.xwiki.rest.model.jaxb.Page;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}")
 public interface PageTranslationResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Page getPageTranslation(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -46,6 +48,8 @@ public interface PageTranslationResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @PUT Response putPageTranslation(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -55,6 +59,8 @@ public interface PageTranslationResource
             Page page
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @DELETE void deletePageTranslation(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

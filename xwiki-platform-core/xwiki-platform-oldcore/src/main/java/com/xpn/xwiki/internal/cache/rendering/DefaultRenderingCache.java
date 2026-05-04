@@ -162,7 +162,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
         // support for legacy core -> build non-blocking list (lazy)
         if (this.legacyRenderingCacheAware == null) {
-            this.legacyRenderingCacheAware = new LinkedList<RenderingCacheAware>();
+            this.legacyRenderingCacheAware = new LinkedList<>();
             XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
             for (String pluginName : pluginManager.getPlugins()) {
                 XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
@@ -222,7 +222,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             if (parameters != null) {
                 // Sort the Map so that the returned value can be used as a key that doesn't change if the servlet
                 // container sends the parameter in a different order.
-                SortedMap<String, String[]> sortedMap = new TreeMap<String, String[]>(parameters);
+                SortedMap<String, String[]> sortedMap = new TreeMap<>(parameters);
                 return constructRequestString(sortedMap);
             }
         }

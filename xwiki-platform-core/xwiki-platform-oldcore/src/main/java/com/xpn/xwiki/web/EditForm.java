@@ -149,7 +149,7 @@ public class EditForm extends XWikiForm
         StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
-            if (!parameter[i].equals("")) {
+            if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {
@@ -216,7 +216,7 @@ public class EditForm extends XWikiForm
     {
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = getRequest().getParameterMap();
-        Map<String, String[]> result = new HashMap<String, String[]>();
+        Map<String, String[]> result = new HashMap<>();
         for (String name : allParameters.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);

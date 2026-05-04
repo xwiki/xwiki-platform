@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
@@ -43,6 +44,9 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
 {
     @Inject
     private Container container;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     protected void serveResource(String resourceName, InputStream resourceStream)
         throws ResourceReferenceHandlerException
@@ -64,12 +68,26 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
         try {
             Response response = this.container.getResponse();
 
+            String actualContentType = (contentType != null) ? contentType
+                : TikaUtils.detect(markResetSupportingStream, resourceName);
             // Set the content type
-            if (contentType != null) {
-                response.setContentType(contentType);
-            } else {
-                response.setContentType(TikaUtils.detect(markResetSupportingStream, resourceName));
+            response.setContentType(actualContentType);
+
+            // The inline attribute of Content-Disposition tells the browser that they should display
+            // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
+            // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
+            // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
+            // Save dialog box (exe, zip, xar, etc).
+            String dispType = "inline";
+
+            // If the mimetype is not authorized to be displayed inline,
+            // let's force its content disposition to download.
+            if (attachmentSecurityManager.shouldBeDownloaded(actualContentType)) {
+                dispType = "attachment";
             }
+            // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
+            // See http://tools.ietf.org/html/rfc2231 for more details.
+            response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + resourceName);
 
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {

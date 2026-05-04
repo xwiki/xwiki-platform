@@ -37,8 +37,7 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
     /**
      * The bundle cache.
      */
-    protected Map<Locale, LocalizedTranslationBundle> bundleCache =
-        new ConcurrentHashMap<Locale, LocalizedTranslationBundle>();
+    protected Map<Locale, LocalizedTranslationBundle> bundleCache = new ConcurrentHashMap<>();
 
     /**
      * Default constructor.

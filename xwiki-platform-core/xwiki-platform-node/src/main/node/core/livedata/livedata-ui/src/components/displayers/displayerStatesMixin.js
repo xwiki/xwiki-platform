@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -24,7 +24,7 @@ export default {
    * - isLoading: true when the displayer is currently loading, because it needs to be initialized
    * by an asynchronous operation This mixing can be used to avoid redeclaring the mandatory states
    * in each displayer.
-   * @returns {{isLoading: boolean, isView: boolean}} the mixing data values.
+   * @returns \{\{isLoading: boolean, isView: boolean\}\} the mixing data values.
    */
   data() {
     return {

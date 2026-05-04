@@ -70,8 +70,8 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         this.referenceFR = new DocumentReference(this.wikiName, this.spaces, this.pageName, Locale.FRENCH);
 
         // Clean
-        this.testUtils.rest().delete(this.referenceFR);
-        this.testUtils.rest().delete(this.referenceDefault);
+        getUtil().rest().delete(this.referenceFR);
+        getUtil().rest().delete(this.referenceDefault);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         newPage.setContent("fr contenue");
         newPage.setLanguage(Locale.FRENCH.toString());
 
-        assertFalse(this.testUtils.rest().exists(this.referenceDefault));
+        assertFalse(getUtil().rest().exists(this.referenceDefault));
 
         String uri =
             buildURI(PageTranslationResource.class, getWiki(), this.spaces, this.pageName, Locale.FRENCH).toString();
@@ -111,8 +111,8 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         assertEquals("fr contenue", modifiedPage.getContent());
         assertEquals(Locale.FRENCH.toString(), modifiedPage.getLanguage());
 
-        assertTrue(this.testUtils.rest().exists(this.referenceFR));
-        assertFalse(this.testUtils.rest().exists(this.referenceDefault));
+        assertTrue(getUtil().rest().exists(this.referenceFR));
+        assertFalse(getUtil().rest().exists(this.referenceDefault));
 
         // GET
         GetMethod getMethod = executeGet(uri);
@@ -128,8 +128,8 @@ public class PageTranslationResourceIT extends AbstractHttpIT
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
 
-        assertFalse(this.testUtils.rest().exists(this.referenceDefault));
-        assertFalse(this.testUtils.rest().exists(this.referenceFR));
+        assertFalse(getUtil().rest().exists(this.referenceDefault));
+        assertFalse(getUtil().rest().exists(this.referenceFR));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
     {
         // Setup: Create a page and a translation with several versions
         Locale language = Locale.FRENCH;
-        assertFalse(this.testUtils.rest().exists(this.referenceDefault));
+        assertFalse(getUtil().rest().exists(this.referenceDefault));
         String uri = buildURI(PageTranslationResource.class, getWiki(), this.space, this.pageName, language);
 
         try {

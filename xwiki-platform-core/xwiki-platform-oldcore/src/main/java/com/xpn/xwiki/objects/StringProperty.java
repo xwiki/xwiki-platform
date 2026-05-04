@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * XProperty for containing a string of limited size (default 255 characters max).
  *
@@ -26,7 +28,18 @@ package com.xpn.xwiki.objects;
  */
 public class StringProperty extends BaseStringProperty
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "String";
+
     private static final long serialVersionUID = 1L;
 
-    // No different from BaseStringProperty, only exists for Hibernate mapping.
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
 }

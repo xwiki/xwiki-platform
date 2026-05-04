@@ -37,6 +37,7 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -48,12 +49,29 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Define an xclass property to hold a text value.
+ *
+ * @version $Id$
+ */
 public class TextAreaClass extends StringClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "TextArea";
+
     private static final String FAILED_VELOCITY_EXECUTION_WARNING =
         "Failed to execute velocity code in text area property [{}]: [{}]";
 
     private static final String RESTRICTED = "restricted";
+    private static final String PURETEXT_LOWERCASE = "puretext";
+    private static final String PURETEXT = "PureText";
+    private static final String ROWS = "rows";
+    private static final String EDITOR = "editor";
+    private static final String CONTENT_TYPE = "contenttype";
 
     /**
      * Possible values for the editor meta property.
@@ -65,7 +83,7 @@ public class TextAreaClass extends StringClass
         /**
          * Plain text without any known syntax.
          */
-        PURE_TEXT("PureText"),
+        PURE_TEXT(PURETEXT),
 
         /**
          * Edit wiki syntax using a text editor.
@@ -77,10 +95,15 @@ public class TextAreaClass extends StringClass
          */
         WYSIWYG("Wysiwyg");
 
-        private static final Map<String, EditorType> editorTypeMap =
+        private static final Map<String, EditorType> EDITOR_TYPE_MAP =
             Arrays.stream(EditorType.values()).collect(Collectors.toMap(e -> e.value.toLowerCase(), e -> e));
 
         private final String value;
+
+        EditorType(String value)
+        {
+            this.value = value;
+        }
 
         /**
          * Retreive the {@link EditorType} based on its value.
@@ -93,12 +116,7 @@ public class TextAreaClass extends StringClass
          */
         public static EditorType getByValue(String value)
         {
-            return value != null ? editorTypeMap.get(value.toLowerCase()) : null;
-        }
-
-        private EditorType(String value)
-        {
-            this.value = value;
+            return value != null ? EDITOR_TYPE_MAP.get(value.toLowerCase()) : null;
         }
 
         @Override
@@ -120,7 +138,7 @@ public class TextAreaClass extends StringClass
         /**
          * Plain text without any known syntax.
          */
-        PURE_TEXT("PureText"),
+        PURE_TEXT(PURETEXT),
 
         /**
          * Wiki content.
@@ -139,10 +157,15 @@ public class TextAreaClass extends StringClass
          */
         VELOCITYWIKI("VelocityWiki");
 
-        private static final Map<String, ContentType> contentTypeMap =
+        private static final Map<String, ContentType> CONTENT_TYPE_MAP =
             Arrays.stream(ContentType.values()).collect(Collectors.toMap(c -> c.value.toLowerCase(), c -> c));
 
         private final String value;
+
+        ContentType(String value)
+        {
+            this.value = value;
+        }
 
         /**
          * Retreive the {@link ContentType} based on its value.
@@ -155,12 +178,7 @@ public class TextAreaClass extends StringClass
          */
         public static ContentType getByValue(String value)
         {
-            return value != null ? contentTypeMap.get(value.toLowerCase()) : null;
-        }
-
-        private ContentType(String value)
-        {
-            this.value = value;
+            return value != null ? CONTENT_TYPE_MAP.get(value.toLowerCase()) : null;
         }
 
         @Override
@@ -176,6 +194,10 @@ public class TextAreaClass extends StringClass
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
 
+    /**
+     * Default constructor with a metaclass.
+     * @param wclass the metaclass.
+     */
     public TextAreaClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Text Area", wclass);
@@ -184,6 +206,9 @@ public class TextAreaClass extends StringClass
         setRows(5);
     }
 
+    /**
+     * Empty constructor with a null metaclass.
+     */
     public TextAreaClass()
     {
         this(null);
@@ -191,6 +216,7 @@ public class TextAreaClass extends StringClass
 
     /**
      * @param contentType the content type
+     * @param def default value
      * @return the editor type compatible with the passed content type, null if several are compatible
      */
     public static EditorType getEditorType(ContentType contentType, EditorType def)
@@ -215,6 +241,7 @@ public class TextAreaClass extends StringClass
 
     /**
      * @param editorType the editor type
+     * @param def default value
      * @return the content type compatible with the passed editor type, null if several are compatible
      */
     public static ContentType getContentType(EditorType editorType, ContentType def)
@@ -235,19 +262,29 @@ public class TextAreaClass extends StringClass
         return property;
     }
 
+    /**
+     * @return the number of rows of the textarea field.
+     */
     public int getRows()
     {
-        return getIntValue("rows");
+        return getIntValue(ROWS);
     }
 
+    /**
+     * @param rows the number of rows of the textarea field.
+     */
     public void setRows(int rows)
     {
-        setIntValue("rows", rows);
+        setIntValue(ROWS, rows);
     }
 
+    /**
+     * @return the editor defined in the field, or the editor compatible with the defined content type when none is
+     * defined.
+     */
     public String getEditor()
     {
-        String editor = getStringValue("editor").toLowerCase();
+        String editor = getStringValue(EDITOR).toLowerCase();
         if (EditorType.getByValue(editor) == null) {
             EditorType compatibleEditor = getEditorType(getContentType(), null);
             if (compatibleEditor != null) {
@@ -266,7 +303,7 @@ public class TextAreaClass extends StringClass
      */
     public void setEditor(String editor)
     {
-        setStringValue("editor", editor);
+        setStringValue(EDITOR, editor);
     }
 
     /**
@@ -286,9 +323,13 @@ public class TextAreaClass extends StringClass
         }
     }
 
+    /**
+     * @return the content type used by the field.
+     * @see ContentType
+     */
     public String getContentType()
     {
-        String result = getStringValue("contenttype").toLowerCase();
+        String result = getStringValue(CONTENT_TYPE).toLowerCase();
         if (result.isEmpty()) {
             result = ContentType.WIKI_TEXT.toString().toLowerCase();
         }
@@ -296,9 +337,14 @@ public class TextAreaClass extends StringClass
         return result;
     }
 
+    /**
+     * Set the content type to be used by the field.
+     * @param contentType the content type to use.
+     * @see ContentType
+     */
     public void setContentType(String contentType)
     {
-        setStringValue("contenttype", contentType);
+        setStringValue(CONTENT_TYPE, contentType);
     }
 
     /**
@@ -316,6 +362,10 @@ public class TextAreaClass extends StringClass
         }
     }
 
+    /**
+     * @param context the current context
+     * @return {@code true} if the editor type is {@code wysiwyg}.
+     */
     public boolean isWysiwyg(XWikiContext context)
     {
         return "wysiwyg".equals(getEditorType(context));
@@ -349,7 +399,7 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        return contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode");
+        return contentType != null && !PURETEXT_LOWERCASE.equals(contentType) && !"velocitycode".equals(contentType);
     }
 
     /**
@@ -394,7 +444,7 @@ public class TextAreaClass extends StringClass
         parameters.put("id", fieldName);
         parameters.put("name", fieldName);
         parameters.put("cols", getSize());
-        parameters.put("rows", getRows());
+        parameters.put(ROWS, getRows());
         parameters.put("disabled", isDisabled());
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         parameters.put("sourceDocumentReference", object.getDocumentReference());
@@ -412,7 +462,8 @@ public class TextAreaClass extends StringClass
         {
             syntax = Syntax.PLAIN_1_0;
         } else {
-            syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+            syntax = PURETEXT_LOWERCASE.equals(editorType) ? Syntax.PLAIN_1_0
+                : getObjectDocumentSyntax(object, context);
         }
         SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
         try {
@@ -574,5 +625,11 @@ public class TextAreaClass extends StringClass
         XWikiDocument doc = getObjectDocument(object, context);
 
         return doc != null && doc.getSyntax() != null ? doc.getSyntax() : Syntax.XWIKI_1_0;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

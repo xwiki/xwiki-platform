@@ -23,8 +23,8 @@ import { require } from "./requirejs.js";
 /**
  * Load requirejs modules using an asynchronous call instead of a callback.
  *
- * @param ids an array of ids to load using require js
- * @return {Promise<unknown>} return the array of resolved requested modules
+ * @param ids - an array of ids to load using require js
+ * @returns return the array of resolved requested modules
  * @since 17.4.0RC1
  */
 export function loadById(...ids) {

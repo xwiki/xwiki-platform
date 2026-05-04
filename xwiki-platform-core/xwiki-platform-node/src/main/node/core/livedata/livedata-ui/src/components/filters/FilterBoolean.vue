@@ -73,19 +73,10 @@ export default {
     },
     // Settings used when creating the selectize widget.
     selectizeSettings() {
-      let options = this.config.options || [];
       return {
-        // Allow free text because we want to support the contains and startsWith operators.
+        // Forbid custom values. The value can be either true or false.
         create: false,
-        // Take the list of (initial) options from the filter configuration. This list will be extended with the results
-        // obtained from the configured search URL.
-        options,
-        // Limit the selection to a single value because:
-        // * selecting multiple values increases the height of the filter row when table layout is used
-        // * constraint (filter) values should be strings; this isn't a limitation of the live data model, but using
-        //   arrays or complex objects make it difficult to express the filter in the REST URL used to fetch the live
-        //   data or in the live data macro parameters
-        // * the user can still add more values by adding more constraints from the advanced filtering panel
+        // Single selection, because the value is either true or false.
         maxItems: 1,
         onChange: (value) => {
           if (this.$refs.input.selectize.items.length === 0) {
@@ -126,7 +117,7 @@ export default {
 </script>
 
 <style>
-.livedata-filter.filter-boolean .selectize-input {
+.livedata-filter.filter-boolean .ts-control {
   height: 100%;
   vertical-align: middle;
 }

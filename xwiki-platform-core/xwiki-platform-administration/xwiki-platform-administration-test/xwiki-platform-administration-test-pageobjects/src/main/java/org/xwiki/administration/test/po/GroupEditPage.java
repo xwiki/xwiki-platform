@@ -80,7 +80,7 @@ public class GroupEditPage extends InlinePage
     {
         SuggestInputElement picker = new SuggestInputElement(input);
         for (String member : members) {
-            picker.sendKeys(member).waitForSuggestions().selectByIndex(0);
+            picker.clear().sendKeys(member).waitForSuggestions().selectByIndex(0);
         }
         picker.hideSuggestions();
         clickAddMemberButton();

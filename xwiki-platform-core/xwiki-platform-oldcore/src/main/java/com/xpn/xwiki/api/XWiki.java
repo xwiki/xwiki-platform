@@ -493,7 +493,7 @@ public class XWiki extends Api
             if (attachments == null || attachments.isEmpty()) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -524,7 +524,7 @@ public class XWiki extends Api
             if (attachments == null) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -1000,7 +1000,7 @@ public class XWiki extends Api
      */
     public List<Document> wrapDocs(List<?> docs)
     {
-        List<Document> result = new ArrayList<Document>();
+        List<Document> result = new ArrayList<>();
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
@@ -1432,7 +1432,7 @@ public class XWiki extends Api
      */
     public List<String> getWikiNames()
     {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         try {
             result = this.xwiki.getVirtualWikisDatabaseNames(getXWikiContext());

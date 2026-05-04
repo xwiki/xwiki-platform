@@ -38,10 +38,15 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.filter.test.po.ApplicationFilterHomePage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
@@ -114,7 +119,7 @@ public class FilterIT extends AbstractTest
     {
         ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
 
-        URL url = getClass().getResource("/xml/document1.xml");
+        URL url = getClass().getResource("/xml/document2.xml");
 
         // Set input
         filterApp.setInputFilter("filter+xml");
@@ -126,7 +131,9 @@ public class FilterIT extends AbstractTest
         // Start conversion
         filterApp.convert();
 
-        Page page = getUtil().rest().get(new LocalDocumentReference(List.of("space", "nestedspace"), "document"),
+        LocalDocumentReference localDocumentReference =
+            new LocalDocumentReference(List.of("space", "nestedspace2"), "document");
+        Page page = getUtil().rest().get(localDocumentReference,
             Map.of("objects", new Object[] {"true"}, "class", new Object[] {"true"}, "attachments",
                 new Object[] {"true"}));
 
@@ -139,6 +146,64 @@ public class FilterIT extends AbstractTest
 
         assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate().getTime());
         assertEquals("25.1", attachment.getVersion());
+        List<ObjectSummary> objectSummaries = page.getObjects().getObjectSummaries();
+        assertEquals(1, objectSummaries.size());
+
+        ObjectReference objectReference = new ObjectReference("space.nestedspace2.document[0]",
+            new DocumentReference(localDocumentReference, new WikiReference("xwiki")));
+
+        org.xwiki.rest.model.jaxb.Object object = getUtil().rest().get(objectReference);
+        List<Property> properties = object.getProperties();
+        assertEquals(1, properties.size());
+        assertEquals("prop1", properties.get(0).getName());
+        assertEquals("1", properties.get(0).getValue());
+    }
+
+    @Test
+    public void testImportDocumentWithoutXClassInfo() throws Exception
+    {
+        ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
+
+        URL url = getClass().getResource("/xml/document1.xml");
+
+        // Set input
+        filterApp.setInputFilter("filter+xml");
+        filterApp.setSource("url:" + url.toString());
+
+        // Set output
+        filterApp.setOutputFilter("xwiki+instance");
+
+        // Start conversion
+        filterApp.convert();
+
+        LocalDocumentReference localDocumentReference =
+            new LocalDocumentReference(List.of("space", "nestedspace"), "document");
+        Page page = getUtil().rest().get(localDocumentReference,
+            Map.of("objects", new Object[] {"true"}, "class", new Object[] {"true"}, "attachments",
+                new Object[] {"true"}));
+
+        // the document is missing xclass information so it triggers a migration.
+        assertEquals("2.1", page.getVersion());
+        assertEquals("Migrated property [prop1] from class [space.nestedspace.document]", page.getComment());
+
+        assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), page.getModified().getTime());
+        assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), page.getCreated().getTime());
+
+        Attachment attachment = page.getAttachments().getAttachments().get(0);
+
+        assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate().getTime());
+        assertEquals("25.1", attachment.getVersion());
+        List<ObjectSummary> objectSummaries = page.getObjects().getObjectSummaries();
+        assertEquals(1, objectSummaries.size());
+
+        ObjectReference objectReference = new ObjectReference("space.nestedspace.document[0]",
+            new DocumentReference(localDocumentReference, new WikiReference("xwiki")));
+
+        org.xwiki.rest.model.jaxb.Object object = getUtil().rest().get(objectReference);
+        List<Property> properties = object.getProperties();
+        assertEquals(1, properties.size());
+        assertEquals("prop1", properties.get(0).getName());
+        assertEquals("1", properties.get(0).getValue());
     }
 
     private Date toDate(String datePattern) throws ParseException

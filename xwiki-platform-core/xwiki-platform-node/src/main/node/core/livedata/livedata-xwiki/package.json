@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-livedata-xwiki",
-  "version": "18.2.0-SNAPSHOT",
+  "version": "18.4.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -38,14 +38,21 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-livedata-api": "workspace:*"
+    "@xwiki/platform-livedata-api": "workspace:*",
+    "@xwiki/platform-localization-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "jquery": "4.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/jquery": "catalog:",
     "@types/sinon": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "jquery": "catalog:",
     "sinon": "catalog:",

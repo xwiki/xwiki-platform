@@ -27,6 +27,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -39,6 +40,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Boolean";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "boolean";
@@ -68,7 +76,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayType()
     {
         String dtype = getStringValue("displayType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "yesno";
         }
         return dtype;
@@ -77,7 +85,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayFormType()
     {
         String dtype = getStringValue("displayFormType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "radio";
         }
         return dtype;
@@ -126,6 +134,12 @@ public class BooleanClass extends PropertyClass
     }
 
     @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
+
+    @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
@@ -160,13 +174,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if (getDisplayType().equals("checkbox")) {
+        if ("checkbox".equals(getDisplayType())) {
             displayFormType = "checkbox";
         }
 
-        if (displayFormType.equals("checkbox")) {
+        if ("checkbox".equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if (displayFormType.equals("select")) {
+        } else if ("select".equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);

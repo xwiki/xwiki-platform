@@ -1,6 +1,16 @@
 ##!source.syntax=xwiki/2.1
 {{velocity output="false"}}
 #macro (blocknote $parameters)
+  ## Load the CSS needed by the Image and Macro Wizards.
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-wysiwyg-webjar',
+      'webjar.bundle.min.css'
+    ), {
+      'type': 'text/css',
+      'rel': 'stylesheet'
+    }
+  ))
   #set ($discard = $xwiki.linkx.use(
     $services.webjars.url(
       'org.xwiki.platform:xwiki-platform-blocknote-webjar',

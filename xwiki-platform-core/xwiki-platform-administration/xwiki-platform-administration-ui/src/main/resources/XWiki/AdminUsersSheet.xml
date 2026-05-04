@@ -836,10 +836,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
 }
 #deleteUserModal .xform &gt; dl {
   margin-top: 1em;
-}
-/* Make sure the drop down for the new author picker is shown on top of the modal. */
-body &gt; .selectize-dropdown {
-  z-index: 10051;
 }</code>
     </property>
     <property>

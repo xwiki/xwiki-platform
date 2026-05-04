@@ -22,12 +22,16 @@ package org.xwiki.linkchecker.internal;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.transformation.linkchecker.LinkCheckerTransformationConfiguration;
-import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.linkchecker.internal.XWikiLinkCheckerTransformationConfiguration}.
@@ -38,13 +42,14 @@ import static org.junit.Assert.*;
 @ComponentList({
     XWikiLinkCheckerTransformationConfiguration.class
 })
-public class XWikiLinkCheckerTransformationConfigurationTest
+@ComponentTest
+class XWikiLinkCheckerTransformationConfigurationTest
 {
-    @Rule
-    public ComponentManagerRule componentManager = new ComponentManagerRule();
+    @InjectComponentManager
+    public MockitoComponentManager componentManager;
 
     @Test
-    public void getExcludedReferencePatterns() throws Exception
+    void getExcludedReferencePatterns() throws Exception
     {
         LinkCheckerTransformationConfiguration configuration =
             this.componentManager.getInstance(LinkCheckerTransformationConfiguration.class);

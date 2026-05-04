@@ -60,7 +60,8 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
     },
     /** Create the content of the confirmation dialog: icon + question text, buttons */
     createContent : function (data) {
-      var question = new Element("div", {"class" : "question"}).update(data.confirmationText);
+      var question = new Element("div", {"class" : "question"});
+      question.textContent = data.confirmationText;
       var buttons = new Element("div", {"class" : "buttons"});
       var yesButton = this.createButton("button", data.yesButtonText, "(Enter)", "");
       Event.observe(yesButton, "click", this.onYes.bindAsEventListener(this));
@@ -96,4 +97,10 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
       }
     }
   });
+  /**
+   * @return {string} the expected format of the textContent property
+   * @since 18.4.0RC1
+   * @since 17.10.9
+   */
+  XWiki.widgets.ConfirmationBox.textContentFormat = () => "plain";
 } // if the parent widget is defined

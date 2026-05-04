@@ -84,6 +84,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
                 return Thumbnails.of((BufferedImage) image).forceSize(width, height)
                     .imageType(getBestImageTypeFor(image)).asBufferedImage();
             } catch (IOException e) {
+                // If the scaling fails with Thumbnailator, we fall back to the default image processor.
+                // TODO: We should probably log a warning
             }
         }
         return super.scaleImage(image, width, height);
@@ -96,6 +98,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
             try {
                 return imageReaders.next().getFormatName();
             } catch (IOException e) {
+                // If an I/O error occurred while reading from input sources, return the passed mime type
+                // TODO: We should probably log a warning
             }
         }
         return mimeType;

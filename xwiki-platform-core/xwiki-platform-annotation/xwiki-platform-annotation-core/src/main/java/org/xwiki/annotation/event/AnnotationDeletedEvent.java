@@ -49,7 +49,7 @@ public class AnnotationDeletedEvent extends AbstractAnnotationEvent
      */
     public AnnotationDeletedEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

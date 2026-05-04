@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 9.8
  */
 @ComponentTest
-public class ViewableQueryFilterTest
+class ViewableQueryFilterTest
 {
     @InjectMockComponents
     private ViewableQueryFilter filter;
@@ -54,59 +54,59 @@ public class ViewableQueryFilterTest
     @MockComponent
     private ContextualAuthorizationManager authorization;
 
-    private DocumentReference authorized = new DocumentReference("wiki", "Users", "Alice");
+    private final DocumentReference authorized = new DocumentReference("wiki", "Users", "Alice");
 
-    private AttachmentReference unauthorized = new AttachmentReference("bob.png", authorized);
+    private final AttachmentReference unauthorized = new AttachmentReference("bob.png", this.authorized);
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
-        when(this.authorization.hasAccess(Right.VIEW, authorized)).thenReturn(true);
-        when(this.authorization.hasAccess(Right.VIEW, unauthorized)).thenReturn(false);
+        when(this.authorization.hasAccess(Right.VIEW, this.authorized)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, this.unauthorized)).thenReturn(false);
     }
 
     @Test
-    public void filterStatement()
+    void filterStatement()
     {
         String statement = "select doc.fullName from XWikiDocument doc";
         assertSame(statement, this.filter.filterStatement(statement, Query.HQL));
     }
 
     @Test
-    public void filterResultsEmpty()
+    void filterResultsEmpty()
     {
-        List<Object> results = Collections.emptyList();
+        List<Object> results = List.of();
         assertEquals(results, this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithOneEntityReferenceColumn()
+    void filterResultsWithOneEntityReferenceColumn()
     {
         List<Object> results = Arrays.asList(this.unauthorized, this.authorized);
-        assertEquals(Arrays.asList(this.authorized), this.filter.filterResults(results));
+        assertEquals(List.of(this.authorized), this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumnsAndEntityReference()
+    void filterResultsWithTwoColumnsAndEntityReference()
     {
         List<Object> results =
-            Arrays.asList(new Object[]{ this.unauthorized, 23 }, new Object[]{ this.authorized, 17 });
+            Arrays.asList(new Object[] { this.unauthorized, 23 }, new Object[] { this.authorized, 17 });
         List<Object> filteredResults = this.filter.filterResults(results);
         assertEquals(1, filteredResults.size());
-        assertArrayEquals(new Object[]{ this.authorized, 17 }, (Object[]) filteredResults.get(0));
+        assertArrayEquals(new Object[] { this.authorized, 17 }, (Object[]) filteredResults.get(0));
     }
 
     @Test
-    public void filterResultsWithOneColumnNotEntityReference()
+    void filterResultsWithOneColumnNotEntityReference()
     {
-        List<Object> results = Collections.singletonList("Path.To.Page");
-        assertEquals(Collections.emptyList(), this.filter.filterResults(results));
+        List<Object> results = List.of("Path.To.Page");
+        assertEquals(List.of(), this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumnsNotEntityReference()
+    void filterResultsWithTwoColumnsNotEntityReference()
     {
-        List<Object> results = Collections.singletonList(new Object[]{ 17, this.authorized });
-        assertEquals(Collections.emptyList(), this.filter.filterResults(results));
+        List<Object> results = Collections.singletonList(new Object[] { 17, this.authorized });
+        assertEquals(List.of(), this.filter.filterResults(results));
     }
 }

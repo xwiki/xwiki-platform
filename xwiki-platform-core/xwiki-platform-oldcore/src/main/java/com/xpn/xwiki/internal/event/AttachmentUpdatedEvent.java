@@ -49,7 +49,7 @@ public class AttachmentUpdatedEvent extends AbstractAttachmentEvent
      */
     public AttachmentUpdatedEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

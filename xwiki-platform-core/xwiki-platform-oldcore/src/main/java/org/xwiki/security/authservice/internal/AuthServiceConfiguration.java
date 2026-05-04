@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
@@ -101,6 +102,9 @@ public class AuthServiceConfiguration
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @return the hint of the configured authentication service
      * @throws XWikiException when failing to load the configuration
@@ -110,14 +114,24 @@ public class AuthServiceConfiguration
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Try at current wiki level
-        String service = getAuthService(xcontext.getWikiReference(), xcontext);
-        if (service != null) {
-            return service;
+        try {
+            String service = getAuthService(xcontext.getWikiReference(), xcontext);
+            if (service != null) {
+                return service;
+            }
+        } catch (XWikiException e) {
+            if (xcontext.isMainWiki()) {
+                throw e;
+            }
+
+            this.logger.error(
+                "Failed to load the authentication service configured for wiki [{}]. Falling back on main wiki.",
+                xcontext.getWikiId(), e);
         }
 
         // Try at main wiki level
         if (!xcontext.isMainWiki()) {
-            service = getAuthService(xcontext.getWikiReference(), xcontext);
+            String service = getAuthService(xcontext.getMainWikiReference(), xcontext);
             if (service != null) {
                 return service;
             }
@@ -184,7 +198,7 @@ public class AuthServiceConfiguration
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        setAuthServiceId(id, new WikiReference(xcontext.getWikiId()), xcontext);
+        setAuthServiceId(id, xcontext.getWikiReference(), xcontext);
     }
 
     /**

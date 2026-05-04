@@ -252,7 +252,7 @@ public class MavenResolver
         // module artifacts as XWiki Extensions).
         Model model = getModelFromCurrentPOM();
         for (Dependency dependency : model.getDependencies()) {
-            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
+            if ("clover".equals(dependency.getArtifactId()) && "org.openclover".equals(dependency.getGroupId())) {
                 artifacts.add(convertToArtifact(dependency));
             }
         }

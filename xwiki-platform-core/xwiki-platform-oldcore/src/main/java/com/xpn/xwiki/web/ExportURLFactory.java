@@ -592,7 +592,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
         String path = url.toString();
 
-        if (url.getProtocol().equals("file")) {
+        if ("file".equals(url.getProtocol())) {
             path = path.substring("file://".length());
         }
 

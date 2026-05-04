@@ -399,7 +399,7 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        return contentType != null && !contentType.equals(PURETEXT_LOWERCASE) && !contentType.equals("velocitycode");
+        return contentType != null && !PURETEXT_LOWERCASE.equals(contentType) && !"velocitycode".equals(contentType);
     }
 
     /**

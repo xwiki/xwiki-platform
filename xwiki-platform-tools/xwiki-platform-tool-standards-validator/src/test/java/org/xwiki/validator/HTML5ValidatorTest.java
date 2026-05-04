@@ -30,8 +30,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit tests for {@link org.xwiki.validator.HTML5Validator}.
  *
- * @since 6.0RC1
  * @version $Id$
+ * @since 6.0RC1
  */
 public class HTML5ValidatorTest
 {
@@ -40,36 +40,36 @@ public class HTML5ValidatorTest
     @Before
     public void setUp()
     {
-        validator = new HTML5Validator();
+        this.validator = new HTML5Validator();
     }
 
     @Test
     public void testValid()
     {
-        validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
-        List<ValidationError> errors = validator.validate();
+        this.validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
+        List<ValidationError> errors = this.validator.validate();
         assertTrue(errors.isEmpty());
     }
 
     @Test
     public void testInvalid()
     {
-        validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
-        List<ValidationError> errors = validator.validate();
-        assertEquals(errors, validator.getErrors());
+        this.validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
+        List<ValidationError> errors = this.validator.validate();
+        assertEquals(errors, this.validator.getErrors());
         assertEquals(6, errors.size());
-        validator.clear();
-        assertTrue(validator.getErrors().isEmpty());
+        this.validator.clear();
+        assertTrue(this.validator.getErrors().isEmpty());
     }
 
     @Test
     public void testWhenException()
     {
-        validator.setDocument(null);
+        this.validator.setDocument(null);
         boolean exceptionCaught = false;
         try {
-            validator.validate();
-        } catch(RuntimeException e) {
+            this.validator.validate();
+        } catch (RuntimeException e) {
             exceptionCaught = true;
         }
         assertTrue(exceptionCaught);
@@ -78,6 +78,6 @@ public class HTML5ValidatorTest
     @Test
     public void testName()
     {
-        assertEquals("HTML5", validator.getName());
+        assertEquals("HTML5", this.validator.getName());
     }
 }

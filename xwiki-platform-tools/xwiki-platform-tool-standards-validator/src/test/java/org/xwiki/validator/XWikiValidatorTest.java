@@ -31,20 +31,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test class for {@link org.xwiki.validator.XWikiValidator}.
  *
- * @since 6.4M3
  * @version $Id$
+ * @since 6.4M3
  */
-public class XWikiValidatorTest
+class XWikiValidatorTest
 {
     private XWikiValidator validator;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         this.validator = new XWikiValidator();
     }
 
-    private void validate(InputStream document) throws Exception
+    private void validate(InputStream document)
     {
         this.validator.setHTML5Document(document);
         this.validator.validate();
@@ -53,7 +53,7 @@ public class XWikiValidatorTest
     // Tests
 
     @Test
-    public void testValid() throws Exception
+    void testValid()
     {
         validate(getClass().getResourceAsStream("/xwiki-valid.html"));
         List<ValidationError> errors = this.validator.getErrors();
@@ -61,7 +61,7 @@ public class XWikiValidatorTest
     }
 
     @Test
-    public void testInvalid() throws Exception
+    void testInvalid()
     {
         validate(getClass().getResourceAsStream("/xwiki-invalid.html"));
         List<ValidationError> errors = this.validator.validate();

@@ -333,7 +333,7 @@
         showMacroWizard: function(macroCall) {
           // We don't use _showMacroWizard directly as RequireJS callback because it is asynchronous and RequireJS has
           // issues with async callbacks. See https://github.com/requirejs/requirejs/issues/1694 .
-          require(['macroWizard'], (macroWizard) => {
+          require(['xwiki-wysiwyg-macro-wizard'], (macroWizard) => {
             this._showMacroWizard(macroWizard, macroCall);
           });
         },
@@ -406,11 +406,7 @@
             fromHTML: true,
             toHTML: true,
             text: editor.getData()
-          }).done((html, textStatus, jqXHR) => {
-            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            require(['macroWizard'], () => {
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-            });
+          }).done((html) => {
             editor.setData(html, {
               callback: () => {
                 // The new content may contain widgets (e.g. macros) that need to be initialized.
@@ -448,7 +444,10 @@
       });
 
       // Command to quickly insert/install macros
-      require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
+      require([
+        'xwiki-wysiwyg-macro-service',
+        'xwiki-l10n!xwiki-wysiwyg-macro-selector-translation-keys'
+      ], function (macroService, translations) {
         editor.addCommand('xwiki-macro-maybe-install-insert', {
           async: true,
           exec: function (editor, macroCall) {
@@ -628,7 +627,10 @@
 
       // Register Quick Actions
 
-      require(['macroService', 'l10n!macroSelector'], function (macroService, translations) {
+      require([
+        'xwiki-wysiwyg-macro-service',
+        'xwiki-l10n!xwiki-wysiwyg-macro-selector-translation-keys'
+      ], function (macroService, translations) {
 
         // Icons used for Quick Actions
         var categoriesIcons = {

@@ -236,14 +236,38 @@ public @interface UITest
     String[] servletEngineNetworkAliases() default {};
 
     /**
+     * Configure the blob store backend to use for the tests. By default the filesystem blob store is used unless
+     * clustering is enabled, in which case it's S3 by default.
+     * 
      * @return the blob store backend to use, see {@link BlobStore}
      * @since 17.10.0RC1
      */
-    BlobStore blobStore() default BlobStore.FILESYSTEM;
+    BlobStore blobStore() default BlobStore.DEFAULT;
 
     /**
      * @return the docker image tag to use for the blob store (if not specified, uses the "latest" tag)
      * @since 17.10.0RC1
      */
     String blobStoreTag() default "";
+
+    /**
+     * Configure whether a remote Solr instance should be used for the tests, instead of an embedded one. It's disabled
+     * by default, unless clustering in enabled, in which case it's always enabled.
+     * 
+     * @return true if a remote Solr instance should be used for the tests, instead of an embedded one
+     * @since 18.3.0RC1
+     */
+    SolrMode solrMode() default SolrMode.DEFAULT;
+
+    /**
+     * @return the docker image tag to use for Solr (if not specified, uses the "latest" tag)
+     * @since 18.3.0RC1
+     */
+    String remoteSolrTag() default "";
+
+    /**
+     * @return the number of instances to run during tests.
+     * @since 18.3.0RC1
+     */
+    XWikiInstances xwikiInstances() default @XWikiInstances;
 }

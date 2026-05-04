@@ -112,7 +112,7 @@ public class SortedEvent
         DocumentReference document = getDocument();
         return document != null
                 && !document.equals(sortedEvent.getDocument())
-                && document.getName().equals("WebHome")
+                && "WebHome".equals(document.getName())
                 && sortedEvent.getDocument().hasParent(document.getLastSpaceReference());
     }
 

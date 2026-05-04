@@ -58,11 +58,11 @@ public class ListFilter extends AbstractHTMLFilter
                 if (nextChild.getNodeType() == Node.TEXT_NODE) {
                     String trimmed = StringUtils.stripStart(nextChild.getTextContent(), WHITE_SPACE_CHARS);
                     nextChild.setTextContent(trimmed);
-                    if (trimmed.equals("")) {
+                    if ("".equals(trimmed)) {
                         nextChild = nextChild.getNextSibling();
                         continue;
                     }
-                } else if (nextChild.getNodeName().equals(TAG_P)) {
+                } else if (TAG_P.equals(nextChild.getNodeName())) {
                     replaceWithChildren((Element) nextChild);
                 }
                 break;

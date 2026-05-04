@@ -27,8 +27,8 @@ import org.xwiki.query.Query;
 import org.xwiki.query.WrappingQuery;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
-import static org.mockito.Mockito.mock;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link WrappingQuery}.
@@ -41,7 +41,7 @@ class WrappingQueryTest
     @Test
     void bindValueReturnsThisTest()
     {
-        Query wrappedQuery =  mock(Query.class);
+        Query wrappedQuery = mock(Query.class);
         Query wrappingQuery = new WrappingQuery(wrappedQuery);
         assertSame(wrappingQuery, wrappingQuery.bindValue("hello", "world"));
         assertSame(wrappingQuery, wrappingQuery.bindValue(0, "hello"));

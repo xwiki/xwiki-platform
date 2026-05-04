@@ -141,12 +141,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .livedata-filter,
 .livedata-filter-loader {
   display: inline-block;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
   min-height: 1em;
 }
 </style>

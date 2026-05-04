@@ -19,21 +19,28 @@
  */
 package org.xwiki.groovy.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SecureGroovyCompilationCustomizer}.
@@ -41,85 +48,60 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 4.1M1
  */
-public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+class SecureGroovyCompilationCustomizerTest
 {
-    private ScriptEngine engine;
+    @MockComponent
+    private ConfigurationSource source;
 
-    @Test
-    public void executeWithSecureCustomizerWhenNoProgrammingRights() throws Exception
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeEach
+    void setUp()
     {
-        setUpWhenNoProgrammingRights();
-
-        // Verify synchronized statements are not authorized
-        assertProtectedScript("synchronized(this) { }");
-        // Verify we can't call System methods
-        assertProtectedScript("System.exit(0)");
-        // Verify we can't access private variables
-        assertProtectedScript("\"Hello World\".value[0]");
-
-        // Verify we can do a new and use Integer class
-        assertSafeScript("new Integer(6)");
+        when(this.source.getProperty("groovy.compilationCustomizers", Collections.emptyList()))
+            .thenReturn(List.of("secure"));
     }
 
     @Test
-    public void executeWithSecureCustomizerWhenProgrammingRights() throws Exception
+    void executeWithSecureCustomizerWhenNoProgrammingRights() throws Exception
     {
-        final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
-        final ContextualAuthorizationManager cam = registerMockComponent(ContextualAuthorizationManager.class);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+        ScriptEngine engine = createGroovyEngine();
 
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-            oneOf(cam).hasAccess(Right.PROGRAM);
-                will(returnValue(true));
-        }});
+        // Verify synchronized statements are not authorized
+        assertThrows(ScriptException.class, () -> engine.eval("synchronized(this) { }"));
+        // Verify we can't call System methods
+        assertThrows(ScriptException.class, () -> engine.eval("System.exit(0)"));
+        // Verify we can't access private variables
+        assertThrows(ScriptException.class, () -> engine.eval("\"Hello World\".value[0]"));
 
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngineFactory groovyScriptEngineFactory =
-            getComponentManager().getInstance(ScriptEngineFactory.class, "groovy");
-        manager.registerEngineName("groovy", groovyScriptEngineFactory);
+        // Verify we can do a new and use Integer class
+        assertDoesNotThrow(() -> engine.eval("new Integer(6)"));
+    }
 
-        final ScriptEngine engine = manager.getEngineByName("groovy");
+    @Test
+    void executeWithSecureCustomizerWhenProgrammingRights() throws Exception
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        ScriptEngine engine = createGroovyEngine();
 
         // Verify that the Secure AST Customizer is not active by running a Groovy script that raise an exception
         // when the Secure AST Customizer is active
-        engine.eval("synchronized(this) { }");
+        assertDoesNotThrow(() -> engine.eval("synchronized(this) { }"));
     }
 
-    private void setUpWhenNoProgrammingRights() throws Exception
+    private ScriptEngine createGroovyEngine() throws Exception
     {
-        final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
-        final ContextualAuthorizationManager cam = registerMockComponent(ContextualAuthorizationManager.class);
-
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-            oneOf(cam).hasAccess(Right.PROGRAM);
-                will(returnValue(false));
-        }});
-
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngineFactory groovyScriptEngineFactory =
-            getComponentManager().getInstance(ScriptEngineFactory.class, "groovy");
+            this.componentManager.getInstance(ScriptEngineFactory.class, "groovy");
         manager.registerEngineName("groovy", groovyScriptEngineFactory);
-
-        this.engine = manager.getEngineByName("groovy");
-    }
-
-    private void assertProtectedScript(String script)
-    {
-        try {
-            engine.eval(script);
-            Assert.fail("Should have thrown an exception here");
-        } catch (ScriptException expected) {
-            // Expected, test passed!
-        }
-    }
-
-    private void assertSafeScript(String script) throws Exception
-    {
-        engine.eval(script);
+        return manager.getEngineByName("groovy");
     }
 }

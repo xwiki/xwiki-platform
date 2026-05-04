@@ -126,19 +126,6 @@
     <property type="LargeString">
       <code>XWiki.locale = document.documentElement.getAttribute('lang') || '';
 
-require.config({
-  config: {
-    l10n: {
-      // We need to specify the language because this URL can be used after the page is loaded and thus after the
-      // context language changes on the server session (e.g. if the user opens another page in another browser tab with
-      // a different language specified). We take the current language from the page HTML, rather than using Velocity,
-      // in order to avoid having the current language cached.
-      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=' +
-        encodeURIComponent(XWiki.locale))
-    }
-  }
-});
-
 define('xwiki-ckeditor', [
   'jquery',
   // The CKEditor standard API.
@@ -156,7 +143,7 @@ define('xwiki-ckeditor', [
   // (e.g. between the filebrowser and filetools plugins).
   var getUploadURL = function(document, initiator) {
     return document.getURL('get', $.param({
-      sheet: 'CKEditor.FileUploader',
+      sheet: 'XWiki.WYSIWYG.FileUploader',
       outputSyntax: 'plain',
       // The syntax and language are important especially when the upload request creates a new document.
       syntax: document.syntax,
@@ -196,7 +183,7 @@ define('xwiki-ckeditor', [
         // We use the source document to compute the link label generator URL because we want the link references to be
         // resolved relative to the edited document (as they were inserted).
         labelGenerator: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.LinkLabelGenerator',
+          sheet: 'XWiki.WYSIWYG.LinkLabelGenerator',
           outputSyntax: 'plain',
           language: XWiki.locale
         }))
@@ -1932,7 +1919,6 @@ exports=CKEDITOR</parameters>
     <property type="LargeString">
       <parameters>id=xwiki-ckeditor-plugins
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins', 'webjar.bundle.min')
-bundles=resource, resourcePicker, entityResourcePicker, entityResourceSuggester, modal, l10n, macroWizard, imageWizard
 deps=jquery, ckeditor</parameters>
     </property>
     <property type="String">

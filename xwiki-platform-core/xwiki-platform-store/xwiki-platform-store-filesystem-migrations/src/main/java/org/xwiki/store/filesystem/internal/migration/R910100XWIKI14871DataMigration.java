@@ -146,7 +146,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
                     String value2 = xmlReader.getElementText();
 
                     String path;
-                    if (xmlReader.getLocalName().equals("path")) {
+                    if ("path".equals(xmlReader.getLocalName())) {
                         path = value2;
                     } else {
                         path = value1;

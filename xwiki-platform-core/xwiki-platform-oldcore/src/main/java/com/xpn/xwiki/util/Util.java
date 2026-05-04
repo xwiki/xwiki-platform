@@ -724,7 +724,7 @@ public class Util
      */
     public static boolean isValidXMLElementName(String elementName)
     {
-        if (elementName == null || elementName.equals("") || elementName.matches("(?i)^(xml).*")
+        if (elementName == null || elementName.isEmpty() || elementName.matches("(?i)^(xml).*")
             || !elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)")) {
             return false;
         }

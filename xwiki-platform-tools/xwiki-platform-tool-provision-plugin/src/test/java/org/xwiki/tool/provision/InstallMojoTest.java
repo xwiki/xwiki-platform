@@ -19,29 +19,27 @@
  */
 package org.xwiki.tool.provision;
 
-import java.util.Arrays;
+import java.util.Collections;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionId;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
  * Unit tests for {@link InstallMojo}.
  *
  * @version $Id$
  */
-public class InstallMojoTest
+@WireMockTest(httpPort = 8888)
+class InstallMojoTest
 {
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(8888);
-
     @Test
-    public void install() throws Exception
+    void install()
     {
         stubFor(put(urlEqualTo("/xwiki/rest/jobs?jobType=install&async=false"))
             .willReturn(aResponse()
@@ -52,8 +50,8 @@ public class InstallMojoTest
         ReflectionUtils.setFieldValue(mojo, "username", "superadmin");
         ReflectionUtils.setFieldValue(mojo, "password", "pass");
         ReflectionUtils.setFieldValue(mojo, "extensionIds",
-            Arrays.asList(new ExtensionId().withId("id").withVersion("version")));
+            Collections.singletonList(new ExtensionId().withId("id").withVersion("version")));
 
-        mojo.execute();
+        assertDoesNotThrow(mojo::execute);
     }
 }

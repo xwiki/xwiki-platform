@@ -51,7 +51,7 @@ public class DocumentUpdatedEvent extends AbstractDocumentEvent
      */
     public DocumentUpdatedEvent()
     {
-        super();
+        // Nothing to do.
     }
     
     /**

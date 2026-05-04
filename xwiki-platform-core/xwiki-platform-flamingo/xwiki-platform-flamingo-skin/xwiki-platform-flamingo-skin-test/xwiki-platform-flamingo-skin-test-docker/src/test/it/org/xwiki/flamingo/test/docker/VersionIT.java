@@ -1239,7 +1239,7 @@ class VersionIT
         assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
 
         testUtils.setUseDockerBaseUrl(true);
-        String xmlViewerContent = testUtils.getString(testUtils.getURL(testReference), Map.of("viewer", "xml"));
+        String xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("viewer", "xml"));
         assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
                 + "      <stringTest>anothervalue</stringTest>\n"
                 + "    </property>"),
@@ -1421,7 +1421,7 @@ class VersionIT
         assertEquals("+anothervalue", stringTestDiff.get(1));
 
         testUtils.setUseDockerBaseUrl(true);
-        xmlViewerContent = testUtils.getString(testUtils.getURL(testReference), Map.of("rev", "6.1", "viewer", "xml"));
+        xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("rev", "6.1", "viewer", "xml"));
         assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
                 + "      <stringTest>anothervalue</stringTest>\n"
                 + "    </property>"),

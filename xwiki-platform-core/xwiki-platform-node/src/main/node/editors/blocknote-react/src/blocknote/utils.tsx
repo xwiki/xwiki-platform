@@ -316,7 +316,11 @@ function adaptMacroForBlockNote(
 
     if (renderedJsx instanceof Error) {
       // TODO: how to display properly an error?
-      return <strong>Failed to render macro: {renderedJsx.message}</strong>;
+      return (
+        <strong onDoubleClick={openParamsEditor}>
+          Failed to render macro: {renderedJsx.message}
+        </strong>
+      );
     }
 
     return macro.renderAs === "block" ? (

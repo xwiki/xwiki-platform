@@ -88,13 +88,13 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
 
                 int i = 0;
                 for (String param : filters.keySet()) {
-                    if (param.equals("name")) {
+                    if ("name".equals(param)) {
                         stringBuilder.append("upper(doc.fullName) like :name ");
                     }
-                    if (param.equals("space")) {
+                    if ("space".equals(param)) {
                         stringBuilder.append("upper(doc.space) like :space ");
                     }
-                    if (param.equals("author")) {
+                    if ("author".equals(param)) {
                         stringBuilder.append("upper(doc.contentAuthor) like :author ");
                     }
                     i++;

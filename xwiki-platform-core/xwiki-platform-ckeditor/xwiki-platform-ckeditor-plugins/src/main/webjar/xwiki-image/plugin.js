@@ -19,9 +19,10 @@
  */
 (function() {
   'use strict';
+  const $ = jQuery;
 
   function disableResizer(widget) {
-    require(['imageStyleClient'], function (imageStyleClient) {
+    require(['xwiki-wysiwyg-image-style-client'], function (imageStyleClient) {
       widget.resizer.removeClass('hidden');
       var styleId = widget.data.imageStyle;
       if (styleId) {
@@ -64,48 +65,97 @@
       return imageOrLink;
     }
 
+    function updateImage(data) {
+      if (widget?.element) {
+        widget.setData(data);
 
-    require(['imageWizard'], function(imageWizard) {
-      imageWizard({
-        editor: editor,
-        imageData: Object.assign({}, widget.data),
-        isInsert: isInsert,
-        setImageData: setImageData
-      }).done(function(data) {
-        if (widget && widget.element) {
-          widget.setData(data);
+        disableResizer(widget);
 
-          disableResizer(widget);
-
-          // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
-          // compliant with the new image dialog.
-          if (widget.element.getName() === 'p') {
-            widget.element = unwrapFromCentering(widget.element);
-            widget.element.setAttribute('data-widget', widget.name);
-          }
-
-        } else {
-          // Wrap the image in a span to have somewhere to place the resize element.
-          var element = CKEDITOR.dom.element.createFromHtml('<span>' + widget.template.output() + '</span>',
-            editor.document);
-          var wrapper = editor.widgets.wrapElement(element, widget.name);
-          var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
-
-          // Append wrapper to a temporary document. This will unify the environment in which #data listeners work when
-          // creating and editing widget.
-          temp.append(wrapper);
-
-          // Initialize an empty image widget, then update it with the data from the image dialog.
-          var widgetInstance = editor.widgets.initOn(element, widget, {});
-          widgetInstance.setData(data);
-          editor.widgets.finalizeCreation(temp);
+        // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
+        // compliant with the new image dialog.
+        if (widget.element.getName() === 'p') {
+          widget.element = unwrapFromCentering(widget.element);
+          widget.element.setAttribute('data-widget', widget.name);
         }
+
+      } else {
+        // Wrap the image in a span to have somewhere to place the resize element.
+        var element = CKEDITOR.dom.element.createFromHtml('<span>' + widget.template.output() + '</span>',
+          editor.document);
+        var wrapper = editor.widgets.wrapElement(element, widget.name);
+        var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
+
+        // Append wrapper to a temporary document. This will unify the environment in which #data listeners work when
+        // creating and editing widget.
+        temp.append(wrapper);
+
+        // Initialize an empty image widget, then update it with the data from the image dialog.
+        var widgetInstance = editor.widgets.initOn(element, widget, {});
+        widgetInstance.setData(data);
+        editor.widgets.finalizeCreation(temp);
+      }
+    }
+
+    // Skip the wizard if setImageData is set.
+    if (setImageData) {
+      updateImage(setImageData);
+    } else {
+      require(['xwiki-wysiwyg-image-wizard'], function(imageWizard) {
+        imageWizard({
+          captionAllowed: editor.filter.checkFeature(editor.widgets.registered.image.features.caption),
+          currentDocument: editor.config.sourceDocument.documentReference,
+          getImageResourceURL: (resourceReference, params) => getImageResourceURL(editor, resourceReference, params),
+          imageData: Object.assign({}, widget.data),
+          isHTML5: editor.config.htmlSyntax === 'annotatedhtml/5.0',
+          isInsert,
+          upload: (...args) => createLoader(editor, ...args),
+        }).done(updateImage);
       });
+    }
+  }
+
+  /**
+   * Initialize a loader for the provided file. Three optional callbacks can be provided in the options
+   * object:
+   * - onSuccess is called when the upload is successful, the entity reference is passed as argument.
+   * - onError is called when the upload fails
+   * - onAbort is called when the upload is aborted
+   * @param uploadedFile the uploaded file to create the loader for
+   * @param options an option object with callback actions
+   */
+  function createLoader(editor, uploadedFile, options = {}) {
+    const loader = editor.uploadRepository.create(uploadedFile);
+    loader.on('uploaded', function (event) {
+      const resourceReference = event.sender.responseData.message.resourceReference;
+      const entityReference = CKEDITOR.plugins.xwikiResource.convertResourceReferenceToEntityReference(
+        resourceReference);
+      options.onSuccess?.(entityReference);
     });
+
+    loader.on('error', function (error) {
+      console.log('Failed to upload a file', error);
+      options.onError?.();
+    });
+    loader.on('abort', function (error) {
+      console.log('Failed to upload a file', error);
+      options.onAbort?.();
+    });
+
+    loader.loadAndUpload(editor.config.filebrowserUploadUrl);
+  }
+
+  function getImageResourceURL(editor, resourceReference, params = {}) {
+    let resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor);
+    // Only set the params for resource reference types that can support it. Sending the custom params to external URLs
+    // does not make sense as they are not able to interpret them.
+    if (resourceReference.type !== 'url') {
+      resourceURL = resourceURL + '&' + new URLSearchParams(params);
+    }
+    return resourceURL;
   }
 
   CKEDITOR.plugins.add('xwiki-image', {
-    requires: 'xwiki-image-old,xwiki-dialog',
+    requires: 'xwiki-image-old,xwiki-dialog,xwiki-resource',
     beforeInit: function(editor) {
       editor.on('widgetDefinition', function(event) {
         var widgetDefinition = event.data;
@@ -144,7 +194,7 @@
           '</div>' +
           '</li>',
         feed: function (opts, callback) {
-          require(['attachmentService'], function (attachmentService) {
+          require(['xwiki-wysiwyg-attachment-service'], function (attachmentService) {
 
 
             const attachmentToItem = function (attachment) {
@@ -279,60 +329,48 @@
             return "img::" + item.query;
           }
 
-          require(['jquery', 'resource'], function ($, resource) {
-            if (item.id === "_uploadImage") {
-
-              // Reuse attachment suggest code to show the file picker. Provides the xwiki-file-picker module.
-              const requiredSkinExtensions = `<script src=` +
-                `'${XWiki.contextPath}/${XWiki.servletpath}` +
-                `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
-                `defer='defer'></script>`;
-              $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-
-              require(['attachmentService', 'xwiki-file-picker'], (attachmentService, filePicker) => {
-                // Open the file picker.
-                filePicker.pickLocalFiles({
-                  accept: "image/*",
-                  multiple: false
-                }).then(files => {
-                  if (files.length) {
-                    // Simulate a paste event, as if the selected image files were pasted in the editor.
-                    editor.fire('paste', {
-                      method: 'paste',
-                      dataValue: '',
-                      dataTransfer: new CKEDITOR.plugins.clipboard.dataTransfer({
-                        files,
-                        types: ['Files'],
-                      })
-                    });
-                    editor.once('fileUploadResponse', () => {
-                      // Clear the cache so the new image can appear on next usage of the image quick action.
-                      attachmentService.clearCache();
-                    });
-                  }
-                });
+          if (item.id === "_uploadImage") {
+            require(['xwiki-wysiwyg-attachment-service', 'xwiki-file-picker'], (attachmentService, filePicker) => {
+              // Open the file picker.
+              filePicker.pickLocalFiles({
+                accept: "image/*",
+                multiple: false
+              }).then(files => {
+                if (files.length) {
+                  // Simulate a paste event, as if the selected image files were pasted in the editor.
+                  editor.fire('paste', {
+                    method: 'paste',
+                    dataValue: '',
+                    dataTransfer: new CKEDITOR.plugins.clipboard.dataTransfer({
+                      files,
+                      types: ['Files'],
+                    })
+                  });
+                  editor.once('fileUploadResponse', () => {
+                    // Clear the cache so the new image can appear on next usage of the image quick action.
+                    attachmentService.clearCache();
+                  });
+                }
               });
-
-              return;
-            }
-
-            const resourceReference = {...resource.convertEntityReferenceToResourceReference(
+            });
+          } else {
+            const resourceReference = {...CKEDITOR.plugins.xwikiResource.convertEntityReferenceToResourceReference(
               XWiki.Model.resolve(item.reference, XWiki.EntityType.ATTACHMENT),
               editor.config.sourceDocument.documentReference),
               // Image references are always attachments.
               typed: false
             };
 
-            // Insert the selected image
-            imageWidget.insert({
+            // Insert the selected image after the quick action returns without inserting anything.
+            setTimeout(() => imageWidget.insert({
               setImageData: {
                 resourceReference,
                 src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor)
               }
-            });
-          });
+            }), 0);
+          }
 
-          return "";
+          return '';
         }
       });
 

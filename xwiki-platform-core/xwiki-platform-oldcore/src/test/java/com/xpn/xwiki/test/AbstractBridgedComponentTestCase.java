@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import javax.servlet.ServletContext;
@@ -98,15 +99,19 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         // correctly with a Servlet Context.
         ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         final ServletContext mockServletContext = getMockery().mock(ServletContext.class);
-        environment.setServletContext(mockServletContext);
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/xwiki.cfg");
             will(returnValue(null));
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/resourcecheck/a%61b");
+            will(returnValue(new ByteArrayInputStream("a%61b".getBytes())));
+            allowing(mockServletContext).getRealPath("/");
+            will(returnValue(null));
             allowing(mockServletContext).getAttribute("jakarta.servlet.context.tempdir");
-                will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+            will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
+        environment.setServletContext(mockServletContext);
 
         final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         getMockery().checking(new Expectations() {{

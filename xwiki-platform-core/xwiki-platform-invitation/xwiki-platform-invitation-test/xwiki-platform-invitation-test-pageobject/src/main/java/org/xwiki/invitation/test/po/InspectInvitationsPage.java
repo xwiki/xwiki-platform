@@ -142,7 +142,7 @@ public abstract class InspectInvitationsPage extends BasePage
                 notSpamButton.click();
                 InvitationActionConfirmationElement confirm = new InvitationActionConfirmationElement();
                 // We can't go forward unless we are on the right form.
-                if (!confirm.getLabel().equalsIgnoreCase("Synopsis of findings and/or action taken")) {
+                if (!"Synopsis of findings and/or action taken".equalsIgnoreCase(confirm.getLabel())) {
                     throw new WebDriverException("Not on 'not spam' confirm page, message says: " + confirm.getLabel());
                 }
                 confirm.setMemo(message);

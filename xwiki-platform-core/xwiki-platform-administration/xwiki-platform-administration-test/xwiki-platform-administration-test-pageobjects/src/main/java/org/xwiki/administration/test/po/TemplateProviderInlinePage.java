@@ -22,6 +22,7 @@ package org.xwiki.administration.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
@@ -45,6 +46,12 @@ public class TemplateProviderInlinePage extends InlinePage
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_name")
     private WebElement templateNameInput;
+
+    @FindBy(id = "XWiki.TemplateProviderClass_0_icon")
+    private WebElement iconInput;
+
+    @FindBy(id = "XWiki.TemplateProviderClass_0_description")
+    private WebElement descriptionInput;
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_type")
     private WebElement templateTypeSelect;
@@ -80,6 +87,19 @@ public class TemplateProviderInlinePage extends InlinePage
     {
         this.templateNameInput.clear();
         this.templateNameInput.sendKeys(value);
+    }
+
+    public void setIcon(String icon)
+    {
+        this.iconInput.clear();
+        this.iconInput.sendKeys(icon);
+        this.iconInput.sendKeys(Keys.ESCAPE);
+    }
+
+    public void setDescription(String description)
+    {
+        this.descriptionInput.clear();
+        this.descriptionInput.sendKeys(description);
     }
 
     public String getTemplate()

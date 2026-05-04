@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.rcs.impl.Node;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -166,7 +165,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     private Archive toRCS(final XWikiContext context) throws Exception
     {
-        final Version[] versions = this.getVersions();
         XWikiAttachmentRCSArchive rcsArch = null;
 
         // We need to loop backward since the revision are ordered in desc order.
@@ -181,39 +179,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             }
         }
         return rcsArch;
-    }
-
-    /**
-     * @param rcsArchive the RCS archive to import.
-     * @throws Exception if getting a revision from the RCS archive or deserializing an attachment from XML fails
-     */
-    private void fromRCS(final Archive rcsArchive) throws Exception
-    {
-        if (rcsArchive == null) {
-            return;
-        }
-
-        final Node[] nodes = rcsArchive.changeLog();
-        for (int i = nodes.length - 1; i > -1; i--) {
-            final Object[] lines = rcsArchive.getRevision(nodes[i].getVersion());
-            final StringBuilder content = new StringBuilder();
-            for (int j = 0; j < lines.length; j++) {
-                String line = lines[j].toString();
-                content.append(line);
-                if (j != lines.length - 1) {
-                    content.append("\n");
-                }
-            }
-            final XWikiAttachment rev = new XWikiAttachment();
-            rev.fromXML(content.toString());
-            rev.setDoc(getAttachment().getDoc());
-            rev.setAttachment_archive(this);
-
-            // this should not be necessary, keeping to maintain behavior.
-            rev.setVersion(nodes[i].getVersion().toString());
-
-            revisions.add(rev);
-        }
     }
 
     /**

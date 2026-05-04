@@ -36,6 +36,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -90,5 +91,15 @@ class SolrFieldStringEntityReferenceResolverTest
                 new DocumentReference("bar", Arrays.asList("My App", "Code"), "A Class")),
             new ClassPropertyReference(this.resolver.resolve("A Class.title", EntityType.CLASS_PROPERTY,
                 new WikiReference("bar"))));
+    }
+
+    @Test
+    void resolveWithNullEntityType()
+    {
+        // Verify that passing a null EntityType throws a RuntimeException (not a NullPointerException),
+        // since Map.of() doesn't support null keys.
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> this.resolver.resolve("something", null));
+        assertEquals("No parsing definition found for Entity Type [null]", exception.getMessage());
     }
 }

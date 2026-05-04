@@ -146,11 +146,11 @@ public class NumberClass extends PropertyClass
     {
         String ntype = getNumberType();
         BaseProperty property;
-        if (ntype.equals(TYPE_INTEGER)) {
+        if (TYPE_INTEGER.equals(ntype)) {
             property = new IntegerProperty();
-        } else if (ntype.equals(TYPE_FLOAT)) {
+        } else if (TYPE_FLOAT.equals(ntype)) {
             property = new FloatProperty();
-        } else if (ntype.equals(TYPE_DOUBLE)) {
+        } else if (TYPE_DOUBLE.equals(ntype)) {
             property = new DoubleProperty();
         } else {
             property = new LongProperty();
@@ -173,20 +173,20 @@ public class NumberClass extends PropertyClass
         Number nvalue = null;
 
         try {
-            if (ntype.equals(TYPE_INTEGER)) {
-                if ((value != null) && (!value.equals(""))) {
+            if (TYPE_INTEGER.equals(ntype)) {
+                if ((value != null) && (!value.isEmpty())) {
                     nvalue = Integer.valueOf(value);
                 }
-            } else if (ntype.equals(TYPE_FLOAT)) {
-                if ((value != null) && (!value.equals(""))) {
+            } else if (TYPE_FLOAT.equals(ntype)) {
+                if ((value != null) && (!value.isEmpty())) {
                     nvalue = Float.valueOf(value);
                 }
-            } else if (ntype.equals(TYPE_DOUBLE)) {
-                if ((value != null) && (!value.equals(""))) {
+            } else if (TYPE_DOUBLE.equals(ntype)) {
+                if ((value != null) && (!value.isEmpty())) {
                     nvalue = Double.valueOf(value);
                 }
             } else {
-                if ((value != null) && (!value.equals(""))) {
+                if ((value != null) && (!value.isEmpty())) {
                     nvalue = Long.valueOf(value);
                 }
             }

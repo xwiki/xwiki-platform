@@ -47,13 +47,13 @@ $services.template.execute('logging_macros.vm')
   <dl class="xform">
     ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
     <dt>
-      <label class="collapse-toggle#if ($collapsed || $status.state == 'WAITING') collapsed#end"
+      <button class="btn btn-default btn-xs collapse-toggle#if ($collapsed || $status.state == 'WAITING') collapsed#end"
           data-target-xpath="parent::*/following-sibling::*">
         <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
         <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
         #set ($jobType = $status.jobType)
         $services.localization.render(["job.log.label.$jobType", 'job.log.label'])
-      </label>
+      </button>
     </dt>
     <dd>#printStatusLog($status)</dd>
   </dl>

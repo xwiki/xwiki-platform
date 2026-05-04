@@ -739,7 +739,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId, newVersion).getExtension(0);
         assertEquals("remote-installed", extensionPane.getStatus());
         assertEquals("Version 1.3 is installed", extensionPane.getStatusMessage());
-        extensionPane = extensionPane.upgrade();
+        // Using 20s for the timeout since the default 10s seems to not always be enough for computing the
+        // upgrade plan.
+        extensionPane = extensionPane.upgrade(20);
 
         // Check the upgrade plan.
         List<DependencyPane> upgradePlan = extensionPane.openProgressSection().getJobPlan();
@@ -913,7 +915,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId, oldVersion).getExtension(0);
         assertEquals("remote-installed", extensionPane.getStatus());
         assertEquals("Version 2.1.4 is installed", extensionPane.getStatusMessage());
-        extensionPane = extensionPane.downgrade();
+        // Using 20s for the timeout since the default 10s seems to not always be enough for computing the
+        // downgrade plan.
+        extensionPane = extensionPane.downgrade(20);
 
         // Check the downgrade plan.
         List<DependencyPane> downgradePlan = extensionPane.openProgressSection().getJobPlan();

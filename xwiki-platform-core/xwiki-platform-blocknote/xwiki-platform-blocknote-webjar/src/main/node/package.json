@@ -29,7 +29,8 @@
     "pinia": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "vue-i18n": "catalog:"
+    "vue-i18n": "catalog:",
+    "xwiki-platform-localization-webjar": "workspace:*"
   },
   "peerDependencies": {
     "vue": "3.x"

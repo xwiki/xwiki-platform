@@ -20,8 +20,8 @@
 package org.xwiki.like.test.po;
 
 import org.openqa.selenium.By;
-import org.xwiki.ckeditor.test.po.MacroDialogSelectModal;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 
 /**
  * @version $Id$

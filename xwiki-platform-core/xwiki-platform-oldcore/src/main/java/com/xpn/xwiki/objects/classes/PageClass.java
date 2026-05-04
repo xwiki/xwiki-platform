@@ -60,7 +60,7 @@ public class PageClass extends DBListClass
      */
     public PageClass()
     {
-        super();
+        // Nothing to do.
     }
 
     @Override

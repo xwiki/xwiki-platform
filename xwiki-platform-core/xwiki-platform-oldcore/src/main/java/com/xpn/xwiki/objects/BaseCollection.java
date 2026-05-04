@@ -703,7 +703,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
+                if ((newProperty != null) && (!"".equals(newProperty.toText()))) {
                     if (pclass != null) {
                         String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
                             : pclass.displayView(propertyName, this, context);
@@ -751,7 +751,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             }
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
+                if ((oldProperty != null) && (!"".equals(oldProperty.toText()))) {
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()

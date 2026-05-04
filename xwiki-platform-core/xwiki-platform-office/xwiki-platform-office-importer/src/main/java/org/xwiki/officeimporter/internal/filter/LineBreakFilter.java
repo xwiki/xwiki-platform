@@ -50,9 +50,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
     private static final String[] BLOCK_ELEMENT_TAGS =
         new String[] {TAG_P, TAG_UL, TAG_OL, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_TABLE};
 
-    /**
-     * Sort the block elements tag name array.
-     */
+    // Sort the block elements tag name array.
     static {
         Arrays.sort(BLOCK_ELEMENT_TAGS);
     }
@@ -137,12 +135,12 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     private boolean isEmptyTextNode(Node node)
     {
-        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().equals("");
+        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().isEmpty();
     }
 
     /**
      * Checks if a node represents an html comment.
-     * 
+     *
      * @param node the {@link Node}.
      * @return true if the node is a comment node.
      */
@@ -153,12 +151,12 @@ public class LineBreakFilter extends AbstractHTMLFilter
 
     /**
      * Checks if a node represents an html line break.
-     * 
+     *
      * @param node the {@link Node}
      * @return true of the node represents a line break.
      */
     private boolean isLineBreak(Node node)
     {
-        return null != node && node.getNodeName().equals(TAG_BR);
+        return null != node && TAG_BR.equals(node.getNodeName());
     }
 }

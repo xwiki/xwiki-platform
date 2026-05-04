@@ -249,7 +249,7 @@ class R140401000XWIKI15460DataMigrationTest
         when(deletedUserOther.setLimit(1)).thenReturn(deletedUserOther);
         when(deletedUserOther.execute()).thenReturn(Collections.singletonList(0L));
 
-        if (currentWikiId.equals("mainwikiid")) {
+        if ("mainwikiid".equals(currentWikiId)) {
             UserReference existingUserReference = mock(UserReference.class);
             when(this.documentReferenceUserReferenceResolver.resolve(existingUserDocumentReference))
                 .thenReturn(existingUserReference);

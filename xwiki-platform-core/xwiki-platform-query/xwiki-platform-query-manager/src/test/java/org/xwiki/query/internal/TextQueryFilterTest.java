@@ -44,12 +44,19 @@ class TextQueryFilterTest
     void filterStatement()
     {
         String result = this.filter
-            .filterStatement(" \nseLEct  disTinCT   user.alias  as alias,\n user.name, user.age as unfilterable_age "
-                + "\n\r\tfROm Users user\r\nwHere  user.age >= 18\n", Query.HQL);
-        assertEquals("seLEct  disTinCT   user.alias  as alias,\n user.name, user.age as unfilterable_age "
-            + "\n\r\tfROm Users user\r\n"
-            + "wHere  (lower(str(user.alias)) like lower(:text) or lower(str(user.name)) like lower(:text))"
-            + " and (user.age >= 18)", result);
+            .filterStatement("""
+                \s
+                seLEct  disTinCT   user.alias  as alias,
+                 user.name, user.age as unfilterable_age\s
+                \r\tfROm Users user\r
+                wHere  user.age >= 18
+                """, Query.HQL);
+        assertEquals("""
+                seLEct  disTinCT   user.alias  as alias,
+                 user.name, user.age as unfilterable_age\s
+                \r\tfROm Users user\r
+                wHere  (lower(str(user.alias)) like lower(:text) or lower(str(user.name)) like lower(:text)) and (user.age >= 18)""",
+            result);
     }
 
     @Test

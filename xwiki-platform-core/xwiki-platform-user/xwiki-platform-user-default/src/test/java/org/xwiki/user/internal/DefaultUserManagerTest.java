@@ -25,6 +25,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -123,6 +125,44 @@ class DefaultUserManagerTest
 
         TestUserReference userReference = new TestUserReference();
         Throwable exception = assertThrows(RuntimeException.class, () -> this.userManager.exists(userReference));
+        assertEquals("Failed to find user manager for role [org.xwiki.user.UserManager] and hint "
+            + "[org.xwiki.user.internal.DefaultUserManagerTest$TestUserReference]", exception.getMessage());
+        assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
+    }
+
+    @Test
+    void hasAccess() throws Exception
+    {
+        UserManager customUserManager = mock(UserManager.class);
+        when(customUserManager.hasAccess(eq(Right.VIEW), any(TestUserReference.class),
+            any(TestUserReference.class))).thenReturn(true);
+
+        when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
+            .thenReturn(customUserManager);
+
+        assertTrue(this.userManager.hasAccess(Right.VIEW, new TestUserReference(), new TestUserReference()));
+    }
+
+    @Test
+    void hasAccessWhenNonResourceTarget()
+    {
+        assertTrue(this.userManager.hasAccess(Right.VIEW, mock(UserReference.class), SuperAdminUserReference.INSTANCE));
+        assertTrue(this.userManager.hasAccess(Right.VIEW, mock(UserReference.class), GuestUserReference.INSTANCE));
+        assertFalse(this.userManager.hasAccess(Right.EDIT, mock(UserReference.class),
+            SuperAdminUserReference.INSTANCE));
+        assertFalse(this.userManager.hasAccess(Right.EDIT, mock(UserReference.class), GuestUserReference.INSTANCE));
+    }
+
+    @Test
+    void hasAccessWhenNoUserManager() throws Exception
+    {
+        when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
+            .thenThrow(new ComponentLookupException("error"));
+
+        TestUserReference userReference1 = new TestUserReference();
+        TestUserReference userReference2 = new TestUserReference();
+        Throwable exception = assertThrows(RuntimeException.class,
+            () -> this.userManager.hasAccess(Right.VIEW, userReference1, userReference2));
         assertEquals("Failed to find user manager for role [org.xwiki.user.UserManager] and hint "
             + "[org.xwiki.user.internal.DefaultUserManagerTest$TestUserReference]", exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));

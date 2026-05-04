@@ -596,7 +596,7 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
@@ -609,7 +609,7 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 'solrSearch.min')</parameters>
     </property>
     <property>
-      <scope></scope>
+      <scope/>
     </property>
   </object>
 </xwikidoc>

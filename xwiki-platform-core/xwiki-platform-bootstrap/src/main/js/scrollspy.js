@@ -23,7 +23,7 @@
     this.activeTarget   = null
     this.scrollHeight   = 0
 
-    this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+    this.$scrollElement.on('scroll.bs.scrollspy', this.process.bind(this))
     this.refresh()
     this.process()
   }
@@ -164,7 +164,7 @@
   // SCROLLSPY DATA-API
   // ==================
 
-  $(window).on('load.bs.scrollspy.data-api', function () {
+  $(function () {
     $('[data-spy="scroll"]').each(function () {
       var $spy = $(this)
       Plugin.call($spy, $spy.data())

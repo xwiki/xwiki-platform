@@ -367,19 +367,20 @@ public class ModelFactory
                 List allowedValueList = listClass.getList(xwikiContext);
 
                 if (!allowedValueList.isEmpty()) {
-                    Formatter f = new Formatter();
-                    for (int i = 0; i < allowedValueList.size(); i++) {
-                        if (i != allowedValueList.size() - 1) {
-                            f.format("%s,", allowedValueList.get(i).toString());
-                        } else {
-                            f.format("%s", allowedValueList.get(i).toString());
+                    try (Formatter f = new Formatter()) {
+                        for (int i = 0; i < allowedValueList.size(); i++) {
+                            if (i != allowedValueList.size() - 1) {
+                                f.format("%s,", allowedValueList.get(i).toString());
+                            } else {
+                                f.format("%s", allowedValueList.get(i).toString());
+                            }
                         }
-                    }
 
-                    Attribute attribute = this.objectFactory.createAttribute();
-                    attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
-                    attribute.setValue(f.toString());
-                    property.getAttributes().add(attribute);
+                        Attribute attribute = this.objectFactory.createAttribute();
+                        attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
+                        attribute.setValue(f.toString());
+                        property.getAttributes().add(attribute);
+                    }
                 }
             }
 
@@ -759,11 +760,12 @@ public class ModelFactory
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
     {
         return this.toRestPage(baseUri, self, doc, useVersion, withPrettyNames, withObjects, withXClass,
-            withAttachments, List.of());
+            withAttachments, List.of(), List.of());
     }
 
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
-        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights) throws XWikiException
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights,
+        List<String> supportedSyntaxes) throws XWikiException
     {
         Page page = this.objectFactory.createPage();
         toRestPageSummary(page, baseUri, doc, useVersion, withPrettyNames);
@@ -867,6 +869,22 @@ public class ModelFactory
             right.setValue(this.authorizationManagerProvider.get().hasAccess(checkRight,
                 doc.getDocumentReference()));
             page.withRights(right);
+        }
+
+        // Add html rendering if needed
+        if (!supportedSyntaxes.isEmpty() && !supportedSyntaxes.contains(page.getSyntax())) {
+            XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(doc.getDocumentReference(), xcontext);
+            XWikiDocument oldDoc = xcontext.getDoc();
+
+            try {
+                // Set the right document for rendering.
+                xcontext.setDoc(xwikiDocument);
+
+                page.setRenderedContent(doc.displayDocument());
+            } finally {
+                // Reset context.
+                xcontext.setDoc(oldDoc);
+            }
         }
 
         return page;

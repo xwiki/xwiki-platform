@@ -78,7 +78,6 @@ public class EmailClass extends StringClass
      **/
     public EmailClass()
     {
-        super();
         setValidationRegExp(DEFAULT_EMAIL_VALIDATION_REGEXP);
     }
 

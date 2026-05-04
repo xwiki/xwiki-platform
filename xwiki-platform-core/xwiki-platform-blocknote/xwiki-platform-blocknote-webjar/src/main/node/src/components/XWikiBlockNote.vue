@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
         v-if="editorContent"
@@ -71,8 +71,15 @@
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import { resolver } from "xwiki-platform-localization-webjar";
+import type { ImageWizard } from "../services/image/ImageWizard";
+import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
-import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  BlockOfType,
+  EditorLanguage,
+  ImageUpdateResult,
+} from "@xwiki/platform-editors-blocknote-react";
 import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
@@ -122,12 +129,23 @@ const {
 //
 const value = ref(initialValue);
 const dirty = ref(false);
+const isLoading = ref(true);
 
 const editorContent = ref();
 
-onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
-});
+const defaultLabel = "Editor";
+
+const imageEdition = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  imageWizard.edit(image, {
+    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
+      update({ type: "update", updatedProps }),
+    cancel: () => update({ type: "aborted" }),
+  });
+};
 
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
@@ -139,25 +157,42 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: getLanguage(),
+  label: defaultLabel,
+  overrides: {
+    imageEdition,
+  },
+});
+
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+  editorProps.value.label =
+    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
+      "platform.blocknote.editor.label"
+    ] ?? defaultLabel;
+  isLoading.value = false;
 });
 
 const macros = {
   list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
-    openParamsEditor: (
+    openParamsEditor: async (
       macro: MacroWithUnknownParamsType,
-      params: UnknownMacroParamsType,
+      parameters: UnknownMacroParamsType,
       update: (newProps: UnknownMacroParamsType) => void,
     ) => {
-      // TODO: Open the macro modal.
-      console.debug(
-        "Open macro editor for macro",
-        macro,
-        "with params",
-        params,
-        "and update callback",
-        update,
-      );
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        update(
+          await macroWizard.insertOrUpdate(macro, parameters, {
+            syntax: outputSyntax,
+            inlineParametersSyntax: inputSyntax,
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to edit the macro", error);
+      }
     },
   },
 };

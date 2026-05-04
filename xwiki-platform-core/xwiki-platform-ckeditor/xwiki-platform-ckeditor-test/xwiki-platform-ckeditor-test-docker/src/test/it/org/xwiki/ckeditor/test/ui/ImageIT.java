@@ -36,19 +36,12 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -58,6 +51,12 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogStandardEditForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogIconSelectForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogUrlSelectForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -92,9 +91,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 class ImageIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+    void beforeAll(TestUtils setup) throws Exception {
         setup.loginAsSuperAdmin();
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
     }
     
     @BeforeEach

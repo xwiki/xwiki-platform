@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;
@@ -598,8 +597,10 @@ class UsersGroupsRightsManagementIT
     @Order(11)
     void setExtensionRightsForPageAndChildren(TestUtils setup, TestReference testReference)
     {
-        String testName = testReference.getLastSpaceReference().getName();
-        String userName = String.format("%s_TestUser", testName);
+        // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
+        // LiveTable and we can set rights for it. The better alternative would have been to introduce a filter()
+        // method in EditRightsPane but that's more complex and that Rights Table needs to be moved to a LD ASAP.
+        String userName = "createAndDeleteUser";
 
         // Create a test user
         setup.deletePage("XWiki", userName);
@@ -630,7 +631,6 @@ class UsersGroupsRightsManagementIT
         // Get the rights pane and switch to users
         EditRightsPane editRightsPane = new EditRightsPane();
         editRightsPane.switchToUsers();
-        editRightsPane.waitUntilPageIsReady();
 
         // Verify the user exists in the rights table
         assertTrue(editRightsPane.hasEntity(userName));
@@ -666,8 +666,10 @@ class UsersGroupsRightsManagementIT
     @Order(12)
     void setExtensionRightsForPageOnly(TestUtils setup, TestReference testReference)
     {
-        String testName = testReference.getLastSpaceReference().getName();
-        String userName = String.format("%s_TestUser", testName);
+        // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
+        // LiveTable and we can set rights for it. The better alternative would have been to introduce a filter()
+        // method in EditRightsPane but that's more complex and that Rights Table needs to be moved to a LD ASAP.
+        String userName = "createAndDeleteUser";
 
         // Create a test user
         setup.deletePage("XWiki", userName);
@@ -698,7 +700,6 @@ class UsersGroupsRightsManagementIT
         // Get the rights pane and switch to users
         EditRightsPane editRightsPane = new EditRightsPane();
         editRightsPane.switchToUsers();
-        editRightsPane.waitUntilPageIsReady();
 
         // Verify the user exists in the rights table
         assertTrue(editRightsPane.hasEntity(userName));

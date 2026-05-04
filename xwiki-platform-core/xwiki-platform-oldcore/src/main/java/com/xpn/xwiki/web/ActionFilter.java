@@ -164,8 +164,9 @@ public class ActionFilter implements Filter
         ConfigurationSource configuration =
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
-            if (servletPath
-                .equals(PATH_SEPARATOR + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+            if ((PATH_SEPARATOR + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")).equals(
+                servletPath))
+            {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

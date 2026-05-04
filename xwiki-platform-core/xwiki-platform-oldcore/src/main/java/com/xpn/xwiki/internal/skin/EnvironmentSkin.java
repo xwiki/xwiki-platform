@@ -52,7 +52,7 @@ public class EnvironmentSkin extends AbstractResourceSkin
      * @param logger a logger used to log warning in case of error when parsing a skin's syntax
      * @param environment the wiki environment, this is where this skin load its resources from
      * @param xcontextProvider a wiki context provide, used to give access to the context when resolving the skin's
-     *     rsources.
+     *            rsources.
      * @param urlConfiguration the url configuration used to resolve the url of the skin's resources
      */
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
@@ -67,9 +67,9 @@ public class EnvironmentSkin extends AbstractResourceSkin
     }
 
     @Override
-    protected URL getResourceURL(String propertiesPath)
+    protected URL getResourceURL(String prefixPath, String resourcePath)
     {
-        return this.environment.getResource(propertiesPath);
+        return this.environment.getResource(prefixPath, resourcePath);
     }
 
     @Override
@@ -93,6 +93,6 @@ public class EnvironmentSkin extends AbstractResourceSkin
      */
     public boolean exists()
     {
-        return getResourceURL(getPropertiesPath()) != null;
+        return this.environment.getResource(getSkinFolder(), PROPERTIES_FILE_NAME) != null;
     }
 }

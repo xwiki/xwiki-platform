@@ -219,6 +219,31 @@ class LiveTableRequestHandlerTest
         assertSame(this.originalRequest, requests.get(1));
     }
 
+    @Test
+    void getLiveTableResultsFilterWithNullOperator()
+    {
+        // Verify that a filter with no operator (null) doesn't throw a NullPointerException.
+        // Map.of() used for MATCH_TYPE doesn't support null keys, so the null operator must be handled before lookup.
+        Map<String, String[]> expectedRequestParams = new HashMap<>();
+        expectedRequestParams.put("doc.location/join_mode", new String[] { "OR" });
+        expectedRequestParams.put("reqNo", new String[] { "1" });
+        expectedRequestParams.put("outputSyntax", new String[] { "plain" });
+        expectedRequestParams.put("doc.location", new String[] { "help" });
+        expectedRequestParams.put("doc.location_match", new String[] { "" });
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        // Filter created with just a value (no operator) results in a Constraint with null operator.
+        liveDataQuery.setFilters(Collections.singletonList(new Filter("doc.location", "help")));
+        this.handler.getLiveTableResults(liveDataQuery, () -> null);
+
+        ArgumentCaptor<XWikiRequest> requestCaptor = ArgumentCaptor.forClass(XWikiRequest.class);
+        verify(this.xcontext, times(2)).setRequest(requestCaptor.capture());
+        List<XWikiRequest> requests = requestCaptor.getAllValues();
+
+        assertRequestParameters(expectedRequestParams, requests.get(0).getParameterMap());
+        assertSame(this.originalRequest, requests.get(1));
+    }
+
     private void assertRequestParameters(Map<String, String[]> expectedParams, Map<String, String[]> actualParams)
     {
         assertEquals(expectedParams.size(), actualParams.size());

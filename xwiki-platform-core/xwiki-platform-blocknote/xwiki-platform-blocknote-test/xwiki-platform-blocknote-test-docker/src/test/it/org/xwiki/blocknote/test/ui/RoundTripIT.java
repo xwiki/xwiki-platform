@@ -40,7 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 18.1.0RC1
  */
-@UITest
+@UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    }
+)
 class RoundTripIT extends AbstractBlockNoteIT
 {
     @Test
@@ -359,8 +364,7 @@ class RoundTripIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.PAGE_DOWN, "end");
 
-        // FIXME: XWIKI-23717: BlockNote's editing area fails accessibility tests
-        page = disableWCAG(setup, page::save);
+        page = page.save();
         WikiEditPage wikiEditor = page.editWiki();
         String ending = """
 

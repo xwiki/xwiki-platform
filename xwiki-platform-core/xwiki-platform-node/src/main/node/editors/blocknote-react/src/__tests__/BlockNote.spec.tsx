@@ -60,7 +60,7 @@ test("BlockNote's content can be modified", async ({ mount }) => {
 });
 
 // eslint-disable-next-line max-statements
-test("Image insertion UI can be overriden", async ({ mount }) => {
+test("Image insertion UI can be overriden", async ({ mount, page }) => {
   let overrideFnCalledWithUrl: string | null = null;
 
   const component = await mount(
@@ -86,13 +86,15 @@ test("Image insertion UI can be overriden", async ({ mount }) => {
   await editorEl.press("ArrowDown");
   await editorEl.press("ArrowUp");
 
-  const toolbarEl = component.locator(".bn-toolbar.bn-formatting-toolbar");
+  // The toolbar is rendered via FloatingPortal into document.body (outside the component root),
+  // so we must use page.locator instead of component.locator
+  const toolbarEl = page.locator(".bn-toolbar.bn-formatting-toolbar");
   await toolbarEl.waitFor({ state: "attached" });
 
   // Trigger the image edition UI
   //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
   //   > There is no other real identifying DOM attribute for these buttons
-  const imgEditBtnEl = toolbarEl.locator(
+  const imgEditBtnEl = page.locator(
     'button[aria-label="blocknote.imageToolbar.buttons.edit"]',
   );
   await imgEditBtnEl.waitFor({ state: "attached" });

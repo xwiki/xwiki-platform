@@ -52,7 +52,7 @@ export type BlockNoteConcreteMacro = {
     macro: MacroWithUnknownParamsType;
     bnRendering: {
         type: "block";
-        block: ReturnType<typeof createCustomBlockSpec>;
+        block: ReturnType<typeof createCustomBlockSpec<string, PropSchema, "inline">> | ReturnType<typeof createCustomBlockSpec<string, PropSchema, "none">>;
     } | {
         type: "inline";
         inlineContent: ReturnType<typeof createCustomInlineContentSpec>;
@@ -302,7 +302,7 @@ readonly propSchema: "string";
 // @internal
 export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">(input: {
     config: BlockConfig<Name, Props, InlineType>;
-    implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
+    implementation: ReactCustomBlockImplementation<BlockConfig<Name, Props, InlineType>>;
     slashMenu: false | {
         title: string;
         aliases?: string[];

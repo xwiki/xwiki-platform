@@ -71,7 +71,9 @@ function createCustomBlockSpec<
   customToolbar,
 }: {
   config: BlockConfig<Name, Props, InlineType>;
-  implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
+  implementation: ReactCustomBlockImplementation<
+    BlockConfig<Name, Props, InlineType>
+  >;
   slashMenu:
     | false
     | {
@@ -189,7 +191,13 @@ type BlockNoteConcreteMacro = {
   bnRendering: // Block macro
   | {
         type: "block";
-        block: ReturnType<typeof createCustomBlockSpec>;
+        block:
+          | ReturnType<
+              typeof createCustomBlockSpec<string, PropSchema, "inline">
+            >
+          | ReturnType<
+              typeof createCustomBlockSpec<string, PropSchema, "none">
+            >;
       }
     // Inline macro
     | {
@@ -288,7 +296,7 @@ function adaptMacroForBlockNote(
    * @returns The rendered macro, as a JSX element
    */
   function renderMacro(
-    contentRef: (node: HTMLElement | null) => void,
+    contentRef: ((node: HTMLElement | null) => void) | null,
     props: Props<PropSchema>,
     content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
     // TODO: should also allow to replace the macro's body
@@ -332,38 +340,63 @@ function adaptMacroForBlockNote(
 
   // Block and inline macros are defined pretty differently, so a bit of logic was computed ahead of time
   // to share it between the two definitions here.
+  const slashMenu = getSlashMenu((getDefaultValue) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: () => getDefaultValue() as any,
+  }));
+
   const bnRendering: BlockNoteConcreteMacro["bnRendering"] =
     macro.renderAs === "block"
       ? {
           type: "block",
-          block: createCustomBlockSpec({
-            config: {
-              type: blockNoteName,
-              // NOTE: Nesting is not supported
-              // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-              content: macro.infos.bodyType === "wysiwyg" ? "inline" : "none",
-              propSchema,
-            },
-            implementation: {
-              render: ({ contentRef, block, editor }) =>
-                renderMacro(
-                  contentRef,
-                  block.props,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  block.content as any,
-                  (newProps) => {
-                    editor.updateBlock(block.id, { props: newProps });
+          block:
+            macro.infos.bodyType === "wysiwyg"
+              ? createCustomBlockSpec({
+                  config: {
+                    type: blockNoteName,
+                    // NOTE: Nesting is not supported
+                    // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+                    content: "inline" as const,
+                    propSchema,
                   },
-                ),
-            },
-            slashMenu: getSlashMenu((getDefaultValue) => ({
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              default: () => getDefaultValue() as any,
-            })),
-            // TODO: allow macros to define their own toolbar, using a set of provided UI components (buttons, ...)
-            // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-708
-            customToolbar: null,
-          }),
+                  implementation: {
+                    render: ({ contentRef, block, editor }) =>
+                      renderMacro(
+                        contentRef,
+                        block.props,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        block.content as any,
+                        (newProps) => {
+                          editor.updateBlock(block.id, { props: newProps });
+                        },
+                      ),
+                  },
+                  slashMenu,
+                  // TODO: allow macros to define their own toolbar, using a set of provided UI components (buttons, ...)
+                  // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-708
+                  customToolbar: null,
+                })
+              : createCustomBlockSpec({
+                  config: {
+                    type: blockNoteName,
+                    content: "none" as const,
+                    propSchema,
+                  },
+                  implementation: {
+                    render: ({ block, editor }) =>
+                      renderMacro(
+                        null,
+                        block.props,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        block.content as any,
+                        (newProps) => {
+                          editor.updateBlock(block.id, { props: newProps });
+                        },
+                      ),
+                  },
+                  slashMenu,
+                  customToolbar: null,
+                }),
         }
       : {
           type: "inline",

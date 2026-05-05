@@ -23,6 +23,39 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
     console.warn("[ConfirmationBox widget] Required class missing: XWiki.widgets.ModalPopup");
   }
 } else {
+  /**
+   * A general purpose modal confirmation dialog widget for requesting user confirmation on an action.
+   * Features:
+   * <ul>
+   * <li>Displays a confirmation question with customizable text.</li>
+   * <li>Multiple action buttons: Yes, No, and optional Cancel.</li>
+   * <li>Customizable callbacks for Yes, No, and Cancel actions.</li>
+   * </ul>
+   * To display a confirmation dialog, create a new XWiki.widgets.ConfirmationBox object. Constructor parameters:
+   * <dl>
+   *   <dt>behavior (optional)</dt>
+   *   <dd>An object containing callback functions:
+   *   <ul>
+   *     <li><tt>onYes</tt>: callback when the user picks the Yes option</li>
+   *     <li><tt>onNo</tt>: callback when the user picks the No option</li>
+   *     <li><tt>onCancel</tt>: callback when the user picks the Cancel option</li>
+   *   </ul>
+   *   </dd>
+   *   <dt>interactionParameters (optional)</dt>
+   *   <dd>Configuration options:
+   *   <ul>
+   *     <li><tt>confirmationText</tt>: the question or message to display (defaults to a localized message). Since
+   *     18.4.0RC1 and 17.10.9, its values is used as plain text. Before, it was used as HTML content. You can check for
+   *     the presence of the ConfirmationBox.textContentFormat static method to know which behavior applies at runtime.
+   *     </li>
+   *     <li><tt>yesButtonText</tt>: text for the Yes button (defaults to localized "Yes")</li>
+   *     <li><tt>noButtonText</tt>: text for the No button (defaults to localized "No")</li>
+   *     <li><tt>cancelButtonText</tt>: text for the Cancel button (defaults to localized "Cancel")</li>
+   *     <li><tt>showCancelButton</tt>: boolean to show/hide the Cancel button (defaults to false)</li>
+   *   </ul>
+   *   </dd>
+   * </dl>
+   */
   XWiki.widgets.ConfirmationBox = Class.create(XWiki.widgets.ModalPopup, {
     /** Default displayed texts */
     defaultInteractionParameters : {

@@ -193,8 +193,8 @@ catalogs:
       specifier: 7.0.1
       version: 7.0.1
     publint:
-      specifier: 0.3.18
-      version: 0.3.18
+      specifier: 0.3.19
+      version: 0.3.19
     react:
       specifier: 19.2.5
       version: 19.2.5
@@ -676,7 +676,7 @@ importers:
         version: 17.6.0
       publint:
         specifier: 'catalog:'
-        version: 0.3.18
+        version: 0.3.19
       vite:
         specifier: 'catalog:'
         version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.8.2)
@@ -6078,8 +6078,8 @@ packages:
     resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
     engines: {node: '>=10'}
 
-  publint@0.3.18:
-    resolution: {integrity: sha512-JRJFeBTrfx4qLwEuGFPk+haJOJN97KnPuK01yj+4k/Wj5BgoOK5uNsivporiqBjk2JDaslg7qJOhGRnpltGeog==}
+  publint@0.3.19:
+    resolution: {integrity: sha512-J3p4GOocCRFyLLFRzGfIhAwWgk0Kkcdxj5iFspFvCYbyiJs5IhCM8gsIkcNeQL+tdpV671RtJQiTFSUKhl1Wjg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -11190,7 +11190,7 @@ snapshots:
 
   proxy-from-env@2.1.0: {}
 
-  publint@0.3.18:
+  publint@0.3.19:
     dependencies:
       '@publint/pack': 0.1.4
       package-manager-detector: 1.6.0

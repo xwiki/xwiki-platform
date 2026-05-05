@@ -78,7 +78,8 @@ public class Context extends Api
     public XWikiResponse getResponse()
     {
         XWikiResponse response = getXWikiContext().getResponse();
-        return response != null ? new ScriptXWikiServletResponse(response) : response;
+        return response != null ? new ScriptXWikiServletResponse(response, getContextualAuthorizationManager())
+            : response;
     }
 
     /**

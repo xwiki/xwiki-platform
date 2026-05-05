@@ -58,7 +58,7 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
   padding: 4px 8px 4px 16px;
 }
 
-div.suggestItems ul.xlist.suggestList > li.xitem .value{
+div.suggestItems ul.xlist.suggestList > li.xitem .value {
   font-size: 1rem; /*Using REM to have consistent typography*/
 }
 

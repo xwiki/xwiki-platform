@@ -89,8 +89,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                 new ScriptXWikiServletRequest(xcontext.getRequest(), this.authorization), ScriptContext.ENGINE_SCOPE);
         }
         if (xcontext.getResponse() != null) {
-            scriptContext.setAttribute("response",
-                new ScriptXWikiServletResponse(xcontext.getResponse(), this.authorization), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("response", new ScriptXWikiServletResponse(xcontext.getResponse()),
+                ScriptContext.ENGINE_SCOPE);
         }
 
         // Current document

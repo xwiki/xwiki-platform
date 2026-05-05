@@ -20,7 +20,6 @@
 package com.xpn.xwiki.render;
 
 import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletResponse;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.web.WrappingXWikiResponse;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -36,29 +35,12 @@ import com.xpn.xwiki.web.XWikiResponse;
 // @Deprecated(since = "17.0.0RC1")
 public class ScriptXWikiServletResponse extends WrappingXWikiResponse
 {
-    private final ContextualAuthorizationManager authorization;
-
     /**
      * @param response the wrapped response
-     * @deprecated use {@link #ScriptXWikiServletResponse(XWikiResponse, ContextualAuthorizationManager)} instead
      */
-    @Deprecated(since = "18.4.0RC1, 17.10.9")
     public ScriptXWikiServletResponse(XWikiResponse response)
     {
-        this(response, null);
-    }
-
-    /**
-     * @param response the wrapped response
-     * @param authorization used to check rights of the current author
-     * @since 18.4.0RC1
-     * @since 17.10.9
-     */
-    public ScriptXWikiServletResponse(XWikiResponse response, ContextualAuthorizationManager authorization)
-    {
         super(response);
-
-        this.authorization = authorization;
     }
 
     @Override

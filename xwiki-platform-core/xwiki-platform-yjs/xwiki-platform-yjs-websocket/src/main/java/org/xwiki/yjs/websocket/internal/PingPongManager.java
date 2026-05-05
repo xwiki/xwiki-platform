@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,43 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.yjs.websocket.internal;
 
-import { stringToColor } from "../utils";
-import type { AuthenticationManager } from "@xwiki/platform-authentication-api";
+import jakarta.websocket.Session;
 
-/**
- * Realtime user
- * @since 18.0.0RC1
- * @beta
- */
-export type User = {
-  name: string;
-  color: string;
-};
+import org.xwiki.component.annotation.Role;
 
 /**
+ * Manages ping-pong keep-alive messages for WebSocket sessions.
  *
- * @param authentication - an authentication manager components
- * @since 18.0.0RC1
- * @beta
+ * @version $Id$
+ * @since 18.4.0RC1
  */
-export async function computeCurrentUser(
-  authentication?: AuthenticationManager,
-): Promise<User> {
-  let name = "Anonymous";
+@Role
+public interface PingPongManager
+{
+    /**
+     * Start sending periodic ping messages for the given session.
+     *
+     * @param session the WebSocket session to keep alive
+     */
+    void startPinging(Session session);
 
-  if (authentication && (await authentication.isAuthenticated())) {
-    try {
-      const userDetails = await authentication.getUserDetails();
-      name = userDetails.name;
-    } catch (e) {
-      console.error("Failed to get the user details", e);
-      name = "<Error>";
-    }
-  }
-
-  return {
-    name,
-    color: stringToColor(name),
-  };
+    /**
+     * Stop sending periodic ping messages for the given session.
+     *
+     * @param session the WebSocket session to stop tracking
+     */
+    void stopPinging(Session session);
 }

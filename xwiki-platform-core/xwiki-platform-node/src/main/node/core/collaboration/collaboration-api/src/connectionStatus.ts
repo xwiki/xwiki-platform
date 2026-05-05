@@ -19,12 +19,12 @@
  */
 
 /**
- * Set of allowed provider states.
+ * Collaboration provider connection status.
  *
- * @since 18.0.0RC1
+ * @since 18.4.0RC1
  * @beta
  */
-export enum Status {
+export enum ConnectionStatus {
   Disconnected,
   Connecting,
   Connected,

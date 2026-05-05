@@ -66,6 +66,8 @@ declare global {
       documentReference: XWikiEntityReference;
       getURL: (action?: string, parameters?: URLSearchParams) => string;
     };
+    currentWiki: string;
+    contextPath: string;
     docsyntax: string;
   };
 }

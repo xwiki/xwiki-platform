@@ -17,26 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { collaborationManagerName } from "./collaborationManagerName";
-import { collaborationManagerProviderName } from "./collaborationManagerProviderName";
-import { ComponentInit } from "./componentInit";
-import { Status } from "./status";
-import type { CollaborationInitializer } from "./collaborationInitializer";
-import type { CollaborationManager } from "./collaborationManager";
-import type { CollaborationManagerProvider } from "./collaborationManagerProvider";
-import type { User } from "./user";
-
-export {
-  ComponentInit,
-  Status,
-  collaborationManagerName,
-  collaborationManagerProviderName,
-};
-
-export type {
-  CollaborationInitializer,
-  CollaborationManager,
-  CollaborationManagerProvider,
-  User,
-};
+export { AbstractCollaborationManager } from "./abstractCollaborationManager";
+export { collaborationManagerName } from "./collaborationManager";
+export { collaborationManagerProviderName } from "./collaborationManagerProvider";
+export { ComponentInit } from "./componentInit";
+export { ConnectionStatus } from "./connectionStatus";
+export type { Collaboration } from "./collaboration";
+export type { CollaborationManager } from "./collaborationManager";
+export type { CollaborationManagerProvider } from "./collaborationManagerProvider";
+export type { Collaborator } from "./collaborator";

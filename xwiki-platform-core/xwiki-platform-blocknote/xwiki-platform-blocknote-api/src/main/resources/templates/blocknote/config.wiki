@@ -1,0 +1,10 @@
+##!source.syntax=xwiki/2.1
+{{velocity}}
+{{html clean="false"}}
+## Base configuration for all BlockNote editor instances created on this web page.
+#set ($config = {
+  'collaborationURL': $services.websocket.url('yjs')
+})
+<script id="blocknote-config" type="application/json">$jsontool.serialize($config).replace('<', '\u003C')</script>
+{{/html}}
+{{/velocity}}

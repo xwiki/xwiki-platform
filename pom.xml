@@ -1186,7 +1186,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.30</version>
+        <version>3.5.33</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -1404,30 +1404,27 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16/140,
-                  bouncycastle:bcmail-jdk15/140,
                   bouncycastle:bcmail-jdk14/140,
-                  bouncycastle:bcmail-jdk13/140,
-                  bouncycastle:bcmail-jdk12/140,
-                  org.bouncycastle:bcmail-jdk16,
-                  org.bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk15/140,
+                  bouncycastle:bcmail-jdk16/140,
                   org.bouncycastle:bcmail-jdk14,
-                  org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk15+,
                   org.bouncycastle:bcmail-jdk15on
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk16
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcjmail-jdk18on</id>
+                <features>
+                  org.bouncycastle:bcjmail-jdk15on,
+                  org.bouncycastle:bcjmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>commons-beanutils:commons-beanutils</id>
                 <features>commons-beanutils:commons-beanutils-core</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>org.jdom:jdom</id>
-                <features>
-                  jdom:jdom,
-                  org.jdom:jdom-legacy
-                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:jakarta.mail</id>
@@ -1544,7 +1541,7 @@
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.webjars.npm:momentjs</id>
+                <id>org.webjars.npm:moment</id>
                 <features>org.webjars:momentjs</features>
               </extensionOverride>
               <extensionOverride>

@@ -17,28 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { Doc } from "yjs";
+import { XWikiCollaborationManager } from "./XWikiCollaborationManager";
+import { collaborationManagerName } from "@xwiki/platform-collaboration-api";
+import type { CollaborationManager } from "@xwiki/platform-collaboration-api";
+import type { Container } from "inversify";
 
 /**
- * Holds properties of an collaboration. It's provider, the document held by the provider, and a provide resolved on
- * the initialized is ready.
- * @since 18.0.0RC1
+ * @since 18.4.0RC1
  * @beta
  */
-type CollaborationInitializer = {
-  /**
-   * The provider, can be of arbitrary type.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  provider: any;
-  /**
-   * The yjs document held by the provider.
-   */
-  doc: Doc;
-  /**
-   * The promise must be resolved once the provider is connected and ready.
-   */
-  initialized: Promise<unknown>;
-};
+class ComponentInit {
+  constructor(container: Container) {
+    // Register the hocuspocus collaboration provider as the default for legacy reason.
+    container
+      .bind<CollaborationManager>(collaborationManagerName)
+      .to(XWikiCollaborationManager)
+      .inSingletonScope()
+      .whenNamed("xwiki");
+  }
+}
 
-export { type CollaborationInitializer };
+export { ComponentInit };

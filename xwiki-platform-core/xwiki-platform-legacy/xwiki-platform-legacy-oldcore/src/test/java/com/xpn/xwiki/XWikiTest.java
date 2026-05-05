@@ -19,10 +19,20 @@
  */
 package com.xpn.xwiki;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+
+import org.xwiki.test.annotation.AllComponents;
+
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for legacy methods of {@link com.xpn.xwiki.XWiki}.
@@ -30,48 +40,43 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * @version $Id$
  * @since 5.1M1
  */
-public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class XWikiTest
 {
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     private XWiki xwiki;
 
-    @Override
-    protected void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws MalformedURLException
     {
-        super.setUp();
-
-        getContext().setRequest(new XWikiServletRequestStub());
-        getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
-
-        this.xwiki = new XWiki(new XWikiConfig(), getContext())
-        {
-            // Avoid all the error at XWiki initialization
-            @Override
-            public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
-            {
-                if (prefname.equals("plugins") || prefname.startsWith("macros_")) {
-                    return defaultValue;
-                } else {
-                    return super.getXWikiPreference(prefname, defaultValue, context);
-                }
-            }
-        };
+        this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub());
+        this.oldcore.getXWikiContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
+        this.xwiki = this.oldcore.getSpyXWiki();
     }
 
-    public void testGetDocumentNameFromPath()
+    @Test
+    void getDocumentNameFromPath()
     {
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", getContext()));
-        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
+        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", this.oldcore.getXWikiContext()));
+        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", this.oldcore.getXWikiContext()));
+        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", this.oldcore.getXWikiContext()));
+        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", this.oldcore.getXWikiContext()));
+        assertEquals("Space.Document",
+            this.xwiki.getDocumentNameFromPath("/Space/Document", this.oldcore.getXWikiContext()));
+        assertEquals("Space.WebHome",
+            this.xwiki.getDocumentNameFromPath("/view/Space/", this.oldcore.getXWikiContext()));
+        assertEquals("Space.Document",
+            this.xwiki.getDocumentNameFromPath("/view/Space/Document", this.oldcore.getXWikiContext()));
+        assertEquals("Space.Document",
+            this.xwiki.getDocumentNameFromPath("/view/Space/Document/", this.oldcore.getXWikiContext()));
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
-           getContext()));
+            this.oldcore.getXWikiContext()));
 
         // Test URL encoding and verify an encoded forward slash ("/" - encoded as %2F) works too.
         assertEquals("My Space.My/Document",
-            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", getContext()));
+            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", this.oldcore.getXWikiContext()));
     }
 }

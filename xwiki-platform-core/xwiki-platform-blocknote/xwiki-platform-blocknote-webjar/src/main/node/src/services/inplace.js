@@ -39,7 +39,6 @@ define("xwiki-blocknote-inline", [
       name: config.editorName,
       value: config.document.renderedContent,
       form: config.formId,
-      inputSyntax: `${BlockNote.syntax.type}/${BlockNote.syntax.version}`,
       outputSyntax: config.document.syntax,
       startupFocus: config.startupFocus,
 

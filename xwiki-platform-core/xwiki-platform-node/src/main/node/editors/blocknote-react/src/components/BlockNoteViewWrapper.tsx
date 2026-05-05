@@ -28,7 +28,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import { useTimeoutCheck } from "../hooks";
+import { blocksToYXmlFragment } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -40,8 +40,7 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import type {
   BlockType,
   EditorBlockSchema,
@@ -58,7 +57,7 @@ import type {
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
+import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
 /**
@@ -86,6 +85,15 @@ type BlockNoteViewWrapperProps = {
   blockNoteOptions?: Partial<
     Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">
   >;
+
+  /**
+   * The name of the editor instance, usually the name of the form field it is attached to. When realtime collaboration
+   * is enabled, this is used to identify the Yjs document fragment that the editor is bound to (because a document can
+   * have multiple fields that are being edited in realtime time).
+   *
+   * @since 18.3.0RC1
+   */
+  name?: string;
 
   /**
    * The display theme to use
@@ -136,12 +144,9 @@ type BlockNoteViewWrapperProps = {
     | false;
 
   /**
-   * Realtime options
+   * The collaboration session.
    */
-  realtime?: {
-    collaborationProvider: () => CollaborationInitializer;
-    user: { name: string; color: string };
-  };
+  collaboration?: Collaboration;
 
   /**
    * Run a function when the document's content change
@@ -180,10 +185,11 @@ type BlockNoteViewWrapperProps = {
 // eslint-disable-next-line max-statements
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
+  name = "content",
   theme,
   content,
   macros,
-  realtime,
+  collaboration,
   onChange,
   lang,
   linkEditionCtx,
@@ -191,9 +197,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   label,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
-  const { t } = useTranslation();
-  const collaborationProvider = realtime?.collaborationProvider;
-
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
@@ -211,25 +214,34 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   const schema = createBlockNoteSchema(builtMacros);
 
-  const initializer: CollaborationInitializer | undefined =
-    collaborationProvider ? collaborationProvider() : undefined;
+  // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
+  // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
+  // the initial content at all and let it initialize the content with whatever makes sense (e.g. an empty paragraph).
+  const initialContent = collaboration || !content.length ? undefined : content;
 
-  // Prevent changes in the editor until the provider has synced with other clients
-  const [ready, setReady] = useState(!initializer);
+  const getCollaborationOptions = ():
+    | BlockNoteEditorOptions<never, never, never>["collaboration"]
+    | undefined => {
+    if (!collaboration) {
+      return undefined;
+    }
 
-  // Check if the syncing is happing for too long, in order to display an information message
-  const longLoading = useTimeoutCheck(1000);
+    const collaborator = collaboration.collaborator;
+    return {
+      provider: collaboration.provider,
+      fragment: collaboration.doc.getXmlFragment(name),
+      user: {
+        name: collaborator.user.username!,
+        color: collaborator.color,
+      },
+    };
+  };
 
-  // Creates a new editor instance.
+  // Create the BlockNote editor instance.
   const editor = useCreateBlockNote({
     ...blockNoteOptions,
-    collaboration: initializer?.provider
-      ? {
-          provider: initializer.provider,
-          fragment: initializer.doc.getXmlFragment("document-store"),
-          user: realtime!.user,
-        }
-      : undefined,
+    initialContent,
+    collaboration: getCollaborationOptions(),
     // Editor's schema, with custom blocks definition
     schema,
     // Use the provided language for the dictionary
@@ -246,97 +258,32 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     },
   });
 
+  // Allow the parent component to access the editor instance.
   useEffect(() => {
     setEditor?.(editor);
   }, [setEditor, editor]);
 
-  // When realtime is activated, the first user to join the session sets the content for everybody.
-  // The rest of the participants will just retrieve the editor content from the realtime server.
-  // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
-  // document's configuration map (shared across all session participants).
-  useEffect(() => {
-    // Replace the editor's current content with the provided blocks
-    const replaceContent = (blocks: BlockType[]) => {
-      // NOTE: replacing the content immediately seems to lead to a data race with the provider and/or BlockNote,
-      //       and we end up with an empty editor
-      //       So, to avoid this, we run the content replacement function separately with the smallest possible non-zero delay
-      // This is something we'll need to investigate, but this does the trick for now.
-      setTimeout(() => {
-        // TODO: with time, see if this fix actually works fine
-        //
-        // Some BlockNote crash seems to happen when replacing the whole document, but only sometimes.
-        // So here we ensure the document is never empty by introducing some empty inline content, which will be put
-        // inside a paragraph.
-        if (editor.document.length === 0) {
-          editor.insertInlineContent("");
-        }
-
-        editor.replaceBlocks(editor.document, blocks);
-      }, 1);
-    };
-
-    if (initializer?.provider) {
-      console.debug("Trying to connect to realtime server...");
-
-      // eslint-disable-next-line promise/catch-or-return
-      initializer.initialized.then(() => {
-        console.debug("Connected to realtime server and synced!");
-
-        const initialContentLoaded = initializer.doc
-          .getMap("configuration")
-          .get("initialContentLoaded");
-
-        // eslint-disable-next-line promise/always-return
-        if (!initialContentLoaded) {
-          initializer.doc
-            .getMap("configuration")
-            .set("initialContentLoaded", true);
-
-          console.debug("Setting initial content for realtime first player", {
-            content,
-          });
-
-          replaceContent(content);
-        }
-
-        setReady(true);
-      });
-
-      initializer.provider.on("destroy", () => {
-        initializer.provider.destroy();
-      });
-    } else {
-      // If we don't have a provider, we can simply load the content directly
+  // When realtime collaboration is enabled, the first user joining the session must set the initial content. The rest
+  // of the participants will retrieve the editor content from the realtime server. We know who is the first user
+  // joining the session by checking for the absence of an initialContentLoaded key in the document's configuration map
+  // (shared across all session participants).
+  if (collaboration) {
+    const initialContentLoaded = collaboration.doc
+      .getMap("configuration")
+      .get("initialContentLoaded");
+    if (!initialContentLoaded) {
+      // This is the first user joining the realtime collaboration session.
+      collaboration.doc
+        .getMap("configuration")
+        .set("initialContentLoaded", true);
       console.debug(
-        "No realtime provider, setting document's content directly",
+        "Setting initial content for realtime collaboration session.",
+        content,
       );
-
-      replaceContent(content);
+      // Initialize the realtime collaboration session with the provided content.
+      const fragment = collaboration.doc.getXmlFragment(name);
+      blocksToYXmlFragment(editor, content, fragment);
     }
-  }, [initializer]);
-
-  // Disconnect from the realtime provider when the component is unmounted
-  // Otherwise, our user profile may be left over and still be displayed to other users
-  useEffect(() => {
-    return () => {
-      console.debug(
-        "BlockNoteView is being unmounted, disconnecting from the realtime provider...",
-      );
-
-      initializer?.provider?.disconnect();
-    };
-  }, []);
-
-  if (!ready) {
-    // Only display the loading message after a given amount of time,
-    // otherwise we end up with a flashing pending message
-    //
-    // We still show the <h3> + <em> structure with an insecable space in order to keep the same height at all times
-    return (
-      <h3>
-        <em>{longLoading ? t("blocknote.realtime.pendingSync") : "\u00A0"}</em>
-      </h3>
-    );
   }
 
   // Renders the editor instance using a React component.

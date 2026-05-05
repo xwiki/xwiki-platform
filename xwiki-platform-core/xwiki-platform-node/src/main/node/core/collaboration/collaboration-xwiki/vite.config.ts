@@ -1,5 +1,5 @@
 /**
- * See the NOTICE file distributed with this work for additional
+ * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -18,9 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * @beta
- */
-const collaborationManagerProviderName: string = "collaborationManagerProvider";
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
 
-export { collaborationManagerProviderName };
+export default generateConfig(import.meta.url);

@@ -32,6 +32,8 @@ import org.xwiki.lesscss.internal.LESSConfiguration;
 import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.WikiLESSResourceReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.AfterComponent;
@@ -213,5 +215,26 @@ class CachedLESSCompilerTest
         assertEquals(lessCompilerException, caughtException.getCause());
         assertEquals("Failed to compile the resource [" + resource.toString() + "] with LESS.",
             caughtException.getMessage());
+    }
+
+    @Test
+    void computeWithWikiLESSResourceReference() throws Exception
+    {
+        WikiLESSResourceReference mockWikiLESSResourceReference = mock(WikiLESSResourceReference.class);
+
+        DocumentReference authorReference = new DocumentReference("xwiki", "Space", "User");
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+
+        when(mockWikiLESSResourceReference.getAuthorReference())
+            .thenReturn(authorReference);
+        when(mockWikiLESSResourceReference.getDocumentReference())
+            .thenReturn(documentReference);
+
+        this.cachedCompiler.compute(mockWikiLESSResourceReference, false, true, false, "skin");
+
+        verify(mockWikiLESSResourceReference).getAuthorReference();
+        verify(mockWikiLESSResourceReference).getDocumentReference();
+        verify(this.templateManager).createStringTemplate(mockWikiLESSResourceReference.toString(), "", authorReference,
+            documentReference);
     }
 }

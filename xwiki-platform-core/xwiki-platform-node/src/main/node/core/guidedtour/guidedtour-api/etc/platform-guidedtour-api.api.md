@@ -11,6 +11,7 @@ export interface GuidedTourManagerApi {
     getTasks(tourId: string): Promise<TourTask[] | undefined>;
     getTours(): Promise<TourTour[]>;
     getUsefulLinks(): Promise<string[]>;
+    initExistingTask(): void;
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
     startTask(task: TourTask, remember: boolean): Promise<void>;
 }

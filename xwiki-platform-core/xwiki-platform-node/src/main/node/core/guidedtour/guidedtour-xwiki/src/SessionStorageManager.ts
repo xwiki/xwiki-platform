@@ -42,7 +42,11 @@ export class SessionStorageManager {
   }
 
   static getStorageKeyPrefix(task: TourTask): string {
-    return `guidedtour_${task.tourId!.replaceAll("_", "_|")}__${task.id!.replaceAll("_", "_|")}`;
+    return SessionStorageManager.getStorageKeyPrefixStr(task.tourId!, task.id!);
+  }
+
+  static getStorageKeyPrefixStr(tourId: string, taskId: string): string {
+    return `guidedtour_${tourId.replaceAll("_", "_|")}__${taskId.replaceAll("_", "_|")}`;
   }
 
   static getStorageKey(key: string) {
@@ -53,8 +57,12 @@ export class SessionStorageManager {
     return "guidedtour_activeTask";
   }
 
-  static getTaskStepStorageKey(task: TourTask): string {
+  static getTaskCurrentStepStorageKey(task: TourTask): string {
     return this.getStorageKeyPrefix(task) + "_currentStep";
+  }
+
+  static getTaskStepStorageStorageKey(task: TourTask): string {
+    return this.getStorageKeyPrefix(task) + "_steps";
   }
 
   static setStorageKey(key: string, stepIndex?: string) {

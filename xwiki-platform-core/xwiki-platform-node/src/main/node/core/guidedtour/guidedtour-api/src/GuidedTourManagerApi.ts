@@ -63,4 +63,8 @@ export interface GuidedTourManagerApi {
    * Get all steps of a tour.
    */
   getSteps(tourId: string, taskId: string): Promise<TourStep[] | undefined>;
+  /**
+   * Auto-start a task which was in progress (eg. after redirecting to a new page during task steps)
+   */
+  initExistingTask(): void;
 }

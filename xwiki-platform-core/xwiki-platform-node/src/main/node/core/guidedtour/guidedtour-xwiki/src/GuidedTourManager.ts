@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/* eslint-disable max-statements */
 import { SessionStorageManager } from "./SessionStorageManager";
 import { driver, getDriverConfigForSteps, wrapTask } from "./driverjsMain";
 // import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
@@ -98,7 +97,7 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     if (remember) {
       stepindex = Number.parseInt(
         window.sessionStorage.getItem(
-          SessionStorageManager.getTaskStepStorageKey(task),
+          SessionStorageManager.getTaskCurrentStepStorageKey(task),
         ) ?? "0",
       );
     }
@@ -150,33 +149,22 @@ export class GuidedTourManager implements GuidedTourManagerApi {
           for (const tour of data) {
             for (const task of tour.tasksList ?? []) {
               task.tourId = tour.id;
-              console.log(
-                "When parsing the task:",
-                task.status,
-                TourTaskStatus[task.status],
-              );
               if (undefined === task.status) {
                 task.status = TourTaskStatus.TODO;
               }
-              // else if ((task.status as any) instanceof String) {
-              //   // The REST API returns the status as a string, but typescript stores it as an int.
-              //   // This is a conversion from string to the enum, but typescript is being weird about it so cast to unknown.
-              //   task.status = TourTaskStatus[task.status] as unknown as TourTaskStatus;
-              // }
             }
             this.computeTourStatus(tour);
           }
 
           this._cache.tours = data;
           // get a map of {t.id: t for t of data}
-          const toursMap = new Map<string, TourTour>();
-          data.forEach((t) => toursMap.set(t.id, t));
-          this._cache.toursMap = toursMap;
-          this.initExistingTask();
+          this._cache.toursMap = new Map<string, TourTour>();
+          data.forEach((t) => this._cache.toursMap!.set(t.id, t));
           return data;
         });
+    } else {
+      return this._cache.tours;
     }
-    return this._cache.tours;
   }
 
   async initExistingTask() {
@@ -271,12 +259,12 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     task.status = status;
     this.computeTourStatus((await this.getTour(task.tourId!))!);
     SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskStepStorageKey(task),
+      SessionStorageManager.getTaskCurrentStepStorageKey(task),
       undefined,
     );
     SessionStorageManager.setStorageKey(
-      SessionStorageManager.getActiveTaskStorageKey(),
-      undefined,
+      SessionStorageManager.getTaskStepStorageStorageKey(task),
+      task.steps?.toString(),
     );
     // TODO: Some synchronisation with the server, to set the JSON.
     // TODO: Some other checks for the status, and persistence.
@@ -311,8 +299,24 @@ export class GuidedTourManager implements GuidedTourManagerApi {
   }
 
   async getSteps(tourId: string, taskId: string): Promise<TourStep[]> {
-    const tourSteps: TourStep[] = await this.fetchSteps(tourId, taskId);
-    return Promise.resolve(tourSteps);
+    let parsedCachedSteps;
+    try {
+      parsedCachedSteps = JSON.parse(
+        SessionStorageManager.getStorageKey(
+          SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        ) ?? "",
+      ) as TourStep[];
+      console.info("Using cached steps:", parsedCachedSteps);
+    } catch (e) {
+      console.error("Error while parsing cached guidedtour steps:", e);
+      SessionStorageManager.setStorageKey(
+        SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        undefined,
+      );
+    }
+    const taskSteps: TourStep[] =
+      parsedCachedSteps ?? (await this.fetchSteps(tourId, taskId));
+    return Promise.resolve(taskSteps);
   }
 
   async fetchSteps(tourId: string, taskId: string): Promise<TourStep[]> {
@@ -331,6 +335,12 @@ export class GuidedTourManager implements GuidedTourManagerApi {
         // Driver doesn't know what to do with an empty selector, but handles undefined values fine.
         if (step.element == "") {
           step.element = undefined;
+          // if (false == step['backdrop']) {
+          //   step['element'] = 'body'; // FIXME: This is NOT FULL PROOF, this should be changed (eg. I want to highlight a random element without a backdrop).
+          //   step['popover']['side'] = 'over';
+          // } else {
+          //   delete step.element;
+          // }
         }
         // FIXME: The path computed here is not an actual URL.
         step.path =

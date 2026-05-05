@@ -35,7 +35,9 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
  * <dl>
  *   <dt>text</dt>
- *   <dd>The notification text</dd>
+ *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text. Before, it was used
+ *   as HTML content. You can check for the presence of the Notification.textFormat static method to know which
+ *   behavior applies at runtime.</dd>
  *   <dt>type (optional)</dt>
  *   <dd>The notification type, one of <tt>plain</tt>, <tt>info</tt>, <tt>warning</tt>, <tt>error</tt>, <tt>inprogress</tt>,
  *    <tt>done</tt>. If an unknown or no type is passed, <tt>plain</tt> is used by default.</dd>

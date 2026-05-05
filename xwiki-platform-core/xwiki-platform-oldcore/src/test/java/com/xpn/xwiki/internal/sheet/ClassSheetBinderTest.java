@@ -23,75 +23,78 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.sheet.SheetBinder;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link ClassSheetBinder}.
  * 
  * @version $Id$
  */
-public class ClassSheetBinderTest
+@ComponentTest
+class ClassSheetBinderTest
 {
-    /**
-     * Mocks the dependencies of the component under test.
-     */
-    @Rule
-    public final MockitoComponentMockingRule<SheetBinder> mocker = new MockitoComponentMockingRule<SheetBinder>(
-        ClassSheetBinder.class);
-
     /**
      * The query used to retrieve the list of all sheet bindings.
      */
     private Query sheetBindingsQuery;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private QueryManager queryManager;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @InjectMockComponents
+    private ClassSheetBinder binder;
+
+    /**
+     * This is called when the component is initialized.
+     */
+    @BeforeComponent
+    void setUp() throws Exception
     {
-        sheetBindingsQuery = mock(Query.class);
-        QueryManager queryManager = mocker.getInstance(QueryManager.class);
+        this.sheetBindingsQuery = mock(Query.class);
         // This is called when the component is initialized.
-        when(queryManager.createQuery(any(), any())).thenReturn(sheetBindingsQuery);
+        when(this.queryManager.createQuery(any(), any())).thenReturn(this.sheetBindingsQuery);
     }
 
     /**
      * Unit test for {@link ClassSheetBinder#getDocuments(DocumentReference)}.
      */
     @Test
-    public void getDocuments() throws Exception
+    void getDocuments() throws Exception
     {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         queryResult.add(new Object[] {"Alice", "AnotherSheet"});
         queryResult.add(new Object[] {"Bob", "Sheet"});
         // If several fields are selected then T=Object[].
-        when(sheetBindingsQuery.<Object[]> execute()).thenReturn(queryResult);
+        when(this.sheetBindingsQuery.<Object[]> execute()).thenReturn(queryResult);
 
         DocumentReference sheetReference = new DocumentReference("wiki", "Space", "Sheet");
-        DocumentReferenceResolver<String> documentReferenceResolver =
-            mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         DocumentReference anotherSheetReference = new DocumentReference("wiki", "Space", "AnotherSheet");
-        when(documentReferenceResolver.resolve("Alice", sheetReference)).thenReturn(aliceReference);
-        when(documentReferenceResolver.resolve("AnotherSheet", aliceReference)).thenReturn(anotherSheetReference);
+        when(this.documentReferenceResolver.resolve("Alice", sheetReference)).thenReturn(aliceReference);
+        when(this.documentReferenceResolver.resolve("AnotherSheet", aliceReference)).thenReturn(anotherSheetReference);
 
         DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
-        when(documentReferenceResolver.resolve("Bob", sheetReference)).thenReturn(bobReference);
-        when(documentReferenceResolver.resolve("Sheet", bobReference)).thenReturn(sheetReference);
+        when(this.documentReferenceResolver.resolve("Bob", sheetReference)).thenReturn(bobReference);
+        when(this.documentReferenceResolver.resolve("Sheet", bobReference)).thenReturn(sheetReference);
 
-        Assert.assertEquals(Arrays.asList(bobReference), mocker.getComponentUnderTest().getDocuments(sheetReference));
+        assertEquals(List.of(bobReference), this.binder.getDocuments(sheetReference));
 
-        verify(sheetBindingsQuery).setWiki(sheetReference.getWikiReference().getName());
+        verify(this.sheetBindingsQuery).setWiki(sheetReference.getWikiReference().getName());
     }
 }

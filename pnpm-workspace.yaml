@@ -101,7 +101,7 @@ catalog:
   inversify: 7.11.0
   jiti: 2.6.1
   jquery: 4.0.0
-  jsdom: 28.1.0
+  jsdom: 29.1.1
   lib0: 0.2.117
   lodash-es: 4.18.1
   lz-string: 1.5.0

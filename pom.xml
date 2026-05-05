@@ -1366,18 +1366,22 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16/140,
-                  bouncycastle:bcmail-jdk15/140,
                   bouncycastle:bcmail-jdk14/140,
-                  bouncycastle:bcmail-jdk13/140,
-                  bouncycastle:bcmail-jdk12/140,
-                  org.bouncycastle:bcmail-jdk16,
-                  org.bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk15/140,
+                  bouncycastle:bcmail-jdk16/140,
                   org.bouncycastle:bcmail-jdk14,
-                  org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk15+,
                   org.bouncycastle:bcmail-jdk15on
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk16
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcjmail-jdk18on</id>
+                <features>
+                  org.bouncycastle:bcjmail-jdk15on,
+                  org.bouncycastle:bcjmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>

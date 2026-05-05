@@ -19,16 +19,19 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Validate {@link BaseObjectReference}.
@@ -36,85 +39,86 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
  * @version $Id$
  */
 @ReferenceComponentList
-public class BaseObjectReferenceTest
+@OldcoreTest
+class BaseObjectReferenceTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private DocumentReference document;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before()
     {
         this.document = new DocumentReference("wiki", "space", "page");
     }
 
     @Test
-    public void testSerialize() throws Exception
+    void serialize()
     {
         BaseObjectReference reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class"), 42, this.document);
 
-        Assert.assertEquals("space.class[42]", reference.getName());
+        assertEquals("space.class[42]", reference.getName());
 
         reference = new BaseObjectReference(new DocumentReference("wiki", "space", "class"), null, this.document);
 
-        Assert.assertEquals("space.class", reference.getName());
+        assertEquals("space.class", reference.getName());
     }
 
     @Test
-    public void testSerializeEscape() throws Exception
+    void serializeEscape()
     {
         BaseObjectReference reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class[42]"), null, this.document);
 
-        Assert.assertEquals("space.class\\[42]", reference.getName());
+        assertEquals("space.class\\[42]", reference.getName());
 
         reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class\\\\[42]"), null, this.document);
 
-        Assert.assertEquals("space.class\\\\\\\\\\[42]", reference.getName());
+        assertEquals("space.class\\\\\\\\\\[42]", reference.getName());
     }
 
     @Test
-    public void testUnserialize() throws Exception
+    void unserialize()
     {
         BaseObjectReference reference =
             new BaseObjectReference(new EntityReference("space.class[42]", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
-        Assert.assertEquals(42, (int) reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
+        assertEquals(42, (int) reference.getObjectNumber());
 
         reference = new BaseObjectReference(new EntityReference("space.class", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
-        Assert.assertNull(reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
+        assertNull(reference.getObjectNumber());
     }
 
     @Test
-    public void testUnserializeEscape() throws Exception
+    void unserializeEscape()
     {
         BaseObjectReference reference =
             new BaseObjectReference(new EntityReference("space.class\\[42]", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class[42]"), reference.getXClassReference());
-        Assert.assertNull(reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class[42]"), reference.getXClassReference());
+        assertNull(reference.getObjectNumber());
 
         reference =
             new BaseObjectReference(new EntityReference("space.class\\\\[42]", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class\\"), reference.getXClassReference());
-        Assert.assertEquals(42, (int) reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class\\"), reference.getXClassReference());
+        assertEquals(42, (int) reference.getObjectNumber());
 
         reference =
             new BaseObjectReference(new EntityReference("space.class\\\\\\[42]", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class\\[42]"), reference.getXClassReference());
-        Assert.assertNull(reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class\\[42]"), reference.getXClassReference());
+        assertNull(reference.getObjectNumber());
 
         reference = new BaseObjectReference(new EntityReference("space.class[word]", EntityType.OBJECT, this.document));
 
-        Assert.assertEquals(new DocumentReference("wiki", "space", "class[word]"), reference.getXClassReference());
-        Assert.assertNull(reference.getObjectNumber());
+        assertEquals(new DocumentReference("wiki", "space", "class[word]"), reference.getXClassReference());
+        assertNull(reference.getObjectNumber());
     }
 }

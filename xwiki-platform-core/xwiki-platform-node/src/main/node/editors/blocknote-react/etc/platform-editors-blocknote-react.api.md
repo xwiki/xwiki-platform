@@ -651,9 +651,11 @@ export function createDictionary(lang: EditorLanguage): {
         edited: string;
         save_button_text: string;
         cancel_button_text: string;
+        deleted_reference_text: string;
         actions: {
             add_reaction: string;
             resolve: string;
+            reopen: string;
             edit_comment: string;
             delete_comment: string;
             more_actions: string;

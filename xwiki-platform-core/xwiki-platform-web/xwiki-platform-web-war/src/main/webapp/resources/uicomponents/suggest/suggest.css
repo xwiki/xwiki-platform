@@ -129,9 +129,6 @@ ul.xlist li.showAllResults {
   border-top: 1px solid var(--xwiki-border-color);
 }
 
-.horizontalLayout div.resultContainer div.sourceName {
-}
-
 .horizontalLayout div.resultContainer a.xitemcontainer {
   margin-left:10px;
 }

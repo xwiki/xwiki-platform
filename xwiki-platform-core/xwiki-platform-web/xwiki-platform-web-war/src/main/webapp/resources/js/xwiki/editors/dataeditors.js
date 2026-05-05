@@ -137,11 +137,11 @@
             return $(this).parents('#add_xproperty,#add_xobject').length === 0
                 && $(this).parents('.xclass').length > 0;
         };
-        $('input,textarea').filter(filterInputs).on('change', function(e) {
+        $('input,textarea,select').filter(filterInputs).on('change', function(e) {
           self.unsavedChanges = true;
         });
         $(document).on('xwiki:dom:updated', function (event, data) {
-          $(data.elements).find('input,textarea').filter(filterInputs).on('change', function (e) {
+          $(data.elements).find('input,textarea,select').filter(filterInputs).on('change', function (e) {
             self.unsavedChanges = true;
           });
         });
@@ -320,7 +320,6 @@
           this.ajaxObjectDeletion(object);
           this.editButtonBehavior(object);
           this.expandCollapseObject(object);
-          this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
         }
       }
 
@@ -508,7 +507,9 @@
             if (!item.disabled) {
               item.prop('disabled', true);
               let notification = new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.inProgress'], "inprogress");
-              $.post(item.href).done(function(data) {
+              $.post(item.attr('data-action'), {
+                'form_token': xm.form_token
+              }).done(function(data) {
                 // Remove deprecated properties box
                 container.find(".deprecatedProperties").remove();
                 notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.done'], "done"));
@@ -671,6 +672,7 @@
               // display the elements before firing the event to be sure they are visible.
               object.toggleClass('collapsed');
               $(document).trigger('xwiki:dom:updated', {elements: objectContent.toArray()});
+              self.ajaxRemoveDeprecatedProperties(objectContent, ".syncProperties");
               notification.replace(new XWiki.widgets.Notification(l10n['object.loadObject.done'], "done"));
             }).fail(function (error) {
               let failureReason = error.responseText || 'Server not responding';

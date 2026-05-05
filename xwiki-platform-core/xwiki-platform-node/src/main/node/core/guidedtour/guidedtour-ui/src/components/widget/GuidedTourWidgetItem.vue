@@ -60,8 +60,6 @@ const props = defineProps<{
   loading?: boolean;
   waiting?: Ref<boolean>;
 }>();
-
-console.debug("Widget item:", props, props.waiting, props.loading);
 </script>
 
 <style>

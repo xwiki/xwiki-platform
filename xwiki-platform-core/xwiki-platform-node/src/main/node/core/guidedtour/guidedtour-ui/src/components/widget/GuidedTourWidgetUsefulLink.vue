@@ -30,7 +30,6 @@
 
 <script setup lang="ts">
 const props = defineProps(["link"]);
-console.info("In useful link setup.");
 </script>
 
 <style>

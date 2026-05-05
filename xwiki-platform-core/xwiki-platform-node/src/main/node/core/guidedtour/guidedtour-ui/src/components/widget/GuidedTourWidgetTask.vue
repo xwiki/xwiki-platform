@@ -81,7 +81,6 @@ const { task, tourId } = defineProps<{
   tourId: string;
 }>();
 
-console.info("In task setup.", task?.status, task);
 const state = reactive({
   isWaitingAsync: false,
 });
@@ -124,7 +123,6 @@ async function onStartTask() {
   isWaitingAsync.value = false;
   guidedTourManager.startTask(task!, false);
   console.log("Fetched steps:", steps);
-  // driver(getDriverConfigForSteps(steps));
 }
 </script>
 

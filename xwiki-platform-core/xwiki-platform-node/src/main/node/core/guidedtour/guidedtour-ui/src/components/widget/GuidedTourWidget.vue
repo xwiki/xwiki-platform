@@ -160,6 +160,7 @@ onMounted(() => {
       console.error(e);
       state.waitingLoadAsync++;
     });
+  guidedTourManager.initExistingTask();
   // TODO: This should come from the localStorage
   // state.isWidgetShown = await guidedTourManager.isWidgetShown();
   console.log("async loaded", state.tours);

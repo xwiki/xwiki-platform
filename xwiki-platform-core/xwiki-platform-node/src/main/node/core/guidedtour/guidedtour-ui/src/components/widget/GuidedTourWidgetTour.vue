@@ -107,7 +107,6 @@ function onTaskStatusChanged(task: TourTask) {
 }
 defineEmits(["toggleCollapseTour"]);
 const guidedTourManager: GuidedTourManagerApi = inject("GuidedTourManager")!;
-console.info("In tour setup.");
 const state = reactive({
   tasks: [] as TourTask[],
 });
@@ -130,7 +129,6 @@ onMounted(async () => {
   if (!tasks) {
     console.error("No tasks");
   }
-  console.log("async loaded tasks", state.tasks);
 });
 </script>
 

@@ -37,7 +37,6 @@ const props = defineProps<{
   width?: number;
 }>();
 const progress = props.progress; // reactive read-only ref
-console.info("In pbar setup.");
 </script>
 
 <style>

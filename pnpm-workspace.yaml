@@ -83,7 +83,7 @@ catalog:
   "@vue/eslint-config-typescript": 14.7.0
   "@vue/test-utils": 2.4.6
   "@vue/tsconfig": 0.9.1
-  axe-core: 4.11.1
+  axe-core: 4.11.4
   bootstrap-icons: 1.13.1
   dompurify: 3.4.2
   eslint: 9.39.4

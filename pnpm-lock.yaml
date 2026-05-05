@@ -88,8 +88,8 @@ catalogs:
       specifier: 0.9.1
       version: 0.9.1
     axe-core:
-      specifier: 4.11.1
-      version: 4.11.1
+      specifier: 4.11.4
+      version: 4.11.4
     bootstrap-icons:
       specifier: 1.13.1
       version: 1.13.1
@@ -1993,7 +1993,7 @@ importers:
         version: 2.4.6
       axe-core:
         specifier: 'catalog:'
-        version: 4.11.1
+        version: 4.11.4
       vitest:
         specifier: 'catalog:'
         version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@28.1.0)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.8.2))
@@ -4254,8 +4254,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  axe-core@4.11.1:
-    resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
+  axe-core@4.11.4:
+    resolution: {integrity: sha512-KunSNx+TVpkAw/6ULfhnx+HWRecjqZGTOyquAoWHYLRSdK1tB5Ihce1ZW+UY3fj33bYAFWPu7W/GRSmmrCGuxA==}
     engines: {node: '>=4'}
 
   axios@1.15.0:
@@ -8908,7 +8908,7 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.1.0
 
-  axe-core@4.11.1: {}
+  axe-core@4.11.4: {}
 
   axios@1.15.0:
     dependencies:

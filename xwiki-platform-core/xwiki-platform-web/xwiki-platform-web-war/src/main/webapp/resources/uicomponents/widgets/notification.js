@@ -35,7 +35,9 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
  * <dl>
  *   <dt>text</dt>
- *   <dd>The notification text</dd>
+ *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text. Before, it was used
+ *   as HTML content. You can check for the presence of the Notification.textFormat static method to know which
+ *   behavior applies at runtime.</dd>
  *   <dt>type (optional)</dt>
  *   <dd>The notification type, one of <tt>plain</tt>, <tt>info</tt>, <tt>warning</tt>, <tt>error</tt>, <tt>inprogress</tt>,
  *    <tt>done</tt>. If an unknown or no type is passed, <tt>plain</tt> is used by default.</dd>
@@ -108,7 +110,8 @@ widgets.Notification = Class.create({
   createElement : function() {
     if (!this.element) {
       // The notification container is already an ARIA "alert", those notifications do not need extra semantics.
-      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type}).update(this.text);
+      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type});
+      this.element.textContent = this.text;
       if (this.options.icon) {
         this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
       }
@@ -160,6 +163,20 @@ widgets.Notification = Class.create({
 
 /** The container for all the notifications. */
 widgets.Notification.container = null;
+
+/**
+ *
+ * Indicates how the text parameter is interpreted by XWiki.widgets.Notification.
+ * Callers can check for the presence of this method to decide whether to escape their input:
+ * When this method is available, the text parameter is treated as plain text and must not be escaped.
+ * When this method is missing (before 18.4.0RC1/17.10.9), the text parameter is interpreted as HTML and may need to be
+ * escaped.
+ * The returned value is always the "plain" string.
+ * @return {string} the expected format of the text property
+ * @since 18.4.0RC1
+ * @since 17.10.9
+ */
+widgets.Notification.textFormat = () => "plain"
 
 /** Returns the container for all the notifications. The container is created the first time this function is called. */
 widgets.Notification.getContainer = function() {

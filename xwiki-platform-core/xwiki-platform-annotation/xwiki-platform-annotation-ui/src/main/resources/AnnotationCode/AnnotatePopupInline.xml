@@ -1,0 +1,462 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotatePopupInline" locale="">
+  <web>AnnotationCode</web>
+  <name>AnnotatePopupInline</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AnnotatePopupInline</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>Inline popup to annotate by selecting text (user-friendly alternative to the keyboard shortcut)</content>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d2429a21-dbe2-4dd1-9511-3bc911af965c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>
+        "use strict";
+
+        /** This property values (element ids, classes etc.) might change in a XWiki update */
+        const XWikiConstants = Object.freeze({
+          /**
+           * The id of the element containing the XWiki page content
+           * @type {string}
+           */
+          CONTENT_DIV_ID: "xwikicontent",
+          /**
+           * The class that is added when the CKEditor editor is opened
+           * @type {string}
+           */
+          CKEDITOR_OPEN_CLASS: "cke_editable", // TODO: needs to be removed after the BlockNote implementation
+          /**
+           * The class that is added when the BlockNote editor is opened
+           * @type {string}
+           */
+          BLOCKNOTE_OPEN_CLASS: "xwiki-blocknote-wrapper",
+          /**
+           * The keyboard shortcut that needs to be triggered to create a new annotation
+           * @type {KeyboardEventInit}
+           */
+          ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 } // ShortcutJS still expects the deprecated keyCode property
+        });
+
+        /**
+         * Debounces a function
+         * @param {Function} func - A function
+         * @param {number} delay - Delay time
+         * @return {Function} A debounced function
+         */
+        function debounce(func, delay) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => { func.apply(this, args); }, delay);
+            };
+        }
+
+        /**
+         * Inserts popup to DOM
+         *  @return {HTMLElement} The popup element
+         */
+        function addPopupToDOM() {
+            const iconWrapper = document.createElement("div");
+            iconWrapper.classList.add("popup-icon");
+
+            // JavaScript API for icons (https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
+            define("annotation-popup-icons", { icons: ["comment"] });
+            require(["xwiki-icon!annotation-popup-icons"], function(icons) {
+                iconWrapper.appendChild(icons.comment.render());
+            });
+
+            const popup = document.createElement("div");
+            popup.id = "annotation-popup";
+            popup.appendChild(iconWrapper);
+
+            document.body.appendChild(popup);
+            return popup;
+        }
+
+        /**
+         * Displays the popup near the selected text range
+         * @param {HTMLElement} popup - The popup element
+         * @param {Selection} selection - A selection
+         */
+        function openPopup(popup, selection) {
+            const anchorNodeRect = selection.getRangeAt(0).getBoundingClientRect();
+            popup.style.top = (anchorNodeRect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
+            popup.style.left = (anchorNodeRect.left + window.scrollX + anchorNodeRect.width - (popup.offsetWidth / 2)) + "px";
+            popup.classList.add("opened");
+
+            /**
+             * Closes popup when click was outside of the popup
+             * @param {Event} event - The click event
+             */
+            function onClickOutsidePopup(event) {
+               // Check if the click was within the bounds of the original text selection
+               const isClickInsideSelection = anchorNodeRect.left <= event.clientX &&
+                                               event.clientX <= anchorNodeRect.right &&
+                                               anchorNodeRect.top <= event.clientY &&
+                                               event.clientY <= anchorNodeRect.bottom;
+
+              if (!popup.contains(event.target) && !isClickInsideSelection) {
+                  popup.classList.remove("opened");
+                  document.removeEventListener("click", onClickOutsidePopup);
+              }
+            }
+            const listener = debounce(onClickOutsidePopup, 60);
+            document.addEventListener("click", listener);
+        }
+
+        /**
+         * Register event listeners
+         * @param {HTMLElement} wikiContent - The xwikicontent div container
+         * @param {number} popup - The popup element
+         */
+        function registerListeners(wikiContent, popup) {
+            /**
+             * Checks the current selection and opens the popup
+             */
+            function onSelectionChange() {
+                const selection = window.getSelection();
+                if (!selection || !selection.toString() || !wikiContent.contains(selection.anchorNode)) {
+                    return;
+                }
+
+                openPopup(popup, selection);
+            }
+
+            /**
+             * Disables popup when editor is opened
+             * @param {MutationRecord[]} mutations - The xwikicontent div container
+             */
+            function onClassChange(mutations) {
+                for (const mutation of mutations) {
+                    if (mutation.type !== "attributes" || mutation.attributeName !== "class") {
+                        continue;
+                    }
+
+                    const newClassList = mutation.target.classList;
+                    const isEditorOpen = newClassList.contains(XWikiConstants.CKEDITOR_OPEN_CLASS) || newClassList.contains(XWikiConstants.BLOCKNOTE_OPEN_CLASS);
+                    if (isEditorOpen) {
+                        document.removeEventListener("selectionchange", listener);
+                    } else {
+                        document.addEventListener("selectionchange", listener);
+                    }
+                }
+            }
+
+            // selection listener
+            const selectionListener = debounce(onSelectionChange, 800);
+            document.addEventListener("selectionchange", selectionListener);
+
+            // disable annotation popup inside editor
+            const classObserver = new MutationObserver(onClassChange);
+            classObserver.observe(wikiContent, { attributes: true, attributeFilter: ["class"] });
+
+            // popup listeners
+            popup.addEventListener("click", () => {
+                popup.classList.remove("opened");
+                document.dispatchEvent(new KeyboardEvent("keydown", XWikiConstants.ANNOTATE_SHORTCUT));
+            });
+            popup.addEventListener("pointerdown", (event) => { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Load the annotations only in view mode, if the document content is displayed
+            const wikiContent = document.getElementById(XWikiConstants.CONTENT_DIV_ID);
+            if (XWiki.contextaction != "view" || !wikiContent) {
+                return;
+            }
+
+            const popup = addPopupToDOM();
+            registerListeners(wikiContent, popup);
+        });
+      </code>
+    </property>
+    <property>
+      <name>Annotate Popup -- Main JavaScript</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>67f1f446-114a-4598-ac7d-b44446e9ecf2</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>
+        #annotation-popup {
+          position: absolute;
+          background-color: #fff;
+          padding: 4px;
+          border-radius: 4px;
+          box-shadow: 0 1.65px 3px rgba(0, 0, 0, .2);
+          visibility: hidden;
+          opacity: 0;
+          transition: opacity .2s ease-in;
+
+          &.opened {
+            visibility: visible;
+            opacity: 1;
+          }
+
+          .popup-icon {
+            padding: 4px 5.25px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color .1s ease-in;
+
+            &:hover {
+              background-color: rgba(9, 30, 66, .13);
+            }
+          }
+        }
+      </code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Annotate Popup -- Main Styles</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>e962e367-f97d-4b92-b08f-10489b92a9cc</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property type="String">
+      <level>wiki_admin</level>
+    </property>
+  </object>
+</xwikidoc>

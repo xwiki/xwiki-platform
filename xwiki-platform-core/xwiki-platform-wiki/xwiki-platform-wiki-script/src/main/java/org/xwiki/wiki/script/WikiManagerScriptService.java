@@ -179,7 +179,7 @@ public class WikiManagerScriptService implements ScriptService
         XWikiContext context = xcontextProvider.get();
 
         try {
-            // Check if the current script has the programing rights
+            // Check if the current script has programming rights
             checkProgrammingRights();
 
             // Check right access

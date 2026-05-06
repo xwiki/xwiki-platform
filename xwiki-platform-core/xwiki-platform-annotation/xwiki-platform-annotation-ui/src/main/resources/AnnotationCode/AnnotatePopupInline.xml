@@ -196,17 +196,17 @@
                                                rect.top <= event.clientY &&
                                                event.clientY <= rect.bottom;
 
-                if (!popup.contains(event.target) && !isClickInsideSelection) {
-                    closePopup(popup);
-                    document.removeEventListener("click", onClickAway);
-                }
+              if (!popup.contains(event.target) && !isClickInsideSelection) {
+                  closePopup(popup);
+                  document.removeEventListener("click", onClickAway);
+              }
             }, 60);
             document.addEventListener("click", onClickAway);
 
             // close popup when making a new selection
             const onNewSelect = () => {
                 closePopup(popup);
-                document.removeEventListener("selectionchange", selectListener);
+                document.removeEventListener("selectionchange", onNewSelect);
             };
             document.addEventListener("selectionchange", onNewSelect);
         }

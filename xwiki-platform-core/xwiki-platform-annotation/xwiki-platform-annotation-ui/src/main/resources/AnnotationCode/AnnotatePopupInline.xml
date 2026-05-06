@@ -196,10 +196,10 @@
                                                rect.top <= event.clientY &&
                                                event.clientY <= rect.bottom;
 
-              if (!popup.contains(event.target) && !isClickInsideSelection) {
-                  closePopup(popup);
-                  document.removeEventListener("click", onClickAway);
-              }
+                if (!popup.contains(event.target) && !isClickInsideSelection) {
+                    closePopup(popup);
+                    document.removeEventListener("click", onClickAway);
+                }
             }, 60);
             document.addEventListener("click", onClickAway);
 

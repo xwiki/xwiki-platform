@@ -728,7 +728,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
         getRepositoryTestUtils().attachFile(newExtension);
         getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
-            "attach:" + newExtension.getFile().getName());
+            "attach:" + newExtension.getFile().getFile().getName());
 
         // Make sure the old version is installed.
         getExtensionTestUtils().install(new ExtensionId(extensionId, oldVersion));
@@ -787,7 +787,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
         getRepositoryTestUtils().attachFile(newExtension);
         getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
-            "attach:" + newExtension.getFile().getName());
+            "attach:" + newExtension.getFile().getFile().getName());
 
         // Make sure the old version is installed.
         getExtensionTestUtils().install(new ExtensionId(extensionId, oldVersion));
@@ -904,7 +904,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
         getRepositoryTestUtils().attachFile(newExtension);
         getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
-            "attach:" + newExtension.getFile().getName());
+            "attach:" + newExtension.getFile().getFile().getName());
 
         // Make sure the new version is installed.
         getExtensionTestUtils().install(new ExtensionId(extensionId, newVersion));

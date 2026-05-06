@@ -189,26 +189,26 @@
             popup.classList.add(CLASS_POPUP_OPEN);
 
             // close popup on click away
-            const clickListener = debounce((event) => {
+            const onClickAway = debounce((event) => {
                 // Check if the click was within the bounds of the original text selection
                 const isClickInsideSelection = rect.left <= event.clientX &&
-                                                event.clientX <= rect.right &&
-                                                rect.top <= event.clientY &&
-                                                event.clientY <= rect.bottom;
+                                               event.clientX <= rect.right &&
+                                               rect.top <= event.clientY &&
+                                               event.clientY <= rect.bottom;
 
                 if (!popup.contains(event.target) && !isClickInsideSelection) {
                     closePopup(popup);
-                    document.removeEventListener("click", clickListener);
+                    document.removeEventListener("click", onClickAway);
                 }
             }, 60);
-            document.addEventListener("click", clickListener);
+            document.addEventListener("click", onClickAway);
 
             // close popup when making a new selection
-            const selectListener = () => {
+            const onNewSelect = () => {
                 closePopup(popup);
                 document.removeEventListener("selectionchange", selectListener);
             };
-            document.addEventListener("selectionchange", selectListener);
+            document.addEventListener("selectionchange", onNewSelect);
         }
 
         /**

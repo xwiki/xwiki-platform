@@ -173,9 +173,11 @@
          * @param {Selection} selection - A selection
          */
         function openPopup(popup, selection) {
-            const anchorNodeRect = selection.getRangeAt(0).getBoundingClientRect();
-            popup.style.top = (anchorNodeRect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
-            popup.style.left = (anchorNodeRect.left + window.scrollX + anchorNodeRect.width - (popup.offsetWidth / 2)) + "px";
+            const rects = selection.getRangeAt(0).getClientRects();
+            const rect = rects[rects.length - 1]; // position near the last line (multi-line selection) rather than the overall bounding box
+
+            popup.style.top = (rect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
+            popup.style.left = (rect.left + window.scrollX + rect.width - (popup.offsetWidth / 2)) + "px";
             popup.classList.add("opened");
 
             /**
@@ -184,15 +186,15 @@
              */
             function onClickOutsidePopup(event) {
                // Check if the click was within the bounds of the original text selection
-               const isClickInsideSelection = anchorNodeRect.left <= event.clientX &&
-                                               event.clientX <= anchorNodeRect.right &&
-                                               anchorNodeRect.top <= event.clientY &&
-                                               event.clientY <= anchorNodeRect.bottom;
+               const isClickInsideSelection = rect.left <= event.clientX &&
+                                               event.clientX <= rect.right &&
+                                               rect.top <= event.clientY &&
+                                               event.clientY <= rect.bottom;
 
-              if (!popup.contains(event.target) && !isClickInsideSelection) {
-                  popup.classList.remove("opened");
-                  document.removeEventListener("click", onClickOutsidePopup);
-              }
+                if (!popup.contains(event.target) && !isClickInsideSelection) {
+                    popup.classList.remove("opened");
+                    document.removeEventListener("click", onClickOutsidePopup);
+                }
             }
             const listener = debounce(onClickOutsidePopup, 60);
             document.addEventListener("click", listener);

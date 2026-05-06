@@ -173,8 +173,9 @@
          * @param {Selection} selection - A selection
          */
         function openPopup(popup, selection) {
+            // use rect of last last line/element, important for correct positioning in multi-line selections
             const rects = selection.getRangeAt(0).getClientRects();
-            const rect = rects[rects.length - 1]; // position near the last line (multi-line selection) rather than the overall bounding box
+            const rect = rects[rects.length - 1];
 
             popup.style.top = (rect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
             popup.style.left = (rect.left + window.scrollX + rect.width - (popup.offsetWidth / 2)) + "px";
@@ -185,8 +186,8 @@
              * @param {Event} event - The click event
              */
             function onClickOutsidePopup(event) {
-               // Check if the click was within the bounds of the original text selection
-               const isClickInsideSelection = rect.left <= event.clientX &&
+                // Check if the click was within the bounds of the original text selection
+                const isClickInsideSelection = rect.left <= event.clientX &&
                                                event.clientX <= rect.right &&
                                                rect.top <= event.clientY &&
                                                event.clientY <= rect.bottom;

@@ -155,7 +155,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    */
   var escapeTourName = function (tourName) {
     // The Tour API says tour name must contain only alphanumerics, underscores and hyphens.
-    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to
+    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to 
     // avoid collisions).
     return tourName.replace(/[^a-zA-Z0-9\-]/g, function(character) {
       return '_'+character.charCodeAt(0)+'_';
@@ -565,7 +565,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     visibility: hidden;
     opacity: 0;
     /* Using an actual 0s here gets minified to 0, which is incorrect CSS. */
-    transition: opacity .2s ease-in-out, visibility .001s .2s;
+    transition: opacity .2s ease-in-out, visibility .001s .2s; 
     position: relative;
     max-width: 276px;
     padding: 1px;

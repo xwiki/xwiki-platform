@@ -57,8 +57,7 @@ public class UsersAndGroupsTest extends AbstractManualTest
         AbstractEscapingTest.getUrlContent(createUrl("register", "XWiki", "XWikiPreferences",
             params(template("registerinline"), kv("xwikiname", "TEST_USER"),
                 test("register_first_name"), test("register_last_name"), kv("register_email", ""),
-                test("register_password"), test("register2_password"),
-                kv("template", "XWiki.XWikiUserTemplate"), kv("xredirect", ""))));
+                test("register_password"), test("register2_password"), kv("xredirect", ""))));
         // create an even more evil user by renaming the user page
         AbstractEscapingTest.getUrlContent(createUrl("view", "XWiki", "TEST_USER",
             params(template("rename"), kv("step", "2"), kv("newSpaceName", "XWiki"), kv("newPageName", TEST_USER))));

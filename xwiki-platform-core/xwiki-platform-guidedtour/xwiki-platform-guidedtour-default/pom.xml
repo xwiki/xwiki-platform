@@ -33,27 +33,6 @@
 <dependencies>
   <!-- Testing dependencies -->
   <!-- TODO: Check what dependencies are actually needed -->
-  <!-- FIXME: These versioned dependencies are workarounds for the upgrade, they should be removed and fixed in the origin dependency -->
-  <dependency>
-    <groupId>joda-time</groupId>
-    <artifactId>joda-time</artifactId>
-    <version>2.14.1</version>
-  </dependency>
-  <dependency>
-    <groupId>org.apache.pdfbox</groupId>
-    <artifactId>fontbox</artifactId>
-    <version>3.0.7</version>
-  </dependency>
-  <dependency>
-    <groupId>org.apache.pdfbox</groupId>
-    <artifactId>pdfbox</artifactId>
-    <version>3.0.7</version>
-  </dependency>
-  <dependency>
-    <groupId>org.apache.pdfbox</groupId>
-    <artifactId>pdfbox-tools</artifactId>
-    <version>3.0.7</version>
-  </dependency>
   <dependency>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-tool-test-simple</artifactId>
@@ -69,7 +48,6 @@
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-oldcore</artifactId>
     <version>${project.version}</version>
-    <scope>compile</scope>
   </dependency>
   <dependency>
     <groupId>org.xwiki.platform</groupId>

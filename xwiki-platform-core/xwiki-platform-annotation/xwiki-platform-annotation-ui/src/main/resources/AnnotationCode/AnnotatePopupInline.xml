@@ -130,6 +130,7 @@
            */
           ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 } // ShortcutJS still expects the deprecated keyCode property
         });
+        const CLASS_POPUP_OPEN = "opened";
 
         /**
          * Debounces a function
@@ -168,6 +169,12 @@
         }
 
         /**
+         * Close the popup
+         * @param {HTMLElement} popup - The popup element
+         */
+        const closePopup = (popup) => { popup.classList.remove(CLASS_POPUP_OPEN) };
+
+        /**
          * Displays the popup near the selected text range
          * @param {HTMLElement} popup - The popup element
          * @param {Selection} selection - A selection
@@ -179,26 +186,22 @@
 
             popup.style.top = (rect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
             popup.style.left = (rect.left + window.scrollX + rect.width - (popup.offsetWidth / 2)) + "px";
-            popup.classList.add("opened");
+            popup.classList.add(CLASS_POPUP_OPEN);
 
-            /**
-             * Closes popup when click was outside of the popup
-             * @param {Event} event - The click event
-             */
-            function onClickOutsidePopup(event) {
+            // close popup on click away
+            const clickListener = debounce((event) => {
                 // Check if the click was within the bounds of the original text selection
                 const isClickInsideSelection = rect.left <= event.clientX &&
-                                               event.clientX <= rect.right &&
-                                               rect.top <= event.clientY &&
-                                               event.clientY <= rect.bottom;
+                                                event.clientX <= rect.right &&
+                                                rect.top <= event.clientY &&
+                                                event.clientY <= rect.bottom;
 
                 if (!popup.contains(event.target) && !isClickInsideSelection) {
-                    popup.classList.remove("opened");
-                    document.removeEventListener("click", onClickOutsidePopup);
+                    closePopup(popup);
+                    document.removeEventListener("click", clickListener);
                 }
-            }
-            const listener = debounce(onClickOutsidePopup, 60);
-            document.addEventListener("click", listener);
+            }, 60);
+            document.addEventListener("click", clickListener);
         }
 
         /**
@@ -249,7 +252,7 @@
 
             // popup listeners
             popup.addEventListener("click", () => {
-                popup.classList.remove("opened");
+                closePopup(popup);
                 document.dispatchEvent(new KeyboardEvent("keydown", XWikiConstants.ANNOTATE_SHORTCUT));
             });
             popup.addEventListener("pointerdown", (event) => { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges

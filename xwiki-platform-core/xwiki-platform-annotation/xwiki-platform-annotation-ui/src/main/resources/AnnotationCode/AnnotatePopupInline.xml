@@ -1,5 +1,25 @@
 <?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.6" reference="AnnotationCode.AnnotatePopupInline" locale="">
   <web>AnnotationCode</web>
   <name>AnnotatePopupInline</name>
@@ -142,7 +162,7 @@
             let timeout;
             return function (...args) {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => { func.apply(this, args); }, delay);
+                timeout = setTimeout(() =&gt; { func.apply(this, args); }, delay);
             };
         }
 
@@ -172,7 +192,7 @@
          * Close the popup
          * @param {HTMLElement} popup - The popup element
          */
-        const closePopup = (popup) => { popup.classList.remove(CLASS_POPUP_OPEN) };
+        const closePopup = (popup) =&gt; { popup.classList.remove(CLASS_POPUP_OPEN) };
 
         /**
          * Displays the popup near the selected text range
@@ -189,14 +209,14 @@
             popup.classList.add(CLASS_POPUP_OPEN);
 
             // close popup on click away
-            const onClickAway = debounce((event) => {
+            const onClickAway = debounce((event) =&gt; {
                 // Check if the click was within the bounds of the original text selection
-                const isClickInsideSelection = rect.left <= event.clientX &&
-                                               event.clientX <= rect.right &&
-                                               rect.top <= event.clientY &&
-                                               event.clientY <= rect.bottom;
+                const isClickInsideSelection = rect.left &lt;= event.clientX &amp;&amp;
+                                               event.clientX &lt;= rect.right &amp;&amp;
+                                               rect.top &lt;= event.clientY &amp;&amp;
+                                               event.clientY &lt;= rect.bottom;
 
-                if (!popup.contains(event.target) && !isClickInsideSelection) {
+                if (!popup.contains(event.target) &amp;&amp; !isClickInsideSelection) {
                     closePopup(popup);
                     document.removeEventListener("click", onClickAway);
                 }
@@ -204,7 +224,7 @@
             document.addEventListener("click", onClickAway);
 
             // close popup when making a new selection
-            const onNewSelect = () => {
+            const onNewSelect = () =&gt; {
                 closePopup(popup);
                 document.removeEventListener("selectionchange", onNewSelect);
             };
@@ -258,14 +278,14 @@
             classObserver.observe(wikiContent, { attributes: true, attributeFilter: ["class"] });
 
             // popup listeners
-            popup.addEventListener("click", () => {
+            popup.addEventListener("click", () =&gt; {
                 closePopup(popup);
                 document.dispatchEvent(new KeyboardEvent("keydown", XWikiConstants.ANNOTATE_SHORTCUT));
             });
-            popup.addEventListener("pointerdown", (event) => { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges
+            popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", () =&gt; {
             // Load the annotations only in view mode, if the document content is displayed
             const wikiContent = document.getElementById(XWikiConstants.CONTENT_DIV_ID);
             if (XWiki.contextaction != "view" || !wikiContent) {
@@ -404,7 +424,7 @@
           opacity: 0;
           transition: opacity .2s ease-in;
 
-          &.opened {
+          .opened {
             visibility: visible;
             opacity: 1;
           }
@@ -415,7 +435,7 @@
             cursor: pointer;
             transition: background-color .1s ease-in;
 
-            &:hover {
+            &amp;:hover {
               background-color: rgba(9, 30, 66, .13);
             }
           }

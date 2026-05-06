@@ -220,7 +220,6 @@ function XWikiDriverConfig(
       popDOM.wrapper.insertBefore(popDOM.progress, popDOM.title);
 
       // The user will see this step, so update the storage key.
-      console.log("Setting storage to ", activeIndex);
       SessionStorageManager.setStorageKey(
         SessionStorageManager.getTaskCurrentStepStorageKey(task),
         activeIndex.toString(),

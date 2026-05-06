@@ -24,9 +24,6 @@ import {createApp} from 'vue';
 
 
 function init() {
-  console.info("Hi from init 1!");
-
-  // createApp({ render: () => h('div', 'Test') }).mount('#gt2');
   const app = createApp(GuidedTourWidget, { guidedTourManager });
   app.config.errorHandler = (err, instance, info) => {
     console.error('Vue error:', err, info, instance);
@@ -38,6 +35,7 @@ function init() {
   app.mount('#guidedtour-uix');
 }
 
+// FIXME: This check doesn't work.
 if (!document.querySelector('#tourResumeContainer')) {
   init();
 } else {

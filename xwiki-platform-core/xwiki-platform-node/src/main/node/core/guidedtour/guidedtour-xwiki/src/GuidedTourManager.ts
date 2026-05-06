@@ -198,7 +198,6 @@ export class GuidedTourManager implements GuidedTourManagerApi {
   }
 
   async getTours(): Promise<TourTour[]> {
-    console.debug("Getting tours");
     if (this._cache.tours == undefined) {
       console.debug("Fetching tours for cache");
       await this.fetchTours();
@@ -230,7 +229,6 @@ export class GuidedTourManager implements GuidedTourManagerApi {
   }
 
   computeTourStatus(tour: TourTour) {
-    console.log("Computing for tour ", tour.id, tour.tasksList, tour.status);
     if (tour.tasksList?.length == 0) {
       tour.status = TourTaskStatus.SKIPPED;
     } else if (
@@ -247,7 +245,6 @@ export class GuidedTourManager implements GuidedTourManagerApi {
     } else {
       tour.status = TourTaskStatus.DONE;
     }
-    console.log(tour.status);
     return tour.status;
   }
 

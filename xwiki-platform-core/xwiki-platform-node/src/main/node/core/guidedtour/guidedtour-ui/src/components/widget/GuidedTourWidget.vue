@@ -163,7 +163,6 @@ onMounted(() => {
   guidedTourManager.initExistingTask();
   // TODO: This should come from the localStorage
   // state.isWidgetShown = await guidedTourManager.isWidgetShown();
-  console.log("async loaded", state.tours);
 });
 // FIXME: The .val property is a workaround, so vue doesn't auto-unwrap the progress, thus making it non-reactive.
 const progress = {

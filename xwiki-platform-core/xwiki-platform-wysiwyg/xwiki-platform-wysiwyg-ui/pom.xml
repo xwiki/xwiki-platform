@@ -87,6 +87,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used by xwiki-platform-extension-script when accessing the Extension Index Script Service, which is used
+         by the Macro Service to include uninstalled macros (provided by extensions). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-index</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Provides $services.temporaryAttachments used by the FileUploader page. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

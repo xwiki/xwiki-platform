@@ -75,9 +75,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

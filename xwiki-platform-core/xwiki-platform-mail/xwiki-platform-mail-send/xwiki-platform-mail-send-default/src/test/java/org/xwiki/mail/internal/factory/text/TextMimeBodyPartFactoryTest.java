@@ -25,43 +25,42 @@ import java.util.Map;
 
 import javax.mail.internet.MimeBodyPart;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory}.
+ * Unit tests for {@link TextMimeBodyPartFactory}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class TextMimeBodyPartFactoryTest
+@ComponentTest
+class TextMimeBodyPartFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<TextMimeBodyPartFactory> mocker =
-        new MockitoComponentMockingRule<>(TextMimeBodyPartFactory.class);
+    @InjectMockComponents
+    private TextMimeBodyPartFactory factory;
 
     @Test
-    public void createWithoutMimeTypePassed() throws Exception
+    void createWithoutMimeTypePassed() throws Exception
     {
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum",
-            Collections.<String, Object>emptyMap());
+        MimeBodyPart bodyPart = this.factory.create("Lorem ipsum", Collections.emptyMap());
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
         assertEquals("text/plain; charset=UTF-8", bodyPart.getContentType());
     }
 
     @Test
-    public void createWithMimeTypePassedAndWithHeaders() throws Exception
+    void createWithMimeTypePassedAndWithHeaders() throws Exception
     {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("headers", Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
         parameters.put("mimetype", "text/calendar");
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum", parameters);
+        MimeBodyPart bodyPart = this.factory.create("Lorem ipsum", parameters);
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
         assertEquals("text/calendar", bodyPart.getContentType());

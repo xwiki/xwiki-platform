@@ -19,25 +19,26 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
-public class DefaultReferenceDocumentReferenceResolverTest
+class DefaultReferenceDocumentReferenceResolverTest
 {
     private DocumentReferenceResolver<EntityReference> resolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
         this.resolver = new DefaultReferenceDocumentReferenceResolver();
         ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver",
@@ -45,12 +46,12 @@ public class DefaultReferenceDocumentReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithExplicitDocumentReference()
+    void resolveWithExplicitDocumentReference()
     {
         DocumentReference reference = this.resolver.resolve(null, new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals("space", reference.getLastSpaceReference().getName());
-        Assert.assertEquals("wiki", reference.getWikiReference().getName());
+        assertEquals("page", reference.getName());
+        assertEquals("space", reference.getLastSpaceReference().getName());
+        assertEquals("wiki", reference.getWikiReference().getName());
     }
 }

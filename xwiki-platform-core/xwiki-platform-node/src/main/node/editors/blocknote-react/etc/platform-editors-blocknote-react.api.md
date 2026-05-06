@@ -12,7 +12,7 @@ import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
-import { CollaborationInitializer } from '@xwiki/platform-collaboration-api';
+import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
@@ -52,7 +52,7 @@ export type BlockNoteConcreteMacro = {
     macro: MacroWithUnknownParamsType;
     bnRendering: {
         type: "block";
-        block: ReturnType<typeof createCustomBlockSpec>;
+        block: ReturnType<typeof createCustomBlockSpec<string, PropSchema, "inline">> | ReturnType<typeof createCustomBlockSpec<string, PropSchema, "none">>;
     } | {
         type: "inline";
         inlineContent: ReturnType<typeof createCustomInlineContentSpec>;
@@ -62,6 +62,7 @@ export type BlockNoteConcreteMacro = {
 // @beta
 export type BlockNoteViewWrapperProps = {
     blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">>;
+    name?: string;
     theme?: "light" | "dark";
     lang: EditorLanguage;
     label: string;
@@ -70,13 +71,7 @@ export type BlockNoteViewWrapperProps = {
         list: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
     } | false;
-    realtime?: {
-        collaborationProvider: () => CollaborationInitializer;
-        user: {
-            name: string;
-            color: string;
-        };
-    };
+    collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
     linkEditionCtx: LinkEditionContext;
     overrides?: {
@@ -302,7 +297,7 @@ readonly propSchema: "string";
 // @internal
 export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">(input: {
     config: BlockConfig<Name, Props, InlineType>;
-    implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
+    implementation: ReactCustomBlockImplementation<BlockConfig<Name, Props, InlineType>>;
     slashMenu: false | {
         title: string;
         aliases?: string[];
@@ -651,9 +646,11 @@ export function createDictionary(lang: EditorLanguage): {
         edited: string;
         save_button_text: string;
         cancel_button_text: string;
+        deleted_reference_text: string;
         actions: {
             add_reaction: string;
             resolve: string;
+            reopen: string;
             edit_comment: string;
             delete_comment: string;
             more_actions: string;

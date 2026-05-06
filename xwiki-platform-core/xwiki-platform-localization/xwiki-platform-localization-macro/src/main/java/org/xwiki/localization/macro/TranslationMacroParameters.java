@@ -22,7 +22,9 @@ package org.xwiki.localization.macro;
 import java.util.Locale;
 
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the translation macro.
@@ -46,6 +48,11 @@ public class TranslationMacroParameters
      * @see #getParameters()
      */
     private String[] parameters;
+
+    /**
+     * @see #getSciptParameters()
+     */
+    private String scriptParameters;
 
     /**
      * @return the key associated to the translation
@@ -93,9 +100,34 @@ public class TranslationMacroParameters
     /**
      * @param parameters the translation parameters
      */
+    @PropertyFeature("parameters")
     @PropertyDescription("the translation parameters")
     public void setParameters(String[] parameters)
     {
         this.parameters = parameters;
+    }
+
+    /**
+     * @return the name of the variable containing the translation parameters
+     * @since 18.4.0RC1
+     * @since 17.10.9
+     */
+    @Unstable
+    public String getScriptParameters()
+    {
+        return this.scriptParameters;
+    }
+
+    /**
+     * @param scriptParameters the name of the variable containing the translation parameters
+     * @since 18.4.0RC1
+     * @since 17.10.9
+     */
+    @Unstable
+    @PropertyFeature("parameters")
+    @PropertyDescription("The name of the variable containing the translation parameters.")
+    public void setScriptParameters(String scriptParameters)
+    {
+        this.scriptParameters = scriptParameters;
     }
 }

@@ -19,22 +19,24 @@
  */
 package org.xwiki.observation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @Deprecated
-public class ActionExecutionEventTest
+class ActionExecutionEventTest
 {
     @Test
-    public void testActionExecutionEventEquals()
+    void actionExecutionEventEquals()
     {
         Event e1 = new ActionExecutionEvent("test");
         Event e2 = new ActionExecutionEvent("test");
         Event e3 = new ActionExecutionEvent("different");
-        Assert.assertTrue(e1.equals(e1));
-        Assert.assertTrue(e1.equals(e2));
-        Assert.assertFalse(e1.equals(e3));
+        assertTrue(e1.equals(e1));
+        assertTrue(e1.equals(e2));
+        assertFalse(e1.equals(e3));
     }
 }

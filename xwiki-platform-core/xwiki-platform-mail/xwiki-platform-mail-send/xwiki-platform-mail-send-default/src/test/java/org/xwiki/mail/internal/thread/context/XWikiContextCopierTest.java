@@ -21,8 +21,6 @@ package org.xwiki.mail.internal.thread.context;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -58,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiContextCopierTest
+class XWikiContextCopierTest
 {
     private static final String HIBSESSION = "hibsession";
 
@@ -68,16 +66,16 @@ public class XWikiContextCopierTest
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
-    XWikiServletResponseStub originalResponse;
+    private XWikiServletResponseStub originalResponse;
 
-    XWikiRequest originalRequest;
+    private XWikiRequest originalRequest;
 
-    XWikiStoreInterface store;
+    private XWikiStoreInterface store;
 
-    XWikiContext original;
+    private XWikiContext original;
 
     @BeforeEach
-    public void setup() throws Exception
+    void setup() throws Exception
     {
         Utils.setComponentManager(this.componentManager);
 
@@ -116,14 +114,10 @@ public class XWikiContextCopierTest
         this.original.put(HIBSESSION, "opened session");
         this.store = mock(XWikiStoreInterface.class);
         // clean up will remove the session in the given context
-        doAnswer(new Answer<Void>()
-        {
-            public Void answer(InvocationOnMock invocation)
-            {
-                XWikiContext context = (XWikiContext) invocation.getArguments()[0];
-                context.put(HIBSESSION, null);
-                return null;
-            }
+        doAnswer(invocation -> {
+            XWikiContext context = (XWikiContext) invocation.getArguments()[0];
+            context.put(HIBSESSION, null);
+            return null;
         }).when(this.store).cleanUp(any(XWikiContext.class));
         when(xwiki.getStore()).thenReturn(this.store);
 
@@ -137,7 +131,7 @@ public class XWikiContextCopierTest
     }
 
     @Test
-    public void copyContext()
+    void copyContext()
     {
         XWikiContext copy = this.copier.copy(this.original);
 

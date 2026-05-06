@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * @since 2.3M1
  */
 @ComponentTest
-public class DefaultEntityReferenceValueProviderTest implements TestConstants
+class DefaultEntityReferenceValueProviderTest implements TestConstants
 {
     @MockComponent
     private ModelConfiguration configuration;
@@ -47,7 +47,7 @@ public class DefaultEntityReferenceValueProviderTest implements TestConstants
     private DefaultEntityReferenceValueProvider provider;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.configuration.getDefaultReferenceValue(EntityType.SPACE)).thenReturn(TestConstants.DEFAULT_SPACE);
         when(this.configuration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn(TestConstants.DEFAULT_WIKI);
@@ -60,7 +60,7 @@ public class DefaultEntityReferenceValueProviderTest implements TestConstants
     }
 
     @Test
-    public void testGetDefaultValue()
+    void testGetDefaultValue()
     {
         assertEquals(TestConstants.DEFAULT_WIKI, this.provider.getDefaultValue(EntityType.WIKI));
         assertEquals(TestConstants.DEFAULT_SPACE, this.provider.getDefaultValue(EntityType.SPACE));

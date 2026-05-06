@@ -104,12 +104,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -123,7 +117,6 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/ScriptMockSetup*.class</include>
                 <include>**/JUnit5ScriptMockSetup*.class</include>
               </includes>
             </configuration>

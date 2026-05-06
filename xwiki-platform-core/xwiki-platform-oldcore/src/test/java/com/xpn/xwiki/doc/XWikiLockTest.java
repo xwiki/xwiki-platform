@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.4RC1
  */
-public class XWikiLockTest
+class XWikiLockTest
 {
     @Test
-    public void verifyToString()
+    void verifyToString()
     {
         XWikiLock lock = new XWikiLock(1L, "user");
-        assertTrue(lock.toString().matches("userName = \\[user\\], docId = \\[1\\], date = \\[.*\\]"));
+        assertTrue(lock.toString().matches("userName = \\[user], docId = \\[1], date = \\[.*]"));
 
         lock.setDate(new Date(0L));
         assertEquals(String.format("userName = [user], docId = [1], date = [%s]", new Date(0L)), lock.toString());

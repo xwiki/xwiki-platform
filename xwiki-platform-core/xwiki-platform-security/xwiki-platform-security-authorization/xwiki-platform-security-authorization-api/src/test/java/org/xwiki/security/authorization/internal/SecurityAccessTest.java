@@ -19,15 +19,13 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**
@@ -36,7 +34,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2 
  */
-public class SecurityAccessTest
+class SecurityAccessTest
 {
 
     /**
@@ -48,8 +46,8 @@ public class SecurityAccessTest
         SecurityAccess access = XWikiSecurityAccess.getDefaultAccess();
         for (Right right : Right.values()) {
             if (access.get(right) != UNDETERMINED) {
-                assertThat("Right(" + right.getName() + ")",
-                    access.get(right), equalTo(right.getDefaultState()));
+                assertEquals(right.getDefaultState(), access.get(right),
+                    "Right(" + right.getName() + ")");
             }
         }
     }
@@ -58,50 +56,50 @@ public class SecurityAccessTest
      * Assert that access levels can be cleared and set on a SecurityAccess instance.
      */
     @Test
-    public void testAccessLevel() throws Exception
+    void accessLevel() throws Exception
     {
         assertDefaultAccessLevel();
 
         XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
 
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.VIEW)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.EDIT)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.COMMENT)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.LOGIN)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.REGISTER)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.DELETE)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.ADMIN)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.PROGRAM)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.ILLEGAL)));
+        assertEquals(RuleState.ALLOW, l.get(Right.VIEW));
+        assertEquals(RuleState.ALLOW, l.get(Right.EDIT));
+        assertEquals(RuleState.ALLOW, l.get(Right.COMMENT));
+        assertEquals(RuleState.ALLOW, l.get(Right.LOGIN));
+        assertEquals(RuleState.ALLOW, l.get(Right.REGISTER));
+        assertEquals(RuleState.DENY, l.get(Right.DELETE));
+        assertEquals(RuleState.DENY, l.get(Right.ADMIN));
+        assertEquals(RuleState.DENY, l.get(Right.PROGRAM));
+        assertEquals(RuleState.DENY, l.get(Right.ILLEGAL));
 
         l.clear(Right.VIEW);
         l.clear(Right.COMMENT);
         l.clear(Right.LOGIN);
         l.clear(Right.ADMIN);
 
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.VIEW)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.EDIT)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.COMMENT)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.LOGIN)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.REGISTER)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.DELETE)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.ADMIN)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.PROGRAM)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.ILLEGAL)));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.VIEW));
+        assertEquals(RuleState.ALLOW, l.get(Right.EDIT));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.COMMENT));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.LOGIN));
+        assertEquals(RuleState.ALLOW, l.get(Right.REGISTER));
+        assertEquals(RuleState.DENY, l.get(Right.DELETE));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.ADMIN));
+        assertEquals(RuleState.DENY, l.get(Right.PROGRAM));
+        assertEquals(RuleState.DENY, l.get(Right.ILLEGAL));
 
         l.deny(Right.VIEW);
         l.deny(Right.LOGIN);
         l.allow(Right.ADMIN);
             
-        assertThat(RuleState.DENY, equalTo(l.get(Right.VIEW)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.EDIT)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.COMMENT)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.LOGIN)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.REGISTER)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.DELETE)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.ADMIN)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.PROGRAM)));
-        assertThat(RuleState.DENY, equalTo(l.get(Right.ILLEGAL)));
+        assertEquals(RuleState.DENY, l.get(Right.VIEW));
+        assertEquals(RuleState.ALLOW, l.get(Right.EDIT));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.COMMENT));
+        assertEquals(RuleState.DENY, l.get(Right.LOGIN));
+        assertEquals(RuleState.ALLOW, l.get(Right.REGISTER));
+        assertEquals(RuleState.DENY, l.get(Right.DELETE));
+        assertEquals(RuleState.ALLOW, l.get(Right.ADMIN));
+        assertEquals(RuleState.DENY, l.get(Right.PROGRAM));
+        assertEquals(RuleState.DENY, l.get(Right.ILLEGAL));
 
         l.clear(Right.VIEW);
         l.clear(Right.EDIT);
@@ -113,15 +111,15 @@ public class SecurityAccessTest
         l.clear(Right.PROGRAM);
         l.clear(Right.ILLEGAL);
 
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.VIEW)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.EDIT)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.COMMENT)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.LOGIN)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.REGISTER)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.DELETE)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.ADMIN)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.PROGRAM)));
-        assertThat(RuleState.UNDETERMINED, equalTo(l.get(Right.ILLEGAL)));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.VIEW));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.EDIT));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.COMMENT));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.LOGIN));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.REGISTER));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.DELETE));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.ADMIN));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.PROGRAM));
+        assertEquals(RuleState.UNDETERMINED, l.get(Right.ILLEGAL));
 
         l.allow(Right.VIEW);
         l.allow(Right.EDIT);
@@ -133,15 +131,15 @@ public class SecurityAccessTest
         l.allow(Right.PROGRAM);
         l.allow(Right.ILLEGAL);
 
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.VIEW)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.EDIT)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.COMMENT)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.LOGIN)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.REGISTER)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.DELETE)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.ADMIN)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.PROGRAM)));
-        assertThat(RuleState.ALLOW, equalTo(l.get(Right.ILLEGAL)));
+        assertEquals(RuleState.ALLOW, l.get(Right.VIEW));
+        assertEquals(RuleState.ALLOW, l.get(Right.EDIT));
+        assertEquals(RuleState.ALLOW, l.get(Right.COMMENT));
+        assertEquals(RuleState.ALLOW, l.get(Right.LOGIN));
+        assertEquals(RuleState.ALLOW, l.get(Right.REGISTER));
+        assertEquals(RuleState.ALLOW, l.get(Right.DELETE));
+        assertEquals(RuleState.ALLOW, l.get(Right.ADMIN));
+        assertEquals(RuleState.ALLOW, l.get(Right.PROGRAM));
+        assertEquals(RuleState.ALLOW, l.get(Right.ILLEGAL));
 
         assertDefaultAccessLevel();
     }
@@ -150,12 +148,12 @@ public class SecurityAccessTest
      * Assert that the clone method works.
      */
     @Test
-    public void testClone() throws Exception
+    void cloneAccess() throws Exception
     {
         XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
         XWikiSecurityAccess k = l.clone();
-        assertThat(l, equalTo(k));
-        assertThat(l, not(sameInstance(k)));
+        assertEquals(l, k);
+        assertNotSame(k, l);
         assertDefaultAccessLevel();
     }
 }

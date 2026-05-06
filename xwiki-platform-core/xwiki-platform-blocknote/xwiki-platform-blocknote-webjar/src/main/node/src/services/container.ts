@@ -19,6 +19,7 @@
  */
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
+import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
@@ -46,8 +47,10 @@ import { DefaultUniAstIterator } from "./uniast/DefaultUniAstIterator";
 import { XWikiUniAstProcessor } from "./uniast/XWikiUniAstProcessor";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
+import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
-import { Container, injectable } from "inversify";
+import { Container } from "inversify";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -85,6 +88,9 @@ XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
 new MacroServiceComponentList(container);
 
+new CollaborationComponentList(container);
+new XWikiCollaborationComponentList(container);
+
 DefaultUniAstIterator.bind(container);
 XWikiUniAstProcessor.bind(container);
 XWikiMacroBlock.bind(container);
@@ -94,19 +100,6 @@ DefaultImageWizard.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultBlockNoteMacroWizard.bind(container);
 
-// FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
-@injectable()
-class MinimalApp {
-  getContainer() {
-    return container;
-  }
-  getWikiConfig() {
-    return {
-      getType: () => "XWiki",
-    };
-  }
-}
-
-container.bind("CristalApp").to(MinimalApp).inSingletonScope();
+MinimalApp.bind(container);
 
 export { container };

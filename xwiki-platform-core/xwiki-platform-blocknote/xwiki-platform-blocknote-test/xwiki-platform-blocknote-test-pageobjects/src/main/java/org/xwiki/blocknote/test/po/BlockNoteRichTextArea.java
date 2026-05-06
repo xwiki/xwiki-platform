@@ -19,6 +19,7 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -80,7 +81,8 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public void click()
     {
-        this.container.click();
+        // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
+        getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
     }
 
     /**
@@ -150,5 +152,16 @@ public class BlockNoteRichTextArea extends BaseElement
             .get(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Waits until the rich text area contains the specified plain text.
+     * 
+     * @param textFragment the text fragment to wait for
+     * @since 18.4.0RC1
+     */
+    public void waitUntilTextContains(String textFragment)
+    {
+        getDriver().waitUntilCondition(driver -> Strings.CS.contains(getText(), textFragment));
     }
 }

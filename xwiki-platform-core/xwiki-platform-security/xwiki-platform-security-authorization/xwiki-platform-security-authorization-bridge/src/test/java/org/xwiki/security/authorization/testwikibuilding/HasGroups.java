@@ -29,7 +29,6 @@ package org.xwiki.security.authorization.testwikibuilding;
  */
 public interface HasGroups
 {
-
     /**
      * @param name The group name to add.
      * @return a user holder representing the group.

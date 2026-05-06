@@ -80,7 +80,7 @@ class DefaultContextualAuthorizationManagerTest
     private WikiReference currentWikiReference;
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         this.currentWikiReference = new WikiReference("wiki");
         this.oldcore.getXWikiContext().setWikiId(this.currentWikiReference.getName());

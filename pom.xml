@@ -86,7 +86,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>25.8.5</libreoffice.version>
+    <libreoffice.version>25.8.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -114,7 +114,7 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.6.0</mysql.version>
+    <mysql.version>9.7.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.5.8</mariadb.version>
@@ -123,9 +123,9 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.10</pgsql.version>
+    <pgsql.version>42.7.11</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
-    <oracle.artifactId>ojdbc11</oracle.artifactId>
+    <oracle.artifactId>ojdbc17</oracle.artifactId>
     <oracle.version>23.26.1.0.0</oracle.version>
 
     <!-- npm registries configuration -->
@@ -344,7 +344,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.14.1</version>
+        <version>2.14.2</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -1186,7 +1186,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.30</version>
+        <version>3.5.34</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -1404,30 +1404,27 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16/140,
-                  bouncycastle:bcmail-jdk15/140,
                   bouncycastle:bcmail-jdk14/140,
-                  bouncycastle:bcmail-jdk13/140,
-                  bouncycastle:bcmail-jdk12/140,
-                  org.bouncycastle:bcmail-jdk16,
-                  org.bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk15/140,
+                  bouncycastle:bcmail-jdk16/140,
                   org.bouncycastle:bcmail-jdk14,
-                  org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk15+,
                   org.bouncycastle:bcmail-jdk15on
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk16
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcjmail-jdk18on</id>
+                <features>
+                  org.bouncycastle:bcjmail-jdk15on,
+                  org.bouncycastle:bcjmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>commons-beanutils:commons-beanutils</id>
                 <features>commons-beanutils:commons-beanutils-core</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>org.jdom:jdom</id>
-                <features>
-                  jdom:jdom,
-                  org.jdom:jdom-legacy
-                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:jakarta.mail</id>
@@ -1544,7 +1541,7 @@
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.webjars.npm:momentjs</id>
+                <id>org.webjars.npm:moment</id>
                 <features>org.webjars:momentjs</features>
               </extensionOverride>
               <extensionOverride>

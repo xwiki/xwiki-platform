@@ -80,8 +80,8 @@ public class Property extends Element
     }
 
     /**
-     * Returns the {@link BaseProperty#getObfuscatedValue()} or {@link BaseProperty#getValue()} if the user has
-     * programming rights.
+     * Returns the {@link BaseProperty#getObfuscatedValue()} or {@link BaseProperty#getValue()} if the content author
+     * has programming rights.
      * @return the actual value of the property, as a String, Number or List.
      */
     public java.lang.Object getValue()
@@ -91,6 +91,21 @@ public class Property extends Element
         } else {
             return getBaseProperty().getObfuscatedValue();
         }
+    }
+
+    /**
+     * Always returns the obfuscated value if the data is sensitive: this method should be used preferably to
+     * {@link #getValue()} when the content author have privileged accesses but we don't know in advance if the
+     * caller should be able to view the sensitive data.
+     *
+     * @return the value of the property, obfuscated if it's sensitive
+     * @see BaseProperty#getObfuscatedValue()
+     * @since 18.4.0
+     */
+    @Unstable
+    public java.lang.Object getObfuscatedValue()
+    {
+        return getBaseProperty().getObfuscatedValue();
     }
 
     /**

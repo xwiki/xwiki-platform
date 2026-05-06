@@ -90,6 +90,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Required rights edit warnings -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

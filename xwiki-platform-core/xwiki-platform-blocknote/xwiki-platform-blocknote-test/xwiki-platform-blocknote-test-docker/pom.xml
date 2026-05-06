@@ -75,6 +75,20 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- We need an implementation of the WebSocket API (using XWiki components) for realtime collaboration. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-websocket</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need an implementation for the User REST API. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-user-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test only dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -92,6 +106,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Realtime synchronization is done through WebSockets. -->
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

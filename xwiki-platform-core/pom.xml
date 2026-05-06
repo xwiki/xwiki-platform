@@ -149,17 +149,19 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
-            
-            
-
-            
-
-            
-
-            
-            
+            <revapi.differences>
+              <justification>No retro compatibiliity impact, only indicate how to display the macro parameter.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</old>
+                  <new>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature("parameters")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

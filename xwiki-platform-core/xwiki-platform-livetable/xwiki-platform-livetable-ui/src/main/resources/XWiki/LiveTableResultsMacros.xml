@@ -504,7 +504,7 @@
     #end
     #set($fieldObject = $itemDoc.getFirstObject($colname))
     #set($fieldProperty = $fieldObject.getProperty($colname))
-    #set($fieldValue = "$!fieldProperty.getValue()")
+    #set($fieldValue = "$!fieldProperty.getObfuscatedValue()")
     #set($fieldDisplayValue = "#unwrapXPropertyDisplay($itemDoc.display($colname, 'view'))")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))

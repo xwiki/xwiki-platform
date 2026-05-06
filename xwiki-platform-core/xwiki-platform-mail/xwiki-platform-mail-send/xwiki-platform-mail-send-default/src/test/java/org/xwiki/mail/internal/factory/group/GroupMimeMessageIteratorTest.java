@@ -19,19 +19,18 @@
  */
 package org.xwiki.mail.internal.factory.group;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -47,25 +46,25 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.group.GroupMimeMessageIterator}.
+ * Unit tests for {@link GroupMimeMessageIterator}.
  *
  * @version $Id$
  * @since 6.4M3
  */
 @Deprecated
-public class GroupMimeMessageIteratorTest
+class GroupMimeMessageIteratorTest
 {
     @Test
-    public void createMessage() throws Exception
+    void createMessage() throws Exception
     {
         DocumentReference groupReference = new DocumentReference("xwiki", "XWiki", "Marketing");
 
@@ -75,17 +74,10 @@ public class GroupMimeMessageIteratorTest
 
         Session session = Session.getInstance(new Properties());
 
-        MimeMessageFactory<MimeMessage> factory = new MimeMessageFactory<MimeMessage>()
-        {
-            @Override
-            public MimeMessage createMessage(Object source, Map parameters) throws MessagingException
-            {
-                return new ExtendedMimeMessage();
-            }
-        };
+        MimeMessageFactory<MimeMessage> factory = (source, parameters) -> new ExtendedMimeMessage();
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("parameters", Collections.EMPTY_MAP);
+        parameters.put("parameters", Collections.emptyMap());
         parameters.put("session", session);
 
         DocumentAccessBridge accessBridge = mock(DocumentAccessBridge.class);
@@ -112,7 +104,7 @@ public class GroupMimeMessageIteratorTest
 
         BaseObject object = mock(BaseObject.class);
 
-        when(document.getXObjects(any(EntityReference.class))).thenReturn(Arrays.asList(object, object, object));
+        when(document.getXObjects(any(EntityReference.class))).thenReturn(List.of(object, object, object));
 
         DocumentReferenceResolver<String> resolver = mock(DocumentReferenceResolver.class);
         when(resolver.resolve("XWiki.JohnDoe")).thenReturn(userReference1);
@@ -123,23 +115,23 @@ public class GroupMimeMessageIteratorTest
 
         when(componentManager.getInstance(eq(DocumentAccessBridge.class))).thenReturn(accessBridge);
         when(componentManager.getInstance(eq(Execution.class))).thenReturn(execution);
-        when(componentManager.getInstance(eq(DocumentReferenceResolver.TYPE_STRING), eq("current"))).thenReturn(
-            resolver);
+        when(componentManager.getInstance(eq(DocumentReferenceResolver.TYPE_STRING), eq("current")))
+            .thenReturn(resolver);
 
         GroupMimeMessageIterator iterator =
             new GroupMimeMessageIterator(groupReference, factory, parameters, componentManager);
 
         assertTrue(iterator.hasNext());
         MimeMessage message1 = iterator.next();
-        assertArrayEquals(message1.getRecipients(Message.RecipientType.TO), InternetAddress.parse("john@doe.com"));
+        assertArrayEquals(InternetAddress.parse("john@doe.com"), message1.getRecipients(Message.RecipientType.TO));
 
         assertTrue(iterator.hasNext());
         MimeMessage message2 = iterator.next();
-        assertArrayEquals(message2.getRecipients(Message.RecipientType.TO), InternetAddress.parse("jane@doe.com"));
+        assertArrayEquals(InternetAddress.parse("jane@doe.com"), message2.getRecipients(Message.RecipientType.TO));
 
         assertTrue(iterator.hasNext());
         MimeMessage message3 = iterator.next();
-        assertArrayEquals(message3.getRecipients(Message.RecipientType.TO), InternetAddress.parse("jannie@doe.com"));
+        assertArrayEquals(InternetAddress.parse("jannie@doe.com"), message3.getRecipients(Message.RecipientType.TO));
 
         assertFalse(iterator.hasNext());
     }

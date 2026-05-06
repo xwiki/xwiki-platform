@@ -21,7 +21,7 @@
   #set ($editConfirmation = $NULL)
   
   ## Persist the results of the last analysis, and they will be ignored during the next check.
-  #set ($forced = "$!request.get('force')" != '')
+  #set ($forced = "$!request.get('force')" != '' && $services.csrf.isTokenValid($!request.get('force_token')))
   #if ($forced)
     $services.modelvalidation.edit.force()
   #end

@@ -1238,7 +1238,6 @@ class VersionIT
         assertEquals("-<del>my</del>value", stringTestDiff.get(1));
         assertEquals("+<ins>another</ins>value", stringTestDiff.get(2));
 
-        testUtils.setUseDockerBaseUrl(true);
         String xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("viewer", "xml"));
         assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
                 + "      <stringTest>anothervalue</stringTest>\n"
@@ -1247,7 +1246,6 @@ class VersionIT
         // We shouldn't have any occurrence of the password field
         assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
             "Current source is: " + xmlViewerContent);
-        testUtils.setUseDockerBaseUrl(false);
 
         // modify the xclass
         classPage = testUtils.gotoPage(xclassReference);
@@ -1420,7 +1418,6 @@ class VersionIT
         assertEquals("@@ -1,0 +1,1 @@", stringTestDiff.get(0));
         assertEquals("+anothervalue", stringTestDiff.get(1));
 
-        testUtils.setUseDockerBaseUrl(true);
         xmlViewerContent = testUtils.getString(testUtils.getPath(testReference), Map.of("rev", "6.1", "viewer", "xml"));
         assertTrue(xmlViewerContent.contains("<property type=\"String\">\n"
                 + "      <stringTest>anothervalue</stringTest>\n"
@@ -1429,6 +1426,5 @@ class VersionIT
         // We shouldn't have any occurrence of the password field
         assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
             "Current source is: " + xmlViewerContent);
-        testUtils.setUseDockerBaseUrl(false);
     }
 }

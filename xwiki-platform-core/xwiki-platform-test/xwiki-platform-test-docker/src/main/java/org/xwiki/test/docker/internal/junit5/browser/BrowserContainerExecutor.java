@@ -79,10 +79,8 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         Browser browser = testConfiguration.getBrowser();
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        // Note: The official Selenium dockerhub images don't support ARM64 (they won't work on Mac M1 for example).
-        // Thus we swap them for seleniarm docker images when we notice that the architecture is ARM64.
-        // See https://github.com/SeleniumHQ/docker-selenium#experimental-mult-arch-aarch64armhfamd64-images
-        // TODO: Remove if/when https://github.com/testcontainers/testcontainers-java/issues/5183 is fixed
+        // Note: Official Selenium Docker images support ARM64 natively since Selenium 4.26.0, so no architecture
+        // substitution is needed.
         BrowserWebDriverContainer<?> webDriverContainer =
             new XWikiBrowserWebDriverContainer<>(BrowserTestUtils.getSeleniumDockerImageName(this.testConfiguration))
             // We set the width and height to one of the most used resolution by users so that we can reproduce issues

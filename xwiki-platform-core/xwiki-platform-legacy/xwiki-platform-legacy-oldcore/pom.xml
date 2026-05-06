@@ -110,22 +110,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed by the legacy XWikiTest test -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-logging-logback</artifactId>
-      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -150,7 +137,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <!-- Exclude AspectJ's builddef.lst file from the generated JAR since it's not useful there. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
@@ -57,6 +58,9 @@ public class ReviewMapFilter
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @param reviewsMap the review map to filter
      * @return the filtered review map
@@ -72,7 +76,14 @@ public class ReviewMapFilter
         Map<String, List<Review>> map = reviewsMap.getReviewsMap();
         Map<String, List<Review>> filteredMap = new HashMap<>();
         for (Map.Entry<String, List<Review>> stringListEntry : map.entrySet()) {
-            filteredMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().filter(review -> {
+            List<Review> value = stringListEntry.getValue();
+            // Replace the missing value with the empty list when missing. This is useful in the case of malformed
+            // review json.
+            if (value == null) {
+                this.logger.warn("[{}] contains an empty value", stringListEntry.getKey());
+                value = List.of();
+            }
+            filteredMap.put(stringListEntry.getKey(), value.stream().filter(review -> {
                 boolean match = true;
                 if (review.getFilter() != null) {
                     Pattern pattern = Pattern.compile(review.getFilter());

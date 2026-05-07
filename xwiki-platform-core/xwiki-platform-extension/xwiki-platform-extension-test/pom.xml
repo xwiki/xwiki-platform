@@ -42,4 +42,12 @@
     <module>xwiki-platform-extension-test-pageobjects</module>
     <module>xwiki-platform-extension-test-utils</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-extension-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -70,7 +70,7 @@ class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValue
 
     @Override
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         super.configure();
 

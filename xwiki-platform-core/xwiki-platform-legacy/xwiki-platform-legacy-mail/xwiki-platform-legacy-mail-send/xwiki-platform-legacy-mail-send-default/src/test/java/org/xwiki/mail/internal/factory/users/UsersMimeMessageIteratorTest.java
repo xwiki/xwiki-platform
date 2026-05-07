@@ -19,9 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.users;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -31,16 +28,16 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -53,23 +50,21 @@ import static org.mockito.Mockito.when;
  * @since 6.4M3
  */
 @Deprecated
-public class UsersMimeMessageIteratorTest
+class UsersMimeMessageIteratorTest
 {
     @Test
-    public void createMessage() throws Exception
+    void createMessage() throws Exception
     {
         DocumentReference userReference1 = new DocumentReference("xwiki", "XWiki", "JohnDoe");
         DocumentReference userReference2 = new DocumentReference("xwiki", "XWiki", "JaneDoe");
         DocumentReference userReference3 = new DocumentReference("xwiki", "XWiki", "JonnieDoe");
-        List<DocumentReference> userReferences = Arrays.asList(userReference1, userReference2, userReference3);
+        List<DocumentReference> userReferences = List.of(userReference1, userReference2, userReference3);
 
         Session session = Session.getInstance(new Properties());
 
-        MimeMessageFactory factory = (source, parameters) -> new ExtendedMimeMessage();
+        MimeMessageFactory<MimeMessage> factory = (source, parameters) -> new ExtendedMimeMessage();
 
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("parameters", Collections.EMPTY_MAP);
-        parameters.put("session", session);
+        Map<String, Object> parameters = Map.of("parameters", Map.of(), "session", session);
 
         DocumentAccessBridge accessBridge = mock(DocumentAccessBridge.class);
 

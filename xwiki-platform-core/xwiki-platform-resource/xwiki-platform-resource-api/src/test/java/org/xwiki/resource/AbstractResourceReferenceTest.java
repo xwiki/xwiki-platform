@@ -19,7 +19,7 @@
  */
 package org.xwiki.resource;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 6.1M2
  */
-public class AbstractResourceReferenceTest
+class AbstractResourceReferenceTest
 {
-    public class TestableResourceReference extends AbstractResourceReference
+    class TestableResourceReference extends AbstractResourceReference
     {
         @Override
         public void setParameter(String name, Object value)
@@ -58,14 +58,14 @@ public class AbstractResourceReferenceTest
         TestableResourceReference reference = new TestableResourceReference();
         reference.addParameter("param", "value1");
 
-        assertEquals(Arrays.asList("value1"), reference.getParameterValues("param"));
+        assertEquals(List.of("value1"), reference.getParameterValues("param"));
 
         reference.addParameter("param", "value2");
 
-        assertEquals(Arrays.asList("value1", "value2"), reference.getParameterValues("param"));
+        assertEquals(List.of("value1", "value2"), reference.getParameterValues("param"));
 
         reference.setParameter("param", "value3");
 
-        assertEquals(Arrays.asList("value3"), reference.getParameterValues("param"));
+        assertEquals(List.of("value3"), reference.getParameterValues("param"));
     }
 }

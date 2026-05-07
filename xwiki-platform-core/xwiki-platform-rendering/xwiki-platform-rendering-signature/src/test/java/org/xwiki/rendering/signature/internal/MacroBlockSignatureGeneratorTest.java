@@ -19,27 +19,27 @@
  */
 package org.xwiki.rendering.signature.internal;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.crypto.signer.CMSSignedDataGenerator;
 import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.signature.BlockSignatureGenerator;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,63 +52,58 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
-public class MacroBlockSignatureGeneratorTest
+@ComponentTest
+class MacroBlockSignatureGeneratorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<BlockSignatureGenerator> mocker =
-        new MockitoComponentMockingRule<BlockSignatureGenerator>(MacroBlockSignatureGenerator.class);
+    private static final Block MACRO_BLOCK = new MacroBlock("macro", Map.of(), "content", false);
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private static final Block MARKER_BLOCK = new MacroMarkerBlock("macro", Map.of(), "content", List.of(), false);
 
-    private static final Block MACRO_BLOCK = new MacroBlock("macro", Collections.<String, String>emptyMap(), "content", false);
-    private static final Block MARKER_BLOCK = new MacroMarkerBlock("macro", Collections.<String, String>emptyMap(), "content", Collections.<Block>emptyList(), false);
     private static final byte[] DUMPED_BLOCK = "macro\0\0content\04:wiki5:space6:source\0".getBytes();
+
     private static final CMSSignedDataGeneratorParameters CMS_PARAMS = new CMSSignedDataGeneratorParameters();
+
     private static final byte[] BLOCK_SIGNATURE = "Signature".getBytes();
 
+    @InjectMockComponents
+    private MacroBlockSignatureGenerator signer;
+
+    @MockComponent
+    @Named("macro")
     private BlockDumper dumper;
+
+    @MockComponent
     private CMSSignedDataGenerator generator;
-    private BlockSignatureGenerator signer;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        signer = mocker.getComponentUnderTest();
-        dumper = mocker.getInstance(BlockDumper.class, "macro");
-        generator = mocker.getInstance(CMSSignedDataGenerator.class);
-
-        doAnswer(new Answer() {
-            public Object answer(InvocationOnMock invocation) throws IOException {
-                Object[] args = invocation.getArguments();
-                OutputStream out = (OutputStream) args[0];
-                out.write(DUMPED_BLOCK);
-                return null;
-            }
-        }).when(dumper).dump(any(OutputStream.class), or(eq(MACRO_BLOCK), eq(MARKER_BLOCK)));
-        when(dumper.dump(or(eq(MACRO_BLOCK), eq(MARKER_BLOCK)))).thenReturn(DUMPED_BLOCK);
-
-        when(generator.generate(DUMPED_BLOCK, CMS_PARAMS)).thenReturn(BLOCK_SIGNATURE);
+        doAnswer(invocation -> {
+            OutputStream out = invocation.getArgument(0);
+            out.write(DUMPED_BLOCK);
+            return null;
+        }).when(this.dumper).dump(any(OutputStream.class), or(eq(MACRO_BLOCK), eq(MARKER_BLOCK)));
+        when(this.dumper.dump(or(eq(MACRO_BLOCK), eq(MARKER_BLOCK)))).thenReturn(DUMPED_BLOCK);
+        when(this.generator.generate(DUMPED_BLOCK, CMS_PARAMS)).thenReturn(BLOCK_SIGNATURE);
     }
 
     @Test
-    public void testMacroBlockSignature() throws Exception
+    void macroBlockSignature() throws Exception
     {
-        assertThat(signer.generate(MACRO_BLOCK, CMS_PARAMS), equalTo(BLOCK_SIGNATURE));
+        assertArrayEquals(BLOCK_SIGNATURE, this.signer.generate(MACRO_BLOCK, CMS_PARAMS));
     }
 
     @Test
-    public void testMacroMarkerBlockSignature() throws Exception
+    void macroMarkerBlockSignature() throws Exception
     {
-        assertThat(signer.generate(MARKER_BLOCK, CMS_PARAMS), equalTo(BLOCK_SIGNATURE));
+        assertArrayEquals(BLOCK_SIGNATURE, this.signer.generate(MARKER_BLOCK, CMS_PARAMS));
     }
 
     @Test
-    public void testIncompatibleBlockSignature() throws Exception
+    void incompatibleBlockSignature()
     {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Unsupported block [org.xwiki.rendering.block.WordBlock].");
-
-        assertThat(signer.generate(new WordBlock("macro"), CMS_PARAMS), equalTo(BLOCK_SIGNATURE));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> this.signer.generate(new WordBlock("macro"), CMS_PARAMS));
+        assertEquals("Unsupported block [org.xwiki.rendering.block.WordBlock].", exception.getMessage());
     }
 }

@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -99,7 +97,7 @@ class ObjectPropertySolrMetadataExtractorTest
     private final XWikiDocument translatedDocument = mock(XWikiDocument.class, Locale.FRENCH.toString());
 
     private final DocumentReference documentReference =
-        new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
+        new DocumentReference("wiki", List.of("Path", "To", "Page"), "WebHome");
 
     private final DocumentReference frenchDocumentReference =
         new DocumentReference(this.documentReference, Locale.FRENCH);
@@ -159,7 +157,7 @@ class ObjectPropertySolrMetadataExtractorTest
         when(property.isSensitive(this.xcontext)).thenReturn(isSensitive);
 
         // Mock the class reference
-        DocumentReference classReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class");
+        DocumentReference classReference = new DocumentReference("wiki", List.of("Path", "To"), "Class");
 
         BaseClass xclass = mock(BaseClass.class);
         when(object.getXClass(this.xcontext)).thenReturn(xclass);
@@ -199,7 +197,7 @@ class ObjectPropertySolrMetadataExtractorTest
             if (value instanceof List) {
                 values = (List<?>) value;
             } else {
-                values = Collections.singletonList(value);
+                values = List.of(value);
             }
             assertEquals(values, solrDocument.getFieldValues(fieldName));
             assertEquals(values, solrDocument.getFieldValues(localizedFieldName));

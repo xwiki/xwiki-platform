@@ -457,6 +457,7 @@ require([
               // page to match the title of the HTML page loaded in the iframe.
               const originalTitle = document.title;
               document.title = iframe[0].contentDocument.title;
+              console.timeEnd('exportToPDF');
               iframe[0].contentWindow.print();
               iframe.remove();
               document.title = originalTitle;
@@ -494,7 +495,11 @@ require([
         navigator.sendBeacon(`${XWiki.contextPath}/rest?language=${encodeURIComponent(uiLanguage)}`);
       }
     };
-    return runPDFExportJob(data).finally(restoreLanguage).then(job =&gt; {
+    console.time('PDFExportJob');
+    return runPDFExportJob(data).finally(() =&gt; {
+      console.timeEnd('PDFExportJob');
+      restoreLanguage();
+    }).then(job =&gt; {
       // Remove the exception name from the start of the error message to make it less technical.
       const lastError = ((job.lastError || '') + '').replace(/^\w+Exception: /, '');
       if (job.canceled) {
@@ -521,6 +526,7 @@ require([
   };
 
   pdfExportOptionsModal.on('submit', event =&gt; {
+    console.time('exportToPDF');
     event.preventDefault();
     $('body').css('cursor', 'wait');
     const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
@@ -542,6 +548,7 @@ require([
       // Re-enable the PDF export options modal.
       pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', false);
       $('body').css('cursor', '');
+      console.timeEnd('exportToPDF');
     });
   });
 

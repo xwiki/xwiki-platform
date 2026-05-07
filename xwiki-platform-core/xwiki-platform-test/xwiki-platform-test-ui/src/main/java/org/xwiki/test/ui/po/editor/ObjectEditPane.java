@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -35,6 +36,8 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class ObjectEditPane extends FormContainerElement
 {
+    private static final By DEPRECATED_PROPERTIES_SELECTOR = By.className("deprecatedProperties");
+
     /**
      * The object type.
      */

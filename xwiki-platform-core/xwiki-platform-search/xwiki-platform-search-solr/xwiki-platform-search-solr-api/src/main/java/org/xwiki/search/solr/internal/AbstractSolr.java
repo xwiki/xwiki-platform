@@ -52,8 +52,6 @@ public abstract class AbstractSolr implements Solr, Disposable
 {
     private static final String SOLR_TYPENAME_SVERSION = "__sversion";
 
-    private static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
-
     @Inject
     protected ComponentManager componentManager;
 
@@ -190,7 +188,10 @@ public abstract class AbstractSolr implements Solr, Disposable
             return null;
         }
 
-        String value = (String) fieldType.getAttributes().get(SOLR_VERSIONFIELDTYPE_VALUE);
+        String value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
+        if (value == null) {
+            value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE_LEGACY);
+        }
 
         return NumberUtils.createInteger(value);
     }
@@ -199,8 +200,8 @@ public abstract class AbstractSolr implements Solr, Disposable
     {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(SolrSchemaUtils.SOLR_FIELD_NAME, SOLR_TYPENAME_SVERSION);
-        attributes.put(SolrSchemaUtils.SOLR_FIELD_CLASS, "solr.ExternalFileField");
-        attributes.put(SOLR_VERSIONFIELDTYPE_VALUE, String.valueOf(version));
+        attributes.put(SolrSchemaUtils.SOLR_FIELD_CLASS, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_CLASS);
+        attributes.put(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE, String.valueOf(version));
 
         FieldTypeDefinition definition = new FieldTypeDefinition();
         definition.setAttributes(attributes);
@@ -222,8 +223,12 @@ public abstract class AbstractSolr implements Solr, Disposable
 
     protected String getSolrCoreSuffix(int majorVersion)
     {
-        // The solr version was not part of the core name before XWiki Solr 9 support
-        return majorVersion < 9 ? "" : "_" + getSolrMajorVersion();
+        // The Solr version was not part of the core name before XWiki Solr 9 support
+        if (majorVersion < 9) {
+            return "";
+        }
+
+        return "_" + getSolrMajorVersion();
     }
 
     protected String toSolrCoreName(String xwikiCoreName)

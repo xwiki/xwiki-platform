@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component used to process images.
@@ -73,4 +74,16 @@ public interface ImageProcessor
      * @return {@code true} if the given mime type is supported, {@code false} otherwise
      */
     boolean isMimeTypeSupported(String mimeType);
+
+    /**
+     * Attempts to compute the raw size (in bytes) of the given image from an input stream,
+     * without fully loading it in memory.
+     *
+     * @param inputStream the input stream to read the image metadata from
+     * @return the raw image size in bytes
+     * @throws IOException if reading the image metadata fails
+     * @since 18.4.0RC1
+     */
+    @Unstable
+    long estimateImageRawSize(InputStream inputStream) throws IOException;
 }

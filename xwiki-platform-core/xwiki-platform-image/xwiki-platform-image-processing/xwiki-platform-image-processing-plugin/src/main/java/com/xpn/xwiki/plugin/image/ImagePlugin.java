@@ -22,12 +22,14 @@ package com.xpn.xwiki.plugin.image;
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -64,6 +66,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     private static final String DEFAULT_QUALITY_PARAM = "xwiki.plugin.image.defaultQuality";
 
+    private static final String PROCESSING_POOL_SIZE = "xwiki.plugin.image.processingPoolSizeMB";
+
     /**
      * Cache for already served images.
      */
@@ -80,9 +84,19 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private float defaultQuality = 0.5f;
 
     /**
+     * Default available pool size to perform image processing, in MB.
+     */
+    private int processingPoolSizeMB = 200;
+
+    /**
      * The object used to process images.
      */
     private ImageProcessor imageProcessor;
+
+    /**
+     * Semaphore to handle access to the memory pool for image processing.
+     */
+    private Semaphore imageProcessorSemaphore;
 
     /**
      * Creates a new instance of this plugin.
@@ -130,6 +144,19 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     DEFAULT_QUALITY_PARAM, this.defaultQuality);
             }
         }
+
+        String defaultProcessingPoolSize = context.getWiki().Param(PROCESSING_POOL_SIZE);
+        if (!StringUtils.isBlank(defaultProcessingPoolSize)) {
+            try {
+                this.processingPoolSizeMB =
+                    Math.max(0, Integer.parseInt(defaultProcessingPoolSize.trim()));
+            } catch (NumberFormatException e) {
+                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the image processing pool size.",
+                    PROCESSING_POOL_SIZE, this.processingPoolSizeMB);
+            }
+        }
+        this.imageProcessorSemaphore = new Semaphore(
+            (int) Math.min(this.processingPoolSizeMB * 1_000_000L, Integer.MAX_VALUE));
     }
 
     /**
@@ -313,39 +340,60 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
     {
-        Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
-
-        // Compute the new image dimension.
-        int currentWidth = image.getWidth(null);
-        int currentHeight = image.getHeight(null);
-        int[] dimensions =
-            reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight, keepAspectRatio);
-
-        float quality = requestedQuality;
-        if (quality < 0) {
-            // If no scaling is needed and the quality parameter is not specified, return the original image.
-            if (dimensions[0] == currentWidth && dimensions[1] == currentHeight) {
-                return attachment;
-            }
-            quality = this.defaultQuality;
+        // Before processing the image, which would load a raw representation in memory, we check we have enough
+        // available space. The permits we acquire here corresponds to the raw image size in bytes.
+        long requiredPermits;
+        try (InputStream attachmentInputStream = attachment.getContentInputStream(context)) {
+            requiredPermits = this.imageProcessor.estimateImageRawSize(attachmentInputStream);
         }
 
-        // Scale the image to the new dimensions.
-        RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
+        // We skip image processing for any image whose raw size exceeds half the total pool size.
+        if (requiredPermits > this.processingPoolSizeMB * 500_000L) {
+            LOG.warn("Skipping image processing for attachment [{}]. "
+                    + "Its estimated raw size is [{}] bytes which exceeds 50% of the image processing pool of [{}MB]. "
+                    + "Returning unprocessed image.",
+                attachment.getFilename(), requiredPermits, this.processingPoolSizeMB);
+            return attachment;
+        }
+        this.imageProcessorSemaphore.acquire((int) requiredPermits);
 
-        // Create an image attachment for the shrunk image.
-        XWikiAttachment thumbnail = attachment.clone();
-        thumbnail.loadAttachmentContent(context);
+        try {
+            Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
 
-        OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
-        this.imageProcessor.writeImage(shrunkImage,
-            attachment.getMimeType(context),
-            quality,
-            acos);
+            // Compute the new image dimension.
+            int currentWidth = image.getWidth(null);
+            int currentHeight = image.getHeight(null);
+            int[] dimensions =
+                reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight, keepAspectRatio);
 
-        IOUtils.closeQuietly(acos);
+            float quality = requestedQuality;
+            if (quality < 0) {
+                // If no scaling is needed and the quality parameter is not specified, return the original image.
+                if (dimensions[0] == currentWidth && dimensions[1] == currentHeight) {
+                    return attachment;
+                }
+                quality = this.defaultQuality;
+            }
 
-        return thumbnail;
+            // Scale the image to the new dimensions.
+            RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
+
+            // Create an image attachment for the shrunk image.
+            XWikiAttachment thumbnail = attachment.clone();
+            thumbnail.loadAttachmentContent(context);
+
+            OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
+            this.imageProcessor.writeImage(shrunkImage,
+                attachment.getMimeType(context),
+                quality,
+                acos);
+
+            IOUtils.closeQuietly(acos);
+
+            return thumbnail;
+        } finally {
+            this.imageProcessorSemaphore.release((int) requiredPermits);
+        }
     }
 
     /**

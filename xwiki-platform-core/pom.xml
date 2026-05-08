@@ -162,6 +162,21 @@
                 </item>
               </differences>
             </revapi.differences>
+
+            <revapi.differences>
+              <justification>
+                Knowing the raw image size before loading it in memory is important to be able to reject unreasonable
+                image processing requests. Since it'a an operation done on an image, it fits ImageProcessor.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.method.addedToInterface</code>
+                  <fullQualifiedClassName>com.xpn.xwiki.plugin.image.ImageProcessor</fullQualifiedClassName>
+                  <new>method long com.xpn.xwiki.plugin.image.ImageProcessor::estimateImageRawSize(java.io.InputStream) throws java.io.IOException</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

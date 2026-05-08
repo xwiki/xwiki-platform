@@ -32,9 +32,12 @@ import java.util.Iterator;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.inject.Singleton;
 
@@ -112,6 +115,27 @@ public class DefaultImageProcessor implements ImageProcessor
         } catch (NoClassDefFoundError e) {
             // Happens on certain systems where the javax.imageio package is not available.
             return false;
+        }
+    }
+
+    @Override
+    public long estimateImageRawSize(InputStream inputStream) throws IOException
+    {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(inputStream)) {
+            ImageReader imageReader = ImageIO.getImageReaders(iis).next();
+
+            try {
+                imageReader.setInput(iis);
+                int width = imageReader.getWidth(0);
+                int height = imageReader.getHeight(0);
+
+                ImageTypeSpecifier imageTypeSpecifier = imageReader.getImageTypes(0).next();
+                int bitsPerPixel = imageTypeSpecifier.getColorModel().getPixelSize();
+
+                return ((long) width) * height * bitsPerPixel / 8;
+            } finally {
+                imageReader.dispose();
+            }
         }
     }
 

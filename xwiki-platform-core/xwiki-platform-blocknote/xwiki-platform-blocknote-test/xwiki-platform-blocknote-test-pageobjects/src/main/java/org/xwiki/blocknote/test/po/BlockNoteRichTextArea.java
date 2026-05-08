@@ -69,6 +69,15 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * @return the HTML content of the rich text area
+     * @since 18.4.0RC1
+     */
+    public String getContent()
+    {
+        return this.container.getDomProperty("innerHTML");
+    }
+
+    /**
      * Clears the content of the rich text area.
      */
     public void clear()
@@ -158,10 +167,51 @@ public class BlockNoteRichTextArea extends BaseElement
      * Waits until the rich text area contains the specified plain text.
      * 
      * @param textFragment the text fragment to wait for
+     * @return this rich text area instance
      * @since 18.4.0RC1
      */
-    public void waitUntilTextContains(String textFragment)
+    public BlockNoteRichTextArea waitUntilTextContains(String textFragment)
     {
         getDriver().waitUntilCondition(driver -> Strings.CS.contains(getText(), textFragment));
+        return this;
+    }
+
+    /**
+     * Waits until the rich text area is focused. This is especially needed when switching between browser tabs because:
+     * <ul>
+     * <li>when a browser tab becomes inactive its active element gets blurred (loses the focus)</li>
+     * <li>when a browser tab becomes active its active element gets back the focus; however, this doesn't always happen
+     * instantly; moreover, besides the focus, the selection (caret position) also needs to be restored; if you try to
+     * send keys to the active element right after activating the tab they might be ignored</li>
+     * </ul>
+     * 
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilFocused()
+    {
+        // Wait for the rich text area to be focused for two consecutive ticks.
+        String script = """
+            const richTextArea = arguments[0];
+            const selectionContainer = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
+            const focused = document.visibilityState === 'visible'
+              && document.hasFocus()
+              && richTextArea.contains(document.activeElement)
+              && richTextArea.contains(selectionContainer);
+            if (focused) {
+              richTextArea.__focusCount = (richTextArea.__focusCount || 0) + 1;
+              if (richTextArea.__focusCount > 1) {
+                delete richTextArea.__focusCount;
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              delete richTextArea.__focusCount;
+              return false;
+            }
+            """;
+        getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
+        return this;
     }
 }

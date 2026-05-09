@@ -128,40 +128,46 @@
       <code>
         "use strict";
 
-        // Translation API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript)
-        define("annotate-popup-translation-keys", {
-          prefix: "annotations.",
-          keys: ["action.create.submit.text"]
+        const Constants = Object.freeze({
+          /**
+           * The name of the icon rendered in the popup
+           * @type {String}
+           */
+          ANNOTATE_ICON_NAME: "comment",
+          /**
+           * The keyboard shortcut that needs to be triggered to create an annotation
+           * @type {KeyboardEventInit}
+           */
+          ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
+          /**
+           * The translation key for the button title (accessibility)
+           * @type {String}
+           */
+          ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
+          /**
+           * The CSS class that needs to be added to show the popup
+           * @type {String}
+           */
+          POPUP_CLASS_OPEN: "opened",
+          /**
+           * The element id of the popup
+           * @type {String}
+           */
+          POPUP_ID: "annotation-popup"
         });
 
         // Icons API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
-        define("annotate-popup-icons", { icons: ["comment"] });
+        define("xwiki-annotate-popup/icons", { 
+          icons: [Constants.ANNOTATE_ICON_NAME]
+        });
 
-        define("xwiki-annotate-popup", ["xwiki-icon!annotate-popup-icons", "xwiki-l10n!annotate-popup-translation-keys"], function(icons, l10n) {
-          const Constants = Object.freeze({
-            /**
-             * The id of the element containing the XWiki page content
-             * @type {string}
-             */
-            CONTENT_DIV_ID: "xwikicontent",
-            /**
-             * The class that is added when the CKEditor editor is opened
-             * @type {string}
-             */
-            CKEDITOR_OPEN_CLASS: "cke_editable", // TODO: needs to be removed after the BlockNote implementation
-            /**
-             * The class that is added when the BlockNote editor is opened
-             * @type {string}
-             */
-            BLOCKNOTE_OPEN_CLASS: "xwiki-blocknote-wrapper",
-            /**
-             * The keyboard shortcut that needs to be triggered to create a new annotation
-             * @type {KeyboardEventInit}
-             */
-            ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
-            CLASS_POPUP_OPEN: "opened"
-          });
+        // Translation API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript)
+        define("xwiki-annotate-popup/translation-keys", {
+          prefix: "annotations.",
+          keys: [Constants.ANNOTATE_TRANSLATION_KEY]
+        });
 
+        define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys"], function(icons, l10n) {
           /**
            * Debounces a function
            * @param {Function} func - A function
@@ -182,14 +188,14 @@
            */
           function addPopupToDOM() {
               const popup = document.createElement("div");
-              popup.id = "annotation-popup";
+              popup.id = Constants.POPUP_ID;
 
               const iconWrapper = document.createElement("button"); // use button
-              iconWrapper.title = l10n["action.create.submit.text"]; // for accessibility
+              iconWrapper.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY]; // for accessibility
               iconWrapper.classList.add("btn", "btn-default", "btn-xs");
               //iconWrapper.classList.add("popup-icon");
 
-              iconWrapper.appendChild(icons.comment.render());
+              iconWrapper.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
 
               popup.appendChild(iconWrapper);
               document.body.appendChild(popup);
@@ -200,7 +206,7 @@
            * Close the popup
            * @param {HTMLElement} popup - The popup element
            */
-          const closePopup = (popup) =&gt; { popup.classList.remove(Constants.CLASS_POPUP_OPEN) };
+          const closePopup = (popup) =&gt; { popup.classList.remove(Constants.POPUP_CLASS_OPEN) };
 
           /**
            * Displays the popup near the selected text range
@@ -214,7 +220,7 @@
 
               popup.style.top = (rect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
               popup.style.left = (rect.left + window.scrollX + rect.width - (popup.offsetWidth / 2)) + "px";
-              popup.classList.add(Constants.CLASS_POPUP_OPEN);
+              popup.classList.add(Constants.POPUP_CLASS_OPEN);
 
               // close popup on click away
               const onClickAway = debounce((event) =&gt; {
@@ -241,7 +247,7 @@
 
           /**
            * Register event listeners
-           * @param {HTMLElement} wikiContent - The xwikicontent div container
+           * @param {HTMLElement} wikiContent - The XWiki page container
            * @param {number} popup - The popup element
            */
           function registerListeners(wikiContent, popup) {
@@ -256,6 +262,8 @@
 
                   openPopup(popup, selection);
               }
+              const selectionListener = debounce(onSelectionChange, 800);
+              document.addEventListener("selectionchange", selectionListener);
 
               /**
                * Disables popup when editor is opened
@@ -266,7 +274,7 @@
                       if (mutation.target.classList.contains("disabled")) {
                           document.removeEventListener("selectionchange", selectionListener);
                       } else {
-              document.addEventListener("selectionchange", selectionListener);
+                          document.addEventListener("selectionchange", selectionListener);
                       }
                   }
                }
@@ -289,12 +297,12 @@
            * @param {HTMLElement} wikiContent - The XWiki page container
            */
           function init(wikiContent) {
-              const popup = addPopupToDOM();
-              registerListeners(wikiContent, popup);
-            }
+            const popup = addPopupToDOM();
+            registerListeners(wikiContent, popup);
+          }
 
           return init;
-        });
+      });
       </code>
     </property>
     <property>
@@ -416,7 +424,7 @@
       <code>
         #annotation-popup {
           position: absolute;
-          background-color: #fff;
+          background-color: var(--xwiki-page-content-bg);
           padding: 4px;
           border-radius: 4px;
           box-shadow: 0 1.65px 3px var(--btn-default-border);

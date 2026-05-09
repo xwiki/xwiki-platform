@@ -259,31 +259,22 @@
 
               /**
                * Disables popup when editor is opened
-               * @param {MutationRecord[]} mutations - The xwikicontent div container
+               * @param {MutationRecord[]} mutations - List of mutations on the observed element
                */
               function onClassChange(mutations) {
                   for (const mutation of mutations) {
-                      if (mutation.type !== "attributes" || mutation.attributeName !== "class") {
-                          continue;
-                      }
-
-                      const newClassList = mutation.target.classList;
-                      const isEditorOpen = newClassList.contains(Constants.CKEDITOR_OPEN_CLASS) || newClassList.contains(Constants.BLOCKNOTE_OPEN_CLASS);
-                      if (isEditorOpen) {
-                          document.removeEventListener("selectionchange", listener);
+                      if (mutation.target.classList.contains("disabled")) {
+                          document.removeEventListener("selectionchange", selectionListener);
                       } else {
-                          document.addEventListener("selectionchange", listener);
+              document.addEventListener("selectionchange", selectionListener);
                       }
                   }
-              }
-
-              // selection listener
-              const selectionListener = debounce(onSelectionChange, 800);
-              document.addEventListener("selectionchange", selectionListener);
-
-              // disable annotation popup inside editor
+               }
               const classObserver = new MutationObserver(onClassChange);
-              classObserver.observe(wikiContent, { attributes: true, attributeFilter: ["class"] });
+              classObserver.observe(
+                document.getElementById("tmAnnotationsTrigger").parentElement, // has class "disabled" if annotations should be disabled
+                { attributes: true, attributeFilter: ["class"] }
+              );
 
               // popup listeners
               popup.addEventListener("click", () =&gt; {

@@ -188,8 +188,8 @@
            */
           function addPopupToDOM() {
               const annotateButton = document.createElement("button");
-              annotateButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY]; // for accessibility
               annotateButton.classList.add("btn", "btn-default", "btn-xs");
+              annotateButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY]; // for accessibility
               annotateButton.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
               
               const popup = document.createElement("div");

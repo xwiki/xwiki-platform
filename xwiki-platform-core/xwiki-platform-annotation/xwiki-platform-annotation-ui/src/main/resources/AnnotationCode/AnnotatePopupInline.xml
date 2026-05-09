@@ -128,8 +128,16 @@
       <code>
         "use strict";
 
+        // Translation API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript)
+        define("annotate-popup-translation-keys", {
+          prefix: "annotations.",
+          keys: ["action.create.submit.text"]
+        });
+
+        // Icons API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
         define("annotate-popup-icons", { icons: ["comment"] });
-        define("xwiki-annotate-popup", ["xwiki-icon!annotate-popup-icons"], function(icons) {
+
+        define("xwiki-annotate-popup", ["xwiki-icon!annotate-popup-icons", "xwiki-l10n!annotate-popup-translation-keys"], function(icons, l10n) {
           const Constants = Object.freeze({
             /**
              * The id of the element containing the XWiki page content
@@ -176,11 +184,11 @@
               const popup = document.createElement("div");
               popup.id = "annotation-popup";
 
-              const iconWrapper = document.createElement("div"); // use button
-              //iconWrapper.title = "" // for accessibility
-              iconWrapper.classList.add("popup-icon");
+              const iconWrapper = document.createElement("button"); // use button
+              iconWrapper.title = l10n["action.create.submit.text"]; // for accessibility
+              iconWrapper.classList.add("btn", "btn-default", "btn-xs");
+              //iconWrapper.classList.add("popup-icon");
 
-              // render the comment icon (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
               iconWrapper.appendChild(icons.comment.render());
 
               popup.appendChild(iconWrapper);

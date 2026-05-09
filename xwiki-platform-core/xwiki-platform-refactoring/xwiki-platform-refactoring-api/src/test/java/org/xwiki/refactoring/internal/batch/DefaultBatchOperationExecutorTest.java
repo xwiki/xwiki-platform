@@ -19,15 +19,16 @@
  */
 package org.xwiki.refactoring.internal.batch;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.refactoring.batch.BatchOperation;
-import org.xwiki.refactoring.batch.BatchOperationExecutor;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,49 +45,50 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class DefaultBatchOperationExecutorTest
+@ComponentTest
+class DefaultBatchOperationExecutorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<BatchOperationExecutor> mocker =
-        new MockitoComponentMockingRule<>(DefaultBatchOperationExecutor.class);
+    @InjectMockComponents
+    private DefaultBatchOperationExecutor batchOperationExecutor;
 
+    @MockComponent
     private Execution execution;
 
+    @Mock
     private ExecutionContext executionContext;
 
-    @Before
-    public void setup() throws Exception
+    @BeforeEach
+    void setup()
     {
-        executionContext = mock(ExecutionContext.class);
-        execution = mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(this.executionContext);
     }
 
     @Test
-    public void executeWithNoSpecifiedBatchId() throws Exception
+    void executeWithNoSpecifiedBatchId() throws Exception
     {
         // Mock an operation.
         BatchOperation operation = mock(BatchOperation.class);
 
         // Execute it.
-        mocker.getComponentUnderTest().execute(operation, null);
+        this.batchOperationExecutor.execute(operation, null);
 
         // Verify, in order that:
-        InOrder inOrder = inOrder(operation, executionContext);
+        InOrder inOrder = inOrder(operation, this.executionContext);
 
         // * a batch ID is generated and set
-        inOrder.verify(executionContext, times(1)).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY),
-            matches(".*.*-.*-.*"));
+        inOrder.verify(this.executionContext, times(1)).setProperty(
+            eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), matches(".*.*-.*-.*"));
 
         // * the operation is executed
         inOrder.verify(operation).execute();
 
         // * the batch ID is cleaned from the context.
-        inOrder.verify(executionContext, times(1)).setProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY, null);
+        inOrder.verify(this.executionContext, times(1)).setProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY,
+            null);
     }
 
     @Test
-    public void executeWithSpecifiedBatchId() throws Exception
+    void executeWithSpecifiedBatchId() throws Exception
     {
         // Mock an operation.
         BatchOperation operation = mock(BatchOperation.class);
@@ -94,50 +96,53 @@ public class DefaultBatchOperationExecutorTest
         String specifiedBatchId = "a-b-c-d";
 
         // Execute it.
-        mocker.getComponentUnderTest().execute(operation, specifiedBatchId);
+        this.batchOperationExecutor.execute(operation, specifiedBatchId);
 
         // Verify, in order that:
-        InOrder inOrder = inOrder(operation, executionContext);
+        InOrder inOrder = inOrder(operation, this.executionContext);
 
         // * the specified batch ID is used
-        inOrder.verify(executionContext, times(1)).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY),
-            eq(specifiedBatchId));
+        inOrder.verify(this.executionContext, times(1)).setProperty(
+            eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), eq(specifiedBatchId));
 
         // * the operation is executed
         inOrder.verify(operation).execute();
 
         // * the batch ID is cleaned from the context.
-        inOrder.verify(executionContext, times(1)).setProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY, null);
+        inOrder.verify(this.executionContext, times(1)).setProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY,
+            null);
     }
 
     @Test
-    public void executeNested() throws Exception
+    void executeNested() throws Exception
     {
         // Set an existing batchId in the execution, i.e. we are in a nested batch operation execution.
         String existingBatchId = "a-b-c-d";
-        when(executionContext.getProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY)).thenReturn(existingBatchId);
+        when(this.executionContext.getProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY))
+            .thenReturn(existingBatchId);
 
         // Mock an operation.
         BatchOperation operation = mock(BatchOperation.class);
 
         // Execute it.
-        mocker.getComponentUnderTest().execute(operation);
+        this.batchOperationExecutor.execute(operation);
 
         // Verify that:
 
         // * the existing batch ID is detected and the context batch ID will not be touched (re-set or cleared)
-        verify(executionContext, never()).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), any());
+        verify(this.executionContext, never()).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), any());
 
         // * the operation is executed
         verify(operation).execute();
     }
 
     @Test
-    public void executeNestedWithSpecifiedBatchId() throws Exception
+    void executeNestedWithSpecifiedBatchId() throws Exception
     {
         // Set an existing batchId in the execution, i.e. we are in a nested batch operation execution.
         String existingBatchId = "a-b-c-d";
-        when(executionContext.getProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY)).thenReturn(existingBatchId);
+        when(this.executionContext.getProperty(DefaultBatchOperationExecutor.CONTEXT_PROPERTY))
+            .thenReturn(existingBatchId);
 
         String specifiedBatchId = "d-c-b-a";
 
@@ -145,13 +150,13 @@ public class DefaultBatchOperationExecutorTest
         BatchOperation operation = mock(BatchOperation.class);
 
         // Execute it.
-        mocker.getComponentUnderTest().execute(operation, specifiedBatchId);
+        this.batchOperationExecutor.execute(operation, specifiedBatchId);
 
         // Verify that:
 
         // * the existing batch ID is detected and the context batch ID will not be touched (re-set or cleared), even if
         // a batch ID is specified explicitly.
-        verify(executionContext, never()).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), any());
+        verify(this.executionContext, never()).setProperty(eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), any());
 
         // * the operation is executed
         verify(operation).execute();

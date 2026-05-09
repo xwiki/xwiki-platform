@@ -293,12 +293,16 @@
               popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges
           }
 
-          return {
-            init: (wikiContent) =&gt; {
+          /**
+           * Initialize AnnotatePopupInline
+           * @param {HTMLElement} wikiContent - The XWiki page container
+           */
+          function init(wikiContent) {
               const popup = addPopupToDOM();
               registerListeners(wikiContent, popup);
             }
-          };
+
+          return init;
         });
       </code>
     </property>

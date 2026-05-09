@@ -1911,7 +1911,7 @@ define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], functio
   };
 });
 
-require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-events-bridge'], function($, offsetUpdater, annotatePopup) {
+require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-events-bridge'], function($, offsetUpdater, initAnnotatePopup) {
   $(function() {
     // Load the annotations only in view mode, if the document content is displayed
     // (the document content is not displayed when viewer=history for instance).
@@ -2005,9 +2005,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-e
     if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
       // initialize the annotations on the xwikicontent element which is the document content by default
       new XWiki.Annotation(displayHighlight, wikiContent, displayed);
-
-      // initialize inline annotate popup
-      annotatePopup.init(wikiContent);
+      initAnnotatePopup(wikiContent);
     }
   });
 });</code>

@@ -187,17 +187,15 @@
            *  @return {HTMLElement} The popup element
            */
           function addPopupToDOM() {
+              const annotateButton = document.createElement("button");
+              annotateButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY]; // for accessibility
+              annotateButton.classList.add("btn", "btn-default", "btn-xs");
+              annotateButton.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
+              
               const popup = document.createElement("div");
               popup.id = Constants.POPUP_ID;
+              popup.appendChild(annotateButton);
 
-              const iconWrapper = document.createElement("button"); // use button
-              iconWrapper.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY]; // for accessibility
-              iconWrapper.classList.add("btn", "btn-default", "btn-xs");
-              //iconWrapper.classList.add("popup-icon");
-
-              iconWrapper.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
-
-              popup.appendChild(iconWrapper);
               document.body.appendChild(popup);
               return popup;
           }
@@ -435,17 +433,6 @@
           &amp;.opened {
             visibility: visible;
             opacity: 1;
-          }
-
-          .popup-icon {
-            padding: 4px 5.25px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color .1s ease-in;
-
-            &amp;:hover {
-              background-color: rgba(9, 30, 66, .13);
-            }
           }
         }
       </code>

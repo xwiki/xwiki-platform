@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  *
  * @version $Id$
  */
-public class TagNotificationFilterPreferenceTest
+class TagNotificationFilterPreferenceTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         TagNotificationFilterPreference pref1 = new TagNotificationFilterPreference("mytag", "mywiki");
         TagNotificationFilterPreference pref2 = new TagNotificationFilterPreference("mytag", "mywiki");

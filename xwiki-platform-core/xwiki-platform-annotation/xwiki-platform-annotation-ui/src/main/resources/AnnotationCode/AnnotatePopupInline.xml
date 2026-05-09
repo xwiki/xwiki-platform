@@ -127,8 +127,7 @@
       <code>
         "use strict";
 
-        /** This property values (element ids, classes etc.) might change in a XWiki update */
-        const XWikiConstants = Object.freeze({
+        const Constants = Object.freeze({
           /**
            * The id of the element containing the XWiki page content
            * @type {string}
@@ -148,9 +147,9 @@
            * The keyboard shortcut that needs to be triggered to create a new annotation
            * @type {KeyboardEventInit}
            */
-          ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 } // ShortcutJS still expects the deprecated keyCode property
+          ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
+          CLASS_POPUP_OPEN: "opened"
         });
-        const CLASS_POPUP_OPEN = "opened";
 
         /**
          * Debounces a function
@@ -171,19 +170,20 @@
          *  @return {HTMLElement} The popup element
          */
         function addPopupToDOM() {
-            const iconWrapper = document.createElement("div");
+            const popup = document.createElement("div");
+            popup.id = "annotation-popup";
+
+            const iconWrapper = document.createElement("div"); // use button
+            iconWrapper.title = "" // for accessibility
             iconWrapper.classList.add("popup-icon");
 
-            // JavaScript API for icons (https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
+            // render the icon (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
             define("annotation-popup-icons", { icons: ["comment"] });
             require(["xwiki-icon!annotation-popup-icons"], function(icons) {
                 iconWrapper.appendChild(icons.comment.render());
             });
 
-            const popup = document.createElement("div");
-            popup.id = "annotation-popup";
             popup.appendChild(iconWrapper);
-
             document.body.appendChild(popup);
             return popup;
         }
@@ -192,7 +192,7 @@
          * Close the popup
          * @param {HTMLElement} popup - The popup element
          */
-        const closePopup = (popup) =&gt; { popup.classList.remove(CLASS_POPUP_OPEN) };
+        const closePopup = (popup) =&gt; { popup.classList.remove(Constants.CLASS_POPUP_OPEN) };
 
         /**
          * Displays the popup near the selected text range
@@ -206,7 +206,7 @@
 
             popup.style.top = (rect.top + window.scrollY - popup.offsetHeight - 4) + "px"; // 4px over selection so that it is not "attached"
             popup.style.left = (rect.left + window.scrollX + rect.width - (popup.offsetWidth / 2)) + "px";
-            popup.classList.add(CLASS_POPUP_OPEN);
+            popup.classList.add(Constants.CLASS_POPUP_OPEN);
 
             // close popup on click away
             const onClickAway = debounce((event) =&gt; {
@@ -260,7 +260,7 @@
                     }
 
                     const newClassList = mutation.target.classList;
-                    const isEditorOpen = newClassList.contains(XWikiConstants.CKEDITOR_OPEN_CLASS) || newClassList.contains(XWikiConstants.BLOCKNOTE_OPEN_CLASS);
+                    const isEditorOpen = newClassList.contains(Constants.CKEDITOR_OPEN_CLASS) || newClassList.contains(Constants.BLOCKNOTE_OPEN_CLASS);
                     if (isEditorOpen) {
                         document.removeEventListener("selectionchange", listener);
                     } else {
@@ -280,14 +280,14 @@
             // popup listeners
             popup.addEventListener("click", () =&gt; {
                 closePopup(popup);
-                document.dispatchEvent(new KeyboardEvent("keydown", XWikiConstants.ANNOTATE_SHORTCUT));
+                document.dispatchEvent(new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT));
             });
             popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }); // prevent losing focus (the selection) when clicking on popup edges
         }
 
         document.addEventListener("DOMContentLoaded", () =&gt; {
             // Load the annotations only in view mode, if the document content is displayed
-            const wikiContent = document.getElementById(XWikiConstants.CONTENT_DIV_ID);
+            const wikiContent = document.getElementById(Constants.CONTENT_DIV_ID);
             if (XWiki.contextaction != "view" || !wikiContent) {
                 return;
             }
@@ -419,7 +419,7 @@
           background-color: #fff;
           padding: 4px;
           border-radius: 4px;
-          box-shadow: 0 1.65px 3px rgba(0, 0, 0, .2);
+          box-shadow: 0 1.65px 3px var(--btn-default-border);
           visibility: hidden;
           opacity: 0;
           transition: opacity .2s ease-in;

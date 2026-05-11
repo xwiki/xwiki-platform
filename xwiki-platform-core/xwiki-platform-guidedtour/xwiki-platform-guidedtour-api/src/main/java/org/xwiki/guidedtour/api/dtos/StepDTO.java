@@ -23,6 +23,8 @@ import org.xwiki.guidedtour.api.enums.ActionType;
 import org.xwiki.guidedtour.api.enums.Placement;
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Step DTO used to represent a step with its properties.
  *
@@ -30,6 +32,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StepDTO
 {
     private String element;
@@ -64,7 +67,7 @@ public class StepDTO
      */
     public String getElement()
     {
-        return element;
+        return this.element;
     }
 
     /**
@@ -84,7 +87,7 @@ public class StepDTO
      */
     public int getOrder()
     {
-        return order;
+        return this.order;
     }
 
     /**
@@ -104,7 +107,7 @@ public class StepDTO
      */
     public String getContent()
     {
-        return content;
+        return this.content;
     }
 
     /**
@@ -124,7 +127,7 @@ public class StepDTO
      */
     public Placement getPlacement()
     {
-        return placement;
+        return this.placement;
     }
 
     /**
@@ -144,7 +147,7 @@ public class StepDTO
      */
     public boolean isBackdrop()
     {
-        return backdrop;
+        return this.backdrop;
     }
 
     /**
@@ -165,7 +168,7 @@ public class StepDTO
      */
     public boolean isReflex()
     {
-        return reflex;
+        return this.reflex;
     }
 
     /**
@@ -186,7 +189,7 @@ public class StepDTO
      */
     public String getTargetPage()
     {
-        return targetPage;
+        return this.targetPage;
     }
 
     /**
@@ -206,7 +209,7 @@ public class StepDTO
      */
     public ActionType getTargetAction()
     {
-        return targetAction;
+        return this.targetAction;
     }
 
     /**
@@ -227,7 +230,7 @@ public class StepDTO
      */
     public String getQueryParameters()
     {
-        return queryParameters;
+        return this.queryParameters;
     }
 
     /**

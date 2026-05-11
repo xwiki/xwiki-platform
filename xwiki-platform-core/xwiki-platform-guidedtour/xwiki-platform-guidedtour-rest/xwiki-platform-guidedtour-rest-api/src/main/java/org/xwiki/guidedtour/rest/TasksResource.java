@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
-@Path("/guidedTour/tour/{tourId}/tasks")
+@Path("/guidedTour/tours/{tourId}/tasks")
 public interface TasksResource extends XWikiRestComponent
 {
     /**

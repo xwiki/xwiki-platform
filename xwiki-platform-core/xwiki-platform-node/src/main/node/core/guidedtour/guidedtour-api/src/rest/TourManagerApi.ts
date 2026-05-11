@@ -17,11 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// TODO: These 3 should be exported together from some module.
-import type { TourStep } from "./step";
-import type { TourTask } from "./task";
-import type { TourTour } from "./tour";
-import type { TourTaskStatus } from "./tourTaskStatus";
+import type { TourTour } from "../tourData";
 
 /**
  * Present the public API of the logic used inside the Guided Tour UI.
@@ -30,37 +26,27 @@ import type { TourTaskStatus } from "./tourTaskStatus";
  * @since 18.4.0RC1
  * @beta
  */
-export interface GuidedTourManagerApi {
-  /**
-   * Get the Useful Links to display in the widget.
-   */
-  getUsefulLinks(): Promise<string[]>;
+export interface TourManagerApi {
   /**
    * Get all tours available for the user.
    */
   getTours(): Promise<TourTour[]>;
+
   /**
-   * Set the status of a task.
-   * @param task - The task to set the status of
-   * @param status - The new status
+   * Create a new tour.
+   * @param tour - The tour data to create.
    */
-  setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
+  createTour(tour: TourTour): Promise<void>;
+
   /**
-   * Get all tasks of a tour, which are available for the user.
+   * Delete a tour by its id.
+   * @param tourId - The id of the tour to delete.
    */
-  getTask(taskId: string, tourId?: string): Promise<TourTask | undefined>;
+  deleteTour(tourId: string): Promise<void>;
+
   /**
-   * Get all tasks of a tour, which are available for the user.
+   * Update an existing tour.
+   * @param tour - The updated tour data.
    */
-  getTasks(tourId: string): Promise<TourTask[] | undefined>;
-  /**
-   * Start the task.
-   * @param task - The task to start.
-   * @param remember - Whether to resume the task, or to start it anew.
-   */
-  startTask(task: TourTask, remember: boolean): Promise<void>;
-  /**
-   * Get all steps of a tour.
-   */
-  getSteps(tourId: string, taskId: string): Promise<TourStep[] | undefined>;
+  updateTour(tour: TourTour): Promise<void>;
 }

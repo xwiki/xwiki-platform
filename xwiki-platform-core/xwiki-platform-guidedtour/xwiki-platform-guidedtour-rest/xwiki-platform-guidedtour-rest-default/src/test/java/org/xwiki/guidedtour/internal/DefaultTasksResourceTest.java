@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
-import org.xwiki.container.Request;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.guidedtour.api.dtos.TaskDTO;
 import org.xwiki.guidedtour.api.exceptions.InvalidIdException;
@@ -47,6 +47,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -84,7 +86,10 @@ class DefaultTasksResourceTest
     private Container container;
 
     @Mock
-    private Request request;
+    private ServletRequest request;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
 
     @BeforeEach
     void setup()
@@ -93,6 +98,8 @@ class DefaultTasksResourceTest
         when(container.getRequest()).thenReturn(request);
         when(request.getParameter("csrf")).thenReturn(CSRF_VALUE);
         when(csrf.isTokenValid(CSRF_VALUE)).thenReturn(true);
+        when(request.getRequest()).thenReturn(httpServletRequest);
+        when(httpServletRequest.getHeader("xwiki-form-token")).thenReturn(CSRF_VALUE);
     }
 
     @Test
@@ -145,7 +152,6 @@ class DefaultTasksResourceTest
         assertEquals("Path and Body ID mismatch for given task.", response.getEntity());
         assertEquals("Executing: Tasks API: updating task [taskId] from tour [tourId].", logCapture.getMessage(0));
     }
-
 
     @Test
     void deleteTask() throws XWikiRestException

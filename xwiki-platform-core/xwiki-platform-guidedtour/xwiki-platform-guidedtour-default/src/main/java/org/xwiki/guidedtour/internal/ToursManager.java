@@ -100,9 +100,9 @@ public class ToursManager
      */
     public void createTour(TourDTO tourDTO) throws XWikiException, DuplicatedIdException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
-        DocumentReference targetDocRef = documentReferenceResolver.resolve(tourDTO.getId());
+        DocumentReference targetDocRef = this.documentReferenceResolver.resolve(tourDTO.getId());
         XWikiDocument targetDoc = wiki.getDocument(targetDocRef, wikiContext);
         BaseObject tourClassObject = targetDoc.getXObject(TOUR_CLASS);
         if (tourClassObject == null) {
@@ -129,14 +129,15 @@ public class ToursManager
         List<String> filteredLines = new ArrayList<>();
         filteredLines.add(TourProperty.TITLE.formKey(CLASS_PREFIX));
         filteredLines.add(TourProperty.IS_ACTIVE.formKey(CLASS_PREFIX));
-        SolrDocumentList solrDocuments = queryUtil.executeQuery(QS, "type:DOCUMENT", filteredLines);
+        SolrDocumentList solrDocuments = this.queryUtil.executeQuery(QS, "type:DOCUMENT", filteredLines);
         List<TourDTO> tours = new ArrayList<>(solrDocuments.size());
         for (SolrDocument document : solrDocuments) {
-            EntityReference documentReference = solrDocumentReferenceResolver.resolve(document, EntityType.DOCUMENT);
+            EntityReference documentReference =
+                this.solrDocumentReferenceResolver.resolve(document, EntityType.DOCUMENT);
             String title = (String) document.getFirstValue(TourProperty.TITLE.formKey(CLASS_PREFIX));
             boolean isActive = (Boolean) document.getFirstValue(TourProperty.IS_ACTIVE.formKey(CLASS_PREFIX));
             TourDTO dto = new TourDTO(documentReference.toString(), title, isActive);
-            dto.setTasks(tasksManager.getAllTasks(documentReference.toString()));
+            dto.setTasks(this.tasksManager.getAllTasks(documentReference.toString()));
             tours.add(dto);
         }
         return tours;
@@ -153,7 +154,7 @@ public class ToursManager
     public void updateTour(TourDTO tourDTO) throws XWikiException, InvalidIdException
     {
         BaseObject tourClassObject = getTourClassObject(tourDTO.getId());
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
         tourClassObject.set("title", tourDTO.getTitle(), wikiContext);
         tourClassObject.set("isActive", tourDTO.isActive() ? 1 : 0, wikiContext);
@@ -173,16 +174,16 @@ public class ToursManager
     public void deleteTour(String tourId) throws XWikiException, JobException, InvalidIdException
     {
         getTourClassObject(tourId);
-        DocumentReference targetDocRef = documentReferenceResolver.resolve(tourId);
-        Request deleteReq = requestFactory.createDeleteRequest(List.of(targetDocRef.getLastSpaceReference()));
+        DocumentReference targetDocRef = this.documentReferenceResolver.resolve(tourId);
+        Request deleteReq = this.requestFactory.createDeleteRequest(List.of(targetDocRef.getLastSpaceReference()));
         this.jobExecutor.execute(RefactoringJobs.DELETE, deleteReq);
     }
 
     private BaseObject getTourClassObject(String tourId) throws InvalidIdException, XWikiException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
-        DocumentReference targetDocRef = documentReferenceResolver.resolve(tourId);
+        DocumentReference targetDocRef = this.documentReferenceResolver.resolve(tourId);
         XWikiDocument targetDoc = wiki.getDocument(targetDocRef, wikiContext);
         BaseObject tourClassObject = targetDoc.getXObject(TOUR_CLASS);
         if (tourClassObject == null) {

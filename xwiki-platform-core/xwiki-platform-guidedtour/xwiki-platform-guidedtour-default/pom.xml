@@ -22,58 +22,61 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 <modelVersion>4.0.0</modelVersion>
-<parent>
-  <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-platform-guidedtour</artifactId>
-  <version>18.4.0-SNAPSHOT</version>
-</parent>
-<artifactId>xwiki-platform-guidedtour-default</artifactId>
-<name>XWiki Platform - Guided Tour - Default Implementation</name>
-<description>XWiki Platform - Guided Tour - Default Implementation</description>
-<dependencies>
-  <!-- Testing dependencies -->
-  <!-- TODO: Check what dependencies are actually needed -->
-  <dependency>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-tool-test-simple</artifactId>
-    <version>${commons.version}</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
+  <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-model-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-oldcore</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-guidedtour-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-refactoring-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-job-api</artifactId>
-    <version>${commons.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-tool-test-component</artifactId>
-    <version>${commons.version}</version>
-    <scope>test</scope>
-  </dependency>
-</dependencies>
+    <artifactId>xwiki-platform-guidedtour</artifactId>
+    <version>18.4.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-guidedtour-default</artifactId>
+  <name>XWiki Platform - Guided Tour - Default Implementation</name>
+  <description>XWiki Platform - Guided Tour - Default Implementation</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.99</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <!-- Testing dependencies -->
+    <!-- TODO: Check what dependencies are actually needed -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-simple</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-guidedtour-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

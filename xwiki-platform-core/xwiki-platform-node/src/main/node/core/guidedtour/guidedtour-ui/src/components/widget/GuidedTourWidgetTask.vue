@@ -65,7 +65,7 @@ import GuidedTourWidgetItem from "./GuidedTourWidgetItem.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { inject, reactive, ref, toRefs, watch } from "vue";
 import type {
-  GuidedTourManagerApi,
+  GuidedTourManager,
   TourTask,
 } from "@xwiki/platform-guidedtour-api";
 
@@ -86,7 +86,9 @@ const state = reactive({
   isWaitingAsync: false,
 });
 const { isWaitingAsync } = toRefs(state);
-const guidedTourManager: GuidedTourManagerApi = inject("GuidedTourManager")!;
+const guidedTourManager: GuidedTourManager = inject(
+  "DefaultGuidedTourManager",
+)!;
 const emit = defineEmits(["taskStatusChanged"]);
 async function onResetTask() {
   console.info("You clicked to reset this task:", task);

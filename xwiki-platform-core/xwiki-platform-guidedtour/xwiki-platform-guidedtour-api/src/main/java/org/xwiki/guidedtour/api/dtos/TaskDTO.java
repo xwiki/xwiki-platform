@@ -25,6 +25,8 @@ import java.util.List;
 import org.xwiki.guidedtour.api.enums.Status;
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Task DTO used to represent a task with its properties and the list of tasks it depends on.
  *
@@ -32,6 +34,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskDTO
 {
     private String id;
@@ -80,7 +83,7 @@ public class TaskDTO
      */
     public boolean isActive()
     {
-        return isActive;
+        return this.isActive;
     }
 
     /**
@@ -90,7 +93,7 @@ public class TaskDTO
      */
     public void setActive(boolean active)
     {
-        isActive = active;
+        this.isActive = active;
     }
 
     /**
@@ -100,7 +103,7 @@ public class TaskDTO
      */
     public String getTitle()
     {
-        return title;
+        return this.title;
     }
 
     /**
@@ -120,7 +123,7 @@ public class TaskDTO
      */
     public int getOrder()
     {
-        return order;
+        return this.order;
     }
 
     /**
@@ -140,7 +143,7 @@ public class TaskDTO
      */
     public String getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -160,7 +163,7 @@ public class TaskDTO
      */
     public List<String> getDependsOn()
     {
-        return dependsOn;
+        return this.dependsOn;
     }
 
     /**
@@ -180,7 +183,7 @@ public class TaskDTO
      */
     public Status getStatus()
     {
-        return status;
+        return this.status;
     }
 
     /**

@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <description>Default implementation of the Guided Tour REST API.</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.99</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Guided Tour REST Services - Default Implementation</xwiki.extension.name>
   </properties>
@@ -63,6 +64,20 @@
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
   </dependencies>
 </project>

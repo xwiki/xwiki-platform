@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
-@Path("/guidedTour")
+@Path("/guidedTour/tours")
 public interface ToursResource extends XWikiRestComponent
 {
     /**
@@ -51,7 +51,6 @@ public interface ToursResource extends XWikiRestComponent
      *     lacks rights or if the CSRF token is invalid and 500 if any other error occurs
      */
     @GET
-    @Path("/tours")
     Response getAvailableTours() throws XWikiRestException;
 
     /**
@@ -62,7 +61,6 @@ public interface ToursResource extends XWikiRestComponent
      *     already exists and 500 if any other error occurs
      */
     @POST
-    @Path("/tour")
     @Consumes(MediaType.APPLICATION_JSON)
     Response createTour(TourDTO tourDTO) throws XWikiRestException;
 
@@ -75,7 +73,7 @@ public interface ToursResource extends XWikiRestComponent
      *     is not found and 500 if any other error occurs
      */
     @PUT
-    @Path("/tour/{tourId}")
+    @Path("/{tourId}")
     @Consumes(MediaType.APPLICATION_JSON)
     Response updateTour(@PathParam("tourId") String tourId, TourDTO tourDTO) throws XWikiRestException;
 
@@ -87,6 +85,6 @@ public interface ToursResource extends XWikiRestComponent
      *     is not found and 500 if any other error occurs
      */
     @DELETE
-    @Path("/tour/{tourId}")
+    @Path("/{tourId}")
     Response deleteTour(@PathParam("tourId") String tourId) throws XWikiRestException;
 }

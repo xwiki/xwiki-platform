@@ -78,8 +78,8 @@ public class StepsManager
     {
         int highestOrder = getHighestOrder(tourId, taskId, stepDTO.getOrder());
         DocumentReference taskDocRef =
-            documentReferenceResolver.resolve(taskId, documentReferenceResolver.resolve(tourId));
-        XWikiContext wikiContext = wikiContextProvider.get();
+            this.documentReferenceResolver.resolve(taskId, this.documentReferenceResolver.resolve(tourId));
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
         XWikiDocument taskDoc = wiki.getDocument(taskDocRef, wikiContext);
         stepDTO.setOrder(++highestOrder);
@@ -127,7 +127,7 @@ public class StepsManager
             updateStepsOrder(stepId, newDTO.getOrder(), existingSteps);
         }
         populateStepObject(newDTO, stepObject);
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
         wiki.saveDocument(stepObject.getOwnerDocument(), "Updated step.", wikiContext);
     }
@@ -146,7 +146,7 @@ public class StepsManager
         List<BaseObject> existingSteps = getStepObjects(tourId, taskId);
         BaseObject stepObject = getStepObjectFromList(stepId, existingSteps);
         updateStepsOrder(stepId, Integer.MAX_VALUE, existingSteps);
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
         XWikiDocument taskDoc = stepObject.getOwnerDocument();
         taskDoc.removeXObject(stepObject);
@@ -193,7 +193,7 @@ public class StepsManager
 
     private List<BaseObject> getStepObjects(String tourId, String taskId) throws XWikiException, InvalidIdException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         XWiki wiki = wikiContext.getWiki();
         DocumentReference tourDocRef = documentReferenceResolver.resolve(tourId);
         if (wiki.exists(tourDocRef, wikiContext)) {
@@ -232,7 +232,7 @@ public class StepsManager
 
     private void populateStepObject(StepDTO stepDTO, BaseObject taskClassObject) throws XWikiException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         taskClassObject.set(TourProperty.ORDER.getBaseKey(), stepDTO.getOrder(), wikiContext);
         taskClassObject.set(TourProperty.ELEMENT.getBaseKey(), stepDTO.getElement(), wikiContext);
         taskClassObject.set(TourProperty.CONTENT.getBaseKey(), stepDTO.getContent(), wikiContext);

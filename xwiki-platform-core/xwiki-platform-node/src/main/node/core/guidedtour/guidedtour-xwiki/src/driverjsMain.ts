@@ -20,7 +20,7 @@
 import { SessionStorageManager } from "./SessionStorageManager";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { driver } from "driver.js";
-import type { GuidedTourManager } from "./GuidedTourManager";
+import type { DefaultGuidedTourManager } from "./rest/DefaultGuidedTourManager";
 import type { TourStep, TourTask } from "@xwiki/platform-guidedtour-api";
 import type { Config, DriveStep, Driver } from "driver.js";
 
@@ -33,7 +33,7 @@ const util = {
    * @returns The `Skip All` element
    */
   makeSkipAllButton(
-    guidedTourManager: GuidedTourManager,
+    guidedTourManager: DefaultGuidedTourManager,
     task: TourTask,
   ): Element {
     const customSkipAll = document.createElement("a");
@@ -122,7 +122,7 @@ const util = {
  * This is a function to ensure each call has it's own object, and subsequent manipulation doesn't alter the defaults.
  */
 function XWikiDriverConfig(
-  guidedTourManager: GuidedTourManager,
+  guidedTourManager: DefaultGuidedTourManager,
   task: TourTask,
 ): Config {
   console.log("Setting up", task);
@@ -347,7 +347,7 @@ function convertToDriverStep(step: TourStep, task: TourTask): DriveStep {
 function getDriverConfigForSteps(
   steps: TourStep[],
   task: TourTask,
-  guidedTourManager: GuidedTourManager,
+  guidedTourManager: DefaultGuidedTourManager,
 ) {
   console.log(steps);
   const config = XWikiDriverConfig(guidedTourManager, task);
@@ -355,7 +355,10 @@ function getDriverConfigForSteps(
   return config;
 }
 
-function wrapTask(task: Driver, guidedTourManager: GuidedTourManager): Driver {
+function wrapTask(
+  task: Driver,
+  guidedTourManager: DefaultGuidedTourManager,
+): Driver {
   const _drive = task.drive;
   const _moveNext = task.moveNext;
   const _movePrevious = task.movePrevious;
@@ -511,7 +514,7 @@ export { XWikiDriverConfig, driver, getDriverConfigForSteps, wrapTask };
 function bindReflexEvents(
   element: Element,
   step: TourStep,
-  guidedTourManager: GuidedTourManager,
+  guidedTourManager: DefaultGuidedTourManager,
   callbackFn: () => void,
 ) {
   const callback = (event: Event) => {

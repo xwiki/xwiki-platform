@@ -50,8 +50,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     public Response getAvailableTours() throws XWikiRestException
     {
         return execute("Tour API: retrieving all tours.", () -> {
-            validateCSRF();
-            List<TourDTO> json = toursManager.getAllTours();
+            List<TourDTO> json = this.toursManager.getAllTours();
             return Response.ok(json).type(MediaType.APPLICATION_JSON_TYPE).build();
         });
     }
@@ -60,7 +59,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     public Response createTour(TourDTO tourDTO) throws XWikiRestException
     {
         return execute("Tour API: creating new tour.", () -> {
-            toursManager.createTour(tourDTO);
+            this.toursManager.createTour(tourDTO);
             return Response.status(Response.Status.CREATED).build();
         });
     }
@@ -72,7 +71,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
             if (!tourDTO.getId().equals(tourId)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Path ID and Body ID mismatch").build();
             }
-            toursManager.updateTour(tourDTO);
+            this.toursManager.updateTour(tourDTO);
             return Response.ok().build();
         }, tourId);
     }
@@ -81,7 +80,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     public Response deleteTour(String tourId) throws XWikiRestException
     {
         return execute("Tour API: removing tour with id [{}].", () -> {
-            toursManager.deleteTour(tourId);
+            this.toursManager.deleteTour(tourId);
             return Response.ok().build();
         }, tourId);
     }

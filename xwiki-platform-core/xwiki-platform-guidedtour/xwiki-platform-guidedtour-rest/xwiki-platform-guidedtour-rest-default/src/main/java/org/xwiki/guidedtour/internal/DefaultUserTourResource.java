@@ -48,8 +48,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     public Response getUserTourStatus() throws XWikiRestException
     {
         return execute("User tour status API: getting user tour status object.", () -> {
-            validateCSRF();
-            UserTourStatusDTO json = userStatusManager.getUserToursStatus();
+            UserTourStatusDTO json = this.userStatusManager.getUserToursStatus();
             return Response.ok(json).type(MediaType.APPLICATION_JSON_TYPE).build();
         });
     }
@@ -58,7 +57,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     public Response createUserTourStatus() throws XWikiRestException
     {
         return execute("User tour status API: creating new user tour status object.", () -> {
-            userStatusManager.createUserTourStatus();
+            this.userStatusManager.createUserTourStatus();
             return Response.status(Response.Status.CREATED).build();
         });
     }
@@ -67,7 +66,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     public Response updateUserTourStatus(UserTourStatusDTO userTourStatus) throws XWikiRestException
     {
         return execute("User tour status API: updating user tour status object.", () -> {
-            userStatusManager.updateUserTourStatus(userTourStatus);
+            this.userStatusManager.updateUserTourStatus(userTourStatus);
             return Response.ok().build();
         });
     }

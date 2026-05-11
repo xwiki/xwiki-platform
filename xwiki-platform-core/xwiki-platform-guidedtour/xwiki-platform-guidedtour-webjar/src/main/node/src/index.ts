@@ -19,7 +19,7 @@
  */
 
 import {guidedTourManager} from '@xwiki/platform-guidedtour-xwiki';
-import {GuidedTourWidget} from "@xwiki/platform-guidedtour-ui"
+import {GuidedTourWidget} from "@xwiki/platform-guidedtour-ui";
 import {createApp} from 'vue';
 
 

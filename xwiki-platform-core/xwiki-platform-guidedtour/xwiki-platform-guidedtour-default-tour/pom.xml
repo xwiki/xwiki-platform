@@ -21,25 +21,25 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<parent>
-  <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-platform-guidedtour</artifactId>
-  <version>18.4.0-SNAPSHOT</version>
-</parent>
-<artifactId>xwiki-platform-guidedtour-default-tour</artifactId>
-<name>XWiki Platform - Guided Tour - Default Tour</name>
-<description>Guided Tour Default Tour pages</description>
-<packaging>xar</packaging>
-<properties>
-  <!-- Name to display by the Extension Manager -->
-  <xwiki.extension.name>Guided Tour Application</xwiki.extension.name>
-  <xwiki.extension.category>application</xwiki.extension.category>
-</properties>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-guidedtour</artifactId>
+    <version>18.4.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-guidedtour-default-tour</artifactId>
+  <name>XWiki Platform - Guided Tour - Default Tour</name>
+  <description>Guided Tour Default Tour pages</description>
+  <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Guided Tour Application</xwiki.extension.name>
+    <xwiki.extension.category>application</xwiki.extension.category>
+  </properties>
   <dependencies>
     <!-- Runtime dependencies. -->
-  <!-- TODO: Check what dependencies are actually needed -->
-  <!-- FIXME: These versioned dependencies are workarounds for the upgrade, they should be removed and fixed in the origin dependency -->
+    <!-- TODO: Check what dependencies are actually needed -->
+    <!-- FIXME: These versioned dependencies are workarounds for the upgrade, they should be removed and fixed in the origin dependency -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-guidedtour-ui</artifactId>

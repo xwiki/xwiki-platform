@@ -51,8 +51,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     public Response getTourTasks(String tourId) throws XWikiRestException
     {
         return execute("Tasks API: retrieving the tasks for tour [{}].", () -> {
-            validateCSRF();
-            List<TaskDTO> tasks = tasksManager.getAllTasks(tourId);
+            List<TaskDTO> tasks = this.tasksManager.getAllTasks(tourId);
             return Response.ok(tasks).type(MediaType.APPLICATION_JSON_TYPE).build();
         }, tourId);
     }
@@ -61,8 +60,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     public Response getTourTask(String tourId, String taskId) throws XWikiRestException
     {
         return execute("Tasks API: retrieving the task [{}] from tour [{}].", () -> {
-            validateCSRF();
-            TaskDTO task = tasksManager.getTask(tourId, taskId);
+            TaskDTO task = this.tasksManager.getTask(tourId, taskId);
             return Response.ok(task).type(MediaType.APPLICATION_JSON_TYPE).build();
         }, taskId, tourId);
     }
@@ -71,7 +69,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     public Response createTask(String tourId, TaskDTO taskDTO) throws XWikiRestException
     {
         return execute("Tasks API: creating task [{}] for tour [{}].", () -> {
-            tasksManager.createTask(tourId, taskDTO);
+            this.tasksManager.createTask(tourId, taskDTO);
             return Response.status(Response.Status.CREATED).build();
         }, taskDTO.getId(), tourId);
     }
@@ -84,7 +82,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
                 return Response.status(Response.Status.BAD_REQUEST).entity("Path and Body ID mismatch for given task.")
                     .build();
             }
-            tasksManager.updateTask(tourId, taskDTO);
+            this.tasksManager.updateTask(tourId, taskDTO);
             return Response.ok().build();
         }, taskDTO.getId(), tourId);
     }
@@ -93,8 +91,8 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     public Response deleteTask(String tourId, String taskId) throws XWikiRestException
     {
         return execute("Tasks API: removing task [{}] from tour [{}].", () -> {
-            contextualAuthorizationManager.checkAccess(Right.DELETE);
-            tasksManager.deleteTask(tourId, taskId);
+            this.contextualAuthorizationManager.checkAccess(Right.DELETE);
+            this.tasksManager.deleteTask(tourId, taskId);
             return Response.ok().build();
         }, taskId, tourId);
     }

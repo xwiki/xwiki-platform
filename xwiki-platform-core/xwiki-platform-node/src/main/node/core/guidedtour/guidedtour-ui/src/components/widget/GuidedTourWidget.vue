@@ -102,17 +102,17 @@ import GuidedTourWidgetUsefulLink from "./GuidedTourWidgetUsefulLink.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { computed, onMounted, provide, reactive, ref } from "vue";
 import type {
-  GuidedTourManagerApi,
+  GuidedTourManager,
   TourTask,
   TourTour,
 } from "@xwiki/platform-guidedtour-api";
 
 console.info("In widget setup. 233123213");
 const { guidedTourManager } = defineProps<{
-  guidedTourManager: GuidedTourManagerApi;
+  guidedTourManager: GuidedTourManager;
 }>();
 
-provide<GuidedTourManagerApi>("GuidedTourManager", guidedTourManager!);
+provide<GuidedTourManager>("DefaultGuidedTourManager", guidedTourManager!);
 
 const state = reactive({
   guidedTourManager: guidedTourManager,

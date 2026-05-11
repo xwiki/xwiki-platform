@@ -77,7 +77,7 @@ public class UserStatusManager
         UserTourStatusDTO userTourStatus = new UserTourStatusDTO();
         String storedJson = userTourStatusObject.getStringValue(TASKS_STATUS_KEY);
         if (!storedJson.isEmpty()) {
-            Map<String, Status> map = objectMapper.readValue(storedJson, new TypeReference<Map<String, Status>>()
+            Map<String, Status> map = this.objectMapper.readValue(storedJson, new TypeReference<Map<String, Status>>()
             {
             });
             userTourStatus.setTasksStatus(map);
@@ -95,7 +95,7 @@ public class UserStatusManager
      */
     public void createUserTourStatus() throws XWikiException, DuplicatedIdException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         DocumentReference userDocRef = wikiContext.getUserReference();
         XWikiDocument userDoc = wikiContext.getWiki().getDocument(userDocRef, wikiContext);
         if (userDoc.getXObject(USER_TOUR_CLASS) == null) {
@@ -118,9 +118,9 @@ public class UserStatusManager
     public void updateUserTourStatus(UserTourStatusDTO userTourStatus)
         throws XWikiException, JsonProcessingException, InvalidIdException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         BaseObject userTourStatusObject = getUserTourStatusObject();
-        String json = objectMapper.writeValueAsString(userTourStatus.getTasksStatus());
+        String json = this.objectMapper.writeValueAsString(userTourStatus.getTasksStatus());
         userTourStatusObject.setLargeStringValue(TASKS_STATUS_KEY, json);
         userTourStatusObject.setStringValue(WIDGET_STATE_KEY, userTourStatus.getWidgetState().toString());
         userTourStatusObject.setIntValue(CALL_TO_ACTION_KEY, userTourStatus.isCallToAction() ? 1 : 0);
@@ -130,7 +130,7 @@ public class UserStatusManager
 
     private BaseObject getUserTourStatusObject() throws InvalidIdException, XWikiException
     {
-        XWikiContext wikiContext = wikiContextProvider.get();
+        XWikiContext wikiContext = this.wikiContextProvider.get();
         DocumentReference userDocRef = wikiContext.getUserReference();
         XWikiDocument userDoc = wikiContext.getWiki().getDocument(userDocRef, wikiContext);
         BaseObject userTourStatusObject = userDoc.getXObject(USER_TOUR_CLASS);

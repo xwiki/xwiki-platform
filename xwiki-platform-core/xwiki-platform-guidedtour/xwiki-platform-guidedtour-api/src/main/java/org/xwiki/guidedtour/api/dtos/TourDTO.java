@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Tour DTO used to represent a tour with its properties and the list of tasks it contains.
  *
@@ -31,6 +33,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.0RC1
  */
 @Unstable
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TourDTO
 {
     private String id;
@@ -72,7 +75,7 @@ public class TourDTO
      */
     public boolean isActive()
     {
-        return isActive;
+        return this.isActive;
     }
 
     /**
@@ -82,7 +85,7 @@ public class TourDTO
      */
     public void setActive(boolean active)
     {
-        isActive = active;
+        this.isActive = active;
     }
 
     /**
@@ -92,7 +95,7 @@ public class TourDTO
      */
     public String getTitle()
     {
-        return title;
+        return this.title;
     }
 
     /**
@@ -112,7 +115,7 @@ public class TourDTO
      */
     public String getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -132,7 +135,7 @@ public class TourDTO
      */
     public void addTask(TaskDTO taskDTO)
     {
-        tasks.add(taskDTO);
+        this.tasks.add(taskDTO);
     }
 
     /**
@@ -152,6 +155,6 @@ public class TourDTO
      */
     public List<TaskDTO> getTasksList()
     {
-        return tasks;
+        return this.tasks;
     }
 }

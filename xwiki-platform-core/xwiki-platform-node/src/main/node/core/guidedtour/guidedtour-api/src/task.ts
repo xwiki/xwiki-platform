@@ -49,11 +49,11 @@ export interface TourTask {
   /**
    * The id of other tasks which must be completed before this task can be started.
    */
-  dependsOn: string[];
+  dependsOn?: string[];
   /**
    * The order of the task in the tour.
    */
-  order?: number;
+  order: number;
   /**
    * The steps which are part of this task.
    */

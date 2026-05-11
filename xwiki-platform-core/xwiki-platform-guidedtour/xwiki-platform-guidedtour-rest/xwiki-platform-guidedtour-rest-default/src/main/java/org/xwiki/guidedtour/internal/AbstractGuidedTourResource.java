@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.guidedtour.api.exceptions.DuplicatedIdException;
 import org.xwiki.guidedtour.api.exceptions.InvalidIdException;
@@ -67,20 +68,21 @@ public abstract class AbstractGuidedTourResource
     public Response execute(String logMessage, Callable<Response> action, Object... logParams)
     {
         try {
-            logger.debug("Executing: " + logMessage, logParams);
+            this.logger.debug("Executing: " + logMessage, logParams);
+            this.validateCSRF();
             this.contextualAuthorizationManager.checkAccess(Right.VIEW);
             return action.call();
         } catch (AccessDeniedException | SecurityException e) {
-            logger.warn("Authorization error: " + logMessage, appendException(logParams, e));
+            this.logger.warn("Authorization error: " + logMessage, appendException(logParams, e));
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         } catch (InvalidIdException e) {
-            logger.warn("Resource not found: " + logMessage, appendException(logParams, e));
+            this.logger.warn("Resource not found: " + logMessage, appendException(logParams, e));
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         } catch (DuplicatedIdException e) {
-            logger.warn("Conflict: " + logMessage, appendException(logParams, e));
+            this.logger.warn("Conflict: " + logMessage, appendException(logParams, e));
             throw new WebApplicationException(Response.Status.CONFLICT);
         } catch (Exception e) {
-            logger.error("Internal error: " + logMessage, appendException(logParams, e));
+            this.logger.error("Internal error: " + logMessage, appendException(logParams, e));
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,11 +90,11 @@ public abstract class AbstractGuidedTourResource
     /**
      * Utility method to validate the CSRF token from the request. Throws a SecurityException if the token is invalid.
      */
-    public void validateCSRF()
+    private void validateCSRF()
     {
-        Container container = containerProvider.get();
-        String token = (String) container.getRequest().getParameter("csrf");
-        if (!csrf.isTokenValid(token)) {
+        ServletRequest request = (ServletRequest) this.containerProvider.get().getRequest();
+        String token = request.getRequest().getHeader("xwiki-form-token");
+        if (!this.csrf.isTokenValid(token)) {
             throw new SecurityException("Invalid CSRF token.");
         }
     }

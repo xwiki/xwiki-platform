@@ -96,7 +96,7 @@ import GuidedTourWidgetTask from "./GuidedTourWidgetTask.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { inject, onMounted, reactive, ref } from "vue";
 import type {
-  GuidedTourManagerApi,
+  GuidedTourManager,
   TourTask,
   TourTour,
 } from "@xwiki/platform-guidedtour-api";
@@ -106,7 +106,9 @@ function onTaskStatusChanged(task: TourTask) {
   console.warn("Caught event for", task);
 }
 defineEmits(["toggleCollapseTour"]);
-const guidedTourManager: GuidedTourManagerApi = inject("GuidedTourManager")!;
+const guidedTourManager: GuidedTourManager = inject(
+  "DefaultGuidedTourManager",
+)!;
 console.info("In tour setup.");
 const state = reactive({
   tasks: [] as TourTask[],

@@ -70,7 +70,7 @@ public class UserTourStatusDTO
      */
     public Map<String, Status> getTasksStatus()
     {
-        return tasksStatus;
+        return this.tasksStatus;
     }
 
     /**
@@ -92,7 +92,7 @@ public class UserTourStatusDTO
      */
     public void setTaskStatus(String taskId, String status)
     {
-        tasksStatus.put(taskId, Status.fromString(status));
+        this.tasksStatus.put(taskId, Status.fromString(status));
     }
 
     /**
@@ -102,7 +102,7 @@ public class UserTourStatusDTO
      */
     public void removeTaskStatus(String taskId)
     {
-        tasksStatus.remove(taskId);
+        this.tasksStatus.remove(taskId);
     }
 
     /**
@@ -112,7 +112,7 @@ public class UserTourStatusDTO
      */
     public WidgetState getWidgetState()
     {
-        return widgetState;
+        return this.widgetState;
     }
 
     /**
@@ -132,7 +132,7 @@ public class UserTourStatusDTO
      */
     public boolean isCallToAction()
     {
-        return callToAction;
+        return this.callToAction;
     }
 
     /**

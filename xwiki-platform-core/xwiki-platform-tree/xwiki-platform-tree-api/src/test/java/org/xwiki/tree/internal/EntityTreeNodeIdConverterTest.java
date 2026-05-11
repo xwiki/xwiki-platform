@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class EntityTreeNodeIdConverterTest
+class EntityTreeNodeIdConverterTest
 {
     @InjectMockComponents
     private EntityTreeNodeIdConverter converter;
@@ -57,13 +57,13 @@ public class EntityTreeNodeIdConverterTest
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @Test
-    public void convertNullToString()
+    void convertNullToString()
     {
         assertNull(this.converter.convertToString(null));
     }
 
     @Test
-    public void convertToString()
+    void convertToString()
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.defaultEntityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
@@ -76,20 +76,24 @@ public class EntityTreeNodeIdConverterTest
     }
 
     @Test
-    public void convertToEntityReferenceWithoutEntityType()
+    void convertToEntityReferenceWithoutEntityType()
     {
         assertNull(this.converter.convertToType(null, "test"));
     }
 
     @Test
-    public void convertToEntityReferenceWithInvalidEntityType()
+    void convertToEntityReferenceWithInvalidEntityType()
     {
         assertNull(this.converter.convertToType(null, "foo:bar"));
     }
 
     @Test
-    public void convertToEntityReference()
+    void convertToEntityReference()
     {
+        DocumentReference currentDocumentReference = new DocumentReference("wiki", "Current", "Page");
+        when(this.currentEntityReferenceResolver.resolve("", EntityType.DOCUMENT)).thenReturn(currentDocumentReference);
+        assertEquals(currentDocumentReference, this.converter.convertToType(null, "document:"));
+
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page", EntityType.DOCUMENT))
             .thenReturn(documentReference);

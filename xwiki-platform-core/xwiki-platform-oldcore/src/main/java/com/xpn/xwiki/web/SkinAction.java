@@ -503,7 +503,7 @@ public class SkinAction extends XWikiAction
                 // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
                 try (InputStream input = attachment.getContentInputStream(context)) {
-                 IOUtils.copy(input, response.getOutputStream());
+                    IOUtils.copy(input, response.getOutputStream());
                 }
             }
 

@@ -35,7 +35,16 @@ export class Logic {
     this.liveDataSource = liveDataSourceModuleInit($);
     this.element = element;
     this.data = reactive(JSON.parse(element.getAttribute("data-config") || "{}"));
-    this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true";
+
+    this.contentTrusted = false;
+    try {
+      const json = element.querySelector(':scope > script[type="application/json"]').text;
+      const parsedJson = JSON.parse(json);
+      this.contentTrusted = parsedJson.contentTrusted === true;
+    } catch (e) {
+      console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
+        " considered as unsafe.", e);
+    }
 
     // Reactive properties must be initialized before Vue is instantiated.
     this.firstEntriesLoading = ref(true);

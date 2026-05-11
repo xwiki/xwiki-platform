@@ -25,7 +25,7 @@
 }
 
 /* We expect the first node child of the .result-<something> node to be its icon. */
-.upload-result > div > span:first-child {
+.upload-result > div > *:first-child {
   margin-right: 1em;
 }
 

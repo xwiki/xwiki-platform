@@ -17,11 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { manager } from "@xwiki/platform-component-manager-default";
 
-manager.registerComponent(
-  Symbol.for("DesignSystemLoader"),
-  async () =>
-    (await import("./flamingoDesignSystemLoader")).FlamingoDesignSystemLoader,
-  { name: "flamingo" },
-);
+import localConfig from "./vite.config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(defaultConfig, localConfig);

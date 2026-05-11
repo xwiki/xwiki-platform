@@ -17,11 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { manager } from "@xwiki/platform-component-manager-default";
 
-manager.registerComponent(
-  Symbol.for("DesignSystemLoader"),
-  async () =>
-    (await import("./flamingoDesignSystemLoader")).FlamingoDesignSystemLoader,
-  { name: "flamingo" },
-);
+import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
+
+export default generateWebjarNodeConfig(import.meta.url, [
+  "@xwiki/platform-component-annotation-inversify",
+  "@xwiki/platform-component-manager-inversify",
+  "@xwiki/platform-component-manager-api",
+  "@xwiki/platform-component-annotation-default",
+  "@xwiki/platform-component-manager-default",
+  "inversify",
+  "@inversifyjs/common",
+  "@inversifyjs/container",
+  "@inversifyjs/core",
+  "reflect-metadata",
+  "@inversifyjs/reflect-metadata-utils",
+  "@inversifyjs/prototype-utils",
+  "@inversifyjs/plugin",
+]);

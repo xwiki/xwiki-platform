@@ -113,7 +113,18 @@ define('xwiki-livedata', [
     this.liveDataSource = liveDataSourceModule.init();
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
-    this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true"; 
+    this.contentTrusted = false;
+    try {
+      const scriptEl = element.querySelector(':scope > script[type="application/json"]');
+      if(!scriptEl) {
+        console.error("Missing live data configuration for element", element, "The HTML content is" +
+          " considered unsafe.");
+      }
+      this.contentTrusted = scriptEl.getAttribute('data-config-content-trusted') === 'true';
+    } catch (e) {
+      console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
+        " considered unsafe.", e);
+    }
     this.data.entries = Object.freeze(this.data.entries);
 
     // Reactive properties must be initialized before Vue is instantiated.

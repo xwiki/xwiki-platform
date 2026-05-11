@@ -53,7 +53,8 @@
     "eslint": "catalog:",
     "inversify": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "exports": {

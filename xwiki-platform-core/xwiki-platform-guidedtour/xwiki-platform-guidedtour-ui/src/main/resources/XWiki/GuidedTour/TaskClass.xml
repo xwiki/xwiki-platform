@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="XWiki.GuidedTour.TaskClass" locale="">
+<xwikidoc version="1.7" reference="XWiki.GuidedTour.TaskClass" locale="">
   <web>XWiki.GuidedTour</web>
   <name>TaskClass</name>
   <language/>
@@ -118,8 +118,52 @@
   <object>
     <name>XWiki.GuidedTour.TaskClass</name>
     <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>751921fc-8586-47a3-a738-783ba031f8b9</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property type="String">
+      <sheet>GuidedTour.Code.TaskClassSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.GuidedTour.TaskClass</name>
+    <number>1</number>
     <className>XWiki.DocumentSheetBinding</className>
-    <guid>39e5c4eb-bee9-4f01-ae0b-b18516f92cf1</guid>
+    <guid>131c9241-d9f5-4054-85c4-80a508e89f96</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -155,8 +199,52 @@
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
-    <property>
+    <property type="String">
       <sheet>XWiki.ClassSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.GuidedTour.TaskClass</name>
+    <number>2</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>046dd9d6-c224-41c4-815f-272524fd3d78</guid>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property type="String">
+      <sheet>AppWithinMinutes.ClassEditSheet</sheet>
     </property>
   </object>
 </xwikidoc>

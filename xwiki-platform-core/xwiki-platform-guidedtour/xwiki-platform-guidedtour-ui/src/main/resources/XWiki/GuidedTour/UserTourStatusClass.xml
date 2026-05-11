@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="XWiki.GuidedTour.UserTourStatusClass" locale="">
+<xwikidoc version="1.7" reference="XWiki.GuidedTour.UserTourStatusClass" locale="">
   <web>XWiki.GuidedTour</web>
   <name>UserTourStatusClass</name>
   <language/>
@@ -145,7 +145,7 @@
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
-    <property>
+    <property type="String">
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>

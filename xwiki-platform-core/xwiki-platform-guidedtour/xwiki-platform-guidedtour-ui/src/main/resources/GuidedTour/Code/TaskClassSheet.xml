@@ -1,0 +1,514 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.7" reference="GuidedTour.Code.TaskClassSheet" locale="">
+  <web>GuidedTour.Code</web>
+  <name>TaskClassSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity ouptput="false"}}
+#set ($discard = $xwiki.ssx.use('GuidedTour.Code.TaskClassSheet'))
+#set ($discard = $xwiki.jsx.use('GuidedTour.Code.TaskClassSheet'))
+#set ($isEdit = ($xcontext.action == 'edit'))
+
+#set ($steps = $doc.getObjects('XWiki.GuidedTour.StepClass'))
+#set ($task = $doc.getObject('XWiki.GuidedTour.TaskClass'))
+##set ($tour = $doc.parent.getObject('XWiki.GuidedTour.TourClass'))
+#set ($serializedSteps = [])
+#foreach ($step in $steps)
+  #set ($discard = $serializedSteps.add({
+    'element': $step.getValue('element'),
+    'order': $step.getValue('order'),
+    'placement': $step.getValue('placement'),
+    'reflex': $step.getValue('reflex'),
+    'targetPage': $step.getValue('targetPage'),
+    'targetAction': $step.getValue('targetAction'),
+    'queryParameters': $step.getValue('queryParameters')
+  }))
+#end
+
+{{/velocity}}
+
+{{velocity}}
+{{html wiki="true"}}
+&lt;div class="taskSpecificProps"&gt;
+&lt;dl id="guidedtour-task-props"&gt;
+#set($xclass = $task.xWikiClass)
+#foreach($property in $xclass.properties)
+  #set ($propertyId = "${xclass.name}_${step.number}_$property.name")
+  &lt;dt&gt;
+    &lt;label for="$!escapetool.xml($propertyId)"&gt;$escapetool.xml($property.translatedPrettyName)&lt;/label&gt;
+    &lt;span class="xHint"&gt;$!escapetool.xml($property.hint)&lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    $doc.display($property.name, $task)
+  &lt;/dd&gt;
+#end
+&lt;/dl&gt;
+## This should be the page title directly, not a property.
+##makeTaskPropertyDisplay('title')
+&lt;/div&gt;
+
+== Steps ==
+
+#if ($isEdit)
+  &lt;button class="btn btn-primary"&gt;Add Step&lt;/button&gt;
+#end
+
+&lt;div class="stepsListContainer" data-steps="$escapetool.xml($services.rendering.escape($jsontool.serialize($serializedSteps), 'xwiki/2.1'))"&gt;
+    &lt;div class="sidebar"&gt;
+      &lt;h2 class="sidebar-title"&gt;Steps&lt;/h2&gt;
+      &lt;ul class="item-list"&gt;
+        #foreach ($step in $steps)
+          &lt;li class="item" data-id="$foreach.index"&gt;
+            #if ("$!step.getValue('content')" == '')
+              Step # $escapetool.xml($services.rendering.escape($step.getValue('order'), 'xwiki/2.1'))
+            #else
+              $escapetool.xml($services.rendering.escape($step.getValue('content'), 'xwiki/2.1'))
+            #end
+          &lt;/li&gt;
+        #end
+        #if ($isEdit)
+          &lt;li class="item"&gt;+ Add Step&lt;/li&gt;
+        #end
+      &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;div class="content"&gt;
+      &lt;h1 class="content-title"&gt;Properties&lt;/h1&gt;
+      #foreach ($step in $steps)
+        #set($xclass = $step.xWikiClass)
+        &lt;dl id="guidedtour-step-props-${step.getValue('order')}" class="itemDisplay hidden"&gt;
+          #foreach($property in $xclass.properties)
+            #set ($propertyId = "${xclass.name}_${step.number}_$property.name")
+            &lt;dt&gt;
+              &lt;label for="$!escapetool.xml($propertyId)"&gt; $escapetool.xml($services.rendering.escape($property.translatedPrettyName, 'xwiki/2.1')) &lt;/label&gt;
+              &lt;span class="xHint"&gt;$!escapetool.xml($services.rendering.escape($property.hint, 'xwiki/2.1')) &lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              $doc.display($property.name, $step)
+            &lt;/dd&gt;
+          #end
+        &lt;/dl&gt;
+      #end
+    &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>GuidedTour.Code.TaskClassSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>7614b368-7038-4cf6-96db-47a186a2c4ef</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property type="String">
+      <cache>forbid</cache>
+    </property>
+    <property type="LargeString">
+      <code>// Simple interactivity: load properties when clicking sidebar items
+const stepsListContainer = document.querySelector('.stepsListContainer');
+console.warn(stepsListContainer.dataset.steps)
+const steps = JSON.parse(stepsListContainer.dataset.steps);
+const items = document.querySelectorAll('.item');
+function loadItem(id) {
+  const data = steps[id];
+  if (!data) return;
+  document.querySelectorAll('.item').forEach(i =&gt; i.classList.toggle('active', i.dataset.id == String(id)));
+  document.querySelectorAll('.itemDisplay').forEach(i =&gt; i.classList.toggle('hidden', i.id != "guidedtour-step-props-" + String(id)));
+}
+
+items.forEach(i =&gt; i.addEventListener('click', () =&gt; loadItem(i.dataset.id)));
+// load first by default
+loadItem(0);
+</code>
+    </property>
+    <property type="String">
+      <name/>
+    </property>
+    <property type="Integer">
+      <parse>0</parse>
+    </property>
+    <property type="String">
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>GuidedTour.Code.TaskClassSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>346069c0-249b-43a5-aa0b-687b9565fed3</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property type="String">
+      <cache>forbid</cache>
+    </property>
+    <property type="LargeString">
+      <code>:root{
+  --sidebar-w: 260px;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --muted: #727272;
+  --accent: #2563eb;
+  --radius: 10px;
+  --gap: 20px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.stepsListContainer{
+  display:flex;
+  gap:var(--gap);
+  align-items:flex-start;
+  margin:0 auto;
+  width:100%;
+}
+
+/* Sidebar */
+.stepsListContainer .sidebar{
+  width:var(--sidebar-w);
+  border-radius:var(--radius);
+  padding:16px;
+  flex-shrink:0;
+  border: solid var(--muted);
+}
+
+.stepsListContainer .sidebar-title{
+  margin:0 0 12px 0;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.stepsListContainer .item-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.stepsListContainer .item{
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  background:transparent;
+  color:#0f172a;
+  align-items:center;
+  justify-content:space-between;
+  transition:all .12s ease;
+  border:1px solid transparent;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.stepsListContainer .item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 4px 10px rgba(16,24,40,0.06);
+}
+
+.stepsListContainer .item.active{
+  background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.04));
+  border-color:rgba(37,99,235,0.18);
+  color:var(--accent);
+  font-weight:600;
+}
+
+/* Content (form area) */
+.container .content{
+  flex:1;
+  background:var(--card);
+  padding:20px;
+  border-radius:var(--radius);
+  min-height:320px;
+}
+
+.container .content-title{
+  margin:0 0 16px 0;
+  font-size:18px;
+}
+
+.container .props-form{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:12px 20px;
+  align-items:start;
+}
+
+.container .field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.container .field label{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.field input[type="text"],
+.field select,
+.field textarea{
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #e6e9ef;
+  background:#fff;
+  font-size:14px;
+  outline:none;
+  transition:border-color .12s ease, box-shadow .12s ease;
+}
+
+.field input[type="text"]:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:rgba(37,99,235,0.6);
+  box-shadow:0 4px 10px rgba(37,99,235,0.08);
+}
+
+.field input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  transform:translateY(4px);
+}
+
+/* Make description span full width */
+.field textarea{
+  resize:vertical;
+  min-height:88px;
+  grid-column:1 / -1;
+}
+
+/* Actions row spans full width */
+.container .actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:10px;
+  justify-content:flex-start;
+  margin-top:6px;
+}
+/* Responsive */
+@media (max-width:880px){
+  .container{flex-direction:column}
+  .sidebar{width:100%}
+  .props-form{grid-template-columns:1fr}
+  .field textarea{grid-column:1/1}
+  .actions{justify-content:stretch}
+}
+</code>
+    </property>
+    <property type="String">
+      <contentType>CSS</contentType>
+    </property>
+    <property type="String">
+      <name/>
+    </property>
+    <property type="Integer">
+      <parse>0</parse>
+    </property>
+    <property type="String">
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -201,9 +200,7 @@ class FilesystemAttachmentStoreTest
             this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         assertFalse(this.storeFile.exists());
 
-        final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
-        attachments.add(this.mockAttach);
-        attachments.add(this.mockAttach);
+        final List<XWikiAttachment> attachments = List.of(this.mockAttach, this.mockAttach);
         this.attachStore.saveAttachmentsContent(attachments, this.doc, false, this.mockContext, false);
 
         assertTrue(this.storeFile.exists(), "The attachment file was not created.");
@@ -257,8 +254,7 @@ class FilesystemAttachmentStoreTest
             assertTrue(doc.getAttachmentList().isEmpty(), "Attachment was not removed from the list.");
             return null;
         }).when(this.mockHibernate).saveXWikiDoc(doc, mockContext, false);
-        final List<XWikiAttachment> attachList = new ArrayList<XWikiAttachment>();
-        attachList.add(this.mockAttach);
+        final List<XWikiAttachment> attachList = List.of(this.mockAttach);
         this.doc.setAttachmentList(attachList);
         this.createFile();
 

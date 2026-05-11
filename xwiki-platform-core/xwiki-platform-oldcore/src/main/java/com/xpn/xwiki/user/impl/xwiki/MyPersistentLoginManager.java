@@ -187,7 +187,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String protectedUsername = username;
         String protectedPassword = password;
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
             protectedUsername = encryptText(protectedUsername);
             protectedPassword = encryptText(protectedPassword);
             if (protectedUsername == null || protectedPassword == null) {
@@ -217,7 +217,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
@@ -487,7 +487,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private boolean checkValidation(HttpServletRequest request, HttpServletResponse response)
     {
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
@@ -517,9 +517,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
 
-        if (!username.equals(DEFAULT_VALUE)) {
+        if (!DEFAULT_VALUE.equals(username)) {
             if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
+                if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
                     username = decryptText(username);
                 }
                 return username;
@@ -540,9 +540,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
-        if (!password.equals(DEFAULT_VALUE)) {
+        if (!DEFAULT_VALUE.equals(password)) {
             if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
+                if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
                     password = decryptText(password);
                 }
                 return password;
@@ -554,7 +554,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {
-        if (getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, "false").equals("true")) {
+        if ("true".equals(getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, "false"))) {
             return true;
         } else {
             return false;

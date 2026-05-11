@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @version $Id$
  */
 @ComponentTest
-public class SolrInstanceProviderTest
+class SolrInstanceProviderTest
 {
     @MockComponent
     private SolrInstance solrInstance;
@@ -42,7 +42,7 @@ public class SolrInstanceProviderTest
     private SolrInstanceProvider provider;
 
     @Test
-    public void get() throws Exception
+    void get()
     {
         assertSame(this.solrInstance, this.provider.get());
     }

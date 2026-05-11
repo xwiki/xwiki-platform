@@ -664,7 +664,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #else
         &lt;h2&gt;
           $escapetool.xml($services.localization.render('platform.core.profile.section.activityof',
-            [$xwiki.getUserName($doc.fullName, false)]))
+            [$xwiki.getPlainUserName($doc.documentReference)]))
         &lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##

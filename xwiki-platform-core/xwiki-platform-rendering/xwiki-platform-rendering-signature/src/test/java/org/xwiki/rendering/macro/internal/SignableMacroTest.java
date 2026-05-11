@@ -20,17 +20,15 @@
 package org.xwiki.rendering.macro.internal;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
 import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
@@ -44,14 +42,15 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterSignableMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.SignableMacro;
 import org.xwiki.rendering.signature.BlockSignatureGenerator;
 import org.xwiki.rendering.signature.BlockSignatureVerifier;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,13 +60,19 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
-public class SignableMacroTest
+@ComponentTest
+class SignableMacroTest
 {
     private static final BlockReference BLOCK_REFERENCE = new BlockReference("blockName");
-    private static final Block BLOCK = new MacroBlock("testMacro", Collections.<String, String>emptyMap(), true);
+
+    private static final Block BLOCK = new MacroBlock("testMacro", Map.of(), true);
+
     private static final byte[] SIGNATURE = "Signature".getBytes();
+
     private static final CMSSignedDataGeneratorParameters PARAMETERS = new CMSSignedDataGeneratorParameters();
-    private static final CMSSignedDataVerified VERIFIED = new CMSSignedDataVerified() {
+
+    private static final CMSSignedDataVerified VERIFIED = new CMSSignedDataVerified()
+    {
         @Override
         public Collection<CMSSignerVerifiedInformation> getSignatures()
         {
@@ -123,46 +128,52 @@ public class SignableMacroTest
         }
     }
 
-    @Rule
-    public final MockitoComponentMockingRule<SignableMacro> mocker =
-        new MockitoComponentMockingRule<SignableMacro>(TestSignable.class);
+    @InjectMockComponents
+    private TestSignable macro;
 
-    private SignableMacro macro;
+    @MockComponent
+    private BeanManager beanManager;
+
+    @MockComponent
     private SignatureStore store;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    @Named("macro")
+    private BlockSignatureGenerator signer;
+
+    @MockComponent
+    @Named("macro")
+    private BlockSignatureVerifier verifier;
+
+    @MockComponent
+    @Named("currentsignedmacro")
+    private BlockReferenceResolver<Block> blockReferenceResolver;
+
+    @BeforeComponent
+    void beforeComponent()
     {
-        BeanManager beanManager = mocker.getInstance(BeanManager.class);
-        when(beanManager.getBeanDescriptor(Object.class)).thenReturn(new DefaultBeanDescriptor(Object.class));
+        when(this.beanManager.getBeanDescriptor(Object.class)).thenReturn(new DefaultBeanDescriptor(Object.class));
+    }
 
-        store = mocker.registerMockComponent(SignatureStore.class);
-        when(store.retrieve(BLOCK_REFERENCE)).thenReturn(SIGNATURE);
-
-        BlockSignatureGenerator signer = mocker.registerMockComponent(BlockSignatureGenerator.class, "macro");
-        when(signer.generate(BLOCK, PARAMETERS)).thenReturn(SIGNATURE);
-
-        BlockSignatureVerifier verifier = mocker.registerMockComponent(BlockSignatureVerifier.class, "macro");
-        when(verifier.verify(SIGNATURE, BLOCK, null)).thenReturn(VERIFIED);
-
-        BlockReferenceResolver<Block> resolver =
-            mocker.registerMockComponent(new DefaultParameterizedType(null, BlockReferenceResolver.class, Block.class),
-                "currentsignedmacro");
-        when(resolver.resolve(BLOCK)).thenReturn(BLOCK_REFERENCE);
-
-        macro = mocker.getComponentUnderTest();
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        when(this.store.retrieve(BLOCK_REFERENCE)).thenReturn(SIGNATURE);
+        when(this.signer.generate(BLOCK, PARAMETERS)).thenReturn(SIGNATURE);
+        when(this.verifier.verify(SIGNATURE, BLOCK, null)).thenReturn(VERIFIED);
+        when(this.blockReferenceResolver.resolve(BLOCK)).thenReturn(BLOCK_REFERENCE);
     }
 
     @Test
-    public void testMacroSigning() throws Exception
+    void macroSigning() throws Exception
     {
-        macro.sign(BLOCK, PARAMETERS);
-        verify(store).store(BLOCK_REFERENCE, SIGNATURE);
+        this.macro.sign(BLOCK, PARAMETERS);
+        verify(this.store).store(BLOCK_REFERENCE, SIGNATURE);
     }
 
     @Test
-    public void testMacroVerifying() throws Exception
+    void macroVerifying() throws Exception
     {
-        assertThat(macro.verify(BLOCK, null), equalTo(VERIFIED));
+        assertSame(VERIFIED, this.macro.verify(BLOCK, null));
     }
 }

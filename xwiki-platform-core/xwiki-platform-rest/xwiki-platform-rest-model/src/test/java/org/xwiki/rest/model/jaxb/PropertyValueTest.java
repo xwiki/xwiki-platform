@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /**
  * Test for {@link PropertyValue}.
  */
-public class PropertyValueTest
+class PropertyValueTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         assertEquals(new PropertyValue(), new PropertyValue());
 

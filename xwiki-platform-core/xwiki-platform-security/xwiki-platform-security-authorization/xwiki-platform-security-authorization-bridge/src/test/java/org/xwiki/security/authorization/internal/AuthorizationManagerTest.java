@@ -19,55 +19,54 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.AbstractWikiTestCase;
+import org.xwiki.security.authorization.AbstractWikiTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 
 import com.xpn.xwiki.XWikiContext;
 
-public class AuthorizationManagerTest extends AbstractWikiTestCase
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class AuthorizationManagerTest extends AbstractWikiTest
 {
     private AuthorizationManager authorizationManager;
 
-    @Override
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void init() throws Exception
     {
-        super.setUp();
-
         this.authorizationManager = getComponentManager().getInstance(AuthorizationManager.class);
     }
 
     protected void assertAccessTrue(String message, Right right, DocumentReference userReference,
-        EntityReference entityReference, XWikiContext ctx) throws Exception
+        EntityReference entityReference, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertTrue(message, this.authorizationManager.hasAccess(right, userReference, entityReference));
+        assertTrue(this.authorizationManager.hasAccess(right, userReference, entityReference), message);
     }
 
     protected void assertAccessFalse(String message, Right right, DocumentReference userReference,
-        EntityReference entityReference, XWikiContext ctx) throws Exception
+        EntityReference entityReference, XWikiContext ctx)
     {
         setContext(ctx);
 
-        Assert.assertFalse(message, this.authorizationManager.hasAccess(right, userReference, entityReference));
+        assertFalse(this.authorizationManager.hasAccess(right, userReference, entityReference), message);
     }
 
     // Tests
 
     @Test
-    public void testGlobalUserInEmptySubWiki() throws Exception
+    void globalUserInEmptySubWiki() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "emptySubWiki.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki2");
@@ -89,9 +88,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testPublicAccess() throws Exception
+    void publicAccess() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -118,9 +117,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testPublicAccessOnTopLevel() throws Exception
+    void publicAccessOnTopLevel() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -147,9 +146,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testRightOnTopLevel() throws Exception
+    void rightOnTopLevel() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -178,9 +177,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     // Cache tests
 
     @Test
-    public void testRightOnUserAndDelete() throws Exception
+    void rightOnUserAndDelete() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "usersAndGroups.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "usersAndGroups.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -199,9 +198,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testEditAccessToGlobalRightObjectOnEmptyWiki() throws Exception
+    void editAccessToGlobalRightObjectOnEmptyWiki() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -217,10 +216,10 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testEditAccessToGlobalRightObject() throws Exception
+    void editAccessToGlobalRightObject() throws Exception
     {
         LegacyTestWiki testWiki =
-            new LegacyTestWiki(getMockery(), getComponentManager(), "accessToGlobalObjects.xml", false);
+            new LegacyTestWiki(getComponentManager(), "accessToGlobalObjects.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -228,7 +227,6 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         DocumentReference userA = new DocumentReference("wiki", "XWiki", "userA");
         DocumentReference userB = new DocumentReference("wiki", "XWiki", "userB");
         DocumentReference userA2 = new DocumentReference("wiki2", "XWiki", "userA");
-        DocumentReference userB2 = new DocumentReference("wiki2", "XWiki", "userB");
 
         assertAccessTrue("Admin should have edit access to XWikiPreferences when allowed by the wiki",
             Right.EDIT, userA, new DocumentReference("wiki", "XWiki", "XWikiPreferences"), ctx);
@@ -254,9 +252,9 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testMainWikiOwner() throws Exception
+    void mainWikiOwner() throws Exception
     {
-        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+        LegacyTestWiki testWiki = new LegacyTestWiki(getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
@@ -266,10 +264,10 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testGroupAccessThenUserAccess() throws Exception
+    void groupAccessThenUserAccess() throws Exception
     {
         LegacyTestWiki testWiki =
-            new LegacyTestWiki(getMockery(), getComponentManager(), "userAndGroupAdmin.xml", false);
+            new LegacyTestWiki(getComponentManager(), "userAndGroupAdmin.xml", false);
 
         DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
         DocumentReference group = new DocumentReference("wiki", "XWiki", "group");
@@ -286,10 +284,10 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testUserAccessThenGroupAccess() throws Exception
+    void userAccessThenGroupAccess() throws Exception
     {
         LegacyTestWiki testWiki =
-            new LegacyTestWiki(getMockery(), getComponentManager(), "userAndGroupAdmin.xml", false);
+            new LegacyTestWiki(getComponentManager(), "userAndGroupAdmin.xml", false);
 
         DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
         DocumentReference group = new DocumentReference("wiki", "XWiki", "group");

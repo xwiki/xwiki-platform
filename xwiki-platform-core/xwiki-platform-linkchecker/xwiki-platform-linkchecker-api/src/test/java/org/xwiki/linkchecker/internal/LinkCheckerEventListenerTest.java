@@ -22,19 +22,21 @@ package org.xwiki.linkchecker.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.transformation.linkchecker.LinkState;
 import org.xwiki.rendering.transformation.linkchecker.LinkStateManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LinkCheckerEventListener}.
@@ -42,25 +44,25 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 3.3M1
  */
-@MockingRequirement(LinkCheckerEventListener.class)
-public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCase
+@ComponentTest
+class LinkCheckerEventListenerTest
 {
-    private EventListener listener;
+    @InjectMockComponents
+    private LinkCheckerEventListener listener;
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.listener = getComponentManager().getInstance(EventListener.class, "linkchecker");
-    }
+    @MockComponent
+    private DocumentModelBridge documentModelBridge;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
+    private LinkStateManager linkStateManager;
 
     @Test
-    public void testOnEvent() throws Exception
+    void testOnEvent() throws Exception
     {
-        final DocumentModelBridge documentModelBridge = getMockery().mock(DocumentModelBridge.class);
-        final EntityReferenceSerializer serializer = getComponentManager().getInstance(
-            EntityReferenceSerializer.TYPE_STRING);
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final LinkStateManager linkStateManager = getComponentManager().getInstance(LinkStateManager.class);
 
         final Map<String, Map<String, LinkState>> states = new HashMap<String, Map<String, LinkState>>();
         Map<String, LinkState> referenceStates1 = new HashMap<String, LinkState>();
@@ -71,19 +73,18 @@ public class LinkCheckerEventListenerTest extends AbstractMockingComponentTestCa
         referenceStates2.put("wiki1:space1.page1", new LinkState(200, System.currentTimeMillis()));
         states.put("url2", referenceStates2);
         
-        getMockery().checking(new Expectations() {{
-            oneOf(documentModelBridge).getDocumentReference();
-            will(returnValue(reference));
-            oneOf(serializer).serialize(reference);
-            will(returnValue("wiki1:space1.page1"));
-            oneOf(linkStateManager).getLinkStates();
-            will(returnValue(states));
-        }});
+        when(this.documentModelBridge.getDocumentReference()).thenReturn(reference);
+        when(this.serializer.serialize(reference)).thenReturn("wiki1:space1.page1");
+        when(this.linkStateManager.getLinkStates()).thenReturn(states);
         
         this.listener.onEvent(new DocumentUpdatingEvent(), documentModelBridge, null);
-        
-        Assert.assertEquals(1, states.size());
-        Assert.assertEquals(1, states.get("url1").size());
-        Assert.assertNull(states.get("url2"));
+
+        assertEquals(1, states.size());
+        assertEquals(1, states.get("url1").size());
+        assertNull(states.get("url2"));
+
+        verify(this.documentModelBridge).getDocumentReference();
+        verify(this.serializer).serialize(reference);
+        verify(this.linkStateManager).getLinkStates();
     }
 }

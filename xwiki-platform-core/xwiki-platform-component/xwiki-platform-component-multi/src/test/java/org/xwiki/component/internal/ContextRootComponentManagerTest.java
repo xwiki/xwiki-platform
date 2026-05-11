@@ -19,71 +19,71 @@
  */
 package org.xwiki.component.internal;
 
-import static org.mockito.Mockito.verify;
-
 import java.lang.reflect.Type;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.verify;
 
 /**
- * Unit tests for {@link org.xwiki.component.script.ContextRootComponentManager}.
- * 
+ * Unit tests for {@link ContextRootComponentManager}.
+ *
  * @version $Id$
  */
+@ComponentTest
 @ComponentList(ContextComponentManagerProvider.class)
-public class ContextRootComponentManagerTest
+class ContextRootComponentManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ComponentManager> mocker = new MockitoComponentMockingRule<ComponentManager>(
-        ContextRootComponentManager.class);
+    @InjectMockComponents
+    private ContextRootComponentManager contextRootComponentManager;
 
-    /**
-     * The mock component manager used by the script service under test.
-     */
+    @MockComponent
+    @Named("context")
     private ComponentManager contextComponentManager;
 
+    @MockComponent
+    @Named("root")
     private ComponentManager rootComponentManager;
 
-    @Before
-    public void before() throws Exception
-    {
-        this.contextComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "context");
-        this.rootComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "root");
-    }
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void test() throws Exception
+    void test() throws Exception
     {
-        this.mocker.getComponentUnderTest().getInstance(Type.class);
-        this.mocker.getComponentUnderTest().getInstance(Type.class, "hint");
-        this.mocker.getComponentUnderTest().getComponentDescriptor(Type.class, "hint");
-        this.mocker.getComponentUnderTest().getComponentDescriptorList(Type.class);
-        this.mocker.getComponentUnderTest().getComponentDescriptorList((Type)Type.class);
-        this.mocker.getComponentUnderTest().getInstanceList(Type.class);
-        this.mocker.getComponentUnderTest().getInstanceMap(Type.class);
+        this.contextRootComponentManager.getInstance(Type.class);
+        this.contextRootComponentManager.getInstance(Type.class, "hint");
+        this.contextRootComponentManager.getComponentDescriptor(Type.class, "hint");
+        this.contextRootComponentManager.getComponentDescriptorList(Type.class);
+        this.contextRootComponentManager.getComponentDescriptorList((Type)Type.class);
+        this.contextRootComponentManager.getInstanceList(Type.class);
+        this.contextRootComponentManager.getInstanceMap(Type.class);
 
         DefaultComponentDescriptor<Type> descriptor = new DefaultComponentDescriptor<>();
-        this.mocker.getComponentUnderTest().registerComponent(descriptor);
-        this.mocker.getComponentUnderTest().registerComponent(descriptor, Type.class);
+        this.contextRootComponentManager.registerComponent(descriptor);
+        this.contextRootComponentManager.registerComponent(descriptor, Type.class);
 
         // Verify
 
-        verify(contextComponentManager).getInstance(Type.class);
-        verify(contextComponentManager).getInstance(Type.class, "hint");
-        verify(contextComponentManager).getComponentDescriptor(Type.class, "hint");
-        verify(contextComponentManager).getComponentDescriptorList(Type.class);
-        verify(contextComponentManager).getComponentDescriptorList((Type)Type.class);
-        verify(contextComponentManager).getInstanceList(Type.class);
-        verify(contextComponentManager).getInstanceMap(Type.class);
+        verify(this.contextComponentManager).getInstance(Type.class);
+        verify(this.contextComponentManager).getInstance(Type.class, "hint");
+        verify(this.contextComponentManager).getComponentDescriptor(Type.class, "hint");
+        verify(this.contextComponentManager).getComponentDescriptorList(Type.class);
+        verify(this.contextComponentManager).getComponentDescriptorList((Type)Type.class);
+        verify(this.contextComponentManager).getInstanceList(Type.class);
+        verify(this.contextComponentManager).getInstanceMap(Type.class);
 
-        verify(rootComponentManager).registerComponent(descriptor);
-        verify(rootComponentManager).registerComponent(descriptor, Type.class);
+        verify(this.rootComponentManager).registerComponent(descriptor);
+        verify(this.rootComponentManager).registerComponent(descriptor, Type.class);
     }
-
 }

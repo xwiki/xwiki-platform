@@ -22,6 +22,8 @@ package org.xwiki.rest.internal;
 /**
  * @version $Id$
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface Constants
 {
     /**

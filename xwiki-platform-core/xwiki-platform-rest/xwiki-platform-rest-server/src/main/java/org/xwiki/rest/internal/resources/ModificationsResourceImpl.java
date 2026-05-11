@@ -89,7 +89,7 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
                     this.resolver.resolve(Utils.getPageId(wikiName, spaces, pageName));
                 if (this.authorizationManager.hasAccess(VIEW, documentReference)) {
                     String language = (String) fields[2];
-                    if (language.equals("")) {
+                    if ("".equals(language)) {
                         language = null;
                     }
                     XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[3];

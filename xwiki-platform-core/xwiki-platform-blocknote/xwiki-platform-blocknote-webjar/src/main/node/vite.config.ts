@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,23 +20,28 @@
 
 import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    outDir: '../../../target/node-dist',
+    outDir: "../../../target/node-dist",
     lib: {
       entry: resolve(__dirname, "src/main.js"),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["jquery", "vue", "vue-i18n"],
+      external: [
+        "jquery",
+        "vue",
+        "vue-i18n",
+        "xwiki-platform-localization-webjar",
+      ],
       output: {
         globals: {
           vue: "Vue",

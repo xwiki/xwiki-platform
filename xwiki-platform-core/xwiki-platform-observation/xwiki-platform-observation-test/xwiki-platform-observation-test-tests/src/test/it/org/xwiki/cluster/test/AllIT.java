@@ -66,7 +66,7 @@ public class AllIT
         builder.append(" -Djgroups.bind_addr=localhost");
 
         // Set a custom cluster id
-        builder.append(" -Dxconf.xwikiproperties.observation.remote.id=" + executor.getPort());
+        builder.append(" -Dxconf.xwikiproperties.observation.remote.id=" + executor.getBrowserPort());
 
         // Enable and setup event distribution
         builder.append(" -Dxconf.xwikiproperties.observation.remote.enabled=true");

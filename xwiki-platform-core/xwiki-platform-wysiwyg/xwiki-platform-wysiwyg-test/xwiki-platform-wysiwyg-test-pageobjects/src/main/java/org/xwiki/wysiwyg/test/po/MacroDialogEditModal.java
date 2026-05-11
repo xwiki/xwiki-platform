@@ -32,16 +32,28 @@ import org.xwiki.test.ui.po.BaseElement;
 public class MacroDialogEditModal extends BaseElement
 {
     /**
+     * We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+     */
+    private static final By MACRO_NAME = By.cssSelector("[class*=-editor-modal] .macro-name");
+
+    /**
      * Wait until the macro selection edition is loaded.
      *
      * @return the current page object
      */
     public MacroDialogEditModal waitUntilReady()
     {
-        getDriver().waitUntilElementIsVisible(
-            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .macro-name"));
+        getDriver().waitUntilElementIsVisible(MACRO_NAME);
         return this;
+    }
+
+    /**
+     * @return the name of the macro being edited
+     * @since 18.3.0RC1
+     */
+    public String getMacroName()
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(MACRO_NAME).getText();
     }
 
     /**
@@ -63,6 +75,7 @@ public class MacroDialogEditModal extends BaseElement
 
     /**
      * Check or uncheck the checkbox parameter.
+     * 
      * @param name the name of the parameter.
      * @param value the value to give.
      * @return this modal
@@ -162,5 +175,17 @@ public class MacroDialogEditModal extends BaseElement
         getDriver().findElement(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
             By.cssSelector("[class*=-editor-modal] .modal-footer button[data-dismiss='modal']")).click();
+    }
+
+    /**
+     * Click on the "Change Macro" button to open the macro selection modal.
+     * 
+     * @return the macro selection modal
+     * @since 18.3.0RC1
+     */
+    public MacroDialogSelectModal clickChangeMacro()
+    {
+        getDriver().findElement(By.xpath("//*[contains(@class, '-editor-modal')]//button[. = 'Change Macro']")).click();
+        return new MacroDialogSelectModal().waitUntilReady();
     }
 }

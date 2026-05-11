@@ -63,7 +63,7 @@ class ExpressionNodeToEventQueryConverterTest
 
         assertEquals(2, query.getConditions().size());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "typevalue", CompareType.EQUALS),
-            query.getConditions().get(0));
+            query.getConditions().getFirst());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_APPLICATION, "applicationvalue", CompareType.GREATER_OR_EQUALS),
             query.getConditions().get(1));
@@ -74,16 +74,16 @@ class ExpressionNodeToEventQueryConverterTest
         query = this.converter.parse(ornode);
 
         assertEquals(1, query.getConditions().size());
-        GroupQueryCondition group1 = (GroupQueryCondition) query.getConditions().get(0);
+        GroupQueryCondition group1 = (GroupQueryCondition) query.getConditions().getFirst();
         assertEquals(2, group1.getConditions().size());
         assertTrue(group1.isOr());
         assertEquals(new CompareQueryCondition(Event.FIELD_TITLE, "titlevalue", CompareType.LESS_OR_EQUALS),
-            group1.getConditions().get(0));
+            group1.getConditions().getFirst());
         GroupQueryCondition group12 = (GroupQueryCondition) group1.getConditions().get(1);
         assertEquals(2, group12.getConditions().size());
         assertFalse(group12.isOr());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "typevalue", CompareType.EQUALS),
-            group12.getConditions().get(0));
+            group12.getConditions().getFirst());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_APPLICATION, "applicationvalue", CompareType.GREATER_OR_EQUALS),
             group12.getConditions().get(1));

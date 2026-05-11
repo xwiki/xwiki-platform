@@ -28,14 +28,15 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -75,7 +76,8 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
     }
 
     @Test
-    void addEvent() throws IllegalAccessException, NotificationException
+    void addEvent()
+        throws IllegalAccessException, ComponentLifecycleException, InitializationException
     {
         // Force a very short grace period so that the test does not take 1 minute
         FieldUtils.writeField(this.dispatcher, "grace", 100, true);
@@ -133,10 +135,19 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         verifySendMailsCalled(events);
     }
 
+    private void resetDispatcher() throws ComponentLifecycleException, InitializationException, IllegalAccessException
+    {
+        this.dispatcher.dispose();
+        this.dispatcher.initialize();
+        FieldUtils.writeField(this.dispatcher, "grace", 100, true);
+    }
+
     private void verifySendMailsCalled(Map<DocumentReference, List<Event>> events)
+        throws ComponentLifecycleException, InitializationException, IllegalAccessException
     {
         // Wait until the sendMails() method is called with the right parameters or until it times out.
         // We need the wait because there's the grace period and processing the event can also take some time.
         verify(this.sender, timeout(5000).times(1)).sendMails(events);
+        resetDispatcher();
     }
 }

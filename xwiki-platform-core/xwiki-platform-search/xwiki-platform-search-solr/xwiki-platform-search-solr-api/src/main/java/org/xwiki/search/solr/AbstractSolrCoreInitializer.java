@@ -152,9 +152,16 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_17_10_1 = 171001000;
 
     /**
+     * The base schema version for XWiki 17.10.9.
+     *
+     * @since 17.10.9
+     */
+    public static final long SCHEMA_VERSION_17_10_9 = 171009000;
+
+    /**
      * The base schema version.
      */
-    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_10;
+    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_17_10_9;
 
     /**
      * The name of the attribute containing the name of the Solr field.
@@ -576,7 +583,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         for (String fieldName : sourceDocument.getFieldNames()) {
             // Fix special fields:
             // * _version_: internal Solr field used for atomic updates
-            if (!fieldName.equals("_version_")) {
+            if (!"_version_".equals(fieldName)) {
                 targetDocument.setField(fieldName, sourceDocument.getFieldValue(fieldName));
             }
         }

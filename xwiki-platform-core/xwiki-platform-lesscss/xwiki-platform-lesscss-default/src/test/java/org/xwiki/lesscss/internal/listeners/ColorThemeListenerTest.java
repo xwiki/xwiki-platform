@@ -20,12 +20,9 @@
 package org.xwiki.lesscss.internal.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -39,13 +36,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -54,48 +52,43 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.lesscss.internal.listeners.ColorThemeListener}.
  *
- * @since 6.3M2
  * @version $Id$
+ * @since 6.3M2
  */
-public class ColorThemeListenerTest
+@ComponentTest
+class ColorThemeListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ColorThemeListener> mocker =
-            new MockitoComponentMockingRule<>(ColorThemeListener.class);
+    @InjectMockComponents
+    private ColorThemeListener colorThemeListener;
 
+    @MockComponent
     private LESSResourcesCache lessResourcesCache;
 
+    @MockComponent
     private ColorThemeCache colorThemeCache;
 
+    @MockComponent
     private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void getName()
     {
-        lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
-        colorThemeCache = mocker.getInstance(ColorThemeCache.class);
-        colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
+        assertEquals("LESS Color Theme Listener", this.colorThemeListener.getName());
     }
 
     @Test
-    public void getName() throws Exception
+    void getEvents()
     {
-        assertEquals("LESS Color Theme Listener", mocker.getComponentUnderTest().getName());
+        List<Event> eventsToObserve = List.of(
+            new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent());
+
+        assertEquals(eventsToObserve, this.colorThemeListener.getEvents());
     }
 
     @Test
-    public void getEvents() throws Exception
-    {
-        List<Event> eventsToObserve = Arrays.<Event>asList(
-                new DocumentCreatedEvent(),
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent());
-
-        assertEquals(eventsToObserve, mocker.getComponentUnderTest().getEvents());
-    }
-
-    @Test
-    public void onEventWhenFlamingoThemeChanged() throws Exception
+    void onEventWhenFlamingoThemeChanged()
     {
         // Mocks
         Event event = mock(Event.class);
@@ -112,18 +105,18 @@ public class ColorThemeListenerTest
         when(doc.getDocumentReference()).thenReturn(documentReference);
 
         ColorThemeReference colorThemeReference = new DocumentColorThemeReference(documentReference, null);
-        when(colorThemeReferenceFactory.createReference(eq(documentReference))).thenReturn(colorThemeReference);
+        when(this.colorThemeReferenceFactory.createReference(documentReference)).thenReturn(colorThemeReference);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, doc, data);
+        this.colorThemeListener.onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromColorTheme(colorThemeReference);
-        verify(colorThemeCache).clearFromColorTheme(colorThemeReference);
+        verify(this.lessResourcesCache).clearFromColorTheme(colorThemeReference);
+        verify(this.colorThemeCache).clearFromColorTheme(colorThemeReference);
     }
 
     @Test
-    public void onEventWhenColorThemeChanged() throws Exception
+    void onEventWhenColorThemeChanged()
     {
         // Mocks
         Event event = mock(Event.class);
@@ -140,18 +133,18 @@ public class ColorThemeListenerTest
         when(doc.getDocumentReference()).thenReturn(documentReference);
 
         ColorThemeReference colorThemeReference = new DocumentColorThemeReference(documentReference, null);
-        when(colorThemeReferenceFactory.createReference(eq(documentReference))).thenReturn(colorThemeReference);
+        when(this.colorThemeReferenceFactory.createReference(documentReference)).thenReturn(colorThemeReference);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, doc, data);
+        this.colorThemeListener.onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromColorTheme(colorThemeReference);
-        verify(colorThemeCache).clearFromColorTheme(colorThemeReference);
+        verify(this.lessResourcesCache).clearFromColorTheme(colorThemeReference);
+        verify(this.colorThemeCache).clearFromColorTheme(colorThemeReference);
     }
 
     @Test
-    public void onEventWhenNoObject() throws Exception
+    void onEventWhenNoObject()
     {
         // Mocks
         Event event = mock(Event.class);
@@ -159,15 +152,15 @@ public class ColorThemeListenerTest
         Object data = new Object();
 
         EntityReference classReference = new EntityReference("ColorThemeClass", EntityType.DOCUMENT,
-                new EntityReference("ColorThemes", EntityType.SPACE));
+            new EntityReference("ColorThemes", EntityType.SPACE));
         List<BaseObject> objects = new ArrayList<>();
         when(doc.getXObjects(classReference)).thenReturn(objects);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, doc, data);
+        this.colorThemeListener.onEvent(event, doc, data);
 
         // Verify
-        verifyNoInteractions(lessResourcesCache);
-        verifyNoInteractions(colorThemeCache);
+        verifyNoInteractions(this.lessResourcesCache);
+        verifyNoInteractions(this.colorThemeCache);
     }
 }

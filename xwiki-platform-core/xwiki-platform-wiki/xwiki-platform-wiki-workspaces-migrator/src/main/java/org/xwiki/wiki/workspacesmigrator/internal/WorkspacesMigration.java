@@ -119,7 +119,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
 
         // In the first version of the Workspace Application, workspacetemplate did not have the workspace object.
         // We test for the existence of XWiki.ManageWorkspace just to be sure that the workspacetemplate is a workspace.
-        return wikiId.equals("workspacetemplate") && xwiki.exists(new DocumentReference(wikiId,
+        return "workspacetemplate".equals(wikiId) && xwiki.exists(new DocumentReference(wikiId,
                 "XWiki", "ManageWorkspace"), context);
     }
 

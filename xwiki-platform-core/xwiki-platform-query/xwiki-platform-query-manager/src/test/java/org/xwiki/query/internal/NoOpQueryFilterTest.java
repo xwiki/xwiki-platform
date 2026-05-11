@@ -32,10 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @version $Id$
  * @since 5.1M2
  */
-public class NoOpQueryFilterTest
+class NoOpQueryFilterTest
 {
     @Test
-    public void verifyStatementAndResultsAreUnchanged()
+    void verifyStatementAndResultsAreUnchanged()
     {
         NoOpQueryFilter filter = new NoOpQueryFilter();
 

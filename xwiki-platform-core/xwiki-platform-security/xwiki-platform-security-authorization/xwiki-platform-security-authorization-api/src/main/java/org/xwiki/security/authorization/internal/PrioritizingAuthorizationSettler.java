@@ -176,7 +176,7 @@ public class PrioritizingAuthorizationSettler extends AbstractAuthorizationSettl
      */
     private int getPriority(GroupSecurityReference group)
     {
-        if (group.getName().equals("XWikiAllGroup")) {
+        if ("XWikiAllGroup".equals(group.getName())) {
             return ALL_GROUP_PRIORITY;
         } else {
             return ALL_GROUP_PRIORITY + 1;

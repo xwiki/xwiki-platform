@@ -92,7 +92,7 @@ public class PasswordClass extends StringClass
     @Override
     public BaseProperty fromString(String value) throws XWikiException
     {
-        if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
+        if (FORM_PASSWORD_PLACEHODLER.equals(value)) {
             return null;
         }
         BaseProperty property = newProperty();
@@ -152,7 +152,7 @@ public class PasswordClass extends StringClass
             Object value = st.getValue();
             if (value != null) {
                 String type = value.toString().trim();
-                if (!type.equals("")) {
+                if (!type.isEmpty()) {
                     return type;
                 }
             }
@@ -175,7 +175,7 @@ public class PasswordClass extends StringClass
     public String getHashAlgorithm()
     {
         BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
-        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().equals("")) {
+        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().isEmpty()) {
             return alg.getValue().toString();
         }
         return DEFAULT_HASH_ALGORITHM;
@@ -241,7 +241,7 @@ public class PasswordClass extends StringClass
     {
         String storageType = getStorageType();
         String result = password;
-        if (storageType.equals(PasswordMetaClass.HASH)) {
+        if (PasswordMetaClass.HASH.equals(storageType)) {
             result = getPasswordHash(result);
         }
         return result;
@@ -304,7 +304,7 @@ public class PasswordClass extends StringClass
             sb.append(algorithmName);
             sb.append(SEPARATOR);
             // Backward compatibility concern : let's keep unsalted password the way they are.
-            if (!salt.equals("")) {
+            if (!salt.isEmpty()) {
                 sb.append(salt);
                 sb.append(SEPARATOR);
             }

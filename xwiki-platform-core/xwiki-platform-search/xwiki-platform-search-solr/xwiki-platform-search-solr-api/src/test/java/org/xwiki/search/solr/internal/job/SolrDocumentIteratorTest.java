@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal.job;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -120,15 +119,15 @@ class SolrDocumentIteratorTest
         when(this.configuration.getSynchronizationBatchSize()).thenReturn(limit);
 
         SolrDocumentList firstResults = new SolrDocumentList();
-        firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", 1, "1.3"));
-        firstResults.add(createSolrDocument("chess", Arrays.asList("M"), "N", "en", 2, "2.4"));
+        firstResults.add(createSolrDocument("chess", List.of("A", "B"), "C", "", 1, "1.3"));
+        firstResults.add(createSolrDocument("chess", List.of("M"), "N", "en", 2, "2.4"));
 
         QueryResponse firstResponse = mock(QueryResponse.class);
         when(firstResponse.getNextCursorMark()).thenReturn("foo");
         when(firstResponse.getResults()).thenReturn(firstResults);
 
         SolrDocumentList secondResults = new SolrDocumentList();
-        secondResults.add(createSolrDocument("tennis", Arrays.asList("X", "Y", "Z"), "V", "fr", 3, "1.1"));
+        secondResults.add(createSolrDocument("tennis", List.of("X", "Y", "Z"), "V", "fr", 3, "1.1"));
 
         QueryResponse secondResponse = mock(QueryResponse.class);
         when(secondResponse.getNextCursorMark()).thenReturn("bar");
@@ -151,11 +150,11 @@ class SolrDocumentIteratorTest
         verify(this.resolver).getQuery(rootReference);
 
         List<Pair<DocumentReference, DocumentIteratorEntry>> expectedResult = new ArrayList<>();
-        DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
+        DocumentReference documentReference = new DocumentReference("chess", List.of("A", "B"), "C");
         expectedResult.add(entry(documentReference, 1, "1.3"));
-        documentReference = new DocumentReference("chess", Arrays.asList("M"), "N", Locale.ENGLISH);
+        documentReference = new DocumentReference("chess", List.of("M"), "N", Locale.ENGLISH);
         expectedResult.add(entry(documentReference, 2, "2.4"));
-        documentReference = new DocumentReference("tennis", Arrays.asList("X", "Y", "Z"), "V", Locale.FRENCH);
+        documentReference = new DocumentReference("tennis", List.of("X", "Y", "Z"), "V", Locale.FRENCH);
         expectedResult.add(entry(documentReference, 3, "1.1"));
 
         assertEquals(expectedResult, actualResult);

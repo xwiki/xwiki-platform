@@ -144,8 +144,10 @@ class HeadingNameNamingCriterionTest
                 + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals(768,
-            this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())).toString().length());
+        when(this.docBridge.getLocalReferenceMaxLength()).thenReturn(769);
+        // 759 = 769 - length("test:Test:")
+        assertEquals(new DocumentReference("test", "Test", "a".repeat(759)),
+            this.namingCriterion.getDocumentReference(new XDOM(sectionBlock.getChildren())));
         // Test fallback operation
         assertEquals(new DocumentReference("test", "Test", "Test-1"), this.namingCriterion.getDocumentReference(xdom));
 

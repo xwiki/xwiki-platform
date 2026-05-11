@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentSplitter}.
- * 
+ *
  * @version $Id$
  * @since 2.1M1
  */
@@ -67,23 +67,31 @@ class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
 
     /**
      * Test basic document splitting.
-     * 
+     *
      * @throws Exception if it fails to parse the wiki syntax or if it fails to split the document
      */
     @Test
     void documentSplitting() throws Exception
     {
         // Create xwiki/2.0 document.
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("=Heading1=").append('\n');
-        buffer.append("Content").append('\n');
-        buffer.append("==Heading11==").append('\n');
-        buffer.append("Content").append('\n');
-        buffer.append("==Heading12==").append('\n');
-        buffer.append("Content").append('\n');
-        buffer.append("=Heading2=").append('\n');
-        buffer.append("Content").append('\n');
-        XDOM xdom = xwikiSyntaxParser.parse(new StringReader(buffer.toString()));
+        String buffer = """
+            =Heading1=
+            \
+            Content
+            \
+            ==Heading11==
+            \
+            Content
+            \
+            ==Heading12==
+            \
+            Content
+            \
+            =Heading2=
+            \
+            Content
+            """;
+        XDOM xdom = this.xwikiSyntaxParser.parse(new StringReader(buffer));
 
         // Create xdom office document.
         XDOMOfficeDocument officeDocument =
@@ -115,7 +123,7 @@ class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
 
         // Perform the split operation.
         OfficeDocumentSplitterParameters parameters = new OfficeDocumentSplitterParameters();
-        parameters.setHeadingLevelsToSplit(new int[] {1, 2, 3, 4, 5, 6});
+        parameters.setHeadingLevelsToSplit(new int[] { 1, 2, 3, 4, 5, 6 });
         parameters.setNamingCriterionHint("headingNames");
         parameters.setBaseDocumentReference(baseDocument);
         Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =

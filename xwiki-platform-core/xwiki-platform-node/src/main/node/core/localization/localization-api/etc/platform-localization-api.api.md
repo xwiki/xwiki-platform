@@ -8,6 +8,7 @@
 export type Query = string[] | {
     prefix?: string | undefined;
     keys: string[];
+    locale?: string;
 };
 
 // @beta

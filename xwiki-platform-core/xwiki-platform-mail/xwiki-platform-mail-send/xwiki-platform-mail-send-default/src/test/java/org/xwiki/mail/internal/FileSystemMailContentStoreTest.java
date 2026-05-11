@@ -44,6 +44,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
  * @since 6.4M3
  */
 @ComponentTest
-public class FileSystemMailContentStoreTest
+class FileSystemMailContentStoreTest
 {
     @XWikiTempDir
     private File tmpDir;
@@ -67,14 +68,14 @@ public class FileSystemMailContentStoreTest
     private FileSystemMailContentStore store;
 
     @BeforeComponent
-    public void registerMockComponents(MockitoComponentManager componentManager) throws Exception
+    void registerMockComponents(MockitoComponentManager componentManager) throws Exception
     {
         Environment environment = componentManager.registerMockComponent(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(this.tmpDir);
     }
 
     @Test
-    public void saveMessage() throws Exception
+    void saveMessage() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
 
@@ -95,7 +96,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void saveMessageWithCustomMessageId() throws Exception
+    void saveMessageWithCustomMessageId() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
         String mimeMessageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
@@ -117,7 +118,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void saveMessageWhenInstableCustomMessageID() throws Exception
+    void saveMessageWhenInstableCustomMessageID() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
         String mimeMessageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
@@ -139,7 +140,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void saveMessageThrowsMailStoreExceptionWhenError() throws Exception
+    void saveMessageThrowsMailStoreExceptionWhenError() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
@@ -158,7 +159,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void loadMessage() throws Exception
+    void loadMessage() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
@@ -189,7 +190,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void loadMessageThrowsMailStoreExceptionWhenError()
+    void loadMessageThrowsMailStoreExceptionWhenError()
     {
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
@@ -203,7 +204,7 @@ public class FileSystemMailContentStoreTest
     }
 
     @Test
-    public void deleteMessage() throws Exception
+    void deleteMessage() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
         String messageId = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
@@ -216,6 +217,6 @@ public class FileSystemMailContentStoreTest
 
         this.store.delete(batchId, messageId);
 
-        assertTrue(!messageFile.exists());
+        assertFalse(messageFile.exists());
     }
 }

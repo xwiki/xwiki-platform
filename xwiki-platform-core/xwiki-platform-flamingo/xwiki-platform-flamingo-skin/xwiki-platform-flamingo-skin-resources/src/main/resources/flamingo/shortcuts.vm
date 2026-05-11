@@ -82,9 +82,16 @@
   #end
   #if ("$!extraParams" != '')
     #set ($discard = $extraParams.put('viewer', $extraAnchor))
+    #if ("$!{request.rev}" != '')
+      #set ($discard = $extraParams.put('rev', $request.rev))
+    #end
     #set ($url = $doc.getURL('view', $escapetool.url($extraParams)))
   #else
-    #set ($url = $doc.getURL('view', "viewer=$escapetool.url($extraAnchor)"))
+    #set ($viewerParams = "viewer=$escapetool.url($extraAnchor)")
+    #if ("$!{request.rev}" != '')
+      #set ($viewerParams = "$viewerParams&rev=$escapetool.url($request.rev)")
+    #end
+    #set ($url = $doc.getURL('view', $viewerParams))
   #end
 
   #submenuitem($url, $extraText, $idHref, '', $glyphIcon)

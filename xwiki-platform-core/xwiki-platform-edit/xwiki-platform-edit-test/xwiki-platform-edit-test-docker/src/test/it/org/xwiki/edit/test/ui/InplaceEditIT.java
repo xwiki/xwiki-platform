@@ -38,10 +38,13 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,7 +58,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.10.6
  * @since 13.2RC1
  */
-@UITest
+@UITest(
+    extraJARs = {
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
+    },
+    resolveExtraJARs = true
+)
 class InplaceEditIT
 {
     @BeforeAll
@@ -101,6 +112,8 @@ class InplaceEditIT
         viewPage.setDocumentTitle("updated title");
         viewPage.cancel();
         assertEquals("test title", viewPage.getDocumentTitle());
+        // The "Edit" text comes from the section edit link.
+        assertEquals("before\nSection\nEdit\nafter", viewPage.getContent());
         assertTrue(viewPage.getPageURL().endsWith("/editInplace/#"), viewPage.getPageURL());
 
         // Save + Cancel
@@ -517,5 +530,38 @@ class InplaceEditIT
             + "#set($discard = $NULL)\n"
             + "{{/velocity}}", content);
         wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(9)
+    void editInplaceWithRequiredRightsEditWarning(TestUtils setup, TestReference testReference)
+    {
+        // Create a page as superadmin with a Velocity macro.
+        setup.loginAsSuperAdmin();
+        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}\nVelocity content\n{{/velocity}}", "");
+        assertEquals("Velocity content", viewPage.getContent());
+
+        // Login as alice and we should get a warning that editing the page may break things due to missing rights.
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.edit();
+
+        ForceEditLockModal forceEditLockModal = new ForceEditLockModal();
+        setup.getDriver().waitUntilCondition(driver -> forceEditLockModal.isDisplayed());
+        assertEquals("Warning", forceEditLockModal.getTitle());
+        assertThat(forceEditLockModal.getMessage(),
+            containsString(
+                "Editing this page may result in breakage because you are missing the following rights"));
+        forceEditLockModal.clickOk();
+
+        inplaceEditablePage.waitForInplaceEditor();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.sendKeys(Keys.END, Keys.ENTER, "Edited content");
+        inplaceEditablePage.saveAndView();
+
+        // We should have an error message that the Velocity macro failed to execute.
+        assertThat(inplaceEditablePage.getContent(), containsString(
+            "Failed to execute the [velocity] macro."));
     }
 }

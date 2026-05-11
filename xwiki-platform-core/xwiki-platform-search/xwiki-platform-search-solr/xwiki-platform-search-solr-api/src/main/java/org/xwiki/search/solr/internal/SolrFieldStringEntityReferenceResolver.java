@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -54,22 +53,18 @@ public class SolrFieldStringEntityReferenceResolver extends AbstractEntityRefere
     /**
      * Map defining ordered entity types of a proper reference chain for a given entity type.
      */
-    @SuppressWarnings("serial")
-    private static final Map<EntityType, EntityType[]> ENTITY_TYPES = new HashMap<EntityType, EntityType[]>()
-    {
-        {
-            put(EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
-                EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
-                EntityType.SPACE, EntityType.WIKI});
-        }
-    };
+    private static final Map<EntityType, EntityType[]> ENTITY_TYPES = Map.of(
+        EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI},
+        EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
+            EntityType.WIKI},
+        EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI},
+        EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
+            EntityType.WIKI},
+        EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
+            EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI},
+        EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
+            EntityType.SPACE, EntityType.WIKI}
+    );
 
     @Inject
     @Named("current")
@@ -78,7 +73,7 @@ public class SolrFieldStringEntityReferenceResolver extends AbstractEntityRefere
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        EntityType[] entityTypesForType = ENTITY_TYPES.get(type);
+        EntityType[] entityTypesForType = type != null ? ENTITY_TYPES.get(type) : null;
         if (entityTypesForType == null) {
             throw new RuntimeException("No parsing definition found for Entity Type [" + type + "]");
         }

@@ -19,6 +19,7 @@
  */
 import { AbstractStorage } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable } from "inversify";
+import type { XWikiMeta } from "../meta/XWikiMeta";
 import type {
   AttachmentsData,
   Logger,
@@ -36,7 +37,10 @@ export class XWikiStorage extends AbstractStorage {
       .whenNamed("XWiki");
   }
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(
+    @inject("Logger") logger: Logger,
+    @inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta,
+  ) {
     super(logger, "storage.components.xwikiStorage");
   }
 
@@ -76,7 +80,7 @@ export class XWikiStorage extends AbstractStorage {
   ): Promise<PageAttachment | undefined> {
     const attachments = await this.getAttachments(page);
     if (attachments) {
-      return attachments.attachments.filter((a) => a.reference == name)[0];
+      return attachments.attachments.find((a) => a.reference == name);
     }
   }
 
@@ -95,18 +99,58 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  public async saveAttachments(
+  public saveAttachments(
     page: string,
     files: File[],
   ): Promise<undefined | (undefined | string)[]> {
-    await Promise.all(files.map((file) => this.saveAttachment(page, file)));
-    return undefined;
+    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async saveAttachment(page: string, file: File): Promise<unknown> {
-    // TODO
-    throw new Error("Method not implemented.");
+  public async saveAttachment(
+    page: string,
+    file: File,
+  ): Promise<undefined | (undefined | string)> {
+    const uploadURL = this.getUploadURL(page, "filebrowser");
+    const response = await fetch(uploadURL, {
+      method: "POST",
+      body: this.getAttachmentUploadData(file),
+    });
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    const result = await response.json();
+    if (result.uploaded) {
+      return result.message.resourceReference.reference;
+    } else {
+      throw new Error(`Upload failed: ${result.error}`);
+    }
+  }
+
+  private getAttachmentUploadData(file: File): FormData {
+    const formData = new FormData();
+    formData.append("upload", file);
+    return formData;
+  }
+
+  private getUploadURL(page: string, initiator: string): string {
+    const documentReference = XWiki.Model.resolve(
+      page,
+      XWiki.EntityType.DOCUMENT,
+      XWiki.currentDocument.documentReference,
+    );
+    const language = document.documentElement.getAttribute("lang") || "";
+    return new XWiki.Document(documentReference).getURL(
+      "get",
+      new URLSearchParams({
+        sheet: "XWiki.WYSIWYG.FileUploader",
+        outputSyntax: "plain",
+        // The syntax and language are important especially when the upload request creates a new document.
+        syntax: XWiki.docsyntax,
+        language,
+        form_token: this.xwikiMeta.form_token,
+        initiator,
+      }),
+    );
   }
 
   public async delete(): Promise<{ success: boolean; error?: string }> {

@@ -19,16 +19,17 @@
  */
 package org.xwiki.lesscss.internal.listeners;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.lesscss.internal.LESSContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -40,53 +41,54 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.2RC1
  */
-public class LESSExportActionListenerTest
+@ComponentTest
+class LESSExportActionListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<LESSExportActionListener> mocker =
-        new MockitoComponentMockingRule<>(LESSExportActionListener.class);
+    @InjectMockComponents
+    private LESSExportActionListener lessExportActionListener;
+
+    @MockComponent
+    private LESSContext lessContext;
 
     @Test
-    public void getName() throws Exception
+    void getName()
     {
-        assertEquals("lessexport", this.mocker.getComponentUnderTest().getName());
+        assertEquals("lessexport", this.lessExportActionListener.getName());
     }
 
     @Test
-    public void getEvents() throws Exception
+    void getEvents()
     {
-        assertEquals(1, this.mocker.getComponentUnderTest().getEvents().size());
-        assertEquals(new ActionExecutingEvent("export"), this.mocker.getComponentUnderTest().getEvents().get(0));
+        assertEquals(1, this.lessExportActionListener.getEvents().size());
+        assertEquals(new ActionExecutingEvent("export"), this.lessExportActionListener.getEvents().get(0));
     }
 
     @Test
-    public void onEventWhenHTMLExport() throws Exception
+    void onEventWhenHTMLExport()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         XWikiRequest request = mock(XWikiRequest.class);
         when(xcontext.getRequest()).thenReturn(request);
         when(request.get("format")).thenReturn("html");
 
-        this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
+        this.lessExportActionListener.onEvent(new ActionExecutingEvent("export"), null, xcontext);
 
         // The test is here: we verify that the cache is disabled!
-        LESSContext lessContext = mocker.getInstance(LESSContext.class);
-        verify(lessContext).setHtmlExport(true);
+        verify(this.lessContext).setHtmlExport(true);
     }
 
     @Test
-    public void onEventWhenNonHTMLExport() throws Exception
+    void onEventWhenNonHTMLExport()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         XWikiRequest request = mock(XWikiRequest.class);
         when(xcontext.getRequest()).thenReturn(request);
         when(request.get("format")).thenReturn("xar");
 
-        this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
+        this.lessExportActionListener.onEvent(new ActionExecutingEvent("export"), null, xcontext);
 
         // The test is here: we verify that the we do not disable the LESS cache (since the export is not an HTML
         // export). Actually that the context object was not called at all...
-        LESSContext lessContext = mocker.getInstance(LESSContext.class);
-        verifyNoInteractions(lessContext);
+        verifyNoInteractions(this.lessContext);
     }
 }

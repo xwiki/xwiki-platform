@@ -1473,14 +1473,21 @@ public class RepositoryManager
 
     protected boolean update(BaseObject object, String fieldName, Object value) throws XWikiException
     {
-        // Make sure collection are lists
-        if (value instanceof Collection) {
-            if (!(value instanceof List)) {
-                value = new ArrayList<>((Collection) value);
+        // Get current value from the object
+        Object objectValue;
+        if (value instanceof Collection collection) {
+            // Make sure collection are lists
+            if (!(collection instanceof List)) {
+                value = new ArrayList<>(collection);
             }
+
+            objectValue = this.extensionStore.getValue(object, fieldName, Collections.emptyList());
+        } else {
+            objectValue = this.extensionStore.getValue(object, fieldName);
         }
 
-        if (ObjectUtils.notEqual(value, this.extensionStore.getValue(object, fieldName))) {
+        // Check if the value changed
+        if (ObjectUtils.notEqual(value, objectValue)) {
             object.set(fieldName, value, this.xcontextProvider.get());
 
             return true;

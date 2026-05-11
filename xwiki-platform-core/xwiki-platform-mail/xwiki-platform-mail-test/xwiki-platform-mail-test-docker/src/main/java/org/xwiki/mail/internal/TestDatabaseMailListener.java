@@ -49,7 +49,7 @@ public class TestDatabaseMailListener extends DatabaseMailListener
         super.onPrepareMessageSuccess(message, parameters);
         // This is a special case for the test. We want to make sure that the mail is not sent so that we can resend
         // it. Thus we raise an exception to make sure it's not sent to the sender thread.
-        if (counter == 0 && message.getType() != null && message.getType().equals("Test Not Sent")) {
+        if (counter == 0 && message.getType() != null && "Test Not Sent".equals(message.getType())) {
             counter++;
             throw new RuntimeException("Test Not Sent");
         }
@@ -59,7 +59,7 @@ public class TestDatabaseMailListener extends DatabaseMailListener
     public void onPrepareFatalError(Exception exception, Map<String, Object> parameters)
     {
         if (counter > 0 || StringUtils.isEmpty(exception.getMessage())
-            || !exception.getMessage().equals("Test Not Sent"))
+            || !"Test Not Sent".equals(exception.getMessage()))
         {
             super.onPrepareFatalError(exception, parameters);
         }

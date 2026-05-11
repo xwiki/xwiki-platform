@@ -24,36 +24,39 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.DefaultURLInputSource;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Validate {@link XWikiDocumentFilterUtils}.
  * 
  * @version $Id$
  */
+@OldcoreTest
 @XWikiDocumentFilterUtilsComponentList
 @ComponentList(ContextComponentManagerProvider.class)
-public class XWikiDocumentFilterUtilsTest
+class XWikiDocumentFilterUtilsTest
 {
-    public final MockitoComponentMockingRule<XWikiDocumentFilterUtils> mocker =
-        new MockitoComponentMockingRule<>(XWikiDocumentFilterUtils.class);
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Rule
-    public final MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.mocker);
+    @InjectMockComponents
+    private XWikiDocumentFilterUtils filterUtils;
 
     private void assertXML(Object entity, String resource) throws FilterException, IOException, ComponentLookupException
     {
@@ -66,12 +69,11 @@ public class XWikiDocumentFilterUtilsTest
 
         // Import
 
-        Object importedEntity =
-            this.mocker.getComponentUnderTest().importEntity(entity, new DefaultURLInputSource(url));
+        Object importedEntity = this.filterUtils.importEntity(entity, new DefaultURLInputSource(url));
 
         // Export
 
-        String actual = this.mocker.getComponentUnderTest().exportEntity(importedEntity);
+        String actual = this.filterUtils.exportEntity(importedEntity);
 
         // Validate
 
@@ -81,7 +83,7 @@ public class XWikiDocumentFilterUtilsTest
     // Tests
 
     @Test
-    public void class1() throws FilterException, IOException, ComponentLookupException
+    void class1() throws FilterException, IOException, ComponentLookupException
     {
         assertXML(BaseClass.class, "class1");
     }

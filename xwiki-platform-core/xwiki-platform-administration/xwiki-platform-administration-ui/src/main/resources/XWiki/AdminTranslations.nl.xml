@@ -138,7 +138,9 @@ XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specif
 ### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 ### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
 ### Missing: administration.section.users.deleteUser.newAuthor.script=script
-### Missing: admin.usersgroups.extensionrights=Extension Rights
+admin.usersgroups.extensionrights=Extension Rights
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
@@ -154,6 +156,10 @@ XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specif
 # Social category
 ### Missing: admin.social=Social
 ### Missing: admin.social.description=Configuration for social features.
+
+# Network category
+### Missing: admin.network=Network
+### Missing: admin.network.description=Network related features.
 
 # Configurable Class
 ### Missing: XWiki.ConfigurableClass_displayInSection=Display in section

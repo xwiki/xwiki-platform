@@ -19,10 +19,9 @@
  */
 package org.xwiki.blocknote.test.ui;
 
-import java.util.concurrent.Callable;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -33,6 +32,8 @@ import org.xwiki.test.ui.TestUtils;
  */
 abstract class AbstractBlockNoteIT
 {
+    public static final String XWIKI_ALIAS = "xwiki-alias";
+
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
@@ -47,9 +48,15 @@ abstract class AbstractBlockNoteIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup)
+    void afterEach(TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
-        setup.maybeLeaveEditMode();
+        // Handle the edit mode leave confirmation modal (when there are unsaved changes).
+        setup.getDriver().getWindowHandles().forEach(handle -> {
+            multiUserSetup.switchToBrowserTab(handle);
+            setup.maybeLeaveEditMode();
+        });
+
+        multiUserSetup.closeTabs();
     }
 
     protected void loginAsJohn(TestUtils setup)
@@ -57,14 +64,8 @@ abstract class AbstractBlockNoteIT
         setup.login("John", "pass");
     }
 
-    protected <T> T disableWCAG(TestUtils setup, Callable<T> testCode) throws Exception
+    protected void loginAsAlice(TestUtils setup)
     {
-        boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
-        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
-        try {
-            return testCode.call();
-        } finally {
-            setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
-        }
+        setup.createUserAndLogin("Alice", "pass", "editor", "Wysiwyg");
     }
 }

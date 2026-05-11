@@ -19,26 +19,28 @@
  */
 package org.xwiki.wiki.internal.provisioning;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -50,61 +52,58 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0M1
  */
-public class DefaultWikiProvisioningJobExecutorTest
+@ComponentTest
+class DefaultWikiProvisioningJobExecutorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiProvisioningJobExecutor> mocker =
-            new MockitoComponentMockingRule(DefaultWikiProvisioningJobExecutor.class);
+    @InjectMockComponents
+    private DefaultWikiProvisioningJobExecutor defaultWikiProvisioningJobExecutor;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private XWikiContext xcontext;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
-    public void createAndExecuteJob() throws Exception
+    void createAndExecuteJob() throws Exception
     {
         // Mocks
         WikiProvisioningJob provisioningJob = mock(WikiProvisioningJob.class);
-        mocker.registerComponent(Job.class, "wikiprovisioning.test", provisioningJob);
+        this.componentManager.registerComponent(Job.class, "wikiprovisioning.test", provisioningJob);
         ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
-        mocker.registerComponent(ExecutionContextManager.class, executionContextManager);
+        this.componentManager.registerComponent(ExecutionContextManager.class, executionContextManager);
         Execution execution = mock(Execution.class);
-        mocker.registerComponent(Execution.class, execution);
+        this.componentManager.registerComponent(Execution.class, execution);
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
-        when(xcontext.getUserReference()).thenReturn(user);
+        when(this.xcontext.getUserReference()).thenReturn(user);
 
         // Execute
-        WikiProvisioningJob job = mocker.getComponentUnderTest().createAndExecuteJob("wikiid", "wikiprovisioning.test",
-                "templateid");
+        WikiProvisioningJob job = this.defaultWikiProvisioningJobExecutor.createAndExecuteJob("wikiid",
+            "wikiprovisioning.test", "templateid");
 
         // Verify
         // Id of the job.
-        List<String> jobId = new ArrayList<String>();
-        jobId.add("wiki");
-        jobId.add("provisioning");
-        jobId.add("wikiprovisioning.test");
-        jobId.add("wikiid");
+        List<String> jobId = List.of("wiki", "provisioning", "wikiprovisioning.test", "wikiid");
         verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid", user)));
         Thread.sleep(100);
         verify(provisioningJob).run();
 
         // getJobs also works
-        assertEquals(mocker.getComponentUnderTest().getJob(jobId), job);
+        assertEquals(this.defaultWikiProvisioningJobExecutor.getJob(jobId), job);
     }
 
     @Test
-    public void getJobWhenNoJob() throws Exception
+    void getJobWhenNoJob() throws Exception
     {
-        List<String> jobId = new ArrayList<String>();
-        assertNull(mocker.getComponentUnderTest().getJob(jobId));
+        assertNull(this.defaultWikiProvisioningJobExecutor.getJob(List.of()));
     }
-
 }

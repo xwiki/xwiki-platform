@@ -275,37 +275,9 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     private void addRefererStats(XWikiDocument doc, XWikiContext context)
     {
         String referer = StatsUtil.getReferer(context);
-        if ((referer != null) && (!referer.equals(""))) {
+        if ((referer != null) && (!referer.isEmpty())) {
             add(new RefererStatsStoreItem(doc.getFullName(), new Date(), StatsUtil.PeriodType.MONTH, referer, context));
         }
     }
 }
 
-/**
- * Item used to stop the statistics storing.
- *
- * @version $Id$
- */
-class StopStatsRegisterObject implements XWikiStatsStoreItem
-{
-    @Override
-    public String getId()
-    {
-        return null;
-    }
-
-    @Override
-    public void store(List<XWikiStatsStoreItem> register)
-    {
-    }
-}
-
-/**
- * Used to order stopping storing thread.
- *
- * @version $Id$
- */
-class StopStatsStoreException extends Exception
-{
-
-}

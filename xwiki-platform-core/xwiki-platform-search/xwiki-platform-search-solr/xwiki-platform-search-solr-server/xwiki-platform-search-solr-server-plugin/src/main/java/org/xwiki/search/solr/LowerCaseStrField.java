@@ -39,8 +39,8 @@ public class LowerCaseStrField extends StrField
     {
         // Transform the value here, too, to ensure that the value is in lowercase also when stored as doc value.
         Object val;
-        if (value instanceof String inputString) {
-            val = toInternal(inputString);
+        if (value instanceof String) {
+            val = toInternal((String) value);
         } else {
             val = value;
         }

@@ -35,7 +35,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 <div id="_attachments" class="attachments">
 #template("attachmentslist.vm")
 </div> ## attachments
-#if($hasEdit || $hasAdmin)
+#if(($hasEdit || $hasAdmin) && "$!{request.rev}" == '')
   <form class="xform" action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>
   ## CSRF prevention

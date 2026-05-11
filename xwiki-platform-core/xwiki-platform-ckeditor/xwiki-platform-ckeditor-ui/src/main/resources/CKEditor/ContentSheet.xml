@@ -63,7 +63,7 @@
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
       ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the
-      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
+      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in htmlheader.vm
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
         $services.rendering.render($uix.execute(), 'xhtml/1.0')
       #end

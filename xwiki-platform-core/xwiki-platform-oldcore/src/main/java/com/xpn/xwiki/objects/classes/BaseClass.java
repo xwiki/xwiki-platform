@@ -1451,7 +1451,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 

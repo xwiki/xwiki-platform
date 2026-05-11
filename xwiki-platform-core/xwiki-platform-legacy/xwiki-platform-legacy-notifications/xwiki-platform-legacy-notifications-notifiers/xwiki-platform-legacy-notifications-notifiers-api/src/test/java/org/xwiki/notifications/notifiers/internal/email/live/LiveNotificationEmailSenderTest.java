@@ -19,18 +19,18 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,48 +45,33 @@ import static org.mockito.Mockito.when;
  * @since 9.6RC1
  * @version $Id$
  */
-public class LiveNotificationEmailSenderTest
+@ComponentTest
+class LiveNotificationEmailSenderTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<LiveNotificationEmailSender> mocker =
-            new MockitoComponentMockingRule<>(LiveNotificationEmailSender.class);
+    @InjectMockComponents
+    private LiveNotificationEmailSender sender;
 
+    @MockComponent
     private MailSender mailSender;
 
+    @MockComponent
     private SessionFactory sessionFactory;
 
+    @MockComponent
+    @Named("database")
     private Provider<MailListener> mailListenerProvider;
 
+    @MockComponent
     private Provider<NotificationUserIterator> notificationUserIteratorProvider;
 
+    @MockComponent
     private Provider<LiveMimeMessageIterator> liveMimeMessageIteratorProvider;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.mailSender = this.mocker.registerMockComponent(MailSender.class);
-
-        this.sessionFactory = this.mocker.registerMockComponent(SessionFactory.class);
-
-        this.mailListenerProvider = this.mocker.registerMockComponent(Provider.class, "database");
-
-        this.notificationUserIteratorProvider = mock(Provider.class);
-        this.mocker.registerComponent(
-                new DefaultParameterizedType(null, Provider.class, NotificationUserIterator.class),
-                this.notificationUserIteratorProvider);
-
-        this.liveMimeMessageIteratorProvider = mock(Provider.class);
-        this.mocker.registerComponent(
-                new DefaultParameterizedType(null, Provider.class, LiveMimeMessageIterator.class),
-                this.liveMimeMessageIteratorProvider);
-
-        this.wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
-    }
-
     @Test
-    public void testSendMail() throws Exception
+    void sendMail() throws Exception
     {
         CompositeEvent event1 = mock(CompositeEvent.class);
 
@@ -100,7 +85,7 @@ public class LiveNotificationEmailSenderTest
 
         when(this.mailListenerProvider.get()).thenReturn(mock(MailListener.class));
 
-        this.mocker.getComponentUnderTest().sendEmails(event1);
+        this.sender.sendEmails(event1);
 
         verify(this.mailSender, times(1)).sendAsynchronously(
                 any(LiveMimeMessageIterator.class), any(), any(MailListener.class));

@@ -78,8 +78,8 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
 
         // Create a clean test page.
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
     }
 
     @Override
@@ -116,13 +116,13 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         // Clean the wiki for further tests: WikisResourceTest use a list of attachments and might fail
         // if we don't clean here.
         DocumentReference documentReference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
-        this.testUtils.deleteAttachement(documentReference, "my attach.txt");
-        this.testUtils.deleteAttachement(documentReference, "^caret.txt");
-        this.testUtils.deleteAttachement(documentReference, "#pound.txt");
-        this.testUtils.deleteAttachement(documentReference, "%percent.txt");
-        this.testUtils.deleteAttachement(documentReference, "{brace}.txt");
-        this.testUtils.deleteAttachement(documentReference, "[bracket].txt");
-        this.testUtils.deleteAttachement(documentReference, "plus+plus.txt");
+        getUtil().deleteAttachement(documentReference, "my attach.txt");
+        getUtil().deleteAttachement(documentReference, "^caret.txt");
+        getUtil().deleteAttachement(documentReference, "#pound.txt");
+        getUtil().deleteAttachement(documentReference, "%percent.txt");
+        getUtil().deleteAttachement(documentReference, "{brace}.txt");
+        getUtil().deleteAttachement(documentReference, "[bracket].txt");
+        getUtil().deleteAttachement(documentReference, "plus+plus.txt");
     }
 
     protected void putAttachmentFilename(String attachmentName) throws Exception
@@ -370,7 +370,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
             Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up
-            this.testUtils.deletePage(this.reference);
+            getUtil().deletePage(this.reference);
         }
     }
 
@@ -423,7 +423,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
             Assert.assertNotEquals(firstVersion, attachments.getAttachments().get(0).getVersion());
         } finally {
             // Clean up
-            this.testUtils.deletePage(this.reference);
+            getUtil().deletePage(this.reference);
         }
     }
 

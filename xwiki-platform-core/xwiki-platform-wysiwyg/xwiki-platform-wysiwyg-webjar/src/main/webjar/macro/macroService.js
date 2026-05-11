@@ -58,33 +58,30 @@ define('xwiki-wysiwyg-macro-service', [
     return deferred.promise();
   }
 
-  let getMacroParametersFromHTML = function (
+  let convertMacroParameters = async function (
     macroId,
     parameters = {},
-    sourceDocumentReference = XWiki.currentDocument.documentReference
+    sourceDocumentReference = XWiki.currentDocument.documentReference,
+    inputSyntax = undefined,
   ) {
-    let deferred = $.Deferred();
-    if (!Object.keys(parameters).length) {
-      return deferred.resolve(parameters);
-    } else {
+    if (Object.keys(parameters).length) {
       let url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
         language: $('html').attr('lang'),
         sheet: 'XWiki.WYSIWYG.MacroService',
       }));
-      $.post(url, {
+      parameters = await $.post(url, {
         data: 'macroParameters',
         macroId,
         macroParameters: JSON.stringify(parameters),
-      }).done(function (parameters) {
-        if (typeof parameters === 'object' && parameters !== null) {
-          deferred.resolve(parameters);
-        } else {
-          deferred.reject(...arguments);
-        }
-      }).fail(function (...args) {
-        deferred.reject(...args);
+        inputSyntax
       });
-      return deferred.promise();
+      if (typeof parameters === 'object' && parameters !== null) {
+        return parameters;
+      } else {
+        throw new Error('Unexpected conversion result: ' + JSON.stringify(parameters));
+      }
+    } else {
+      return parameters;
     }
   };
 
@@ -145,6 +142,6 @@ define('xwiki-wysiwyg-macro-service', [
     getMacroDescriptor,
     installMacro,
     getMacros,
-    getMacroParametersFromHTML
+    convertMacroParameters
   };
 });

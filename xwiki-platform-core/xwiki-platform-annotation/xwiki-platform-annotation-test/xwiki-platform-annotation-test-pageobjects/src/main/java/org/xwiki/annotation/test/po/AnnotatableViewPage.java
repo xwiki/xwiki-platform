@@ -270,7 +270,7 @@ public class AnnotatableViewPage extends BaseElement
     {
         WebElement body = getDriver().findElement(By.id("body"));
         String os = System.getProperty("os.name");
-        if (os.equals("Mac OS X")) {
+        if ("Mac OS X".equals(os)) {
             body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
         } else {
             body.sendKeys(Keys.chord(Keys.CONTROL, "m"));

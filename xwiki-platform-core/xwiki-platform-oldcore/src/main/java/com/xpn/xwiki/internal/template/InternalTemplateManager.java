@@ -51,8 +51,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheControl;
@@ -195,8 +195,6 @@ public class InternalTemplateManager implements Initializable, Disposable
 
     @Inject
     private Logger logger;
-
-    private String templateRootURL;
 
     private Cache<Template> templateCache;
 
@@ -596,8 +594,6 @@ public class InternalTemplateManager implements Initializable, Disposable
     @Override
     public void initialize() throws InitializationException
     {
-        getTemplateRootPath();
-
         // Initialize the filesystem template cache
         try {
             this.templateCache = this.cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
@@ -650,43 +646,9 @@ public class InternalTemplateManager implements Initializable, Disposable
         }
     }
 
-    private String getTemplateRootPath()
+    private boolean checkFilesystemTemplate(String prefixPath, String resourcePath)
     {
-        if (this.templateRootURL == null) {
-            URL url = this.environment.getResource(TEMPLATE_RESOURCE_SUFFIX);
-
-            if (url != null) {
-                this.templateRootURL = url.toString();
-            }
-        }
-
-        return this.templateRootURL;
-    }
-
-    private boolean checkFilesystemTemplate(String templatePath, boolean checkPathTraversal)
-    {
-        URL templateURL = this.environment.getResource(templatePath);
-
-        // Check if the resource exist
-        if (templateURL == null) {
-            return false;
-        }
-
-        if (checkPathTraversal) {
-            // Prevent inclusion of templates from other directories
-            String rootTemplate = getTemplateRootPath();
-            if (rootTemplate != null) {
-                String templateURLString = templateURL.toString();
-                if (!templateURLString.startsWith(getTemplateRootPath())) {
-                    this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
-                        templateURLString);
-
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return this.environment.getResource(prefixPath, resourcePath) != null;
     }
 
     private void renderError(Throwable throwable, boolean inline, Writer writer)
@@ -1025,13 +987,13 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         if (template != null) {
             // The template was cached already, so just check if the template file still exist
-            if (!checkFilesystemTemplate(templatePath, false)) {
+            if (!checkFilesystemTemplate(TEMPLATE_RESOURCE_SUFFIX, templateName)) {
                 // Force invalidating the cached template since it's not valid anymore
                 this.templateCache.remove(templateId);
 
                 return null;
             }
-        } else if (!checkFilesystemTemplate(templatePath, true)) {
+        } else if (!checkFilesystemTemplate(TEMPLATE_RESOURCE_SUFFIX, templateName)) {
             return null;
         }
 

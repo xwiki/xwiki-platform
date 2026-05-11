@@ -29,7 +29,6 @@ package org.xwiki.security.authorization.testwikibuilding;
  */
 public interface HasUsers
 {
-
     /**
      * @param name The username.
      */

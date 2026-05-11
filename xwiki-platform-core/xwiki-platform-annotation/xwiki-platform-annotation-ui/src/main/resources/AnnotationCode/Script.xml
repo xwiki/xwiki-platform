@@ -1915,7 +1915,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
   $(function() {
     // Load the annotations only in view mode, if the document content is displayed
     // (the document content is not displayed when viewer=history for instance).
-    if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
+    if (XWiki.contextaction != 'view' || !$('#xwikicontent')[0]) {
       return;
     }
 

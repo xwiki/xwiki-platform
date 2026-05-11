@@ -19,10 +19,13 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 /**
  * Represents the BlockNote rich text area.
@@ -66,6 +69,15 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * @return the HTML content of the rich text area
+     * @since 18.4.0RC1
+     */
+    public String getContent()
+    {
+        return this.container.getDomProperty("innerHTML");
+    }
+
+    /**
      * Clears the content of the rich text area.
      */
     public void clear()
@@ -78,7 +90,8 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public void click()
     {
-        this.container.click();
+        // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
+        getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
     }
 
     /**
@@ -115,5 +128,90 @@ public class BlockNoteRichTextArea extends BaseElement
     private void focus(WebElement element)
     {
         getDriver().executeScript("arguments[0].focus()", element);
+    }
+
+    /**
+     * Clicks on the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to click, starting from 0
+     * @since 18.3.0RC1
+     */
+    public void clickImage(int index)
+    {
+        // The image might not be loaded yet, so wait until it's clickable before clicking on it.
+        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
+        image.click();
+    }
+
+    /**
+     * Double clicks on the macro with the specified index in the rich text area to open the macro edit modal.
+     * 
+     * @param index the index of the macro to double click, starting from 0
+     * @return the opened macro edit modal
+     * @since 18.3.0RC1
+     */
+    public MacroDialogEditModal doubleClickMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        WebElement macro = this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
+            .get(index);
+        getDriver().createActions().doubleClick(macro).perform();
+        return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Waits until the rich text area contains the specified plain text.
+     * 
+     * @param textFragment the text fragment to wait for
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilTextContains(String textFragment)
+    {
+        getDriver().waitUntilCondition(driver -> Strings.CS.contains(getText(), textFragment));
+        return this;
+    }
+
+    /**
+     * Waits until the rich text area is focused. This is especially needed when switching between browser tabs because:
+     * <ul>
+     * <li>when a browser tab becomes inactive its active element gets blurred (loses the focus)</li>
+     * <li>when a browser tab becomes active its active element gets back the focus; however, this doesn't always happen
+     * instantly; moreover, besides the focus, the selection (caret position) also needs to be restored; if you try to
+     * send keys to the active element right after activating the tab they might be ignored</li>
+     * </ul>
+     * 
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilFocused()
+    {
+        // Wait for the rich text area to be focused for two consecutive ticks.
+        String script = """
+            const richTextArea = arguments[0];
+            const selectionContainer = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
+            const focused = document.visibilityState === 'visible'
+              && document.hasFocus()
+              && richTextArea.contains(document.activeElement)
+              && richTextArea.contains(selectionContainer);
+            if (focused) {
+              richTextArea.__focusCount = (richTextArea.__focusCount || 0) + 1;
+              if (richTextArea.__focusCount > 1) {
+                delete richTextArea.__focusCount;
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              delete richTextArea.__focusCount;
+              return false;
+            }
+            """;
+        getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
+        return this;
     }
 }

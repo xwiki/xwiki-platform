@@ -19,6 +19,8 @@
  */
 package org.xwiki.user.directory.test.ui;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -26,7 +28,13 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.directory.test.po.UserDirectoryPage;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -44,6 +52,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // displaying documents tagged with a given tag, where the Activity Stream for a tag is displayed too (and
         // Activity Stream is implemented with the Notifications feature).
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        "xwikiPropertiesAdditionalProperties=mail.general.obfuscate=true\n"
+            + "test.prchecker.excludePattern=.*:XWiki\\.UserDirectoryLivetableResults",
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
@@ -96,5 +106,33 @@ class UserDirectoryIT
             "Exception in macro #displayCheckedIfWatched called at",
             "Exception in macro #generateNotificationInput called at"
         );
+    }
+
+    @Test
+    void verifyLiveTableUserResults(TestUtils testUtils) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.createUser("UserDirectoryITUser", "foobar", null, "email", "foo@xwiki.com");
+        testUtils.forceGuestUser();
+
+        String jsonResult = testUtils.getString("/bin/get/XWiki/UserDirectoryLivetableResults", Map.of(
+            "outputSyntax", "plain",
+            "transprefix", "xe.userdirectory.",
+            "classname", "XWiki.XWikiUsers",
+            "collist", "doc.name,first_name,last_name,email,password",
+            "sort", "doc.creationDate"
+        ));
+        JsonNode jsonNode = new ObjectMapper().readTree(jsonResult);
+        assertInstanceOf(ObjectNode.class, jsonNode);
+        ObjectNode objectNode = (ObjectNode) jsonNode;
+        ArrayNode rows = (ArrayNode) objectNode.get("rows");
+        assertEquals(1, rows.size());
+
+        ObjectNode userCreated = (ObjectNode) rows.get(0);
+        assertEquals("XWiki.UserDirectoryITUser", userCreated.get("doc_fullName").asText());
+        assertEquals("********",  userCreated.get("password").asText().trim());
+        assertEquals("",  userCreated.get("password_value").asText().trim());
+        assertEquals("f...@xwiki.com",  userCreated.get("email").asText().trim());
+        assertEquals("f...@xwiki.com",  userCreated.get("email_value").asText().trim());
     }
 }

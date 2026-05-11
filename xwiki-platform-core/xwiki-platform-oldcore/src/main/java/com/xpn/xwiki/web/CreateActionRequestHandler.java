@@ -793,7 +793,7 @@ public class CreateActionRequestHandler
 
         // otherwise, check content and objects (only empty newline content allowed and no objects)
         String content = document.getContent();
-        if (!content.equals("\n") && !content.equals("") && !content.equals("\\\\")) {
+        if (!"\n".equals(content) && !"".equals(content) && !"\\\\".equals(content)) {
             return false;
         }
 

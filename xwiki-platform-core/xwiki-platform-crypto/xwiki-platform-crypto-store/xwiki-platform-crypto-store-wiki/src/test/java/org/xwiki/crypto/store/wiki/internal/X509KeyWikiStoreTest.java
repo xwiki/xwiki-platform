@@ -22,11 +22,11 @@ package org.xwiki.crypto.store.wiki.internal;
 import java.math.BigInteger;
 import java.util.Collections;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.crypto.AsymmetricKeyFactory;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.params.cipher.asymmetric.PrivateKeyParameters;
@@ -37,7 +37,6 @@ import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
 import org.xwiki.crypto.pkix.params.x509certificate.DistinguishedName;
 import org.xwiki.crypto.pkix.params.x509certificate.X509CertifiedPublicKey;
 import org.xwiki.crypto.pkix.params.x509certificate.extension.X509Extensions;
-import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.model.EntityType;
@@ -50,7 +49,9 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,10 +61,9 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceRes
 import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -75,13 +75,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
+@ComponentTest
 @ComponentList({
     CurrentReferenceDocumentReferenceResolver.class,
     CurrentReferenceEntityReferenceResolver.class,
     CurrentStringEntityReferenceResolver.class,
     DefaultSymbolScheme.class
 })
-public class X509KeyWikiStoreTest
+class X509KeyWikiStoreTest
 {
     private static final byte[] PASSWORD = "password".getBytes();
     private static final byte[] PRIVATEKEY = "privatekey".getBytes();
@@ -110,343 +111,379 @@ public class X509KeyWikiStoreTest
     private static final StoreReference DOC_STORE_REF = new WikiStoreReference(DOC_STORE_ENTREF);
     private static final StoreReference SPACE_STORE_REF = new WikiStoreReference(SPACE_STORE_ENTREF);
 
-    @Rule
-    public MockitoComponentMockingRule<KeyStore> mocker = new MockitoComponentMockingRule<>(X509KeyWikiStore.class);
+    @InjectMockComponents
+    private X509KeyWikiStore store;
+
+    @MockComponent
+    @Named("default")
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @MockComponent
+    @Named("current")
+    private EntityReferenceProvider currentEntityReferenceProvider;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    @Named("Base64")
+    private BinaryStringEncoder encoder;
+
+    @MockComponent
+    private AsymmetricKeyFactory keyFactory;
+
+    @MockComponent
+    private PrivateKeyPasswordBasedEncryptor encryptor;
+
+    @MockComponent
+    @Named("X509")
+    private CertificateFactory certificateFactory;
+
+    @MockComponent
+    private QueryManager queryManager;
 
     private XWikiContext xcontext;
+
     private XWiki xwiki;
 
     private Query query;
 
-    private KeyStore store;
+    private PrivateKeyParameters privateKey;
 
-    PrivateKeyParameters privateKey;
-    X509CertifiedPublicKey certificate;
-    CertifiedKeyPair keyPair;
+    private X509CertifiedPublicKey certificate;
 
-    @Before
-    public void setUp() throws Exception
+    private CertifiedKeyPair keyPair;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
-        this.mocker.registerMockComponent(EntityReferenceProvider.class, "default");
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(DOCUMENT_REFERENCE);
 
-        EntityReferenceProvider valueProvider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
-        when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
-        when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
-        when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
+        when(this.encoder.encode(PRIVATEKEY, 64)).thenReturn(ENCODED_PRIVATEKEY);
+        when(this.encoder.decode(ENCODED_PRIVATEKEY)).thenReturn(PRIVATEKEY);
+        when(this.encoder.encode(ENCRYPTED_PRIVATEKEY, 64)).thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
+        when(this.encoder.decode(ENCODED_ENCRYPTED_PRIVATEKEY)).thenReturn(ENCRYPTED_PRIVATEKEY);
+        when(this.encoder.encode(CERTIFICATE, 64)).thenReturn(ENCODED_CERTIFICATE);
+        when(this.encoder.decode(ENCODED_CERTIFICATE)).thenReturn(CERTIFICATE);
+        when(this.encoder.encode(SUBJECT_KEYID)).thenReturn(ENCODED_SUBJECTKEYID);
+        when(this.encoder.decode(ENCODED_SUBJECTKEYID)).thenReturn(SUBJECT_KEYID);
 
-        Provider<XWikiContext> xcontextProvider =
-            mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        this.privateKey = mock(PrivateKeyParameters.class);
+        when(this.privateKey.getEncoded()).thenReturn(PRIVATEKEY);
 
-        BinaryStringEncoder encoder = mocker.getInstance(BinaryStringEncoder.class, "Base64");
-        when(encoder.encode(PRIVATEKEY, 64)).thenReturn(ENCODED_PRIVATEKEY);
-        when(encoder.decode(ENCODED_PRIVATEKEY)).thenReturn(PRIVATEKEY);
-        when(encoder.encode(ENCRYPTED_PRIVATEKEY, 64)).thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
-        when(encoder.decode(ENCODED_ENCRYPTED_PRIVATEKEY)).thenReturn(ENCRYPTED_PRIVATEKEY);
-        when(encoder.encode(CERTIFICATE, 64)).thenReturn(ENCODED_CERTIFICATE);
-        when(encoder.decode(ENCODED_CERTIFICATE)).thenReturn(CERTIFICATE);
-        when(encoder.encode(SUBJECT_KEYID)).thenReturn(ENCODED_SUBJECTKEYID);
-        when(encoder.decode(ENCODED_SUBJECTKEYID)).thenReturn(SUBJECT_KEYID);
+        when(this.keyFactory.fromPKCS8(PRIVATEKEY)).thenReturn(this.privateKey);
 
-        privateKey = mock(PrivateKeyParameters.class);
-        when(privateKey.getEncoded()).thenReturn(PRIVATEKEY);
+        when(this.encryptor.encrypt(PASSWORD, this.privateKey)).thenReturn(ENCRYPTED_PRIVATEKEY);
+        when(this.encryptor.decrypt(PASSWORD, ENCRYPTED_PRIVATEKEY)).thenReturn(this.privateKey);
 
-        AsymmetricKeyFactory keyFactory = mocker.getInstance(AsymmetricKeyFactory.class);
-        when(keyFactory.fromPKCS8(PRIVATEKEY)).thenReturn(privateKey);
+        this.certificate = mock(X509CertifiedPublicKey.class);
+        when(this.certificate.getSerialNumber()).thenReturn(SERIAL);
+        when(this.certificate.getIssuer()).thenReturn(new DistinguishedName(ISSUER));
+        when(this.certificate.getSubject()).thenReturn(new DistinguishedName(SUBJECT));
+        when(this.certificate.getEncoded()).thenReturn(CERTIFICATE);
 
-        PrivateKeyPasswordBasedEncryptor encryptor = mocker.getInstance(PrivateKeyPasswordBasedEncryptor.class);
-        when(encryptor.encrypt(PASSWORD, privateKey)).thenReturn(ENCRYPTED_PRIVATEKEY);
-        when(encryptor.decrypt(PASSWORD, ENCRYPTED_PRIVATEKEY)).thenReturn(privateKey);
-
-        certificate = mock(X509CertifiedPublicKey.class);
-        when(certificate.getSerialNumber()).thenReturn(SERIAL);
-        when(certificate.getIssuer()).thenReturn(new DistinguishedName(ISSUER));
-        when(certificate.getSubject()).thenReturn(new DistinguishedName(SUBJECT));
-        when(certificate.getEncoded()).thenReturn(CERTIFICATE);
-
-        CertificateFactory certificateFactory = mocker.getInstance(CertificateFactory.class, "X509");
-        when(certificateFactory.decode(CERTIFICATE)).thenReturn(certificate);
+        when(this.certificateFactory.decode(CERTIFICATE)).thenReturn(this.certificate);
 
         X509Extensions extensions = mock(X509Extensions.class);
-        when(certificate.getExtensions()).thenReturn(extensions);
+        when(this.certificate.getExtensions()).thenReturn(extensions);
         when(extensions.getSubjectKeyIdentifier()).thenReturn(SUBJECT_KEYID);
-        when(certificate.getSubjectKeyIdentifier()).thenReturn(SUBJECT_KEYID);
+        when(this.certificate.getSubjectKeyIdentifier()).thenReturn(SUBJECT_KEYID);
 
-        keyPair = new CertifiedKeyPair(privateKey, certificate);
+        this.keyPair = new CertifiedKeyPair(this.privateKey, this.certificate);
 
-        QueryManager queryManager = mocker.getInstance(QueryManager.class);
-        query = mock(Query.class);
-        when(query.bindValue(any(String.class), any())).thenReturn(query);
-        when(query.setWiki(WIKI)).thenReturn(query);
-        when(queryManager.createQuery(any(String.class), any(String.class))).thenReturn(query);
-
-        store = mocker.getComponentUnderTest();
+        this.query = mock(Query.class);
+        when(this.query.bindValue(any(String.class), any())).thenReturn(this.query);
+        when(this.query.setWiki(WIKI)).thenReturn(this.query);
+        when(this.queryManager.createQuery(any(String.class), any(String.class))).thenReturn(this.query);
     }
 
     @Test
-    public void storingPrivateKeyToEmptyDocument() throws Exception
+    void storingPrivateKeyToEmptyDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, xcontext)).thenReturn(certObj);
+        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, this.xcontext)).thenReturn(certObj);
 
         BaseObject pkObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, xcontext)).thenReturn(pkObj);
+        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, this.xcontext)).thenReturn(pkObj);
 
-        store.store(DOC_STORE_REF, keyPair);
+        this.store.store(DOC_STORE_REF, this.keyPair);
 
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, ENCODED_SUBJECTKEYID);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, ISSUER);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, SERIAL.toString());
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SUBJECT, SUBJECT);
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
+            ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void storingPrivateKeyToCertificateDocument() throws Exception
+    void storingPrivateKeyToCertificateDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS, 0)).thenReturn(certObj);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space.document", 0}));
+        when(this.query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space.document", 0}));
 
         BaseObject pkObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, xcontext)).thenReturn(pkObj);
+        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, this.xcontext)).thenReturn(pkObj);
 
-        store.store(DOC_STORE_REF, keyPair);
+        this.store.store(DOC_STORE_REF, this.keyPair);
 
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
+            ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void storingPrivateKeyToEmptySpace() throws Exception
+    void storingPrivateKeyToEmptySpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), this.xcontext))
+            .thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, xcontext)).thenReturn(certObj);
+        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, this.xcontext)).thenReturn(certObj);
 
         BaseObject pkObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, xcontext)).thenReturn(pkObj);
+        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, this.xcontext)).thenReturn(pkObj);
 
-        store.store(SPACE_STORE_REF, keyPair);
+        this.store.store(SPACE_STORE_REF, this.keyPair);
 
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, ENCODED_SUBJECTKEYID);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, ISSUER);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, SERIAL.toString());
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SUBJECT, SUBJECT);
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
+            ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void storingPrivateKeyToCertificateSpace() throws Exception
+    void storingPrivateKeyToCertificateSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), this.xcontext))
+            .thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS, 0)).thenReturn(certObj);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
+        when(this.query.<Object[]>execute())
+            .thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
 
         BaseObject pkObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, xcontext)).thenReturn(pkObj);
+        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, this.xcontext)).thenReturn(pkObj);
 
-        store.store(SPACE_STORE_REF, keyPair);
+        this.store.store(SPACE_STORE_REF, this.keyPair);
 
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
+            ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void storingEncryptedPrivateKey() throws Exception
+    void storingEncryptedPrivateKey() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, xcontext)).thenReturn(certObj);
+        when(storeDoc.newXObject(X509CertificateWikiStore.CERTIFICATECLASS, this.xcontext)).thenReturn(certObj);
 
         BaseObject pkObj = mock(BaseObject.class);
-        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, xcontext)).thenReturn(pkObj);
+        when(storeDoc.newXObject(X509KeyWikiStore.PRIVATEKEYCLASS, this.xcontext)).thenReturn(pkObj);
 
-        store.store(DOC_STORE_REF, keyPair, PASSWORD);
+        this.store.store(DOC_STORE_REF, this.keyPair, PASSWORD);
 
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, ENCODED_SUBJECTKEYID);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, ISSUER);
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, SERIAL.toString());
         verify(certObj).setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SUBJECT, SUBJECT);
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(
+            X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_ENCRYPTED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void updatingPrivateKey() throws Exception
+    void updatingPrivateKey() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS, 0)).thenReturn(certObj);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space.document", 0}));
+        when(this.query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space.document", 0}));
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
 
-        store.store(DOC_STORE_REF, keyPair);
+        this.store.store(DOC_STORE_REF, this.keyPair);
 
-        verify(certObj).setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
+        verify(certObj).setLargeStringValue(
+            X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, ENCODED_CERTIFICATE);
         verify(pkObj).setLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, ENCODED_PRIVATEKEY);
 
-        verify(xwiki).saveDocument(storeDoc, xcontext);
+        verify(this.xwiki).saveDocument(storeDoc, this.xcontext);
     }
 
     @Test
-    public void retrievePrivateKeyFromDocument() throws Exception
+    void retrievePrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS)).thenReturn(certObj);
-        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE)).thenReturn(ENCODED_CERTIFICATE);
+        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE))
+            .thenReturn(ENCODED_CERTIFICATE);
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
         when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY)).thenReturn(ENCODED_PRIVATEKEY);
 
-        CertifiedKeyPair keyPair = store.retrieve(DOC_STORE_REF);
-        assertThat(keyPair, notNullValue());
-        assertThat(keyPair.getPrivateKey(), equalTo(privateKey));
-        assertThat(keyPair.getCertificate(), equalTo((CertifiedPublicKey) certificate));
+        CertifiedKeyPair ckp = this.store.retrieve(DOC_STORE_REF);
+        assertNotNull(ckp);
+        assertEquals(this.privateKey, ckp.getPrivateKey());
+        assertEquals(this.certificate, ckp.getCertificate());
     }
 
     @Test
-    public void retrieveEncryptedPrivateKeyFromDocument() throws Exception
+    void retrieveEncryptedPrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS)).thenReturn(certObj);
-        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE)).thenReturn(ENCODED_CERTIFICATE);
+        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE))
+            .thenReturn(ENCODED_CERTIFICATE);
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
-        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY)).thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
+        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY))
+            .thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
 
-        CertifiedKeyPair keyPair = store.retrieve(DOC_STORE_REF, PASSWORD);
-        assertThat(keyPair, notNullValue());
-        assertThat(keyPair.getPrivateKey(), equalTo(privateKey));
-        assertThat(keyPair.getCertificate(), equalTo((CertifiedPublicKey) certificate));
+        CertifiedKeyPair ckp = this.store.retrieve(DOC_STORE_REF, PASSWORD);
+        assertNotNull(ckp);
+        assertEquals(this.privateKey, ckp.getPrivateKey());
+        assertEquals((CertifiedPublicKey) this.certificate, ckp.getCertificate());
     }
 
     @Test
-    public void retrievePrivateKeyFromSpace() throws Exception
+    void retrievePrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), this.xcontext))
+            .thenReturn(storeDoc);
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
         when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY)).thenReturn(ENCODED_PRIVATEKEY);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
+        when(this.query.<Object[]>execute())
+            .thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
 
-        CertifiedKeyPair keyPair = store.retrieve(SPACE_STORE_REF, certificate);
-        assertThat(keyPair, notNullValue());
-        assertThat(keyPair.getPrivateKey(), equalTo(privateKey));
-        assertThat(keyPair.getCertificate(), equalTo((CertifiedPublicKey) certificate));
+        CertifiedKeyPair ckp = this.store.retrieve(SPACE_STORE_REF, this.certificate);
+        assertNotNull(ckp);
+        assertEquals(this.privateKey, ckp.getPrivateKey());
+        assertEquals(this.certificate, ckp.getCertificate());
     }
 
     @Test
-    public void retrieveEncryptedPrivateKeyFromSpace() throws Exception
+    void retrieveEncryptedPrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), this.xcontext))
+            .thenReturn(storeDoc);
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
-        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY)).thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
+        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY))
+            .thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
+        when(this.query.<Object[]>execute())
+            .thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
 
-        CertifiedKeyPair keyPair = store.retrieve(SPACE_STORE_REF, certificate, PASSWORD);
-        assertThat(keyPair, notNullValue());
-        assertThat(keyPair.getPrivateKey(), equalTo(privateKey));
-        assertThat(keyPair.getCertificate(), equalTo((CertifiedPublicKey) certificate));
+        CertifiedKeyPair ckp = this.store.retrieve(SPACE_STORE_REF, this.certificate, PASSWORD);
+        assertNotNull(ckp);
+        assertEquals(this.privateKey, ckp.getPrivateKey());
+        assertEquals(this.certificate, ckp.getCertificate());
     }
 
     @Test
-    public void retrieveMissingPrivateKeyFromDocument() throws Exception
+    void retrieveMissingPrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject certObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509CertificateWikiStore.CERTIFICATECLASS)).thenReturn(certObj);
-        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE)).thenReturn(ENCODED_CERTIFICATE);
+        when(certObj.getLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE))
+            .thenReturn(ENCODED_CERTIFICATE);
 
-        CertifiedKeyPair keyPair = store.retrieve(DOC_STORE_REF);
-        assertThat(keyPair, nullValue());
+        CertifiedKeyPair ckp = this.store.retrieve(DOC_STORE_REF);
+        assertNull(ckp);
     }
 
     @Test
-    public void retrieveMissingCertificateFromDocument() throws Exception
+    void retrieveMissingCertificateFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), this.xcontext)).thenReturn(storeDoc);
 
         BaseObject pkObj = mock(BaseObject.class);
         when(storeDoc.getXObject(X509KeyWikiStore.PRIVATEKEYCLASS)).thenReturn(pkObj);
-        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY)).thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
+        when(pkObj.getLargeStringValue(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY))
+            .thenReturn(ENCODED_ENCRYPTED_PRIVATEKEY);
 
-        CertifiedKeyPair keyPair = store.retrieve(DOC_STORE_REF);
-        assertThat(keyPair, nullValue());
+        CertifiedKeyPair ckp = this.store.retrieve(DOC_STORE_REF);
+        assertNull(ckp);
     }
 
     @Test
-    public void retrieveMissingPrivateKeyFromSpace() throws Exception
+    void retrieveMissingPrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
+        when(this.xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), this.xcontext))
+            .thenReturn(storeDoc);
 
-        when(query.<Object[]>execute()).thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
+        when(this.query.<Object[]>execute())
+            .thenReturn(Collections.singletonList(new Object[]{"space." + ENCODED_SUBJECTKEYID, 0}));
 
-        CertifiedKeyPair keyPair = store.retrieve(SPACE_STORE_REF, certificate);
-        assertThat(keyPair, nullValue());
+        CertifiedKeyPair ckp = this.store.retrieve(SPACE_STORE_REF, this.certificate);
+        assertNull(ckp);
     }
 
     @Test
-    public void retrieveMissingCertificateFromSpace() throws Exception
+    void retrieveMissingCertificateFromSpace() throws Exception
     {
-        CertifiedKeyPair keyPair = store.retrieve(SPACE_STORE_REF, certificate);
-        assertThat(keyPair, nullValue());
+        CertifiedKeyPair ckp = this.store.retrieve(SPACE_STORE_REF, this.certificate);
+        assertNull(ckp);
     }
-
 }

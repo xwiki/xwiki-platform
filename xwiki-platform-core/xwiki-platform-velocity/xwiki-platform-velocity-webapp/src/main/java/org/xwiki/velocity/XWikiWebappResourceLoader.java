@@ -83,7 +83,7 @@ public class XWikiWebappResourceLoader extends ResourceLoader
             this.rootPath = ((ServletEnvironment) this.environment).getServletContext().getRealPath(SLASH);
         } else {
             URL root = this.environment.getResource(SLASH);
-            if (root != null && root.getProtocol().equals("file")) {
+            if (root != null && "file".equals(root.getProtocol())) {
                 try {
                     this.rootPath = new File(root.toURI()).toString();
                 } catch (URISyntaxException e) {

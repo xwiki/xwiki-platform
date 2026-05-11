@@ -228,6 +228,27 @@ public class ObjectEditPane extends FormContainerElement
     }
 
     /**
+     * Click on the button for removing deprecated properties and wait for the warning box to disappear.
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public void clickRemoveDeprecatedProperties()
+    {
+        getDriver().findElementWithoutWaiting(this.getXobjectContainer(), By.className("syncProperties")).click();
+        getDriver().waitUntilElementDisappears(this.getXobjectContainer(), DEPRECATED_PROPERTIES_SELECTOR);
+    }
+
+    /**
+     * @return {@code true} if the pane has a warning box about deprecated properties.
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public boolean hasDeprecatedProperties()
+    {
+        return getDriver().hasElement(this.getXobjectContainer(), DEPRECATED_PROPERTIES_SELECTOR);
+    }
+
+    /**
      * Check if a given deprecated property value is obfuscated. Note that this method throws a
      * {@link NotFoundException} if the property is not among the list of deprecated properties.
      * @param propertyName the name of the property for which to check whether its value is obfuscated or not

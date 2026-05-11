@@ -38,14 +38,14 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
     {
         try {
             String notifpages = context.getWiki().getXWikiPreference("notification_pages", context);
-            if ((notifpages != null) && (!notifpages.equals(""))) {
+            if ((notifpages != null) && (!"".equals(notifpages))) {
                 String[] notifpages2 = StringUtils.split(notifpages, " ,");
                 for (int i = 0; i < notifpages2.length; i++) {
                     notifyPage(notifpages2[i], rule, doc, action, context);
                 }
             }
             String xnotif = (context.getRequest() != null) ? context.getRequest().getParameter("xnotification") : null;
-            if ((xnotif != null) && (!xnotif.equals(""))) {
+            if ((xnotif != null) && (!"".equals(xnotif))) {
                 notifyPage(xnotif, rule, doc, action, context);
             }
         } catch (Throwable e) {

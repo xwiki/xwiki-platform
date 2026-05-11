@@ -25,6 +25,11 @@ import type {
 } from "@xwiki/platform-localization-api";
 
 /**
+ * Combines a chain of translators into a full localizations resolvers. Translators are called in a chain. Only
+ * requested translations unresolved by the first translator are passed to the next one. The chaining stops either
+ * when all requested translation keys, or when the chain is exhausted. Unresolved keys at the end of the chain are
+ * returned as missed.
+ *
  * @param translators - the list of translators to combine to build a full resolver.
  * @since 18.3.0RC1
  * @beta

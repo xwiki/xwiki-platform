@@ -90,7 +90,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     private static final String CUSTOM_DISPLAY = "customDisplay";
     private static final String PRETTY_NAME = "prettyName";
     private static final String HINT = "hint";
-    private static final String NUMBER = "number";
+    private static final String NUMBER_FIELD = "number";
     private static final String TOOLTIP = "tooltip";
     private static final String CLASS_SUFFIX = "Class";
     private static final String UNMODIFIABLE = "unmodifiable";
@@ -433,7 +433,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
-                if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
+                if (CLASS_DISPLAYER_IDENTIFIER.equals(customDisplayer)) {
                     final String rawContent = getCustomDisplay();
                     XWikiDocument classDocument = getObject().getOwnerDocument();
                     final String classSyntax = classDocument.getSyntax().toIdString();
@@ -675,13 +675,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public int getNumber()
     {
-        return getIntValue(NUMBER);
+        return getIntValue(NUMBER_FIELD);
     }
 
     @Override
     public void setNumber(int number)
     {
-        setIntValue(NUMBER, number);
+        setIntValue(NUMBER_FIELD, number);
     }
 
     /**
@@ -909,7 +909,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public boolean validateProperty(BaseProperty property, XWikiContext context)
     {
         String regexp = getValidationRegExp();
-        if ((regexp == null) || (regexp.trim().equals(""))) {
+        if ((regexp == null) || (regexp.trim().isEmpty())) {
             return true;
         }
 

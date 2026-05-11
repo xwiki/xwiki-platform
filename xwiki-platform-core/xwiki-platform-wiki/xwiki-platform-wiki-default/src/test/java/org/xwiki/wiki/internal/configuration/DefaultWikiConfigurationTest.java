@@ -19,13 +19,15 @@
  */
 package org.xwiki.wiki.internal.configuration;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import javax.inject.Named;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,27 +36,23 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 5.4.4
  */
-public class DefaultWikiConfigurationTest
+@ComponentTest
+class DefaultWikiConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiConfiguration> mocker =
-            new MockitoComponentMockingRule(DefaultWikiConfiguration.class);
+    @InjectMockComponents
+    private DefaultWikiConfiguration defaultWikiConfiguration;
 
+    @MockComponent
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        configuration = mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-    }
-
     @Test
-    public void getAliasSuffix() throws Exception
+    void getAliasSuffix()
     {
-        when(configuration.getProperty("wiki.alias.suffix", "")).thenReturn("xwiki.org");
-        assertEquals("xwiki.org", mocker.getComponentUnderTest().getAliasSuffix());
+        when(this.configuration.getProperty("wiki.alias.suffix", "")).thenReturn("xwiki.org");
+        assertEquals("xwiki.org", this.defaultWikiConfiguration.getAliasSuffix());
 
-        when(configuration.getProperty("wiki.alias.suffix", "")).thenReturn("blabla.org");
-        assertEquals("blabla.org", mocker.getComponentUnderTest().getAliasSuffix());
+        when(this.configuration.getProperty("wiki.alias.suffix", "")).thenReturn("blabla.org");
+        assertEquals("blabla.org", this.defaultWikiConfiguration.getAliasSuffix());
     }
 }

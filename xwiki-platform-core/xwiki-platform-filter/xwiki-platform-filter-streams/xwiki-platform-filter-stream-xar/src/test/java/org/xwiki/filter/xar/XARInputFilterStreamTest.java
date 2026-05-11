@@ -26,10 +26,9 @@ import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.test.ExtensionPackager;
@@ -50,27 +49,32 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.AllLogRule;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ComponentTest
 @AllComponents
-public class XARInputFilterStreamTest
+class XARInputFilterStreamTest
 {
-    @Rule
-    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
-    @Rule
-    public AllLogRule allLogRule = new AllLogRule();
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private static final File FOLDER = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
 
     private static ExtensionPackager extensionPackager;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception
+    @BeforeAll
+    static void beforeAll() throws Exception
     {
         extensionPackager = new ExtensionPackager(null, FOLDER);
         extensionPackager.generateExtensions();
@@ -86,7 +90,8 @@ public class XARInputFilterStreamTest
         expected = StringUtils.removeStart(expected, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
 
         BeanInputFilterStreamFactory<XARInputProperties> inputFilterStreamFactory =
-            this.mocker.getInstance(InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
+            this.componentManager.getInstance(InputFilterStreamFactory.class,
+                FilterStreamType.XWIKI_XAR_CURRENT.serialize());
         InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(xarProperties);
 
         StringWriterOutputTarget writer = new StringWriterOutputTarget();
@@ -95,7 +100,8 @@ public class XARInputFilterStreamTest
         properties.setTarget(writer);
 
         BeanOutputFilterStreamFactory<FilterXMLOutputProperties> xmlOutputFilterStreamFactory =
-            this.mocker.getInstance(OutputFilterStreamFactory.class, FilterStreamType.FILTER_XML.serialize());
+            this.componentManager.getInstance(OutputFilterStreamFactory.class,
+                FilterStreamType.FILTER_XML.serialize());
         OutputFilterStream outputFilterStream = xmlOutputFilterStreamFactory.createOutputFilterStream(properties);
 
         inputFilterStream.read(outputFilterStream.getFilter());
@@ -103,11 +109,11 @@ public class XARInputFilterStreamTest
         inputFilterStream.close();
         outputFilterStream.close();
 
-        Assert.assertEquals(expected, writer.getBuffer().toString());
+        assertEquals(expected, writer.getBuffer().toString());
     }
 
     @Test
-    public void testSkipFirstDocument() throws FilterException, IOException, ComponentLookupException
+    void skipFirstDocument() throws FilterException, IOException, ComponentLookupException
     {
         XARInputProperties xarProperties = new XARInputProperties();
 
@@ -117,13 +123,13 @@ public class XARInputFilterStreamTest
         entities.includes(new LocalDocumentReference("space2", "page2"));
         xarProperties.setEntities(entities);
 
-        assertXML("testSkipFirstDocument", xarProperties);
+        assertXML("skipFirstDocument", xarProperties);
 
-        assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
+        assertTrue(this.logCapture.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
     }
 
     @Test
-    public void testSkipLastSpace() throws FilterException, IOException, ComponentLookupException
+    void skipLastSpace() throws FilterException, IOException, ComponentLookupException
     {
         XARInputProperties xarProperties = new XARInputProperties();
 
@@ -133,8 +139,8 @@ public class XARInputFilterStreamTest
         entities.excludes(new EntityReference("space2", EntityType.SPACE));
         xarProperties.setEntities(entities);
 
-        assertXML("testSkipLastSpace", xarProperties);
+        assertXML("skipLastSpace", xarProperties);
 
-        assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
+        assertTrue(this.logCapture.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
     }
 }

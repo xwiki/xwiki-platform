@@ -60,7 +60,6 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
     public WikiMacroBinding(MacroDescriptor descriptor, WikiMacroParameters parameters, String content,
         MacroTransformationContext transformationContext)
     {
-        super();
         setParameters(parameters);
         setDescriptor(descriptor);
         setContent(content);

@@ -40,4 +40,19 @@ class AllIT
     class NestedRoundTripIT extends RoundTripIT
     {
     }
+
+    @Nested
+    class NestedImageIT extends ImageIT
+    {
+    }
+
+    @Nested
+    class NestedMacroIT extends MacroIT
+    {
+    }
+
+    @Nested
+    class NestedCollaborationIT extends CollaborationIT
+    {
+    }
 }

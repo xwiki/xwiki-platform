@@ -19,7 +19,7 @@
  */
 package org.xwiki.mail.internal.configuration;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Named;
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.*;
  * @since 6.1M2
  */
 @ComponentTest
-public class DefaultMailSenderConfigurationTest
+class DefaultMailSenderConfigurationTest
 {
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -73,20 +73,20 @@ public class DefaultMailSenderConfigurationTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwiki");
         when(this.wikiDescriptorManager.isMainWiki("mainwiki")).thenReturn(true);
     }
 
     @Test
-    public void getFromAddressWhenNotConfigured()
+    void getFromAddressWhenNotConfigured()
     {
         assertNull(this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInXWikiProperties()
+    void getFromAddressWhenDefinedInXWikiProperties()
     {
         when(this.xwikiPropertiesSource.getProperty("mail.sender.from", String.class)).thenReturn("john@doe.com");
 
@@ -94,7 +94,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getFromAddressFromMailConfigDocumentInMainWiki()
+    void getFromAddressFromMailConfigDocumentInMainWiki()
     {
         when(this.mailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
 
@@ -102,7 +102,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getFromAddressFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
+    void getFromAddressFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -118,7 +118,7 @@ public class DefaultMailSenderConfigurationTest
      * the main wiki config).
      */
     @Test
-    public void getUsernameAndPasswordWhenNotDefinedAndHostModifiedInSubwiki()
+    void getUsernameAndPasswordWhenNotDefinedAndHostModifiedInSubwiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -135,7 +135,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getUsernameAndPasswordWhenNotDefinedInSubWikiButInMainWikiAndHostNotModifiedInSubwiki()
+    void getUsernameAndPasswordWhenNotDefinedInSubWikiButInMainWikiAndHostNotModifiedInSubwiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -153,7 +153,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getUsernameAndPasswordWhenNotDefinedInSubWikiButInPropertiesAndHostNotModifiedInSubwiki()
+    void getUsernameAndPasswordWhenNotDefinedInSubWikiButInPropertiesAndHostNotModifiedInSubwiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -169,7 +169,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getUsernameAndPasswordWhenDefinedInSubwiki()
+    void getUsernameAndPasswordWhenDefinedInSubwiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -185,7 +185,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getAdditionalPropertiesFromMailConfigDocumentInMainWiki()
+    void getAdditionalPropertiesFromMailConfigDocumentInMainWiki()
     {
         when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(
             "key1=value1\nkey2=value2");
@@ -196,7 +196,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getAdditionalPropertiesFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
+    void getAdditionalPropertiesFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -211,7 +211,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getAdditionalPropertiesFromXWikiProperties()
+    void getAdditionalPropertiesFromXWikiProperties()
     {
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
@@ -224,7 +224,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getAdditionalPropertiesWhenErrorInFormat()
+    void getAdditionalPropertiesWhenErrorInFormat()
     {
         when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn("\\uinvalid");
 
@@ -237,7 +237,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getAllProperties()
+    void getAllProperties()
     {
         when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(
             "mail.smtp.starttls.enable=true");
@@ -259,7 +259,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void usesAuthenticationWhenUserNameAndPasswordExist()
+    void usesAuthenticationWhenUserNameAndPasswordExist()
     {
         when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn("user");
         when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn("pass");
@@ -268,7 +268,7 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getPortFromXWikiPreferences()
+    void getPortFromXWikiPreferences()
     {
         when(this.mailConfigDocumentSource.getProperty("port", Integer.class)).thenReturn(25);
 
@@ -276,16 +276,16 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void getBCCAddressesFromMailConfig()
+    void getBCCAddressesFromMailConfig()
     {
         when(this.mailConfigDocumentSource.getProperty("bcc", String.class)).thenReturn("john@doe.com, mary@doe.com");
 
-        assertThat(Arrays.asList("john@doe.com", "mary@doe.com"),
+        assertThat(List.of("john@doe.com", "mary@doe.com"),
             containsInAnyOrder(this.configuration.getBCCAddresses().toArray()));
     }
 
     @Test
-    public void getPortWhenMailConfigDoesntExist()
+    void getPortWhenMailConfigDoesntExist()
     {
         when(this.xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
 

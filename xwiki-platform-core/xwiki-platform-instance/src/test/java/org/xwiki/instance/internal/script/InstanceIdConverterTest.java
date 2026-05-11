@@ -19,36 +19,36 @@
  */
 package org.xwiki.instance.internal.script;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.instance.InstanceId;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link InstanceIdConverter}.
  *
  * @version $Id$
  */
-public class InstanceIdConverterTest
+@ComponentTest
+class InstanceIdConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<InstanceIdConverter> mocker =
-        new MockitoComponentMockingRule<>(InstanceIdConverter.class);
+    @InjectMockComponents
+    private InstanceIdConverter converter;
 
     @Test
-    public void convertFromString() throws Exception
+    void convertFromString()
     {
         InstanceId id =
-            this.mocker.getComponentUnderTest().convertToType(InstanceId.class, "b6ad6165-daaf-41a1-8a3f-9aa81451c402");
+            this.converter.convertToType(InstanceId.class, "b6ad6165-daaf-41a1-8a3f-9aa81451c402");
         assertEquals("b6ad6165-daaf-41a1-8a3f-9aa81451c402", id.getInstanceId());
     }
 
     @Test
-    public void convertToString() throws Exception
+    void convertToString()
     {
         InstanceId id = new InstanceId("b6ad6165-daaf-41a1-8a3f-9aa81451c402");
-        assertEquals("b6ad6165-daaf-41a1-8a3f-9aa81451c402", this.mocker.getComponentUnderTest().convertToString(id));
+        assertEquals("b6ad6165-daaf-41a1-8a3f-9aa81451c402", this.converter.convertToString(id));
     }
 }

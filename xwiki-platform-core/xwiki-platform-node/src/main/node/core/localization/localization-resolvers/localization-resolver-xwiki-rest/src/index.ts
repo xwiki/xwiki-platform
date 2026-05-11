@@ -23,14 +23,14 @@ import type {
 } from "@xwiki/platform-localization-api";
 
 /**
+ * Initializes a translator that resolves translation keys by sending request to a XWiki REST endpoint.
+ *
  * @param target - the url of the rest endpoint to use to resolve translation
  * @since 18.3.0RC1
  * @beta
  */
 export function translatorFactory(target: string): Translator {
   const cache = {};
-  // TODO: move inflight requests here, prevent calling twice the same query at the same time
-  // and remove from the consumer.
   const inflightRequests = new Map<string, Promise<Translations>>();
   return {
     // eslint-disable-next-line max-statements
@@ -49,12 +49,16 @@ export function translatorFactory(target: string): Translator {
       const urlSearchParams = new URLSearchParams();
 
       const cacheKeys = Object.keys(cache);
+      const defaultLocale = () =>
+        document.documentElement.getAttribute("lang") ?? "en";
       if (Array.isArray(query)) {
         const cleanedQuery = query.filter((key) => !cacheKeys.includes(key));
 
         for (const arg of cleanedQuery) {
           urlSearchParams.append("key", arg);
         }
+
+        urlSearchParams.append("locale", defaultLocale());
       } else {
         const filteredKeys = query.keys.filter(
           (key) => !cacheKeys.includes((query.prefix ?? "") + key),
@@ -65,6 +69,11 @@ export function translatorFactory(target: string): Translator {
         }
         for (const arg of filteredKeys) {
           urlSearchParams.append("key", arg);
+        }
+        if (query.locale) {
+          urlSearchParams.append("locale", query.locale);
+        } else {
+          urlSearchParams.append("locale", defaultLocale());
         }
       }
 

@@ -68,6 +68,9 @@ public class CopyPage extends ViewPage
     @FindBy(xpath = "//input[@type='checkbox' and @name = 'terminal']")
     private WebElement terminalCheckbox;
 
+    @FindBy(xpath = "//input[@type='checkbox' and @name = 'deep']")
+    private WebElement deepCheckbox;
+
     /**
      * @return the breadcrumb that specified the location of the source document
      * @since 7.2M3
@@ -129,6 +132,28 @@ public class CopyPage extends ViewPage
     public boolean isTerminal()
     {
         return this.terminalCheckbox.isSelected();
+    }
+
+    /**
+     * @return {@code true} if the checkbox for preserving children during copy is checked.
+     * @since 17.4.0RC1
+     */
+    public boolean isDeepCopy()
+    {
+        return this.deepCheckbox.isSelected();
+    }
+
+    /**
+     * Sets whether children should be preserved during copy.
+     *
+     * @param deep {@code true} to preserve children, {@code false} otherwise
+     * @since 17.4.0RC1
+     */
+    public void setDeepCopy(boolean deep)
+    {
+        if (deep != isDeepCopy()) {
+            this.deepCheckbox.click();
+        }
     }
 
     /**

@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -48,6 +49,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -55,6 +58,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -712,6 +716,58 @@ class XWikiServletURLFactoryTest
         xwikiContext.setDoc(new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage")));
         URL url = this.urlFactory.createAttachmentURL("file", "space", "page", "download", null, xwikiContext);
         assertEquals("http://127.0.0.1/xwiki/bin/download/space/page/file", url.toString());
+    }
+
+    /**
+     * Verify that when viewing a translation revision whose version number does not exist in the main (default locale)
+     * document, the attachment is resolved from the main document revision that was current at the time the translation
+     * revision was created, rather than from the current main document. See XWIKI-24206.
+     */
+    @Test
+    void createAttachmentURLWhenViewRevAndRevisionNotInContextDoc() throws XWikiException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        xwikiContext.put("rev", "2.1");
+
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment currentAttachment = new XWikiAttachment(document, "file");
+        currentAttachment.setVersion("2.1");
+        document.setAttachment(currentAttachment);
+        xwikiContext.setDoc(document);
+
+        // Set up a translation document (tdoc) whose revision doesn't exist in the main document's archive.
+        XWikiDocument tdoc = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"),
+            Locale.GERMAN);
+        tdoc.setDate(new Date(5000));
+        xwikiContext.put("tdoc", tdoc);
+
+        // Simulate that revision "2.1" doesn't exist for the context (default locale) document.
+        doReturn(null).when(this.oldcore.getSpyXWiki()).getDocument(any(XWikiDocument.class), eq("2.1"),
+            any(XWikiContext.class));
+
+        // Set up the main document's archive with a historical revision at a date matching the translation revision.
+        XWikiDocumentArchive archive = mock(XWikiDocumentArchive.class);
+        XWikiRCSNodeInfo historicalNode = mock(XWikiRCSNodeInfo.class);
+        when(historicalNode.getDate()).thenReturn(new Date(3000));
+        when(historicalNode.getVersion()).thenReturn(new org.suigeneris.jrcs.rcs.Version(1, 1));
+        when(archive.getNodes()).thenReturn(java.util.List.of(historicalNode));
+        document.setDocumentArchive(archive);
+
+        // The historical revision has a different attachment version than the current one.
+        XWikiDocument historicalDoc = new XWikiDocument(
+            new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment historicalAttachment = new XWikiAttachment(historicalDoc, "file");
+        historicalAttachment.setVersion("1.1");
+        historicalDoc.setAttachment(historicalAttachment);
+        doReturn(historicalDoc).when(this.oldcore.getSpyXWiki()).getDocument(any(XWikiDocument.class), eq("1.1"),
+            any(XWikiContext.class));
+        doReturn(false).when(this.oldcore.getSpyXWiki()).hasAttachmentRecycleBin(any(XWikiContext.class));
+
+        // The attachment should be resolved from the historical revision (version 1.1), not from the current document
+        // (version 2.1).
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
+            xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/downloadrev/currentspace/currentpage/file?rev=1.1", url.toString());
     }
 
     @Test

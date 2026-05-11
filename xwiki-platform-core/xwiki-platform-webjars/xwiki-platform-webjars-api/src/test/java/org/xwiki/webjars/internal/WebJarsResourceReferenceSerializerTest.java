@@ -19,20 +19,21 @@
  */
 package org.xwiki.webjars.internal;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WebjarsResourceReferenceSerializer}.
@@ -40,29 +41,31 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 7.1M1
  */
-public class WebJarsResourceReferenceSerializerTest
+@ComponentTest
+class WebJarsResourceReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WebjarsResourceReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(WebjarsResourceReferenceSerializer.class);
+    @InjectMockComponents
+    private WebjarsResourceReferenceSerializer serializer;
+
+    @MockComponent
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> normalizer;
 
     @Test
-    public void serialize() throws Exception
+    void serialize() throws Exception
     {
-        URLNormalizer<ExtendedURL> normalizer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class), "contextpath");
         Map<String, List<String>> parameters = new HashMap<>();
-        parameters.put("key1", Arrays.asList("value1"));
-        parameters.put("key2", Arrays.asList("value2", "value3"));
-        ExtendedURL partialURL = new ExtendedURL(Arrays.asList("webjars", "namespace", "one", "two"), parameters);
+        parameters.put("key1", List.of("value1"));
+        parameters.put("key2", List.of("value2", "value3"));
+        ExtendedURL partialURL = new ExtendedURL(List.of("webjars", "namespace", "one", "two"), parameters);
         ExtendedURL expectedURL = new ExtendedURL(
-            Arrays.asList("xwiki", "webjars", "namespace", "one", "two"), parameters);
-        when(normalizer.normalize(partialURL)).thenReturn(expectedURL);
+            List.of("xwiki", "webjars", "namespace", "one", "two"), parameters);
+        when(this.normalizer.normalize(partialURL)).thenReturn(expectedURL);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
+        WebJarsResourceReference reference = new WebJarsResourceReference("namespace", List.of("one", "two"));
         reference.addParameter("key1", "value1");
         reference.addParameter("key2", new String[]{ "value2", "value3" });
 
-        assertEquals(expectedURL, this.mocker.getComponentUnderTest().serialize(reference));
+        assertEquals(expectedURL, this.serializer.serialize(reference));
     }
 }

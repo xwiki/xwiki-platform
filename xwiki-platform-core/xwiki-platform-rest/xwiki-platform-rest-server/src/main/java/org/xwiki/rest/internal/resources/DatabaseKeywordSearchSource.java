@@ -175,8 +175,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             String addColumn = "";
             if (!StringUtils.isBlank(orderField)) {
                 addColumn =
-                    (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
-                        .equals("space")) ? "" : ", doc." + orderField;
+                    (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField) || "space"
+                        .equals(orderField)) ? "" : ", doc." + orderField;
             }
 
             String addSpace = "";
@@ -478,8 +478,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
              * select clause.
              */
             String addColumn =
-                (orderField.isEmpty() || orderField.equals("fullName") || orderField.equals("name") || orderField
-                    .equals("space")) ? "" : ", doc." + orderField;
+                (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField) || "space"
+                    .equals(orderField)) ? "" : ", doc." + orderField;
 
             if (options.space() != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number");

@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
         v-if="editorContent"
@@ -27,6 +27,7 @@
         :editor-content
         :container
         :macros
+        :collaboration
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
@@ -68,16 +69,38 @@
 </template>
 
 <script setup lang="ts">
+import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
-import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import {
+  inject,
+  onBeforeMount,
+  onUnmounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+} from "vue";
+import { resolver } from "xwiki-platform-localization-webjar";
+import type { ImageWizard } from "../services/image/ImageWizard";
+import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
-import type { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
+import type { CristalApp } from "@xwiki/platform-api";
+import type {
+  Collaboration,
+  CollaborationManager,
+  CollaborationManagerProvider,
+} from "@xwiki/platform-collaboration-api";
+import type {
+  BlockOfType,
+  EditorLanguage,
+  ImageUpdateResult,
+} from "@xwiki/platform-editors-blocknote-react";
 import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
 import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { Ref } from "vue";
 
 //
 // Injected
@@ -97,6 +120,7 @@ const {
   disabled = false,
   inputSyntax = "uniast/1.0",
   outputSyntax = "xwiki/2.1",
+  collaborationURL = undefined,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -115,6 +139,9 @@ const {
 
   // The syntax of the edited content, as expected by the back-end storage.
   outputSyntax?: string;
+
+  // The URL of the collaboration server used for real-time editing. If not specified, real-time editing is disabled.
+  collaborationURL?: string;
 }>();
 
 //
@@ -122,13 +149,26 @@ const {
 //
 const value = ref(initialValue);
 const dirty = ref(false);
+const isLoading = ref(true);
 
+// This is passed to the BlockNote editor component.
 const editorContent = ref();
 
-onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
-});
+const defaultLabel = "Editor";
 
+const imageEdition = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  imageWizard.edit(image, {
+    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
+      update({ type: "update", updatedProps }),
+    cancel: () => update({ type: "aborted" }),
+  });
+};
+
+// This is passed to the BlockNote editor component.
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
 >({
@@ -139,25 +179,64 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: getLanguage(),
+  label: defaultLabel,
+  overrides: {
+    imageEdition,
+  },
 });
 
+// This is passed to the BlockNote editor component.
+const collaboration: Ref<Collaboration | undefined> = ref(undefined);
+let collaborationManager: CollaborationManager | undefined = undefined;
+
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+
+  editorProps.value.label =
+    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
+      "platform.blocknote.editor.label"
+    ] ?? defaultLabel;
+
+  if (collaborationURL) {
+    const cristalApp = container.get<CristalApp>("CristalApp");
+    cristalApp.getWikiConfig().realtimeURL = collaborationURL;
+
+    collaborationManager = container
+      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+      .get();
+    // Join the realtime collaboration session for the current XWiki document.
+    collaboration.value = await collaborationManager.join();
+  }
+
+  isLoading.value = false;
+});
+
+onUnmounted(() => {
+  collaborationManager?.leave();
+});
+
+// This is passed to the BlockNote editor component.
 const macros = {
   list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
-    openParamsEditor: (
+    openParamsEditor: async (
       macro: MacroWithUnknownParamsType,
-      params: UnknownMacroParamsType,
+      parameters: UnknownMacroParamsType,
       update: (newProps: UnknownMacroParamsType) => void,
     ) => {
-      // TODO: Open the macro modal.
-      console.debug(
-        "Open macro editor for macro",
-        macro,
-        "with params",
-        params,
-        "and update callback",
-        update,
-      );
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        update(
+          await macroWizard.insertOrUpdate(macro, parameters, {
+            syntax: outputSyntax,
+            inlineParametersSyntax: inputSyntax,
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to edit the macro", error);
+      }
     },
   },
 };

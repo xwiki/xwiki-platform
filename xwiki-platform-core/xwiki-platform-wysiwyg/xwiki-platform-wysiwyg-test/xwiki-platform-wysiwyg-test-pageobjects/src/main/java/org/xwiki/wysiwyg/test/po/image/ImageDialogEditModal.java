@@ -20,9 +20,9 @@
 package org.xwiki.wysiwyg.test.po.image;
 
 import org.openqa.selenium.By;
+import org.xwiki.test.ui.po.BaseModal;
 import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
 import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogStandardEditForm;
-import org.xwiki.test.ui.po.BaseModal;
 
 /**
  * Page Object for the image edition/configuration modal.
@@ -58,6 +58,18 @@ public class ImageDialogEditModal extends BaseModal
     {
         this.container.findElement(By.className("btn-primary")).click();
         waitForClosed();
+    }
+
+    /**
+     * Click on the "Change Image" button to open the image selection modal.
+     * 
+     * @return the image selection modal
+     * @since 18.3.0RC1
+     */
+    public ImageDialogSelectModal clickChangeImage()
+    {
+        this.container.findElement(By.xpath("//button[. = 'Change Image']")).click();
+        return new ImageDialogSelectModal();
     }
 
     /**

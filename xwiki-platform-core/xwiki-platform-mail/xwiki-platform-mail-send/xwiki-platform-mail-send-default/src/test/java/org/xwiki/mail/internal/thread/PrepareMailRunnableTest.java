@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -35,8 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -143,10 +140,10 @@ class PrepareMailRunnableTest
 
         MemoryMailListener listener1 = this.componentManager.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item1 =
-            new PrepareMailQueueItem(Arrays.asList(message1), session, listener1, batchId1, context1);
+            new PrepareMailQueueItem(List.of(message1), session, listener1, batchId1, context1);
         MemoryMailListener listener2 = this.componentManager.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item2 =
-            new PrepareMailQueueItem(Arrays.asList(message2), session, listener2, batchId2, context2);
+            new PrepareMailQueueItem(List.of(message2), session, listener2, batchId2, context2);
 
         MailQueueManager mailQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
@@ -250,7 +247,7 @@ class PrepareMailRunnableTest
                 }, session, listener1, batchId1, context1);
         MemoryMailListener listener2 = this.componentManager.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item2 =
-            new PrepareMailQueueItem(Arrays.asList(message2), session, listener2, batchId2, context2);
+            new PrepareMailQueueItem(List.of(message2), session, listener2, batchId2, context2);
 
         MailQueueManager prepareMailQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
@@ -261,28 +258,18 @@ class PrepareMailRunnableTest
                 SendMailQueueItem.class));
 
         MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
-        doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Object[] args = invocationOnMock.getArguments();
-                MimeMessage message = (MimeMessage) args[1];
-                message.saveChanges();
-                return null;
-            }
+        doAnswer(invocationOnMock -> {
+            Object[] args = invocationOnMock.getArguments();
+            MimeMessage message = (MimeMessage) args[1];
+            message.saveChanges();
+            return null;
         }).when(contentStore).save(any(String.class), any(ExtendedMimeMessage.class));
 
-        doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock)
-            {
-                Object[] args = invocationOnMock.getArguments();
-                SendMailQueueItem item = (SendMailQueueItem) args[0];
-                ((UpdateableMailStatusResult)item.getListener().getMailStatusResult()).incrementCurrentSize();
-                return true;
-            }
+        doAnswer(invocationOnMock -> {
+            Object[] args = invocationOnMock.getArguments();
+            SendMailQueueItem item = (SendMailQueueItem) args[0];
+            ((UpdateableMailStatusResult) item.getListener().getMailStatusResult()).incrementCurrentSize();
+            return true;
         }).when(sendMailQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
 
@@ -338,7 +325,7 @@ class PrepareMailRunnableTest
 
         MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item =
-            new PrepareMailQueueItem(Arrays.asList(message), session, listener, batchId, context);
+            new PrepareMailQueueItem(List.of(message), session, listener, batchId, context);
 
         MailQueueManager mailQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
@@ -386,7 +373,7 @@ class PrepareMailRunnableTest
 
         MailListener listener = mock(MailListener.class);
         PrepareMailQueueItem item =
-            new PrepareMailQueueItem(Arrays.asList(message), session, listener, batchId, context);
+            new PrepareMailQueueItem(List.of(message), session, listener, batchId, context);
 
         MailQueueManager mailQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,

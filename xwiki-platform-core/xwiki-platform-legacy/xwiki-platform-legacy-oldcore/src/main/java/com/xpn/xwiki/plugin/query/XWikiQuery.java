@@ -142,7 +142,7 @@ public class XWikiQuery extends XWikiCriteria
 
     public void addOrderProperty(String property, String order)
     {
-        addOrderProperty(property, order.equals("desc") ? OrderClause.DESC : OrderClause.ASC);
+        addOrderProperty(property, "desc".equals(order) ? OrderClause.DESC : OrderClause.ASC);
     }
 
     public void addOrderProperty(String property, int order)

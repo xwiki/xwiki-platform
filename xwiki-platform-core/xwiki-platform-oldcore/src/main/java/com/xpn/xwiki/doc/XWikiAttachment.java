@@ -254,7 +254,9 @@ public class XWikiAttachment implements Cloneable
             throw new XWikiException("Failed to clone the attachment", null);
         }
         clone.setFilename(name);
-        clone.setContent(this.getContentInputStream(context));
+        try (InputStream sourceContent = getContentInputStream(context)) {
+            clone.setContent(sourceContent);
+        }
         clone.setAttachment_archive(getAttachmentArchive(context).clone(clone, context));
         return clone;
     }
@@ -1346,7 +1348,7 @@ public class XWikiAttachment implements Cloneable
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
 				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachment.getContentInputStream(null));
+					setContent(attachmentIs);
 					modified = true;
 				}
             }

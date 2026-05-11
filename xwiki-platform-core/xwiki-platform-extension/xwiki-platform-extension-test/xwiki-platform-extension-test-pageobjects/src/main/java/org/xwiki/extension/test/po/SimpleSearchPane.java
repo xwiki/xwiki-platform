@@ -168,6 +168,9 @@ public class SimpleSearchPane extends BaseElement
         searchInput.sendKeys(keywords, Keys.ENTER);
         getDriver().waitUntilPageIsReloaded();
 
+        // Wait for the page to be actually ready.
+        new BasePage();
+
         return new SearchResultsPane();
     }
 

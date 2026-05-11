@@ -307,7 +307,7 @@ public class HTMLCleanerTest
         try {
             StringBuilder input = new StringBuilder();
             String line = reader.readLine();
-            while (line != null && !line.equals(INPUT_EXPECTED_SEPARATOR)) {
+            while (line != null && !INPUT_EXPECTED_SEPARATOR.equals(line)) {
                 appendLine(input, line);
                 line = reader.readLine();
             }

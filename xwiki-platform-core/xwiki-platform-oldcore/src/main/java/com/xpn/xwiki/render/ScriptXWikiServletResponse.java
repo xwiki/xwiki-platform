@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.render;
 
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletResponse;
+
 import com.xpn.xwiki.web.WrappingXWikiResponse;
 import com.xpn.xwiki.web.XWikiResponse;
 
@@ -39,5 +41,11 @@ public class ScriptXWikiServletResponse extends WrappingXWikiResponse
     public ScriptXWikiServletResponse(XWikiResponse response)
     {
         super(response);
+    }
+
+    @Override
+    public jakarta.servlet.http.HttpServletResponse getJakarta()
+    {
+        return new JakartaToJavaxHttpServletResponse<>(this);
     }
 }

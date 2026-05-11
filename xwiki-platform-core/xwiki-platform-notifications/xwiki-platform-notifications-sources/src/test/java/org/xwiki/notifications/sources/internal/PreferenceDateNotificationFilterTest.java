@@ -19,9 +19,9 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PreferenceDateNotificationFilterTest
+class PreferenceDateNotificationFilterTest
 {
     @InjectMockComponents
     private PreferenceDateNotificationFilter notificationFilter;
@@ -49,7 +49,7 @@ public class PreferenceDateNotificationFilterTest
     @Test
     void shouldFilterDefault()
     {
-        assertFalse(this.notificationFilter.shouldFilter(mock(Event.class), Collections.emptyList()));
+        assertFalse(this.notificationFilter.shouldFilter(mock(Event.class), List.of()));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class PreferenceDateNotificationFilterTest
 
         when(event.getDate()).thenReturn(new Date(41));
         when(pref2.getStartDate()).thenReturn(new Date(42));
-        assertTrue(this.notificationFilter.shouldFilter(event, Arrays.asList(pref1, pref2)));
+        assertTrue(this.notificationFilter.shouldFilter(event, List.of(pref1, pref2)));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class PreferenceDateNotificationFilterTest
         when(pref1.getProperties()).thenReturn(Collections.emptyMap());
         when(pref2.getProperties())
             .thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "anotherType"));
-        assertFalse(this.notificationFilter.shouldFilter(event, Arrays.asList(pref1, pref2)));
+        assertFalse(this.notificationFilter.shouldFilter(event, List.of(pref1, pref2)));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class PreferenceDateNotificationFilterTest
         when(event.getDate()).thenReturn(new Date(40));
         when(pref2.getStartDate()).thenReturn(new Date(0));
         when(pref2.getStartDate()).thenReturn(new Date(39));
-        assertFalse(this.notificationFilter.shouldFilter(event, Arrays.asList(pref1, pref2)));
+        assertFalse(this.notificationFilter.shouldFilter(event, List.of(pref1, pref2)));
     }
 
     @Test
@@ -122,6 +122,6 @@ public class PreferenceDateNotificationFilterTest
 
         when(event.getDate()).thenReturn(new Date(42));
         when(pref2.getStartDate()).thenReturn(new Date(42));
-        assertFalse(this.notificationFilter.shouldFilter(event, Arrays.asList(pref1, pref2)));
+        assertFalse(this.notificationFilter.shouldFilter(event, List.of(pref1, pref2)));
     }
 }

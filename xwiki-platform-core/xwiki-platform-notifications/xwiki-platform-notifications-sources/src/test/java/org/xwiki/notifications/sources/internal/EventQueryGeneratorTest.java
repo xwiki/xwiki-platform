@@ -19,12 +19,11 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
@@ -80,8 +79,8 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -98,7 +97,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -112,8 +111,8 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -129,7 +128,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -143,8 +142,8 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
         parameters.endDate = untilDate;
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -163,7 +162,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -176,9 +175,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.endDate = untilDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.blackList = List.of("event1", "event2");
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -189,14 +188,14 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
-        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, List.of("event1", "event2")), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, untilDate, CompareType.LESS_OR_EQUALS, false),
             conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -208,8 +207,8 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -229,7 +228,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -258,10 +257,10 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.blackList = List.of("event1", "event2");
+        parameters.filters = List.of(notificationFilter1, notificationFilter2);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -278,12 +277,12 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
             conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "someValue2", CompareType.EQUALS, false),
             conditions.next());
-        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, List.of("event1", "event2")), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -302,10 +301,10 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.filters = Collections.singleton(notificationFilter1);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.blackList = List.of("event1", "event2");
+        parameters.filters = Set.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -318,12 +317,12 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
-        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, List.of("event1", "event2")), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -349,9 +348,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.filters = Arrays.asList(notificationFilter1);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.filters = List.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -363,7 +362,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -383,9 +382,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.filters = Arrays.asList(notificationFilter1);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.filters = List.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -403,7 +402,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -423,9 +422,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.filters = Arrays.asList(notificationFilter1);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.filters = List.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -443,7 +442,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -463,9 +462,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
-        parameters.filters = Arrays.asList(notificationFilter1);
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.filters = List.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -483,7 +482,7 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 
     @Test
@@ -510,9 +509,9 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
-        parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
-        parameters.preferences = Arrays.asList(this.pref1);
-        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+        parameters.filters = List.of(notificationFilter1, notificationFilter2);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
@@ -534,6 +533,6 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         List<SortClause> sortClause = query.getSorts();
 
-        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
     }
 }

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -44,12 +45,9 @@ import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
-import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.text.StringUtils;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.junit.jupiter.api.Assertions.assertEquals;

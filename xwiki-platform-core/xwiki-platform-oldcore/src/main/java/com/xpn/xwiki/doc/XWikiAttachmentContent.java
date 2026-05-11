@@ -187,7 +187,9 @@ public class XWikiAttachmentContent implements Cloneable
                 clone.attachment = null;
                 clone.file = null;
                 boolean contentDirty = this.isContentDirty();
-                clone.setContent(getContentInputStream());
+                try (InputStream contentInputStream = getContentInputStream()) {
+                    clone.setContent(contentInputStream);
+                }
                 clone.setContentDirty(contentDirty);
                 clone.setAttachment(attachment);
             } catch (IOException e) {

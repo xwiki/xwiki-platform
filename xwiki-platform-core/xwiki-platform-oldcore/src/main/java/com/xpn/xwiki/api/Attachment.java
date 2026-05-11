@@ -171,9 +171,10 @@ public class Attachment extends Api
     {
         try {
             // the input stream can be null if the attachment has been deleted for example.
-            InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext());
-            if (contentInputStream != null) {
-                return IOUtils.toByteArray(contentInputStream);
+            try (InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext())) {
+                if (contentInputStream != null) {
+                    return IOUtils.toByteArray(contentInputStream);
+                }
             }
         } catch (IOException ex) {
             // This really shouldn't happen.

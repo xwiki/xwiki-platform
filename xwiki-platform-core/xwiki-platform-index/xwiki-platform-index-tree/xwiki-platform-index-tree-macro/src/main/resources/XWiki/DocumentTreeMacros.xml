@@ -68,7 +68,9 @@
     #end
   #end
   ## Handle relative references
-  #makeNodeReferencesAbsolute($docTreeConfig ['root', 'openTo'])
+  #foreach ($key in ['root', 'openTo'])
+    #set ($docTreeConfig[$key] = $services.index.tree.normalizeEntityTreeNodeId($docTreeConfig[$key]))
+  #end
   ## FIXME: The 'orderBy' property of the tree API is shared by all tree node types, which means we can't indicate a
   ## different sort field per tree node type (e.g. sort wiki nodes by name and document nodes by last modification
   ## date). At the same time, this property is currently taken into account only for sorting document tree nodes, so for
@@ -92,29 +94,6 @@
     #set ($tree = $services.tree.nestedPages)
   #end
   #set ($discard = $tree.properties.putAll($docTreeConfig))
-#end
-
-#set ($documentPseudoNodeTypes = ['translations', 'attachments', 'classProperties', 'objects', 'addDocument',
-  'addAttachment'])
-#macro (makeNodeReferencesAbsolute $map $keys)
-  #foreach ($key in $keys)
-    #set ($nodeId = $map.get($key))
-    #set ($parts = $nodeId.split(':', 2))
-    #if ($parts &amp;&amp; $parts.size() == 2)
-      #set ($nodeType = $parts[0].toLowerCase())
-      #set ($nodeReference = $parts[1])
-      #set ($entityType = $nodeType)
-      #if ($documentPseudoNodeTypes.contains($nodeType))
-        #set ($entityType = 'document')
-      #end
-      #set ($discard = "#evaluate(""${escapetool.h}set (${escapetool.d}entityReference =
-        ${escapetool.d}services.model.resolve$stringtool.capitalize($entityType)(${escapetool.d}nodeReference))"")")
-      #if ($entityReference)
-        #set ($nodeReference = $services.model.serialize($entityReference, 'default'))
-      #end
-      #set ($discard = $map.put($key, "$nodeType:$nodeReference"))
-    #end
-  #end
 #end
 
 #macro (handleDocumentTreeRequest)
@@ -211,8 +190,39 @@
   #if ($parts &amp;&amp; $parts.size() == 2)
     #set ($nodeType = $parts[0])
     #set ($nodeReference = $parts[1])
-    #set ($discard = "#evaluate(""${escapetool.h}maybeAdd$stringtool.capitalize($nodeType)Node(
-      ${escapetool.d}nodeReference ${escapetool.d}siblings ${escapetool.d}placeholder)"")")
+    #if ($nodeType == 'farm')
+      #maybeAddFarmNode($nodeReference $siblings)
+    #elseif ($nodeType == 'wiki')
+      #maybeAddWikiNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'space')
+      #maybeAddSpaceNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'document')
+      #maybeAddDocumentNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'addDocument')
+      #maybeAddAddDocumentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'translations')
+      #maybeAddTranslationsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'translation')
+      #maybeAddTranslationNode($nodeReference $siblings)
+    #elseif ($nodeType == 'attachments')
+      #maybeAddAttachmentsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'attachment')
+      #maybeAddAttachmentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'addAttachment')
+      #maybeAddAddAttachmentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'classProperties')
+      #maybeAddClassPropertiesNode($nodeReference $siblings)
+    #elseif ($nodeType == 'classProperty')
+      #maybeAddClassPropertyNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objects')
+      #maybeAddObjectsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objectsOfType')
+      #maybeAddObjectsOfTypeNode($nodeReference $siblings)
+    #elseif ($nodeType == 'object')
+      #maybeAddObjectNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objectProperty')
+      #maybeAddObjectPropertyNode($nodeReference $siblings)
+    #end
   #end
 #end
 

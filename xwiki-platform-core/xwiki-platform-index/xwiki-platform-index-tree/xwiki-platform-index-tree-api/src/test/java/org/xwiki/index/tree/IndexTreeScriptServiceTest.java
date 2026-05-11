@@ -1,0 +1,91 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.index.tree;
+
+import jakarta.inject.Named;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.properties.converter.Converter;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for {@link IndexTreeScriptService}.
+ *
+ * @version $Id$
+ */
+@ComponentTest
+class IndexTreeScriptServiceTest
+{
+    @InjectMockComponents
+    private IndexTreeScriptService indexTreeScriptService;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @MockComponent
+    @Named("entityTreeNodeId")
+    private Converter<EntityReference> entityTreeNodeIdConverter;
+
+    @Test
+    void normalizeEntityTreeNodeId()
+    {
+        // Null safe check.
+        assertNull(this.indexTreeScriptService.normalizeEntityTreeNodeId(null));
+        assertEquals("Failed to normalize the given entity tree node id [null].", this.logCapture.getMessage(0));
+
+        // Normalize an invalid entity tree node id.
+        assertEquals("unexpectedIdFormat", this.indexTreeScriptService.normalizeEntityTreeNodeId("unexpectedIdFormat"));
+        assertEquals("Failed to normalize the given entity tree node id [unexpectedIdFormat].",
+            this.logCapture.getMessage(1));
+
+        // Normalize an actual entity (attachment) tree node id.
+        AttachmentReference attachmentReference =
+            new AttachmentReference("image.png", new DocumentReference("wiki", "Current", "Page"));
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "attachment:image.png"))
+            .thenReturn(attachmentReference);
+        when(this.entityTreeNodeIdConverter.convert(String.class, attachmentReference))
+            .thenReturn("attachment:wiki:Current.Page@image.png");
+        assertEquals("attachment:wiki:Current.Page@image.png",
+            this.indexTreeScriptService.normalizeEntityTreeNodeId("attachment:image.png"));
+        assertEquals(2, this.logCapture.size());
+
+        // Normalize a document pseudo tree node id.
+        DocumentReference documentReference = new DocumentReference("wiki", "Current", "OtherPage");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:OtherPage"))
+            .thenReturn(documentReference);
+        when(this.entityTreeNodeIdConverter.convert(String.class, documentReference))
+            .thenReturn("document:wiki:Current.OtherPage");
+        assertEquals("translations:wiki:Current.OtherPage",
+            this.indexTreeScriptService.normalizeEntityTreeNodeId("tranSLations:OtherPage"));
+        assertEquals(2, this.logCapture.size());
+    }
+}

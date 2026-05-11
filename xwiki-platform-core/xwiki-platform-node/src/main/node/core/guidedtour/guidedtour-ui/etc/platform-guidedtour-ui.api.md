@@ -7,7 +7,7 @@
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { DefineComponent } from 'vue';
-import { GuidedTourManagerApi } from '@xwiki/platform-guidedtour-api';
+import { GuidedTourManager } from '@xwiki/platform-guidedtour-api';
 import { PublicProps } from 'vue';
 
 // Warning: (ae-forgotten-export) The symbol "__VLS_Props" needs to be exported by the entry point index.d.ts

@@ -46,7 +46,8 @@ export interface TourManagerApi {
 
   /**
    * Update an existing tour.
+   * @param tourId - The tour id.
    * @param tour - The updated tour data.
    */
-  updateTour(tour: TourTour): Promise<void>;
+  updateTour(tourId: string, tour: TourTour): Promise<void>;
 }

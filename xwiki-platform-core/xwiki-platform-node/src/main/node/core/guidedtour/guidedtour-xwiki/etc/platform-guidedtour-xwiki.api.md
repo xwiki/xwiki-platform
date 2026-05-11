@@ -5,58 +5,52 @@
 ```ts
 
 import { Driver } from 'driver.js';
-import { GuidedTourManagerApi } from '@xwiki/platform-guidedtour-api';
+import { GuidedTourManager } from '@xwiki/platform-guidedtour-api';
 import { TourStep } from '@xwiki/platform-guidedtour-api';
 import { TourTask } from '@xwiki/platform-guidedtour-api';
 import { TourTaskStatus } from '@xwiki/platform-guidedtour-api';
 import { TourTour } from '@xwiki/platform-guidedtour-api';
 
 // @beta
-export class GuidedTourManager implements GuidedTourManagerApi {
-    constructor(xm: any);
-    // (undocumented)
+export class DefaultGuidedTourManager implements GuidedTourManager {
+    // Warning: (ae-forgotten-export) The symbol "TourStore" needs to be exported by the entry point index.d.ts
+    constructor(xm: Promise, sharedStore: TourStore);
     activeDriverTask?: Driver;
-    // (undocumented)
     activeTask?: TourTask;
+    createStep(tourId: string, taskId: string, stepData: TourStep): Promise<void>;
     // (undocumented)
-    computeTourStatus(tour: TourTour): TourTaskStatus;
+    createTask(tourId: string, taskData: TourTask): Promise<void>;
     // (undocumented)
-    fetchSteps(tourId: string, taskId: string): Promise<TourStep[]>;
-    fetchTours(): Promise<TourTour[]>;
+    createTour(tour: TourTour): Promise<void>;
+    deleteStep(tourId: string, taskId: string, stepId: number): Promise<void>;
     // (undocumented)
-    getCSRFToken(): Promise<string>;
+    deleteTask(tourId: string, taskId: string): Promise<void>;
     // (undocumented)
+    deleteTour(tourId: string): Promise<void>;
     getSandboxSpace(): Promise<string>;
-    // (undocumented)
     getSteps(tourId: string, taskId: string): Promise<TourStep[]>;
     // (undocumented)
-    getTask(taskId: string, tourId?: string): Promise<TourTask | undefined>;
+    getTask(taskId: string, tourId: string): Promise<TourTask | undefined>;
     // (undocumented)
     getTasks(tourId: string): Promise<TourTask[]>;
     // (undocumented)
-    getTour(tourId: string): Promise<TourTour | undefined>;
-    // (undocumented)
     getTours(): Promise<TourTour[]>;
-    // (undocumented)
     getUsefulLinks(): Promise<string[]>;
-    // (undocumented)
     initExistingTask(): Promise<void>;
-    // (undocumented)
-    static isInEditMode(): boolean;
-    // (undocumented)
     resetTask(task: TourTask): Promise<void>;
-    // (undocumented)
     saveTaskStatus(tourId: string, taskId: string, status: TourTaskStatus): Promise<void>;
-    // (undocumented)
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
-    // (undocumented)
     setupStep(step: TourStep): void;
-    // (undocumented)
     startTask(task: TourTask, remember?: boolean): Promise<void>;
+    updateStep(tourId: string, taskId: string, stepId: number, stepData: TourStep): Promise<void>;
+    // (undocumented)
+    updateTask(tourId: string, taskId: string, taskData: TourTask): Promise<void>;
+    // (undocumented)
+    updateTour(tourId: string, tour: TourTour): Promise<void>;
 }
 
 // @beta
-export const guidedTourManager: GuidedTourManager;
+export const guidedTourManager: DefaultGuidedTourManager;
 
 // (No @packageDocumentation comment for this package)
 

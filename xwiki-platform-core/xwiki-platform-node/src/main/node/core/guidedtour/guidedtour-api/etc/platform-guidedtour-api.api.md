@@ -5,14 +5,49 @@
 ```ts
 
 // @beta
-export interface GuidedTourManagerApi {
+export interface GuidedTourManager {
+    createStep(tourId: string, taskId: string, stepData: TourStep): Promise<void>;
+    createTask(tourId: string, taskData: TourTask): Promise<void>;
+    createTour(tour: TourTour): Promise<void>;
+    deleteStep(tourId: string, taskId: string, stepId: number): Promise<void>;
+    deleteTask(tourId: string, taskId: string): Promise<void>;
+    deleteTour(tourId: string): Promise<void>;
     getSteps(tourId: string, taskId: string): Promise<TourStep[] | undefined>;
-    getTask(taskId: string, tourId?: string): Promise<TourTask | undefined>;
+    getTask(tourId: string, taskId: string): Promise<TourTask | undefined>;
     getTasks(tourId: string): Promise<TourTask[] | undefined>;
     getTours(): Promise<TourTour[]>;
     getUsefulLinks(): Promise<string[]>;
+    saveTaskStatus(tourId: string, taskId: string, status: TourTaskStatus): Promise<void>;
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
     startTask(task: TourTask, remember: boolean): Promise<void>;
+    updateStep(tourId: string, taskId: string, stepId: number, stepData: TourStep): Promise<void>;
+    updateTask(tourId: string, taskId: string, taskData: TourTask): Promise<void>;
+    updateTour(tourId: string, tour: TourTour): Promise<void>;
+}
+
+// @beta
+export interface StepManagerApi {
+    createStep(tourId: string, taskId: string, stepData: TourStep): Promise<void>;
+    deleteStep(tourId: string, taskId: string, stepId: number): Promise<void>;
+    getSteps(tourId: string, taskId: string): Promise<TourStep[]>;
+    updateStep(tourId: string, taskId: string, stepId: number, stepData: TourStep): Promise<void>;
+}
+
+// @beta
+export interface TaskManagerApi {
+    createTask(tourId: string, taskData: TourTask): Promise<void>;
+    deleteTask(tourId: string, taskId: string): Promise<void>;
+    getTask(tourId: string, taskId: string): Promise<TourTask | undefined>;
+    getTasks(tourId: string): Promise<TourTask[]>;
+    updateTask(tourId: string, taskId: string, taskData: TourTask): Promise<void>;
+}
+
+// @beta
+export interface TourManagerApi {
+    createTour(tour: TourTour): Promise<void>;
+    deleteTour(tourId: string): Promise<void>;
+    getTours(): Promise<TourTour[]>;
+    updateTour(tourId: string, tour: TourTour): Promise<void>;
 }
 
 // @beta
@@ -34,9 +69,9 @@ export type TourStep = {
 // @beta
 export interface TourTask {
     active?: boolean;
-    dependsOn: string[];
+    dependsOn?: string[];
     id: string;
-    order?: number;
+    order: number;
     status: TourTaskStatus;
     steps?: TourStep[];
     title: string;

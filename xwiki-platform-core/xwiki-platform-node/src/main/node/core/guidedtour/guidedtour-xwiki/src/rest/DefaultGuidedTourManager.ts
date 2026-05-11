@@ -158,11 +158,11 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     taskId: string,
     taskData: TourTask,
   ): Promise<void> {
-    this.defaultTaskManagerApi.updateTask(tourId, taskId, taskData);
+    return this.defaultTaskManagerApi.updateTask(tourId, taskId, taskData);
   }
 
   createTask(tourId: string, taskData: TourTask): Promise<void> {
-    this.defaultTaskManagerApi.createTask(tourId, taskData);
+    return this.defaultTaskManagerApi.createTask(tourId, taskData);
   }
 
   deleteTask(tourId: string, taskId: string): Promise<void> {

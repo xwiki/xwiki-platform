@@ -58,7 +58,7 @@ export class GuidedTourRestClient {
     body?: unknown,
   ): Promise<T> {
     const headers: Record<string, string> = {
-      "XWiki-Form-Token": await this.getCSRFToken(),
+      // "XWiki-Form-Token": await this.getCSRFToken(),
     };
     if (body !== undefined) {
       headers["Content-Type"] = "application/json";

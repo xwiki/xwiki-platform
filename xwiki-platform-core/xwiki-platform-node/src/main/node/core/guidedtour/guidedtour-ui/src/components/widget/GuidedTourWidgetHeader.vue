@@ -55,7 +55,6 @@ import GuidedTourWidgetProgressBar from "./GuidedTourWidgetProgressBar.vue";
 import { computed } from "vue";
 import type { ComputedRef } from "vue";
 const emit = defineEmits(["closeGuidedTourWidget"]);
-console.info("In header setup.");
 
 function onCloseButtonClicked(buttonClicked: boolean) {
   console.info("Send widget close event...", buttonClicked);

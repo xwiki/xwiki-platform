@@ -203,7 +203,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     if (remember) {
       stepindex = Number.parseInt(
         window.sessionStorage.getItem(
-          SessionStorageManager.getTaskStepStorageKey(task),
+          SessionStorageManager.getTaskCurrentStepStorageKey(task),
         ) ?? "0",
       );
     }
@@ -272,13 +272,16 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    */
   async setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void> {
     task.status = status;
+    this.defaultTourManagerApi.computeToursStatus(
+      Array.of((await this.defaultTourManagerApi.getTour(task.tourId!))!),
+    );
     SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskStepStorageKey(task),
+      SessionStorageManager.getTaskCurrentStepStorageKey(task),
       undefined,
     );
     SessionStorageManager.setStorageKey(
-      SessionStorageManager.getActiveTaskStorageKey(),
-      undefined,
+      SessionStorageManager.getTaskStepStorageStorageKey(task),
+      task.steps?.toString(),
     );
   }
 
@@ -286,10 +289,25 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    * Get all steps for a task by delegating to {@link DefaultStepManagerApi}.
    */
   async getSteps(tourId: string, taskId: string): Promise<TourStep[]> {
-    const tourSteps: TourStep[] = await this.defaultStepManagerApi.getSteps(
-      tourId,
-      taskId,
-    );
-    return Promise.resolve(tourSteps);
+    // FIXME: This parsing step should be moved elsewhere.
+    let parsedCachedSteps;
+    try {
+      parsedCachedSteps = JSON.parse(
+        SessionStorageManager.getStorageKey(
+          SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        ) ?? "",
+      ) as TourStep[];
+      console.info("Using cached steps:", parsedCachedSteps);
+    } catch (e) {
+      console.error("Error while parsing cached guidedtour steps:", e);
+      SessionStorageManager.setStorageKey(
+        SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        undefined,
+      );
+    }
+    const taskSteps: TourStep[] =
+      parsedCachedSteps ??
+      (await this.defaultStepManagerApi.getSteps(tourId, taskId));
+    return Promise.resolve(taskSteps);
   }
 }

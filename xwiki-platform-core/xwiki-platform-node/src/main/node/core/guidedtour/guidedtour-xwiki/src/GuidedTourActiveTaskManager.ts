@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,28 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+// import type { TourTask } from "@xwiki/platform-guidedtour-api";
+// import { driver, type Driver } from "driver.js";
+// import { wrapTask, getDriverConfigForSteps } from "./driverjsMain";
+// import { guidedTourManager } from ".";
 
-import {guidedTourManager} from '@xwiki/platform-guidedtour-xwiki';
-import {GuidedTourWidget} from "@xwiki/platform-guidedtour-ui";
-import {createApp} from 'vue';
+// export class GuidedTourActiveTaskManager {
+//   activeTask: TourTask;
+//   activeDriverTask: Driver;
 
+//   constructor(task: TourTask) {
+//     this.activeTask = task;
+//     this.activeDriverTask = wrapTask(driver(getDriverConfigForSteps()), guidedTourManager)
+//   }
 
-function init() {
-  const app = createApp(GuidedTourWidget, { guidedTourManager });
-  app.config.errorHandler = (err, instance, info) => {
-    console.error('Vue error:', err, info, instance);
-    throw err;
-  };
-  app.config.warnHandler = (msg, instance, trace) => {
-    console.warn('Vue warn:', msg, trace, instance);
-  };
-  app.mount('#guidedtour-uix');
-}
-
-// FIXME: This check doesn't work.
-if (!document.querySelector('#tourResumeContainer')) {
-  init();
-} else {
-  console.warn("Since the Tour Application is installed, not showing the GuidedTour Widget, to prevent conflicts.");
-  init(); // TODO: Remove this, this is temporary for testing.
-}
+// }
+console.log(1);

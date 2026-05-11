@@ -25,15 +25,19 @@
 -->
 
 <template>
-  <template v-if="tour">
+  <template v-if="props.tour.value">
     <section
       :id="props.tour.value.id"
       class="guidedtour-tour"
       :class="{
         ['tour-' + props.tour.value.status]: true,
         collapsed: props.tour.value.isCollapsed,
+        hidden:
+          (props.tour.value.tasksList?.length ?? 0) == 0 ||
+          !(props.tour.value.active ?? false),
       }"
     >
+      <!-- FIXME: The active check should probably be done in the REST API -->
       <GuidedTourWidgetItem
         :loading="false"
         :waiting="ref(false)"
@@ -109,7 +113,6 @@ defineEmits(["toggleCollapseTour"]);
 const guidedTourManager: GuidedTourManager = inject(
   "DefaultGuidedTourManager",
 )!;
-console.info("In tour setup.");
 const state = reactive({
   tasks: [] as TourTask[],
 });
@@ -132,7 +135,6 @@ onMounted(async () => {
   if (!tasks) {
     console.error("No tasks");
   }
-  console.log("async loaded tasks", state.tasks);
 });
 </script>
 

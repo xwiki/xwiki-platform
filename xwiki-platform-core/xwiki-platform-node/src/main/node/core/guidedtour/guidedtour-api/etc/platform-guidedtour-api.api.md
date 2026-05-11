@@ -47,6 +47,7 @@ export interface TourManagerApi {
     createTour(tour: TourTour): Promise<void>;
     deleteTour(tourId: string): Promise<void>;
     getTours(): Promise<TourTour[]>;
+    initExistingTask(): void;
     updateTour(tourId: string, tour: TourTour): Promise<void>;
 }
 

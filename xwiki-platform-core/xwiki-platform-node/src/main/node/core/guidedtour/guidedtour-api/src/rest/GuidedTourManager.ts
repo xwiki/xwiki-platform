@@ -154,4 +154,8 @@ export interface GuidedTourManager {
     taskId: string,
     status: TourTaskStatus,
   ): Promise<void>;
+  /**
+   * Auto-start a task which was in progress (eg. after redirecting to a new page during task steps)
+   */
+  initExistingTask(): void;
 }

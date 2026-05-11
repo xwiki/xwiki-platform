@@ -239,10 +239,13 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    * Called on page load to recover tours that span multiple pages.
    */
   async initExistingTask() {
+    // FIXME: This should be moved somewhere else, but idk where. `GuidedTourWidget.vue` ? idk
     const existingActiveTask = SessionStorageManager.getStorageKey(
       SessionStorageManager.getActiveTaskStorageKey(),
     );
     if (existingActiveTask) {
+      // FIXME: I shouldn't parse this here, but have it already available somehow more easily.
+      // Also, this parsing is not robust to pages which containt the `__` separator present in the item value.
       const parsedIds =
         SessionStorageManager.parseStorageKeyPrefix(existingActiveTask);
       if (parsedIds !== undefined) {

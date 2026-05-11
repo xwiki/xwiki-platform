@@ -17,6 +17,7 @@ export interface GuidedTourManager {
     getTasks(tourId: string): Promise<TourTask[] | undefined>;
     getTours(): Promise<TourTour[]>;
     getUsefulLinks(): Promise<string[]>;
+    initExistingTask(): void;
     saveTaskStatus(tourId: string, taskId: string, status: TourTaskStatus): Promise<void>;
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
     startTask(task: TourTask, remember: boolean): Promise<void>;
@@ -47,7 +48,6 @@ export interface TourManagerApi {
     createTour(tour: TourTour): Promise<void>;
     deleteTour(tourId: string): Promise<void>;
     getTours(): Promise<TourTour[]>;
-    initExistingTask(): void;
     updateTour(tourId: string, tour: TourTour): Promise<void>;
 }
 

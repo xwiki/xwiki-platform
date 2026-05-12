@@ -33,6 +33,12 @@ export interface TourManagerApi {
   getTours(): Promise<TourTour[]>;
 
   /**
+   * Get a single tour by id.
+   * @param tourId - The id of the tour.
+   */
+  getTour(tourId: string): Promise<TourTour | undefined>;
+
+  /**
    * Create a new tour.
    * @param tour - The tour data to create.
    */

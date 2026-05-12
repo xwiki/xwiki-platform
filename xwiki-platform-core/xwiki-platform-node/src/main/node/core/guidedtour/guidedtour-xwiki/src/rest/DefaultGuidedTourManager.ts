@@ -145,7 +145,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     await this.defaultStepManagerApi.createStep(tourId, taskId, stepData);
   }
 
-  getTask(taskId: string, tourId: string): Promise<TourTask | undefined> {
+  getTask(tourId: string, taskId: string): Promise<TourTask | undefined> {
     return this.defaultTaskManagerApi.getTask(taskId, tourId);
   }
 

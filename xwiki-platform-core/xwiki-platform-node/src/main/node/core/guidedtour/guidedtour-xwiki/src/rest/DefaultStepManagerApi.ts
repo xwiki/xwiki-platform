@@ -39,19 +39,6 @@ export class DefaultStepManagerApi implements StepManagerApi {
   }
 
   /**
-   * Build the REST URL for steps, optionally targeting a specific step.
-   */
-  private getStepsUrl(tourId: string, taskId: string, stepId?: number): string {
-    let url = `${XWiki.contextPath}/rest/guidedTour/tours/${tourId}/tasks/${taskId}/steps`;
-
-    if (stepId !== undefined) {
-      url += `/${stepId}`;
-    }
-
-    return url;
-  }
-
-  /**
    * Delete a step from a task via the REST API.
    */
   async deleteStep(
@@ -154,5 +141,18 @@ export class DefaultStepManagerApi implements StepManagerApi {
     }
 
     return task.steps ?? [];
+  }
+
+  /**
+   * Build the REST URL for steps, optionally targeting a specific step.
+   */
+  private getStepsUrl(tourId: string, taskId: string, stepId?: number): string {
+    let url = `${XWiki.contextPath}/rest/guidedTour/tours/${tourId}/tasks/${taskId}/steps`;
+
+    if (stepId !== undefined) {
+      url += `/${stepId}`;
+    }
+
+    return url;
   }
 }

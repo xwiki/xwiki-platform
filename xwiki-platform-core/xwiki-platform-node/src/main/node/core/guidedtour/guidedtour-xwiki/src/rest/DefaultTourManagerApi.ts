@@ -45,17 +45,6 @@ export class DefaultTourManagerApi implements TourManagerApi {
   }
 
   /**
-   * Build the REST URL for tours, optionally targeting a specific tour.
-   */
-  private getTasksUrl(tourId?: string): string {
-    let url = `${XWiki.contextPath}/rest/guidedTour/tours`;
-    if (tourId !== undefined) {
-      url += `/${tourId}`;
-    }
-    return url;
-  }
-
-  /**
    * Fetch all tours. Returns cached data if available.
    */
   async getTours(): Promise<TourTour[]> {
@@ -133,5 +122,16 @@ export class DefaultTourManagerApi implements TourManagerApi {
   async updateTour(tourId: string, tour: TourTour): Promise<void> {
     console.debug("Updating tour", tour);
     await this.restClient.request(this.getTasksUrl(tourId), "PUT", tour);
+  }
+
+  /**
+   * Build the REST URL for tours, optionally targeting a specific tour.
+   */
+  private getTasksUrl(tourId?: string): string {
+    let url = `${XWiki.contextPath}/rest/guidedTour/tours`;
+    if (tourId !== undefined) {
+      url += `/${tourId}`;
+    }
+    return url;
   }
 }

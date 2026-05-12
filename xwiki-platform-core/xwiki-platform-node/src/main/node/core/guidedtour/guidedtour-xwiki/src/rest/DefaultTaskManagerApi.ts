@@ -41,17 +41,6 @@ export class DefaultTaskManagerApi implements TaskManagerApi {
   }
 
   /**
-   * Build the REST URL for tasks, optionally targeting a specific task.
-   */
-  private getTasksUrl(tourId: string, taskId?: string): string {
-    let url = `${XWiki.contextPath}/rest/guidedTour/tours/${tourId}/tasks`;
-    if (taskId !== undefined) {
-      url += `/${taskId}`;
-    }
-    return url;
-  }
-
-  /**
    * Get all tasks for a tour. Returns cached data if available.
    */
   public async getTasks(tourId: string): Promise<TourTask[]> {
@@ -61,19 +50,6 @@ export class DefaultTaskManagerApi implements TaskManagerApi {
       return await this.prepareTasks(tourId);
     }
 
-    return tasks;
-  }
-
-  /**
-   * Fetch tasks from the REST API and update the store.
-   */
-  private async prepareTasks(tourId: string) {
-    const url = this.getTasksUrl(tourId);
-    const tasks = await this.restClient.request<TourTask[]>(url, "GET");
-    for (const task of tasks) {
-      task.tourId = tourId;
-    }
-    this.sharedStore.updateTourTasks(tourId, tasks);
     return tasks;
   }
 
@@ -123,5 +99,29 @@ export class DefaultTaskManagerApi implements TaskManagerApi {
   ): Promise<void> {
     const url = this.getTasksUrl(tourId, taskId);
     await this.restClient.request<TourTask>(url, "PUT", taskData);
+  }
+
+  /**
+   * Build the REST URL for tasks, optionally targeting a specific task.
+   */
+  private getTasksUrl(tourId: string, taskId?: string): string {
+    let url = `${XWiki.contextPath}/rest/guidedTour/tours/${tourId}/tasks`;
+    if (taskId !== undefined) {
+      url += `/${taskId}`;
+    }
+    return url;
+  }
+
+  /**
+   * Fetch tasks from the REST API and update the store.
+   */
+  private async prepareTasks(tourId: string) {
+    const url = this.getTasksUrl(tourId);
+    const tasks = await this.restClient.request<TourTask[]>(url, "GET");
+    for (const task of tasks) {
+      task.tourId = tourId;
+    }
+    this.sharedStore.updateTourTasks(tourId, tasks);
+    return tasks;
   }
 }

@@ -338,8 +338,8 @@ var XWiki = (function(XWiki){
       this.container.select('.hide-button-wrapper').invoke('hide');
       this.ajID = setTimeout( function() { pointer.doAjaxRequests(requestId) }, this.options.delay );
 
+      return true;
     }
-    return false;
   },
 
   /**

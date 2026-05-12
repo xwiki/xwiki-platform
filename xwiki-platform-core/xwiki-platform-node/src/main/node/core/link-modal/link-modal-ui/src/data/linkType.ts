@@ -40,6 +40,7 @@ type LinkData = {
  * @since 18.4.0RC-1
  * @beta
  */
+// TODO: dynamic types - https://jira.xwiki.org/browse/XWIKI-23927
 type LinkTarget =
   | { type: "page"; config: LinkPageConfig }
   | { type: "attachment"; config: LinkAttachmentConfig }

@@ -214,7 +214,7 @@ public class BlockNoteRichTextArea extends BaseElement
     /**
      * Asserts that the rich text area text is exactly the specified plain text.
      *
-     * @param text the expected text, optionally including the position of the user cursors using the "%s" placeholder
+     * @param expectedText the expected text, optionally including the position of the user cursors using the "%s" placeholder
      * @param cursors the list of users whose cursor position is displayed inside the edited content
      * @since 18.4.0RC1
      */

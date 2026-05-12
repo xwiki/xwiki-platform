@@ -163,7 +163,7 @@ widgets.DynamicButtonGroup = Class.create({
       href: '#dropDownMenu',
       'class': 'dropdown-toggle' + (buttons[0].hasClassName('secondary') ? ' secondary' : ''),
       tabindex: 0
-    }).insert(icons['caret-down'] + " <span class='sr-only'>" 
+    }).insert(icons['caret-down'] + "<span class='sr-only'>" 
       + l10n['core.widgets.buttonGroup.dropDown.toggle.hint'] + "</span>")});
 
     // Insert the drop down menu.

@@ -295,6 +295,131 @@ class CollaborationIT extends AbstractBlockNoteIT
         assertTrue(source.contains("**bolder** //italic// __underline__ end"), "Unexpected content: " + source);
     }
 
+    @Test
+    @Order(4)
+    void localUndoRedo(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        // Edit the page in the first browser tab (in-place).
+        new InplaceEditablePage().editInplace();
+        BlockNoteEditor firstEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.click();
+        firstTextArea.sendKeys("one |", Keys.LEFT);
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab (standalone).
+        setup.gotoPage(testReference).editWYSIWYG();
+        BlockNoteEditor secondEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.click();
+        secondTextArea.waitUntilTextContains("|");
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " red");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("red");
+        firstTextArea.waitUntilFocused().sendKeys("two ");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("two");
+        secondTextArea.waitUntilFocused().sendKeys(" green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("green");
+        firstTextArea.waitUntilFocused().sendKeys(Keys.HOME);
+        // Select "one" and replace.
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        firstTextArea.sendKeys("1");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("1").waitUntilFocused();
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT));
+        // Select "red" and replace.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        secondTextArea.sendKeys("-");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("-").waitUntilFocused();
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one two | -%s green", "John");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one | -%s green", "John");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        firstTextArea.waitUntilTextIs("one two | -%s green", "John");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextIs("one%s two | - green", "John").waitUntilFocused();
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one%s two | red green", "John");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one%s two | red", "John");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one%s two | red green", "John");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextIs("one two | red green%s", "John");
+        firstTextArea.waitUntilFocused().sendKeys("[");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("[").waitUntilFocused();
+
+        // Verify we can still redo local changes after a remote change is received.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("[%s two | red", "John");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("[%s two | red green", "John");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("[%s two | - green", "John");
+
+        // Verify the care position after a redo/undo sequence.
+        secondTextArea.sendKeys("]");
+        secondTextArea.assertTextIs("[%s two | ] green", "John");
+    }
+
     private void editAndForceLock(InplaceEditablePage inplaceEditablePage, String lockedBy, TestUtils setup)
     {
         inplaceEditablePage.edit();

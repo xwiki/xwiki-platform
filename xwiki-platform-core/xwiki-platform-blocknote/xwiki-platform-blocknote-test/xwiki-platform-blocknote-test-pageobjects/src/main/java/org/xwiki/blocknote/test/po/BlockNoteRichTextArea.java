@@ -19,13 +19,15 @@
  */
 package org.xwiki.blocknote.test.po;
 
-import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Represents the BlockNote rich text area.
@@ -172,8 +174,53 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea waitUntilTextContains(String textFragment)
     {
-        getDriver().waitUntilCondition(driver -> Strings.CS.contains(getText(), textFragment));
+        try {
+            getDriver().waitUntilCondition(driver -> getText().contains(textFragment));
+        } catch (Exception e) {
+            String text = getText();
+            assertTrue(text.contains(textFragment), "Unexpected content: " + text);
+        }
         return this;
+    }
+
+    /**
+     * Waits until the rich text area text is exactly the specified plain text.
+     *
+     * @param text the expected text, optionally including the position of the user cursors using the "%s" placeholder
+     * @param cursors the list of users whose cursor position is displayed inside the edited content
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilTextIs(String text, String... cursors)
+    {
+        String expectedText = getExpectedText(text, cursors);
+        try {
+            getDriver().waitUntilCondition(driver -> expectedText.equals(getText()));
+        } catch (Exception e) {
+            assertEquals(expectedText, getText());
+        }
+        return this;
+    }
+
+    private String getExpectedText(String expectedText, String... cursors)
+    {
+        Object[] args = new Object[cursors.length];
+        for (int i = 0; i < cursors.length; i++) {
+            args[i] = "\u2060%n%s%n\u2060".formatted(cursors[i]);
+        }
+        return expectedText.formatted(args);
+    }
+
+    /**
+     * Asserts that the rich text area text is exactly the specified plain text.
+     *
+     * @param text the expected text, optionally including the position of the user cursors using the "%s" placeholder
+     * @param cursors the list of users whose cursor position is displayed inside the edited content
+     * @since 18.4.0RC1
+     */
+    public void assertTextIs(String expectedText, String... cursors)
+    {
+        assertEquals(getExpectedText(expectedText, cursors), getText());
     }
 
     /**

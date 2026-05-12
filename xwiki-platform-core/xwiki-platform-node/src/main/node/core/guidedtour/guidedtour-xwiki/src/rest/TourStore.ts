@@ -67,6 +67,7 @@ export class TourStore {
    * @param tourId - The id of the tour.
    */
   public getTourTasks(tourId: string): TourTask[] {
+    // FIXME: What if we need to fetch the cache in this step? (i.e. a valid tour is not in the cache)
     return this._cache.toursMap.get(tourId)?.tasksList ?? [];
   }
 

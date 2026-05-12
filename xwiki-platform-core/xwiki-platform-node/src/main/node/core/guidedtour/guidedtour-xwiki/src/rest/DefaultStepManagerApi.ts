@@ -95,7 +95,7 @@ export class DefaultStepManagerApi implements StepManagerApi {
     taskId: string,
   ): Promise<TourStep[]> {
     // FIXME: Reapply this for merge commit.
-    //     let parsedCachedSteps;
+    // let parsedCachedSteps;
     // try {
     //   parsedCachedSteps = JSON.parse(
     //     SessionStorageManager.getStorageKey(
@@ -128,6 +128,8 @@ export class DefaultStepManagerApi implements StepManagerApi {
         if (step.element == "") {
           step.element = undefined;
         }
+        step.path =
+          "" + step.targetPage + step.targetAction + step.queryParameters;
         // if (false == step['backdrop']) {
         //   step['element'] = 'body'; // FIXME: This is NOT FULL PROOF, this should be changed (eg. I want to highlight a random element without a backdrop).
         //   step['popover']['side'] = 'over';

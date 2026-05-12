@@ -36,7 +36,8 @@ const props = defineProps<{
   progress: ComputedRef<number>;
   width?: number;
 }>();
-const progress = props.progress; // reactive read-only ref
+// Reactive read-only ref of the progress.
+const progress = props.progress;
 </script>
 
 <style>

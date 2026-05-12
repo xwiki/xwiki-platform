@@ -35,7 +35,6 @@
     id="task.id"
     @click="onStartTask"
   >
-    <!-- :loading="loading.val" -->
     <template v-slot:pre-btns>
       <!-- This is just for show, it shouldn't do anything. -->
       <button>
@@ -69,13 +68,6 @@ import type {
   TourTask,
 } from "@xwiki/platform-guidedtour-api";
 
-// const loading = {
-//   val: computed(() => {
-//     console.error("ayeee", task, task == undefined, task === undefined);
-//     return task == undefined;
-//   }),
-// };
-// import XWiki from "../../services/xwiki.js";
 const { task, tourId } = defineProps<{
   task: TourTask;
   tourId: string;
@@ -90,7 +82,6 @@ const guidedTourManager: GuidedTourManager = inject(
 )!;
 const emit = defineEmits(["taskStatusChanged"]);
 async function onResetTask() {
-  console.info("You clicked to reset this task:", task);
   isWaitingAsync.value = true;
   await guidedTourManager.setTaskStatus(task!, TourTaskStatus.TODO);
   emit("taskStatusChanged", task);
@@ -101,16 +92,13 @@ async function onResetTask() {
 watch(
   () => task,
   (newTask, oldTask) => {
-    console.warn("Task changed:", task, newTask, oldTask);
     if (newTask.status != oldTask.status) {
-      console.warn("Sending taskStatusChanged.");
       emit("taskStatusChanged", task);
     }
   },
 );
 
 async function onSkipTask() {
-  console.info("You clicked to skip this task:", task);
   isWaitingAsync.value = true;
   await guidedTourManager.setTaskStatus(task!, TourTaskStatus.SKIPPED);
   emit("taskStatusChanged", task);
@@ -119,12 +107,11 @@ async function onSkipTask() {
 }
 
 async function onStartTask() {
-  console.info("You clicked to start this task:", task);
+  // Fetch the steps manually, so we can show the loader nicely while waiting for the steps to be fetched.
   isWaitingAsync.value = true;
-  const steps = await guidedTourManager.getSteps(tourId, task!.id);
+  await guidedTourManager.getSteps(tourId, task!.id);
   isWaitingAsync.value = false;
   guidedTourManager.startTask(task!, false);
-  console.log("Fetched steps:", steps);
 }
 </script>
 

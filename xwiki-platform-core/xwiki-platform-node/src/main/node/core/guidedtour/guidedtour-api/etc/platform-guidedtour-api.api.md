@@ -47,6 +47,7 @@ export interface TaskManagerApi {
 export interface TourManagerApi {
     createTour(tour: TourTour): Promise<void>;
     deleteTour(tourId: string): Promise<void>;
+    getTour(tourId: string): Promise<TourTour | undefined>;
     getTours(): Promise<TourTour[]>;
     updateTour(tourId: string, tour: TourTour): Promise<void>;
 }

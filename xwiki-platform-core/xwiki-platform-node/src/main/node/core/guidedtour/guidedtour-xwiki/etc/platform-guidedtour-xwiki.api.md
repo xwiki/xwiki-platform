@@ -30,7 +30,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     getSandboxSpace(): Promise<string>;
     getSteps(tourId: string, taskId: string): Promise<TourStep[]>;
     // (undocumented)
-    getTask(taskId: string, tourId: string): Promise<TourTask | undefined>;
+    getTask(tourId: string, taskId: string): Promise<TourTask | undefined>;
     // (undocumented)
     getTasks(tourId: string): Promise<TourTask[]>;
     // (undocumented)

@@ -126,7 +126,7 @@ const util = {
   solveButtons(
     popDOM: PopoverDOM,
     step: TourStep,
-    guidedTourManager: GuidedTourManager,
+    guidedTourManager: DefaultGuidedTourManager,
     task: TourTask,
   ) {
     if (step.reflex) {
@@ -139,21 +139,22 @@ const util = {
     popDOM.footer.appendChild(util.makeSkipAllButton(guidedTourManager, task));
   },
   async shouldSwitchSteps(
+    task: TourTask,
     thisStepActiveIndex: number,
     currentStep: TourStep,
     nextStep: TourStep,
-    guidedTourManager: GuidedTourManager,
+    guidedTourManager: DefaultGuidedTourManager,
   ) {
     // TODO: Add a better check here, in a separate method.
-    if (currentStep.path != nextStep.path) {
-      console.debug(
-        "Attempted to go to next step, but that one is on another page.",
-        currentStep,
-        nextStep,
-      );
-      // TODO: Maybe add a redirect here.
-      return false;
-    }
+    // if (currentStep.path != nextStep.path) {
+    //   console.debug(
+    //     "Attempted to go to next step, but that one is on another page.",
+    //     currentStep,
+    //     nextStep,
+    //   );
+    //   // TODO: Maybe add a redirect here.
+    //   return false;
+    // }
 
     // FIXME: Refactor this
     return await util
@@ -268,13 +269,37 @@ function XWikiDriverConfig(
         return;
       }
       const targetedElement = await util.shouldSwitchSteps(
+        task,
         thisStepActiveIndex,
         task.steps![thisStepActiveIndex],
         nextStep,
         guidedTourManager,
       );
       if (targetedElement !== false) {
-        bindReflexEvents(targetedElement, nextStep, guidedTourManager);
+        bindReflexEvents(targetedElement, nextStep, guidedTourManager, () => {
+          console.warn(
+            "Calling callback for next step move (hopefully)",
+            nextStep.order,
+            task.steps![thisStepActiveIndex].order,
+          );
+          const thisStepActiveIndex2 =
+            guidedTourManager.activeDriverTask!.getActiveIndex()!;
+          const nextStep2 = task.steps![thisStepActiveIndex2 + 1];
+          if (nextStep.path != nextStep2.path) {
+            console.debug(
+              "Setting the task step index prematurely to",
+              task.steps!.indexOf(nextStep2),
+            );
+            SessionStorageManager.setStorageKey(
+              SessionStorageManager.getTaskCurrentStepStorageKey(task),
+              task.steps!.indexOf(nextStep2).toString(),
+            );
+          }
+          // FIXME: This recursion should be guarded better, lest there be an infinite recursion.
+          guidedTourManager
+            .activeDriverTask!.getState()
+            .popover!.nextButton.click();
+        });
         guidedTourManager.activeDriverTask!.moveNext();
       }
       return;
@@ -289,13 +314,33 @@ function XWikiDriverConfig(
         return;
       }
       const targetedElement = await util.shouldSwitchSteps(
+        task,
         thisStepActiveIndex,
         task.steps![thisStepActiveIndex],
         prevStep,
         guidedTourManager,
       );
       if (targetedElement !== false) {
-        bindReflexEvents(targetedElement, prevStep, guidedTourManager);
+        bindReflexEvents(targetedElement, prevStep, guidedTourManager, () => {
+          console.warn("Calling callback for prev step move (hopefully)");
+          const thisStepActiveIndex2 =
+            guidedTourManager.activeDriverTask!.getActiveIndex()!;
+          const nextStep2 = task.steps![thisStepActiveIndex2 - 1];
+          if (prevStep.path != nextStep2.path) {
+            console.debug(
+              "Setting the task step index prematurely to",
+              task.steps!.indexOf(prevStep),
+            );
+            SessionStorageManager.setStorageKey(
+              SessionStorageManager.getTaskCurrentStepStorageKey(task),
+              task.steps!.indexOf(prevStep).toString(),
+            );
+          }
+          // FIXME: This recursion should be guarded better, lest there be an infinite recursion.
+          guidedTourManager
+            .activeDriverTask!.getState()
+            .popover!.nextButton.click();
+        });
         guidedTourManager.activeDriverTask!.movePrevious();
       }
       return;
@@ -315,13 +360,16 @@ function convertToDriverStep(step: TourStep, task: TourTask): DriveStep {
 }
 
 function getDriverConfigForSteps(
-  steps: TourStep[],
   task: TourTask,
   guidedTourManager: DefaultGuidedTourManager,
 ) {
-  console.log(steps);
+  if (!task.steps) {
+    console.error("Task has no steps:", task);
+    throw "Task has no steps";
+  }
+  console.log(task.steps);
   const config = XWikiDriverConfig(guidedTourManager, task);
-  config.steps = steps.map((step) => convertToDriverStep(step, task));
+  config.steps = task.steps!.map((step) => convertToDriverStep(step, task));
   return config;
 }
 
@@ -333,14 +381,28 @@ function wrapTask(
   // const _moveNext = task.moveNext;
   // const _movePrevious = task.movePrevious;
   const _destroy = task.destroy;
-  task.drive = function (stepIndex: number = 0) {
-    _drive(stepIndex);
+  task.drive = async function (stepIndex: number = 0) {
+    SessionStorageManager.setStorageKey(
+      SessionStorageManager.getTaskStepStorageStorageKey(
+        guidedTourManager.activeTask!,
+      ),
+      JSON.stringify(guidedTourManager.activeTask!.steps!),
+    );
     SessionStorageManager.setStorageKey(
       SessionStorageManager.getTaskCurrentStepStorageKey(
         guidedTourManager.activeTask!,
       ),
       stepIndex.toString(),
     );
+    // TODO: Add bindReflexEvents call here.
+    bindReflexEvents(
+      await util.waitForElement(
+        guidedTourManager.activeTask!.steps![stepIndex].element,
+      ),
+      guidedTourManager.activeTask!.steps![stepIndex],
+      guidedTourManager,
+    );
+    _drive(stepIndex);
   }.bind(task);
 
   // task.moveNext = function () {
@@ -508,6 +570,7 @@ function bindReflexEvents(
     guidedTourManager.activeDriverTask!.getState().popover!.nextButton.click();
   },
 ) {
+  console.warn("Doing reflex bind");
   if (!step.reflex || element === undefined) {
     if (step.reflex && element === undefined) {
       console.warn("WARNING: reflex step with empty element:", step);

@@ -146,6 +146,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
   }
 
   getTask(tourId: string, taskId: string): Promise<TourTask | undefined> {
+    // FIXME: The tourId and taskId are swapped, idk why.
     return this.defaultTaskManagerApi.getTask(taskId, tourId);
   }
 
@@ -198,7 +199,10 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    * @param remember - Whether to resume from a saved step index.
    */
   async startTask(task: TourTask, remember = true): Promise<void> {
-    const steps = await this.getSteps(task.tourId!, task.id);
+    if (!task.steps) {
+      // Fetch or get the cached steps.
+      task.steps = await this.getSteps(task.tourId!, task.id);
+    }
     let stepindex = 0;
     if (remember) {
       stepindex = Number.parseInt(
@@ -207,8 +211,8 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         ) ?? "0",
       );
     }
-    this.setupStep(steps[stepindex]);
-    const driverTour = driver(getDriverConfigForSteps(steps, task, this));
+    // this.setupStep(task.steps[stepindex]);
+    const driverTour = driver(getDriverConfigForSteps(task, this));
     SessionStorageManager.setStorageKey(
       SessionStorageManager.getActiveTaskStorageKey(),
       SessionStorageManager.getStorageKeyPrefix(task),
@@ -250,8 +254,8 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         SessionStorageManager.parseStorageKeyPrefix(existingActiveTask);
       if (parsedIds !== undefined) {
         const task = await this.getTask(
-          parsedIds["tourId"],
           parsedIds["taskId"],
+          parsedIds["tourId"],
         );
         if (task !== undefined) {
           this.startTask(task, true);
@@ -282,9 +286,10 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       SessionStorageManager.getTaskCurrentStepStorageKey(task),
       undefined,
     );
+    // FIXME: Why did I do this???
     SessionStorageManager.setStorageKey(
       SessionStorageManager.getTaskStepStorageStorageKey(task),
-      task.steps?.toString(),
+      undefined,
     );
   }
 
@@ -297,12 +302,20 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     try {
       parsedCachedSteps = JSON.parse(
         SessionStorageManager.getStorageKey(
-          SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+          SessionStorageManager.getTaskStepStorageStorageKey(
+            (await this.getTask(taskId, tourId))!,
+          ),
         ) ?? "",
       ) as TourStep[];
       console.info("Using cached steps:", parsedCachedSteps);
     } catch (e) {
-      console.error("Error while parsing cached guidedtour steps:", e);
+      console.error(
+        "Error while parsing cached guidedtour steps:",
+        SessionStorageManager.getStorageKey(
+          SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        ),
+        e,
+      );
       SessionStorageManager.setStorageKey(
         SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
         undefined,

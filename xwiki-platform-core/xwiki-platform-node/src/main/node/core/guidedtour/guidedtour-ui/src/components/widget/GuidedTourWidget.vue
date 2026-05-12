@@ -56,7 +56,6 @@
             :tour="ref(tour)"
             @toggleCollapseTour="
               (tour: TourTour) => {
-                console.debug('toggleCollapseTour closeset for ', tour);
                 tour.isCollapsed = !tour.isCollapsed;
               }
             "
@@ -107,7 +106,6 @@ import type {
   TourTour,
 } from "@xwiki/platform-guidedtour-api";
 
-console.info("In widget setup. 233123213");
 const { guidedTourManager } = defineProps<{
   guidedTourManager: GuidedTourManager;
 }>();
@@ -116,7 +114,7 @@ provide<GuidedTourManager>("DefaultGuidedTourManager", guidedTourManager!);
 
 const state = reactive({
   guidedTourManager: guidedTourManager,
-  isWidgetCollapsed: false,
+  isWidgetCollapsed: true,
   tours: [] as TourTour[],
   usefulLinks: [] as string[],
   isWidgetShown: true,
@@ -125,7 +123,6 @@ const state = reactive({
 });
 provide("GuidedTourWidgetState", state!);
 function onCloseGuidedTourWidget(buttonClicked: boolean) {
-  console.info("toggle colapse in parent", buttonClicked);
   if (state.isWidgetCollapsed && buttonClicked) {
     state.isWidgetShown = false;
   } else {
@@ -167,7 +164,6 @@ onMounted(() => {
 // FIXME: The .val property is a workaround, so vue doesn't auto-unwrap the progress, thus making it non-reactive.
 const progress = {
   val: computed(() => {
-    console.debug("Computing progress...", state.tours);
     const allTasks: TourTask[] = state.tours.flatMap((t) => t.tasksList!);
     return (
       allTasks.filter(

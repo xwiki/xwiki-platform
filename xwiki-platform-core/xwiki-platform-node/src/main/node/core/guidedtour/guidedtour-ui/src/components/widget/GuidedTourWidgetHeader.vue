@@ -57,12 +57,12 @@ import type { ComputedRef } from "vue";
 const emit = defineEmits(["closeGuidedTourWidget"]);
 
 function onCloseButtonClicked(buttonClicked: boolean) {
-  console.info("Send widget close event...", buttonClicked);
   emit("closeGuidedTourWidget", buttonClicked);
 }
 
 const props = defineProps<{ progress: ComputedRef<number> }>();
-const progress = props.progress; // reactive read-only ref
+// Reactive read-only ref for progress.
+const progress = props.progress;
 </script>
 
 <style>

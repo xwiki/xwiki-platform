@@ -48,7 +48,6 @@ export class DefaultTourManagerApi implements TourManagerApi {
    * Fetch all tours. Returns cached data if available.
    */
   async getTours(): Promise<TourTour[]> {
-    console.debug("Getting tours");
     if (this.sharedStore.cache.tours?.length > 0) {
       return this.sharedStore.cache.tours;
     }

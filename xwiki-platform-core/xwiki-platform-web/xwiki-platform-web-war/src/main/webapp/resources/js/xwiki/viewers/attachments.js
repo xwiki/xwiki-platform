@@ -62,7 +62,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** Enhance the upload form with JS behaviors. */
     prepareForm() {
-      if (!$("attachform")) return;
+      if ($("attachform").length === 0) return;
       this.form = $("#attachform").parents("form");
       let fileInput = this.form.find("input[type='file']");
       this.defaultFileDiv = fileInput.parent("div");

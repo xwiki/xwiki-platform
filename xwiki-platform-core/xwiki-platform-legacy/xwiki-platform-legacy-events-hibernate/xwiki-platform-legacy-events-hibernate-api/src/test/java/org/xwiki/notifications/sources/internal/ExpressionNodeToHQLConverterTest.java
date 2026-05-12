@@ -45,6 +45,7 @@ import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.text.StringUtils;
@@ -57,6 +58,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 /**
  * Unit tests for {@link ExpressionNodeToHQLConverter}.
  */
+@ComponentTest
 class ExpressionNodeToHQLConverterTest
 {
     @InjectMockComponents

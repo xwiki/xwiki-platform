@@ -62,10 +62,10 @@
     <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.8</jetty.server.version>
+    <jetty.server.version>12.1.9</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.12.Final</netty.version>
+    <netty.version>4.2.13.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.154.0</metaeffekt.version>
@@ -949,7 +949,7 @@
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.27.0</version>
+        <version>1.28.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1198,16 +1198,6 @@
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
         <version>7.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>inversify</artifactId>
-        <version>7.10.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>reflect-metadata</artifactId>
-        <version>0.2.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

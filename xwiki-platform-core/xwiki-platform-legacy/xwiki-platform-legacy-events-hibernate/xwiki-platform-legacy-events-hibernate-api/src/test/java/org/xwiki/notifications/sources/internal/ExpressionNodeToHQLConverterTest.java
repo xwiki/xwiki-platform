@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -49,8 +50,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.text.StringUtils;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -59,6 +58,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 /**
  * Unit tests for {@link ExpressionNodeToHQLConverter}.
  */
+@ComponentTest
 class ExpressionNodeToHQLConverterTest
 {
     @InjectMockComponents

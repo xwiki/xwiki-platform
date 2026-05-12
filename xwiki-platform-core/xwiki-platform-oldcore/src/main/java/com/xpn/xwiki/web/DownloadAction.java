@@ -270,17 +270,18 @@ public class DownloadAction extends XWikiAction
         final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
-            InputStream data = attachment.getContentInputStream(context);
-            data = new BoundedInputStream(data, end + 1);
-            data.skip(start);
-            setCommonHeaders(attachment, request, response, context);
-            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-            if ((end - start + 1L) < Integer.MAX_VALUE) {
-                setContentLength(response, end - start + 1);
+            try (InputStream data = attachment.getContentInputStream(context)) {
+                InputStream boundedData = new BoundedInputStream(data, end + 1);
+                boundedData.skip(start);
+                setCommonHeaders(attachment, request, response, context);
+                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                if ((end - start + 1L) < Integer.MAX_VALUE) {
+                    setContentLength(response, end - start + 1);
+                }
+                response.setHeader("Content-Range",
+                    "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
+                IOUtils.copyLarge(boundedData, response.getOutputStream());
             }
-            response.setHeader("Content-Range",
-                "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
-            IOUtils.copyLarge(data, response.getOutputStream());
         } else {
             response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
         }

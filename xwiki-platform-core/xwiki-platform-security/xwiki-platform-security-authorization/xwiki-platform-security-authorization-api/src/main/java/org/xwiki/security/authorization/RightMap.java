@@ -53,7 +53,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     private transient List<Object> rights;
 
     /** Cached key set. */
-    private transient Set<Right> keySet;
+    private transient Set<Right> cachedKeySet;
 
     /** Cached value collection. */
     private transient Collection<V> cachedValues;
@@ -260,10 +260,10 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public Set<Right> keySet()
     {
-        if (keySet == null) {
-            keySet = new RightSet();
+        if (cachedKeySet == null) {
+            cachedKeySet = new RightSet();
         }
-        return keySet;
+        return cachedKeySet;
     }
 
     /**

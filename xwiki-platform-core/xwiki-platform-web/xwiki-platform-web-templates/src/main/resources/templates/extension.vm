@@ -110,7 +110,7 @@
           #else
             #set ($compatible = true)
           #end
-          <div class="extension-search-more collapse#if($customExtensionFilter) in#end">
+          <div class="extension-search-more collapse#if($customExtensionFilter) in#end" role="tabpanel">
             <div>
               <span class="box">
                 #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
@@ -142,7 +142,7 @@
       </div>
     </form>
     ## Advanced search form.
-    <form action="$xwiki.relativeRequestURL" class="xform extension-search-more collapse#if($customExtensionFilter) in#end">
+    <form action="$xwiki.relativeRequestURL" class="xform extension-search-more collapse#if($customExtensionFilter) in#end" role="tabpanel">
       <fieldset id="extension-search-advanced">
         <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
         <div id="extension-search-advanced-body"></div>

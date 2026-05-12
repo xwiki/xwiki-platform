@@ -45,16 +45,16 @@ export function parseLinkTarget(
 
   const ref = tryFallible(() => remoteURLParser.parse(url));
 
+  const parsedUrl = tryFallible(() => new URL(url));
+
   switch (ref?.type) {
     case EntityType.DOCUMENT:
       return {
         type: "page",
         config: {
           ref,
-          // TODO
-          anchor: undefined,
-          // TODO
-          queryString: undefined,
+          anchor: parsedUrl?.hash,
+          queryString: parsedUrl?.search,
         },
       };
 
@@ -63,13 +63,10 @@ export function parseLinkTarget(
         type: "attachment",
         config: {
           ref,
-          // TODO
-          queryString: undefined,
+          queryString: parsedUrl?.search,
         },
       };
   }
-
-  const parsedUrl = tryFallible(() => new URL(url));
 
   if (parsedUrl?.protocol === "mailto:") {
     const params = new URLSearchParams(parsedUrl.searchParams);

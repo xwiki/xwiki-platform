@@ -29,7 +29,7 @@ import type { EntityReference } from "@xwiki/platform-model-api";
 
 @injectable("Singleton")
 export class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
-  public static override bind(container: Container): void {
+  public static bindComponents(container: Container): void {
     container
       .bind("ModelReferenceHandler")
       .to(XWikiModelReferenceHandler)

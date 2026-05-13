@@ -347,7 +347,7 @@ public class XWiki implements EventListener
 
     private XWikiStatsService statsService;
 
-    private XWikiURLFactoryService urlFactoryService;
+    private volatile XWikiURLFactoryService urlFactoryService;
 
     private XWikiCriteriaService criteriaService;
 

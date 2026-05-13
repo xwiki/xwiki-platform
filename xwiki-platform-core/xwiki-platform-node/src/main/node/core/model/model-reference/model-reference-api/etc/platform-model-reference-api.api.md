@@ -10,6 +10,18 @@ import { EntityReference } from '@xwiki/platform-model-api';
 import { EntityType } from '@xwiki/platform-model-api';
 import { SpaceReference } from '@xwiki/platform-model-api';
 
+// @beta
+export abstract class AbstractModelReferenceHandler implements ModelReferenceHandler {
+    // (undocumented)
+    abstract createDocumentReference(name: string, space: SpaceReference): DocumentReference;
+    // (undocumented)
+    getParentDocumentReference(reference: DocumentReference): DocumentReference | undefined;
+    // (undocumented)
+    getParentSpaceReference(reference: SpaceReference): SpaceReference | undefined;
+    // (undocumented)
+    abstract getTitle(reference: EntityReference): string;
+}
+
 // @beta (undocumented)
 export class ComponentInit {
     constructor(container: Container);

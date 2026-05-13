@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AbstractModelReferenceHandler } from "./abstractModelReferenceHandler";
 import {
   AttachmentReference,
   DocumentReference,
@@ -25,7 +26,6 @@ import {
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { injectable } from "inversify";
-import type { ModelReferenceHandler } from "./modelReferenceHandler";
 import type { EntityReference, WikiReference } from "@xwiki/platform-model-api";
 
 /**
@@ -35,7 +35,7 @@ import type { EntityReference, WikiReference } from "@xwiki/platform-model-api";
  * @beta
  */
 @injectable()
-class DefaultModelReferenceHandler implements ModelReferenceHandler {
+class DefaultModelReferenceHandler extends AbstractModelReferenceHandler {
   createDocumentReference(
     name: string,
     space: SpaceReference,
@@ -53,34 +53,6 @@ class DefaultModelReferenceHandler implements ModelReferenceHandler {
         return (reference as DocumentReference).name;
       case EntityType.ATTACHMENT:
         return (reference as AttachmentReference).name;
-    }
-  }
-
-  getParentDocumentReference(
-    reference: DocumentReference,
-  ): DocumentReference | undefined {
-    const parentSpace = reference.space
-      ? this.getParentSpaceReference(reference.space)
-      : undefined;
-
-    if (parentSpace) {
-      return this.createDocumentReference(
-        reference.space!.names.at(-1)!,
-        parentSpace,
-      );
-    }
-  }
-
-  getParentSpaceReference(
-    reference: SpaceReference,
-  ): SpaceReference | undefined {
-    if (reference.names.length > 0) {
-      return new SpaceReference(
-        reference.wiki,
-        ...reference.names.slice(0, -1),
-      );
-    } else {
-      return undefined;
     }
   }
 }

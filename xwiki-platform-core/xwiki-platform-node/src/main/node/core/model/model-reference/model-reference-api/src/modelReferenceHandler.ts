@@ -54,7 +54,8 @@ interface ModelReferenceHandler {
    * Returns the {@link DocumentReference} considered as the direct parent of
    * the given document reference.
    * @param reference - the reference for which we want the parent
-   * @returns the parent for the given reference
+   * @returns the parent for the given reference, undefined if there is none
+
    *
    * @since 18.4.0RC1
    * @beta
@@ -67,7 +68,7 @@ interface ModelReferenceHandler {
    * Returns the {@link SpaceReference} considered as the direct parent of
    * the given space reference.
    * @param reference - the reference for which we want the parent
-   * @returns the parent for the given reference
+   * @returns the parent for the given reference, undefined if there is none
    *
    * @since 18.4.0RC1
    * @beta

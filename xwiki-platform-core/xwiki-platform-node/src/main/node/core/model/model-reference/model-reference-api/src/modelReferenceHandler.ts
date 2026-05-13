@@ -55,7 +55,6 @@ interface ModelReferenceHandler {
    * the given document reference.
    * @param reference - the reference for which we want the parent
    * @returns the parent for the given reference, undefined if there is none
-
    *
    * @since 18.4.0RC1
    * @beta

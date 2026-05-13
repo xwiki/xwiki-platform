@@ -587,7 +587,7 @@ var XWiki = (function(XWiki){
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
-            // This need to be changed for XWIKI-24323
+            // TODO: Replace with the use of the icon theme (see XWIKI-24323).
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({

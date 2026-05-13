@@ -19,7 +19,6 @@
  */
 package org.xwiki.repository.internal.resources;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProxySelector;
@@ -39,6 +38,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -186,7 +187,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
                 final ClassicHttpResponse responseToClose = subResponse;
                 InputStream baseStream = entity != null ? entity.getContent() : InputStream.nullInputStream();
-                InputStream contentStream = new FilterInputStream(baseStream)
+                InputStream contentStream = new ProxyInputStream(baseStream)
                 {
                     @Override
                     public void close() throws IOException
@@ -194,11 +195,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                         try {
                             super.close();
                         } finally {
-                            try {
-                                responseToClose.close();
-                            } finally {
-                                httpClient.close();
-                            }
+                            IOUtils.closeQuietly(responseToClose, httpClient);
                         }
                     }
                 };
@@ -210,18 +207,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 handoffSucceeded = true;
             } finally {
                 if (!handoffSucceeded) {
-                    if (subResponse != null) {
-                        try {
-                            subResponse.close();
-                        } catch (IOException ignored) {
-                            // Best effort cleanup.
-                        }
-                    }
-                    try {
-                        httpClient.close();
-                    } catch (IOException ignored) {
-                        // Best effort cleanup.
-                    }
+                    IOUtils.closeQuietly(subResponse, httpClient);
                 }
             }
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {

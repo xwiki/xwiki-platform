@@ -18,18 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AbstractModelReferenceHandler } from "./abstractModelReferenceHandler";
 import {
   AttachmentReference,
   DocumentReference,
   EntityType,
+  SpaceReference,
 } from "@xwiki/platform-model-api";
 import { injectable } from "inversify";
-import type { ModelReferenceHandler } from "./modelReferenceHandler";
-import type {
-  EntityReference,
-  SpaceReference,
-  WikiReference,
-} from "@xwiki/platform-model-api";
+import type { EntityReference, WikiReference } from "@xwiki/platform-model-api";
 
 /**
  * Default implementation for {@link ModelReferenceHandler}.
@@ -38,7 +35,7 @@ import type {
  * @beta
  */
 @injectable()
-class DefaultModelReferenceHandler implements ModelReferenceHandler {
+class DefaultModelReferenceHandler extends AbstractModelReferenceHandler {
   createDocumentReference(
     name: string,
     space: SpaceReference,
@@ -52,13 +49,11 @@ class DefaultModelReferenceHandler implements ModelReferenceHandler {
         return (reference as WikiReference).name;
       case EntityType.SPACE:
         return [...(reference as SpaceReference).names].pop()!;
-      case EntityType.DOCUMENT: {
+      case EntityType.DOCUMENT:
         return (reference as DocumentReference).name;
-      }
       case EntityType.ATTACHMENT:
         return (reference as AttachmentReference).name;
     }
-    return "";
   }
 }
 

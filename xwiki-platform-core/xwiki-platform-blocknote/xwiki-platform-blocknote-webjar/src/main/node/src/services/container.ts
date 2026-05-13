@@ -65,7 +65,7 @@ DefaultModelReferenceSerializerProvider.bind(container);
 XWikiModelReferenceSerializer.bind(container);
 
 DefaultModelReferenceHandlerProvider.bind(container);
-XWikiModelReferenceHandler.bind(container);
+XWikiModelReferenceHandler.bindComponents(container);
 
 DefaultResourceReferenceParser.bind(container);
 

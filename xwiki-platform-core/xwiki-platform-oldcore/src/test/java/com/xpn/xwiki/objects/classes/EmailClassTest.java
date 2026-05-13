@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,6 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,22 +48,20 @@ class EmailClassTest
 
     private EmailAddressObfuscator emailAddressObfuscator;
 
-    private EmailClass emailClass;
+    private final EmailClass emailClass = new EmailClass();
 
     @BeforeEach
     void setUp() throws Exception
     {
         Utils.setComponentManager(this.componentManager);
         this.emailAddressObfuscator = this.componentManager.registerMockComponent(EmailAddressObfuscator.class);
-        this.emailClass = new EmailClass();
     }
 
     @Test
-    void getObfuscatedValueWithValidEmail()
+    void getObfuscatedValueWithValidEmail() throws AddressException
     {
-        when(this.emailAddressObfuscator.obfuscate(
-            argThat(address -> "john@doe.com".equals(address.getAddress())))).thenReturn("j...@doe.com");
-
+        when(this.emailAddressObfuscator.obfuscate(InternetAddress.parse("john@doe.com")[0]))
+            .thenReturn("j...@doe.com");
         assertEquals("j...@doe.com", this.emailClass.getObfuscatedValue("john@doe.com"));
     }
 

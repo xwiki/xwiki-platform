@@ -35,9 +35,9 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
  * <dl>
  *   <dt>text</dt>
- *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text. Before, it was used
- *   as HTML content. You can check for the presence of the Notification.textFormat static method to know which
- *   behavior applies at runtime.</dd>
+ *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text unless textHtml is true.
+ *   Before, it was used as HTML content. You can check for the presence of the Notification.textFormat static
+ *   method to know which default behavior applies at runtime.</dd>
  *   <dt>type (optional)</dt>
  *   <dd>The notification type, one of <tt>plain</tt>, <tt>info</tt>, <tt>warning</tt>, <tt>error</tt>, <tt>inprogress</tt>,
  *    <tt>done</tt>. If an unknown or no type is passed, <tt>plain</tt> is used by default.</dd>
@@ -49,6 +49,10 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  *     <li><tt>icon</tt>: a custom image to use</li>
  *     <li><tt>color</tt>: a custom color for the text</li>
  *     <li><tt>backgroundColor</tt>: a custom color for the background</li>
+ *     <li><tt>textHtml</tt> (since 18.4.0RC1): when true, the <tt>text</tt> parameter is interpreted as HTML; when
+ *      false (default), it is used as plain text. <strong>Warning:</strong> setting this to true exposes the
+ *      notification to XSS attacks if the <tt>text</tt> value contains untrusted content; callers are responsible
+ *      for properly escaping any user-provided data before passing it in.</li>
  *   </ul>
  *   </dd>
  * </dl>
@@ -95,7 +99,8 @@ widgets.Notification = Class.create({
     "warning"    : {timeout : 5},
     "error"      : {timeout : 10},
     "inprogress" : {timeout : false},
-    "done"       : {timeout : 2}
+    "done"       : {timeout : 2},
+    textHtml     : false
   },
   initialize : function(text, type, options) {
     this.text = text || this.text;
@@ -111,7 +116,11 @@ widgets.Notification = Class.create({
     if (!this.element) {
       // The notification container is already an ARIA "alert", those notifications do not need extra semantics.
       this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type});
-      this.element.textContent = this.text;
+      if (this.options.textHtml) {
+        this.element.update(this.text);
+      } else {
+        this.element.textContent = this.text;
+      }
       if (this.options.icon) {
         this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
       }

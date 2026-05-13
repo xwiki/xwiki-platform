@@ -219,7 +219,7 @@ var XWiki = (function(XWiki) {
       this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
       this.failedBox = new XWiki.widgets.Notification(
         '$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""></span>"]))',
-        "error", {inactive: true});
+        "error", {inactive: true, textHtml: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
       this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});

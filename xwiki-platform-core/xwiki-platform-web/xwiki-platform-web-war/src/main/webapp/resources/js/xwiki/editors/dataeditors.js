@@ -545,7 +545,8 @@
               }).fail(function (error) {
                 // FIXME: we should change translation value for action.addClassProperty.error.invalidName
                 let failureReason = error.responseText.replaceAll("&#60;br/&#62;", "<br/>") || 'Server not responding';
-                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason, "error"));
+                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason,
+                  "error", {textHtml: true}));
               }).always(function () {
                 item.prop('disabled', false);
               });

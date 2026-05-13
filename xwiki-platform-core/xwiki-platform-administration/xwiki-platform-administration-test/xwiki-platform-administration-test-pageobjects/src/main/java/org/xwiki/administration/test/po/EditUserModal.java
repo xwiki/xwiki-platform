@@ -60,6 +60,8 @@ public class EditUserModal extends BaseModal
     public EditUserModal waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector("#editUserModal form#edituser"));
+        // Wait until the loading class has been removed from the modal body.
+        getDriver().waitUntilElementDisappears(By.cssSelector("#editUserModal .modal-body.loading"));
         return this;
     }
 
@@ -71,6 +73,17 @@ public class EditUserModal extends BaseModal
     public EditUserModal waitUntilEditConfirmationWarningIsDisplayed()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector("#editUserModal .forceLock"));
+        // The required rights warning is loaded through AJAX and its toggle handler is attached asynchronously.
+        // Wait for the handler to be bound so clicking the details toggle is reliable.
+        // TODO: it would be nice to have something less fragile/targeted.
+        getDriver().waitUntilJavascriptCondition(
+            "var toggle = arguments[0].querySelector('.required-rights-advanced-toggle');"
+                + "if (!toggle) { return true; }"
+                + "var events = window.jQuery && window.jQuery._data && window.jQuery._data(toggle, 'events');"
+                + "return !!(events && events.click && events.click.some(function(handler) {"
+                + "  return handler.namespace === 'required-rights-results';"
+                + "}));",
+            this.container);
         return this;
     }
 

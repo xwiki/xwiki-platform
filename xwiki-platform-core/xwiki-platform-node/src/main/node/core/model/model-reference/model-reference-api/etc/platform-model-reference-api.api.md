@@ -18,6 +18,8 @@ export class ComponentInit {
 // @beta
 export interface ModelReferenceHandler {
     createDocumentReference(name: string, space: SpaceReference): DocumentReference;
+    getParentDocumentReference(reference: DocumentReference): DocumentReference | undefined;
+    getParentSpaceReference(reference: SpaceReference): SpaceReference | undefined;
     getTitle(reference: EntityReference): string;
 }
 

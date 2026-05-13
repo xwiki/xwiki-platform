@@ -627,7 +627,7 @@ var XWiki = (function(XWiki){
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
-      // This need to be changed for XWIKI-24324
+      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

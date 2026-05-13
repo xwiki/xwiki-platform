@@ -156,29 +156,31 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
                 HttpGet getMethod = new HttpGet(url.toString());
 
-                int[] statusCodeHolder = {0};
-                String[] contentTypeHolder = {null};
-                byte[] content;
+                record HttpResult(int statusCode, String contentType, byte[] content) { }
+
+                HttpResult result;
                 try {
-                    content = httpClient.execute(getMethod, subResponse -> {
-                        statusCodeHolder[0] = subResponse.getCode();
+                    result = httpClient.execute(getMethod, subResponse -> {
                         var entity = subResponse.getEntity();
-                        contentTypeHolder[0] = entity != null ? entity.getContentType() : null;
-                        return entity != null ? EntityUtils.toByteArray(entity) : new byte[0];
+                        return new HttpResult(
+                            subResponse.getCode(),
+                            entity != null ? entity.getContentType() : null,
+                            entity != null ? EntityUtils.toByteArray(entity) : new byte[0]
+                        );
                     });
                 } catch (Exception e) {
                     throw new IOException("Failed to request [" + url + "]", e);
                 }
 
-                response = Response.status(statusCodeHolder[0]);
-                MediaType type = contentTypeHolder[0] != null ? MediaType.valueOf(contentTypeHolder[0])
+                response = Response.status(result.statusCode());
+                MediaType type = result.contentType() != null ? MediaType.valueOf(result.contentType())
                     : MediaType.APPLICATION_OCTET_STREAM_TYPE;
                 response.type(type);
 
                 BaseObject extensionObject = getExtensionObject(extensionDocument);
                 String extensionType =
                     this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
-                response.entity(content);
+                response.entity(result.content());
                 response.header("Content-Disposition",
                     "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
             }

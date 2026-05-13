@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,9 +54,9 @@ import static org.mockito.Mockito.when;
  * @since 6.1RC1
  */
 @ComponentTest
-public class TemplateMimeBodyPartFactoryTest
+class TemplateMimeBodyPartFactoryTest
 {
-    private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+    private final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
     @InjectMockComponents
     private TemplateMimeBodyPartFactory templateMimeBodyPartFactory;
@@ -135,7 +134,7 @@ public class TemplateMimeBodyPartFactoryTest
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", "Hello John Doe, john@doe.com");
-        htmlParameters.put("attachments", Arrays.asList(attachment1, attachment2));
+        htmlParameters.put("attachments", List.of(attachment1, attachment2));
 
         verify(this.htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
     }

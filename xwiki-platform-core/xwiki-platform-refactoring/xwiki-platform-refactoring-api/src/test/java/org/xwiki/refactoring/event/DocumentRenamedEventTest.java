@@ -22,26 +22,22 @@ package org.xwiki.refactoring.event;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link DocumentRenamedEvent}.
- * 
+ *
  * @version $Id$
  */
-public class DocumentRenamedEventTest
+class DocumentRenamedEventTest
 {
     @Test
-    public void cancelThrowsException()
+    void cancelThrowsException()
     {
         DocumentRenamedEvent event = new DocumentRenamedEvent();
         assertFalse(event.isCanceled());
 
-        try {
-            event.cancel();
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // This event can't be canceled.
-        }
+        // This event can't be canceled.
+        assertThrows(UnsupportedOperationException.class, event::cancel);
     }
 }

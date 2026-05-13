@@ -20,8 +20,8 @@
 package org.xwiki.mail.integration;
 
 import java.security.Security;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Provider;
@@ -103,7 +103,7 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
+class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + AuthenticatingIntegrationTest.class.getSimpleName();
 
@@ -127,7 +127,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     private MailSender sender;
 
     @BeforeComponent
-    public void registerConfiguration() throws Exception
+    void registerConfiguration() throws Exception
     {
         this.greenMail.start();
 
@@ -161,7 +161,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @BeforeEach
-    public void initialize() throws Exception
+    void initialize() throws Exception
     {
         // Create a user in the SMTP server.
         this.greenMail.setUser("peter@doe.com", "peter", "password");
@@ -177,7 +177,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @AfterEach
-    public void cleanUp() throws Exception
+    void cleanUp() throws Exception
     {
         logCapture.ignoreAllMessages();
 
@@ -191,7 +191,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendTextMail() throws Exception
+    void sendTextMail() throws Exception
     {
         // Set the EC
         Execution execution = this.componentManager.getInstance(Execution.class);
@@ -220,11 +220,11 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
         Multipart multipart = new MimeMultipart("mixed");
         // Add text in the body
         multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
-            Collections.<String, Object>singletonMap("mimetype", "text/plain")));
+            Collections.singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
         // Step 4: Send the mail
-        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+        this.sender.sendAsynchronously(List.of(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);

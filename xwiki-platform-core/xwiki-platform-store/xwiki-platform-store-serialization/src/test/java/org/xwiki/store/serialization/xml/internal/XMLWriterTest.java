@@ -22,11 +22,13 @@ package org.xwiki.store.serialization.xml.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests XMLWriter
@@ -34,110 +36,105 @@ import org.junit.Test;
  * @version $Id$
  * @since 3.0M2
  */
-public class XMLWriterTest
+class XMLWriterTest
 {
-    private static final String TEST_CONTENT =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<root>\n"
-      + " <doc>\n"
-      + "  <obj>\n"
-      + "   <prop>\n"
-      + "   </prop>\n"
-      + "  </obj>\n"
-      + " </doc>\n"
-      + "</root>";
+    private static final String TEST_CONTENT = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <root>
+         <doc>
+          <obj>
+           <prop>
+           </prop>
+          </obj>
+         </doc>
+        </root>""";
 
     private static final String BASE64_INPUT =
         "This string will be converted to base64, it has to be long enough to see that the "
       + "lines will be broken at the right length.";
 
-    private static final String BASE64_TEST =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<root>\n"
-      + " <doc>\n"
-      + "  <obj>\n"
-      + "   <prop>\n"
-      + "VGhpcyBzdHJpbmcgd2lsbCBiZSBjb252ZXJ0ZWQgdG8gYmFzZTY0LCBpdCBoYXMgdG8gYmUgbG9uZyBl\n"
-      + "bm91Z2ggdG8gc2VlIHRoYXQgdGhlIGxpbmVzIHdpbGwgYmUgYnJva2VuIGF0IHRoZSByaWdodCBsZW5n\n"
-      + "dGgu\n"
-      + "   </prop>\n"
-      + "  </obj>\n"
-      + " </doc>\n"
-      + "</root>";
+    private static final String BASE64_TEST = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <root>
+         <doc>
+          <obj>
+           <prop>
+        VGhpcyBzdHJpbmcgd2lsbCBiZSBjb252ZXJ0ZWQgdG8gYmFzZTY0LCBpdCBoYXMgdG8gYmUgbG9uZyBl
+        bm91Z2ggdG8gc2VlIHRoYXQgdGhlIGxpbmVzIHdpbGwgYmUgYnJva2VuIGF0IHRoZSByaWdodCBsZW5n
+        dGgu
+           </prop>
+          </obj>
+         </doc>
+        </root>""";
 
-    private static final String WRITE_STREAM_TEST =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<root>\n"
-      + " <prop>Hello World!</prop>\n"
-      + "</root>";
-
-    private XMLWriter writer;
+    private static final String WRITE_STREAM_TEST = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <root>
+         <prop>Hello World!</prop>
+        </root>""";
 
     /**
      * Make sure writeClose closes internediet nodes.
      */
     @Test
-    public void testWriteClose() throws Exception
+    void writeClose() throws Exception
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final OutputFormat of = new OutputFormat(" ", true, "UTF-8");
 
-        this.writer = new XMLWriter(baos, of);
-        this.writer.startDocument();
+        XMLWriter writer = new XMLWriter(baos, of);
+        writer.startDocument();
 
-        this.writer.writeOpen(new DOMElement("root"));
-        this.writer.writeOpen(new DOMElement("doc"));
-        this.writer.writeOpen(new DOMElement("obj"));
-        this.writer.writeOpen(new DOMElement("prop"));
-        this.writer.writeClose(new DOMElement("root"));
+        writer.writeOpen(new DOMElement("root"));
+        writer.writeOpen(new DOMElement("doc"));
+        writer.writeOpen(new DOMElement("obj"));
+        writer.writeOpen(new DOMElement("prop"));
+        writer.writeClose(new DOMElement("root"));
 
-        this.writer.endDocument();
+        writer.endDocument();
 
-        Assert.assertEquals("WriteClose didn't write the correct response.",
-            TEST_CONTENT,
-            new String(baos.toByteArray(), "UTF-8"));
+        assertEquals(TEST_CONTENT, baos.toString(StandardCharsets.UTF_8),
+            "WriteClose didn't write the correct response.");
     }
 
     @Test
-    public void testBase64() throws Exception
+    void base64() throws Exception
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final OutputFormat of = new OutputFormat(" ", true, "UTF-8");
 
-        this.writer = new XMLWriter(baos, of);
-        this.writer.startDocument();
+        XMLWriter writer = new XMLWriter(baos, of);
+        writer.startDocument();
 
-        this.writer.writeOpen(new DOMElement("root"));
-        this.writer.writeOpen(new DOMElement("doc"));
-        this.writer.writeOpen(new DOMElement("obj"));
-        this.writer.writeBase64(new DOMElement("prop"),
-            new ByteArrayInputStream(BASE64_INPUT.getBytes("UTF-8")));
-        this.writer.writeClose(new DOMElement("root"));
+        writer.writeOpen(new DOMElement("root"));
+        writer.writeOpen(new DOMElement("doc"));
+        writer.writeOpen(new DOMElement("obj"));
+        writer.writeBase64(new DOMElement("prop"),
+            new ByteArrayInputStream(BASE64_INPUT.getBytes(StandardCharsets.UTF_8)));
+        writer.writeClose(new DOMElement("root"));
 
-        this.writer.endDocument();
+        writer.endDocument();
 
-        Assert.assertEquals("Incorrect response from testBase64.",
-            BASE64_TEST,
-            new String(baos.toByteArray(), "UTF-8"));
+        assertEquals(BASE64_TEST, baos.toString(StandardCharsets.UTF_8),
+            "Incorrect response from testBase64.");
     }
 
     @Test
-    public void testWriteStream() throws Exception
+    void writeStream() throws Exception
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final OutputFormat of = new OutputFormat(" ", true, "UTF-8");
 
-        this.writer = new XMLWriter(baos, of);
-        this.writer.startDocument();
+        XMLWriter writer = new XMLWriter(baos, of);
+        writer.startDocument();
 
-        this.writer.writeOpen(new DOMElement("root"));
-        this.writer.write(new DOMElement("prop"), new StringReader("Hello World!"));
-        this.writer.writeClose(new DOMElement("root"));
+        writer.writeOpen(new DOMElement("root"));
+        writer.write(new DOMElement("prop"), new StringReader("Hello World!"));
+        writer.writeClose(new DOMElement("root"));
 
-        this.writer.endDocument();
+        writer.endDocument();
 
-        Assert.assertEquals("Incorrect response from testWriteStream.",
-            WRITE_STREAM_TEST,
-            new String(baos.toByteArray(), "UTF-8"));
+        assertEquals(WRITE_STREAM_TEST, baos.toString(StandardCharsets.UTF_8),
+            "Incorrect response from testWriteStream.");
     }
 }

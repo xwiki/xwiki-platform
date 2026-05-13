@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import jakarta.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -29,9 +29,11 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,35 +42,28 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.2M1
  */
-public class CurrentAttachmentReferenceResolverTest
+@ComponentTest
+class CurrentAttachmentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<CurrentAttachmentReferenceResolver> mocker =
-            new MockitoComponentMockingRule<>(CurrentAttachmentReferenceResolver.class);
-    
+    @InjectMockComponents
+    private CurrentAttachmentReferenceResolver resolver;
+
+    @MockComponent
+    @Named("current")
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
-    
-    @Before
-    public void SetUp() throws Exception
-    {
-        entityReferenceResolver = mocker.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "current");
-    }
 
     @Test
-    public void resolveTest() throws Exception
+    void resolveTest()
     {
-        // Mocks
         EntityReference entityReference = new EntityReference("hello.txt", EntityType.ATTACHMENT);
-        
-        AttachmentReference attachmentReference = new AttachmentReference("hello.txt", 
+
+        AttachmentReference attachmentReference = new AttachmentReference("hello.txt",
                 new DocumentReference("Document", new SpaceReference("Space", new WikiReference("wiki"))));
-        
-        when(entityReferenceResolver.resolve(entityReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);
-        
-        // Test
-        AttachmentReference result = mocker.getComponentUnderTest().resolve(entityReference);
-        
-        // Verify
+
+        when(this.entityReferenceResolver.resolve(entityReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);
+
+        AttachmentReference result = this.resolver.resolve(entityReference);
+
         assertEquals(attachmentReference, result);
     }
 }

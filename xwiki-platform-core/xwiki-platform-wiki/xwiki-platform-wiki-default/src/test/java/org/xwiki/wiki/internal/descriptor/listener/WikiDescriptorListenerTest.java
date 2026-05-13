@@ -22,14 +22,14 @@ package org.xwiki.wiki.internal.descriptor.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
@@ -50,28 +50,23 @@ import static org.mockito.Mockito.when;
  * @since 6.0M1
  * @version $Id$
  */
-public class WikiDescriptorListenerTest
+@ComponentTest
+class WikiDescriptorListenerTest
 {
-    @Rule
-    public org.xwiki.test.mockito.MockitoComponentMockingRule<WikiDescriptorListener> mocker =
-        new MockitoComponentMockingRule(WikiDescriptorListener.class);
+    @InjectMockComponents
+    private WikiDescriptorListener wikiDescriptorListener;
 
+    @MockComponent
     private WikiDescriptorBuilder builder;
 
+    @MockComponent
     private WikiDescriptorCache cache;
 
+    @MockComponent
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        builder = mocker.getInstance(WikiDescriptorBuilder.class);
-        cache = mocker.getInstance(WikiDescriptorCache.class);
-        wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
-    }
-
     @Test
-    public void onDocumentDeletedEvent() throws Exception
+    void onDocumentDeletedEvent()
     {
         XWikiDocument document = mock(XWikiDocument.class);
         XWikiDocument originalDocument = mock(XWikiDocument.class);
@@ -87,21 +82,22 @@ public class WikiDescriptorListenerTest
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwikiA");
         when(originalDocument.getDocumentReference()).thenReturn(documentReference);
 
-        when(wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(documentReference)).thenReturn("subwikia");
+        when(this.wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(documentReference))
+            .thenReturn("subwikia");
 
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("subwikia", "alias");
-        when(cache.getFromId("subwikia")).thenReturn(descriptor);
+        when(this.cache.getFromId("subwikia")).thenReturn(descriptor);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, document, null);
+        this.wikiDescriptorListener.onEvent(event, document, null);
 
         // Verify
-        verify(cache).remove(descriptor.getId(), descriptor.getAliases());
-        verify(cache, never()).add(any(DefaultWikiDescriptor.class));
+        verify(this.cache).remove(descriptor.getId(), descriptor.getAliases());
+        verify(this.cache, never()).add(any(DefaultWikiDescriptor.class));
     }
 
     @Test
-    public void onDocumentUpdatedEvent() throws Exception
+    void onDocumentUpdatedEvent()
     {
         XWikiDocument document = mock(XWikiDocument.class);
         XWikiDocument originalDocument = mock(XWikiDocument.class);
@@ -117,10 +113,11 @@ public class WikiDescriptorListenerTest
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwikiA");
         when(originalDocument.getDocumentReference()).thenReturn(documentReference);
 
-        when(wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(documentReference)).thenReturn("subwikia");
+        when(this.wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(documentReference))
+            .thenReturn("subwikia");
 
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("subwikia", "alias");
-        when(cache.getFromId("subwikia")).thenReturn(descriptor);
+        when(this.cache.getFromId("subwikia")).thenReturn(descriptor);
 
         // New objects
         List<BaseObject> newObjects = new ArrayList<>();
@@ -129,14 +126,13 @@ public class WikiDescriptorListenerTest
 
         when(document.getXObjects(WikiDescriptorListener.SERVER_CLASS)).thenReturn(newObjects);
         DefaultWikiDescriptor newDescriptor = new DefaultWikiDescriptor("subwikia", "newAlias");
-        when(builder.buildDescriptorObject(newObjects, document)).thenReturn(newDescriptor);
+        when(this.builder.buildDescriptorObject(newObjects, document)).thenReturn(newDescriptor);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, document, null);
+        this.wikiDescriptorListener.onEvent(event, document, null);
 
         // Verify
-        verify(cache).remove(descriptor.getId(), descriptor.getAliases());
-        verify(cache).add(newDescriptor);
+        verify(this.cache).remove(descriptor.getId(), descriptor.getAliases());
+        verify(this.cache).add(newDescriptor);
     }
-
 }

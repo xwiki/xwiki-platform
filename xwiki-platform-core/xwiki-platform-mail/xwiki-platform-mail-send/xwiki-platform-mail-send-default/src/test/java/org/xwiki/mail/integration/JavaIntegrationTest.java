@@ -22,8 +22,8 @@ package org.xwiki.mail.integration;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -112,7 +112,7 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class JavaIntegrationTest extends AbstractMailIntegrationTest
+class JavaIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + JavaIntegrationTest.class.getSimpleName();
 
@@ -139,7 +139,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     private MailSender sender;
 
     @BeforeComponent
-    public void registerConfiguration() throws Exception
+    void registerConfiguration() throws Exception
     {
         this.greenMail.start();
 
@@ -170,7 +170,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @BeforeEach
-    public void initialize() throws Exception
+    void initialize() throws Exception
     {
         // Make sure files for temporary attachments are saved in the target directory
         StandardEnvironment environment = this.componentManager.getInstance(Environment.class);
@@ -204,7 +204,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @AfterEach
-    public void cleanUp() throws Exception
+    void cleanUp() throws Exception
     {
         logCapture.ignoreAllMessages();
 
@@ -218,7 +218,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendTextMail() throws Exception
+    void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
         Session session = Session.getInstance(this.configuration.getAllProperties());
@@ -236,7 +236,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         message.setContent(multipart);
 
         // We also test using some default BCC addresses from configuration in this test
-        this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
+        this.configuration.setBCCAddresses(List.of("bcc1@doe.com", "bcc2@doe.com"));
 
         // Ensure we do not reuse the same message identifier for multiple similar messages in this test
         MimeMessage message2 = new MimeMessage(message);
@@ -247,7 +247,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message, message2, message3), session, memoryMailListener);
+        this.sender.sendAsynchronously(List.of(message, message2, message3), session, memoryMailListener);
 
         // Note: we don't test status reporting from the listener since this is already tested in the
         // ScriptingIntegrationTest test class.
@@ -273,7 +273,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendHTMLAndCalendarInvitationMail() throws Exception
+    void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
         Session session = Session.getInstance(this.configuration.getAllProperties());
@@ -305,7 +305,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+        this.sender.sendAsynchronously(List.of(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
@@ -329,7 +329,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendMailWithAttachment() throws Exception
+    void sendMailWithAttachment() throws Exception
     {
         // Remove any tmp file to start with a clean slate
         FileUtils.cleanDirectory(new File(MAILTMPDIR));
@@ -355,7 +355,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         assertEquals(1, new File(MAILTMPDIR).listFiles().length);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+        this.sender.sendAsynchronously(List.of(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
@@ -378,7 +378,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendMailWithCustomMessageId() throws Exception
+    void sendMailWithCustomMessageId() throws Exception
     {
         Session session = Session.getInstance(this.configuration.getAllProperties());
         MimeMessage message = new MimeMessage(session)
@@ -397,7 +397,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         message.setSubject("subject");
 
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
+        this.sender.sendAsynchronously(List.of(message), session, memoryMailListener);
 
         // Verify that the mails have been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);

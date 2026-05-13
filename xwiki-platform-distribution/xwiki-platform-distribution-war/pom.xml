@@ -161,9 +161,7 @@
                     <exclude>jakarta.servlet:jakarta.servlet-api:*:*:compile</exclude>
                   </excludes>
                   <includes>
-                    <!-- Allow only JUnit and JMock with scope test because -->
-                    <include>org.jmock:*:*:*:test</include>
-                    <include>jmock:*:*:*:test</include>
+                    <!-- Allow only JUnit with scope test -->
                     <include>junit:*:*:*:test</include>
                     <include>org.junit.*:*:*:*:test</include>
                     <include>org.mockito:*:*:*:test</include>

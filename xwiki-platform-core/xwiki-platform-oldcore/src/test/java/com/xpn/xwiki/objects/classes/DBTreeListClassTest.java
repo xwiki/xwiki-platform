@@ -19,18 +19,17 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
@@ -39,29 +38,24 @@ import static org.mockito.Mockito.doAnswer;
  * 
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
-public class DBTreeListClassTest
+class DBTreeListClassTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before() throws Exception
     {
-        doAnswer(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(0);
-            }
-        }).when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
+        doAnswer(invocation -> invocation.getArgument(0))
+            .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
 
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
     }
 
     @Test
-    public void testGetQueryWhenNoSQLSCriptSpecified()
+    void getQueryWhenNoSQLScriptSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         assertEquals("select doc.name from XWikiDocument doc where 1 = 0",
@@ -69,7 +63,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithSqlScriptSpecified()
+    void getQueryWithSqlScriptSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         assertEquals("", dbtlc.getSql());
@@ -79,7 +73,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithClassSpecified()
+    void getQueryWithClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -90,7 +84,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithClassAndParentSpecified()
+    void getQueryWithClassAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -102,7 +96,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdSpecified()
+    void getQueryWithIdSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -118,7 +112,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndParentSpecified()
+    void getQueryWithIdAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -167,7 +161,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithValueSpecified()
+    void getQueryWithValueSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setValueField("doc.name");
@@ -176,7 +170,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndClassnameSpecified()
+    void getQueryWithIdAndClassnameSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -200,7 +194,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdParentAndClassnameSpecified()
+    void getQueryWithIdParentAndClassnameSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -271,7 +265,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndValueSpecified()
+    void getQueryWithIdAndValueSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -330,7 +324,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueAndParentSpecified()
+    void getQueryWithIdValueAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -350,7 +344,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueAndClassSpecified()
+    void getQueryWithIdValueAndClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -391,7 +385,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueParentAndClassSpecified()
+    void getQueryWithIdValueParentAndClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");

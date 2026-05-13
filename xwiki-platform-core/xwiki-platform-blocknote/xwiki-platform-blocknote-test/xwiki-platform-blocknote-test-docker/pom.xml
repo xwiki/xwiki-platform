@@ -108,6 +108,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used to enable multilingual. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
       <groupId>jakarta.websocket</groupId>

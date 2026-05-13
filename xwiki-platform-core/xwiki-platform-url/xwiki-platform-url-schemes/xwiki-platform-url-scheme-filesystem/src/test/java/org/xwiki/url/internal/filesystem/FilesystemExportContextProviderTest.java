@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * @since 7.2M1
  */
 @ComponentTest
-public class FilesystemExportContextProviderTest
+class FilesystemExportContextProviderTest
 {
     @MockComponent
     private Execution execution;
@@ -49,31 +49,31 @@ public class FilesystemExportContextProviderTest
     private ExecutionContext ec = new ExecutionContext();
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
-        when(this.execution.getContext()).thenReturn(ec);
+        when(this.execution.getContext()).thenReturn(this.ec);
     }
 
     @Test
-    public void getWhenExportContextNotInEC() throws Exception
+    void getWhenExportContextNotInEC()
     {
         FilesystemExportContext fec = this.provider.get();
-        assertSame(fec, ec.getProperty("filesystemExportContext"));
+        assertSame(fec, this.ec.getProperty("filesystemExportContext"));
     }
 
     @Test
-    public void getWhenExportContextAlreadyInEC() throws Exception
+    void getWhenExportContextAlreadyInEC()
     {
         FilesystemExportContext fec = new FilesystemExportContext();
-        ec.setProperty("filesystemExportContext", fec);
+        this.ec.setProperty("filesystemExportContext", fec);
 
         FilesystemExportContext newfec = this.provider.get();
-        assertSame(newfec, ec.getProperty("filesystemExportContext"));
+        assertSame(newfec, this.ec.getProperty("filesystemExportContext"));
         assertSame(newfec, fec);
     }
 
     @Test
-    public void set() throws Exception
+    void set()
     {
         FilesystemExportContext fec = new FilesystemExportContext();
         FilesystemExportContextProvider.set(this.ec, fec);

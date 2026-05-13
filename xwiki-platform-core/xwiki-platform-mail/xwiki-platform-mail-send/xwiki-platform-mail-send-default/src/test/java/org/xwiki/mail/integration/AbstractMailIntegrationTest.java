@@ -26,7 +26,7 @@ import com.icegreen.greenmail.util.ServerSetup;
  *
  * @version $Id$
  */
-public abstract class AbstractMailIntegrationTest
+abstract class AbstractMailIntegrationTest
 {
     protected ServerSetup getCustomServerSetup(ServerSetup setup)
     {

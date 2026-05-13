@@ -21,11 +21,11 @@ package org.xwiki.rest.model.jaxb;
 
 import java.util.LinkedHashMap;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link MapAdapter}.
@@ -33,10 +33,10 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 9.8RC1
  */
-public class MapAdapterTest
+class MapAdapterTest
 {
     @Test
-    public void marshal() throws Exception
+    void marshal() throws Exception
     {
         java.util.Map<String, java.lang.Object> input = new LinkedHashMap<>();
         input.put("label", "News");
@@ -53,7 +53,7 @@ public class MapAdapterTest
         assertEquals("count", output.getEntries().get(1).getKey());
         assertEquals(7, output.getEntries().get(1).getValue());
         assertEquals("nested map", output.getEntries().get(2).getKey());
-        assertTrue(output.getEntries().get(2).getValue() instanceof Map);
+        assertInstanceOf(Map.class, output.getEntries().get(2).getValue());
         Map value = (Map) output.getEntries().get(2).getValue();
         assertEquals(2, value.getEntries().size());
         assertEquals("test", value.getEntries().get(0).getKey());
@@ -63,13 +63,13 @@ public class MapAdapterTest
     }
 
     @Test
-    public void marshalNull() throws Exception
+    void marshalNull() throws Exception
     {
         assertNull(new MapAdapter().marshal(null));
     }
 
     @Test
-    public void unmarshal() throws Exception
+    void unmarshal() throws Exception
     {
         Map input = new Map();
         input.getEntries().add(new MapEntry().withKey("label").withValue("Release"));
@@ -82,7 +82,7 @@ public class MapAdapterTest
     }
 
     @Test
-    public void unmarshalNull() throws Exception
+    void unmarshalNull() throws Exception
     {
         assertNull(new MapAdapter().unmarshal(null));
     }

@@ -19,9 +19,8 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -97,12 +96,12 @@ class UsersParameterHandlerTest
         when(this.entityReferenceSerializer.serialize(defaultBarRef)).thenReturn("xwiki:XWiki.Bar");
         when(this.entityReferenceSerializer.serialize(bazRef)).thenReturn("otherwiki:XWiki.Baz");
 
-        List<NotificationFilter> notificationFilterList = Collections.singletonList(
-            new FollowedUserOnlyEventFilter(entityReferenceSerializer, Arrays.asList(
+        List<NotificationFilter> notificationFilterList = List.of(
+            new FollowedUserOnlyEventFilter(entityReferenceSerializer, List.of(
                 "currentwiki:XWiki.Foo", "xwiki:XWiki.Bar", "otherwiki:XWiki.Baz"
             ))
         );
-        List<NotificationFilterPreference> notificationFilterPreferenceList = Arrays.asList(
+        List<NotificationFilterPreference> notificationFilterPreferenceList = List.of(
             getFilterPreference("currentwiki:XWiki.Foo"),
             getFilterPreference("xwiki:XWiki.Bar"),
             getFilterPreference("otherwiki:XWiki.Baz")
@@ -124,7 +123,7 @@ class UsersParameterHandlerTest
         pref.setId(String.format("userRestFilters_%s", userId));
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
         pref.setEnabled(true);
-        pref.setNotificationFormats(Collections.singleton(NotificationFormat.EMAIL));
+        pref.setNotificationFormats(Set.of(NotificationFormat.EMAIL));
         pref.setUser(userId);
         return pref;
     }

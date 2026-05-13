@@ -303,6 +303,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 if (xmlReader.isStartElement() && "fieldType".equals(xmlReader.getLocalName())
                     && SolrSchemaUtils.SOLR_TYPENAME_CVERSION.equals(xmlReader.getAttributeValue(null, "name"))) {
                     String version = xmlReader.getAttributeValue(null, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
+                    if (version == null) {
+                        version = xmlReader.getAttributeValue(null, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE_LEGACY);
+                    }
                     if (version != null) {
                         return NumberUtils.createLong(version);
                     }

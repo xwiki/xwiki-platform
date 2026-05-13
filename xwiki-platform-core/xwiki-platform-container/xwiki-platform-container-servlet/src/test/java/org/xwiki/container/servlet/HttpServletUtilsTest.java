@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class HttpServletUtilsTest
+class HttpServletUtilsTest
 {
     private HttpServletRequest request(String urlString, Map<String, String>... headerGroup)
         throws MalformedURLException
@@ -96,7 +96,7 @@ public class HttpServletUtilsTest
     // Tests
 
     @Test
-    public void getSourceBaseURL() throws MalformedURLException
+    void getSourceBaseURL() throws MalformedURLException
     {
         assertSourceBaseURL("http://host:8080", "http://host:8080");
         assertSourceBaseURL("http://host", "http://host");

@@ -22,17 +22,17 @@ package org.xwiki.platform.wiki.creationjob.internal.steps;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.user.WikiUserManager;
 import org.xwiki.wiki.user.WikiUserManagerException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doThrow;
@@ -41,36 +41,32 @@ import static org.mockito.Mockito.verify;
 /**
  * @version $Id$
  */
-public class AddUsersStepTest
+@ComponentTest
+class AddUsersStepTest
 {
-    @Rule
-    public MockitoComponentMockingRule<AddUsersStep> mocker = new MockitoComponentMockingRule<>(AddUsersStep.class);
+    @InjectMockComponents
+    private AddUsersStep addUsersStep;
 
+    @MockComponent
     private WikiUserManager wikiUserManager;
-    
-    @Before
-    public void setUp() throws Exception
-    {
-        wikiUserManager = mocker.getInstance(WikiUserManager.class);
-    }
-    
+
     @Test
-    public void execute() throws Exception
+    void execute() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
         List<String> members = new ArrayList<>();
         request.setMembers(members);
-        
+
         // Test
-        mocker.getComponentUnderTest().execute(request);
-        
+        this.addUsersStep.execute(request);
+
         // Verify
-        verify(wikiUserManager).addMembers(members, "wikiId");
+        verify(this.wikiUserManager).addMembers(members, "wikiId");
     }
 
     @Test
-    public void executeWhenException() throws Exception
+    void executeWhenException() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -78,26 +74,18 @@ public class AddUsersStepTest
         request.setMembers(members);
 
         Exception exception = new WikiUserManagerException("Execption in WikiUserManager.");
-        doThrow(exception).when(wikiUserManager).addMembers(anyCollection(), any());
+        doThrow(exception).when(this.wikiUserManager).addMembers(anyCollection(), any());
 
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().execute(request);
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-
-        // Verify
-        assertNotNull(caughtException);
+        // Test and verify
+        WikiCreationException caughtException = assertThrows(WikiCreationException.class,
+            () -> this.addUsersStep.execute(request));
         assertEquals("Failed to add members to the wiki [wikiId].", caughtException.getMessage());
         assertEquals(exception, caughtException.getCause());
-
     }
-    
+
     @Test
-    public void getOrder() throws Exception
+    void getOrder()
     {
-        assertEquals(4000, mocker.getComponentUnderTest().getOrder());
+        assertEquals(4000, this.addUsersStep.getOrder());
     }
 }

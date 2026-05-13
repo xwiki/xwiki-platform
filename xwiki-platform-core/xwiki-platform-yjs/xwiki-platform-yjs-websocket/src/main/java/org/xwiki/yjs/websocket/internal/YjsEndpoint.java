@@ -21,6 +21,7 @@ package org.xwiki.yjs.websocket.internal;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -31,6 +32,7 @@ import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,6 +58,8 @@ import static org.xwiki.security.authorization.Right.EDIT;
 public class YjsEndpoint extends Endpoint implements EndpointComponent
 {
     private static final String ROOM_QUERY_PARAMETER = "room";
+
+    private static final String LOCALE_QUERY_PARAMETER = "locale";
 
     @Inject
     private Logger logger;
@@ -83,19 +87,48 @@ public class YjsEndpoint extends Endpoint implements EndpointComponent
         session.setMaxTextMessageBufferSize(this.configuration.getMaxTextMessageBufferSize());
 
         this.context.run(session, () -> {
-            List<String> room = session.getRequestParameterMap().get(ROOM_QUERY_PARAMETER);
-
-            if (room == null || room.isEmpty()) {
-                closeSession(session, UNEXPECTED_CONDITION,
-                    "The [%s] query parameter is mandatory.".formatted(ROOM_QUERY_PARAMETER));
-            } else if (room.size() > 1) {
-                closeSession(session, UNEXPECTED_CONDITION,
-                    "The [%s] query parameter is expected only once.".formatted(ROOM_QUERY_PARAMETER));
-            } else {
-                var documentReference = this.documentReferenceResolver.resolve(room.get(0));
-                maybeJoin(session, documentReference);
+            DocumentReference documentReference = getDocumentReference(session);
+            if (documentReference != null) {
+                Locale locale = getLocale(session);
+                if (locale != null) {
+                    documentReference = new DocumentReference(documentReference, locale);
+                    maybeJoin(session, documentReference);
+                }
             }
         });
+    }
+
+    private DocumentReference getDocumentReference(Session session)
+    {
+        String room = getMandatoryParameter(session, ROOM_QUERY_PARAMETER);
+        return room == null ? null : this.documentReferenceResolver.resolve(room);
+    }
+
+    private Locale getLocale(Session session)
+    {
+        String locale = getMandatoryParameter(session, LOCALE_QUERY_PARAMETER);
+        if (locale != null) {
+            try {
+                return LocaleUtils.toLocale(locale);
+            } catch (IllegalArgumentException e) {
+                closeSession(session, UNEXPECTED_CONDITION, "Invalid locale: [%s].".formatted(locale));
+            }
+        }
+        return null;
+    }
+
+    private String getMandatoryParameter(Session session, String name)
+    {
+        List<String> values = session.getRequestParameterMap().get(name);
+        if (values == null || values.isEmpty()) {
+            closeSession(session, UNEXPECTED_CONDITION, "The [%s] query parameter is mandatory.".formatted(name));
+        } else if (values.size() > 1) {
+            closeSession(session, UNEXPECTED_CONDITION,
+                "The [%s] query parameter is expected only once.".formatted(name));
+        } else {
+            return values.get(0);
+        }
+        return null;
     }
 
     @Override

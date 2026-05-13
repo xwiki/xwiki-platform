@@ -33,8 +33,10 @@
   <description>XWiki Platform - Component - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-component-front-api</module>
     <module>xwiki-platform-component-multi</module>
     <module>xwiki-platform-component-script</module>
+    <module>xwiki-platform-component-webjar</module>
     <module>xwiki-platform-component-wiki</module>
   </modules>
 </project>

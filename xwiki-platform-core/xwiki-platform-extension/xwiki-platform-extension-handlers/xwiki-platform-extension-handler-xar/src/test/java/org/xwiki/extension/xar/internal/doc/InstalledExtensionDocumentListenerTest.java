@@ -19,9 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.doc;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class InstalledExtensionDocumentListenerTest
+class InstalledExtensionDocumentListenerTest
 {
     @InjectMockComponents
     private InstalledExtensionDocumentListener listener;
@@ -85,7 +85,7 @@ public class InstalledExtensionDocumentListenerTest
     private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         Packager packager = mock(Packager.class);
         when(this.packagerProvider.get()).thenReturn(packager);
@@ -102,7 +102,7 @@ public class InstalledExtensionDocumentListenerTest
     }
 
     @Test
-    public void onDocumentUpdated()
+    void onDocumentUpdated()
     {
         DocumentReference alice = new DocumentReference("wiki", "Users", "Alice");
         DocumentReference aliceFR = new DocumentReference(alice, Locale.FRENCH);
@@ -126,24 +126,24 @@ public class InstalledExtensionDocumentListenerTest
     }
 
     @Test
-    public void onApplicationReady() throws Exception
+    void onApplicationReady() throws Exception
     {
         when(this.wikiDescriptorManagerProvider.get().getCurrentWikiId()).thenReturn("test");
 
         XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
         when(this.xarRepositoryProvider.get().getInstalledExtensions("wiki:test"))
-            .thenReturn(Collections.singleton(xarInstalledExtension));
+            .thenReturn(Set.of(xarInstalledExtension));
 
         XarPackage xarPackage = mock(XarPackage.class);
         when(xarInstalledExtension.getXarPackage()).thenReturn(xarPackage);
 
         XarEntry xarEntry = mock(XarEntry.class);
-        when(xarPackage.getEntries()).thenReturn(Collections.singleton(xarEntry));
+        when(xarPackage.getEntries()).thenReturn(Set.of(xarEntry));
 
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
         DocumentReference documentReferenceWithLocale = new DocumentReference(documentReference, Locale.FRENCH);
-        when(this.packagerProvider.get().getDocumentReferences(eq(Collections.singleton(xarEntry)),
-            any(PackageConfiguration.class))).thenReturn(Collections.singletonList(documentReferenceWithLocale));
+        when(this.packagerProvider.get().getDocumentReferences(eq(Set.of(xarEntry)),
+            any(PackageConfiguration.class))).thenReturn(List.of(documentReferenceWithLocale));
         when(this.customizationDetectorProvider.get().isCustomized(documentReferenceWithLocale)).thenReturn(true);
 
         this.listener.onEvent(new ApplicationReadyEvent(), null, null);
@@ -153,7 +153,7 @@ public class InstalledExtensionDocumentListenerTest
     }
 
     @Test
-    public void onExtensionUninstalled() throws Exception
+    void onExtensionUninstalled() throws Exception
     {
         XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
         XarPackage xarPackage = mock(XarPackage.class);
@@ -161,19 +161,19 @@ public class InstalledExtensionDocumentListenerTest
 
         XarEntry firstXAREntry = mock(XarEntry.class, "first");
         XarEntry secondXAREntry = mock(XarEntry.class, "second");
-        when(xarPackage.getEntries()).thenReturn(Arrays.asList(firstXAREntry, secondXAREntry));
+        when(xarPackage.getEntries()).thenReturn(List.of(firstXAREntry, secondXAREntry));
 
         DocumentReference alice = new DocumentReference("test", "Users", "Alice");
         DocumentReference aliceWithLocale = new DocumentReference(alice, Locale.FRENCH);
         DocumentReference bob = new DocumentReference("test", "Users", "Bob");
         DocumentReference bobWithLocale = new DocumentReference(bob, Locale.FRENCH);
-        when(this.packagerProvider.get().getDocumentReferences(eq(Arrays.asList(firstXAREntry, secondXAREntry)),
-            any(PackageConfiguration.class))).thenReturn(Arrays.asList(aliceWithLocale, bobWithLocale));
+        when(this.packagerProvider.get().getDocumentReferences(eq(List.of(firstXAREntry, secondXAREntry)),
+            any(PackageConfiguration.class))).thenReturn(List.of(aliceWithLocale, bobWithLocale));
 
         // Bob page is part of another extension.
         XarInstalledExtension otherXARInstalledExtension = mock(XarInstalledExtension.class, "other");
         when(((XarInstalledExtensionRepository) this.xarRepositoryProvider.get())
-            .getXarInstalledExtensions(bobWithLocale)).thenReturn(Collections.singleton(otherXARInstalledExtension));
+            .getXarInstalledExtensions(bobWithLocale)).thenReturn(Set.of(otherXARInstalledExtension));
 
         ExtensionUninstalledEvent extensionUninstalledEvent =
             new ExtensionUninstalledEvent(new ExtensionId("org.xwiki.test:test"), "wiki:test");

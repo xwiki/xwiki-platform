@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.4M2
  */
-public abstract class AbstractEntityJobTest extends AbstractJobTest
+abstract class AbstractEntityJobTest extends AbstractJobTest
 {
     @MockComponent
     protected AuthorizationManager authorization;
@@ -48,10 +48,10 @@ public abstract class AbstractEntityJobTest extends AbstractJobTest
 
     @Override
     @BeforeEach
-    protected void configure() throws Exception
+    void configure()
     {
         super.configure();
-        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 }

@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}.
  */
 @OldcoreTest
-public class MailSenderApiTest
+class MailSenderApiTest
 {
     @MockComponent
     private MailSenderConfiguration mockConfiguration;
@@ -63,7 +63,7 @@ public class MailSenderApiTest
     private static GreenMail mailserver;
 
     @BeforeAll
-    public static void beforeAll()
+    static void beforeAll()
     {
         // Increase startup timeout (default is 1s, which can be too fast on slow CI agents).
         ServerSetup newSetup = ServerSetupTest.SMTP.createCopy();
@@ -74,13 +74,13 @@ public class MailSenderApiTest
     }
 
     @AfterAll
-    public static void afterAll()
+    static void afterAll()
     {
         mailserver.stop();
     }
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.mockConfiguration.getHost()).thenReturn(mailserver.getSmtp().getBindTo());
         when(this.mockConfiguration.getPort()).thenReturn(mailserver.getSmtp().getPort());
@@ -91,13 +91,13 @@ public class MailSenderApiTest
     }
 
     @AfterEach
-    public void afterEach() throws FolderException
+    void afterEach() throws FolderException
     {
         mailserver.purgeEmailFromAllMailboxes();
     }
 
     @Test
-    public void testSendMail() throws Exception
+    void sendMail() throws Exception
     {
         Mail mail = this.api.createMail();
         mail.setFrom("john@acme.org");
@@ -118,7 +118,7 @@ public class MailSenderApiTest
     }
 
     @Test
-    public void testSendMailWithCustomConfiguration() throws Exception
+    void sendMailWithCustomConfiguration() throws Exception
     {
         Mail mail = this.api.createMail();
         mail.setFrom("john@acme.org");
@@ -141,7 +141,7 @@ public class MailSenderApiTest
     }
 
     @Test
-    public void testSendRawMessage() throws MessagingException, IOException
+    void sendRawMessage() throws MessagingException, IOException
     {
         assertEquals(0, this.api.sendRawMessage("john@acme.org", "peter@acme.org",
             "Subject:Test subject\nFrom:steve@acme.org\nCc:adam@acme.org\nheader:value\n\nTest content"));

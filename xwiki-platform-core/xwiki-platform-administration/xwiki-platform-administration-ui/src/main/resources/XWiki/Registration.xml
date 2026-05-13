@@ -151,7 +151,6 @@
    *        * register_password
    *        * register2_password
    *        * register_email
-   *        * template
    *       Removing or renaming any of these fields will result in undefined behavior.
    *
    *###

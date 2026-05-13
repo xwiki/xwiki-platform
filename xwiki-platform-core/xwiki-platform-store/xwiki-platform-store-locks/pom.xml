@@ -39,11 +39,5 @@
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>

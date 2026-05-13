@@ -44,11 +44,11 @@ import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyVal
 /**
  * Test for {@link StaticListClassPropertyValuesProvider}.
  *
- * @since 11.5RC1
  * @version $Id$
+ * @since 11.5RC1
  */
 @OldcoreTest
-public class StaticListClassPropertyValuesProviderTest
+class StaticListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private StaticListClassPropertyValuesProvider staticListClassPropertyValuesProvider;
@@ -192,7 +192,8 @@ public class StaticListClassPropertyValuesProviderTest
 
         String translatedLabel = "<Translated & &amp; Label>";
         expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
-        when(this.localization.getTranslationPlain("XWiki.TestQueryResultSpecial_Query_Id")).thenReturn(translatedLabel);
+        when(this.localization.getTranslationPlain("XWiki.TestQueryResultSpecial_Query_Id"))
+            .thenReturn(translatedLabel);
 
         // Test filter by translated label.
         actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Id", staticListClass);

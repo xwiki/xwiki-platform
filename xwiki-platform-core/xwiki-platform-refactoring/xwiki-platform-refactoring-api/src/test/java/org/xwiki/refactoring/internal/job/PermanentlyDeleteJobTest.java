@@ -31,6 +31,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atMost;
@@ -153,7 +154,7 @@ class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-    public void failToExecuteIfNoWikiSpecified() throws Throwable
+    void failToExecuteIfNoWikiSpecified()
     {
         long deletedDocumentId = 13;
 
@@ -161,15 +162,8 @@ class PermanentlyDeleteJobTest extends AbstractJobTest
         request.setDeletedDocumentIds(List.of(deletedDocumentId));
         request.setWikiReference(null);
 
-        try {
-            run(request);
-        } catch (IllegalArgumentException actual) {
-            // Verify that the job threw an exception.
-            Throwable expected = new IllegalArgumentException("No wiki reference was specified in the job request");
-
-            assertEquals(expected.getClass(), actual.getClass());
-            assertEquals(expected.getMessage(), actual.getMessage());
-        }
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> run(request));
+        assertEquals("No wiki reference was specified in the job request", actual.getMessage());
 
         // Verify that the document is not restored.
         verify(this.modelBridge, never()).permanentlyDeleteDocument(deletedDocumentId, request);

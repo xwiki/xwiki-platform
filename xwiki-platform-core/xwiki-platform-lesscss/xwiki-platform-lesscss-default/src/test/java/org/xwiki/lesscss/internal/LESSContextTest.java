@@ -19,15 +19,16 @@
  */
 package org.xwiki.lesscss.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -36,58 +37,57 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
-public class LESSContextTest
+@ComponentTest
+class LESSContextTest
 {
-    @Rule
-    public MockitoComponentMockingRule<LESSContext> mocker =
-            new MockitoComponentMockingRule<>(LESSContext.class);
+    @InjectMockComponents
+    private LESSContext lessContext;
 
+    @MockComponent
     private Execution execution;
 
     private ExecutionContext executionContext;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        execution = mocker.getInstance(Execution.class);
-        executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+        this.executionContext = new ExecutionContext();
+        when(this.execution.getContext()).thenReturn(this.executionContext);
     }
 
     @Test
-    public void disableCache() throws Exception
+    void disableCache()
     {
-        mocker.getComponentUnderTest().disableCache();
-        assertTrue((Boolean)executionContext.getProperty("less.cache.disable"));
+        this.lessContext.disableCache();
+        assertTrue((Boolean) this.executionContext.getProperty("less.cache.disable"));
     }
 
     @Test
-    public void stopDisablingCache() throws Exception
+    void stopDisablingCache()
     {
-        mocker.getComponentUnderTest().disableCache();
-        assertTrue((Boolean) executionContext.getProperty("less.cache.disable"));
-        mocker.getComponentUnderTest().stopDisablingCache();
-        assertFalse((Boolean)executionContext.getProperty("less.cache.disable"));
+        this.lessContext.disableCache();
+        assertTrue((Boolean) this.executionContext.getProperty("less.cache.disable"));
+        this.lessContext.stopDisablingCache();
+        assertFalse((Boolean) this.executionContext.getProperty("less.cache.disable"));
     }
 
     @Test
-    public void isCacheDisabled() throws Exception
+    void isCacheDisabled()
     {
-        assertFalse(mocker.getComponentUnderTest().isCacheDisabled());
-        mocker.getComponentUnderTest().disableCache();
-        assertTrue(mocker.getComponentUnderTest().isCacheDisabled());
-        mocker.getComponentUnderTest().stopDisablingCache();
-        assertFalse(mocker.getComponentUnderTest().isCacheDisabled());
+        assertFalse(this.lessContext.isCacheDisabled());
+        this.lessContext.disableCache();
+        assertTrue(this.lessContext.isCacheDisabled());
+        this.lessContext.stopDisablingCache();
+        assertFalse(this.lessContext.isCacheDisabled());
     }
 
     @Test
-    public void setHTMLExport() throws Exception
+    void setHTMLExport()
     {
-        assertFalse(mocker.getComponentUnderTest().isHtmlExport());
-        mocker.getComponentUnderTest().setHtmlExport(true);
-        assertTrue(mocker.getComponentUnderTest().isHtmlExport());
-        mocker.getComponentUnderTest().setHtmlExport(false);
-        assertFalse(mocker.getComponentUnderTest().isHtmlExport());
+        assertFalse(this.lessContext.isHtmlExport());
+        this.lessContext.setHtmlExport(true);
+        assertTrue(this.lessContext.isHtmlExport());
+        this.lessContext.setHtmlExport(false);
+        assertFalse(this.lessContext.isHtmlExport());
     }
-
 }

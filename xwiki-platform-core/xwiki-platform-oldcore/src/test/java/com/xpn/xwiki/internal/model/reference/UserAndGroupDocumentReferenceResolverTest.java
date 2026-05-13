@@ -19,20 +19,20 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,36 +40,38 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@AllComponents
-public class UserAndGroupDocumentReferenceResolverTest
+@ComponentTest
+@ComponentList({ UserAndGroupEntityReferenceResolver.class, DefaultSymbolScheme.class })
+class UserAndGroupDocumentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DocumentReferenceResolver<String>> mocker =
-        new MockitoComponentMockingRule<DocumentReferenceResolver<String>>(UserAndGroupDocumentReferenceResolver.class);
+    @InjectMockComponents
+    private UserAndGroupDocumentReferenceResolver resolver;
 
-    @AfterComponent
-    public void afterComponent() throws Exception
+    @MockComponent
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @BeforeEach
+    void beforeEach()
     {
-        EntityReferenceProvider provider = this.mocker.registerMockComponent(EntityReferenceProvider.class);
-
-        when(provider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("defaultwiki"));
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI))
+            .thenReturn(new WikiReference("defaultwiki"));
     }
 
     @Test
-    public void testResolver() throws ComponentLookupException
+    void resolver()
     {
         assertEquals(new DocumentReference("defaultwiki", "XWiki", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("Bosse"));
+            this.resolver.resolve("Bosse"));
         assertEquals(new DocumentReference("defaultwiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse"));
+            this.resolver.resolve("bossesSpace.Bosse"));
         assertEquals(new DocumentReference("bossesWiki", "XWiki", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("Bosse", new WikiReference("bossesWiki")));
+            this.resolver.resolve("Bosse", new WikiReference("bossesWiki")));
         assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
+            this.resolver.resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
         assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesWiki:bossesSpace.Bosse"));
+            this.resolver.resolve("bossesWiki:bossesSpace.Bosse"));
 
         // If null is passed we expect no reference (i.e. the guest user).
-        assertNull(this.mocker.getComponentUnderTest().resolve(null));
+        assertNull(this.resolver.resolve(null));
     }
 }

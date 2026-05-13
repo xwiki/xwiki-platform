@@ -21,9 +21,9 @@ package org.xwiki.lesscss.internal.colortheme.converter;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.lesscss.internal.cache.ColorThemeCache;
 import org.xwiki.lesscss.internal.colortheme.ColorTheme;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
@@ -33,16 +33,16 @@ import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.skin.FSSkinReference;
 import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,76 +51,75 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.0RC1
  */
-public class DefaultLESSColorThemeConverterTest
+@ComponentTest
+class DefaultLESSColorThemeConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultLESSColorThemeConverter> mocker =
-            new MockitoComponentMockingRule<>(DefaultLESSColorThemeConverter.class);
+    @InjectMockComponents
+    private DefaultLESSColorThemeConverter defaultLESSColorThemeConverter;
 
+    @MockComponent
     private ColorThemeCache cache;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private CurrentColorThemeGetter currentColorThemeGetter;
 
+    @MockComponent
     private SkinReferenceFactory skinReferenceFactory;
 
+    @MockComponent
     private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
+    @MockComponent
     private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
+    @Mock
     private XWikiContext xcontext;
 
+    @Mock
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        cache = mocker.getInstance(ColorThemeCache.class);
-        currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
-        skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
-        colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
-        lessResourceReferenceFactory = mocker.getInstance(LESSResourceReferenceFactory.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getSkin(xcontext)).thenReturn("skin");
-        when(currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("colorTheme");
-        when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
-        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
-                new NamedColorThemeReference("colorTheme"));
-        when(cache.getMutex(eq(new LESSSkinFileResourceReference("file", null, null)), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("mutex");
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(this.xwiki.getSkin(this.xcontext)).thenReturn("skin");
+        when(this.currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("colorTheme");
+        when(this.skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
+        when(this.colorThemeReferenceFactory.createReference("colorTheme"))
+            .thenReturn(new NamedColorThemeReference("colorTheme"));
+        when(this.cache.getMutex(new LESSSkinFileResourceReference("file", null, null), new FSSkinReference("skin"),
+            new NamedColorThemeReference("colorTheme"))).thenReturn("mutex");
     }
 
     @Test
-    public void getColorThemeFromSkinFileWhenInCache() throws Exception
+    void getColorThemeFromSkinFileWhenInCache() throws Exception
     {
         // Mocks
         ColorTheme cachedColorTheme = new ColorTheme();
         cachedColorTheme.put("key", "value1");
-        
-        LESSSkinFileResourceReference lessSkinFileResourceReference 
-                = new LESSSkinFileResourceReference("file", null, null);
-        when(lessResourceReferenceFactory.createReferenceForSkinFile("file")).thenReturn(lessSkinFileResourceReference);
-        
-        when(cache.get(eq(lessSkinFileResourceReference), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")))).thenReturn(cachedColorTheme);
+
+        LESSSkinFileResourceReference lessSkinFileResourceReference
+            = new LESSSkinFileResourceReference("file", null, null);
+        when(this.lessResourceReferenceFactory.createReferenceForSkinFile("file")).thenReturn(
+            lessSkinFileResourceReference);
+
+        when(this.cache.get(lessSkinFileResourceReference, new FSSkinReference("skin"),
+            new NamedColorThemeReference("colorTheme"))).thenReturn(cachedColorTheme);
 
         // Test
-        ColorTheme result = mocker.getComponentUnderTest().getColorThemeFromSkinFile("file", "skin", false);
+        ColorTheme result = this.defaultLESSColorThemeConverter.getColorThemeFromSkinFile("file", "skin", false);
 
         // Verify
         assertEquals(cachedColorTheme, result);
         // Verify that the returned value is not the instance stored in the cache (that the end-user would wrongly be
         // able to modify)
-        assertTrue(result != cachedColorTheme);
+        assertNotSame(result, cachedColorTheme);
         // Be extra-sure :)
         result.put("key", "value2");
         assertNotEquals("value2", cachedColorTheme.get("key"));
-
     }
-
 }

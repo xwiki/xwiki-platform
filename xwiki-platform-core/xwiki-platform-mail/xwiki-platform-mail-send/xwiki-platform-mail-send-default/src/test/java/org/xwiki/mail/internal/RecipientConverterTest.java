@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @since 6.1RC1
  */
 @ComponentTest
-public class RecipientConverterTest
+class RecipientConverterTest
 {
     @InjectMockComponents
     private RecipientConverter converter;
 
     @Test
-    public void convert()
+    void convert()
     {
         assertEquals(Message.RecipientType.TO,
             this.converter.convert(Message.RecipientType.class, "to"));
@@ -58,7 +58,7 @@ public class RecipientConverterTest
     }
 
     @Test
-    public void convertWhenInvalidType()
+    void convertWhenInvalidType()
     {
         Throwable exception = assertThrows(ConversionException.class, () -> {
             this.converter.convert(Message.RecipientType.class, "something");
@@ -67,7 +67,7 @@ public class RecipientConverterTest
     }
 
     @Test
-    public void convertWhenTypeIsAlreadyARecipientType()
+    void convertWhenTypeIsAlreadyARecipientType()
     {
         assertEquals(Message.RecipientType.TO,
             this.converter.convert(Message.RecipientType.class, Message.RecipientType.TO));

@@ -587,6 +587,7 @@ var XWiki = (function(XWiki){
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
+            // This need to be changed for XWIKI-24323
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({
@@ -626,6 +627,7 @@ var XWiki = (function(XWiki){
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
+      // This need to be changed for XWIKI-24324
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

@@ -30,13 +30,13 @@
       <span class="icon fa fa-compass" />
       <div class="title">Guided Tours</div>
       <div class="right-group">
-        <button
+        <!-- <button
           id="widget-options"
           class="btn"
           @click.stop="console.info('Options menu')"
         >
           <span class="fa fa-cog" />
-        </button>
+        </button> -->
         <button
           id="widget-close"
           class="btn"
@@ -105,6 +105,10 @@ const progress = props.progress;
 
 .guidedtour-widget.collapsed:not(.dragging) .header {
   cursor: pointer;
+}
+
+.guidedtour-widget.collapsed .right-group button#widget-close {
+  display: none;
 }
 
 .guidedtour-widget.collapsed .right-group button#widget-options {

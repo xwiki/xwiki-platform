@@ -38,12 +38,12 @@ export class GuidedTourRestClient {
   // @ts-expect-error xm is any
   private xm: Promise;
 
-  /**
-   * Resolve the XWiki CSRF form token from the xwiki-meta module.
-   */
-  private async getCSRFToken(): Promise<string> {
-    return (this.xm instanceof Promise ? await this.xm : this.xm).form_token;
-  }
+  // /**
+  //  * Resolve the XWiki CSRF form token from the xwiki-meta module.
+  //  */
+  // private async getCSRFToken(): Promise<string> {
+  //   return (this.xm instanceof Promise ? await this.xm : this.xm).form_token;
+  // }
 
   /**
    * Perform a fetch request with the XWiki CSRF token header.

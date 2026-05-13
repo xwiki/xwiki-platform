@@ -37,13 +37,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.CoreProtocolPNames;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.util.Timeout;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
@@ -143,39 +143,45 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // It's an URL
             URL url = new URL(resourceReference.getReference());
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setResponseTimeout(Timeout.ofSeconds(60))
+                .setConnectTimeout(Timeout.ofSeconds(10))
+                .build();
 
-            httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "XWikiExtensionRepository");
-            httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-            httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+            try (CloseableHttpClient httpClient = HttpClients.custom()
+                .setUserAgent("XWikiExtensionRepository")
+                .setDefaultRequestConfig(requestConfig)
+                .setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+                .build()) {
 
-            ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
-                httpClient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
-            httpClient.setRoutePlanner(routePlanner);
+                HttpGet getMethod = new HttpGet(url.toString());
 
-            HttpGet getMethod = new HttpGet(url.toString());
+                int[] statusCodeHolder = {0};
+                String[] contentTypeHolder = {null};
+                byte[] content;
+                try {
+                    content = httpClient.execute(getMethod, subResponse -> {
+                        statusCodeHolder[0] = subResponse.getCode();
+                        var entity = subResponse.getEntity();
+                        contentTypeHolder[0] = entity != null ? entity.getContentType() : null;
+                        return entity != null ? EntityUtils.toByteArray(entity) : new byte[0];
+                    });
+                } catch (Exception e) {
+                    throw new IOException("Failed to request [" + url + "]", e);
+                }
 
-            HttpResponse subResponse;
-            try {
-                subResponse = httpClient.execute(getMethod);
-            } catch (Exception e) {
-                throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
+                response = Response.status(statusCodeHolder[0]);
+                MediaType type = contentTypeHolder[0] != null ? MediaType.valueOf(contentTypeHolder[0])
+                    : MediaType.APPLICATION_OCTET_STREAM_TYPE;
+                response.type(type);
+
+                BaseObject extensionObject = getExtensionObject(extensionDocument);
+                String extensionType =
+                    this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+                response.entity(content);
+                response.header("Content-Disposition",
+                    "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
             }
-
-            response = Response.status(subResponse.getStatusLine().getStatusCode());
-
-            HttpEntity entity = subResponse.getEntity();
-
-            MediaType type = entity.getContentType() != null ? MediaType.valueOf(entity.getContentType().getValue())
-                : MediaType.APPLICATION_OCTET_STREAM_TYPE;
-            response.type(type);
-
-            BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String extensionType =
-                this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
-            response.entity(entity.getContent());
-            response.header("Content-Disposition",
-                "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;
             if (resourceReference instanceof ExtensionResourceReference) {

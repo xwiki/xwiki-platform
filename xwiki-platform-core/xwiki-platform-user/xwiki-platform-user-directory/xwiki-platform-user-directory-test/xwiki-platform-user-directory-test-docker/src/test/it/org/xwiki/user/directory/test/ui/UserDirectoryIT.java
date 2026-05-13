@@ -72,6 +72,7 @@ class UserDirectoryIT
     @BeforeEach
     void setUp(TestUtils setup)
     {
+        // Delete possible existing users
         setup.loginAsSuperAdmin();
         setup.deletePage("XWiki", "test");
         setup.deletePage("XWiki", "UserDirectoryITUser");
@@ -82,8 +83,6 @@ class UserDirectoryIT
     void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.loginAsSuperAdmin();
-
-        // Delete possible existing users
 
         UserDirectoryPage page = UserDirectoryPage.gotoPage();
 

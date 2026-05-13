@@ -13,7 +13,7 @@ export class ComponentInit {
 }
 
 // @beta
-export function createXWikiWebSocketProvider(url: string, room: string): WebsocketProvider;
+export function createXWikiWebSocketProvider(url: string, room: string, locale: string): WebsocketProvider;
 
 // (No @packageDocumentation comment for this package)
 

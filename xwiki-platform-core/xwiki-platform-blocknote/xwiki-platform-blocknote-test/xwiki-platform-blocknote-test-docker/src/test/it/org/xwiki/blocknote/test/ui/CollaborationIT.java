@@ -19,19 +19,27 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WindowType;
+import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ForceEditLockModal;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -105,7 +113,7 @@ class CollaborationIT extends AbstractBlockNoteIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Alice:");
 
         String firstUserText = "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. End";
@@ -119,13 +127,13 @@ class CollaborationIT extends AbstractBlockNoteIT
             //
             // Second Tab
             //
-            setup.getDriver().switchTo().window(secondTabHandle);
+            multiUserSetup.switchToBrowserTab(secondTabHandle);
             secondTextArea.waitUntilFocused().sendKeys(" " + secondUserWords[i]);
 
             //
             // First Tab
             //
-            setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+            multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
             firstTextArea.waitUntilFocused().sendKeys(" " + firstUserWords[i]);
         }
 
@@ -133,7 +141,7 @@ class CollaborationIT extends AbstractBlockNoteIT
         // Second Tab
         //
 
-        setup.getDriver().switchTo().window(secondTabHandle);
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
         // Wait to receive all the content typed by the first user.
         secondTextArea.waitUntilTextContains("End");
 
@@ -420,6 +428,120 @@ class CollaborationIT extends AbstractBlockNoteIT
         secondTextArea.assertTextIs("[%s two | ] green", "John");
     }
 
+    @Test
+    @Order(5)
+    void editPageTranslation(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh. We target the default English translation in order to make sure we delete all the translations.
+        DocumentReference testReferenceEn = new DocumentReference(testReference, Locale.ENGLISH);
+        setup.deletePage(testReferenceEn);
+        setup.createPage(testReferenceEn, "One", "");
+
+        // Edit the default page translation in the first browser tab (in-place).
+        InplaceEditablePage firstEditPage = new InplaceEditablePage().editInplace();
+        BlockNoteEditor firstEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.click().sendKeys(Keys.PAGE_UP, Keys.END, " two");
+
+        //
+        // Second Tab
+        //
+
+        // Enable multilingual support from a different tab, using the alias to be able to login as super admin and to
+        // avoid changing the language of the first tab.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        setup.loginAsSuperAdmin();
+        // We also want to verify that language variants are properly handled.
+        setMultiLingual(setup, true, "en", "de", "fr_CA");
+
+        // Edit the default page translation in the second browser tab (standalone).
+        setup.gotoPage(testReferenceEn).editWYSIWYG();
+        new ForceEditLockPage().clickForceEdit();
+        WYSIWYGEditPage secondEditPage = new WYSIWYGEditPage();
+        BlockNoteEditor secondEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.click().waitUntilTextContains("two");
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " three");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("three");
+        firstTextArea.assertTextIs("One two three%s", "superadmin");
+
+        // Leave and create the German translation.
+        firstEditPage.cancel();
+        DocumentReference testReferenceDe = new DocumentReference(testReference, Locale.GERMAN);
+        setup.createPage(testReferenceDe, "Eins", "");
+        firstEditPage = new InplaceEditablePage().editInplace();
+        firstEditor = new BlockNoteEditor("content");
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.click().sendKeys(Keys.PAGE_UP, Keys.END, " zwei");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilFocused().sendKeys(" four");
+        secondTextArea.assertTextIs("One two three four");
+
+        // Leave the default (English) translation and join the German translation.
+        secondEditPage.clickCancel().openInformationDocExtraPane().clickTranslationLink(Locale.GERMAN);
+        new ViewPage().editWYSIWYG();
+        new ForceEditLockPage().clickForceEdit();
+        secondEditPage = new WYSIWYGEditPage();
+        secondEditor = new BlockNoteEditor("content");
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.click().waitUntilTextContains("zwei");
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " drei");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("drei");
+        firstTextArea.assertTextIs("Eins zwei drei%s", "superadmin");
+
+        // Leave and start editing the French Canadian translation (without saving).
+        firstEditPage.cancel().openInformationDocExtraPane().clickTranslationLink(Locale.CANADA_FRENCH);
+        firstEditor = new BlockNoteEditor("content");
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.click().assertTextIs("One");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a")).sendKeys("Un deux");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilFocused().sendKeys(" vier");
+        secondTextArea.assertTextIs("Eins zwei drei vier");
+
+        // Leave the German translation and join the French Canadian translation.
+        secondEditPage.clickCancel();
+        setup.gotoPage(testReference, "edit", "language=fr_CA&editor=wysiwyg");
+        secondEditor = new BlockNoteEditor("content");
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilTextContains("Un deux").click();
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " trois");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("trois");
+        firstTextArea.assertTextIs("Un deux trois%s", "superadmin");
+    }
+
     private void editAndForceLock(InplaceEditablePage inplaceEditablePage, String lockedBy, TestUtils setup)
     {
         inplaceEditablePage.edit();
@@ -428,5 +550,21 @@ class CollaborationIT extends AbstractBlockNoteIT
         assertThat(forceEditLockModal.getMessage(), containsString("This page is currently locked by " + lockedBy));
         forceEditLockModal.clickOk();
         inplaceEditablePage.waitForInplaceEditor();
+    }
+
+    private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
+    {
+        AdministrationPage adminPage = AdministrationPage.gotoPage();
+        LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
+        sectionPage.setMultiLingual(isMultiLingual);
+        sectionPage.setDefaultLanguage("en");
+        sectionPage.setSupportedLanguages(List.of(supportedLanguages));
+        // The localization administration section doesn't save asynchronously so we can't wait for the save success
+        // notification. There's no JavaScript involved in the form submit process so Selenium should wait for the page
+        // to be reloaded. However, in practice we noticed that we can't always navigate to another page right after
+        // saving the localization settings, probably because the browser is in the process of reloading the page.
+        setup.getDriver().addPageNotYetReloadedMarker();
+        sectionPage.clickSave();
+        setup.getDriver().waitUntilPageIsReloaded();
     }
 }

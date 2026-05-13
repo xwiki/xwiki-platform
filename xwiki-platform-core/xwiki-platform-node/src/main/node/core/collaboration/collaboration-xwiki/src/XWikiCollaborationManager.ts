@@ -74,13 +74,14 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     const room = this.modelReferenceSerializer
       .serialize(documentReference)
       ?.substring("doc:".length);
+    const locale = documentReference.locale ?? "";
     console.debug(
-      "Connecting the the collaboration WebSocket endpoint for document: ",
-      room,
+      `Connecting the the collaboration WebSocket endpoint for document [${room}(${locale})].`,
     );
     return createXWikiWebSocketProvider(
       this.cristalApp.getWikiConfig().realtimeURL!,
       room!,
+      locale,
     );
   }
 

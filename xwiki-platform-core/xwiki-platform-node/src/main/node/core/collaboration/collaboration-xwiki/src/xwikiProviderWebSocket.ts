@@ -63,20 +63,20 @@ function readClientId(handlerDecoder: decoding.Decoder) {
 export function createXWikiWebSocketProvider(
   url: string,
   room: string,
+  locale: string,
 ): WebsocketProvider {
   const splits = url.split("/");
   const roomname = splits.at(-1)!;
   const doc = new Doc();
-  // Creates a new editor instance.
   const websocketProvider = new WebsocketProvider(
-    // Since WebSocket provider force having a roomname that is concatenated to the url with a '/'.
-    // Therefore, we have to artificially split out the last segment to have it concatenated back by WebSocket
-    // provider later.
+    // Yjs WebSocket provider expects the room name to be concatenated to the URL as its last path segment, but our
+    // endpoint reads the room name from the query parameters. Therefore, we have to artificially split out the last
+    // path segment to have it concatenated back by Yjs WebSocket provider later.
     splits.slice(0, -1).join("/"),
     roomname,
     doc,
     {
-      params: { room },
+      params: { room, locale },
     },
   );
 

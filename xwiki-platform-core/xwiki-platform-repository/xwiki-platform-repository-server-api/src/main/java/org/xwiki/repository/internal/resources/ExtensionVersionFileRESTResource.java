@@ -19,7 +19,9 @@
  */
 package org.xwiki.repository.internal.resources;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +44,8 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.util.Timeout;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
@@ -148,41 +151,78 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 .setConnectTimeout(Timeout.ofSeconds(10))
                 .build();
 
-            try (CloseableHttpClient httpClient = HttpClients.custom()
+            final CloseableHttpClient httpClient = HttpClients.custom()
                 .setUserAgent("XWikiExtensionRepository")
                 .setDefaultRequestConfig(requestConfig)
                 .setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()))
-                .build()) {
+                .build();
 
+            // Stream the entity content back to the caller without buffering it in memory.
+            // Ownership of httpClient and subResponse is transferred to the returned InputStream:
+            // when JAX-RS closes the stream after writing the response, both are closed too.
+            // If anything fails before that handoff, the finally block releases them.
+            boolean handoffSucceeded = false;
+            ClassicHttpResponse subResponse = null;
+            try {
                 HttpGet getMethod = new HttpGet(url.toString());
 
-                record HttpResult(int statusCode, String contentType, byte[] content) { }
-
-                HttpResult result;
                 try {
-                    result = httpClient.execute(getMethod, subResponse -> {
-                        var entity = subResponse.getEntity();
-                        return new HttpResult(
-                            subResponse.getCode(),
-                            entity != null ? entity.getContentType() : null,
-                            entity != null ? EntityUtils.toByteArray(entity) : new byte[0]
-                        );
-                    });
+                    subResponse = httpClient.executeOpen(null, getMethod, null);
                 } catch (Exception e) {
                     throw new IOException("Failed to request [" + url + "]", e);
                 }
 
-                response = Response.status(result.statusCode());
-                MediaType type = result.contentType() != null ? MediaType.valueOf(result.contentType())
+                response = Response.status(subResponse.getCode());
+
+                HttpEntity entity = subResponse.getEntity();
+                String contentTypeStr = entity != null ? entity.getContentType() : null;
+                MediaType type = contentTypeStr != null ? MediaType.valueOf(contentTypeStr)
                     : MediaType.APPLICATION_OCTET_STREAM_TYPE;
                 response.type(type);
 
                 BaseObject extensionObject = getExtensionObject(extensionDocument);
                 String extensionType =
                     this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
-                response.entity(result.content());
+
+                final ClassicHttpResponse responseToClose = subResponse;
+                InputStream baseStream = entity != null ? entity.getContent() : InputStream.nullInputStream();
+                InputStream contentStream = new FilterInputStream(baseStream)
+                {
+                    @Override
+                    public void close() throws IOException
+                    {
+                        try {
+                            super.close();
+                        } finally {
+                            try {
+                                responseToClose.close();
+                            } finally {
+                                httpClient.close();
+                            }
+                        }
+                    }
+                };
+
+                response.entity(contentStream);
                 response.header("Content-Disposition",
                     "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
+
+                handoffSucceeded = true;
+            } finally {
+                if (!handoffSucceeded) {
+                    if (subResponse != null) {
+                        try {
+                            subResponse.close();
+                        } catch (IOException ignored) {
+                            // Best effort cleanup.
+                        }
+                    }
+                    try {
+                        httpClient.close();
+                    } catch (IOException ignored) {
+                        // Best effort cleanup.
+                    }
+                }
             }
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;

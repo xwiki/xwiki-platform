@@ -115,7 +115,7 @@ public class EmailClass extends StringClass
             // can't blindly access index 0.
             InternetAddress[] addresses = InternetAddress.parse(String.valueOf(value));
             if (addresses.length == 0) {
-                return null;
+                return "";
             }
             return emailAddressObfuscator.obfuscate(addresses[0]);
         } catch (AddressException e) {

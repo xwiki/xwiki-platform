@@ -70,7 +70,7 @@ class EmailClassTest
     {
         // InternetAddress.parse("") returns an empty array (rather than throwing AddressException). The implementation
         // must handle this without raising ArrayIndexOutOfBoundsException.
-        assertNull(this.emailClass.getObfuscatedValue(""));
+        assertEquals("", this.emailClass.getObfuscatedValue(""));
     }
 
     @Test

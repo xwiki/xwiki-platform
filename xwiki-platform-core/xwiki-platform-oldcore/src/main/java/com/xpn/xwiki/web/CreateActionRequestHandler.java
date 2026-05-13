@@ -181,7 +181,7 @@ public class CreateActionRequestHandler
 
     private SpaceReference spaceReference;
 
-    private String documentName;
+    private String name;
 
     private boolean isSpace;
 
@@ -197,7 +197,7 @@ public class CreateActionRequestHandler
 
     private List<Document> recommendedTemplateProviders;
 
-    private String documentType;
+    private String type;
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
@@ -233,7 +233,7 @@ public class CreateActionRequestHandler
             document.getDocumentReference().getLastSpaceReference(), templateProviderClassReference, context);
 
         // Get the type of document to create
-        documentType = request.get(TYPE);
+        type = request.get(TYPE);
 
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
@@ -265,7 +265,7 @@ public class CreateActionRequestHandler
                 // Note: We leave the spaceReference variable intentionally null to symbolize a top level space or
                 // non-terminal document.
 
-                documentName = request.getParameter(NAME);
+                name = request.getParameter(NAME);
 
                 // Determine the type of document we are creating (terminal vs non-terminal).
 
@@ -293,19 +293,19 @@ public class CreateActionRequestHandler
     {
         // Current space and page name.
         spaceReference = document.getDocumentReference().getLastSpaceReference();
-        documentName = document.getDocumentReference().getName();
+        name = document.getDocumentReference().getName();
 
         // Determine if the current document is in a top-level space.
         EntityReference parentSpaceReference = spaceReference.getParent();
         boolean isTopLevelSpace = parentSpaceReference.extractReference(EntityType.SPACE) == null;
 
         // Remember this since we might update it below.
-        String originalName = documentName;
+        String originalName = name;
 
         // Since WebHome is a convention, determine the real name and parent of our document.
-        if (WEBHOME.equals(documentName)) {
+        if (WEBHOME.equals(name)) {
             // Determine its name from the space name.
-            documentName = spaceReference.getName();
+            name = spaceReference.getName();
 
             // Determine its space reference by looking at the space's parent.
             if (!isTopLevelSpace) {
@@ -373,14 +373,14 @@ public class CreateActionRequestHandler
         if (isSpace) {
             // Always creating top level spaces in this mode. Adapt to the new implementation.
             spaceReference = null;
-            documentName = spaceParameter;
+            name = spaceParameter;
         } else {
             if (StringUtils.isNotEmpty(spaceParameter)) {
                 // Always creating documents in top level spaces in this mode.
                 spaceReference = new SpaceReference(spaceParameter, document.getDocumentReference().getWikiReference());
             }
 
-            documentName = request.getParameter(PAGE);
+            name = request.getParameter(PAGE);
         }
     }
 
@@ -581,14 +581,14 @@ public class CreateActionRequestHandler
      */
     public DocumentReference getDocumentReference()
     {
-        if (StringUtils.isEmpty(documentName)) {
+        if (StringUtils.isEmpty(name)) {
             // Can`t do anything without a name.
             return null;
         }
 
         // The new values, after the processing needed for ND below, to be used when creating the document reference.
         SpaceReference newSpaceReference = spaceReference;
-        String newName = documentName;
+        String newName = name;
 
         // Special handling for old spaces or new Nested Documents.
         if (isSpace) {
@@ -598,7 +598,7 @@ public class CreateActionRequestHandler
             }
 
             // The new space's reference.
-            newSpaceReference = new SpaceReference(documentName, parentSpaceReference);
+            newSpaceReference = new SpaceReference(name, parentSpaceReference);
 
             // The new document's name set to the new space's homepage. In Nested Documents, this leads to the new ND's
             // reference name.
@@ -666,7 +666,7 @@ public class CreateActionRequestHandler
             if (creationRestrictionsEnforced && !isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
                 TP_CREATION_RESTRICTIONS_PROPERTY)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, documentName };
+                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, name };
                 XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
                     "Template {0} cannot be used in space {1} when creating page {2}", null, args);
@@ -855,7 +855,7 @@ public class CreateActionRequestHandler
      */
     public String getName()
     {
-        return documentName;
+        return name;
     }
 
     /**
@@ -897,6 +897,6 @@ public class CreateActionRequestHandler
      */
     public String getType()
     {
-        return documentType;
+        return type;
     }
 }

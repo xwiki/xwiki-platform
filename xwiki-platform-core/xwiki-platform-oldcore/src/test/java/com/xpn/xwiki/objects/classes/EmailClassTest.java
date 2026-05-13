@@ -68,8 +68,6 @@ class EmailClassTest
     @Test
     void getObfuscatedValueWithEmptyString()
     {
-        // InternetAddress.parse("") returns an empty array (rather than throwing AddressException). The implementation
-        // must handle this without raising ArrayIndexOutOfBoundsException.
         assertEquals("", this.emailClass.getObfuscatedValue(""));
     }
 

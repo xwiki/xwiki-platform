@@ -391,7 +391,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       clearInterval(this.timer);
       this.formData.input.fire('xwiki:html5upload:message', {
         content: 'UPLOAD_FINISHING', type: 'inprogress', source: this,
-        parameters: {name: this.file.name.escapeHTML()}
+        parameters: {name: this.file.name}
       });
     }
 
@@ -419,7 +419,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       }
       this.formData.input.fire('xwiki:html5upload:message', {
         content: 'UPLOAD_FINISHED', type: 'done', source: this,
-        parameters: {name: this.file.name.escapeHTML(), size: UploadUtils.bytesToSize(this.file.size)}
+        parameters: {name: this.file.name, size: UploadUtils.bytesToSize(this.file.size)}
       });
       this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
       clearInterval(this.timer);
@@ -453,7 +453,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       clearInterval(this.timer);
       this.formData.input.fire('xwiki:html5upload:message', {
         content: message, type: 'error', source: this, parameters:
-            {name: this.file.name.escapeHTML()}
+            {name: this.file.name}
       });
       this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
     }

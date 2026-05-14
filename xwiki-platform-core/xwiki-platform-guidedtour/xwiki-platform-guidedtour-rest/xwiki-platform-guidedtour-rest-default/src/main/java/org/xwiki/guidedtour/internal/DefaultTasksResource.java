@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.guidedtour.api.dtos.TaskDTO;
 import org.xwiki.guidedtour.rest.TasksResource;
-import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -48,7 +47,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     private TasksManager tasksManager;
 
     @Override
-    public Response getTourTasks(String tourId) throws XWikiRestException
+    public Response getTourTasks(String tourId)
     {
         return execute("Tasks API: retrieving the tasks for tour [{}].", () -> {
             List<TaskDTO> tasks = this.tasksManager.getAllTasks(tourId);
@@ -57,7 +56,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response getTourTask(String tourId, String taskId) throws XWikiRestException
+    public Response getTourTask(String tourId, String taskId)
     {
         return execute("Tasks API: retrieving the task [{}] from tour [{}].", () -> {
             TaskDTO task = this.tasksManager.getTask(tourId, taskId);
@@ -66,7 +65,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response createTask(String tourId, TaskDTO taskDTO) throws XWikiRestException
+    public Response createTask(String tourId, TaskDTO taskDTO)
     {
         return execute("Tasks API: creating task [{}] for tour [{}].", () -> {
             this.tasksManager.createTask(tourId, taskDTO);
@@ -75,7 +74,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response updateTask(String tourId, String taskId, TaskDTO taskDTO) throws XWikiRestException
+    public Response updateTask(String tourId, String taskId, TaskDTO taskDTO)
     {
         return execute("Tasks API: updating task [{}] from tour [{}].", () -> {
             if (!taskDTO.getId().equals(taskId)) {
@@ -88,7 +87,7 @@ public class DefaultTasksResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response deleteTask(String tourId, String taskId) throws XWikiRestException
+    public Response deleteTask(String tourId, String taskId)
     {
         return execute("Tasks API: removing task [{}] from tour [{}].", () -> {
             this.contextualAuthorizationManager.checkAccess(Right.DELETE);

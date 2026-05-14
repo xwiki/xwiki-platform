@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.guidedtour.api.dtos.UserTourStatusDTO;
 import org.xwiki.guidedtour.rest.UserTourResource;
-import org.xwiki.rest.XWikiRestException;
 
 /**
  * Default implementation of {@link UserTourResource}.
@@ -45,7 +44,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     private UserStatusManager userStatusManager;
 
     @Override
-    public Response getUserTourStatus() throws XWikiRestException
+    public Response getUserTourStatus()
     {
         return execute("User tour status API: getting user tour status object.", () -> {
             UserTourStatusDTO json = this.userStatusManager.getUserToursStatus();
@@ -54,7 +53,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     }
 
     @Override
-    public Response createUserTourStatus() throws XWikiRestException
+    public Response createUserTourStatus()
     {
         return execute("User tour status API: creating new user tour status object.", () -> {
             this.userStatusManager.createUserTourStatus();
@@ -63,7 +62,7 @@ public class DefaultUserTourResource extends AbstractGuidedTourResource implemen
     }
 
     @Override
-    public Response updateUserTourStatus(UserTourStatusDTO userTourStatus) throws XWikiRestException
+    public Response updateUserTourStatus(UserTourStatusDTO userTourStatus)
     {
         return execute("User tour status API: updating user tour status object.", () -> {
             this.userStatusManager.updateUserTourStatus(userTourStatus);

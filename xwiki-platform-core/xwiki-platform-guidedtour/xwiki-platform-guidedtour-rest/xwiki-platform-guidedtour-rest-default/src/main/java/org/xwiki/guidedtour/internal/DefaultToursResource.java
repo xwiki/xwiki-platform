@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.guidedtour.api.dtos.TourDTO;
 import org.xwiki.guidedtour.rest.ToursResource;
-import org.xwiki.rest.XWikiRestException;
 
 /**
  * Default implementation of {@link ToursResource}.
@@ -47,7 +46,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     private ToursManager toursManager;
 
     @Override
-    public Response getAvailableTours() throws XWikiRestException
+    public Response getAvailableTours()
     {
         return execute("Tour API: retrieving all tours.", () -> {
             List<TourDTO> json = this.toursManager.getAllTours();
@@ -56,7 +55,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response createTour(TourDTO tourDTO) throws XWikiRestException
+    public Response createTour(TourDTO tourDTO)
     {
         return execute("Tour API: creating new tour.", () -> {
             this.toursManager.createTour(tourDTO);
@@ -65,7 +64,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response updateTour(String tourId, TourDTO tourDTO) throws XWikiRestException
+    public Response updateTour(String tourId, TourDTO tourDTO)
     {
         return execute("Tour API: updating tour with id [{}].", () -> {
             if (!tourDTO.getId().equals(tourId)) {
@@ -77,7 +76,7 @@ public class DefaultToursResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response deleteTour(String tourId) throws XWikiRestException
+    public Response deleteTour(String tourId)
     {
         return execute("Tour API: removing tour with id [{}].", () -> {
             this.toursManager.deleteTour(tourId);

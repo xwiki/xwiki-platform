@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.guidedtour.api.dtos.StepDTO;
 import org.xwiki.guidedtour.rest.StepsResource;
-import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -48,7 +47,7 @@ public class DefaultStepsResource extends AbstractGuidedTourResource implements 
     private StepsManager stepsManager;
 
     @Override
-    public Response getTaskSteps(String tourId, String taskId) throws XWikiRestException
+    public Response getTaskSteps(String tourId, String taskId)
     {
         return execute("Steps API: retrieving the steps for task [{}] from tour [{}].", () -> {
             List<StepDTO> tasks = this.stepsManager.getAllSteps(tourId, taskId);
@@ -57,7 +56,7 @@ public class DefaultStepsResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response createStep(String tourId, String taskId, StepDTO stepDTO) throws XWikiRestException
+    public Response createStep(String tourId, String taskId, StepDTO stepDTO)
     {
         return execute("Steps API: creating step for task [{}] from tour [{}].", () -> {
             this.stepsManager.createStep(tourId, taskId, stepDTO);
@@ -66,7 +65,7 @@ public class DefaultStepsResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response updateStep(String tourId, String taskId, int stepId, StepDTO stepDTO) throws XWikiRestException
+    public Response updateStep(String tourId, String taskId, int stepId, StepDTO stepDTO)
     {
         return execute("Steps API: updating step on position [{}] for task [{}] from tour [{}].", () -> {
             this.stepsManager.updateStep(tourId, taskId, stepId, stepDTO);
@@ -75,7 +74,7 @@ public class DefaultStepsResource extends AbstractGuidedTourResource implements 
     }
 
     @Override
-    public Response deleteStep(String tourId, String taskId, int stepId) throws XWikiRestException
+    public Response deleteStep(String tourId, String taskId, int stepId)
     {
         return execute("Steps API: removing step on position [{}] for task [{}] from tour [{}].", () -> {
             this.contextualAuthorizationManager.checkAccess(Right.DELETE);

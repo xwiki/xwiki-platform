@@ -38,8 +38,6 @@
   </properties>
   <dependencies>
     <!-- Runtime dependencies. -->
-    <!-- TODO: Check what dependencies are actually needed -->
-    <!-- FIXME: These versioned dependencies are workarounds for the upgrade, they should be removed and fixed in the origin dependency -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-guidedtour-ui</artifactId>

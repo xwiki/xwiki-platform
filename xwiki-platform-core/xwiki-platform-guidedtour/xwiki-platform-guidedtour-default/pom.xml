@@ -31,11 +31,12 @@
   <name>XWiki Platform - Guided Tour - Default Implementation</name>
   <description>XWiki Platform - Guided Tour - Default Implementation</description>
   <properties>
+    <xwiki.extension.name>Guided Tour Default API Implementation</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
     <xwiki.jacoco.instructionRatio>0.99</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Testing dependencies -->
-    <!-- TODO: Check what dependencies are actually needed -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-simple</artifactId>

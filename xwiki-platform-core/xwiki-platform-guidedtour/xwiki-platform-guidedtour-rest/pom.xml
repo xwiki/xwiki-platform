@@ -34,6 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Guided Tour REST Services</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <modules>
     <module>xwiki-platform-guidedtour-rest-api</module>

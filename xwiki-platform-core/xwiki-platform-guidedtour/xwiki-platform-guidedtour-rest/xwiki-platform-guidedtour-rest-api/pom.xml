@@ -33,6 +33,7 @@
   <description>The API of the Guided Tour REST services.</description>
   <properties>
     <xwiki.extension.name>Guided Tour REST Services API</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <!-- TODO: Check what dependencies are actually needed -->

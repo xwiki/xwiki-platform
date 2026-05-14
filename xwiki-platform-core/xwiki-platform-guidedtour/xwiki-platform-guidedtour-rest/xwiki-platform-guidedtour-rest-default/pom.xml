@@ -35,9 +35,9 @@
     <xwiki.jacoco.instructionRatio>0.99</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Guided Tour REST Services - Default Implementation</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
-    <!-- TODO: Check what dependencies are actually needed -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>

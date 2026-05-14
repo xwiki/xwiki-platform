@@ -32,6 +32,10 @@
   <name>XWiki Platform - Guided Tour - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Guided Tour - API</description>
+  <properties>
+    <xwiki.extension.name>Guided Tour API</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

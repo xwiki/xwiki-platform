@@ -138,33 +138,7 @@ onMounted(async () => {
 });
 </script>
 
-<style>
-:root {
-  --guidedtour-text-color: #b0b0b0;
-  --guidedtour-background-color-secondary: #f2f2f2;
-}
-
-.guidedtour-tour.loading-content {
-  /* width: 100%;
-  height: 8px;
-  border-radius: 4px; */
-  content: "";
-  background: linear-gradient(
-    90deg,
-    var(--guidedtour-text-color) 0%,
-    var(--guidedtour-text-color) 25%,
-    var(--guidedtour-background-color-secondary) 30%,
-    var(--guidedtour-background-color-secondary) 35%,
-    var(--guidedtour-text-color) 40%,
-    var(--guidedtour-text-color) 75%,
-    var(--guidedtour-background-color-secondary) 80%,
-    var(--guidedtour-background-color-secondary) 85%,
-    var(--guidedtour-text-color) 90%
-  );
-  background-size: 200% 100%;
-  animation: loading-shimmer 1.5s ease-in-out infinite;
-}
-
+<style scoped>
 .guidedtour-tour.tour-DONE .guidedtour-tour-header .tour-title {
   text-decoration: line-through;
   color: var(

@@ -32,7 +32,7 @@
 const props = defineProps(["link"]);
 </script>
 
-<style>
+<style scoped>
 .useful-link {
   padding: 14px 16px 14px 16px;
   border-color: #ddddddff;

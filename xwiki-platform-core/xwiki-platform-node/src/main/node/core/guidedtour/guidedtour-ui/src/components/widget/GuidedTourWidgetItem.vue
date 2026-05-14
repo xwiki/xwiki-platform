@@ -28,7 +28,7 @@
     <div class="guidedtour-widget-item loading" />
   </template>
   <template v-else>
-    <div class="guidedtour-widget-item" v-bind="$attrs">
+    <div class="guidedtour-widget-item" :id="props.id" @click="props.onClick">
       <span class="pre-btns">
         <slot name="pre-btns" />
       </span>
@@ -52,17 +52,15 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
 
-defineOptions({
-  inheritAttrs: false,
-});
-
 const props = defineProps<{
   loading?: boolean;
   waiting?: Ref<boolean>;
+  id?: string;
+  onClick?: () => void;
 }>();
 </script>
 
-<style>
+<style scoped>
 .guidedtour-widget-item.loading {
   /* width: 100%;
   height: 8px;

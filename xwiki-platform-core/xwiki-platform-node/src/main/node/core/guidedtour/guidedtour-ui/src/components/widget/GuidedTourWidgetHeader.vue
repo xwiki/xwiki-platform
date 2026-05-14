@@ -65,7 +65,7 @@ const props = defineProps<{ progress: ComputedRef<number> }>();
 const progress = props.progress;
 </script>
 
-<style>
+<style scoped>
 .top-bar {
   display: flex;
   cursor: pointer;

@@ -40,13 +40,13 @@ const props = defineProps<{
 const progress = props.progress;
 </script>
 
-<style>
+<style scoped>
 .guidedtour-widget .completeness {
   margin: 16px 0 16px 0;
   height: 9px;
   position: relative;
   width: 100%;
-  background: #f2f2f2ff;
+  background: var(--guidedtour-background-color-secondary);
   border-start-start-radius: 18px;
   border-start-end-radius: 18px;
   border-end-start-radius: 18px;

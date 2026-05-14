@@ -31,7 +31,6 @@
       collapsed: state.isWidgetCollapsed,
     }"
   >
-    <DriverCss />
     <GuidedTourWidgetHeader
       @closeGuidedTourWidget="onCloseGuidedTourWidget"
       :progress="progress.val"
@@ -63,7 +62,7 @@
         </template>
         <div v-else>
           <template v-if="state.tours.length == 0">
-            <GuidedTourWidgetItem />
+            <div>No tours to show</div>
           </template>
           <template v-else-if="state.toursLoadError.length > 0">{{
             state.toursLoadError
@@ -93,7 +92,6 @@
 //import type { I18n } from "vue-i18n";
 // All the logic should live here (TODO: Maybe move most of it to a .ts file)
 // FIXME: This should be injected from somewhere else, but I have no idea from where.
-import DriverCss from "./DriverCss.vue";
 import GuidedTourWidgetHeader from "./GuidedTourWidgetHeader.vue";
 import GuidedTourWidgetItem from "./GuidedTourWidgetItem.vue";
 import GuidedTourWidgetTour from "./GuidedTourWidgetTour.vue";
@@ -176,6 +174,11 @@ const progress = {
 </script>
 
 <style>
+@import "./styles/variables.css";
+@import "./styles/driver.css";
+</style>
+
+<style scoped>
 .guidedtour-useful-links {
   max-height: 300px;
   .empty {

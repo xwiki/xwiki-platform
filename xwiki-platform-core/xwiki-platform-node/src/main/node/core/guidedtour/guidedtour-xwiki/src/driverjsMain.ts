@@ -646,20 +646,6 @@ function loadCss(href) {
     window.localStorage.setItem('TourFloaterCollapsed', document.querySelector('.guidedtour-widget').classList.toggle('collapsed'));
   });
 
-  bindFloaterClickEvent('#widget-close', (event) => {
-    if (event.target.closest('.guidedtour-widget').classList.contains('collapsed')) {
-      event.target.closest('.guidedtour-widget').remove();
-      // window.localStorage.setItem('TourFloaterCollapsed', 'hidden') // Commented to not disable the widget completely, permanently.
-      event.stopPropagation();
-      // TODO: Or just hide it, and set some cookie/option to not load the javascript code at all the next time.
-    }
-  });
-
-  bindFloaterClickEvent('#widget-options', (event) => {
-    event.stopPropagation();
-    console.info('Opened settings menu');
-  });
-
   if (window.localStorage.getItem('guidedtour-widget-position-x')) {
     // FIXME: Could be XSS i think, if someone edits this key. But that's how the right side panel works too.
     // FIXME: Clamp the allowed values, so the widget is always visible on the screen. Maybe set the value as percentage of screen width? In the dragging functions I mean.

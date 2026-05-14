@@ -32,7 +32,7 @@
       ['task-' + task!.status]: true,
       'guidedtour-task': true,
     }"
-    id="task.id"
+    :id="task.id"
     @click="onStartTask"
   >
     <template v-slot:pre-btns>
@@ -115,12 +115,7 @@ async function onStartTask() {
 }
 </script>
 
-<style>
-:root {
-  --guidedtour-text-color: #b0b0b0;
-  --guidedtour-background-color-secondary: #f2f2f2;
-}
-
+<style scoped>
 .guidedtour-task.loading-content {
   /* width: 100%;
   height: 8px;

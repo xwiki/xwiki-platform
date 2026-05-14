@@ -61,6 +61,17 @@
       <artifactId>xwiki-platform-observation-remote</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to set the effective author when saving during a real-time collaboration session. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-container-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>

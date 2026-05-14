@@ -134,7 +134,7 @@ public class YjsEndpoint extends Endpoint implements EndpointComponent
     @Override
     public void onClose(Session session, CloseReason closeReason)
     {
-        this.roomManager.leave(session);
+        this.context.run(session, () -> this.roomManager.leave(session));
     }
 
     @Override

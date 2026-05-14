@@ -542,6 +542,145 @@ class CollaborationIT extends AbstractBlockNoteIT
         firstTextArea.assertTextIs("Un deux trois%s", "superadmin");
     }
 
+    @Test
+    @Order(6)
+    void restrictScriptMacroExecution(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh. We target the default English translation because the previous test has changed the current UI
+        // language.
+        DocumentReference testReferenceEn = new DocumentReference(testReference, Locale.ENGLISH);
+        setup.deletePage(testReferenceEn);
+        setup.createPage(testReferenceEn, """
+            one
+
+            {{velocity}}
+            $xcontext.userReference.name
+            {{/velocity}}
+            """, "");
+
+        // Edit the page in the first browser tab (in-place) as John (no script rights).
+        InplaceEditablePage firstEditPage = new InplaceEditablePage().editInplace();
+        BlockNoteEditor firstEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea firstTextArea = firstEditor.getRichTextArea();
+        // The title field is focused by default. Move the focus to the content field.
+        setup.getDriver().switchTo().activeElement().sendKeys(Keys.TAB);
+        // John makes a change and becomes the effective author of the collaboration session.
+        firstTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " two");
+
+        //
+        // Second Tab
+        //
+
+        // Edit the page in the second browser tab (standalone) as superadmin (has script rights).
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        setup.loginAsSuperAdmin();
+        setup.gotoPage(testReferenceEn).editWYSIWYG();
+        new ForceEditLockPage().clickForceEdit();
+        WYSIWYGEditPage secondEditPage = new WYSIWYGEditPage();
+        BlockNoteEditor secondEditor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
+        // Superadmin makes a change but John remains the effective author because the session script level cannot
+        // increase.
+        secondTextArea.waitUntilTextContains("two");
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " three");
+
+        // Save and check that the script macro is not executed because John is the effective author.
+        ViewPage secondViewPage = secondEditPage.clickSaveAndView();
+        String content = secondViewPage.getContent();
+        assertTrue(content.contains("The execution of the [velocity] script macro is not allowed"),
+            "Unexpected content: " + content);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("three");
+
+        // Save and check that the script macro is not executed: John is still the effective author.
+        content = firstEditPage.saveAndView().getContent();
+        assertTrue(content.contains("The execution of the [velocity] script macro is not allowed"),
+            "Unexpected content: " + content);
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        // Start a new collaboration session.
+        secondEditPage = secondViewPage.editWYSIWYG();
+        secondEditor = new BlockNoteEditor("content");
+        secondTextArea = secondEditor.getRichTextArea();
+        // Superadmin makes a change and becomes the effective author of the new collaboration session.
+        secondTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " four");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Join the new collaboration session.
+        editAndForceLock(firstEditPage, "superadmin", setup);
+        firstEditor = new BlockNoteEditor("content");
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilTextContains("four");
+
+        // Save and check that the script macro is not executed: even though superadmin is the effective author, if the
+        // user saving the page (John in this case) has less script rights, it becomes the effective script author for
+        // that revision.
+        content = firstEditPage.saveAndView().getContent();
+        assertTrue(content.contains("The execution of the [velocity] script macro is not allowed"),
+            "Unexpected content: " + content);
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilFocused().sendKeys(" five");
+
+        // Save (to check that the script macro is executed) but don't leave the edit mode yet. We want to keep the
+        // collaboration session active for John to be able to rejoin.
+        secondEditPage.clickSaveAndContinue();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Re-join the collaboration session.
+        editAndForceLock(firstEditPage, "superadmin", setup);
+        firstEditor = new BlockNoteEditor("content");
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilTextContains("five");
+        // John makes a change and becomes the effective author.
+        firstTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " six");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("six");
+        // Cancel and check that the script macro is executed after the last save.
+        content = secondEditPage.clickCancel().getContent();
+        assertTrue(content.contains("superadmin"), "Unexpected content: " + content);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Save and check that the script macro is not executed since John is the effective author.
+        content = firstEditPage.saveAndView().getContent();
+        assertTrue(content.contains("The execution of the [velocity] script macro is not allowed"),
+            "Unexpected content: " + content);
+    }
+
     private void editAndForceLock(InplaceEditablePage inplaceEditablePage, String lockedBy, TestUtils setup)
     {
         inplaceEditablePage.edit();

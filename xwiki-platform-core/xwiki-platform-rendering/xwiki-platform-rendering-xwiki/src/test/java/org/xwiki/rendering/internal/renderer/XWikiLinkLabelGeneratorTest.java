@@ -19,14 +19,14 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -37,10 +37,13 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiLinkLabelGenerator}.
@@ -48,170 +51,161 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.0M1
  */
-public class XWikiLinkLabelGeneratorTest
+@ComponentTest
+class XWikiLinkLabelGeneratorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiLinkLabelGenerator> mocker =
-        new MockitoComponentMockingRule<>(XWikiLinkLabelGenerator.class);
+    @InjectMockComponents
+    private XWikiLinkLabelGenerator linkLabelGenerator;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private RenderingConfiguration configuration;
+
+    @MockComponent
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @MockComponent
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> localSerializer;
+
+    @BeforeEach
+    void setUp()
     {
-        RenderingConfiguration configuration = this.mocker.getInstance(RenderingConfiguration.class);
-        when(configuration.getLinkLabelFormat()).thenReturn(
+        when(this.configuration.getLinkLabelFormat()).thenReturn(
             "%l%la%n%na%N%NA [%w:%s.%p] %ls %np %P %NP (%t) [%w:%s.%p] %ls %np %P %NP (%t)");
-
-        EntityReferenceProvider entityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
-        when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
             new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 
     @Test
-    public void generateWhenTerminalPage() throws Exception
+    void generateWhenTerminalPage() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
         DocumentReference documentReference =
-            new DocumentReference("wiki", Arrays.asList("space1", "space2"), "HelloWorld");
+            new DocumentReference("wiki", List.of("space1", "space2"), "HelloWorld");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("My title");
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("wiki", "space1", "space2"))).thenReturn("space1.space2");
+        when(this.localSerializer.serialize(new SpaceReference("wiki", "space1", "space2")))
+            .thenReturn("space1.space2");
 
         assertEquals("%l%la%n%na%N%NA "
             + "[wiki:space1.space2.HelloWorld] space2 HelloWorld Hello World Hello World (My title) "
             + "[wiki:space1.space2.HelloWorld] space2 HelloWorld Hello World Hello World (My title)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 
     @Test
-    public void generateWhenNestedPage() throws Exception
+    void generateWhenNestedPage() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("WebHome");
         DocumentReference documentReference =
-            new DocumentReference("wiki", Arrays.asList("space1", "NestedPage"), "WebHome");
+            new DocumentReference("wiki", List.of("space1", "NestedPage"), "WebHome");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("My title");
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("wiki", "space1", "NestedPage"))).thenReturn(
-            "space1.NestedPage");
+        when(this.localSerializer.serialize(new SpaceReference("wiki", "space1", "NestedPage")))
+            .thenReturn("space1.NestedPage");
 
         assertEquals("%l%la%n%na%N%NA "
             + "[wiki:space1.NestedPage.WebHome] NestedPage NestedPage Web Home Nested Page (My title) "
             + "[wiki:space1.NestedPage.WebHome] NestedPage NestedPage Web Home Nested Page (My title)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 
     @Test
-    public void generateWhenDocumentFailsToLoad() throws Exception
+    void generateWhenDocumentFailsToLoad() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
         DocumentReference documentReference = new DocumentReference("xwiki", "Main", "HelloWorld");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenThrow(new Exception("error"));
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenThrow(new Exception("error"));
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
+        when(this.localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
 
         assertEquals("%l%la%n%na%N%NA "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 
     @Test
-    public void generateWhenDocumentTitleIsNull() throws Exception
+    void generateWhenDocumentTitleIsNull() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
         DocumentReference documentReference = new DocumentReference("xwiki", "Main", "HelloWorld");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn(null);
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
+        when(this.localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
 
         assertEquals("%l%la%n%na%N%NA "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 
     @Test
-    public void generateWhithRegexpSyntax() throws Exception
+    void generateWithRegexpSyntax() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
         DocumentReference documentReference = new DocumentReference("$0", "\\", "$0");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("$0");
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("$0", "\\"))).thenReturn("\\");
+        when(this.localSerializer.serialize(new SpaceReference("$0", "\\"))).thenReturn("\\");
 
         assertEquals("%l%la%n%na%N%NA [$0:\\.$0] \\ $0 $0 $0 ($0) [$0:\\.$0] \\ $0 $0 $0 ($0)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 
     @Test
-    public void generateWhithPageNameWithPercent() throws Exception
+    void generateWithPageNameWithPercent() throws Exception
     {
         ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page%t");
 
-        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
-        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("my title");
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(new SpaceReference("wiki", "space"))).thenReturn("space");
+        when(this.localSerializer.serialize(new SpaceReference("wiki", "space"))).thenReturn("space");
 
         assertEquals("%l%la%n%na%N%NA "
             + "[wiki:space.page%t] space page%t page%t page%t (my title) "
             + "[wiki:space.page%t] space page%t page%t page%t (my title)",
-            this.mocker.getComponentUnderTest().generate(resourceReference));
+            this.linkLabelGenerator.generate(resourceReference));
     }
 }

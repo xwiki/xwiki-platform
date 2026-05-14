@@ -21,13 +21,15 @@ package org.xwiki.wiki.workspacesmigrator.internal;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -45,143 +47,149 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class WorkspaceMigrationTest
+@ComponentTest
+class WorkspaceMigrationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WorkspacesMigration> mocker =
-            new MockitoComponentMockingRule(WorkspacesMigration.class, HibernateDataMigration.class,
-                    "R530000WorkspacesMigration");
+    @InjectMockComponents(role = HibernateDataMigration.class)
+    private WorkspacesMigration workspacesMigration;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private DocumentRestorerFromAttachedXAR documentRestorerFromAttachedXAR;
 
+    @MockComponent
     private Execution execution;
+
+    @MockComponent
+    private Logger logger;
 
     private XWikiContext xcontext;
 
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        documentRestorerFromAttachedXAR = mocker.getInstance(DocumentRestorerFromAttachedXAR.class);
-        execution = mock(Execution.class);
-        mocker.registerComponent(Execution.class, execution);
-        xcontext = mock(XWikiContext.class);
-        xwiki = mock(XWiki.class);
+        this.xcontext = mock(XWikiContext.class);
+        this.xwiki = mock(XWiki.class);
 
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
-        when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(this.execution.getContext()).thenReturn(executionContext);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
     }
 
     @Test
-    public void upgradeWorkspace() throws Exception
+    void upgradeWorkspace() throws Exception
     {
         // Mocks about the descriptor
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspace");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspace");
         XWikiDocument oldDescriptorDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspace")),
-                any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
+        when(this.xwiki.getDocument(
+            eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspace")),
+            any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
 
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
-        when(oldDescriptorDocument.getXObject(eq(new DocumentReference("mainWiki", "WorkspaceManager",
-                "WorkspaceClass")))).thenReturn(oldWorkspaceObject);
+        when(oldDescriptorDocument.getXObject(
+            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            .thenReturn(oldWorkspaceObject);
 
         // Mocks about the old document to restore form the main wiki
         DocumentReference documentToRestore2 = new DocumentReference("mainWiki", "XWiki", "RegistrationConfig");
         XWikiDocument documentToRestore2FromMainWiki = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class))).
-                thenReturn(documentToRestore2FromMainWiki);
-        when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
+        when(this.xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class)))
+            .thenReturn(documentToRestore2FromMainWiki);
+        when(this.xwiki.exists(documentToRestore2, this.xcontext)).thenReturn(true);
 
         // Run
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.workspacesMigration.hibernateMigrate();
 
         // Verify we try to restore the documents from the xar
-        verify(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(eq(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install")), eq("workspace-template.xar"), any(List.class));
+        verify(this.documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(
+            eq(new DocumentReference("mainWiki", "WorkspaceManager", "Install")), eq("workspace-template.xar"),
+            any(List.class));
 
         // Verify the document to restore has been restored from the main wiki
-        verify(xwiki).copyDocument(eq(documentToRestore2),
-                eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
+        verify(this.xwiki).copyDocument(eq(documentToRestore2),
+            eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(mocker.getMockedLogger()).warn("Failed to restore some documents: [{}]. You should import manually " +
-                "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your" +
-                " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, " +
-                "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
+        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
+            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
+            + " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, "
+            + "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
     }
 
     @Test
-    public void upgradeWorkspaceTemplate() throws Exception
+    void upgradeWorkspaceTemplate() throws Exception
     {
         // Mocks about the descriptor
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspacetemplate");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspacetemplate");
         XWikiDocument oldDescriptorDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE,
-                "XWikiServerWorkspacetemplate")), any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
+        when(this.xwiki.getDocument(
+            eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspacetemplate")),
+            any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
 
         // Mock that the workspace special page exists
         DocumentReference workspacePageReference = new DocumentReference("workspacetemplate", "XWiki",
-                "ManageWorkspace");
-        when(xwiki.exists(eq(workspacePageReference), any(XWikiContext.class))).thenReturn(true);
+            "ManageWorkspace");
+        when(this.xwiki.exists(eq(workspacePageReference), any(XWikiContext.class))).thenReturn(true);
 
         // Run
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.workspacesMigration.hibernateMigrate();
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(mocker.getMockedLogger()).warn("Failed to restore some documents: [{}]. You should import manually " +
-                "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your" +
-                " wiki, to restore these documents.", "workspacetemplate:XWiki.AdminRegistrationSheet, " +
-                "workspacetemplate:XWiki.RegistrationConfig, workspacetemplate:XWiki.RegistrationHelp, " +
-                "workspacetemplate:XWiki.AdminUsersSheet");
+        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
+            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
+            + " wiki, to restore these documents.", "workspacetemplate:XWiki.AdminRegistrationSheet, "
+            + "workspacetemplate:XWiki.RegistrationConfig, workspacetemplate:XWiki.RegistrationHelp, "
+            + "workspacetemplate:XWiki.AdminUsersSheet");
     }
 
     @Test
-    public void upgradeRegularSubwiki() throws Exception
+    void upgradeRegularSubwiki() throws Exception
     {
         // Mocks about the descriptor
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         XWikiDocument oldDescriptorDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE,
-                "XWikiServerSubwiki")), any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
+        when(this.xwiki.getDocument(
+            eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerSubwiki")),
+            any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
 
         // Run
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.workspacesMigration.hibernateMigrate();
 
         // Verify that the migration did not try to restore old documents
-        verify(xwiki, never()).exists(eq(new DocumentReference("subwiki", "XWiki", "AdminRegistrationSheet")),
-                any(XWikiContext.class));
+        verify(this.xwiki, never()).exists(eq(new DocumentReference("subwiki", "XWiki", "AdminRegistrationSheet")),
+            any(XWikiContext.class));
     }
 
     @Test
-    public void errorWhenRestoringFromXAR() throws Exception
+    void errorWhenRestoringFromXAR() throws Exception
     {
         // Mocks about the descriptor
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspace");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspace");
         XWikiDocument oldDescriptorDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspace")),
-                any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
+        when(this.xwiki.getDocument(
+            eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspace")),
+            any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
-        when(oldDescriptorDocument.getXObject(eq(new DocumentReference("mainWiki", "WorkspaceManager",
-                "WorkspaceClass")))).thenReturn(oldWorkspaceObject);
+        when(oldDescriptorDocument.getXObject(
+            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            .thenReturn(oldWorkspaceObject);
 
-        doThrow(new XWikiException()).when(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(
-                any(DocumentReference.class), any(String.class), any(List.class));
+        doThrow(new XWikiException()).when(this.documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(
+            any(DocumentReference.class), any(String.class), any(List.class));
         // Run
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.workspacesMigration.hibernateMigrate();
 
         // Verify
-        verify(mocker.getMockedLogger()).error(eq("Error while restoring documents from the Workspace XAR"),
-                any(XWikiException.class));
+        verify(this.logger).error(eq("Error while restoring documents from the Workspace XAR"),
+            any(XWikiException.class));
     }
-
-
 }

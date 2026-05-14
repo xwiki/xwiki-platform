@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @ExtendWith(MockitoRepositoryUtilsExtension.class)
-public class RepairXarJobTest extends AbstractExtensionHandlerTest
+class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
     private InstalledExtensionRepository xarExtensionRepository;
 
@@ -90,7 +90,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     }
 
     @Test
-    public void testRepairOnRoot() throws Throwable
+    void repairOnRoot() throws Throwable
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
@@ -106,7 +106,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     }
 
     @Test
-    public void testRepairOnWiki() throws Throwable
+    void repairOnWiki() throws Throwable
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
@@ -122,7 +122,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     }
 
     @Test
-    public void testRepairInvalidOnRoot() throws Throwable
+    void repairInvalidOnRoot() throws Throwable
     {
         ExtensionId extensionId = new ExtensionId("invalid", "1.0");
 

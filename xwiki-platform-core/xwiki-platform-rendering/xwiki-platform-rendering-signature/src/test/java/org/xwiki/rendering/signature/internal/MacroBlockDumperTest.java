@@ -19,25 +19,25 @@
  */
 package org.xwiki.rendering.signature.internal;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for {@link org.xwiki.rendering.signature.internal.MacroBlockDumper}.
@@ -45,131 +45,119 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 6.1M2
  */
-public class MacroBlockDumperTest
+@ComponentTest
+class MacroBlockDumperTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<BlockDumper> mocker =
-        new MockitoComponentMockingRule<BlockDumper>(MacroBlockDumper.class);
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @InjectMockComponents
+    private MacroBlockDumper dumper;
 
     private Map<String, String> params = new HashMap<>();
 
-    private BlockDumper dumper;
-
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void dumpMacroBlockWithoutSource() throws Exception
     {
-        dumper = mocker.getComponentUnderTest();
+        byte[] dump1 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        byte[] dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertArrayEquals(dump1, dump2);
+
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", true));
+        assertArrayEquals(dump1, dump2);
+
+        dump2 = this.dumper.dump(new MacroBlock("macro2", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content2", false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        this.params.put("param", "value");
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        dump1 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertArrayEquals(dump1, dump2);
+
+        this.params.put("param", "value2");
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        this.params.clear();
+        this.params.put("param2", "value");
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
+
+        this.params.clear();
+        this.params.put("param", "value");
+        this.params.put("param2", "value2");
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
     }
 
     @Test
-    public void testDumpMacroBlockWithoutSource() throws Exception
+    void dumpMacroBlockWithSource() throws Exception
     {
-        byte[] dump1 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        byte[] dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, equalTo(dump2));
-
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", true));
-        assertThat(dump1, equalTo(dump2));
-
-        dump2 = dumper.dump(new MacroBlock("macro2", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        dump2 = dumper.dump(new MacroBlock("macro", params, false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content2", false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        params.put("param", "value");
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        dump1 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, equalTo(dump2));
-
-        params.put("param", "value2");
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        params.clear();
-        params.put("param2", "value");
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
-
-        params.clear();
-        params.put("param", "value");
-        params.put("param2", "value2");
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
-    }
-
-    @Test
-    public void testDumpMacroBlockWithSource() throws Exception
-    {
-        Block macro1 = new MacroBlock("macro", params, "content", false);
-        Block macro2 = new MacroBlock("macro", params, "content", false);
-        XDOM xdom1 = new XDOM(Collections.singletonList(macro1));
-        XDOM xdom2 = new XDOM(Collections.singletonList(macro2));
+        Block macro1 = new MacroBlock("macro", this.params, "content", false);
+        Block macro2 = new MacroBlock("macro", this.params, "content", false);
+        XDOM xdom1 = new XDOM(List.of(macro1));
+        XDOM xdom2 = new XDOM(List.of(macro2));
         xdom1.getMetaData().addMetaData(MetaData.SOURCE, "source");
         xdom2.getMetaData().addMetaData(MetaData.SOURCE, "source");
 
-        byte[] dump1 = dumper.dump(macro1);
-        byte[] dump2 = dumper.dump(macro2);
-        assertThat(dump1, equalTo(dump2));
+        byte[] dump1 = this.dumper.dump(macro1);
+        byte[] dump2 = this.dumper.dump(macro2);
+        assertArrayEquals(dump1, dump2);
 
-        dump2 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        assertThat(dump1, not(equalTo(dump2)));
+        dump2 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        assertFalse(Arrays.equals(dump1, dump2));
 
         xdom2.getMetaData().addMetaData(MetaData.SOURCE, "other");
-        dump2 = dumper.dump(macro2);
-        assertThat(dump1, not(equalTo(dump2)));
+        dump2 = this.dumper.dump(macro2);
+        assertFalse(Arrays.equals(dump1, dump2));
 
         xdom2.getMetaData().addMetaData(MetaData.SOURCE, null);
-        dump1 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        dump2 = dumper.dump(macro2);
-        assertThat(dump1, equalTo(dump2));
+        dump1 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        dump2 = this.dumper.dump(macro2);
+        assertArrayEquals(dump1, dump2);
     }
 
     @Test
-    public void testDumpMacroMarkerBlockWithoutSource() throws Exception
+    void dumpMacroMarkerBlockWithoutSource() throws Exception
     {
-        byte[] dump1 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        byte[] dump2 = dumper.dump(new MacroMarkerBlock("macro", params, "content", Collections.<Block>emptyList(), false));
-        assertThat(dump1, equalTo(dump2));
+        byte[] dump1 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        byte[] dump2 = this.dumper.dump(
+            new MacroMarkerBlock("macro", this.params, "content", List.of(), false));
+        assertArrayEquals(dump1, dump2);
 
-        params.put("param", "value");
-        params.put("param2", "value2");
-        dump1 = dumper.dump(new MacroBlock("macro", params, "content", false));
-        dump2 = dumper.dump(new MacroMarkerBlock("macro", params, "content", Collections.<Block>emptyList(), false));
-        assertThat(dump1, equalTo(dump2));
+        this.params.put("param", "value");
+        this.params.put("param2", "value2");
+        dump1 = this.dumper.dump(new MacroBlock("macro", this.params, "content", false));
+        dump2 = this.dumper.dump(
+            new MacroMarkerBlock("macro", this.params, "content", List.of(), false));
+        assertArrayEquals(dump1, dump2);
     }
 
     @Test
-    public void testDumpMacroMarkerBlockWithSource() throws Exception
+    void dumpMacroMarkerBlockWithSource() throws Exception
     {
-        Block macro1 = new MacroBlock("macro", params, "content", false);
-        Block macro2 = new MacroMarkerBlock("macro", params, "content", Collections.<Block>emptyList(), false);
-        XDOM xdom1 = new XDOM(Collections.singletonList(macro1));
-        XDOM xdom2 = new XDOM(Collections.singletonList(macro2));
+        Block macro1 = new MacroBlock("macro", this.params, "content", false);
+        Block macro2 = new MacroMarkerBlock("macro", this.params, "content", List.of(), false);
+        XDOM xdom1 = new XDOM(List.of(macro1));
+        XDOM xdom2 = new XDOM(List.of(macro2));
         xdom1.getMetaData().addMetaData(MetaData.SOURCE, "source");
         xdom2.getMetaData().addMetaData(MetaData.SOURCE, "source");
 
-        byte[] dump1 = dumper.dump(macro1);
-        byte[] dump2 = dumper.dump(macro2);
-        assertThat(dump1, equalTo(dump2));
+        byte[] dump1 = this.dumper.dump(macro1);
+        byte[] dump2 = this.dumper.dump(macro2);
+        assertArrayEquals(dump1, dump2);
     }
 
     @Test
-    public void testIllegalArgumentException() throws Exception
+    void illegalArgumentException()
     {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Unsupported block [org.xwiki.rendering.block.WordBlock].");
-
-        dumper.dump(new WordBlock("macro"));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> this.dumper.dump(new WordBlock("macro")));
+        assertEquals("Unsupported block [org.xwiki.rendering.block.WordBlock].", exception.getMessage());
     }
 }
-
-

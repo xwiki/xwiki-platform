@@ -19,26 +19,29 @@
  */
 package org.xwiki.extension.xar.internal.question;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ConflictQuestionRecorder}.
- * 
+ *
  * @version $Id$
  * @since 7.1RC1
  */
-public class ConflictQuestionRecorderTest
+class ConflictQuestionRecorderTest
 {
     @Test
-    public void recordAndReplay()
+    void recordAndReplay()
     {
         XWikiDocument alice = mock(XWikiDocument.class, "Alice");
         when(alice.getDocumentReference()).thenReturn(new DocumentReference("dev", "Users", "Alice"));

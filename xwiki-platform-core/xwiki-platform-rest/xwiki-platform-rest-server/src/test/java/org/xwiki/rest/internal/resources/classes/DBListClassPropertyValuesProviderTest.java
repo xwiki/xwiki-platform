@@ -62,12 +62,12 @@ import static org.mockito.Mockito.when;
  * @since 9.8RC1
  */
 @ComponentTest
-public class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
+class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private DBListClassPropertyValuesProvider provider;
 
-    private DBListClass dbListClass = new DBListClass();
+    private final DBListClass dbListClass = new DBListClass();
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -78,8 +78,9 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     @MockComponent
     protected QueryBuilder<DBListClass> allowedValuesQueryBuilder;
 
+    @Override
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         super.configure();
 
@@ -91,29 +92,29 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     }
 
     @Test
-    public void getValuesForMissingProperty() throws Exception
+    void getValuesForMissingProperty()
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("status", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
         Throwable exception = assertThrows(XWikiRestException.class, () -> {
             this.provider.getValues(propertyReference, 0);
         });
-        assertEquals(exception.getMessage(), "Property [status reference] not found.");
+        assertEquals("Property [status reference] not found.", exception.getMessage());
     }
 
     @Test
-    public void getValuesForWrongProperty() throws Exception
+    void getValuesForWrongProperty()
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("date", this.classReference);
         when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
         Throwable exception = assertThrows(XWikiRestException.class, () -> {
             this.provider.getValues(propertyReference, 0);
         });
-        assertEquals(exception.getMessage(), "This [status reference] is not a [DBListClass] property.");
+        assertEquals("This [status reference] is not a [DBListClass] property.", exception.getMessage());
     }
 
     @Test
-    public void getValuesAllowed() throws Exception
+    void getValuesAllowed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
@@ -127,7 +128,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     }
 
     @Test
-    public void getValuesMixedWithoutUsed() throws Exception
+    void getValuesMixedWithoutUsed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
@@ -143,7 +144,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     }
 
     @Test
-    public void getValuesMixedWithUsed() throws Exception
+    void getValuesMixedWithUsed() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
@@ -159,7 +160,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
         Query query = mock(Query.class);
         QueryParameter queryParameter = mock(QueryParameter.class);
-        when(this.usedValuesQueryBuilder.build(dbListClass)).thenReturn(query);
+        when(this.usedValuesQueryBuilder.build(this.dbListClass)).thenReturn(query);
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("bar")).thenReturn(queryParameter);
@@ -179,11 +180,11 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
     }
 
     @Test
-    public void getValue() throws Exception
+    void getValue() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         when(this.authorExecutor.call(any(), any(), any()))
-                .thenAnswer(answer -> ((Callable) answer.getArgument(0)).call());
+            .thenAnswer(answer -> ((Callable) answer.getArgument(0)).call());
 
         PropertyValue red = new PropertyValue();
         red.setValue("red");
@@ -192,7 +193,7 @@ public class DBListClassPropertyValuesProviderTest extends AbstractListClassProp
 
         Query query = mock(Query.class);
         QueryParameter queryParameter = mock(QueryParameter.class);
-        when(this.allowedValuesQueryBuilder.build(dbListClass)).thenReturn(query);
+        when(this.allowedValuesQueryBuilder.build(this.dbListClass)).thenReturn(query);
         when(query.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.literal("red")).thenReturn(queryParameter);
         when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "red", "Red" }));

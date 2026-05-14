@@ -22,13 +22,12 @@ package org.xwiki.search.solr.internal.metadata;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -43,8 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.GeneralMailConfiguration;
@@ -151,7 +148,7 @@ class DocumentSolrMetadataExtractorTest
     private XWikiDocument translatedDocument = mock(XWikiDocument.class, Locale.FRENCH.toString());
 
     private DocumentReference documentReference =
-        new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
+        new DocumentReference("wiki", List.of("Path", "To", "Page"), "WebHome");
 
     private DocumentReference frenchDocumentReference = new DocumentReference(this.documentReference, Locale.FRENCH);
 
@@ -186,18 +183,13 @@ class DocumentSolrMetadataExtractorTest
         when(this.translatedDocument.getDocumentReference()).thenReturn(this.frenchDocumentReference);
         when(this.translatedDocument.getAuthors()).thenReturn(this.documentAuthors);
 
-        when(this.fieldNameSerializer.serialize(any())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                EntityReference reference = (EntityReference) invocation.getArguments()[0];
-                StringBuilder result = new StringBuilder();
-                for (EntityReference parent : reference.getReversedReferenceChain()) {
-                    result.append('.').append(parent.getName());
-                }
-                return result.substring(1);
+        when(this.fieldNameSerializer.serialize(any())).then(invocation -> {
+            EntityReference reference = (EntityReference) invocation.getArguments()[0];
+            StringBuilder result = new StringBuilder();
+            for (EntityReference parent : reference.getReversedReferenceChain()) {
+                result.append('.').append(parent.getName());
             }
+            return result.substring(1);
         });
 
         when(this.fieldNameEncoder.encode(any())).then(AdditionalAnswers.returnsFirstArg());
@@ -256,7 +248,7 @@ class DocumentSolrMetadataExtractorTest
             new DocumentReference("wiki", "space", "document1"), new DocumentReference("wiki", "space", "document2")));
 
         // XObjects.
-        when(this.document.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
+        when(this.document.getXObjects()).thenReturn(Map.of());
 
         // Title
         String title = "title";
@@ -264,18 +256,10 @@ class DocumentSolrMetadataExtractorTest
 
         // Rendered Content
         final String renderedContent = "rendered content";
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation)
-            {
-                Object[] args = invocation.getArguments();
-
-                WikiPrinter printer = (WikiPrinter) args[1];
-                printer.print(renderedContent);
-
-                return null;
-            }
+        doAnswer(invocation -> {
+            WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+            printer.print(renderedContent);
+            return null;
         }).when(this.renderer).render((Block) any(), any());
 
         // Raw Content
@@ -293,12 +277,12 @@ class DocumentSolrMetadataExtractorTest
         assertEquals(id, solrDocument.getFieldValue(FieldUtils.ID));
 
         assertEquals(this.documentReference.getWikiReference().getName(), solrDocument.getFieldValue(FieldUtils.WIKI));
-        assertEquals(Arrays.asList("Path", "To", "Page"), solrDocument.getFieldValues(FieldUtils.SPACES));
+        assertEquals(List.of("Path", "To", "Page"), solrDocument.getFieldValues(FieldUtils.SPACES));
         assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
 
-        assertEquals(Arrays.asList("0/Path.", "1/Path.To.", "2/Path.To.Page."),
+        assertEquals(List.of("0/Path.", "1/Path.To.", "2/Path.To.Page."),
             solrDocument.getFieldValues(FieldUtils.SPACE_FACET));
-        assertEquals(Arrays.asList("Path", "Path.To", "Path.To.Page"),
+        assertEquals(List.of("Path", "Path.To", "Path.To.Page"),
             solrDocument.getFieldValues(FieldUtils.SPACE_PREFIX));
 
         assertEquals(Locale.US.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
@@ -398,7 +382,7 @@ class DocumentSolrMetadataExtractorTest
         when(passwordField.isSensitive(this.xcontext)).thenReturn(true);
         commentFields.add(passwordField);
 
-        List<String> commentList = Arrays.asList("a", "list");
+        List<String> commentList = List.of("a", "list");
         BaseProperty<EntityReference> listField = mock(BaseProperty.class);
         when(listField.getName()).thenReturn("list");
         when(listField.getValue()).thenReturn(commentList);
@@ -420,7 +404,7 @@ class DocumentSolrMetadataExtractorTest
 
         DocumentReference commentsClassReference = new DocumentReference("wiki", "space", "commentsClass");
         when(this.document.getXObjects())
-            .thenReturn(Collections.singletonMap(commentsClassReference, Arrays.asList(comment)));
+            .thenReturn(Map.of(commentsClassReference, List.of(comment)));
 
         BaseClass xclass = mock(BaseClass.class);
         when(comment.getXClass(this.xcontext)).thenReturn(xclass);
@@ -444,7 +428,7 @@ class DocumentSolrMetadataExtractorTest
         //
         // Assert and verify
         //
-        assertEquals(Arrays.asList("space.commentsClass"), solrDocument.getFieldValues(FieldUtils.CLASS));
+        assertEquals(List.of("space.commentsClass"), solrDocument.getFieldValues(FieldUtils.CLASS));
 
         // A TextArea property must be indexed as a localized text.
         assertSame(commentContent,
@@ -516,7 +500,7 @@ class DocumentSolrMetadataExtractorTest
 
         // Add the mocked email object
         when(this.document.getXObjects())
-            .thenReturn(Collections.singletonMap(userClassRef, Arrays.asList(userObject)));
+            .thenReturn(Map.of(userClassRef, List.of(userObject)));
 
         // Mock the class
         BaseClass xclass = mock(BaseClass.class);
@@ -573,34 +557,34 @@ class DocumentSolrMetadataExtractorTest
         @SuppressWarnings("unchecked")
         BaseProperty<EntityReference> listProperty = mock(BaseProperty.class);
         when(listProperty.getName()).thenReturn("color");
-        when(listProperty.getValue()).thenReturn(Arrays.asList("red", "green"));
+        when(listProperty.getValue()).thenReturn(List.of("red", "green"));
         when(listProperty.getObject()).thenReturn(xobject);
 
         DocumentReference classReference = new DocumentReference("wiki", "Space", "MyClass");
-        when(this.document.getXObjects()).thenReturn(Collections.singletonMap(classReference, Arrays.asList(xobject)));
+        when(this.document.getXObjects()).thenReturn(Map.of(classReference, List.of(xobject)));
 
         BaseClass xclass = mock(BaseClass.class);
         when(xobject.getXClass(this.xcontext)).thenReturn(xclass);
-        when(xobject.getFieldList()).thenReturn(Arrays.<Object>asList(listProperty));
+        when(xobject.getFieldList()).thenReturn(List.<Object>of(listProperty));
         when(xobject.getRelativeXClassReference())
             .thenReturn(classReference.removeParent(classReference.getWikiReference()));
 
         StaticListClass staticListClass = mock(StaticListClass.class);
         when(xclass.get("color")).thenReturn(staticListClass);
         when(staticListClass.getMap(xcontext))
-            .thenReturn(Collections.singletonMap("red", new ListItem("red", "Dark Red")));
+            .thenReturn(Map.of("red", new ListItem("red", "Dark Red")));
 
         SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
         // Make sure both the raw value (which is saved in the database) and the display value (specified in the XClass)
         // are indexed. The raw values are indexed as strings in order to be able to perform exact matches.
-        assertEquals(Arrays.asList("red", "green"), solrDocument.getFieldValues("property.Space.MyClass.color_string"));
-        assertEquals(Collections.singletonList("Dark Red"),
+        assertEquals(List.of("red", "green"), solrDocument.getFieldValues("property.Space.MyClass.color_string"));
+        assertEquals(List.of("Dark Red"),
             solrDocument.getFieldValues(FieldUtils.getFieldName("property.Space.MyClass.color", Locale.US)));
 
         // Check the sort field. Only the last value we set is used for sorting because we cannot sort on fields that
         // have multiple values.
-        assertEquals(Collections.singletonList("green"),
+        assertEquals(List.of("green"),
             solrDocument.getFieldValues("property.Space.MyClass.color_sortString"));
     }
 
@@ -643,7 +627,7 @@ class DocumentSolrMetadataExtractorTest
         XWikiAttachment logo;
         try (InputStream stream = getClass().getResourceAsStream("/files/" + filename)) {
             logo = createMockAttachment(filename, "image/png", new Date(), stream, "Alice", "Shy Alice");
-            when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo));
+            when(this.document.getAttachmentList()).thenReturn(List.of(logo));
         }
 
         SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
@@ -659,19 +643,19 @@ class DocumentSolrMetadataExtractorTest
         XWikiAttachment logo = createMockAttachment("logo.png", "image/png", logoDate, "foo", "Alice", "Shy Alice");
         Date todoDate = new Date(456);
         XWikiAttachment todo = createMockAttachment("todo.txt", "text/plain", todoDate, "bar bar", "Bob", "Angry Bob");
-        when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo, todo));
+        when(this.document.getAttachmentList()).thenReturn(List.of(logo, todo));
 
         SolrInputDocument solrDocument =
             this.metadataExtractor.getSolrDocument(this.frenchDocumentReference);
 
-        assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
-        assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
-        assertEquals(Arrays.asList(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
-        assertEquals(Arrays.asList(3L, 7L), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
-        assertEquals(Arrays.asList("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_fr"));
-        assertEquals(Arrays.asList("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
+        assertEquals(List.of("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
+        assertEquals(List.of("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
+        assertEquals(List.of(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
+        assertEquals(List.of(3L, 7L), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
+        assertEquals(List.of("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_fr"));
+        assertEquals(List.of("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
             solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR));
-        assertEquals(Arrays.asList("Shy Alice", "Angry Bob"),
+        assertEquals(List.of("Shy Alice", "Angry Bob"),
             solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY));
     }
 

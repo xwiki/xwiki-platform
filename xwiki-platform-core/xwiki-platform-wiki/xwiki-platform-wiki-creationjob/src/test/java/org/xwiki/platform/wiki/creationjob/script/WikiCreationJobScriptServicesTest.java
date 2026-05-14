@@ -21,9 +21,9 @@ package org.xwiki.platform.wiki.creationjob.script;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.ExtensionId;
@@ -37,15 +37,17 @@ import org.xwiki.platform.wiki.creationjob.WikiCreator;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -56,106 +58,109 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class WikiCreationJobScriptServicesTest
+@ComponentTest
+class WikiCreationJobScriptServicesTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiCreationJobScriptServices> mocker =
-            new MockitoComponentMockingRule<>(WikiCreationJobScriptServices.class);
+    @InjectMockComponents
+    private WikiCreationJobScriptServices wikiCreationJobScriptServices;
 
+    @MockComponent
     private WikiCreator wikiCreator;
 
+    @MockComponent
     private Execution execution;
 
+    @MockComponent
     private AuthorizationManager authorizationManager;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
-    
+
+    @MockComponent
     private DistributionManager distributionManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    private Logger logger;
 
     private XWikiContext xcontext;
 
     private XWiki xwiki;
-    
-    @Before
-    public void setUp() throws Exception
+
+    @BeforeEach
+    void setUp()
     {
-        wikiCreator = mocker.getInstance(WikiCreator.class);
-        execution = mocker.getInstance(Execution.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        distributionManager = mocker.getInstance(DistributionManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWikiId");
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWikiId");
 
         ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
-        
+        when(this.execution.getContext()).thenReturn(executionContext);
+
         ExtensionId extensionId = new ExtensionId("authorized-extension", "1.0");
-        when(distributionManager.getWikiUIExtensionId()).thenReturn(extensionId);
-    }
-    
-    @Test
-    public void createWiki() throws Exception
-    {
-        Job job = mock(Job.class);
-        when(wikiCreator.createWiki(any(WikiCreationRequest.class))).thenReturn(job);
-        
-        WikiCreationRequest wikiCreationRequest = new WikiCreationRequest();
-        wikiCreationRequest.setExtensionId("authorized-extension", "1.0");
-        assertEquals(job, mocker.getComponentUnderTest().createWiki(wikiCreationRequest));
-        assertNull(mocker.getComponentUnderTest().getLastError());
+        when(this.distributionManager.getWikiUIExtensionId()).thenReturn(extensionId);
     }
 
     @Test
-    public void createWikiWhenExtensionIsNotAuthorized() throws Exception
+    void createWiki() throws Exception
+    {
+        Job job = mock(Job.class);
+        when(this.wikiCreator.createWiki(any(WikiCreationRequest.class))).thenReturn(job);
+
+        WikiCreationRequest wikiCreationRequest = new WikiCreationRequest();
+        wikiCreationRequest.setExtensionId("authorized-extension", "1.0");
+        assertEquals(job, this.wikiCreationJobScriptServices.createWiki(wikiCreationRequest));
+        assertNull(this.wikiCreationJobScriptServices.getLastError());
+    }
+
+    @Test
+    void createWikiWhenExtensionIsNotAuthorized()
     {
         WikiCreationRequest wikiCreationRequest = new WikiCreationRequest();
         wikiCreationRequest.setExtensionId("badExtension", "version");
-        
-        assertNull(mocker.getComponentUnderTest().createWiki(wikiCreationRequest));
-        Exception lastError = mocker.getComponentUnderTest().getLastError();
+
+        assertNull(this.wikiCreationJobScriptServices.createWiki(wikiCreationRequest));
+        Exception lastError = this.wikiCreationJobScriptServices.getLastError();
         assertNotNull(lastError);
         assertEquals("The extension [badExtension/version] is not authorized.", lastError.getMessage());
-        verify(mocker.getMockedLogger()).warn("Failed to create a new wiki.", lastError);
+        verify(this.logger).warn("Failed to create a new wiki.", lastError);
     }
 
     @Test
-    public void createWikiWhenNoCreateWikiRight() throws Exception
+    void createWikiWhenNoCreateWikiRight() throws Exception
     {
         DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "User");
-        when(xcontext.getUserReference()).thenReturn(currentUser);
+        when(this.xcontext.getUserReference()).thenReturn(currentUser);
         AccessDeniedException exception =
-                new AccessDeniedException(Right.CREATE_WIKI, currentUser, new WikiReference("mainWikiId"));
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(currentUser),
-                eq(new WikiReference("mainWikiId")));
+            new AccessDeniedException(Right.CREATE_WIKI, currentUser, new WikiReference("mainWikiId"));
+        doThrow(exception).when(this.authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(currentUser),
+            eq(new WikiReference("mainWikiId")));
 
         WikiCreationRequest wikiCreationRequest = new WikiCreationRequest();
         wikiCreationRequest.setExtensionId("authorized-extension", "1.0");
 
-        assertNull(mocker.getComponentUnderTest().createWiki(wikiCreationRequest));
-        Exception lastError = mocker.getComponentUnderTest().getLastError();
+        assertNull(this.wikiCreationJobScriptServices.createWiki(wikiCreationRequest));
+        Exception lastError = this.wikiCreationJobScriptServices.getLastError();
         assertNotNull(lastError);
         assertEquals(exception, lastError);
     }
 
     @Test
-    public void getJobStatus() throws Exception
+    void getJobStatus()
     {
         JobStatus jobStatus = mock(JobStatus.class);
-        when(wikiCreator.getJobStatus("wikiId")).thenReturn(jobStatus);
-        assertEquals(jobStatus, mocker.getComponentUnderTest().getJobStatus("wikiId"));
+        when(this.wikiCreator.getJobStatus("wikiId")).thenReturn(jobStatus);
+        assertEquals(jobStatus, this.wikiCreationJobScriptServices.getJobStatus("wikiId"));
     }
 
     @Test
-    public void newWikiCreationRequest() throws Exception
+    void newWikiCreationRequest()
     {
-        assertNotNull(mocker.getComponentUnderTest().newWikiCreationRequest());
+        assertNotNull(this.wikiCreationJobScriptServices.newWikiCreationRequest());
     }
 }

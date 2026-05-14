@@ -19,10 +19,11 @@
  */
 package org.xwiki.rendering.internal.executor;
 
-import java.util.Collections;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.executor.ContentExecutorException;
@@ -32,10 +33,15 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MacroContentExecutor}.
@@ -43,67 +49,65 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 8.4RC1
  */
-public class MacroContentExecutorTest
+@ComponentTest
+class MacroContentExecutorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<MacroContentExecutor> mocker =
-        new MockitoComponentMockingRule<>(MacroContentExecutor.class);
-
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "page");
 
+    @InjectMockComponents
+    private MacroContentExecutor macroContentExecutor;
+
+    @MockComponent
+    private ContentParser contentParser;
+
+    @MockComponent
+    @Named("macro")
+    private Transformation macroTransformation;
+
     @Test
-    public void executeWithNoSource() throws Exception
+    void executeWithNoSource() throws Exception
     {
-        XDOM parsedBlocks = new XDOM(Collections.emptyList());
-        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
-        when(contentParser.parse("", Syntax.PLAIN_1_0)).thenReturn(parsedBlocks);
+        XDOM parsedBlocks = new XDOM(List.of());
+        when(this.contentParser.parse("", Syntax.PLAIN_1_0)).thenReturn(parsedBlocks);
 
         TransformationContext transformationContext = new TransformationContext();
         MacroTransformationContext context = new MacroTransformationContext(transformationContext);
 
-        this.mocker.getComponentUnderTest().execute("", Syntax.PLAIN_1_0, context);
+        this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, context);
 
         // The test is here: Verify that the Macro Transformation has been called
-        Transformation macroTransformation = this.mocker.getInstance(Transformation.class, "macro");
-        verify(macroTransformation).transform(parsedBlocks, transformationContext);
+        verify(this.macroTransformation).transform(parsedBlocks, transformationContext);
     }
 
     @Test
-    public void executeWithSource() throws Exception
+    void executeWithSource() throws Exception
     {
-        XDOM parsedBlocks = new XDOM(Collections.emptyList());
-        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
-        when(contentParser.parse("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE)).thenReturn(parsedBlocks);
+        XDOM parsedBlocks = new XDOM(List.of());
+        when(this.contentParser.parse("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE)).thenReturn(parsedBlocks);
 
         TransformationContext transformationContext = new TransformationContext();
         MacroTransformationContext context = new MacroTransformationContext(transformationContext);
 
-        this.mocker.getComponentUnderTest().execute("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE, context);
+        this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE, context);
 
         // The test is here: Verify that the Macro Transformation has been called
-        Transformation macroTransformation = this.mocker.getInstance(Transformation.class, "macro");
-        verify(macroTransformation).transform(parsedBlocks, transformationContext);
+        verify(this.macroTransformation).transform(parsedBlocks, transformationContext);
     }
 
     @Test
-    public void executeWhenTransformationException() throws Exception
+    void executeWhenTransformationException() throws Exception
     {
-        XDOM parsedBlocks = new XDOM(Collections.emptyList());
-        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
-        when(contentParser.parse("", Syntax.PLAIN_1_0)).thenReturn(parsedBlocks);
+        XDOM parsedBlocks = new XDOM(List.of());
+        when(this.contentParser.parse("", Syntax.PLAIN_1_0)).thenReturn(parsedBlocks);
 
         TransformationContext transformationContext = new TransformationContext();
         MacroTransformationContext context = new MacroTransformationContext(transformationContext);
 
-        Transformation macroTransformation = this.mocker.getInstance(Transformation.class, "macro");
         doThrow(new TransformationException("error"))
-            .when(macroTransformation).transform(parsedBlocks, transformationContext);
+            .when(this.macroTransformation).transform(parsedBlocks, transformationContext);
 
-        try {
-            this.mocker.getComponentUnderTest().execute("", Syntax.PLAIN_1_0, context);
-            fail("Should have raised a ContentExecutorException");
-        } catch (ContentExecutorException expected) {
-            assertEquals("Failed to execute content", expected.getMessage());
-        }
+        ContentExecutorException exception = assertThrows(ContentExecutorException.class,
+            () -> this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, context));
+        assertEquals("Failed to execute content", exception.getMessage());
     }
 }

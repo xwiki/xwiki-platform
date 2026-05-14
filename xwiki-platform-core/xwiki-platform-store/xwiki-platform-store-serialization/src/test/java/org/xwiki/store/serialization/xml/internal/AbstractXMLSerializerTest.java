@@ -22,6 +22,7 @@ package org.xwiki.store.serialization.xml.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Element;
@@ -37,19 +38,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class AbstractXMLSerializerTest
 {
-    private static final String TEST_CONTENT =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "\n"
-      + "<root>\n"
-      + " <doc>\n"
-      + "  <name>docName</name>\n"
-      + "  <obj>\n"
-      + "   <name>objName</name>\n"
-      + "   <content>objContent</content>\n"
-      + "  </obj>\n"
-      + "  <content>docContent</content>\n"
-      + " </doc>\n"
-      + "</root>";
+    private static final String TEST_CONTENT = """
+        <?xml version="1.0" encoding="UTF-8"?>
+
+        <root>
+         <doc>
+          <name>docName</name>
+          <obj>
+           <name>objName</name>
+           <content>objContent</content>
+          </obj>
+          <content>docContent</content>
+         </doc>
+        </root>""";
 
     @Test
     void parseAndSerialize() throws Exception
@@ -66,13 +67,13 @@ class AbstractXMLSerializerTest
                 writeTo.write(object);
             }
         };
-        final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
+        final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes(StandardCharsets.US_ASCII));
         final Element element = serializer.parse(bais);
         bais.close();
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         IOUtils.copy(serializer.serialize(element), baos);
-        final String test = new String(baos.toByteArray(), "US-ASCII");
+        final String test = baos.toString(StandardCharsets.US_ASCII);
         assertEquals(TEST_CONTENT, test, "Parsing and serializing yields a different output.");
     }
 }

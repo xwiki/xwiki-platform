@@ -421,17 +421,45 @@ importers:
         specifier: 'catalog:'
         version: 3.2.7(typescript@5.9.3)
 
+  xwiki-platform-core/xwiki-platform-component/xwiki-platform-component-webjar/src/main/node:
+    dependencies:
+      '@xwiki/platform-component-annotation-default':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-default
+      '@xwiki/platform-component-manager-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-api
+      '@xwiki/platform-component-manager-default':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-default
+    devDependencies:
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+
   xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node:
     dependencies:
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/api
+      '@xwiki/platform-component-annotation-default':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-default
+      '@xwiki/platform-component-manager-default':
+        specifier: workspace:*
+        version: link:../../../../../../xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-default
       '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/ds/api
-      reflect-metadata:
-        specifier: 0.x
-        version: 0.2.2
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -466,9 +494,6 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.4(jiti@2.6.1)
-      inversify:
-        specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
       jquery:
         specifier: 'catalog:'
         version: 4.0.0
@@ -1171,6 +1196,193 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.34(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-default:
+    dependencies:
+      '@xwiki/platform-component-annotation-inversify':
+        specifier: workspace:*
+        version: link:../component-annotation-inversify
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.7(@types/node@24.12.2)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-inversify:
+    dependencies:
+      inversify:
+        specifier: 'catalog:'
+        version: 7.11.0(reflect-metadata@0.2.2)
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.7(@types/node@24.12.2)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-api:
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.7(@types/node@24.12.2)
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-default:
+    dependencies:
+      '@xwiki/platform-component-manager-api':
+        specifier: workspace:*
+        version: link:../component-manager-api
+      '@xwiki/platform-component-manager-inversify':
+        specifier: workspace:*
+        version: link:../component-manager-inversify
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.7(@types/node@24.12.2)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-inversify:
+    dependencies:
+      '@xwiki/platform-component-manager-api':
+        specifier: workspace:*
+        version: link:../component-manager-api
+      inversify:
+        specifier: 'catalog:'
+        version: 7.11.0(reflect-metadata@0.2.2)
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.7(@types/node@24.12.2)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.6.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api:
     dependencies:
@@ -2110,6 +2322,9 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
       vitest-mock-extended:
         specifier: 'catalog:'
         version: 4.0.0(typescript@5.9.3)(vitest@4.1.5(@types/node@24.12.2)(happy-dom@20.7.0)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)))
@@ -2477,6 +2692,9 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.2)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config:
     devDependencies:

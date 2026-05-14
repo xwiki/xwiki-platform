@@ -20,6 +20,12 @@
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 var widgets = XWiki.widgets = XWiki.widgets || {};
+const l10n = {
+  "core.widgets.buttonGroup.dropDown.toggle.hint" : "$!escapetool.javascript($services.localization.render('core.widgets.buttonGroup.dropDown.toggle.hint'))",
+};
+const icons = {
+  'caret-down': "$!escapetool.javascript($services.icon.renderHTML('caret-down'))"
+};
 
 /**
  * A static button group. Both the drop-down toggle and the drop-down menu must be present in the DOM document. This
@@ -152,12 +158,13 @@ widgets.DynamicButtonGroup = Class.create({
     // Initialize the container.
     container.removeClassName('dynamic-button-group').addClassName('buttonwrapper button-group initialized');
 
-    // Insert the drop down menu toggle.
+    // Insert the dropdown menu toggle.
     buttons[0].insert({after: new Element('a', {
       href: '#dropDownMenu',
       'class': 'dropdown-toggle' + (buttons[0].hasClassName('secondary') ? ' secondary' : ''),
       tabindex: 0
-    }).insert(new Element('span'))});
+    }).insert(icons['caret-down'] + "<span class='sr-only'>" 
+      + l10n['core.widgets.buttonGroup.dropDown.toggle.hint'] + "</span>")});
 
     // Insert the drop down menu.
     var dropDownMenu = new Element('span', {'class': 'dropdown-menu'});

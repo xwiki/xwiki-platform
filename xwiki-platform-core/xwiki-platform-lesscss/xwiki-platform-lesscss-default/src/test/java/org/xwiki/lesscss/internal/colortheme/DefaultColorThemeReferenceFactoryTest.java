@@ -21,110 +21,109 @@ package org.xwiki.lesscss.internal.colortheme;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link org.xwiki.lesscss.internal.colortheme.DefaultColorThemeReferenceFactory}.
  *
- * @since 6.4M2
  * @version $Id$
+ * @since 6.4M2
  */
-public class DefaultColorThemeReferenceFactoryTest
+@ComponentTest
+class DefaultColorThemeReferenceFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultColorThemeReferenceFactory> mocker =
-            new MockitoComponentMockingRule<>(DefaultColorThemeReferenceFactory.class);
+    @InjectMockComponents
+    private DefaultColorThemeReferenceFactory defaultColorThemeReferenceFactory;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
     private XWikiContext xcontext;
 
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-                String.class));
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
     @Test
-    public void createReferenceWhenItIsAColorTheme() throws Exception
+    void createReferenceWhenItIsAColorTheme() throws Exception
     {
         // Mocks
         DocumentReference colorThemeDocRef = new DocumentReference("otherWiki", "ColorThemes", "colorTheme");
-        when(documentReferenceResolver.resolve(eq("colorTheme"), eq(new WikiReference("wikiId")))).thenReturn(
-                colorThemeDocRef);
+        when(this.documentReferenceResolver.resolve("colorTheme", new WikiReference("wikiId")))
+            .thenReturn(colorThemeDocRef);
         XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
-        when(colorThemeDoc.getXObjectSize(eq(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))).
-                thenReturn(1);
+        when(this.xwiki.getDocument(colorThemeDocRef, this.xcontext)).thenReturn(colorThemeDoc);
+        when(colorThemeDoc.getXObjectSize(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))
+            .thenReturn(1);
 
         // Test
         assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme"),
-                        null), mocker.getComponentUnderTest().createReference("colorTheme"));
+            null), this.defaultColorThemeReferenceFactory.createReference("colorTheme"));
     }
 
     @Test
-    public void createReferenceWhenItIsAFlamingoTheme() throws Exception
+    void createReferenceWhenItIsAFlamingoTheme() throws Exception
     {
         // Mocks
         DocumentReference colorThemeDocRef = new DocumentReference("otherWiki", "ColorThemes", "colorTheme");
-        when(documentReferenceResolver.resolve(eq("colorTheme"), eq(new WikiReference("wikiId")))).thenReturn(
-                colorThemeDocRef);
+        when(this.documentReferenceResolver.resolve("colorTheme", new WikiReference("wikiId")))
+            .thenReturn(colorThemeDocRef);
         XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
-        when(colorThemeDoc.getXObjectSize(eq(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))).
-                thenReturn(0);
-        when(colorThemeDoc.getXObjectSize(eq(new DocumentReference("otherWiki", "FlamingoThemesCode", "ThemeClass")))).
-                thenReturn(1);
+        when(this.xwiki.getDocument(colorThemeDocRef, this.xcontext)).thenReturn(colorThemeDoc);
+        when(colorThemeDoc.getXObjectSize(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))
+            .thenReturn(0);
+        when(colorThemeDoc.getXObjectSize(new DocumentReference("otherWiki", "FlamingoThemesCode", "ThemeClass")))
+            .thenReturn(1);
 
         // Test
         assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme"),
-                        null), mocker.getComponentUnderTest().createReference("colorTheme"));
+            null), this.defaultColorThemeReferenceFactory.createReference("colorTheme"));
     }
 
     @Test
-    public void createReferenceWhenItIsDefault() throws Exception
+    void createReferenceWhenItIsDefault() throws Exception
     {
         // Mocks
         DocumentReference colorThemeDocRef = new DocumentReference("wikiId", "Main", "default");
-        when(documentReferenceResolver.resolve("default", new WikiReference("wikiId"))).thenReturn(colorThemeDocRef);
+        when(this.documentReferenceResolver.resolve("default", new WikiReference("wikiId"))).thenReturn(
+            colorThemeDocRef);
         XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
+        when(this.xwiki.getDocument(colorThemeDocRef, this.xcontext)).thenReturn(colorThemeDoc);
         when(colorThemeDoc.isNew()).thenReturn(true);
 
         // Test
         assertEquals(new NamedColorThemeReference("default"),
-                mocker.getComponentUnderTest().createReference("default"));
+            this.defaultColorThemeReferenceFactory.createReference("default"));
     }
 }

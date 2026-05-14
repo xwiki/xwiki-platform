@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -113,8 +114,10 @@ public class XWikiAttachmentArchive implements Cloneable
                     // Update the revision with the new attachment information.
                     newRevision.setFilename(attachment.getFilename());
                     newRevision.setDoc(attachment.getDoc());
-                    // The context needs to be copied, otherwise the location is not found on the storage. 
-                    newRevision.setContent(newRevision.getContentInputStream(context));
+                    // The context needs to be copied, otherwise the location is not found on the storage.
+                    try (InputStream content = newRevision.getContentInputStream(context)) {
+                        newRevision.setContent(content);
+                    }
                     return newRevision;
                 } catch (XWikiException e) {
                     LOGGER.warn("Failed to access revision [{}] for attachment [{}]. Cause: [{}].", version,

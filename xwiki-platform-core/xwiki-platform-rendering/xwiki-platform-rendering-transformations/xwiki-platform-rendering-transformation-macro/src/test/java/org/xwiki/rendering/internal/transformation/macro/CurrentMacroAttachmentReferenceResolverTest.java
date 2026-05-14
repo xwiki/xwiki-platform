@@ -19,39 +19,43 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
-import static org.mockito.Mockito.*;
-import org.junit.Assert;
+import javax.inject.Named;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link CurrentMacroAttachmentReferenceResolver}.
- * 
+ *
  * @version $Id$
  * @since 5.0M1
  */
-public class CurrentMacroAttachmentReferenceResolverTest
+@ComponentTest
+class CurrentMacroAttachmentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<AttachmentReferenceResolver<String>> mocker =
-        new MockitoComponentMockingRule<AttachmentReferenceResolver<String>>(
-            CurrentMacroAttachmentReferenceResolver.class);
+    @InjectMockComponents
+    private CurrentMacroAttachmentReferenceResolver resolver;
+
+    @MockComponent
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     @Test
-    public void resolve() throws Exception
+    void resolve()
     {
         EntityReference result = new AttachmentReference("file", new DocumentReference("wiki", "Space", "Page"));
-        EntityReferenceResolver<String> macroEntityReferenceResolver =
-            mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "macro");
-        when(macroEntityReferenceResolver.resolve("reference", EntityType.ATTACHMENT, "parameter")).thenReturn(result);
-        Assert.assertEquals(result, mocker.getComponentUnderTest().resolve("reference", "parameter"));
+        when(this.macroEntityReferenceResolver.resolve("reference", EntityType.ATTACHMENT, "parameter"))
+            .thenReturn(result);
+        assertEquals(result, this.resolver.resolve("reference", "parameter"));
     }
 }

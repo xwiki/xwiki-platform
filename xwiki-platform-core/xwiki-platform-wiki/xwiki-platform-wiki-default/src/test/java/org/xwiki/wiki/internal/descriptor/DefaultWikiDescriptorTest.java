@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class DefaultWikiDescriptorTest
+class DefaultWikiDescriptorTest
 {
     @Test
-    public void constructor()
+    void constructor()
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("id", "alias", "owner");
 

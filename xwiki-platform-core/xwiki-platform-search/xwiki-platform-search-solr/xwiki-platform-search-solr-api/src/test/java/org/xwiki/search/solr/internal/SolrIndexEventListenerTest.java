@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
@@ -99,7 +99,7 @@ class SolrIndexEventListenerTest
 
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getLocale()).thenReturn(Locale.ROOT);
-        when(document.getTranslationLocales(xcontext)).thenReturn(Arrays.asList(Locale.FRENCH, Locale.GERMAN));
+        when(document.getTranslationLocales(xcontext)).thenReturn(List.of(Locale.FRENCH, Locale.GERMAN));
 
         DocumentReference documentReference = new DocumentReference("wiki", "Path", "Page");
         when(document.getDocumentReference()).thenReturn(documentReference);
@@ -125,7 +125,7 @@ class SolrIndexEventListenerTest
             when(document.getLocale()).thenReturn(Locale.FRENCH);
         }
 
-        when(document.getTranslationLocales(xcontext)).thenReturn(Arrays.asList(Locale.FRENCH, Locale.GERMAN));
+        when(document.getTranslationLocales(xcontext)).thenReturn(List.of(Locale.FRENCH, Locale.GERMAN));
 
         DocumentReference documentReference = new DocumentReference("wiki", "Path", "Page");
         when(document.getDocumentReference()).thenReturn(documentReference);

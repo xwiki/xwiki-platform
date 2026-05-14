@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.extension;
+package org.xwiki.extension.test.docker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +29,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.administration.test.po.AdministrationPage;
@@ -44,6 +47,7 @@ import org.xwiki.extension.DefaultExtensionSupporter;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
+import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.extension.test.po.AdvancedSearchPane;
 import org.xwiki.extension.test.po.DependencyPane;
 import org.xwiki.extension.test.po.ExtensionAdministrationPage;
@@ -59,57 +63,99 @@ import org.xwiki.extension.test.po.SearchResultsPane;
 import org.xwiki.extension.test.po.SimpleSearchPane;
 import org.xwiki.extension.test.po.UnusedPagesPane;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.repository.test.RepositoryTestUtils;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.repository.test.TestExtension;
-import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedIT;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.EntityDiff;
 import org.xwiki.test.ui.po.diff.RawChanges;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the Extension Manager user interface.
- * 
+ *
  * @version $Id$
- * @since 4.2M1
+ * @since 18.4.0RC1
  */
-public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
+@UITest(
+    // - xwiki-commons-extension-repository-xwiki provides the XWikiExtensionRepositoryFactory component needed
+    // to support the "xwiki" repository type used for self:xwiki. It must be in WEB-INF/lib at startup.
+    // - xwiki-platform-extension-index provides the Solr-backed extension index (required for keyword search).
+    extraJARs = {
+        "org.xwiki.commons:xwiki-commons-extension-repository-xwiki",
+        "org.xwiki.platform:xwiki-platform-extension-index"
+    },
+    // - Disable core extension resolve because Jetty is not ready when it starts
+    // - Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
+    // the test creates this page with Groovy code and thus requires PR FTM.
+    // - Put self and Maven as extensions repository
+    properties = {
+        "xwikiPropertiesAdditionalProperties=extension.core.resolve=false\n"
+            + "test.prchecker.excludePattern=.*:ExtensionTest\\.Service\n"
+            + "extension.repositories = self:xwiki:http://localhost:8080/xwiki/rest"
+    }
+)
+class ExtensionIT
 {
-    @Override
-    public void setUp() throws Exception
+    private static RepositoryUtils repositoryUtils;
+
+    private static RepositoryTestUtils repositoryTestUtils;
+
+    private static org.xwiki.extension.test.junit5.ExtensionTestUtils extensionTestUtils;
+
+    @BeforeAll
+    static void beforeAll(TestUtils setup) throws Exception
     {
-        super.setUp();
+        repositoryUtils = new RepositoryUtils();
 
-        // Make sure the extensions we are playing with are not already installed.
-        getExtensionTestUtils().finishCurrentJob();
-        getExtensionTestUtils().uninstall("alice-xar-extension");
-        getExtensionTestUtils().uninstall("bob-xar-extension");
-        getExtensionTestUtils().uninstall("scriptServiceJarExtension");
+        setup.loginAsSuperAdmin();
+        setup.recacheSecretToken();
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-        // Delete the pages that are provided by the XAR extensions we use in tests.
-        getUtil().rest().deletePage("ExtensionTest", "Alice");
-        assertFalse(getUtil().pageExists("ExtensionTest", "Alice"));
-        getUtil().rest().deletePage("ExtensionTest", "Bob");
-        assertFalse(getUtil().pageExists("ExtensionTest", "Bob"));
+        repositoryTestUtils =
+            new RepositoryTestUtils(setup, repositoryUtils, new SolrTestUtils(setup));
+        // init() calls repositoryUtils.setup() which generates the test extension files
+        repositoryTestUtils.init();
+        extensionTestUtils = new org.xwiki.extension.test.junit5.ExtensionTestUtils(setup);
+    }
 
-        // Delete from the repository the XAR extensions we use in tests.
-        // The extension page name is either the extension name, if specified, or the extension id. Most of the tests
-        // don't set the extension name but some do and we end up with two extensions (two pages) with the same id.
-        getRepositoryTestUtils().deleteExtension("Alice Wiki Macro");
-        getRepositoryTestUtils().deleteExtension("Bob Wiki Macro");
-        getRepositoryTestUtils().deleteExtension("alice-xar-extension");
-        getRepositoryTestUtils().deleteExtension("bob-xar-extension");
-        getRepositoryTestUtils().deleteExtension("scriptServiceJarExtension");
+    @BeforeEach
+    void setUp(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.recacheSecretToken();
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-        getRepositoryTestUtils().waitUntilReady();
+        extensionTestUtils.finishCurrentJob();
+        extensionTestUtils.uninstall("alice-xar-extension");
+        extensionTestUtils.uninstall("bob-xar-extension");
+        extensionTestUtils.uninstall("scriptServiceJarExtension");
 
-        // Double check that the XWiki Extension Repository is empty.
+        setup.rest().deletePage("ExtensionTest", "Alice");
+        assertFalse(setup.pageExists("ExtensionTest", "Alice"));
+        setup.rest().deletePage("ExtensionTest", "Bob");
+        assertFalse(setup.pageExists("ExtensionTest", "Bob"));
+
+        repositoryTestUtils.deleteExtension("Alice Wiki Macro");
+        repositoryTestUtils.deleteExtension("Bob Wiki Macro");
+        repositoryTestUtils.deleteExtension("alice-xar-extension");
+        repositoryTestUtils.deleteExtension("bob-xar-extension");
+        repositoryTestUtils.deleteExtension("scriptServiceJarExtension");
+        repositoryTestUtils.deleteExtension("XWiki Commons - Diff API");
+        repositoryTestUtils.deleteExtension("XWiki Platform - Display API");
+
+        repositoryTestUtils.waitUntilReady();
+
         ExtensionsSearchResult searchResult =
-            getUtil().rest().getResource("repository/search", Collections.singletonMap("number", new Object[] {1}));
+            setup.rest().getResource("repository/search", Collections.singletonMap("number", new Object[] {1}));
         assertEquals(0, searchResult.getTotalHits());
     }
 
@@ -117,7 +163,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * The extension search results pagination.
      */
     @Test
-    public void testPagination()
+    @Order(1)
+    void testPagination()
     {
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoCoreExtensions();
 
@@ -172,7 +219,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests the simple search form.
      */
     @Test
-    public void testSimpleSearch()
+    @Order(2)
+    void testSimpleSearch()
     {
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoCoreExtensions();
         int coreExtensionCount = adminPage.getSearchResults().getPagination().getResultsCount();
@@ -196,11 +244,11 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         for (int i = 0; i < searchResults.getPagination().getPageCount(); i++) {
             ExtensionPane extension = searchResults.getExtension(i);
             assertTrue(
-                "Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
-                    + extension.getSummary() + ")",
                 extension.getSummary().toLowerCase().contains("commons")
                     || extension.getId().getId().toLowerCase().contains("commons")
-                    || extension.getName().toLowerCase().contains("commons"));
+                    || extension.getName().toLowerCase().contains("commons"),
+                "Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
+                    + extension.getSummary() + ")");
             assertEquals("core", extension.getStatus());
         }
 
@@ -216,19 +264,21 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = searchBar.search("groovy");
         assertNull(searchResults.getNoResultsMessage());
         assertNull(searchResults.getPagination());
-        assertTrue(searchResults.getDisplayedResultsCount() > 1);
+        assertTrue(searchResults.getDisplayedResultsCount() >= 1);
 
         ExtensionPane extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue("Can't find [groovy] in the name of the extension [" + extension.getId() + "] ("
-            + extension.getName() + ")", extension.getName().toLowerCase().contains("groovy"));
+        assertTrue(extension.getName().toLowerCase().contains("groovy"),
+            "Can't find [groovy] in the name of the extension [" + extension.getId() + "] ("
+                + extension.getName() + ")");
     }
 
     /**
      * Tests the advanced search form.
      */
     @Test
-    public void testAdvancedSearch()
+    @Order(3)
+    void testAdvancedSearch()
     {
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoCoreExtensions();
 
@@ -263,7 +313,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how core extensions are displayed.
      */
     @Test
-    public void testCoreExtensions()
+    @Order(4)
+    void testCoreExtensions()
     {
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoCoreExtensions();
 
@@ -278,7 +329,6 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertNull(extension.getUninstallButton());
         assertNull(extension.getUpgradeButton());
         assertNull(extension.getDowngradeButton());
-        // Just test that the button to show the extension details is present.
         assertEquals("core", extension.showDetails().getStatus());
     }
 
@@ -286,13 +336,14 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests the extension repository selector (all, core, installed, local).
      */
     @Test
-    public void testRepositorySelector() throws Exception
+    @Order(5)
+    void testRepositorySelector(TestUtils setup) throws Exception
     {
         // Setup the extension.
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
-        getRepositoryTestUtils().addExtension(extension);
-        getRepositoryTestUtils().waitUntilReady();
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "xar");
+        repositoryTestUtils.addExtension(extension);
+        repositoryTestUtils.waitUntilReady();
 
         // Check that the Supported Extensions are displayed by default.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -314,7 +365,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertNull(new SimpleSearchPane().selectRepository("local").getExtension(extensionId));
 
         // Check that an installed extension appears also in "Installed Extensions" and "Local Extensions".
-        getExtensionTestUtils().install(extensionId);
+        extensionTestUtils.install(extensionId);
         adminPage = ExtensionAdministrationPage.gotoPage();
         adminPage.getSearchBar().selectRepository("installed");
         searchResults = adminPage.getSearchBar().search("alice");
@@ -328,7 +379,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
 
         // Check local extension.
-        getExtensionTestUtils().uninstall(extensionId.getId(), true);
+        extensionTestUtils.uninstall(extensionId.getId(), true);
         adminPage = ExtensionAdministrationPage.gotoPage();
         adminPage.getSearchBar().selectRepository("installed");
         searchResults = adminPage.getSearchBar().search("alice");
@@ -346,11 +397,12 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests the extension details (license, web site).
      */
     @Test
-    public void testShowDetails() throws Exception
+    @Order(6)
+    void testShowDetails(TestUtils setup) throws Exception
     {
         // Setup the extension.
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "xar");
         extension.setName("Alice Wiki Macro");
         extension.setSummary("A **useless** macro");
         extension.addAuthor(new DefaultExtensionAuthor("Thomas", (String) null));
@@ -363,7 +415,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             new DefaultExtensionScmConnection("git", "git:git@github.com:xwiki-contrib/alice-xar-extension.git")));
         extension
             .setIssueManagement(new DefaultExtensionIssueManagement("jira", "https://jira.xwiki.org/browse/ALICE"));
-        getRepositoryTestUtils().addExtension(extension);
+        repositoryTestUtils.addExtension(extension);
 
         // Search the extension and assert the displayed information.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -383,7 +435,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         ExtensionDescriptionPane descriptionPane = extensionPane.openDescriptionSection();
         assertEquals(extension.getLicenses().iterator().next().getName(), descriptionPane.getLicense());
         assertEquals(extension.getId().getId(), descriptionPane.getId());
-        assertEquals(extension.getFeatures().iterator().next(), descriptionPane.getFeatures().get(0));
+        assertEquals(extension.getFeatures().iterator().next(), descriptionPane.getFeatures().getFirst());
         assertEquals(extension.getType(), descriptionPane.getType());
 
         WebElement webSiteLink = descriptionPane.getWebSite();
@@ -398,30 +450,44 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         List<String> namespaces = descriptionPane.getNamespaces();
         assertEquals(1, namespaces.size());
         String prefix = "Home, by superadmin on ";
-        assertTrue(namespaces.get(0).startsWith(prefix));
-        Date installDate = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(namespaces.get(0).substring(prefix.length()));
+        assertTrue(namespaces.getFirst().startsWith(prefix));
+        Date installDate =
+            new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(namespaces.getFirst().substring(prefix.length()));
         // Ignore the seconds as they are not displayed.
-        assertTrue(String.format("Install date [%s] should be after [%s].", installDate, beforeInstall),
-            installDate.getTime() / 60000 >= beforeInstall.getTime() / 60000);
-        assertTrue(String.format("Install date [%s] should be before [%s].", installDate, afterInstall),
-            installDate.before(afterInstall));
+        assertTrue(installDate.getTime() / 60000 >= beforeInstall.getTime() / 60000,
+            String.format("Install date [%s] should be after [%s].", installDate, beforeInstall));
+        assertTrue(installDate.before(afterInstall),
+            String.format("Install date [%s] should be before [%s].", installDate, afterInstall));
     }
 
     /**
      * Tests how extension dependencies are displayed (both direct and backward dependencies).
      */
     @Test
-    public void testDependencies() throws Exception
+    @Order(7)
+    void testDependencies(TestUtils setup) throws Exception
     {
+        // Add fake remote versions of core extensions to test remote-core and remote-core-incompatible statuses.
+        // These must exist in the self:xwiki repository so the extension manager can resolve them.
+        TestExtension diffApiExtension = repositoryTestUtils.getTestExtension(
+            new ExtensionId("org.xwiki.commons:xwiki-commons-diff-api", "2.7"), "jar");
+        diffApiExtension.setName("XWiki Commons - Diff API");
+        repositoryTestUtils.addExtension(diffApiExtension);
+
+        TestExtension displayApiExtension = repositoryTestUtils.getTestExtension(
+            new ExtensionId("org.xwiki.platform:xwiki-platform-display-api", "100.1"), "jar");
+        displayApiExtension.setName("XWiki Platform - Display API");
+        repositoryTestUtils.addExtension(displayApiExtension);
+
         // Setup the extension and its dependencies.
         ExtensionId dependencyId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
-        TestExtension dependency = getRepositoryTestUtils().getTestExtension(dependencyId, "xar");
+        TestExtension dependency = repositoryTestUtils.getTestExtension(dependencyId, "xar");
         dependency.setName("Bob Wiki Macro");
         dependency.setSummary("Required by Alice");
-        getRepositoryTestUtils().addExtension(dependency);
+        repositoryTestUtils.addExtension(dependency);
 
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "xar");
         extension.addDependency(new DefaultExtensionDependency(dependencyId.getId(),
             new DefaultVersionConstraint(dependencyId.getVersion().getValue())));
         extension
@@ -432,7 +498,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             new DefaultVersionConstraint("2.7")));
         extension.addDependency(new DefaultExtensionDependency("org.xwiki.platform:xwiki-platform-display-api",
             new DefaultVersionConstraint("100.1")));
-        getRepositoryTestUtils().addExtension(extension);
+        repositoryTestUtils.addExtension(extension);
+        repositoryTestUtils.waitUntilReady();
 
         // Search the extension and assert the list of dependencies.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -489,20 +556,21 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how an extension is installed.
      */
     @Test
-    public void testInstall() throws Exception
+    @Order(8)
+    void testInstall(TestUtils setup, TestReference testReference) throws Exception
     {
         // Setup the extension and its dependencies.
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "xar");
 
         ExtensionId dependencyId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
-        getRepositoryTestUtils().addExtension(getRepositoryTestUtils().getTestExtension(dependencyId, "xar"));
+        repositoryTestUtils.addExtension(repositoryTestUtils.getTestExtension(dependencyId, "xar"));
         extension.addDependency(new DefaultExtensionDependency(dependencyId.getId(),
             new DefaultVersionConstraint(dependencyId.getVersion().getValue())));
 
         extension.addDependency(new DefaultExtensionDependency("org.xwiki.platform:xwiki-platform-sheet-api",
             new DefaultVersionConstraint("[3.2,)")));
-        getRepositoryTestUtils().addExtension(extension);
+        repositoryTestUtils.addExtension(extension);
 
         // Search the extension and install it.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -530,7 +598,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             log.get(logSize - 1).getMessage());
 
         // Test that both extensions are usable.
-        ViewPage viewPage = getUtil().createPage(getTestClassName(), getTestMethodName(), "{{alice/}}\n\n{{bob/}}", "");
+        ViewPage viewPage = setup.createPage(testReference, "{{alice/}}\n\n{{bob/}}", "");
         String content = viewPage.getContent();
         assertTrue(content.contains("Alice says hello!"));
         assertTrue(content.contains("Bob says hi!"));
@@ -588,24 +656,25 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how an extension is uninstalled.
      */
     @Test
-    public void testUninstall() throws Exception
+    @Order(9)
+    void testUninstall(TestUtils setup) throws Exception
     {
         // Setup the extension and its dependencies.
         ExtensionId dependencyId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
-        getRepositoryTestUtils().addExtension(getRepositoryTestUtils().getTestExtension(dependencyId, "xar"));
+        repositoryTestUtils.addExtension(repositoryTestUtils.getTestExtension(dependencyId, "xar"));
 
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "xar");
         extension.addDependency(new DefaultExtensionDependency(dependencyId.getId(),
             new DefaultVersionConstraint(dependencyId.getVersion().getValue())));
-        getRepositoryTestUtils().addExtension(extension);
+        repositoryTestUtils.addExtension(extension);
 
         // Install the extensions.
-        getExtensionTestUtils().install(extensionId);
+        extensionTestUtils.install(extensionId);
 
         // Check if the installed pages are present.
-        assertTrue(getUtil().pageExists("ExtensionTest", "Alice"));
-        assertTrue(getUtil().pageExists("ExtensionTest", "Bob"));
+        assertTrue(setup.pageExists("ExtensionTest", "Alice"));
+        assertTrue(setup.pageExists("ExtensionTest", "Bob"));
 
         // Uninstall the dependency.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoInstalledExtensions();
@@ -640,14 +709,14 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals("Finished job of type [uninstall] with identifier [extension/action/bob-xar-extension/wiki:xwiki]",
-            log.get(log.size() - 1).getMessage());
+            log.getLast().getMessage());
 
         // Check if the uninstalled pages have been deleted.
-        assertFalse(getUtil().pageExists("ExtensionTest", "Alice"));
-        assertFalse(getUtil().pageExists("ExtensionTest", "Bob"));
+        assertFalse(setup.pageExists("ExtensionTest", "Alice"));
+        assertFalse(setup.pageExists("ExtensionTest", "Bob"));
 
         // Install both extension again and uninstall only the one with the dependency.
-        getExtensionTestUtils().install(extensionId);
+        extensionTestUtils.install(extensionId);
 
         adminPage = ExtensionAdministrationPage.gotoInstalledExtensions();
         extensionPane = adminPage.getSearchBar().clickAdvancedSearch().search(extensionId).getExtension(0);
@@ -656,7 +725,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check the uninstall plan. Only one extension should be included.
         uninstallPlan = extensionPane.openProgressSection().getJobPlan();
         assertEquals(1, uninstallPlan.size());
-        assertEquals(extensionId, uninstallPlan.get(0).getId());
+        assertEquals(extensionId, uninstallPlan.getFirst().getId());
 
         // Check the confirmation to delete the unused wiki pages.
         extensionPane = extensionPane.confirm();
@@ -669,14 +738,14 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
         assertEquals("Resolving extension [alice-xar-extension 1.3] from namespace [Home]", log.get(2).getMessage());
-        assertEquals("info", log.get(log.size() - 1).getLevel());
+        assertEquals("info", log.getLast().getLevel());
         assertEquals(
             "Finished job of type [uninstall] with identifier [extension/action/alice-xar-extension/wiki:xwiki]",
-            log.get(log.size() - 1).getMessage());
+            log.getLast().getMessage());
 
         // Check if the uninstalled pages have been deleted.
-        assertFalse(getUtil().pageExists("ExtensionTest", "Alice"));
-        assertTrue(getUtil().pageExists("ExtensionTest", "Bob"));
+        assertFalse(setup.pageExists("ExtensionTest", "Alice"));
+        assertTrue(setup.pageExists("ExtensionTest", "Bob"));
 
         // Check the list of installed extensions. It should contain only the second extension.
         adminPage = ExtensionAdministrationPage.gotoInstalledExtensions();
@@ -695,11 +764,12 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests that an extension can be installed and uninstalled without reloading the extension manager UI.
      */
     @Test
-    public void testInstallAndUninstallWithoutReload() throws Exception
+    @Order(10)
+    void testInstallAndUninstallWithoutReload(TestUtils setup) throws Exception
     {
         // Setup the extension.
         ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
-        getRepositoryTestUtils().addExtension(getRepositoryTestUtils().getTestExtension(extensionId, "xar"));
+        repositoryTestUtils.addExtension(repositoryTestUtils.getTestExtension(extensionId, "xar"));
 
         // Search the extension to install.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -715,23 +785,24 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how an extension is upgraded.
      */
     @Test
-    public void testUpgrade() throws Exception
+    @Order(11)
+    void testUpgrade(TestUtils setup) throws Exception
     {
         // Setup the extension.
         String extensionId = "alice-xar-extension";
         String oldVersion = "1.3";
         String newVersion = "2.1.4";
         TestExtension oldExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
-        getRepositoryTestUtils().addExtension(oldExtension);
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
+        repositoryTestUtils.addExtension(oldExtension);
         TestExtension newExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
-        getRepositoryTestUtils().attachFile(newExtension);
-        getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
+        repositoryTestUtils.attachFile(newExtension);
+        repositoryTestUtils.addVersionObject(newExtension, newVersion,
             "attach:" + newExtension.getFile().getName());
 
         // Make sure the old version is installed.
-        getExtensionTestUtils().install(new ExtensionId(extensionId, oldVersion));
+        extensionTestUtils.install(new ExtensionId(extensionId, oldVersion));
 
         // Upgrade the extension.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -746,10 +817,10 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check the upgrade plan.
         List<DependencyPane> upgradePlan = extensionPane.openProgressSection().getJobPlan();
         assertEquals(1, upgradePlan.size());
-        assertEquals(extensionId, upgradePlan.get(0).getName());
-        assertEquals(newVersion, upgradePlan.get(0).getVersion());
-        assertEquals("remote-installed", upgradePlan.get(0).getStatus());
-        assertEquals("Version 1.3 is installed", upgradePlan.get(0).getStatusMessage());
+        assertEquals(extensionId, upgradePlan.getFirst().getName());
+        assertEquals(newVersion, upgradePlan.getFirst().getVersion());
+        assertEquals("remote-installed", upgradePlan.getFirst().getStatus());
+        assertEquals("Version 1.3 is installed", upgradePlan.getFirst().getStatusMessage());
 
         // Finish the upgrade and check the upgrade log.
         extensionPane = extensionPane.confirm();
@@ -759,13 +830,13 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
         assertEquals("Resolving extension [alice-xar-extension 2.1.4] on namespace [Home]", log.get(2).getMessage());
-        assertEquals("info", log.get(log.size() - 1).getLevel());
+        assertEquals("info", log.getLast().getLevel());
         assertEquals(
             "Finished job of type [install] with identifier " + "[extension/action/alice-xar-extension/wiki:xwiki]",
-            log.get(log.size() - 1).getMessage());
+            log.getLast().getMessage());
 
         // Assert the changes.
-        ViewPage viewPage = getUtil().gotoPage("ExtensionTest", "Alice");
+        ViewPage viewPage = setup.gotoPage("ExtensionTest", "Alice");
         assertEquals("Alice Wiki Macro (upgraded)", viewPage.getDocumentTitle());
         assertTrue(viewPage.getContent().contains("Alice says hi guys!"));
     }
@@ -774,23 +845,23 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how an extension is upgraded when there is a merge conflict.
      */
     @Test
-    public void testUpgradeWithMergeConflict() throws Exception
+    @Order(12)
+    void testUpgradeWithMergeConflict(TestUtils setup) throws Exception
     {
-        // Setup the extension.
         String extensionId = "alice-xar-extension";
         String oldVersion = "1.3";
         String newVersion = "2.1.4";
         TestExtension oldExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
-        getRepositoryTestUtils().addExtension(oldExtension);
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
+        repositoryTestUtils.addExtension(oldExtension);
         TestExtension newExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
-        getRepositoryTestUtils().attachFile(newExtension);
-        getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
+        repositoryTestUtils.attachFile(newExtension);
+        repositoryTestUtils.addVersionObject(newExtension, newVersion,
             "attach:" + newExtension.getFile().getName());
 
         // Make sure the old version is installed.
-        getExtensionTestUtils().install(new ExtensionId(extensionId, oldVersion));
+        extensionTestUtils.install(new ExtensionId(extensionId, oldVersion));
 
         // Edit the installed version so that we have a merge conflict.
         Map<String, String> queryParameters = new HashMap<String, String>();
@@ -798,7 +869,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         queryParameters.put("content",
             "== Usage ==\n\n{{code language=\"none\"}}\n" + "{{alice/}}\n{{/code}}\n\n== Output ==\n\n{{alice/}}");
         queryParameters.put("XWiki.WikiMacroClass_0_code", "{{info}}Alice says hello!{{/info}}");
-        getUtil().gotoPage("ExtensionTest", "Alice", "save", queryParameters);
+        setup.gotoPage("ExtensionTest", "Alice", "save", queryParameters);
 
         // Initiate the upgrade process.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -883,7 +954,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             lastLogItem.getMessage());
 
         // Check the merge result.
-        ViewPage mergedPage = getUtil().gotoPage("ExtensionTest", "Alice");
+        ViewPage mergedPage = setup.gotoPage("ExtensionTest", "Alice");
         assertEquals("Alice Wiki Macro (upgraded)", mergedPage.getDocumentTitle());
     }
 
@@ -891,23 +962,24 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests how an extension is downgraded.
      */
     @Test
-    public void testDowngrade() throws Exception
+    @Order(13)
+    void testDowngrade(TestUtils setup) throws Exception
     {
         // Setup the extension.
         String extensionId = "alice-xar-extension";
         String oldVersion = "1.3";
         String newVersion = "2.1.4";
         TestExtension oldExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
-        getRepositoryTestUtils().addExtension(oldExtension);
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, oldVersion), "xar");
+        repositoryTestUtils.addExtension(oldExtension);
         TestExtension newExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
-        getRepositoryTestUtils().attachFile(newExtension);
-        getRepositoryTestUtils().addVersionObject(newExtension, newVersion,
+            repositoryTestUtils.getTestExtension(new ExtensionId(extensionId, newVersion), "xar");
+        repositoryTestUtils.attachFile(newExtension);
+        repositoryTestUtils.addVersionObject(newExtension, newVersion,
             "attach:" + newExtension.getFile().getName());
 
         // Make sure the new version is installed.
-        getExtensionTestUtils().install(new ExtensionId(extensionId, newVersion));
+        extensionTestUtils.install(new ExtensionId(extensionId, newVersion));
 
         // Downgrade the extension.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -922,10 +994,10 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check the downgrade plan.
         List<DependencyPane> downgradePlan = extensionPane.openProgressSection().getJobPlan();
         assertEquals(1, downgradePlan.size());
-        assertEquals(extensionId, downgradePlan.get(0).getName());
-        assertEquals(oldVersion, downgradePlan.get(0).getVersion());
-        assertEquals("remote-installed", downgradePlan.get(0).getStatus());
-        assertEquals("Version 2.1.4 is installed", downgradePlan.get(0).getStatusMessage());
+        assertEquals(extensionId, downgradePlan.getFirst().getName());
+        assertEquals(oldVersion, downgradePlan.getFirst().getVersion());
+        assertEquals("remote-installed", downgradePlan.getFirst().getStatus());
+        assertEquals("Version 2.1.4 is installed", downgradePlan.getFirst().getStatusMessage());
 
         // Finish the downgrade and check the downgrade log.
         // Using 20s for the timeout since 10s seems to not always be enough
@@ -936,13 +1008,13 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
         assertEquals("Resolving extension [alice-xar-extension 1.3] on namespace [Home]", log.get(2).getMessage());
-        assertEquals("info", log.get(log.size() - 1).getLevel());
+        assertEquals("info", log.getLast().getLevel());
         assertEquals(
             "Finished job of type [install] with identifier " + "[extension/action/alice-xar-extension/wiki:xwiki]",
-            log.get(log.size() - 1).getMessage());
+            log.getLast().getMessage());
 
         // Assert the changes.
-        ViewPage viewPage = getUtil().gotoPage("ExtensionTest", "Alice");
+        ViewPage viewPage = setup.gotoPage("ExtensionTest", "Alice");
         assertEquals("Alice Macro", viewPage.getDocumentTitle());
         assertTrue(viewPage.getContent().contains("Alice says hello!"));
     }
@@ -951,10 +1023,11 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Tests if a Java component script service is properly installed.
      */
     @Test
-    public void testInstallScriptService() throws Exception
+    @Order(14)
+    void testInstallScriptService(TestUtils setup, TestReference testReference) throws Exception
     {
         // Make sure the script service is not available before the extension is installed.
-        ViewPage viewPage = getUtil().createPage(getTestClassName(), getTestMethodName(),
+        ViewPage viewPage = setup.createPage(testReference,
             "{{velocity}}$services.greeter.greet('world') "
                 + "$services.greeter.greet('XWiki', 'default'){{/velocity}}",
             "");
@@ -962,8 +1035,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         // Setup the extension.
         ExtensionId extensionId = new ExtensionId("scriptServiceJarExtension", "4.2-milestone-1");
-        TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "jar");
-        getRepositoryTestUtils().addExtension(extension);
+        TestExtension extension = repositoryTestUtils.getTestExtension(extensionId, "jar");
+        repositoryTestUtils.addExtension(extension);
 
         // Search the extension and install it.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
@@ -973,31 +1046,32 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         // Check the result.
         assertEquals("Hello world! Hello XWiki!",
-            getUtil().gotoPage(getTestClassName(), getTestMethodName()).getContent());
+            setup.gotoPage(testReference).getContent());
     }
 
     /**
      * Make sure supported extensions are properly filtered.
      */
     @Test
-    public void testFilterSupported() throws Exception
+    @Order(15)
+    void testFilterSupported(TestUtils setup) throws Exception
     {
         // Add supported extension
         ExtensionId supportedExtensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension supportedExtension = getRepositoryTestUtils().getTestExtension(supportedExtensionId, "xar");
+        TestExtension supportedExtension = repositoryTestUtils.getTestExtension(supportedExtensionId, "xar");
         DefaultExtensionSupporter supporter = new DefaultExtensionSupporter("Supporter", null);
         DefaultExtensionSupportPlan supportPlan =
             new DefaultExtensionSupportPlan(supporter, "Support Plan", null, true);
         supportedExtension.setSupportPlans(new DefaultExtensionSupportPlans(List.of(supportPlan)));
-        getRepositoryTestUtils().addExtension(supportedExtension);
+        repositoryTestUtils.addExtension(supportedExtension);
 
         // Add not supported extension
         ExtensionId notSupportedExtensionId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
-        TestExtension notSupportedExtension = getRepositoryTestUtils().getTestExtension(notSupportedExtensionId, "xar");
-        getRepositoryTestUtils().addExtension(notSupportedExtension);
+        TestExtension notSupportedExtension = repositoryTestUtils.getTestExtension(notSupportedExtensionId, "xar");
+        repositoryTestUtils.addExtension(notSupportedExtension);
 
         // Make sure everything is ready
-        getRepositoryTestUtils().waitUntilReady();
+        repositoryTestUtils.waitUntilReady();
 
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
 

@@ -82,7 +82,7 @@
 == Steps ==
 
 #if ($isEdit)
-  &lt;button class="btn btn-primary"&gt;Add Step&lt;/button&gt;
+  &lt;button id='add-step-btn' class="btn btn-primary"&gt;Add Step&lt;/button&gt;
 #end
 
 &lt;div class="stepsListContainer" data-steps="$escapetool.xml($services.rendering.escape($jsontool.serialize($serializedSteps), 'xwiki/2.1'))"&gt;
@@ -90,16 +90,13 @@
       &lt;h2 class="sidebar-title"&gt;Steps&lt;/h2&gt;
       &lt;ul class="item-list"&gt;
         #foreach ($step in $steps)
-          &lt;li class="item" data-id="$foreach.index"&gt;
+          &lt;li class="item" data-id="$step.number"&gt;
             #if ("$!step.getValue('content')" == '')
               Step # $escapetool.xml($services.rendering.escape($step.getValue('order'), 'xwiki/2.1'))
             #else
               $escapetool.xml($services.rendering.escape($step.getValue('content'), 'xwiki/2.1'))
             #end
           &lt;/li&gt;
-        #end
-        #if ($isEdit)
-          &lt;li class="item"&gt;+ Add Step&lt;/li&gt;
         #end
       &lt;/ul&gt;
     &lt;/div&gt;
@@ -108,11 +105,11 @@
       &lt;h1 class="content-title"&gt;Properties&lt;/h1&gt;
       #foreach ($step in $steps)
         #set($xclass = $step.xWikiClass)
-        &lt;dl id="guidedtour-step-props-${step.getValue('order')}" class="itemDisplay hidden"&gt;
+        &lt;dl id='${xclass.name}_${step.number}' class='itemDisplay hidden'&gt;
           #foreach($property in $xclass.properties)
             #set ($propertyId = "${xclass.name}_${step.number}_$property.name")
             &lt;dt&gt;
-              &lt;label for="$!escapetool.xml($propertyId)"&gt; $escapetool.xml($services.rendering.escape($property.translatedPrettyName, 'xwiki/2.1')) &lt;/label&gt;
+              &lt;label for="$!escapetool.xml($propertyId)"&gt; $escapetool.xml($services.rendering.escape($property.translatedPrettyName, 'xwiki/2.1'))&lt;/label&gt;
               &lt;span class="xHint"&gt;$!escapetool.xml($services.rendering.escape($property.hint, 'xwiki/2.1')) &lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
@@ -121,6 +118,20 @@
           #end
         &lt;/dl&gt;
       #end
+      ## Have a template prepared for any Steps that might get added.
+      #set ($nb = $doc.createNewObject('XWiki.GuidedTour.StepClass'))
+      #set ($step = $doc.getObject('XWiki.GuidedTour.StepClass', $nb))
+      #set ($xclass = $step.xWikiClass)
+      &lt;dl id='${xclass.name}_template' class='itemDisplay'&gt;
+      #foreach($property in $xclass.properties)
+        #set ($propertyId = "${xclass.name}_template_$property.name")
+        &lt;dt&gt;
+          &lt;label for="$!escapetool.xml($propertyId)"&gt; $escapetool.xml($services.rendering.escape($property.translatedPrettyName, 'xwiki/2.1'))&lt;/label&gt;
+          &lt;span class="xHint"&gt;$!escapetool.xml($services.rendering.escape($property.hint, 'xwiki/2.1')) &lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;$doc.display($property.name, $step)&lt;/dd&gt;
+      #end
+      &lt;/dl&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 {{/html}}
@@ -212,28 +223,80 @@
       <cache>forbid</cache>
     </property>
     <property type="LargeString">
-      <code>// Simple interactivity: load properties when clicking sidebar items
-const stepsListContainer = document.querySelector('.stepsListContainer');
-console.warn(stepsListContainer.dataset.steps)
-const steps = JSON.parse(stepsListContainer.dataset.steps);
-const items = document.querySelectorAll('.item');
-function loadItem(id) {
-  const data = steps[id];
-  if (!data) return;
-  document.querySelectorAll('.item').forEach(i =&gt; i.classList.toggle('active', i.dataset.id == String(id)));
-  document.querySelectorAll('.itemDisplay').forEach(i =&gt; i.classList.toggle('hidden', i.id != "guidedtour-step-props-" + String(id)));
-}
+      <code>require.config({
+  paths: {
+    '@xwiki/platform-guidedtour-xwiki': $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-guidedtour-node-ui', 'index.es.js'))
+  }
+});
 
-items.forEach(i =&gt; i.addEventListener('click', () =&gt; loadItem(i.dataset.id)));
-// load first by default
-loadItem(0);
+require(['@xwiki/platform-guidedtour-xwiki'], function (gt) {
+  console.info(gt);
+  // Simple interactivity: load properties when clicking sidebar items
+  const stepsListContainer = document.querySelector('.stepsListContainer');
+  console.warn(stepsListContainer.dataset.steps)
+  const steps = JSON.parse(stepsListContainer.dataset.steps);
+  const items = document.querySelectorAll('.item');
+  function loadItem(id) {
+    const data = steps[id];
+    if (!data) return;
+    document.querySelectorAll('.item').forEach(i =&gt; i.classList.toggle('active', i.dataset.id == String(id)));
+    document.querySelectorAll('.itemDisplay').forEach(i =&gt; i.classList.toggle('hidden', i.id != "XWiki.GuidedTour.StepClass_" + String(id)));
+  }
+
+  function reorderItems() {
+    const children = document.querySelectorAll('.item');
+    const itemList = document.querySelectorAll('.item-list');
+  }
+
+  items.forEach(i =&gt; i.addEventListener('click', () =&gt; loadItem(i.dataset.id)));
+  // load first item by default
+  loadItem(0);
+  //new FormData(formElement)
+  // Add listener for order changes, to reorder the steps in the UI XWiki.GuidedTour.StepClass_0_order
+  const addStepButton = document.querySelector('#add-step-btn');
+  const formKeyRegex = /^XWiki.GuidedTour.StepClass_(\d+)_(\S+)$/;
+  if (addStepButton) {
+    addStepButton.addEventListener('click', (e) =&gt; {
+      e.preventDefault();
+      // FIXME: This selector is brittle, but idk how else to get all the necessary data (and overwrite the actual save to not do any step updates)
+      let a = document.createElement('input');
+      a.id = 'addedObjects'
+      a.value = ['XWiki.GuiedTour.StepClass_1']
+      a.classList.add('hidden')
+      document.querySelector('form#inline').appendChild(a)
+      const formData = new FormData(document.querySelector('form#inline'));
+      console.info(steps)
+      for (let formKey of formData.keys()) {
+        const matches = formKey.match(formKeyRegex);
+        if (matches) {
+          const stepIdx = Number.parseInt(matches[1]);
+          const prop = matches[2];
+          if (stepIdx &gt;= steps.length) {
+            // This is a new added step.
+            steps.push({})
+          }
+          steps[stepIdx][prop] = formData.get(formKey)
+        }
+      }
+      console.info(steps)
+      // formData.set('addedObjects', 'XWiki.GuidedTour.StepClass_1'); // This doesn't work.
+      console.warn('clicked', e, formData);
+    });
+  }
+  document.on('xwiki:actions:beforeSave', (e) =&gt; {
+    // e.preventDefault();
+    // request.set('addedObjects', ['XWiki.GuidedTour.StepClass_6'])
+    // request.set('deletedObjects', ['XWiki.GuidedTour.StepClass_6'])
+    console.error('before save', e);
+  });
+});
 </code>
     </property>
     <property type="String">
       <name/>
     </property>
     <property type="Integer">
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property type="String">
       <use>onDemand</use>

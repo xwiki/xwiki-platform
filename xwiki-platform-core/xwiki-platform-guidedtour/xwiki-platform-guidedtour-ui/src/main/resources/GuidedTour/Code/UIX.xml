@@ -163,8 +163,7 @@
     <property type="LargeString">
       <content>{{velocity}}
 {{html}}
-&lt;!--&lt;script type="module" src="$services.webjars.url('org.xwiki.platform:xwiki-platform-guidedtour-webjar', 'index.es.js')"/&gt;--&gt;
-&lt;script type="module" src="/xwiki/resources/guidedtour-liveserver-dir-uniquename/index.es.js?r=1"/&gt;
+&lt;script type="module" src="$services.webjars.url('org.xwiki.platform:xwiki-platform-guidedtour-webjar', 'index.es.js')"/&gt;
 &lt;div id="guidedtour-uix"/&gt;
 {{/html}}
 {{/velocity}}</content>

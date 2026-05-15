@@ -230,8 +230,7 @@ function XWikiDriverConfig(
       );
     },
     onDestroyed: function (_element, _step, _options) {
-      console.debug("onDestroyed", _element, _step, _options);
-      // TODO: Add back the commented code, when you find a way to reliably detect whether a task was skipped.
+      console.debug("onDestroyed", _element, _step, _options, guidedTourTask);
       // The state is empty when this function is called.
       const status =
         Number.parseInt(

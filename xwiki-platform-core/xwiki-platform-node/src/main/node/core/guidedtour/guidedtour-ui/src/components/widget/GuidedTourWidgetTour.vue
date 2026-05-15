@@ -30,7 +30,7 @@
       :id="props.tour.value.id"
       class="guidedtour-tour"
       :class="{
-        ['tour-' + props.tour.value.status]: true,
+        ['tour-' + status]: true,
         collapsed: props.tour.value.isCollapsed,
         hidden:
           (props.tour.value.tasksList?.length ?? 0) == 0 ||
@@ -106,8 +106,9 @@ import type {
 } from "@xwiki/platform-guidedtour-api";
 import type { Ref } from "vue";
 const props = defineProps<{ tour: Ref<TourTour> }>();
-function onTaskStatusChanged(task: TourTask) {
-  console.warn("Caught event for", task);
+const status = ref(props.tour.value.status);
+function onTaskStatusChanged() {
+  status.value = props.tour.value.status;
 }
 defineEmits(["toggleCollapseTour"]);
 const guidedTourManager: GuidedTourManager = inject(
@@ -117,16 +118,22 @@ const state = reactive({
   tasks: [] as TourTask[],
 });
 
-function onSkipTour() {
-  for (let task of state.tasks) {
-    guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
-  }
+async function onSkipTour() {
+  await Promise.all(
+    state.tasks.map((task) =>
+      guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED),
+    ),
+  );
+  status.value = props.tour.value.status;
 }
 
-function onResetTour() {
-  for (let task of state.tasks) {
-    guidedTourManager.setTaskStatus(task, TourTaskStatus.TODO);
-  }
+async function onResetTour() {
+  await Promise.all(
+    state.tasks.map((task) =>
+      guidedTourManager.setTaskStatus(task, TourTaskStatus.TODO),
+    ),
+  );
+  status.value = props.tour.value.status;
 }
 
 onMounted(async () => {

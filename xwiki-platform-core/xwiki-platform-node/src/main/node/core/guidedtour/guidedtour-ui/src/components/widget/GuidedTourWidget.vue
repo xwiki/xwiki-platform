@@ -223,8 +223,10 @@ const progress = {
     transition: max-height 0.45s cubic-bezier(0.25, 1, 0.25, 1);
   }
 
-  transition:
-    max-height 0.45s cubic-bezier(0.25, 1, 0.25, 1),
-    max-width 0.45s ease-in-out;
+  * {
+    transition:
+      max-height 0.45s cubic-bezier(0.25, 1, 0.25, 1),
+      max-width 0.45s ease-in-out;
+  }
 }
 </style>

@@ -93,8 +93,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       }
       try {
         return JSON.parse(userTaskStatusesStr);
-      } catch (e) {
-        console.error(e);
+      } catch {
         return;
       }
     })();
@@ -117,7 +116,6 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         )
       ).flat(),
     );
-    console.debug(taskStatuses, await guidedTourManager.getTours());
     // For guest users, set the session storage for persistence.
     StorageManager.setStorageKey(
       "userTaskStatuses",
@@ -128,6 +126,9 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
 
   private async updateTourStatusesFromStorage() {
     const userTaskStatuses = await this.loadUserTaskStatuses();
+    if (!userTaskStatuses) {
+      return;
+    }
     for (const key of Object.keys(userTaskStatuses)) {
       const ids = StorageManager.parseStorageKeyPrefix(key);
       if (!ids) {
@@ -141,7 +142,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
 
   async getTours(): Promise<TourTour[]> {
     //FIXME: Not really an indicator of first time getTours() is called but oh well.
-    const refetchDone = this.sharedStore.cache.tours?.length > 0;
+    const refetchDone = this.sharedStore.cache.tours?.length == 0;
     const tours = await this.defaultTourManagerApi.getTours();
 
     if (refetchDone) {
@@ -380,18 +381,8 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         ) ?? "",
       ) as TourStep[];
       console.info("Using cached steps:", parsedCachedSteps);
-    } catch (e) {
-      console.error(
-        "Error while parsing cached guidedtour steps:",
-        StorageManager.getStorageKey(
-          StorageManager.getStorageKeyPrefixStr(tourId, taskId),
-        ),
-        e,
-      );
-      StorageManager.setStorageKey(
-        StorageManager.getStorageKeyPrefixStr(tourId, taskId),
-        undefined,
-      );
+    } catch {
+      console.info("No cached guidedtour steps.");
     }
     const taskSteps: TourStep[] =
       parsedCachedSteps ??

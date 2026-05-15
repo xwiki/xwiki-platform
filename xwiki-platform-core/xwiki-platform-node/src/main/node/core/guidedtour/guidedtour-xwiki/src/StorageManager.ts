@@ -48,10 +48,6 @@ export class StorageManager {
     return `guidedtour_${tourId.replaceAll("__", "_|_")}__${taskId.replaceAll("__", "_|_")}`;
   }
 
-  static getStorageKey(key: string) {
-    return window.sessionStorage.getItem(key);
-  }
-
   static getActiveTaskStorageKey(): string {
     return "guidedtour_activeTask";
   }
@@ -64,11 +60,15 @@ export class StorageManager {
     return this.getStorageKeyPrefix(task) + "_steps";
   }
 
+  static getStorageKey(key: string) {
+    return window.localStorage.getItem(key);
+  }
+
   static setStorageKey(key: string, stepIndex?: string) {
     if (stepIndex === undefined) {
-      window.sessionStorage.removeItem(key);
+      window.localStorage.removeItem(key);
     } else {
-      window.sessionStorage.setItem(key, stepIndex);
+      window.localStorage.setItem(key, stepIndex);
     }
   }
 }

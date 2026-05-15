@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import GuidedTourWidgetItem from "./GuidedTourWidgetItem.vue";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
-import { inject, reactive, ref, toRefs, watch } from "vue";
+import { inject, reactive, ref, toRefs } from "vue";
 import type {
   GuidedTourManager,
   TourTask,
@@ -88,15 +88,6 @@ async function onResetTask() {
   isWaitingAsync.value = false;
   // new XWiki.widgets.Notification("Task reset! You can start it again to retake the tour.", "success");
 }
-
-watch(
-  () => task,
-  (newTask, oldTask) => {
-    if (newTask.status != oldTask.status) {
-      emit("taskStatusChanged", task);
-    }
-  },
-);
 
 async function onSkipTask() {
   isWaitingAsync.value = true;

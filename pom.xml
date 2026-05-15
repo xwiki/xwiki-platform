@@ -78,7 +78,7 @@
     <rssreader.version>3.11.0</rssreader.version>
 
     <!-- The default Tomcat cache size  -->
-    <xwiki.tomcat.cacheMaxSize>100176</xwiki.tomcat.cacheMaxSize>
+    <xwiki.tomcat.cacheMaxSize>120176</xwiki.tomcat.cacheMaxSize>
 
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make

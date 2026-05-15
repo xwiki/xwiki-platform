@@ -55,7 +55,6 @@ export class DefaultTourManagerApi implements TourManagerApi {
       this.getTasksUrl(),
       "GET",
     );
-    this.computeToursStatus(tours ?? []);
     this.sharedStore.updateTours(tours ?? []);
     return this.sharedStore.cache.tours ?? [];
   }

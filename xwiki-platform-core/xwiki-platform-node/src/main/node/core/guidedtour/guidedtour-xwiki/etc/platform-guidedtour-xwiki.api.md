@@ -13,7 +13,6 @@ import { TourTour } from '@xwiki/platform-guidedtour-api';
 
 // @beta
 export class DefaultGuidedTourManager implements GuidedTourManager {
-    // Warning: (ae-forgotten-export) The symbol "TourStore" needs to be exported by the entry point index.d.ts
     constructor(xm: Promise, sharedStore: TourStore);
     activeDriverTask?: Driver;
     activeTask?: TourTask;
@@ -37,10 +36,16 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     getTours(): Promise<TourTour[]>;
     getUsefulLinks(): Promise<string[]>;
     initExistingTask(): Promise<void>;
+    // (undocumented)
+    loadUserTaskStatuses(): Promise<any>;
     resetTask(task: TourTask): Promise<void>;
     saveTaskStatus(tourId: string, taskId: string, status: TourTaskStatus): Promise<void>;
+    // (undocumented)
+    saveUserTaskStatuses(guidedTourManager: DefaultGuidedTourManager): Promise<void>;
     setTaskStatus(task: TourTask, status: TourTaskStatus): Promise<void>;
     setupStep(step: TourStep): void;
+    // Warning: (ae-forgotten-export) The symbol "TourStore" needs to be exported by the entry point index.d.ts
+    sharedStore: TourStore;
     startTask(task: TourTask, remember?: boolean): Promise<void>;
     updateStep(tourId: string, taskId: string, stepId: number, stepData: TourStep): Promise<void>;
     // (undocumented)

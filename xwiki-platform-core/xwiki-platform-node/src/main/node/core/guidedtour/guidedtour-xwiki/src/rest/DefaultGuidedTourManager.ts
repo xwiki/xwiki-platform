@@ -56,7 +56,10 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    * The currently active task, if a task is in progress.
    */
   activeTask?: TourTask;
-
+  /**
+   * FIXME: It's 12 oclock I'm tired.
+   */
+  sharedStore: TourStore;
   /**
    * @param xm - A promise resolving to the xwiki-meta module (provides the CSRF form token).
    * @param sharedStore - Shared in-memory cache for tours, tasks, and steps.
@@ -76,10 +79,78 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       restClient,
       sharedStore,
     );
+    this.sharedStore = sharedStore;
+  }
+
+  async loadUserTaskStatuses() {
+    // For guest users, set the session storage for persistence.
+    const userTaskStatuses = (() => {
+      const userTaskStatusesStr =
+        SessionStorageManager.getStorageKey("userTaskStatuses");
+      if (!userTaskStatusesStr) {
+        console.warn("No task statuses in sessionStorage");
+        return;
+      }
+      try {
+        return JSON.parse(userTaskStatusesStr);
+      } catch (e) {
+        console.error(e);
+        return;
+      }
+    })();
+    // // TODO: For logged-in users, also save this in their user profile.
+    // // ...
+    return userTaskStatuses;
+  }
+
+  async saveUserTaskStatuses(guidedTourManager: DefaultGuidedTourManager) {
+    // Get a map of {"task_tour": task.status}
+    const taskStatuses = Object.fromEntries(
+      (
+        await Promise.all(
+          (await guidedTourManager.getTours()).map(async (tour) =>
+            (await guidedTourManager.getTasks(tour.id)).map((task) => [
+              SessionStorageManager.getStorageKeyPrefix(task),
+              task.status,
+            ]),
+          ),
+        )
+      ).flat(),
+    );
+    console.debug(taskStatuses, await guidedTourManager.getTours());
+    // For guest users, set the session storage for persistence.
+    SessionStorageManager.setStorageKey(
+      "userTaskStatuses",
+      JSON.stringify(taskStatuses),
+    );
+    // TODO: For logged-in users, also save this in their user profile.
+  }
+
+  private async updateTourStatusesFromStorage() {
+    const userTaskStatuses = await this.loadUserTaskStatuses();
+    for (const key of Object.keys(userTaskStatuses)) {
+      const ids = SessionStorageManager.parseStorageKeyPrefix(key);
+      if (!ids) {
+        console.error("Failed to parse storage key", key);
+        continue;
+      }
+      (await this.getTask(ids.tourId, ids?.taskId))!.status =
+        userTaskStatuses[key] ?? TourTaskStatus.TODO;
+    }
   }
 
   async getTours(): Promise<TourTour[]> {
-    return await this.defaultTourManagerApi.getTours();
+    //FIXME: Not really an indicator of first time getTours() is called but oh well.
+    const refetchDone = this.sharedStore.cache.tours?.length > 0;
+    const tours = await this.defaultTourManagerApi.getTours();
+
+    if (refetchDone) {
+      // If Guest user, don't use the status returned by the API, use the local storage values.
+      await this.updateTourStatusesFromStorage();
+    }
+
+    this.defaultTourManagerApi.computeToursStatus(tours ?? []);
+    return tours;
   }
 
   async createTour(tour: TourTour): Promise<void> {
@@ -291,6 +362,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       SessionStorageManager.getTaskStepStorageStorageKey(task),
       undefined,
     );
+    await this.saveUserTaskStatuses(this);
   }
 
   /**

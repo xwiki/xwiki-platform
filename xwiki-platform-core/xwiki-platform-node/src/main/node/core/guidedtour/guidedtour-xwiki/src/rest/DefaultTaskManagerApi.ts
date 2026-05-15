@@ -57,8 +57,8 @@ export class DefaultTaskManagerApi implements TaskManagerApi {
    * Get a single task by id (fetches tasks first if needed).
    */
   public async getTask(
-    taskId: string,
     tourId: string,
+    taskId: string,
   ): Promise<TourTask | undefined> {
     const tasks = await this.getTasks(tourId);
     return tasks.find((t) => t.id === taskId);

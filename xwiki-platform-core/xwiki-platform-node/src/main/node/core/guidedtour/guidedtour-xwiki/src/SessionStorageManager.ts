@@ -34,10 +34,9 @@ export class SessionStorageManager {
     }
     // Also unescape the ids
     const result = {
-      taskId: matches.value[1].replaceAll("_|", "_"),
-      tourId: matches.value[2].replaceAll("_|", "_"),
+      tourId: matches.value[1].replaceAll("_|_", "__"),
+      taskId: matches.value[2].replaceAll("_|_", "__"),
     };
-    console.info("Results of parsing:", result);
     return result;
   }
 
@@ -46,7 +45,7 @@ export class SessionStorageManager {
   }
 
   static getStorageKeyPrefixStr(tourId: string, taskId: string): string {
-    return `guidedtour_${tourId.replaceAll("_", "_|")}__${taskId.replaceAll("_", "_|")}`;
+    return `guidedtour_${tourId.replaceAll("__", "_|_")}__${taskId.replaceAll("__", "_|_")}`;
   }
 
   static getStorageKey(key: string) {

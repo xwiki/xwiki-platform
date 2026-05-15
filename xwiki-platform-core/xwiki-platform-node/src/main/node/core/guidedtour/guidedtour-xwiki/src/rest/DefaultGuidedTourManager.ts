@@ -146,8 +146,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
   }
 
   getTask(tourId: string, taskId: string): Promise<TourTask | undefined> {
-    // FIXME: The tourId and taskId are swapped, idk why.
-    return this.defaultTaskManagerApi.getTask(taskId, tourId);
+    return this.defaultTaskManagerApi.getTask(tourId, taskId);
   }
 
   getTasks(tourId: string): Promise<TourTask[]> {
@@ -254,8 +253,8 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         SessionStorageManager.parseStorageKeyPrefix(existingActiveTask);
       if (parsedIds !== undefined) {
         const task = await this.getTask(
-          parsedIds["taskId"],
           parsedIds["tourId"],
+          parsedIds["taskId"],
         );
         if (task !== undefined) {
           this.startTask(task, true);
@@ -282,11 +281,12 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     this.defaultTourManagerApi.computeToursStatus(
       Array.of((await this.defaultTourManagerApi.getTour(task.tourId!))!),
     );
+    // Since we're setting the task status, it means we're done with all steps.
+    // So we can delete both the current step index and the cached steps objects.
     SessionStorageManager.setStorageKey(
       SessionStorageManager.getTaskCurrentStepStorageKey(task),
       undefined,
     );
-    // FIXME: Why did I do this???
     SessionStorageManager.setStorageKey(
       SessionStorageManager.getTaskStepStorageStorageKey(task),
       undefined,
@@ -303,7 +303,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       parsedCachedSteps = JSON.parse(
         SessionStorageManager.getStorageKey(
           SessionStorageManager.getTaskStepStorageStorageKey(
-            (await this.getTask(taskId, tourId))!,
+            (await this.getTask(tourId, taskId))!,
           ),
         ) ?? "",
       ) as TourStep[];

@@ -94,25 +94,6 @@ export class DefaultStepManagerApi implements StepManagerApi {
     tourId: string,
     taskId: string,
   ): Promise<TourStep[]> {
-    // FIXME: Reapply this for merge commit.
-    // let parsedCachedSteps;
-    // try {
-    //   parsedCachedSteps = JSON.parse(
-    //     SessionStorageManager.getStorageKey(
-    //       SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
-    //     ) ?? "",
-    //   ) as TourStep[];
-    //   console.info("Using cached steps:", parsedCachedSteps);
-    // } catch (e) {
-    //   console.error("Error while parsing cached guidedtour steps:", e);
-    //   SessionStorageManager.setStorageKey(
-    //     SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
-    //     undefined,
-    //   );
-    // }
-    // const taskSteps: TourStep[] =
-    //   parsedCachedSteps ?? (await this.fetchSteps(tourId, taskId));
-    // return Promise.resolve(taskSteps);
     const cache = this.sharedStore.cache;
     const tour = cache.toursMap.get(tourId);
     const task = tour?.tasksList?.find((t) => t.id === taskId);

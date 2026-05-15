@@ -22,7 +22,7 @@ import { DefaultStepManagerApi } from "./DefaultStepManagerApi";
 import { DefaultTaskManagerApi } from "./DefaultTaskManagerApi";
 import { DefaultTourManagerApi } from "./DefaultTourManagerApi";
 import { GuidedTourRestClient } from "./GuidedTourRestClient";
-import { SessionStorageManager } from "../SessionStorageManager";
+import { StorageManager } from "../StorageManager";
 import { driver, getDriverConfigForSteps, wrapTask } from "../driverjsMain";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { DocumentReference } from "@xwiki/platform-model-api";
@@ -86,7 +86,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     // For guest users, set the session storage for persistence.
     const userTaskStatuses = (() => {
       const userTaskStatusesStr =
-        SessionStorageManager.getStorageKey("userTaskStatuses");
+        StorageManager.getStorageKey("userTaskStatuses");
       if (!userTaskStatusesStr) {
         console.warn("No task statuses in sessionStorage");
         return;
@@ -110,7 +110,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
         await Promise.all(
           (await guidedTourManager.getTours()).map(async (tour) =>
             (await guidedTourManager.getTasks(tour.id)).map((task) => [
-              SessionStorageManager.getStorageKeyPrefix(task),
+              StorageManager.getStorageKeyPrefix(task),
               task.status,
             ]),
           ),
@@ -119,7 +119,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     );
     console.debug(taskStatuses, await guidedTourManager.getTours());
     // For guest users, set the session storage for persistence.
-    SessionStorageManager.setStorageKey(
+    StorageManager.setStorageKey(
       "userTaskStatuses",
       JSON.stringify(taskStatuses),
     );
@@ -129,7 +129,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
   private async updateTourStatusesFromStorage() {
     const userTaskStatuses = await this.loadUserTaskStatuses();
     for (const key of Object.keys(userTaskStatuses)) {
-      const ids = SessionStorageManager.parseStorageKeyPrefix(key);
+      const ids = StorageManager.parseStorageKeyPrefix(key);
       if (!ids) {
         console.error("Failed to parse storage key", key);
         continue;
@@ -277,15 +277,15 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     if (remember) {
       stepindex = Number.parseInt(
         window.sessionStorage.getItem(
-          SessionStorageManager.getTaskCurrentStepStorageKey(task),
+          StorageManager.getTaskCurrentStepStorageKey(task),
         ) ?? "0",
       );
     }
     // this.setupStep(task.steps[stepindex]);
     const driverTour = driver(getDriverConfigForSteps(task, this));
-    SessionStorageManager.setStorageKey(
-      SessionStorageManager.getActiveTaskStorageKey(),
-      SessionStorageManager.getStorageKeyPrefix(task),
+    StorageManager.setStorageKey(
+      StorageManager.getActiveTaskStorageKey(),
+      StorageManager.getStorageKeyPrefix(task),
     );
 
     this.activeTask = task;
@@ -314,14 +314,14 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    */
   async initExistingTask() {
     // FIXME: This should be moved somewhere else, but idk where. `GuidedTourWidget.vue` ? idk
-    const existingActiveTask = SessionStorageManager.getStorageKey(
-      SessionStorageManager.getActiveTaskStorageKey(),
+    const existingActiveTask = StorageManager.getStorageKey(
+      StorageManager.getActiveTaskStorageKey(),
     );
     if (existingActiveTask) {
       // FIXME: I shouldn't parse this here, but have it already available somehow more easily.
       // Also, this parsing is not robust to pages which containt the `__` separator present in the item value.
       const parsedIds =
-        SessionStorageManager.parseStorageKeyPrefix(existingActiveTask);
+        StorageManager.parseStorageKeyPrefix(existingActiveTask);
       if (parsedIds !== undefined) {
         const task = await this.getTask(
           parsedIds["tourId"],
@@ -354,12 +354,12 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     );
     // Since we're setting the task status, it means we're done with all steps.
     // So we can delete both the current step index and the cached steps objects.
-    SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskCurrentStepStorageKey(task),
+    StorageManager.setStorageKey(
+      StorageManager.getTaskCurrentStepStorageKey(task),
       undefined,
     );
-    SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskStepStorageStorageKey(task),
+    StorageManager.setStorageKey(
+      StorageManager.getTaskStepStorageStorageKey(task),
       undefined,
     );
     await this.saveUserTaskStatuses(this);
@@ -373,8 +373,8 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     let parsedCachedSteps;
     try {
       parsedCachedSteps = JSON.parse(
-        SessionStorageManager.getStorageKey(
-          SessionStorageManager.getTaskStepStorageStorageKey(
+        StorageManager.getStorageKey(
+          StorageManager.getTaskStepStorageStorageKey(
             (await this.getTask(tourId, taskId))!,
           ),
         ) ?? "",
@@ -383,13 +383,13 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
     } catch (e) {
       console.error(
         "Error while parsing cached guidedtour steps:",
-        SessionStorageManager.getStorageKey(
-          SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+        StorageManager.getStorageKey(
+          StorageManager.getStorageKeyPrefixStr(tourId, taskId),
         ),
         e,
       );
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getStorageKeyPrefixStr(tourId, taskId),
+      StorageManager.setStorageKey(
+        StorageManager.getStorageKeyPrefixStr(tourId, taskId),
         undefined,
       );
     }

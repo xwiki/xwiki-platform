@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { SessionStorageManager } from "./SessionStorageManager";
+import { StorageManager } from "./StorageManager";
 import { TourTaskStatus } from "@xwiki/platform-guidedtour-api";
 import { driver } from "driver.js";
 import type { DefaultGuidedTourManager } from "./rest/DefaultGuidedTourManager";
@@ -28,17 +28,17 @@ const util = {
   /**
    * Do the necessary setup for rendering the `Skip All` link.
    * @param guidedTourManager - API
-   * @param task - the task to make the button for
+   * @param guidedTourTask - the task to make the button for
    * @returns The `Skip All` element
    */
   makeSkipAllButton(
     guidedTourManager: DefaultGuidedTourManager,
-    task: TourTask,
+    guidedTourTask: TourTask,
   ): Element {
     const customSkipAll = document.createElement("a");
     customSkipAll.classList.add("driver-xwiki-skip-all-button");
     function onSkipAll() {
-      guidedTourManager.setTaskStatus(task, TourTaskStatus.SKIPPED);
+      guidedTourManager.setTaskStatus(guidedTourTask, TourTaskStatus.SKIPPED);
       guidedTourManager.activeDriverTask?.destroy();
     }
     customSkipAll.onclick = onSkipAll;
@@ -127,7 +127,7 @@ const util = {
     popDOM: PopoverDOM,
     step: TourStep,
     guidedTourManager: DefaultGuidedTourManager,
-    task: TourTask,
+    guidedTourTask: TourTask,
   ) {
     if (step.reflex) {
       popDOM.footerButtons.removeChild(popDOM.nextButton);
@@ -136,10 +136,12 @@ const util = {
       popDOM.nextButton.classList.add("btn", "btn-sm", "btn-primary"); // TODO: Make this an <a> instead of <button>
       popDOM.previousButton.classList.add("btn", "btn-sm"); // TODO: Make this an <a> instead of <button>
     }
-    popDOM.footer.appendChild(util.makeSkipAllButton(guidedTourManager, task));
+    popDOM.footer.appendChild(
+      util.makeSkipAllButton(guidedTourManager, guidedTourTask),
+    );
   },
   async shouldSwitchSteps(
-    task: TourTask,
+    guidedTourTask: TourTask,
     thisStepActiveIndex: number,
     currentStep: TourStep,
     nextStep: TourStep,
@@ -191,9 +193,9 @@ const util = {
  */
 function XWikiDriverConfig(
   guidedTourManager: DefaultGuidedTourManager,
-  task: TourTask,
+  guidedTourTask: TourTask,
 ): Config {
-  console.log("Setting up", task);
+  console.log("Setting up", guidedTourTask);
   // Old code calls this variable `tour`.
   return {
     nextBtnText: "Next >", // TODO: Add translation.
@@ -206,23 +208,24 @@ function XWikiDriverConfig(
       const activeIndex = options.state.activeIndex ?? -1;
       util.solveButtons(
         popDOM,
-        task.steps![activeIndex],
+        guidedTourTask.steps![activeIndex],
         guidedTourManager,
-        task,
+        guidedTourTask,
       );
 
       popDOM.progress.style.display = "";
       popDOM.progress.innerText =
         "⬤ ".repeat(activeIndex + 1) +
         "◯ ".repeat(options.config.steps!.length - activeIndex - 1);
-      options.config.overlayOpacity = task.steps![activeIndex].backdrop
+      options.config.overlayOpacity = guidedTourTask.steps![activeIndex]
+        .backdrop
         ? 0.3
         : 0;
       popDOM.wrapper.insertBefore(popDOM.progress, popDOM.title);
 
       // The user will see this step, so update the storage key.
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getTaskCurrentStepStorageKey(task),
+      StorageManager.setStorageKey(
+        StorageManager.getTaskCurrentStepStorageKey(guidedTourTask),
         activeIndex.toString(),
       );
     },
@@ -232,19 +235,19 @@ function XWikiDriverConfig(
       // The state is empty when this function is called.
       const status =
         Number.parseInt(
-          SessionStorageManager.getStorageKey(
-            SessionStorageManager.getTaskCurrentStepStorageKey(task),
+          StorageManager.getStorageKey(
+            StorageManager.getTaskCurrentStepStorageKey(guidedTourTask),
           ) ?? "-1",
         ) +
           1 >=
-        task.steps!.length
+        guidedTourTask.steps!.length
           ? TourTaskStatus.DONE
           : TourTaskStatus.SKIPPED;
-      guidedTourManager.setTaskStatus(task, status);
+      guidedTourManager.setTaskStatus(guidedTourTask, status);
       // TODO: See if this is needed.
       // TODO: Maybe move this to guidedTourManager.setTaskStatus(task, status) ?
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getActiveTaskStorageKey(),
+      StorageManager.setStorageKey(
+        StorageManager.getActiveTaskStorageKey(),
         undefined,
       );
       guidedTourManager.activeTask = undefined;
@@ -258,20 +261,20 @@ function XWikiDriverConfig(
        * - Am I in the last step?
        * - Am I expecting a redirect?
        * - Wait for element to appear
-       * - Setting the task status shouldn't be done here
+       * - Setting the guidedTourTask status shouldn't be done here
        */
       // Cache the current step index, so we can check later (after async operations) if we are in the same step we started in.
       const thisStepActiveIndex =
         guidedTourManager.activeDriverTask!.getActiveIndex()!;
-      const nextStep = task.steps![thisStepActiveIndex + 1];
+      const nextStep = guidedTourTask.steps![thisStepActiveIndex + 1];
       if (!nextStep) {
         guidedTourManager.activeDriverTask!.moveNext();
         return;
       }
       const targetedElement = await util.shouldSwitchSteps(
-        task,
+        guidedTourTask,
         thisStepActiveIndex,
-        task.steps![thisStepActiveIndex],
+        guidedTourTask.steps![thisStepActiveIndex],
         nextStep,
         guidedTourManager,
       );
@@ -280,19 +283,19 @@ function XWikiDriverConfig(
           console.warn(
             "Calling callback for next step move (hopefully)",
             nextStep.order,
-            task.steps![thisStepActiveIndex].order,
+            guidedTourTask.steps![thisStepActiveIndex].order,
           );
           const thisStepActiveIndex2 =
             guidedTourManager.activeDriverTask!.getActiveIndex()!;
-          const nextStep2 = task.steps![thisStepActiveIndex2 + 1];
+          const nextStep2 = guidedTourTask.steps![thisStepActiveIndex2 + 1];
           if (nextStep.path != nextStep2.path) {
             console.debug(
               "Setting the task step index prematurely to",
-              task.steps!.indexOf(nextStep2),
+              guidedTourTask.steps!.indexOf(nextStep2),
             );
-            SessionStorageManager.setStorageKey(
-              SessionStorageManager.getTaskCurrentStepStorageKey(task),
-              task.steps!.indexOf(nextStep2).toString(),
+            StorageManager.setStorageKey(
+              StorageManager.getTaskCurrentStepStorageKey(guidedTourTask),
+              guidedTourTask.steps!.indexOf(nextStep2).toString(),
             );
           }
           // FIXME: This recursion should be guarded better, lest there be an infinite recursion.
@@ -308,15 +311,15 @@ function XWikiDriverConfig(
       // Cache the current step index, so we can check later (after async operations) if we are in the same step we started in.
       const thisStepActiveIndex =
         guidedTourManager.activeDriverTask!.getActiveIndex()!;
-      const prevStep = task.steps![thisStepActiveIndex - 1];
+      const prevStep = guidedTourTask.steps![thisStepActiveIndex - 1];
       if (!prevStep) {
         guidedTourManager.activeDriverTask!.movePrevious();
         return;
       }
       const targetedElement = await util.shouldSwitchSteps(
-        task,
+        guidedTourTask,
         thisStepActiveIndex,
-        task.steps![thisStepActiveIndex],
+        guidedTourTask.steps![thisStepActiveIndex],
         prevStep,
         guidedTourManager,
       );
@@ -325,15 +328,15 @@ function XWikiDriverConfig(
           console.warn("Calling callback for prev step move (hopefully)");
           const thisStepActiveIndex2 =
             guidedTourManager.activeDriverTask!.getActiveIndex()!;
-          const nextStep2 = task.steps![thisStepActiveIndex2 - 1];
+          const nextStep2 = guidedTourTask.steps![thisStepActiveIndex2 - 1];
           if (prevStep.path != nextStep2.path) {
             console.debug(
               "Setting the task step index prematurely to",
-              task.steps!.indexOf(prevStep),
+              guidedTourTask.steps!.indexOf(prevStep),
             );
-            SessionStorageManager.setStorageKey(
-              SessionStorageManager.getTaskCurrentStepStorageKey(task),
-              task.steps!.indexOf(prevStep).toString(),
+            StorageManager.setStorageKey(
+              StorageManager.getTaskCurrentStepStorageKey(guidedTourTask),
+              guidedTourTask.steps!.indexOf(prevStep).toString(),
             );
           }
           // FIXME: This recursion should be guarded better, lest there be an infinite recursion.
@@ -349,47 +352,52 @@ function XWikiDriverConfig(
   };
 }
 
-function convertToDriverStep(step: TourStep, task: TourTask): DriveStep {
+function convertToDriverStep(
+  step: TourStep,
+  guidedTourTask: TourTask,
+): DriveStep {
   return {
     element: step.element,
     popover: {
-      title: step.title ?? task.title,
+      title: step.title ?? guidedTourTask.title,
       description: step.content,
     },
   };
 }
 
 function getDriverConfigForSteps(
-  task: TourTask,
+  guidedTourTask: TourTask,
   guidedTourManager: DefaultGuidedTourManager,
 ) {
-  if (!task.steps) {
-    console.error("Task has no steps:", task);
+  if (!guidedTourTask.steps) {
+    console.error("Task has no steps:", guidedTourTask);
     throw "Task has no steps";
   }
-  console.log(task.steps);
-  const config = XWikiDriverConfig(guidedTourManager, task);
-  config.steps = task.steps!.map((step) => convertToDriverStep(step, task));
+  console.log(guidedTourTask.steps);
+  const config = XWikiDriverConfig(guidedTourManager, guidedTourTask);
+  config.steps = guidedTourTask.steps!.map((step) =>
+    convertToDriverStep(step, guidedTourTask),
+  );
   return config;
 }
 
 function wrapTask(
-  task: Driver,
+  guidedTourTask: Driver,
   guidedTourManager: DefaultGuidedTourManager,
 ): Driver {
-  const _drive = task.drive;
-  // const _moveNext = task.moveNext;
-  // const _movePrevious = task.movePrevious;
-  const _destroy = task.destroy;
-  task.drive = async function (stepIndex: number = 0) {
-    SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskStepStorageStorageKey(
+  const _drive = guidedTourTask.drive;
+  // const _moveNext = guidedTourTask.moveNext;
+  // const _movePrevious = guidedTourTask.movePrevious;
+  const _destroy = guidedTourTask.destroy;
+  guidedTourTask.drive = async function (stepIndex: number = 0) {
+    StorageManager.setStorageKey(
+      StorageManager.getTaskStepStorageStorageKey(
         guidedTourManager.activeTask!,
       ),
       JSON.stringify(guidedTourManager.activeTask!.steps!),
     );
-    SessionStorageManager.setStorageKey(
-      SessionStorageManager.getTaskCurrentStepStorageKey(
+    StorageManager.setStorageKey(
+      StorageManager.getTaskCurrentStepStorageKey(
         guidedTourManager.activeTask!,
       ),
       stepIndex.toString(),
@@ -403,9 +411,9 @@ function wrapTask(
       guidedTourManager,
     );
     _drive(stepIndex);
-  }.bind(task);
+  }.bind(guidedTourTask);
 
-  // task.moveNext = function () {
+  // guidedTourTask.moveNext = function () {
   //   /**
   //    * - Cache active task
   //    * - Compute expectPageRefresh
@@ -451,13 +459,13 @@ function wrapTask(
   //       newStepIndex,
   //     );
   //   }
-  //   SessionStorageManager.setStorageKey(
-  //     SessionStorageManager.getTaskCurrentStepStorageKey(activeTask),
+  //   StorageManager.setStorageKey(
+  //     StorageManager.getTaskCurrentStepStorageKey(activeTask),
   //     newStepIndex?.toString() ?? undefined,
   //   );
-  // }.bind(task);
+  // }.bind(guidedTourTask);
 
-  // task.movePrevious = function () {
+  // guidedTourTask.movePrevious = function () {
   //   let expectPageRefresh: boolean = false;
   //   // Cache the active task, since _moveNext() will destroy it if we're on the last step.
   //   const activeTask = guidedTourManager.activeTask!;
@@ -501,24 +509,24 @@ function wrapTask(
   //       newStep,
   //     );
   //   }
-  //   SessionStorageManager.setStorageKey(
-  //     SessionStorageManager.getTaskCurrentStepStorageKey(activeTask),
+  //   StorageManager.setStorageKey(
+  //     StorageManager.getTaskCurrentStepStorageKey(activeTask),
   //     newStep?.toString() ?? undefined,
   //   );
-  // }.bind(task);
+  // }.bind(guidedTourTask);
 
-  task.destroy = function () {
-    const currentStep = task.getActiveIndex();
+  guidedTourTask.destroy = function () {
+    const currentStep = guidedTourTask.getActiveIndex();
     // FIXME: Don't use guidedTourManager.activeTask! null assertion everywhere.
     console.info(
-      `Trying to see if, on destroy, the task is actually done, or we're expecting a redirect`,
+      `Trying to see if, on destroy, the guidedTourTask is actually done, or we're expecting a redirect`,
     );
-    if (currentStep != task.getConfig().steps?.length) {
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getTaskCurrentStepStorageKey(
+    if (currentStep != guidedTourTask.getConfig().steps?.length) {
+      StorageManager.setStorageKey(
+        StorageManager.getTaskCurrentStepStorageKey(
           guidedTourManager.activeTask!,
         ),
-        task.getActiveIndex()!.toString(),
+        guidedTourTask.getActiveIndex()!.toString(),
       );
       guidedTourManager.setTaskStatus(
         guidedTourManager.activeTask!,
@@ -526,15 +534,15 @@ function wrapTask(
       );
     } else {
       // Delete the current step storage key.
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getTaskCurrentStepStorageKey(
+      StorageManager.setStorageKey(
+        StorageManager.getTaskCurrentStepStorageKey(
           guidedTourManager.activeTask!,
         ),
         undefined,
       );
       // Clear the step cache.
-      SessionStorageManager.setStorageKey(
-        SessionStorageManager.getTaskStepStorageStorageKey(
+      StorageManager.setStorageKey(
+        StorageManager.getTaskStepStorageStorageKey(
           guidedTourManager.activeTask!,
         ),
         undefined,
@@ -545,9 +553,9 @@ function wrapTask(
       );
     }
     _destroy();
-  }.bind(task);
+  }.bind(guidedTourTask);
 
-  return task;
+  return guidedTourTask;
 }
 
 export { XWikiDriverConfig, driver, getDriverConfigForSteps, wrapTask };

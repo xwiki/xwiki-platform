@@ -19,7 +19,7 @@
  */
 import type { TourTask } from "@xwiki/platform-guidedtour-api";
 
-export class SessionStorageManager {
+export class StorageManager {
   static parseStorageKeyPrefix(
     key: string,
   ): { taskId: string; tourId: string } | undefined {
@@ -41,7 +41,7 @@ export class SessionStorageManager {
   }
 
   static getStorageKeyPrefix(task: TourTask): string {
-    return SessionStorageManager.getStorageKeyPrefixStr(task.tourId!, task.id!);
+    return StorageManager.getStorageKeyPrefixStr(task.tourId!, task.id!);
   }
 
   static getStorageKeyPrefixStr(tourId: string, taskId: string): string {

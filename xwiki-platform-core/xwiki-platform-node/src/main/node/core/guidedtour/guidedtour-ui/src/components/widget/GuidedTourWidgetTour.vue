@@ -150,8 +150,16 @@ onMounted(async () => {
   color: var(--guidedtour-text-color);
 }
 
+.guidedtour-content {
+  display: flex;
+  max-height: 400px; /* Placeholder so the height animates nicely. */
+  transition: max-height 0.45s cubic-bezier(0.25, 1, 0.25, 1);
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* FIXME: guidedtour-content should be renamed to -collapsible or something. */
-.guidedtour-widget .guidedtour-tour.value.collapsed .guidedtour-content {
+.collapsed .guidedtour-content {
   max-height: 0;
 }
 

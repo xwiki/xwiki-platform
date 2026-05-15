@@ -37,9 +37,11 @@
       /></span>
       <slot name="loading-icon">
         <i
-          class="fa-solid fa-circle-notch fa-spin"
           style="--fa-animation-timing: ease-in-out"
-          v-show="props.waiting!.value"
+          :class="{
+            transparent: !props.waiting!.value,
+            ['fa-solid fa-circle-notch fa-spin']: true,
+          }"
         />
       </slot>
       <span class="post-btns">
@@ -104,6 +106,14 @@ const props = defineProps<{
 
 .guidedtour-widget-item:hover {
   background: var(--guidedtour-background-color-secondary) 100%;
+}
+
+.fa-circle-notch.transparent {
+  opacity: 0;
+}
+.fa-circle-notch {
+  opacity: 1;
+  transition: opacity 0.15s ease;
 }
 
 .guidedtour-widget-item:hover .pre-btns *:not(.always-show),

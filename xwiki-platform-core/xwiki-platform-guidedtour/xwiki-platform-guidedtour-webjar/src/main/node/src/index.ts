@@ -35,8 +35,7 @@ function init() {
   app.mount('#guidedtour-uix');
 }
 
-// FIXME: This check doesn't work.
-if (!document.querySelector('#tourResumeContainer')) {
+if (!document.querySelector('script[src*="/jsx/TourCode/TourJS"]')) {
   init();
 } else {
   console.warn("Since the Tour Application is installed, not showing the GuidedTour Widget, to prevent conflicts.");

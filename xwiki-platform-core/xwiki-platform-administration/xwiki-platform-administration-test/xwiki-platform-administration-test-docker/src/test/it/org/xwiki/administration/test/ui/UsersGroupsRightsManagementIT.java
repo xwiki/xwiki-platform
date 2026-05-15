@@ -473,6 +473,7 @@ class UsersGroupsRightsManagementIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
         editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", userName);
         assertTrue(editRightsPane.hasEntity(userName));
         editRightsPane.setRight(userName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
 

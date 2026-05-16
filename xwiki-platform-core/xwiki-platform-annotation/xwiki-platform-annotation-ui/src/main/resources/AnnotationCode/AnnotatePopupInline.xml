@@ -262,24 +262,9 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       const selectionListener = debounce(onSelectionChange, 800);
       document.addEventListener("selectionchange", selectionListener);
 
-      /**
-       * Disables popup when editor is opened
-       * @param {MutationRecord[]} mutations - List of mutations on the observed element
-       */
-      function onClassChange(mutations) {
-          for (const mutation of mutations) {
-              if (mutation.target.classList.contains("disabled")) {
-                  document.removeEventListener("selectionchange", selectionListener);
-              } else {
-                  document.addEventListener("selectionchange", selectionListener);
-              }
-          }
-       }
-      const classObserver = new MutationObserver(onClassChange);
-      classObserver.observe(
-        document.getElementById("tmAnnotationsTrigger").parentElement, // has class "disabled" if annotations should be disabled
-        { attributes: true, attributeFilter: ["class"] }
-      );
+      // Disable annotation popup in edit mode
+      wikiContent.on("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", selectionListener); });
+      wikiContent.on("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", selectionListener); });
 
       // popup listeners
       popup.addEventListener("click", () =&gt; {

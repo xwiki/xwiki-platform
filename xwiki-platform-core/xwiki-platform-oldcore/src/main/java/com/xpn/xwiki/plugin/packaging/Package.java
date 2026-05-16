@@ -1051,12 +1051,14 @@ public class Package
     }
 
     /**
-     * You should prefer {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter)}. If an error occurs, a stacktrace is dump
-     * to logs, and an empty String is returned.
+     * Serialize the package descriptor to an XML string. If an error occurs, a stacktrace is dumped to logs, and an
+     * empty String is returned.
      *
-     * @return a package.xml file for the this package
+     * @param context the current XWiki context
+     * @return a package.xml file for this package as a String
+     * @since 2.3M2
      */
-    public String toXml(XWikiContext context)
+    public String toXMLString(XWikiContext context)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -1066,6 +1068,15 @@ public class Package
             e.printStackTrace();
             return "";
         }
+    }
+
+    /**
+     * @deprecated since 2.3M2, use {@link #toXMLString(XWikiContext)} instead
+     */
+    @Deprecated
+    public String toXml(XWikiContext context)
+    {
+        return toXMLString(context);
     }
 
     /**

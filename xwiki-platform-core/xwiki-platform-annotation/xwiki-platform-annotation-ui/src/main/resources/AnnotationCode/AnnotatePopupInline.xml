@@ -185,18 +185,18 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       };
    }
 
-   // TODO: use private class method once Google Closure Compiler supports it
-   // see: https://github.com/google/closure-compiler/issues/4286
+   // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
    class AnnotatePopup {
+      wikiContent = null;
+      popup = null;
+      annotateButton = null;
+      previousFocusElem = null;
+
       /**
        * @param {HTMLElement} wikiContent - The XWiki page container
        */
       constructor(wikiContent) {
          this.wikiContent = wikiContent;
-         this.popup = null;
-         this.annotateButton = null;
-         this.currentRect = null;
-         this.previousFocusElem = null;
 
          this.onSelectionChange = debounce(this.onSelectionChange.bind(this), 700);
          this.onKeyDown = debounce(this.onKeyDown.bind(this), 60);
@@ -213,7 +213,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       _createPopup() {
          this.popup = document.createElement("div");
          this.popup.id = Constants.POPUP_ID;
-         this.popup.setAttribute("role", "dialog");
+         this.popup.setAttribute("role", "toolbar");
          this.popup.setAttribute("aria-hidden", "true");
 
          this.popupButton = document.createElement("button");
@@ -230,23 +230,21 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * Register event listeners
        */
       _registerListeners() {
-         // add select listener for opening popup
-         document.addEventListener("selectionchange", this.onSelectionChange, { passive: true });
-
          // add click listener to button
          this.popupButton.addEventListener("click", () =&gt; {
             this.close();
             document.dispatchEvent(new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT));
-         });
+         }, { passive: true });
 
          // press button on Enter, close popup on Esc (listening on popup button because it is focused and popup is closed when losing focus)
          this.popupButton.addEventListener("keydown", this.onKeyDown);
 
-         // Disable annotation popup in edit mode
-         this.wikiContent.on("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this.onSelectionChange); });
-         this.wikiContent.on("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this.onSelectionChange, { passive: true }); });
+         // open popup on text selection, disable in edit mode
+         document.addEventListener("selectionchange", this.onSelectionChange, { passive: true });
+         this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this.onSelectionChange); });
+         this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this.onSelectionChange, { passive: true }); });
 
-         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); });  // prevent losing focus (the selection) when clicking on popup edges
+         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });  // prevent losing focus (the selection) when clicking on popup edges
       }
 
       /**

@@ -187,13 +187,29 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
    // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
    class AnnotatePopup {
+      /**
+       * The page container
+       * @type {HTMLElement}
+       */
       wikiContent = null;
+      /**
+       * The popup element
+       * @type {HTMLElement}
+       */
       popup = null;
+      /**
+       * The popup button container
+       * @type {HTMLElement}
+       */
       annotateButton = null;
+      /**
+       * The last focussed element before focus was set programmatically (open method)
+       * @type {HTMLElement}
+       */
       previousFocusElem = null;
 
       /**
-       * @param {HTMLElement} wikiContent - The XWiki page container
+       * @param {HTMLElement} wikiContent - The page container
        */
       constructor(wikiContent) {
          this.wikiContent = wikiContent;

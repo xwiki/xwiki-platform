@@ -199,8 +199,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.previousFocusElem = null;
 
          this.onSelectionChange = debounce(this.onSelectionChange.bind(this), 700);
-         this.onEscapeKey = debounce(this.onEscapeKey.bind(this), 60);
-         this.onClickAway = debounce(this.onClickAway.bind(this), 60);
+         this.onKeyDown = debounce(this.onKeyDown.bind(this), 60);
+         this.onBlur = debounce(this.onBlur.bind(this), 60);
          this.onViewportChange = debounce(this.onViewportChange.bind(this), 150);
 
          this._createPopup();
@@ -239,16 +239,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
             document.dispatchEvent(new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT));
          });
 
-         // press button when pressing Enter
-         this.popupButton.addEventListener("keydown", (e) =&gt; {
-           if (e.key !== "Enter") return;
-
-           e.preventDefault();
-           this.popupButton.click();
-         });
-
-         // close popup when pressing Esc (listening on popup button because it is focused and popup is closed when clicking outside)
-         this.popupButton.addEventListener("keydown", this.onEscapeKey);
+         // press button on Enter, close popup on Esc (listening on popup button because it is focused and popup is closed when losing focus)
+         this.popupButton.addEventListener("keydown", this.onKeyDown);
 
          // Disable annotation popup in edit mode
          this.wikiContent.on("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this.onSelectionChange); });
@@ -272,18 +264,25 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Close popup when pressing escape key
+       * Keyboard navigation: Press button on Enter, close popup on Escape
        * @param {KeyboardEvent} event
        */
-      onEscapeKey(event) {
-         if (event.key !== "Escape") return;
+      onKeyDown(event) {
+         if (e.key === "Enter") {
+            event.preventDefault();
+            this.popupButton.click();
+         } else if (event.key === "Escape") {
+            this.close();
+            this.popupButton.removeEventListener("keydown", this.onKeyDown);
 
-         this.close();
-         this.popupButton.removeEventListener("keydown", this.onEscapeKey);
-
-         // restore focus
-         if (this.previousFocusElem &amp;&amp; document.contains(this.previousFocusElem) &amp;&amp; typeof this.previousFocusElem.focus === "function") {
-           this.previousFocusElem.focus();
+            // restore focus safely
+            if (this.previousFocusElem &amp;&amp;
+                document.contains(this.previousFocusElem) &amp;&amp;
+                typeof this.previousFocusElem.focus === "function" &amp;&amp;
+                !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
+                this.previousFocusElem.getClientRects().length) {
+              this.previousFocusElem.focus();
+            }
          }
       }
 

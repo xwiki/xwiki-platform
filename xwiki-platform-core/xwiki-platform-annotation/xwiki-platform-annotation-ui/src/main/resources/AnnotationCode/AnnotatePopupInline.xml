@@ -287,24 +287,17 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Closes popup when clicking on the page
-       * @param {Clickevent} event
+       * Close popup on blur
+       * @param {FocusEvent} event
        */
-      onClickAway(event) {
-         if(!this.currentRect) {
-            console.debug("Could not check if click was within text selection, currentRect is null");
+      onBlur(event) {
+         if(!event.relatedTarget) {
             return;
          }
 
-         // Check if the click was within the bounds of the original text selection
-         const isClickInsideSelection = this.currentRect.left &lt;= event.clientX &amp;&amp;
-                                        event.clientX &lt;= this.currentRect.right &amp;&amp;
-                                        this.currentRect.top &lt;= event.clientY &amp;&amp;
-                                        event.clientY &lt;= this.currentRect.bottom;
-
-         if (!this.popup.contains(event.target) &amp;&amp; !isClickInsideSelection) {
-             this.close();
-             this.wikiContent.removeEventListener("click", this.onClickAway);
+         if (!this.popup.contains(event.relatedTarget &amp;&amp; !isClickInsideSelection)) {
+            this.close();
+            this.popup.removeEventListener("blur", this.onBlur);
          }
       }
 
@@ -325,7 +318,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.popup.setAttribute("aria-hidden", "true");
 
          // remove event listeners
-         this.wikiContent.removeEventListener("click", this.onClickAway);
+         this.popup.removeEventListener("blur", this.onBlur);
          if(window.visualViewport) window.visualViewport.removeEventListener("resize", this.onViewportChange);
       }
 
@@ -343,11 +336,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          // use last rectangle of selection, important for correct positioning in multi-line selections
          const rects = selection.getRangeAt(0).getClientRects();
          if (!rects.length) return;
-         this.currentRect = rects[rects.length - 1];
+         const rect = rects[rects.length - 1];
 
          return {
-          top: (this.currentRect.top + window.scrollY - this.popup.offsetHeight - 4) + "px",
-          left: (this.currentRect.left + window.scrollX + this.currentRect.width - (this.popup.offsetWidth / 2)) + "px"
+          top: (rect.top + window.scrollY - this.popup.offsetHeight - 4) + "px",
+          left: (rect.left + window.scrollX + rect.width - (this.popup.offsetWidth / 2)) + "px"
          };
       }
 
@@ -373,8 +366,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.popupButton.focus();
 
          // add event listeners
-         this.wikiContent.addEventListener("click", this.onClickAway); // close on click away
-         if(window.visualViewport) window.visualViewport.addEventListener("resize", this.onViewportChange); // re-position on viewport change
+         this.popup.addEventListener("blur", this.onBlur, { passive: true });
+         if(window.visualViewport) window.visualViewport.addEventListener("resize", this.onViewportChange, { passive: true }); // re-position on viewport change
       }
    }
 

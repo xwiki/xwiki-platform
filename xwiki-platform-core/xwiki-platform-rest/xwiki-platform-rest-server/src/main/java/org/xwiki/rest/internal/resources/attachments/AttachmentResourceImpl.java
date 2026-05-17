@@ -66,7 +66,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
             }
 
             String ofilename = Util.encodeURI(xwikiAttachment.getFilename(), getXWikiContext())
-                .replaceAll("\\+", "%20");
+                .replace("+", "%20");
             // The inline attribute of Content-Disposition tells the browser that they should display
             // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
             // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save

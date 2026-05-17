@@ -323,7 +323,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       close() {
          this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
-         this.popup.setAttribute("aria-hidden", "false");
+         this.popup.setAttribute("aria-hidden", "true");
 
          // remove event listeners
          this.wikiContent.removeEventListener("click", this.onClickAway);

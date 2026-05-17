@@ -266,7 +266,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * @param {KeyboardEvent} event
        */
       onKeyDown(event) {
-         if (e.key === "Enter") {
+         if (event.key === "Enter") {
             event.preventDefault();
             this.popupButton.click();
          } else if (event.key === "Escape") {

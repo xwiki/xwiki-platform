@@ -92,7 +92,7 @@ watch(linkTargetTypeSelect, (label) => {
   </details>
 </template>
 
-<style>
+<style scoped>
 summary {
   cursor: pointer;
   user-select: none;

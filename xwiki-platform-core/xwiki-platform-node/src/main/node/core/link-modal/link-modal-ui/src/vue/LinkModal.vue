@@ -22,23 +22,21 @@ import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
 import EmailConfig from "./linkTypes/EmailConfig.vue";
 import PageConfig from "./linkTypes/PageConfig.vue";
 import UrlConfig from "./linkTypes/UrlConfig.vue";
-import { createLinkEditionContext } from "../linkSuggest";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { inject, provide } from "vue";
+import { provide } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData } from "../data/linkType";
-import type { CristalApp } from "@xwiki/platform-api";
+import type { LinkEditionContext } from "../linkSuggest";
 
 const props = defineProps<{
   current: LinkData;
+  linkEditionCtx: LinkEditionContext;
 }>();
 
 const { t } = useI18n({ messages: translations });
 
-const cristal = inject<CristalApp>("cristal")!;
-const container = cristal.getContainer();
-provide("linkEditionCtx", createLinkEditionContext(container));
+provide("linkEditionCtx", props.linkEditionCtx);
 
 const linkData = typedRef(props.current);
 

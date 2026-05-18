@@ -40,7 +40,6 @@
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
-    "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-icons": "workspace:*",

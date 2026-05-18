@@ -380,7 +380,6 @@ ul.innerMenu {
 }
 .innerMenu li {
   display: inline-block;
-  sborder: 1px solid red;
   vertical-align: top;
   margin-left: -1px;
 }

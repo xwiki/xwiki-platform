@@ -21,6 +21,8 @@ package org.xwiki.user.directory.test.ui;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -67,13 +69,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class UserDirectoryIT
 {
+    @BeforeEach
+    void setUp(TestUtils setup)
+    {
+        // Delete possible existing users
+        setup.loginAsSuperAdmin();
+        setup.deletePage("XWiki", "test");
+        setup.deletePage("XWiki", "UserDirectoryITUser");
+    }
+
     @Test
+    @Order(1)
     void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.loginAsSuperAdmin();
-
-        // Delete possible existing user
-        setup.deletePage("XWiki", "test");
 
         UserDirectoryPage page = UserDirectoryPage.gotoPage();
 
@@ -109,6 +118,7 @@ class UserDirectoryIT
     }
 
     @Test
+    @Order(2)
     void verifyLiveTableUserResults(TestUtils testUtils) throws Exception
     {
         testUtils.loginAsSuperAdmin();

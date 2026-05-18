@@ -81,31 +81,39 @@ public class BlockNoteRichTextArea extends BaseElement
 
     /**
      * Clears the content of the rich text area.
+     *
+     * @return this rich text area instance
      */
-    public void clear()
+    public BlockNoteRichTextArea clear()
     {
         this.container.clear();
+        return this;
     }
 
     /**
      * Clicks on the rich text area.
+     *
+     * @return this rich text area instance
      */
-    public void click()
+    public BlockNoteRichTextArea click()
     {
         // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
         getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
+        return this;
     }
 
     /**
      * Simulate typing in the rich text area.
      * 
      * @param keysToSend the sequence of keys to by typed
+     * @return this rich text area instance
      */
-    public void sendKeys(CharSequence... keysToSend)
+    public BlockNoteRichTextArea sendKeys(CharSequence... keysToSend)
     {
         if (keysToSend.length > 0) {
             getActiveElement().sendKeys(keysToSend);
         }
+        return this;
     }
 
     /**
@@ -136,14 +144,16 @@ public class BlockNoteRichTextArea extends BaseElement
      * Clicks on the image with the specified index in the rich text area.
      *
      * @param index the index of the image to click, starting from 0
+     * @return this rich text area instance
      * @since 18.3.0RC1
      */
-    public void clickImage(int index)
+    public BlockNoteRichTextArea clickImage(int index)
     {
         // The image might not be loaded yet, so wait until it's clickable before clicking on it.
         WebElement image = this.container.findElements(By.tagName("img")).get(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
+        return this;
     }
 
     /**
@@ -214,7 +224,8 @@ public class BlockNoteRichTextArea extends BaseElement
     /**
      * Asserts that the rich text area text is exactly the specified plain text.
      *
-     * @param expectedText the expected text, optionally including the position of the user cursors using the "%s" placeholder
+     * @param expectedText the expected text, optionally including the position of the user cursors using the "%s"
+     *            placeholder
      * @param cursors the list of users whose cursor position is displayed inside the edited content
      * @since 18.4.0RC1
      */

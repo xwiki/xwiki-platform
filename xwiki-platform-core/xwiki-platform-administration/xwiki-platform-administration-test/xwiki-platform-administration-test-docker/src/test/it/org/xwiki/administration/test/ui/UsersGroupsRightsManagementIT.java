@@ -480,6 +480,7 @@ class UsersGroupsRightsManagementIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
         editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", userName);
         assertTrue(editRightsPane.hasEntity(userName));
         editRightsPane.setRight(userName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
 
@@ -513,7 +514,9 @@ class UsersGroupsRightsManagementIT
         administrationPage = AdministrationPage.gotoPage();
         editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
         editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", userName);
         assertFalse(editRightsPane.hasEntity(userName));
+        editRightsPane.getRightsTable().filterColumn("name", newUserName);
         assertTrue(editRightsPane.hasEntity(newUserName));
         assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newUserName, EditRightsPane.Right.VIEW));
         // Reset the right to avoid interference with other tests.

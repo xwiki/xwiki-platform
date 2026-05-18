@@ -1,8 +1,10 @@
 #template('colorThemeInit.vm')
 
 div.suggestItems.searchSuggest {
-  border-top: 1px solid $theme.borderColor;
-  box-shadow:3px 3px 5px;
+  border-top: 1px solid var(--xwiki-border-color);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.175);
+  overflow: hidden;
 }
 
 .xlist .xitem .xitemcontainer {
@@ -18,15 +20,11 @@ ul.xlist li.showAllResults {
 }
 
 ul.xlist li.showAllResults.loading {
-  background-position:6px center;
+  background-position: calc(100% - 6px) center;
 }
 
 ul.xlist li.showAllResults button.xitemcontainer {
-  margin-left: 0;
-  padding-left: 10px;
+  padding: 4px 8px;
   font-size: 1em;
-  height: 100%;
-  padding-right: 10px;
-  padding-top: 3px;
-  text-align: right;
+  color: var(--link-color);
 }

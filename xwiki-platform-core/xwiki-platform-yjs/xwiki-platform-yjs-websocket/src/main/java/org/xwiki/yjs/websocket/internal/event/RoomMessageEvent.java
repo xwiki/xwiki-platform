@@ -19,12 +19,9 @@
  */
 package org.xwiki.yjs.websocket.internal.event;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.Event;
 import org.xwiki.yjs.websocket.internal.Client;
 
 /**
@@ -33,17 +30,12 @@ import org.xwiki.yjs.websocket.internal.Client;
  * @version $Id$
  * @since 18.4.0RC1
  */
-public class RoomMessageEvent implements Event, Serializable
+public class RoomMessageEvent extends AbstractRoomEvent
 {
     /**
      * The client that sent the message.
      */
     private final Client client;
-
-    /**
-     * The reference of the room where the message was sent.
-     */
-    private final DocumentReference roomReference;
 
     /**
      * A new message was sent by the given client in the specified room.
@@ -53,8 +45,8 @@ public class RoomMessageEvent implements Event, Serializable
      */
     public RoomMessageEvent(Client client, DocumentReference roomReference)
     {
+        super(roomReference);
         this.client = client;
-        this.roomReference = roomReference;
     }
 
     /**
@@ -73,20 +65,12 @@ public class RoomMessageEvent implements Event, Serializable
         return this.client;
     }
 
-    /**
-     * @return the reference of the room where the message was sent
-     */
-    public DocumentReference getRoomReference()
-    {
-        return this.roomReference;
-    }
-
     @Override
     public boolean matches(Object otherEvent)
     {
         if (otherEvent instanceof RoomMessageEvent event) {
             return (this.client == null || this.client.equals(event.client))
-                && (this.roomReference == null || this.roomReference.equals(event.roomReference));
+                && (this.getRoomReference() == null || this.getRoomReference().equals(event.getRoomReference()));
         }
         return false;
     }
@@ -101,13 +85,13 @@ public class RoomMessageEvent implements Event, Serializable
             return false;
         }
         RoomMessageEvent other = (RoomMessageEvent) obj;
-        return new EqualsBuilder().append(this.client, other.client).append(this.roomReference, other.roomReference)
-            .isEquals();
+        return new EqualsBuilder().append(this.client, other.client)
+            .append(this.getRoomReference(), other.getRoomReference()).isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(17, 37).append(this.client).append(this.roomReference).toHashCode();
+        return new HashCodeBuilder(17, 37).append(this.client).append(this.getRoomReference()).toHashCode();
     }
 }

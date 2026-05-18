@@ -219,7 +219,13 @@ watch(suggestions, (suggestions) => {
       @blur="closeSuggestions()"
     />
 
-    <div class="suggestions-container" v-if="suggestions.status !== 'closed'">
+    <div
+      class="suggestions-container"
+      v-if="
+        (suggestions.status !== 'uninitialized' || loading) &&
+        suggestions.status !== 'closed'
+      "
+    >
       <h3
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"
@@ -236,12 +242,24 @@ watch(suggestions, (suggestions) => {
         Loading...
       </h3>
 
+      <h3
+        class="status-message"
+        v-if="
+          suggestions.status === 'resolved' && suggestions.results.length === 0
+        "
+      >
+        <!-- TODO: add translation -->
+        No result found
+      </h3>
+
       <!-- NOTE: `@mousedown.prevent` prevents the `blur` event from the query `input` field above to trigger *before*
                   the suggestions' `click` handler -->
       <ul
         class="suggestions"
         @mousedown.prevent
-        v-if="suggestions.status === 'resolved'"
+        v-if="
+          suggestions.status === 'resolved' && suggestions.results.length > 0
+        "
       >
         <li
           v-for="suggestion in suggestions.results"
@@ -261,11 +279,6 @@ watch(suggestions, (suggestions) => {
             <em>Missing suggestion rendering slot</em>
           </slot>
         </li>
-
-        <li class="suggestion" v-if="suggestions.results.length === 0">
-          <!-- TODO: add translation -->
-          <em>No result found</em>
-        </li>
       </ul>
     </div>
   </div>
@@ -273,7 +286,7 @@ watch(suggestions, (suggestions) => {
 
 <style>
 .status-message {
-  color: darkgray;
+  color: var(--cr-color-neutral-100);
 }
 
 .suggestions-container {

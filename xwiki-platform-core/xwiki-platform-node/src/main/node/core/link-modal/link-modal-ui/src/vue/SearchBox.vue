@@ -286,7 +286,10 @@ watch(suggestions, (suggestions) => {
 
 <style>
 .status-message {
-  color: var(--cr-color-neutral-100);
+  font-style: italic;
+  text-align: center;
+  padding: 0;
+  margin: 0;
 }
 
 .suggestions-container {

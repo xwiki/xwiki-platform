@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -41,6 +43,7 @@ import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,10 +69,12 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 /**
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class BaseAttachmentsResource extends XWikiResource
 {
     /**
@@ -136,6 +141,9 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("document")
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -441,5 +449,44 @@ public class BaseAttachmentsResource extends XWikiResource
         xwiki.saveDocument(document, xcontext);
 
         return attachment;
+    }
+
+    /**
+     * Compute a proper Response for the REST API based on the given attachment to return.
+     * @param xwikiAttachment the attachment to return
+     * @return a {@link Response} with proper metadata to return the attachment
+     * @throws XWikiRestException in case of problem when loading the content of the attachment
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public Response answerWithAttachment(com.xpn.xwiki.api.Attachment xwikiAttachment) throws XWikiRestException
+    {
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        String ofilename = Util.encodeURI(xwikiAttachment.getFilename(), getXWikiContext())
+            .replaceAll("\\+", "%20");
+        // The inline attribute of Content-Disposition tells the browser that they should display
+        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
+        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
+        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
+        // Save dialog box (exe, zip, xar, etc).
+        String dispType = "inline";
+        // If the mimetype is not authorized to be displayed inline,
+        // let's force its content disposition to download.
+        if (attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment)) {
+            dispType = "attachment";
+        }
+        try {
+            return Response
+                .ok()
+                .type(xwikiAttachment.getMimeType())
+                .entity(xwikiAttachment.getContent())
+                .header("Content-Disposition", dispType + "; filename*=utf-8''" + ofilename)
+                .build();
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
+        }
     }
 }

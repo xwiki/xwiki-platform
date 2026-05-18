@@ -155,10 +155,10 @@ watch(query, async (query) => {
 <style scoped>
 .segment {
   color: var(--cr-color-neutral-500);
-  padding-right: 0.5rem;
+  padding-right: var(--cr-spacing-x-small);
 
   &:not(:last-child)::after {
-    padding-left: 0.5rem;
+    padding-left: var(--cr-spacing-x-small);
     content: ">";
   }
 }

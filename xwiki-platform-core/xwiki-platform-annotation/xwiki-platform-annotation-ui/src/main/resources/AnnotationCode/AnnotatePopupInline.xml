@@ -142,7 +142,7 @@ const Constants = Object.freeze({
    * The keyboard shortcut that needs to be triggered to create an annotation
    * @type {KeyboardEventInit}
    */
-  ANNOTATE_SHORTCUT: { ctrlKey: true, keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
+  ANNOTATE_SHORTCUT: { ctrlKey: true, code: "KeyM", key: "m", keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
   /**
    * The translation key for the button title (for accessibility)
    * @type {String}
@@ -185,6 +185,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       };
    }
 
+   const annotateTriggerEvent = new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT);
+
    // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
    class AnnotatePopup {
       /**
@@ -215,8 +217,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.wikiContent = wikiContent;
 
          this.onSelectionChange = debounce(this.onSelectionChange.bind(this), 700);
-         this.onKeyDown = debounce(this.onKeyDown.bind(this), 60);
-         this.onBlur = debounce(this.onBlur.bind(this), 60);
+         this.onEscapeKey = debounce(this.onEscapeKey.bind(this), 60);
          this.onViewportChange = debounce(this.onViewportChange.bind(this), 150);
 
          this._createPopup();
@@ -249,18 +250,19 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          // add click listener to button
          this.popupButton.addEventListener("click", () =&gt; {
             this.close();
-            document.dispatchEvent(new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT));
+            document.dispatchEvent(annotateTriggerEvent);
          }, { passive: true });
 
-         // press button on Enter, close popup on Esc (listening on popup button because it is focused and popup is closed when losing focus)
-         this.popupButton.addEventListener("keydown", this.onKeyDown);
+         // listener to close popup on Esc
+         this.popupButton.addEventListener("keydown", this.onEscapeKey);
 
          // open popup on text selection, disable in edit mode
          document.addEventListener("selectionchange", this.onSelectionChange, { passive: true });
          this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this.onSelectionChange); });
          this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this.onSelectionChange, { passive: true }); });
 
-         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });  // prevent losing focus (the selection) when clicking on popup edges
+         // prevent losing focus (the selection) when clicking on popup edges
+         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });
       }
 
       /**
@@ -278,40 +280,12 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Keyboard navigation: Press button on Enter, close popup on Escape
+       * Close popup on Escape key press
        * @param {KeyboardEvent} event
        */
-      onKeyDown(event) {
-         if (event.key === "Enter") {
-            event.preventDefault();
-            this.popupButton.click();
-         } else if (event.key === "Escape") {
+      onEscapeKey(event) {
+         if(event.key === "Escape") {
             this.close();
-            this.popupButton.removeEventListener("keydown", this.onKeyDown);
-
-            // restore focus safely
-            if (this.previousFocusElem &amp;&amp;
-                document.contains(this.previousFocusElem) &amp;&amp;
-                typeof this.previousFocusElem.focus === "function" &amp;&amp;
-                !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
-                this.previousFocusElem.getClientRects().length) {
-              this.previousFocusElem.focus();
-            }
-         }
-      }
-
-      /**
-       * Close popup on blur
-       * @param {FocusEvent} event
-       */
-      onBlur(event) {
-         if(!event.relatedTarget) {
-            return;
-         }
-
-         if (!this.popup.contains(event.relatedTarget &amp;&amp; !isClickInsideSelection)) {
-            this.close();
-            this.popup.removeEventListener("blur", this.onBlur);
          }
       }
 
@@ -328,11 +302,21 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * Close the popup
        */
       close() {
+          // remove focus safely
+          if (this.previousFocusElem &amp;&amp;
+             document.contains(this.previousFocusElem) &amp;&amp;
+             typeof this.previousFocusElem.focus === "function" &amp;&amp;
+             !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
+             this.previousFocusElem.getClientRects().length) {
+           this.previousFocusElem.focus();
+         } else {
+            // TODO: add better alternative way if this fails
+            this.popupButton.blur();
+         }
          this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
          this.popup.setAttribute("aria-hidden", "true");
 
          // remove event listeners
-         this.popup.removeEventListener("blur", this.onBlur);
          if(window.visualViewport) window.visualViewport.removeEventListener("resize", this.onViewportChange);
       }
 
@@ -380,7 +364,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.popupButton.focus();
 
          // add event listeners
-         this.popup.addEventListener("blur", this.onBlur, { passive: true });
+         this.popupButton.addEventListener("blur", () =&gt; { this.close(); }, { passive: true, once: true });
          if(window.visualViewport) window.visualViewport.addEventListener("resize", this.onViewportChange, { passive: true }); // re-position on viewport change
       }
    }

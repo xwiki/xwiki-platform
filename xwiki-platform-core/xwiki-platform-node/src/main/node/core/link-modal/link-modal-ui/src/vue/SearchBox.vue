@@ -97,6 +97,7 @@ const suggestions = shallowRef<
       status: "resolved";
       results: SearchLinkSuggestion<T, U>[];
     }
+  | { status: "loadingNextResults"; prevResults: SearchLinkSuggestion<T, U>[] }
   | {
       status: "backendSearchUnsupported";
     }
@@ -215,7 +216,7 @@ watch(suggestions, (suggestions) => {
       @blur="closeSuggestions()"
     />
 
-    <div class="suggestions">
+    <div class="suggestions-container">
       <h3
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"
@@ -234,7 +235,9 @@ watch(suggestions, (suggestions) => {
       <ul
         class="suggestions"
         @mousedown.prevent
-        v-if="suggestions.status === 'resolved'"
+        v-if="
+          suggestions.status === 'resolved' && suggestions.results.length > 0
+        "
       >
         <li
           v-for="suggestion in suggestions.results"
@@ -264,18 +267,27 @@ watch(suggestions, (suggestions) => {
   color: darkgray;
 }
 
+.suggestions-container {
+  position: absolute;
+  z-index: 100;
+  border: var(--cr-input-border-width) solid var(--cr-input-border-color);
+  border-radius: var(--cr-border-radius-large);
+  background: var(--cr-color-neutral-50);
+  padding: var(--cr-spacing-xs);
+}
+
 .suggestions {
-  padding: 0rem 0.5rem;
   list-style-type: none;
+  padding: 0;
 }
 
 .suggestion {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  padding: var(--cr-spacing-medium);
+  border-radius: var(--cr-border-radius-medium);
   cursor: pointer;
 
   &.focused {
-    background-color: lightgray;
+    background-color: var(--cr-color-gray-50);
   }
 }
 </style>

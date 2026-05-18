@@ -83,18 +83,21 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 
 <style scoped>
 .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cr-spacing-large);
   position: absolute;
-  border: 1px solid black;
-  border-radius: 0.5rem;
-  background: white /*rgba(255, 255, 255, 0.8)*/;
-  padding: 5px;
+  border: var(--cr-input-border-width) solid var(--cr-input-border-color);
+  border-radius: var(--cr-border-radius-large);
+  background: var(--cr-color-neutral-50);
+  padding: var(--cr-spacing-medium);
   z-index: 99;
 }
 
 .actions {
-  padding: 1rem;
+  padding: var(--cr-spacing-large);
   display: flex;
   justify-content: end;
-  gap: 0.5rem;
+  gap: var(--cr-spacing-medium);
 }
 </style>

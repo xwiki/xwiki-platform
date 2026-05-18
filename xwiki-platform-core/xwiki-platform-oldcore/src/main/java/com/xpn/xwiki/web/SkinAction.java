@@ -20,10 +20,12 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -32,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -85,6 +88,9 @@ public class SkinAction extends XWikiAction
     private static final String ENCODING = "UTF-8";
 
     private static final String DOCDOESNOTEXIST = "docdoesnotexist";
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -456,7 +462,15 @@ public class SkinAction extends XWikiAction
             } else {
                 // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
-                IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
+
+                String contentDisposition = (attachmentSecurityManager.shouldBeDownloaded(attachment))
+                    ? "attachment" : "inline";
+                String ofilename = Util.encodeURI(filename, context).replaceAll("\\+", "%20");
+                response.setHeader("Content-Disposition",
+                    String.format("%s; filename*=utf-8''%s", contentDisposition, ofilename));
+                try (InputStream input = attachment.getContentInputStream(context)) {
+                    IOUtils.copy(input, response.getOutputStream());
+                }
             }
 
             return true;
@@ -529,6 +543,7 @@ public class SkinAction extends XWikiAction
      * @since 11.10
      * @since 11.3.6
      * @since 10.11.10
+     * @deprecated this API manipulates {@link XWikiResponse} which is deprecated.
      */
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)
     {

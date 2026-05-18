@@ -83,7 +83,7 @@ catalog:
   "@types/requirejs": 2.1.37
   "@types/sinon": 21.0.1
   "@vitejs/plugin-react": 5.1.0
-  "@vitejs/plugin-vue": 6.0.4
+  "@vitejs/plugin-vue": 6.0.7
   "@vitest/eslint-plugin": 1.6.16
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.7.0

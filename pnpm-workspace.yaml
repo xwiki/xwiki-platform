@@ -105,7 +105,7 @@ catalog:
   globals: 17.6.0
   i18next: 25.10.10
   inversify: 7.11.0
-  jiti: 2.6.1
+  jiti: 2.7.0
   jquery: 4.0.0
   jsdom: 29.1.1
   lib0: 0.2.117

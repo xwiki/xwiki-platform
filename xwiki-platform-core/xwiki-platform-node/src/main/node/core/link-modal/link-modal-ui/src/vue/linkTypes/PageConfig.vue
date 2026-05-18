@@ -124,7 +124,13 @@ watch(query, async (query) => {
           <c-icon name="file-earmark" :size="Size.Small" /> {{ title }}
           <br />
 
-          <span v-for="segment in segments" :key="segment" class="segment">
+          <span
+            v-for="segment in title !== 'WebHome'
+              ? segments.concat([title])
+              : segments"
+            :key="segment"
+            class="segment"
+          >
             {{ segment }}
           </span>
         </template>

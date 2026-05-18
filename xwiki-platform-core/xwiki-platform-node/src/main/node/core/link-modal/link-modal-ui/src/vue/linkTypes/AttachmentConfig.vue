@@ -128,7 +128,9 @@ watch(query, async (query) => {
           <br />
 
           <span
-            v-for="segment in segments.concat([title])"
+            v-for="segment in title !== 'WebHome'
+              ? segments.concat([title])
+              : segments"
             :key="segment"
             class="segment"
           >

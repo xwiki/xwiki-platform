@@ -1681,9 +1681,6 @@ importers:
       '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../ds/api
-      '@xwiki/platform-fn-utils':
-        specifier: workspace:*
-        version: link:../../fn-utils
       '@xwiki/platform-icons':
         specifier: workspace:*
         version: link:../../icons
@@ -1715,6 +1712,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig

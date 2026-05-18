@@ -92,7 +92,7 @@ const query = ref(initialValue ?? "");
 const justDynamicallyUpdatedQuery = ref(false);
 
 const suggestions = shallowRef<
-  | { status: "loading" }
+  | { status: "uninitialized" }
   | {
       status: "resolved";
       results: SearchLinkSuggestion<T, U>[];
@@ -100,13 +100,17 @@ const suggestions = shallowRef<
   | {
       status: "backendSearchUnsupported";
     }
->({ status: "resolved", results: [] });
+  | { status: "closed" }
+>({ status: "uninitialized" });
+
+const loading = ref(false);
 
 const performSearch = debounce(async (search: string) => {
-  suggestions.value = { status: "loading" };
+  loading.value = true;
 
   const results = await getSuggestions(search);
 
+  loading.value = false;
   suggestions.value =
     results === false
       ? { status: "backendSearchUnsupported" }
@@ -123,7 +127,7 @@ function selectSuggestion(suggestion: SearchLinkSuggestion<T, U>): void {
 
 function closeSuggestions(): void {
   if (suggestions.value.status === "resolved") {
-    suggestions.value = { status: "resolved", results: [] };
+    suggestions.value = { status: "closed" };
   }
 }
 
@@ -215,7 +219,7 @@ watch(suggestions, (suggestions) => {
       @blur="closeSuggestions()"
     />
 
-    <div class="suggestions-container">
+    <div class="suggestions-container" v-if="suggestions.status !== 'closed'">
       <h3
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"
@@ -224,7 +228,10 @@ watch(suggestions, (suggestions) => {
         Backend search is unsupported.
       </h3>
 
-      <h3 class="status-message" v-if="suggestions.status === 'loading'">
+      <h3
+        class="status-message"
+        v-if="suggestions.status === 'uninitialized' && loading"
+      >
         <!-- TODO: add translation -->
         Loading...
       </h3>

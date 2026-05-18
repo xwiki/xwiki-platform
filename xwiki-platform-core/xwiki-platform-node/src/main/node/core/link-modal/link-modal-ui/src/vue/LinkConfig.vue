@@ -30,6 +30,7 @@ defineSlots<{
   options(): void;
 }>();
 
+// TODO: use modern localization system (server-side)
 const { t } = useI18n({ messages: translations });
 
 const targetTypes: { label: string; default: LinkTarget }[] = [

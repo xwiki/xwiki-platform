@@ -220,10 +220,12 @@ watch(suggestions, (suggestions) => {
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"
       >
+        <!-- TODO: add translation -->
         Backend search is unsupported.
       </h3>
 
       <h3 class="status-message" v-if="suggestions.status === 'loading'">
+        <!-- TODO: add translation -->
         Loading...
       </h3>
 
@@ -248,6 +250,7 @@ watch(suggestions, (suggestions) => {
           "
         >
           <slot name="renderSuggestion" v-bind="suggestion">
+            <!-- TODO: add translation -->
             <em>Missing suggestion rendering slot</em>
           </slot>
         </li>

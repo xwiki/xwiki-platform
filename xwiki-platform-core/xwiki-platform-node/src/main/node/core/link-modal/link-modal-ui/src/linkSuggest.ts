@@ -90,6 +90,15 @@ type LinkSuggestion = {
  */
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
 
+/**
+ * Create a link edition context from a Cristal container
+ *
+ * @param container - The container to provide from
+ * @returns The link edition context
+ *
+ * @since 18.4.0RC1
+ * @beta
+ */
 function createLinkEditionContext(container: Container): LinkEditionContext {
   const linkSuggestService = container
     .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")

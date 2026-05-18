@@ -286,6 +286,7 @@ watch(suggestions, (suggestions) => {
 
 <style>
 .status-message {
+  font-weight: normal;
   font-style: italic;
   text-align: center;
   padding: 0;

@@ -36,11 +36,7 @@ import {
   useTemplateRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
-import type {
-  Collaboration,
-  CollaborationInitializer,
-} from "@xwiki/platform-collaboration-api";
+import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
   ContextForMacros,

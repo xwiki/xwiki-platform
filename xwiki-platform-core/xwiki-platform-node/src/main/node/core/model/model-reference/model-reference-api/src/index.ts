@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AbstractModelReferenceHandler } from "./abstractModelReferenceHandler";
 import { ComponentInit } from "./componentInit";
 import type { ModelReferenceHandler } from "./modelReferenceHandler";
 import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
@@ -27,6 +28,7 @@ import type { ModelReferenceParserProvider } from "./modelReferenceParserProvide
 import type { ModelReferenceSerializer } from "./modelReferenceSerializer";
 import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
 export {
+  AbstractModelReferenceHandler,
   ComponentInit,
   type ModelReferenceHandler,
   type ModelReferenceHandlerProvider,

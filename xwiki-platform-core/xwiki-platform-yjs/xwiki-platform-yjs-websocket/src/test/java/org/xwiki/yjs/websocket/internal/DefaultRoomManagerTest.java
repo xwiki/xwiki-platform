@@ -19,7 +19,6 @@
  */
 package org.xwiki.yjs.websocket.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -27,13 +26,13 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -43,18 +42,22 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.websocket.AbstractPartialBinaryMessageHandler;
+import org.xwiki.websocket.WebSocketContext;
 import org.xwiki.yjs.websocket.internal.event.RoomMessageEvent;
-import org.xwiki.yjs.websocket.internal.event.RoomMessageListener;
-
-import com.google.protobuf.CodedOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.yjs.websocket.internal.MessageTestUtils.createAwarenessMessage;
+import static org.xwiki.yjs.websocket.internal.MessageTestUtils.createIdMessage;
+import static org.xwiki.yjs.websocket.internal.MessageTestUtils.createSyncStep1Message;
+import static org.xwiki.yjs.websocket.internal.MessageTestUtils.createSyncUpdateMessage;
 
 /**
  * Unit tests for {@link DefaultRoomManager}.
@@ -66,9 +69,6 @@ class DefaultRoomManagerTest
 {
     @InjectMockComponents
     private DefaultRoomManager roomManager;
-
-    @InjectMockComponents
-    private RoomMessageListener roomMessageListener;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -86,7 +86,7 @@ class DefaultRoomManagerTest
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
 
     @MockComponent
-    private RemoteObservationManagerContext remoteObservationManagerContext;
+    private WebSocketContext context;
 
     @Captor
     private ArgumentCaptor<AbstractPartialBinaryMessageHandler> messageHandlerCaptor;
@@ -95,6 +95,16 @@ class DefaultRoomManagerTest
     private ArgumentCaptor<CloseReason> closeReasonCaptor;
 
     private DocumentReference documentReference = new DocumentReference("xwiki", "Some", "Page");
+
+    @BeforeEach
+    void beforeEach()
+    {
+        doAnswer(invocation -> {
+            Runnable runnable = invocation.getArgument(1);
+            runnable.run();
+            return null;
+        }).when(this.context).run(any(Session.class), any(Runnable.class));
+    }
 
     @Test
     void joinReceiveSendAndLeave() throws Exception
@@ -165,9 +175,7 @@ class DefaultRoomManagerTest
 
         UserReference carolReference = mock(UserReference.class, "carol-reference");
         Client carol = new Client(carolReference, 42L);
-        when(this.remoteObservationManagerContext.isRemoteState()).thenReturn(true);
-        this.roomMessageListener.onEvent(new RoomMessageEvent(carol, documentReference), createIdMessage(carol.getId()),
-            null);
+        this.roomManager.get(documentReference).onMessage(carol, createIdMessage(carol.getId()));
 
         //
         // Alice asks for synchronization.
@@ -217,7 +225,7 @@ class DefaultRoomManagerTest
         //
 
         byte[] thirdUpdate = createSyncUpdateMessage("three");
-        this.roomMessageListener.onEvent(new RoomMessageEvent(carol, documentReference), thirdUpdate, null);
+        this.roomManager.get(documentReference).onMessage(carol, thirdUpdate);
         // The update is broadcasted to Alice and Bob.
         verify(aliceBasicRemote).sendBinary(ByteBuffer.wrap(thirdUpdate));
         verify(bobBasicRemote).sendBinary(ByteBuffer.wrap(thirdUpdate));
@@ -285,7 +293,7 @@ class DefaultRoomManagerTest
         //
 
         message = Message.leave(carol.getId());
-        this.roomMessageListener.onEvent(new RoomMessageEvent(carol, documentReference), message, null);
+        this.roomManager.get(documentReference).onMessage(carol, message);
         verify(bobBasicRemote).sendBinary(ByteBuffer.wrap(message));
 
         //
@@ -307,46 +315,5 @@ class DefaultRoomManagerTest
         this.roomManager.join(bobSession, documentReference);
         this.roomManager.leave(bobSession);
         verify(this.pingPongManager, times(3)).stopPinging(bobSession);
-    }
-
-    private byte[] createIdMessage(long id) throws Exception
-    {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(output);
-        codedOutputStream.writeUInt64NoTag(2);
-        codedOutputStream.writeUInt64NoTag(id);
-        codedOutputStream.flush();
-        return output.toByteArray();
-    }
-
-    private byte[] createSyncStep1Message() throws Exception
-    {
-        return createSyncMessage(0, "");
-    }
-
-    private byte[] createSyncUpdateMessage(String content) throws Exception
-    {
-        return createSyncMessage(2, content);
-    }
-
-    private byte[] createSyncMessage(long syncType, String content) throws Exception
-    {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(output);
-        codedOutputStream.writeUInt64NoTag(0);
-        codedOutputStream.writeUInt64NoTag(syncType);
-        codedOutputStream.writeByteArrayNoTag(content.getBytes());
-        codedOutputStream.flush();
-        return output.toByteArray();
-    }
-
-    private byte[] createAwarenessMessage(String content) throws Exception
-    {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(output);
-        codedOutputStream.writeUInt64NoTag(1);
-        codedOutputStream.writeByteArrayNoTag(content.getBytes());
-        codedOutputStream.flush();
-        return output.toByteArray();
     }
 }

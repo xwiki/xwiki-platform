@@ -15,9 +15,9 @@ body {
 
 div.suggestItems {
   position: absolute;
-  border: 1px solid $theme.borderColor;
+  border: 1px solid var(--xwiki-border-color);
   border-top: none;
-  background: $theme.pageContentBackgroundColor;
+  background: var(--xwiki-page-content-bg);
   z-index: 100013;
   text-align:left;
 }
@@ -55,10 +55,15 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
   suggest list is not specified, the list adapts its width to fit the suggest items. */
   float: none;
   width: auto;
+  padding: 4px 8px 4px 16px;
+}
+
+div.suggestItems ul.xlist.suggestList > li.xitem .value {
+  font-size: 1rem; /*Using REM to have consistent typography*/
 }
 
 div.suggestItems * {
-  line-height:1.6em;
+  line-height:1.5rem; /*Using REM to have consistent spacing*/
 }
 
 div.suggestItems em {
@@ -73,8 +78,6 @@ div.suggestItems span.info span.hint {
 
 div.suggestItems div.info {
   color: $theme.textSecondaryColor;
-  font-size: 0.8em;
-  padding-left:5px;
 }
 
 div.suggestItems div.info span.legend {
@@ -115,22 +118,15 @@ div.suggestItemInfo {
 }
 
 div.resultContainer div.sourceName {
-  background-color:$theme.menuContentBackgroundColor;
-  font-variant: small-caps;
-  font-weight: 700;
-  color:$theme.menuContentLinkColor;
-  padding-top:3px;
-  font-size:0.875em;
-  background-position:3px 3px;
-  background-repeat:no-repeat;
+  background-position: 3px 8px;
+  background-repeat: no-repeat;
+  font-weight: var(--font-weight-semibold);
+  border-top: 1px solid var(--xwiki-border-color);
+  padding: 5px 0;
 }
 
-.horizontalLayout div.resultContainer div.sourceName {
-  float:left;
-  width:150px;
-  padding-right:23px;
-  text-align:right;
-  background-position:right 3px center;
+ul.xlist li.showAllResults {
+  border-top: 1px solid var(--xwiki-border-color);
 }
 
 .horizontalLayout div.resultContainer a.xitemcontainer {
@@ -139,7 +135,6 @@ div.resultContainer div.sourceName {
 
 .horizontalLayout div.resultContainer div.results {
   clear:both;
-  background-color:$theme.menuContentBackgroundColor;
 }
 
 .horizontalLayout div.resultContainer ul.suggestList {

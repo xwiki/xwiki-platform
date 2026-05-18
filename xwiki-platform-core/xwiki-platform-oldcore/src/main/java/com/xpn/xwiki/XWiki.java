@@ -347,7 +347,11 @@ public class XWiki implements EventListener
 
     private XWikiStatsService statsService;
 
-    private XWikiURLFactoryService urlFactoryService;
+    /**
+     * volatile: {@link #getURLFactoryService()} uses double-checked locking; without volatile the JVM may reorder
+     * the write with the constructor, letting another thread observe a non-null but partially-initialized instance.
+     */
+    private volatile XWikiURLFactoryService urlFactoryService;
 
     private XWikiCriteriaService criteriaService;
 

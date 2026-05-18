@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.websocket.WebSocketContext;
 
 /**
  * Default implementation of {@link RoomManager}.
@@ -57,6 +58,12 @@ public class DefaultRoomManager implements RoomManager
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
+    @Inject
+    private WebSocketContext context;
+
+    @Inject
+    private RoomScriptAuthorTracker roomScriptAuthorTracker;
 
     /**
      * The lock used to make sure join and leave operations are atomic.
@@ -109,8 +116,11 @@ public class DefaultRoomManager implements RoomManager
     {
         synchronized (this.lock) {
             if (createIfNotExists) {
-                return this.rooms.computeIfAbsent(roomReference, newRoomReference -> new DefaultRoom(this,
-                    newRoomReference, this.configuration, this.observationManager));
+                return this.rooms.computeIfAbsent(roomReference, newRoomReference -> {
+                    this.roomScriptAuthorTracker.setScriptAuthor(newRoomReference, null);
+                    return new DefaultRoom(this, newRoomReference, this.configuration, this.observationManager,
+                        this.context);
+                });
             } else {
                 return this.rooms.get(roomReference);
             }

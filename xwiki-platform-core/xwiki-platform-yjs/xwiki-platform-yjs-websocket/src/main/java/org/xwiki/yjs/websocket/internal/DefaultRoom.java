@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.websocket.AbstractPartialBinaryMessageHandler;
+import org.xwiki.websocket.WebSocketContext;
 import org.xwiki.yjs.websocket.internal.event.RoomMessageEvent;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -53,6 +54,8 @@ public class DefaultRoom extends AbstractRoom
 
     private final ObservationManager observationManager;
 
+    private final WebSocketContext context;
+
     /**
      * Creates a new room, managed by the given room manager and associated to the specified wiki page.
      *
@@ -60,13 +63,15 @@ public class DefaultRoom extends AbstractRoom
      * @param documentReference the wiki page associated to this room
      * @param configuration the Yjs WebSocket endpoint configuration
      * @param observationManager the observation manager to use to trigger room events
+     * @param context the WebSocket context to use when handling room messages
      */
     public DefaultRoom(RoomManager roomManager, DocumentReference documentReference,
-        YjsEndpointConfiguration configuration, ObservationManager observationManager)
+        YjsEndpointConfiguration configuration, ObservationManager observationManager, WebSocketContext context)
     {
         super(documentReference, configuration);
         this.roomManager = roomManager;
         this.observationManager = observationManager;
+        this.context = context;
     }
 
     @Override
@@ -88,7 +93,7 @@ public class DefaultRoom extends AbstractRoom
                 @Override
                 public void onMessage(byte[] message)
                 {
-                    DefaultRoom.this.onMessage(client, message);
+                    DefaultRoom.this.context.run(session, () -> DefaultRoom.this.onMessage(client, message));
                 }
             });
         }

@@ -30,3 +30,8 @@ export type {
 } from "./data/linkType";
 
 export { parseLinkTarget } from "./convert";
+
+export {
+  type LinkEditionContext,
+  createLinkEditionContext,
+} from "./linkSuggest";

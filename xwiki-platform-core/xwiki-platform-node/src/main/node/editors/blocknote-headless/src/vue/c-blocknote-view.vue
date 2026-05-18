@@ -239,6 +239,7 @@ onUnmounted(() => {
           linkEditionCtx.remoteURLParser,
         ),
       }"
+      :link-edition-ctx="linkEditionCtx"
       @submit="submitEditedLink"
       @cancel="editingLink = null"
     />

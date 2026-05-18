@@ -1669,9 +1669,6 @@ importers:
       '@blocknote/core':
         specifier: 'catalog:'
         version: 0.47.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(@types/hast@3.0.4)
-      '@xwiki/platform-api':
-        specifier: workspace:*
-        version: link:../../../api
       '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../attachments/attachments-api

@@ -415,6 +415,8 @@ XWiki.Selection = Class.create({
       subLeft = left.substring(left.length - leftExpansion, left.length);
     }
     this.selectionContext = subLeft + this.selectionText + subRight;
+    this.selectionContext.replaceAll(
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))", '');
     this.selectionOffset = Math.max(subLeft.length, 0);
   },
 

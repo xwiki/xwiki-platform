@@ -59,7 +59,7 @@ public class BooleanClass extends PropertyClass
     
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Boolean", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public BooleanClass()

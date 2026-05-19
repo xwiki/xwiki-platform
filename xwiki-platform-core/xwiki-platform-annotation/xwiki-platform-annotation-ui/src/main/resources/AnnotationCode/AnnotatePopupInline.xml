@@ -174,6 +174,7 @@ define("xwiki-annotate-popup/translation-keys", {
 define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys"], function(icons, l10n) {
    /**
     * Debounces a function
+    * @param {Function} func
     * @param {number} delay - Delay time
     * @returns {Function} - Debounced version of func (result not returned)
     */
@@ -195,17 +196,17 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       wikiContent = null;
       /**
-       * The popup element
+       * The popup container element
        * @type {HTMLElement}
        */
       popup = null;
       /**
-       * The popup button container
+       * The popup button
        * @type {HTMLElement}
        */
       annotateButton = null;
       /**
-       * The last focussed element before focus was set programmatically (open method)
+       * The last focussed element before focus was set programmatically (see this.open())
        * @type {HTMLElement}
        */
       previousFocusElem = null;
@@ -266,7 +267,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Checks the current selection and opens the popup
+       * Event handler for document selection. Checks the current selection and opens the popup
        */
       onSelectionChange() {
          this.close(); // close opened popups on new select
@@ -280,7 +281,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Close popup on Escape key press
+       * Event handler for popup button keydown. Closes popup on Escape key press
        * @param {KeyboardEvent} event
        */
       onEscapeKey(event) {
@@ -290,7 +291,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Recalculate positioning of popup when resizing / zooming
+       * Event handler for window resize/zoom. Recalculates the positioning of the popup
        */
       onViewportChange(event) {
          const { top, left } = this._getPositioning(window.getSelection());
@@ -310,7 +311,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
              this.previousFocusElem.getClientRects().length) {
            this.previousFocusElem.focus();
          } else {
-            // TODO: add better alternative way if this fails
+            // TODO: add better alternative?
             this.popupButton.blur();
          }
          this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
@@ -343,7 +344,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /**
-       * Displays the popup near the selected text range
+       * Open the popup near the selected text range
        * @param {Selection} selection - A selection
        */
       open(selection) {

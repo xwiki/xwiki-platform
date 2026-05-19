@@ -28,24 +28,6 @@ import { XWiki } from "../services/xwiki.js";
  */
 export class GuidedTourRestClient {
   /**
-   * @param xm - A promise that resolves to the XWiki meta object containing the CSRF form token.
-   */
-  // @ts-expect-error xm is any
-  constructor(xm: Promise) {
-    // @ts-expect-error d is any
-    this.xm = xm.then((d) => d).catch(console.error);
-  }
-  // @ts-expect-error xm is any
-  private xm: Promise;
-
-  // /**
-  //  * Resolve the XWiki CSRF form token from the xwiki-meta module.
-  //  */
-  // private async getCSRFToken(): Promise<string> {
-  //   return (this.xm instanceof Promise ? await this.xm : this.xm).form_token;
-  // }
-
-  /**
    * Perform a fetch request with the XWiki CSRF token header.
    * On non-OK responses a user-facing XWiki notification is shown and an error is thrown.
    * @param url - The full URL to request.

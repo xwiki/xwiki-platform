@@ -13,7 +13,7 @@ import { TourTour } from '@xwiki/platform-guidedtour-api';
 
 // @beta
 export class DefaultGuidedTourManager implements GuidedTourManager {
-    constructor(xm: Promise, sharedStore: TourStore);
+    constructor(sharedStore: TourStore);
     activeDriverTask?: Driver;
     activeTask?: TourTask;
     createStep(tourId: string, taskId: string, stepData: TourStep): Promise<void>;

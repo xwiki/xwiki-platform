@@ -27,6 +27,21 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  */
 @UITest
+// (
+//     properties = {
+//         "xwikiCfgPlugins=com.xpn.xwiki.plugin.packaging.PackagePlugin" },
+//     // Needed to import some test tours for testing.
+//     extraJARs = {
+//         "org.xwiki.platform:xwiki-platform-guidedtour-test-tours",
+//     }, resolveExtraJARs = true)
 class GuidedTourApplicationIT
 {
+  /**
+   * The displayed tours should not include inactive tours, or tours which the user has no rights to view.
+   */
+  @Test
+  void tourVisiblity() {
+    TourWidget tourWidget = new TourWidget();
+    assertEquals(tourWidget.getTourIds(), List.of("xwiki:GuidedTour.PanelTour"));
+  }
 }

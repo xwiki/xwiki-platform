@@ -57,16 +57,15 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    */
   activeTask?: TourTask;
   /**
-   * FIXME: It's 12 oclock I'm tired.
+   * Various tour/step caches.
    */
   sharedStore: TourStore;
   /**
-   * @param xm - A promise resolving to the xwiki-meta module (provides the CSRF form token).
    * @param sharedStore - Shared in-memory cache for tours, tasks, and steps.
    */
-  // @ts-expect-error xm is any
-  constructor(xm: Promise, sharedStore: TourStore) {
-    const restClient = new GuidedTourRestClient(xm);
+  constructor(sharedStore: TourStore) {
+    this.sharedStore = sharedStore;
+    const restClient = new GuidedTourRestClient();
     this.defaultTourManagerApi = new DefaultTourManagerApi(
       restClient,
       sharedStore,
@@ -79,7 +78,6 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
       restClient,
       sharedStore,
     );
-    this.sharedStore = sharedStore;
   }
 
   async loadUserTaskStatuses() {
@@ -141,8 +139,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
   }
 
   async getTours(): Promise<TourTour[]> {
-    //FIXME: Not really an indicator of first time getTours() is called but oh well.
-    const refetchDone = this.sharedStore.cache.tours?.length == 0;
+    const refetchDone = this.sharedStore.cache.tours.length == 0;
     const tours = await this.defaultTourManagerApi.getTours();
 
     if (refetchDone) {
@@ -246,18 +243,17 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
    * TODO: Make this configurable via Admin Settings.
    */
   getSandboxSpace(): Promise<string> {
-    return Promise.resolve(
-      new DocumentReference("GuidedTour.SandboxSpace").name,
-    );
+    return Promise.resolve(new DocumentReference("Sandbox.WebHome").name);
   }
 
   /**
    * Get useful links to display in the widget.
+   * TODO: Get these from the Admin section.
    */
   getUsefulLinks(): Promise<string[]> {
     const usefulLinks: string[] = [
-      "<a>Useful link 1</a>",
-      "<a>Useful link 2</a>",
+      // "<a>Useful link 1</a>",
+      // "<a>Useful link 2</a>",
     ];
     return Promise.resolve(usefulLinks);
   }
@@ -329,7 +325,7 @@ export class DefaultGuidedTourManager implements GuidedTourManager {
           parsedIds["taskId"],
         );
         if (task !== undefined) {
-          this.startTask(task, true);
+          await this.startTask(task, true);
         } else {
           console.error(
             "Tried to get task for ",

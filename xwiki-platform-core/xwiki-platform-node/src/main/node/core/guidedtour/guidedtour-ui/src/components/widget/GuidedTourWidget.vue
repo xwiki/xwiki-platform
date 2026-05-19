@@ -119,7 +119,6 @@ const state = reactive({
   toursLoadError: "",
   waitingLoadAsync: 0,
 });
-provide("GuidedTourWidgetState", state!);
 function onCloseGuidedTourWidget(buttonClicked: boolean) {
   if (state.isWidgetCollapsed && buttonClicked) {
     state.isWidgetShown = false;

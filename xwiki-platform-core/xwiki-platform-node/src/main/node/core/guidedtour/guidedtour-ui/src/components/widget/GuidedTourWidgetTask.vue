@@ -100,8 +100,9 @@ async function onSkipTask() {
 async function onStartTask() {
   // Fetch the steps manually, so we can show the loader nicely while waiting for the steps to be fetched.
   isWaitingAsync.value = true;
-  await guidedTourManager.getSteps(tourId, task!.id);
-  isWaitingAsync.value = false;
+  await guidedTourManager.getSteps(tourId, task!.id).finally(() => {
+    isWaitingAsync.value = false;
+  });
   guidedTourManager.startTask(task!, false);
 }
 </script>

@@ -37,6 +37,7 @@
   "dependencies": {
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "inversify": "catalog:"
   },

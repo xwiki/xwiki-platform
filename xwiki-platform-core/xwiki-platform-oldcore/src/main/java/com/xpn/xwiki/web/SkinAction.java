@@ -508,7 +508,7 @@ public class SkinAction extends XWikiAction
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
                 String contentDisposition = (attachmentSecurityManager.shouldBeDownloaded(attachment))
                     ? "attachment" : "inline";
-                String ofilename = Util.encodeURI(filename, context).replaceAll("\\+", "%20");
+                String ofilename = Util.encodeURI(filename, context).replace("+", "%20");
                 response.setHeader("Content-Disposition",
                     String.format("%s; filename*=utf-8''%s", contentDisposition, ofilename));
                 try (InputStream input = attachment.getContentInputStream(context)) {

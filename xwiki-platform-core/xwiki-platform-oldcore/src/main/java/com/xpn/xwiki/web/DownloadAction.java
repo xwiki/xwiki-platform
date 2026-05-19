@@ -110,6 +110,9 @@ public class DownloadAction extends XWikiAction
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -275,7 +278,7 @@ public class DownloadAction extends XWikiAction
             try (InputStream data = attachment.getContentInputStream(context)) {
                 InputStream boundedData = new BoundedInputStream(data, end + 1);
                 boundedData.skip(start);
-                setCommonHeaders(attachment, request, response, context);
+                setCommonHeaders(attachment, response, context);
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 if ((end - start + 1L) < Integer.MAX_VALUE) {
                     setContentLength(response, end - start + 1);
@@ -304,7 +307,7 @@ public class DownloadAction extends XWikiAction
     {
         InputStream stream = null;
         try {
-            setCommonHeaders(attachment, request, response, context);
+            setCommonHeaders(attachment, response, context);
             setContentLength(response, attachment.getContentLongSize(context));
             stream = attachment.getContentInputStream(context);
             IOUtils.copy(stream, response.getOutputStream());
@@ -453,12 +456,10 @@ public class DownloadAction extends XWikiAction
      * Set the response HTTP headers common to both partial (Range) and full responses.
      *
      * @param attachment the attachment to get content from
-     * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
      */
-    private void setCommonHeaders(final XWikiAttachment attachment, final XWikiRequest request,
-        final XWikiResponse response, final XWikiContext context)
+    private void setCommonHeaders(XWikiAttachment attachment, XWikiResponse response, XWikiContext context)
     {
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
@@ -470,24 +471,9 @@ public class DownloadAction extends XWikiAction
             response.setCharacterEncoding(characterEncoding);
         }
 
-        String ofilename = Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
-
-        // The inline attribute of Content-Disposition tells the browser that they should display
-        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
-        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
-        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
-        // Save dialog box (exe, zip, xar, etc).
-        String dispType = "inline";
-
-        XWikiAttachmentSecurityManager attachmentSecurityManager =
-            Utils.getComponent(XWikiAttachmentSecurityManager.class);
-        // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if (attachmentSecurityManager.shouldBeDownloaded(attachment)) {
-            dispType = ATTACHMENT;
-        }
-        // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
-        // See http://tools.ietf.org/html/rfc2231 for more details.
-        response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + ofilename);
+        boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
+        response.addHeader("Content-disposition",
+            attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(), shouldBeDownloaded));
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed

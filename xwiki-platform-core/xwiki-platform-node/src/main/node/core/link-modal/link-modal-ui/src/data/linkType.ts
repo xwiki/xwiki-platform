@@ -25,7 +25,7 @@ import type {
 /**
  * Parameters for a link
  *
- * @since 18.4.0RC-1
+ * @since 18.5.0RC1
  * @beta
  */
 type LinkData = {

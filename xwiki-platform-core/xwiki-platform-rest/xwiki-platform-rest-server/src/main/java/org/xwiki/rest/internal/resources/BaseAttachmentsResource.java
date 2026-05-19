@@ -69,7 +69,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 /**
  * @version $Id$
@@ -465,25 +464,15 @@ public class BaseAttachmentsResource extends XWikiResource
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
-        String ofilename = Util.encodeURI(xwikiAttachment.getFilename(), getXWikiContext())
-            .replaceAll("\\+", "%20");
-        // The inline attribute of Content-Disposition tells the browser that they should display
-        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
-        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
-        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
-        // Save dialog box (exe, zip, xar, etc).
-        String dispType = "inline";
-        // If the mimetype is not authorized to be displayed inline,
-        // let's force its content disposition to download.
-        if (attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment)) {
-            dispType = "attachment";
-        }
+        boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment);
         try {
             return Response
                 .ok()
                 .type(xwikiAttachment.getMimeType())
                 .entity(xwikiAttachment.getContent())
-                .header("Content-Disposition", dispType + "; filename*=utf-8''" + ofilename)
+                .header("Content-Disposition",
+                    attachmentSecurityManager.getContentDispositionHeader(
+                        xwikiAttachment.getFilename(), shouldBeDownloaded))
                 .build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);

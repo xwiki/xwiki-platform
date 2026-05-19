@@ -63,7 +63,7 @@
     ##
     #set ($ok = $scheduler.scheduleJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
     #else
       #set ($jobName = "$jobObj.get('jobName')")
@@ -76,7 +76,7 @@
     ##
     #set ($ok = $scheduler.pauseJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
     #else
       {{info}}$services.localization.render('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
@@ -88,7 +88,7 @@
     ##
     #set ($ok = $scheduler.resumeJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
     #else
       {{info}}$services.localization.render('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
@@ -100,7 +100,7 @@
     ##
     #set ($ok = $scheduler.unscheduleJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
     #else
       {{info}}$services.localization.render('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
@@ -118,7 +118,7 @@
         #set ($deleteRedirect = $xwiki.getURL($jobObj.getName(), 'delete'))
         $response.sendRedirect($deleteRedirect)
       #else
-        {{error}}$xcontext.get('error'){{/error}}
+        {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
       #end
     #else
@@ -131,7 +131,7 @@
     ##
     #set ($ok = $scheduler.triggerJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$services.rendering.escape($xcontext.get('error'), 'xwiki/2.1'){{/error}}
 
     #else
       {{info}}$services.localization.render('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}

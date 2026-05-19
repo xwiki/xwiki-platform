@@ -24,7 +24,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} label={"Editor"} />,
+    <BlockNoteForTest content={[]} macros={false} />,
   );
 
   await expect(component).toBeVisible();
@@ -36,7 +36,6 @@ test("BlockNote shows with initial content", async ({ mount }) => {
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
       macros={false}
-      label={"Editor"}
     />,
   );
 
@@ -46,7 +45,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} label={"Editor"} />,
+    <BlockNoteForTest content={[]} macros={false} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -68,7 +67,6 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
     <BlockNoteForTest
       content={[buildImage(SMALL_IMG_DATA_URL)]}
       macros={false}
-      label={"Editor"}
       overrides={{
         // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
         imageEdition: (image) => {
@@ -103,7 +101,7 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
   expect(overrideFnCalledWithUrl).toBe(SMALL_IMG_DATA_URL);
 });
 
-test("Allowed syntax features should be available", async ({ mount }) => {
+test("Allowed syntax features should be available", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest macros={false} content={[]} syntax={FULL_SYNTAX} />,
   );
@@ -112,7 +110,10 @@ test("Allowed syntax features should be available", async ({ mount }) => {
 
   await editorEl.press("/");
 
-  const slashMenuEl = component.locator("#bn-suggestion-menu");
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+
   await slashMenuEl.waitFor({ state: "attached" });
 
   const menuItems = await slashMenuEl
@@ -128,7 +129,10 @@ test("Allowed syntax features should be available", async ({ mount }) => {
 });
 
 // eslint-disable-next-line max-statements
-test("Disallowed syntax features should be unavailable", async ({ mount }) => {
+test("Disallowed syntax features should be unavailable", async ({
+  mount,
+  page,
+}) => {
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;
   syntax.features.blocks.quotes = false;
@@ -141,7 +145,10 @@ test("Disallowed syntax features should be unavailable", async ({ mount }) => {
 
   await editorEl.press("/");
 
-  const slashMenuEl = component.locator("#bn-suggestion-menu");
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+
   await slashMenuEl.waitFor({ state: "attached" });
 
   const menuItems = await slashMenuEl

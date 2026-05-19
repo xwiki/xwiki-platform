@@ -5,27 +5,50 @@
 ```ts
 
 import { AttachmentReference } from '@xwiki/platform-model-api';
+import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
+import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
 import { DocumentReference } from '@xwiki/platform-model-api';
+import { DocumentService } from '@xwiki/platform-document-api';
+import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
+import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
+import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 
-// @public (undocumented)
+// @beta
+export function createLinkEditionContext(container: Container): LinkEditionContext;
+
+// @beta
 export type LinkAttachmentConfig = {
     ref: AttachmentReference | null;
     queryString?: string;
 };
 
-// @public (undocumented)
+// @beta
 export type LinkData = {
     displayText: string;
     newTab?: boolean;
     target: LinkTarget;
 };
 
-// @public (undocumented)
+// @beta (undocumented)
+export type LinkEditionContext = {
+    linkSuggestService: LinkSuggestService | null;
+    modelReferenceParser: ModelReferenceParser;
+    modelReferenceSerializer: ModelReferenceSerializer;
+    modelReferenceHandler: ModelReferenceHandler;
+    remoteURLParser: RemoteURLParser;
+    remoteURLSerializer: RemoteURLSerializer;
+    attachmentsService: AttachmentsService;
+    documentService: DocumentService;
+};
+
+// @beta
 export type LinkEmailConfig = {
     address: string;
     messageSubject?: string;
@@ -43,14 +66,14 @@ onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
 
-// @public (undocumented)
+// @beta
 export type LinkPageConfig = {
     ref: DocumentReference | null;
     queryString?: string;
     anchor?: string;
 };
 
-// @public (undocumented)
+// @beta
 export type LinkTarget = {
     type: "page";
     config: LinkPageConfig;
@@ -65,13 +88,18 @@ export type LinkTarget = {
     config: LinkEmailConfig;
 };
 
-// @public (undocumented)
+// @beta
 export type LinkUrlConfig = {
     url: string;
 };
 
-// @public (undocumented)
+// @beta
 export function parseLinkTarget(url: string, remoteURLParser: RemoteURLParser): LinkTarget;
+
+// Warnings were encountered during analysis:
+//
+// dist/vue/LinkModal.vue.d.ts:8:5 - (ae-incompatible-release-tags) The symbol "submit" is marked as @public, but its signature references "LinkData" which is marked as @beta
+// dist/vue/LinkModal.vue.d.ts:11:5 - (ae-incompatible-release-tags) The symbol "onSubmit" is marked as @public, but its signature references "LinkData" which is marked as @beta
 
 // (No @packageDocumentation comment for this package)
 

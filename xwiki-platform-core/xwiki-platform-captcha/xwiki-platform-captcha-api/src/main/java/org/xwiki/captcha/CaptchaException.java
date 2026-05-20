@@ -33,6 +33,17 @@ public class CaptchaException extends Exception
      * Constructor.
      *
      * @param message the detail message
+     * @since 18.5.0RC1
+     */
+    public CaptchaException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param message the detail message
      * @param cause the cause of this exception
      */
     public CaptchaException(String message, Throwable cause)

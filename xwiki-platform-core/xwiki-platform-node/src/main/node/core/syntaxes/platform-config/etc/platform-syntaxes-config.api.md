@@ -5,13 +5,10 @@
 ```ts
 
 // @beta
-export type SyntaxConfig = {
-    id: string;
-    features: SyntaxFeaturesWhitelist;
-};
+export const SYNTAX_CONFIG_COMPONENT_GROUP_NAME = "SyntaxConfig";
 
 // @beta
-export type SyntaxFeaturesWhitelist = {
+export type SyntaxAllowedFeatures = {
     blocks: {
         headings: {
             levels1To3: boolean;
@@ -89,6 +86,12 @@ export type SyntaxFeaturesWhitelist = {
             nesting: boolean;
         };
     };
+};
+
+// @beta
+export type SyntaxConfig = {
+    id: string;
+    features: SyntaxAllowedFeatures;
 };
 
 // (No @packageDocumentation comment for this package)

@@ -2854,6 +2854,9 @@ importers:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
@@ -2885,6 +2888,9 @@ importers:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
       eslint:
         specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)

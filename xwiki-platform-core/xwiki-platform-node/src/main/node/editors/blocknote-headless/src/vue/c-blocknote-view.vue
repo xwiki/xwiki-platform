@@ -154,7 +154,8 @@ const submitEditedLink = ({
   displayText,
   target: { type, config },
 }: LinkData) => {
-  // TODO
+  // TODO: support
+
   const url =
     type === "url"
       ? config.url

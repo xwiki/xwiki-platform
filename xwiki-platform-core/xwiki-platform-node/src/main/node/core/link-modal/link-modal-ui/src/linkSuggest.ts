@@ -71,7 +71,7 @@ type LinkEditionContext = {
 /**
  * Describe a link suggestion action (i.e., a search result entry).
  *
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 type LinkSuggestion = {
@@ -85,7 +85,7 @@ type LinkSuggestion = {
 /**
  * Shape of a function providing a list of link suggestions for a given query
  *
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
@@ -96,7 +96,7 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * @param container - The container to provide from
  * @returns The link edition context
  *
- * @since 18.4.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 function createLinkEditionContext(container: Container): LinkEditionContext {

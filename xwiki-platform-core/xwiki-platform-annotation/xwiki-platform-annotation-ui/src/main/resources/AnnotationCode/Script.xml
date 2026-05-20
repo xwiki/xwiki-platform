@@ -396,8 +396,10 @@ XWiki.Selection = Class.create({
 
   computeContextFF : function() {
     var left = this.getLeftDocument(this.range.startContainer) + this.range.startContainer.textContent.substring(0, this.range.startOffset);
+    left = left.replaceAll("$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))", '');
     var subLeft = '';
     var right = this.range.endContainer.textContent.substring(this.range.endOffset, this.range.endContainer.textContent.length) + this.getRightDocument(this.range.endContainer);
+    right = right.replaceAll("$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))", '');
     var subRight = '';
     var offset = 0;
     var context = this.range.toString();
@@ -415,8 +417,6 @@ XWiki.Selection = Class.create({
       subLeft = left.substring(left.length - leftExpansion, left.length);
     }
     this.selectionContext = subLeft + this.selectionText + subRight;
-    this.selectionContext.replaceAll(
-        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))", '');
     this.selectionOffset = Math.max(subLeft.length, 0);
   },
 

@@ -18,7 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export { default as LinkModal } from "./vue/LinkModal.vue";
+import { default as _LinkModal } from "./vue/LinkModal.vue";
+
+/**
+ * Link modal UI component
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+const LinkModal = _LinkModal;
 
 export type {
   LinkAttachmentConfig,

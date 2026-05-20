@@ -1052,6 +1052,7 @@ XWiki.Annotation = Class.create({
     var wrapper = document.createElement('mark');
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
+    wrapper.addClassName(ann.state.toLowerCase());
     var parentNode = markedNode.parentElement;
     parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);

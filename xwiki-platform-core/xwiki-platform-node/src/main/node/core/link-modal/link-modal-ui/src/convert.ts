@@ -31,7 +31,7 @@ import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
  *
  * @returns The parsed link target
  *
- * @since 18.4.0RC-1
+ * @since 18.5.0RC1
  * @beta
  */
 export function parseLinkTarget(

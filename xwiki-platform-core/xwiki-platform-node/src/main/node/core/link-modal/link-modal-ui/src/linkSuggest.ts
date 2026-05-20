@@ -53,7 +53,7 @@ import type {
 import type { Container } from "inversify";
 
 /**
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 type LinkEditionContext = {

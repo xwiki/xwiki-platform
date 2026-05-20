@@ -19,10 +19,14 @@ import { UniAst } from '@xwiki/platform-uniast-api';
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
 <<<<<<< HEAD
+<<<<<<< HEAD
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 >>>>>>> 357cbef0fc (update)
+=======
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+>>>>>>> 1e2e66bd72 (update)
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
@@ -37,10 +41,14 @@ getContent: () => UniAst | Error;
 "debounced-change": (content: UniAst) => any;
 }, string, PublicProps, Readonly<{
 <<<<<<< HEAD
+<<<<<<< HEAD
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 >>>>>>> 357cbef0fc (update)
+=======
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+>>>>>>> 1e2e66bd72 (update)
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
@@ -53,7 +61,6 @@ depsContainer: Container;
 "onDebounced-change"?: ((content: UniAst) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }

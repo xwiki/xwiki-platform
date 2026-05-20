@@ -106,4 +106,8 @@ export default {
   (see https://stackoverflow.com/a/18488334/657524). */
   height: 100%;
 }
+
+.layout-table tbody tr:first-child td.cell {
+  border-top: 0
+}
 </style>

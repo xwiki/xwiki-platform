@@ -306,10 +306,12 @@ export default {
   min-width: 100%;
   padding: var(--padding-large-vertical) 0;
 }
-.layout-table .column-name:hover {
+
+.layout-table .column-name:hover{
   transition: background-color 250ms;
   background-color: rgba(0, 0, 0, 0.03);
 }
+
 .layout-table .draggable-item .resize-handle {
   /* Position the resize handle at the right edge of the column name and ensure it spans the full height. */
   position: absolute;

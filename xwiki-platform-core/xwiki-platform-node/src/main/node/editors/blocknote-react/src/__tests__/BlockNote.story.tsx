@@ -32,7 +32,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 export type BlockNoteForTestProps = Omit<
   BlockNoteViewWrapperProps,
-  "lang" | "linkEditionCtx" | "syntax" | "label"
+  "lang" | "syntax" | "label"
 > & { syntax?: SyntaxConfig };
 
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({

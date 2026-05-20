@@ -22,7 +22,7 @@ import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-con
 import { Container } from "inversify";
 
 /**
- * @since 18.3.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 export class ComponentInit {

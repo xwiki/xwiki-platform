@@ -26,7 +26,7 @@ import { default as _LinkModal } from "./vue/LinkModal.vue";
  * @since 18.5.0RC1
  * @beta
  */
-const LinkModal = _LinkModal;
+export const LinkModal = _LinkModal;
 
 export type {
   LinkAttachmentConfig,

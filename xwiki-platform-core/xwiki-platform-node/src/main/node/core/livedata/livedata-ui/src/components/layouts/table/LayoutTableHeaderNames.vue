@@ -313,7 +313,8 @@ export default {
 .layout-table .draggable-item .resize-handle {
   /* Position the resize handle at the right edge of the column name and ensure it spans the full height. */
   position: absolute;
-  right: 0;
+  /* Ensure horizontal centering of the hit area */
+  right: -6px;
   top: 0;
   bottom: 0;
   /* Hide the resize handle by default. */
@@ -327,17 +328,16 @@ export default {
   /* Indicate with the mouse cursor that this is a resize handle. */
   cursor: col-resize;
   /* Style the resize handle as 4px wide in default state. */
-  width: 4px;
+  width: 16px;
   /* Ensure that the resize handle is above the next column name. */
   z-index: 1;
 }
 
-.layout-table .draggable-item:focus-within .resize-handle,
-.layout-table .draggable-item:hover .resize-handle {
+.layout-table .draggable-item .resize-handle:focus-within,
+.layout-table .draggable-item .resize-handle:hover {
   /* Show the resize handle and increase its width when the column is focused or hovered. */
   opacity: 1;
   transition: opacity 250ms;
-  width: 6px; /*resize handle interactive area*/
   outline: 0;
   background: transparent;
   box-shadow: none;
@@ -349,7 +349,7 @@ export default {
   content: " ";
   position: absolute;
   pointer-events: none;
-  left: 3px; /*center the handle horizontally, should be changed in case the resize-handle are is increased*/
+  left: 8px; /*center the handle horizontally, should be changed in case the resize-handle are is increased*/
   top: calc((1em - (100% / 2)) * -1);
   background: var(--input-border-focus);
   width: 3px;

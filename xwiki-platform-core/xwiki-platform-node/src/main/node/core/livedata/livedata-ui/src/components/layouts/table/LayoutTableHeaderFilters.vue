@@ -83,6 +83,7 @@ export default {
   padding: 2px;
   font-weight: normal;
   vertical-align: middle;
+  border: 0;
 }
 
 .layout-table .column-filters th.entry-selector {

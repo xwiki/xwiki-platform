@@ -287,6 +287,10 @@ export default {
 </script>
 
 <style>
+.layout-table th {
+  background-color: var(--panel-bg);
+}
+
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;
@@ -295,12 +299,17 @@ export default {
 
 .layout-table .column-name {
   display: flex;
+  font-weight: var(--font-weight-semibold);
   justify-content: space-between;
   /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
  when the column has been resized to a smaller width that is prevented by some table cell. */
   min-width: 100%;
+  padding: var(--padding-large-vertical) 0;
 }
-
+.layout-table .column-name:hover {
+  transition: background-color 250ms;
+  background-color: rgba(0, 0, 0, 0.03);
+}
 .layout-table .draggable-item .resize-handle {
   /* Position the resize handle at the right edge of the column name and ensure it spans the full height. */
   position: absolute;
@@ -328,23 +337,23 @@ export default {
   /* Show the resize handle and increase its width when the column is focused or hovered. */
   opacity: 1;
   transition: opacity 250ms;
-  width: 6px; //resize handle interactive area
+  width: 6px; /*resize handle interactive area*/
   outline: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.layout-table .draggable-item:focus-within .resize-handle:after,
+.layout-table .draggable-item .resize-handle:focus-within:after,
 .layout-table .draggable-item:hover .resize-handle:after {
   /* Show the resize handle bar. This is done as a pseudo element so we can have a larger hit area but with a small UI footprint*/
   content: " ";
   position: absolute;
   pointer-events: none;
-  left: 3px; //center the handle, should be changed in case the resize-handle are is increased
-  top: 0;
+  left: 3px; /*center the handle horizontally, should be changed in case the resize-handle are is increased*/
+  top: calc((1em - (100% / 2)) * -1);
   background: var(--input-border-focus);
   width: 3px;
-  height: 80%;
+  height: 2em;
   border-radius: 99px;
 }
 
@@ -368,7 +377,9 @@ export default {
   border: 0;
   text-align: left;
   padding: var(--table-cell-padding);
+  /*Ensure that we have vertical alignment*/
   padding-top: 0;
+  padding-bottom: 0
 }
 
 .layout-table .draggable-item .property-name {

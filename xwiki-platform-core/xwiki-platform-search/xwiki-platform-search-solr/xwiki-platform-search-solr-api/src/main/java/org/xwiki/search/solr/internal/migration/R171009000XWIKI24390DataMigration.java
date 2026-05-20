@@ -87,8 +87,7 @@ public class R171009000XWIKI24390DataMigration implements HibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        // Change to 171009000 for 17.10.9.
-        return new XWikiDBVersion(180500000);
+        return new XWikiDBVersion(171009000);
     }
 
     @Override

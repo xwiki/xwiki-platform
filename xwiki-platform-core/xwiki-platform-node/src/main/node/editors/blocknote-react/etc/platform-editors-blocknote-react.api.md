@@ -54,9 +54,12 @@ export type BlockNoteViewWrapperProps = {
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
 <<<<<<< HEAD
+<<<<<<< HEAD
     depsContainer: Container;
 =======
     linkEditionHandler: LinkEditionHandler;
+=======
+>>>>>>> 1e2e66bd72 (update)
     linkEditionCtx: LinkEditionContext;
 >>>>>>> 357cbef0fc (update)
     overrides?: {
@@ -150,22 +153,6 @@ export type InlineMacroInvocation = {
 };
 
 // @beta
-export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
-
-// @beta
-export type LinkEditionHandlerProps = {
-    current: {
-        title: string;
-        url: string;
-    };
-    onSubmit: (link: {
-        title: string;
-        url: string;
-    }) => void;
-    mode: "createNew" | "editExisting";
-};
-
-// @beta
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
@@ -197,6 +184,14 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
     unmount: () => void;
 };
 
+<<<<<<< HEAD
+=======
+// Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
+//
+// @beta
+export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[], syntax: SyntaxConfig, lang: EditorLanguage): DefaultReactSuggestionItem[];
+
+>>>>>>> 1e2e66bd72 (update)
 // (No @packageDocumentation comment for this package)
 
 ```

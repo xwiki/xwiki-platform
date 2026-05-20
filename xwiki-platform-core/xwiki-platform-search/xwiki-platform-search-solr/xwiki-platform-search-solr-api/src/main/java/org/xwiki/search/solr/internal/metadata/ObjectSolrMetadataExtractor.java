@@ -69,7 +69,6 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         }
 
         solrDocument.setField(FieldUtils.ID, resolver.getId(object.getReference()));
-        setDocumentFields(documentReference, solrDocument);
         solrDocument.setField(FieldUtils.TYPE, objectReference.getType().name());
         solrDocument.setField(FieldUtils.CLASS, localSerializer.serialize(classReference));
         solrDocument.setField(FieldUtils.NUMBER, objectReference.getObjectNumber());

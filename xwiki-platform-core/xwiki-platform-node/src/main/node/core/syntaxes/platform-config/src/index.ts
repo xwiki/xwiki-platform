@@ -162,7 +162,7 @@ type SyntaxAllowedFeatures = {
       blockInTableCells: boolean;
 
       /**
-       * Support fo rusing multiple blocks inside list items (e.g. two consecutive lists)
+       * Support for using multiple blocks inside list items (e.g. two consecutive lists)
        */
       multipleBlocksInTableCells: boolean;
 
@@ -285,7 +285,7 @@ type SyntaxAllowedFeatures = {
       customText: boolean;
 
       /**
-       * Support fo rstyling the custom text
+       * Support for styling the custom text
        */
       customTextStyling: boolean;
 

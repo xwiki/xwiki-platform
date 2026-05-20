@@ -272,11 +272,11 @@
   cursor: pointer;
 
   &amp;.updated {
-  background-color: var(--mark-updated-bg);
+    background-color: var(--mark-updated-bg);
   }
 
   &amp;.altered {
-  background-color: var(--mark-altered-bg);
+    background-color: var(--mark-altered-bg);
   }
   
   &amp;.hovered,

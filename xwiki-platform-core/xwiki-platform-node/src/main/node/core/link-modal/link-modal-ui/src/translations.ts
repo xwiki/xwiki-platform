@@ -20,6 +20,7 @@
 
 import en from "../langs/translation-en.json";
 
+// TODO: handle translations in a way that can be handled by the server itself: https://jira.xwiki.org/browse/XWIKI-24392
 export const translations: Record<string, Record<string, string>> = {
   en,
 };

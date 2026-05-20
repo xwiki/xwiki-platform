@@ -50,7 +50,7 @@
       #set ($wikiNamesList = "$wikiName, $wikiNamesList")
     #end
   #end
-  #set ($wikiNamesList = $services.rendering.escape($wikiNamesList.replaceAll(',\s$',''), 'xwiki/2.1'))
+  #set ($wikiNamesList = $wikiNamesList.replaceAll(',\s$',''))
   #set ($translationParameters = [$wikiNamesList])
   #if ($wikiNames.size() == 1)
     #set ($translationKey = 'platform.wiki.users.profile.activity.title')
@@ -58,7 +58,8 @@
     #set ($translationKey = 'platform.wiki.users.profile.activity.multipletitle')
   #end
   = {{translation key="$translationKey" scriptParameters='translationParameters' /}} =
-  {{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="false" wikis="$wikiNamesList"}}
+  #set ($wikiNamesListEscaped = $services.rendering.escape($wikiNamesList, 'xwiki/2.1'))
+  {{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="false" wikis="$wikiNamesListEscaped"}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

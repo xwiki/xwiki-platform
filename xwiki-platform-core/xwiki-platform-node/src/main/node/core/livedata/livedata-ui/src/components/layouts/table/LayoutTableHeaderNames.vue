@@ -327,8 +327,25 @@ export default {
 .layout-table .draggable-item:hover .resize-handle {
   /* Show the resize handle and increase its width when the column is focused or hovered. */
   opacity: 1;
-  background: var(--text-muted);
-  width: 6px;
+  transition: opacity 250ms;
+  width: 6px; //resize handle interactive area
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.layout-table .draggable-item:focus-within .resize-handle:after,
+.layout-table .draggable-item:hover .resize-handle:after {
+  /* Show the resize handle bar. This is done as a pseudo element so we can have a larger hit area but with a small UI footprint*/
+  content: " ";
+  position: absolute;
+  pointer-events: none;
+  left: 3px; //center the handle, should be changed in case the resize-handle are is increased
+  top: 0;
+  background: var(--input-border-focus);
+  width: 3px;
+  height: 80%;
+  border-radius: 99px;
 }
 
 /* Center the resize handle between the current and the next column name, if there is one. */

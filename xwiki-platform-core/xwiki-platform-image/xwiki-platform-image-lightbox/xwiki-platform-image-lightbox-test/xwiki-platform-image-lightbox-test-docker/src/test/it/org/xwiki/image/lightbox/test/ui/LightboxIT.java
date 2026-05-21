@@ -67,6 +67,11 @@ class LightboxIT
 
     private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
 
+    /**
+     * Alt text containing HTML that would trigger XSS if lightbox doesn't escape it.
+     */
+    private static final String XSS_ALT = "<b id=xss-alt>XSSAlt</b>";
+
     @BeforeAll
     void beforeAll(TestUtils testUtils)
     {
@@ -453,6 +458,22 @@ class LightboxIT
         assertEquals(lastUploadDate, lightbox.getDate());
     }
 
+    @Test
+    @Order(15)
+    void testXSSInCaption(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        enableLightbox(testUtils, true);
+
+        testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0), XSS_ALT));
+        LightboxPage lightboxPage = new LightboxPage();
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
+
+        assertEquals(XSS_ALT, lightbox.getCaption());
+    }
+
     private void setTimezone(TestUtils testUtils, String timezoneValue) throws Exception
     {
         Object userObject = testUtils.rest().object(new LocalDocumentReference("XWiki", USER_NAME), "XWiki.XWikiUsers");
@@ -479,11 +500,18 @@ class LightboxIT
 
     private String getImageWithAlt(String image)
     {
+        return getImageWithAlt(image, "Alternative text");
+    }
+    
+    private String getImageWithAlt(String image, String alt)
+    {
         StringBuilder sb = new StringBuilder();
 
         sb.append("[[image:");
         sb.append(image);
-        sb.append("||alt=\"Alternative text\" width=120 height=120]]\n\n");
+        sb.append("||alt=\"");
+        sb.append(alt);
+        sb.append("\" width=120 height=120]]\n\n");
 
         return sb.toString();
     }

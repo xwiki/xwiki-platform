@@ -68,17 +68,13 @@ define('xwiki-lightbox-description', [
   var updateDescriptionCaption = function(imageData, attachmentData) {
     if (imageData?.caption) {
       $('.lightboxDescription .caption').html(imageData.caption);
-      return;
     } else if (imageData) {
       // Verify to not display the url as caption, since this is the default value for alt.
       let alt = imageData.alt == decodeURIComponent(imageData.href) ? '' : imageData.alt;
       $('.lightboxDescription .caption').text(alt || imageData.title || '');
-      return;
-    }
-
-    if (attachmentData && attachmentData.name) {
+    } else if ($('.lightboxDescription .caption').is(':empty') && attachmentData?.name) {
       $('.lightboxDescription .caption').text(attachmentData.name);
-    } else if (imageData && imageData.fileName) {
+    } else if ($('.lightboxDescription .caption').is(':empty') && imageData?.fileName) {
       $('.lightboxDescription .caption').text(imageData.fileName);
     }
   };

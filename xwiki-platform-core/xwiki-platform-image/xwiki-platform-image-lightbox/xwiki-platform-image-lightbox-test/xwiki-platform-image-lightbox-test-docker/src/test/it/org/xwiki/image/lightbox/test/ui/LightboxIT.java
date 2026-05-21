@@ -68,9 +68,9 @@ class LightboxIT
     private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
 
     /**
-     * Alt text containing HTML that would trigger XSS if lightbox doesn't escape it.
+     * Caption text containing HTML that would trigger XSS if lightbox doesn't escape it.
      */
-    private static final String XSS_ALT = "<b id=xss-alt>XSSAlt</b>";
+    private static final String XSS_CAPTION = "<b id=xss-caption>XSSCaption</b>";
 
     @BeforeAll
     void beforeAll(TestUtils testUtils)
@@ -464,14 +464,14 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0), XSS_ALT));
+        testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0), XSS_CAPTION));
         LightboxPage lightboxPage = new LightboxPage();
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
 
-        assertEquals(XSS_ALT, lightbox.getCaption());
+        assertEquals(XSS_CAPTION, lightbox.getCaption());
     }
 
     private void setTimezone(TestUtils testUtils, String timezoneValue) throws Exception

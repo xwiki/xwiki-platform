@@ -38,7 +38,7 @@
     "@eslint/js": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-headers": "catalog:",
-    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-import-x": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "eslint-plugin-promise": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",

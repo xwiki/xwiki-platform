@@ -36,7 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-{{documentTree showTranslations="false" showAttachments="false" root="document:$doc.documentReference" /}}
-{{/velocity}}</content>
+  <content>{{documentTree showTranslations="false" showAttachments="false" root="document:" /}}</content>
 </xwikidoc>

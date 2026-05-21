@@ -68,7 +68,7 @@
     <netty.version>4.2.13.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.154.0</metaeffekt.version>
+    <metaeffekt.version>0.155.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -79,7 +79,7 @@
     <rssreader.version>3.12.0</rssreader.version>
 
     <!-- The default Tomcat cache size  -->
-    <xwiki.tomcat.cacheMaxSize>100176</xwiki.tomcat.cacheMaxSize>
+    <xwiki.tomcat.cacheMaxSize>120176</xwiki.tomcat.cacheMaxSize>
 
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
@@ -127,7 +127,7 @@
     <pgsql.version>42.7.11</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc17</oracle.artifactId>
-    <oracle.version>23.26.1.0.0</oracle.version>
+    <oracle.version>23.26.2.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
@@ -315,7 +315,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>7.5.10</version>
+        <version>7.6.0</version>
       </dependency>
 
       <dependency>

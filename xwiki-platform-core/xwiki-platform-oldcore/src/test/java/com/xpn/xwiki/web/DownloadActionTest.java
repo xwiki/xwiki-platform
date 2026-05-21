@@ -34,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
@@ -43,6 +45,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.velocity.VelocityManager;
@@ -72,52 +75,71 @@ import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DownloadAction}.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
+@ComponentList({ XWikiAttachmentSecurityManager.class })
 class DownloadActionTest
 {
-    /** The name of the attachment being downloaded in most of the tests. */
+    /**
+     * The name of the attachment being downloaded in most of the tests.
+     */
     private static final String DEFAULT_FILE_NAME = "file.txt";
 
-    /** The URI requested in most of the tests. */
+    /**
+     * The URI requested in most of the tests.
+     */
     private static final String DEFAULT_URI = "/xwiki/bin/download/space/page/file.txt";
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
-    /** Mocked context document. */
+    /**
+     * Mocked context document.
+     */
     private XWikiDocument document;
 
-    /** Mocked client request. */
+    /**
+     * Mocked client request.
+     */
     @Mock
     private XWikiRequest request;
 
-    /** Mocked client response. */
+    /**
+     * Mocked client response.
+     */
     @Mock
     private XWikiResponse response;
 
-    /** Mocked engine context. */
+    /**
+     * Mocked engine context.
+     */
     @Mock
     private XWikiEngineContext engineContext;
 
-    /** A mocked output stream where the output file data is being written. */
+    /**
+     * A mocked output stream where the output file data is being written.
+     */
     @Mock
     private ServletOutputStream out;
 
-    /** The action being tested. */
+    /**
+     * The action being tested.
+     */
     @InjectMockComponents
     private DownloadAction action;
 
-    /** The content of the file being downloaded in most of the tests. */
+    /**
+     * The content of the file being downloaded in most of the tests.
+     */
     private byte[] fileContent = "abcdefghijklmn".getBytes(XWiki.DEFAULT_ENCODING);
 
     @MockComponent
     private ResourceReferenceManager resourceReferenceManager;
 
     @MockComponent
-    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+    private Container container;
 
     private DocumentReference documentReference;
 
@@ -150,6 +172,7 @@ class DownloadActionTest
         when(this.response.getOutputStream()).thenReturn(this.out);
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
             any(XWikiContext.class))).thenReturn(false);
+        when(this.container.getRequest()).thenReturn(new ServletRequest(this.request));
     }
 
     // Helpers for the tests
@@ -409,7 +432,6 @@ class DownloadActionTest
         XWikiAttachment attachment = createAttachment(d, "file name.txt");
         when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
-        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
@@ -425,7 +447,6 @@ class DownloadActionTest
 
         when(this.engineContext.getMimeType("file\u021B.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
-        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
@@ -712,7 +733,6 @@ class DownloadActionTest
             new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page")), EntityResourceAction.VIEW));
 
         // Note: we don't give PR and the attachment is not an authorized mime type.
-        when(attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
         assertNull(action.render(xcontext));
 
         // This is the test, we verify what is set in the response
@@ -778,7 +798,6 @@ class DownloadActionTest
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
         when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
         doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
-        when(this.attachmentSecurityManager.shouldBeDownloaded(attachment)).thenReturn(true);
 
         assertNull(action.render(xcontext));
 

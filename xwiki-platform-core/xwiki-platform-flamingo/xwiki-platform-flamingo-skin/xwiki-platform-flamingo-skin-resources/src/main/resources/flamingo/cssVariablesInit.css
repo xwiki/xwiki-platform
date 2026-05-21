@@ -46,6 +46,8 @@
 "font-weight-semibold": 700,
 "font-weight-bold": "900",
 "mark-bg": "color-mix(in srgb, var(--btn-warning-bg), white)",
+"mark-updated-bg": "color-mix(in srgb, var(--btn-warning-bg), var(--btn-danger-bg) 20%, white)",
+"mark-altered-bg": "color-mix(in srgb, var(--btn-danger-bg), white)",
 "mark-highlighted-bg": "var(--btn-warning-bg)"
 })
 

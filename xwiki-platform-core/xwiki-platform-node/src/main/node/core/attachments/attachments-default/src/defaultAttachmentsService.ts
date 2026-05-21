@@ -191,7 +191,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
     files: File[],
   ): Promise<(string | undefined)[] | undefined> {
     this.store.startUploading();
-    let resolvedAttachments = undefined;
+    let resolvedAttachments;
     try {
       resolvedAttachments = await this.storageProvider
         .get()

@@ -270,6 +270,15 @@
      The highlights can happen in the middle of words, and it would look odd. */
   padding: 0;
   cursor: pointer;
+
+  &amp;.updated {
+    background-color: var(--mark-updated-bg);
+  }
+
+  &amp;.altered {
+    background-color: var(--mark-altered-bg);
+  }
+  
   &amp;.hovered,
   &amp;.hovered .annotation-highlight, &amp;.hovered .selection-highlight {
     /* We want to increase the accent on the element when hovered. 
@@ -422,12 +431,10 @@ mark.annotation:not(.annotation-highlight) {
   background: transparent #attImgURL('notesmall') left 4px no-repeat;
   text-align: justify;
 }
-#allAnnotations .UPDATED .annotationText, #xwikicontent .UPDATED {
-  ##background-image: #imgURL('note_error');
+#allAnnotations .UPDATED .annotationText {
   background-image: #attImgURL('notesmallorange');
 }
-#allAnnotations .ALTERED annotationText, #xwikicontent .ALTERED {
-  ##background-image: #imgURL('note_delete');
+#allAnnotations .ALTERED annotationText {
   background-image: #attImgURL('notesmallred');
 }
 

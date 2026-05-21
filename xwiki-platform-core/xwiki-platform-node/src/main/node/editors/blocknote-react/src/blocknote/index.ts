@@ -103,7 +103,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
  * @beta
  */
 function createDictionary(lang: EditorLanguage) {
-  // eslint-disable-next-line import/namespace
+  // eslint-disable-next-line import-x/namespace
   return locales[lang];
 }
 

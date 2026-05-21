@@ -313,7 +313,6 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       _onClick() {
          this.close();
          document.dispatchEvent(annotateTriggerEvent);
-         }
       }
 
       /**

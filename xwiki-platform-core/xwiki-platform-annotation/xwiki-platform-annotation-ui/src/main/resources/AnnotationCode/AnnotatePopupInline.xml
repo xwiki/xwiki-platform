@@ -354,8 +354,10 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       _onViewportChange(event) {
          const { top, left } = this._getPositioning(document.getSelection());
-         this.popup.style.top = top;
-         this.popup.style.left = left;
+         requestAnimationFrame(() =&gt; {
+            this.popup.style.top = top;
+            this.popup.style.left = left;
+         });
       }
 
       /**

@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -32,7 +31,6 @@ import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
@@ -49,7 +47,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 
 /**
  * Test of {@link LiveDataRenderer}.
@@ -96,12 +93,11 @@ class LiveDataRendererTest
     {
         LiveDataRendererParameters parameters = initParams();
         Block block = this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
-        assertEquals(new GroupBlock(
-            List.of(new RawBlock("<script type='application/json'>{ \"contentTrusted\": false}</script>", HTML_5_0)),
-            Map.of(
-                "class", "liveData loading",
-                "data-config", ADVANCED_PARAMETERS_EMPTY
-            )), block);
+        assertEquals(new GroupBlock(Map.of(
+            "class", "liveData loading",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
+            "data-config-content-trusted", "false"
+        )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
     }
@@ -113,13 +109,12 @@ class LiveDataRendererTest
         LiveDataRendererParameters parameters = initParams(params -> params.setId(liveDataId));
 
         Block block = this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
-        assertEquals(new GroupBlock(
-            List.of(new RawBlock("<script type='application/json'>{ \"contentTrusted\": false}</script>", HTML_5_0)),
-            Map.of(
-                "class", "liveData loading",
-                "data-config", ADVANCED_PARAMETERS_EMPTY,
-                "id", liveDataId
-            )), block);
+        assertEquals(new GroupBlock(Map.of(
+            "class", "liveData loading",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
+            "data-config-content-trusted", "false",
+            "id", liveDataId
+        )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
     }
@@ -127,7 +122,7 @@ class LiveDataRendererTest
     @Test
     void render() throws Exception
     {
-        Syntax html50 = HTML_5_0;
+        Syntax html50 = Syntax.HTML_5_0;
 
         ComponentManager componentManager = mock(ComponentManager.class);
         BlockRenderer blockRenderer = mock(BlockRenderer.class);
@@ -140,12 +135,11 @@ class LiveDataRendererTest
 
         this.renderer.render(new LiveDataRendererParameters(), Map.of(), true);
 
-        verify(blockRenderer).render(eq(new GroupBlock(
-            List.of(new RawBlock("<script type='application/json'>{ \"contentTrusted\": false}</script>", HTML_5_0)),
-            Map.of(
-                "class", "liveData loading",
-                "data-config", ADVANCED_PARAMETERS_EMPTY
-            ))), any(WikiPrinter.class));
+        verify(blockRenderer).render(eq(new GroupBlock(Map.of(
+            "class", "liveData loading",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
+            "data-config-content-trusted", "false"
+        ))), any(WikiPrinter.class));
     }
 
     private LiveDataRendererParameters initParams() throws Exception

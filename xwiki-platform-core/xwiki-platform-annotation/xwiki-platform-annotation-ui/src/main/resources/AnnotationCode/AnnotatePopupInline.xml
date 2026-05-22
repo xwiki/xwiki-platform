@@ -331,8 +331,6 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * Event handler for document selection. Checks the current selection and opens the popup
        */
       _onSelectionChange() {
-         this.close(); // close opened popups on new select
-
          const selection = document.getSelection();
          if (!selection || !this.wikiContent.contains(selection.anchorNode) || !selection.toString().trim()) {
              return;

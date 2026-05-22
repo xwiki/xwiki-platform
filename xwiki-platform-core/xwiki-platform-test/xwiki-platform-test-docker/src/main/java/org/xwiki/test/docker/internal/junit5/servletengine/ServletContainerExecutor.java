@@ -44,6 +44,7 @@ import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.libreoffice.LibreOfficeResolver;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
@@ -408,8 +409,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 getDockerImageTag(),
                 getDockerImageHash());
 
+            // Resolve the version of LibreOffice to install in the image
+            String officeVersion = 
+                LibreOfficeResolver.resolve(this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version"));
             // We rebuild every time the LibreOffice version changes
-            String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
             String imageVersion = String.format("LO-%S", officeVersion);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withReferenceFilter(imageName)
@@ -417,7 +420,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 .exec();
 
             if (imageSearchResults.isEmpty()) {
-                LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
+                LOGGER.info("(*) Build a dedicated image embedding LibreOffice [{}]...", officeVersion);
+
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
                 container = new XWikiLocalGenericContainer<>(new ImageFromDockerfile(imageName, false)
@@ -434,9 +438,19 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
+                            // Install the required tools to download the LibreOffice files
+                            // Also installed dependencies of LibreOffice which are apparently missing from the deb
+                            // packages declarations
+                            .run("apt-get update && "
+                                + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2-dev libxslt1-dev")
+                            // Download the LibreOffice deb packages
                             .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            // Install the LibreOffice deb packages and create a symlink to have a consistent path to
+                            // the LibreOffice installation directory
                             .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
                                 + "apt-get install --no-install-recommends ./*.deb &&"
                                 + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
@@ -454,6 +468,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder.build();
                     }));
             } else {
+                LOGGER.info("(*) An image with LibreOffice [{}] is already available, no need to build one.",
+                    officeVersion);
+
                 container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {

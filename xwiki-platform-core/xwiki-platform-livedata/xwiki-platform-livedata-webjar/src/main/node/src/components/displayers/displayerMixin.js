@@ -128,7 +128,7 @@ export default {
     sanitizeUrl(url, subtitute) {
       // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see
       // XWIKI-20249).
-      if (this.logic.isContentTrusted() || DOMPurify.isValidAttribute("a", "href", url)) {
+      if (this.logic.isContentTrusted() || DOMPurify.isValidAttribute("a", "href", url || "")) {
         return url;
       } else {
         return (subtitute || "#");

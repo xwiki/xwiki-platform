@@ -439,7 +439,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2 libxslt1-dev")
+                                + "libxml2-dev libxslt1-dev")
                             .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")

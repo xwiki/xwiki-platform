@@ -218,9 +218,10 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.wikiContent = wikiContent;
 
          this._onSelectionChange = debounce(this._onSelectionChange.bind(this), 700);
-         this._onClick = debounce(this._onClick.bind(this), 60);
-         this._onEscapeKey = debounce(this._onEscapeKey.bind(this), 60);
-         this._onViewportChange = debounce(this._onViewportChange.bind(this), 150);
+         this._onEscapeKey = this._onEscapeKey.bind(this);
+         this._onButtonClick = debounce(this._onButtonClick.bind(this), 75);
+         this._onPageClick = this._onPageClick.bind(this);
+         this._onViewportChange = debounce(this._onViewportChange.bind(this), 75);
 
          this._create();
          this._registerListeners();
@@ -267,7 +268,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.popupButton.focus();
 
          // add event listeners
-         this.popupButton.addEventListener("blur", () =&gt; { this.close(); }, { passive: true, once: true });
+         document.addEventListener("click", this._onPageClick);
          if(window.visualViewport) window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-position on viewport change
       }
 
@@ -289,6 +290,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.popup.setAttribute("aria-hidden", "true");
 
          // remove event listeners
+         document.removeEventListener("click", this._onPageClick);
          if(window.visualViewport) window.visualViewport.removeEventListener("resize", this._onViewportChange);
       }
 
@@ -310,9 +312,19 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       /**
        * Event handler for popup button click
        */
-      _onClick() {
+      _onButtonClick() {
          this.close();
          document.dispatchEvent(annotateTriggerEvent);
+      }
+
+      /*
+       * Event handler for click away
+       * @param {PointerEvent} event
+       */
+      _onPageClick(event) {
+        if(!this.popup.contains(event.target)) {
+           this.close();
+        }
       }
 
       /**

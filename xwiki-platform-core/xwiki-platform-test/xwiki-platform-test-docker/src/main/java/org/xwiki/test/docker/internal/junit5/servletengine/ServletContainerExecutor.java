@@ -448,17 +448,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
-                            // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
-                            // JODConverter: https://bit.ly/2w8B82Q
-                            .run("apt-get update && "
-                                + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
-                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2-dev libxslt1-dev")
                             .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
                             .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "apt-get install --no-install-recommends ./*.deb &&"
+                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

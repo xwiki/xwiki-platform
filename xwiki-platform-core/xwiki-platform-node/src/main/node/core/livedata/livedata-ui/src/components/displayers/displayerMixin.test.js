@@ -69,4 +69,29 @@ describe("displayerMixin.js", () => {
       expect(wrapper.vm.data).toBe("dataTest");
     });
   });
+
+  describe("sanitizeUrl()", function () {
+    it("returns the url when url is undefined and content is not trusted", () => {
+      const wrapper = initWrapper(TestComponent, {
+        logic: { isContentTrusted: () => false },
+      });
+      expect(wrapper.vm.sanitizeUrl(undefined)).toBeUndefined();
+    });
+    it("returns the url when content is not trusted and the url is valid", () => {
+      const wrapper = initWrapper(TestComponent, {
+        logic: { isContentTrusted: () => false },
+      });
+      expect(wrapper.vm.sanitizeUrl("http://example.com")).toBe(
+        "http://example.com",
+      );
+    });
+    it("returns the url when content is trusted", () => {
+      const wrapper = initWrapper(TestComponent, {
+        logic: { isContentTrusted: () => true },
+      });
+      expect(wrapper.vm.sanitizeUrl("http://example.com")).toBe(
+        "http://example.com",
+      );
+    });
+  });
 });

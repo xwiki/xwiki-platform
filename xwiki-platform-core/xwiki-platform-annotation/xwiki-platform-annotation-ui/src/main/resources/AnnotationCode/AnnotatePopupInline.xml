@@ -298,7 +298,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * Register event listeners
        */
       _registerListeners() {
-         this.popupButton.addEventListener("click", this._onClick, { passive: true });
+         this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
          this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // listener to close popup on Esc
 
          // open popup on text selection, disable in edit mode

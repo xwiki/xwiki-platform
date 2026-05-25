@@ -19,9 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -61,7 +60,7 @@ class SystemUserNotificationFilterTest
     private DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "alice");
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         DocumentReference systemUserReference = new DocumentReference("xwiki", "XWiki", "superadmin");
         DocumentReference randomUserReference = new DocumentReference("xwiki", "XWiki", "bob");
@@ -69,43 +68,43 @@ class SystemUserNotificationFilterTest
         when(this.entityReferenceSerializer.serialize(systemUserReference.getLocalDocumentReference()))
             .thenReturn("serializedSystemUser");
 
-        nonSystemEvent = mock(Event.class);
+        this.nonSystemEvent = mock(Event.class);
         when(this.nonSystemEvent.getUser()).thenReturn(randomUserReference);
 
-        systemEvent = mock(Event.class);
+        this.systemEvent = mock(Event.class);
         when(this.systemEvent.getUser()).thenReturn(systemUserReference);
     }
 
     @Test
-    void filterEvent() throws Exception
+    void filterEvent()
     {
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-            this.filter.filterEvent(nonSystemEvent, randomUser, Collections.emptyList(), NotificationFormat.ALERT));
+            this.filter.filterEvent(this.nonSystemEvent, this.randomUser, List.of(), NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-            this.filter.filterEvent(systemEvent, randomUser, Collections.emptyList(), NotificationFormat.ALERT));
+            this.filter.filterEvent(this.systemEvent, this.randomUser, List.of(), NotificationFormat.ALERT));
     }
 
     @Test
-    void filterTargetedSystemEvent() throws Exception
+    void filterTargetedSystemEvent()
     {
-        when(this.systemEvent.getTarget()).thenReturn(new HashSet<>(Arrays.asList("user1", "user2")));
+        when(this.systemEvent.getTarget()).thenReturn(Set.of("user1", "user2"));
 
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-            this.filter.filterEvent(systemEvent, randomUser, Collections.emptyList(), NotificationFormat.ALERT));
+            this.filter.filterEvent(this.systemEvent, this.randomUser, List.of(), NotificationFormat.ALERT));
     }
 
     @Test
-    void filterExpression() throws Exception
+    void filterExpression()
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
-        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(), fakePreference));
+        assertNull(this.filter.filterExpression(this.randomUser, List.of(), fakePreference));
         assertEquals("USER <> \"serializedSystemUser\"", this.filter
-            .filterExpression(randomUser, Collections.emptyList(), NotificationFilterType.EXCLUSIVE, null).toString());
+            .filterExpression(this.randomUser, List.of(), NotificationFilterType.EXCLUSIVE, null).toString());
     }
 
     @Test
-    void matchesPreference() throws Exception
+    void matchesPreference()
     {
         assertFalse(this.filter.matchesPreference(mock(NotificationPreference.class)));
     }

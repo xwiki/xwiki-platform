@@ -19,17 +19,17 @@
  */
 package org.xwiki.platform.wiki.creationjob.internal.steps;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
@@ -38,21 +38,17 @@ import static org.mockito.Mockito.verify;
 /**
  * @version $Id$
  */
-public class CreateWikiStepTest
+@ComponentTest
+class CreateWikiStepTest
 {
-    @Rule
-    public MockitoComponentMockingRule<CreateWikiStep> mocker = new MockitoComponentMockingRule<>(CreateWikiStep.class);
+    @InjectMockComponents
+    private CreateWikiStep createWikiStep;
 
+    @MockComponent
     private WikiManager wikiManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        wikiManager = mocker.getInstance(WikiManager.class);
-    }
-
     @Test
-    public void execute() throws Exception
+    void execute() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -61,21 +57,21 @@ public class CreateWikiStepTest
         request.setFailOnExist(true);
 
         // Test
-        mocker.getComponentUnderTest().execute(request);
+        this.createWikiStep.execute(request);
 
         // Verify
-        verify(wikiManager).create("wikiId", "wikiAlias", "owner", true);
+        verify(this.wikiManager).create("wikiId", "wikiAlias", "owner", true);
 
         // Test 2
         request.setFailOnExist(false);
-        mocker.getComponentUnderTest().execute(request);
+        this.createWikiStep.execute(request);
 
         // Verify
-        verify(wikiManager).create("wikiId", "wikiAlias", "owner", false);
+        verify(this.wikiManager).create("wikiId", "wikiAlias", "owner", false);
     }
 
     @Test
-    public void executeWhenException() throws Exception
+    void executeWhenException() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -84,26 +80,18 @@ public class CreateWikiStepTest
         request.setFailOnExist(true);
 
         Exception exception = new WikiManagerException("Exception in WikiManager.");
-        doThrow(exception).when(wikiManager).create(any(), any(), any(), anyBoolean());
+        doThrow(exception).when(this.wikiManager).create(any(), any(), any(), anyBoolean());
 
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().execute(request);
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-
-        // Verify
-        assertNotNull(caughtException);
+        // Test and verify
+        WikiCreationException caughtException = assertThrows(WikiCreationException.class,
+            () -> this.createWikiStep.execute(request));
         assertEquals("Failed to create the wiki [wikiId].", caughtException.getMessage());
         assertEquals(exception, caughtException.getCause());
-
     }
 
     @Test
-    public void getOrder() throws Exception
+    void getOrder()
     {
-        assertEquals(1000, mocker.getComponentUnderTest().getOrder());
+        assertEquals(1000, this.createWikiStep.getOrder());
     }
 }

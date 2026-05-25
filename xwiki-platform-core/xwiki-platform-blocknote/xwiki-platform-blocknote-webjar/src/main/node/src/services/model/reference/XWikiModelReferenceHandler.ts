@@ -23,13 +23,13 @@ import {
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import { AbstractModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 import { Container, injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
-import type { ModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 
 @injectable("Singleton")
-export class XWikiModelReferenceHandler implements ModelReferenceHandler {
-  public static bind(container: Container): void {
+export class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
+  public static bindComponents(container: Container): void {
     container
       .bind("ModelReferenceHandler")
       .to(XWikiModelReferenceHandler)

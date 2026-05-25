@@ -22,10 +22,10 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Verify the {@link XWikiNotificationManager}
@@ -33,40 +33,40 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 @Deprecated
-public class XWikiNotificationManagerTest
+class XWikiNotificationManagerTest
 {
     private XWikiNotificationManager notificationManager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        notificationManager = new XWikiNotificationManager();
+        this.notificationManager = new XWikiNotificationManager();
     }
 
     @Test
-    public void testRemoveRuleFromNamedRule()
+    void removeRuleFromNamedRule()
     {
         XWikiNotificationRule rule1 = getDummyNotificationRule();
         XWikiNotificationRule rule2 = getDummyNotificationRule();
-        assertNull(notificationManager.getNamedRules("testrule"));
-        notificationManager.addNamedRule("testrule", rule1);
-        notificationManager.addNamedRule("testrule", rule2);
-        assertEquals(2, notificationManager.getNamedRules("testrule").size());
-        notificationManager.removeNamedRule("testrule", rule1);
-        assertEquals(1, notificationManager.getNamedRules("testrule").size());
-        notificationManager.removeNamedRule("testrule", rule2);
-        assertNull(notificationManager.getNamedRules("testrule"));
+        assertNull(this.notificationManager.getNamedRules("testrule"));
+        this.notificationManager.addNamedRule("testrule", rule1);
+        this.notificationManager.addNamedRule("testrule", rule2);
+        assertEquals(2, this.notificationManager.getNamedRules("testrule").size());
+        this.notificationManager.removeNamedRule("testrule", rule1);
+        assertEquals(1, this.notificationManager.getNamedRules("testrule").size());
+        this.notificationManager.removeNamedRule("testrule", rule2);
+        assertNull(this.notificationManager.getNamedRules("testrule"));
     }
 
     @Test
-    public void testRemoveNamedRule()
+    void removeNamedRule()
     {
-        assertNull(notificationManager.getNamedRules("testrule"));
-        notificationManager.addNamedRule("testrule", getDummyNotificationRule());
-        notificationManager.addNamedRule("testrule", getDummyNotificationRule());
-        assertEquals(2, notificationManager.getNamedRules("testrule").size());
-        notificationManager.removeNamedRule("testrule");
-        assertNull(notificationManager.getNamedRules("testrule"));
+        assertNull(this.notificationManager.getNamedRules("testrule"));
+        this.notificationManager.addNamedRule("testrule", getDummyNotificationRule());
+        this.notificationManager.addNamedRule("testrule", getDummyNotificationRule());
+        assertEquals(2, this.notificationManager.getNamedRules("testrule").size());
+        this.notificationManager.removeNamedRule("testrule");
+        assertNull(this.notificationManager.getNamedRules("testrule"));
     }
 
     private XWikiNotificationRule getDummyNotificationRule()

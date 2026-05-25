@@ -130,7 +130,7 @@ export default {
       // XWIKI-20249).
       if (
         this.logic.isContentTrusted() ||
-        DOMPurify.isValidAttribute("a", "href", url)
+        DOMPurify.isValidAttribute("a", "href", url || "")
       ) {
         return url;
       } else {

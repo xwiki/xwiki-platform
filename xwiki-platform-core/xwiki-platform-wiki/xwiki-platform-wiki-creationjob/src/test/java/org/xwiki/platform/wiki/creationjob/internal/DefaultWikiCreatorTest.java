@@ -19,11 +19,9 @@
  */
 package org.xwiki.platform.wiki.creationjob.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -31,86 +29,75 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
  */
-public class DefaultWikiCreatorTest
+@ComponentTest
+class DefaultWikiCreatorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiCreator> mocker =
-            new MockitoComponentMockingRule<>(DefaultWikiCreator.class);
+    @InjectMockComponents
+    private DefaultWikiCreator defaultWikiCreator;
 
+    @MockComponent
     private JobExecutor jobExecutor;
 
+    @MockComponent
     private JobStatusStore jobStatusStore;
-    
-    @Before
-    public void setUp() throws Exception
-    {
-        jobExecutor = mocker.getInstance(JobExecutor.class);
-        jobStatusStore = mocker.getInstance(JobStatusStore.class);
-    }
-    
+
     @Test
-    public void createWiki() throws Exception
+    void createWiki() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
-        
+
         // Mock
         Job job = mock(Job.class);
-        when(jobExecutor.execute("wikicreationjob", request)).thenReturn(job);
-        
+        when(this.jobExecutor.execute("wikicreationjob", request)).thenReturn(job);
+
         // Test
-        assertEquals(job, mocker.getComponentUnderTest().createWiki(request));
-        
+        assertEquals(job, this.defaultWikiCreator.createWiki(request));
+
         // Verify
-        assertEquals(Arrays.asList("wikicreation", "createandinstall", "wikiId"), request.getId());
+        assertEquals(List.of("wikicreation", "createandinstall", "wikiId"), request.getId());
     }
 
     @Test
-    public void createWikiWithException() throws Exception
+    void createWikiWithException() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
-        
+
         // Mock
         JobException jobException = new JobException("Error in JobException");
-        when(jobExecutor.execute("wikicreationjob", request)).thenThrow(jobException);
+        when(this.jobExecutor.execute("wikicreationjob", request)).thenThrow(jobException);
 
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().createWiki(request);
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-
-        // Verify
-        assertNotNull(caughtException);
+        // Test and verify
+        assertThrows(WikiCreationException.class, () -> this.defaultWikiCreator.createWiki(request));
     }
-    
+
     @Test
-    public void getJobStatus() throws Exception
+    void getJobStatus() throws Exception
     {
         // Mocks
         Job job = mock(Job.class);
         JobStatus jobStatus1 = mock(JobStatus.class);
         when(job.getStatus()).thenReturn(jobStatus1);
-        when(jobExecutor.getJob(Arrays.asList("wikicreation", "createandinstall", "wiki1"))).thenReturn(job);
+        when(this.jobExecutor.getJob(List.of("wikicreation", "createandinstall", "wiki1"))).thenReturn(job);
         JobStatus jobStatus2 = mock(JobStatus.class);
-        when(jobStatusStore.getJobStatus(Arrays.asList("wikicreation", "createandinstall", "wiki2"))).
-                thenReturn(jobStatus2);
-        
+        when(this.jobStatusStore.getJobStatus(List.of("wikicreation", "createandinstall", "wiki2")))
+            .thenReturn(jobStatus2);
+
         // Tests
-        assertEquals(jobStatus1, mocker.getComponentUnderTest().getJobStatus("wiki1"));
-        assertEquals(jobStatus2, mocker.getComponentUnderTest().getJobStatus("wiki2"));
+        assertEquals(jobStatus1, this.defaultWikiCreator.getJobStatus("wiki1"));
+        assertEquals(jobStatus2, this.defaultWikiCreator.getJobStatus("wiki2"));
     }
 }

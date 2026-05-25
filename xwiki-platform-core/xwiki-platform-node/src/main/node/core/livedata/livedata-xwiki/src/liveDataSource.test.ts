@@ -19,6 +19,7 @@
  */
 
 import { XWikiLiveDataSource } from "./XWikiLiveDataSource";
+// eslint-disable-next-line import-x/no-named-as-default
 import $ from "jquery";
 import { stub } from "sinon";
 import { describe, expect, it, vi } from "vitest";

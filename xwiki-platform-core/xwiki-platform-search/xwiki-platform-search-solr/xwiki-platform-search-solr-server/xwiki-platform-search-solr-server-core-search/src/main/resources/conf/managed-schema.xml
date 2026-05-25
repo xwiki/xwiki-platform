@@ -84,6 +84,9 @@
            * a "docid" plong field has been added to store the XWiki document long local identifier (XWikiDocument#getId)
            * a dynamic *_string_lowercase and a corresponding copy field have been added to automatically provide a lower case version of all exact string properties
            * the fullname field is now set for all entities, not just DOCUMENT
+
+        17.10.9 (171009000) (migration):
+          * changed the class of the __cversion and __cmversion fields to solr.TextField (the previous one, solr.ExternalFileField, was deprecated in Solr 9.9 and deleted in Solr 10.0)
     -->
     <!-- XWIKI: the versions of the schema from XWiki point of view.
     
@@ -98,8 +101,8 @@
            * it makes the upgrade of Solr standalone setups much easier
            * it better support customizations of the Solr configuration (i.e. they are not reseted)
     -->
-    <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
-    <fieldType name="__cmversion" class="solr.ExternalFileField" defVal="170600000"/>
+    <fieldType name="__cversion" class="solr.TextField"  positionIncrementGap="160600000"/>
+    <fieldType name="__cmversion" class="solr.TextField" positionIncrementGap="171009000"/>
 
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field

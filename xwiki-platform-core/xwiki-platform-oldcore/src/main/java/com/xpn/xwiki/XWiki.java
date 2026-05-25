@@ -347,7 +347,11 @@ public class XWiki implements EventListener
 
     private XWikiStatsService statsService;
 
-    private XWikiURLFactoryService urlFactoryService;
+    /**
+     * volatile: {@link #getURLFactoryService()} uses double-checked locking; without volatile the JVM may reorder
+     * the write with the constructor, letting another thread observe a non-null but partially-initialized instance.
+     */
+    private volatile XWikiURLFactoryService urlFactoryService;
 
     private XWikiCriteriaService criteriaService;
 
@@ -3922,7 +3926,6 @@ public class XWiki implements EventListener
             String password2 = request.getParameter("register2_password");
             String password = (map.get("password"))[0];
             String email = (map.get("email"))[0];
-            String template = request.getParameter("template");
             String parent = request.getParameter("parent");
             String validkey = null;
 
@@ -3946,15 +3949,6 @@ public class XWiki implements EventListener
             if (!password.equals(password2)) {
                 // TODO: throw wrong password exception
                 return -2;
-            }
-
-            if ((template != null) && (!template.isEmpty())) {
-                XWikiDocument tdoc = getDocument(template, context);
-                if ((!tdoc.isNew())) {
-                    // FIXME: This ignores template objects, attachments, etc.
-                    content = tdoc.getContent();
-                    syntax = tdoc.getSyntax();
-                }
             }
 
             if ((parent == null) || (parent.isEmpty())) {

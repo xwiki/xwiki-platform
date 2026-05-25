@@ -23,20 +23,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -44,31 +45,32 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-public class DateClassTest
+@ComponentTest
+class DateClassTest
 {
-    @Rule
-    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private LocalizationContext localizationContext;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         DelegateComponentManager contextCM = new DelegateComponentManager();
-        contextCM.setComponentManager(mocker);
-        mocker.registerComponent(ComponentManager.class, "context", contextCM);
+        contextCM.setComponentManager(this.componentManager);
+        this.componentManager.registerComponent(ComponentManager.class, "context", contextCM);
 
-        Utils.setComponentManager(mocker);
+        Utils.setComponentManager(this.componentManager);
 
-        localizationContext = mocker.registerMockComponent(LocalizationContext.class);
+        this.localizationContext = this.componentManager.registerMockComponent(LocalizationContext.class);
     }
 
     @Test
-    public void fromString() throws XWikiException
+    void fromString() throws XWikiException
     {
         DateClass dateClass = new DateClass();
         dateClass.setDateFormat("MMMM yyyy");
-        when(localizationContext.getCurrentLocale()).thenReturn(new Locale("ro"));
+        when(this.localizationContext.getCurrentLocale()).thenReturn(new Locale("ro"));
 
         BaseProperty property = dateClass.fromString("octombrie 2015");
         Date date = (Date) property.getValue();
@@ -76,11 +78,11 @@ public class DateClassTest
     }
 
     @Test
-    public void toFormString() throws Exception
+    void toFormString() throws Exception
     {
         DateClass dateClass = new DateClass();
         dateClass.setDateFormat("MMMM yyyy");
-        when(localizationContext.getCurrentLocale()).thenReturn(new Locale("ro"));
+        when(this.localizationContext.getCurrentLocale()).thenReturn(new Locale("ro"));
 
         DateProperty property = new DateProperty();
         property.setValue(new SimpleDateFormat("MM/yyyy").parse("10/2015"));

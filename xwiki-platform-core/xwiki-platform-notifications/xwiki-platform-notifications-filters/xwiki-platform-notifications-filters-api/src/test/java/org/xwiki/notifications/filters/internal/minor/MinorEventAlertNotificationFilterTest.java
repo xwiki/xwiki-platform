@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal.minor;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
@@ -61,16 +61,16 @@ class MinorEventAlertNotificationFilterTest
         when(event3.getType()).thenReturn("update");
         when(event3.getDocumentVersion()).thenReturn("2.1");
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                this.filter.filterEvent(event1, randomUser, Collections.emptyList(),
+                this.filter.filterEvent(event1, randomUser, List.of(),
                         NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-            this.filter.filterEvent(event1, randomUser, Collections.emptyList(),
+            this.filter.filterEvent(event1, randomUser, List.of(),
                 NotificationFormat.EMAIL));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                this.filter.filterEvent(event2, randomUser, Collections.emptyList(),
+                this.filter.filterEvent(event2, randomUser, List.of(),
                         NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                this.filter.filterEvent(event3, randomUser, Collections.emptyList(),
+                this.filter.filterEvent(event3, randomUser, List.of(),
                         NotificationFormat.ALERT));
     }
 
@@ -80,9 +80,9 @@ class MinorEventAlertNotificationFilterTest
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
-        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(), fakePreference));
+        assertNull(this.filter.filterExpression(randomUser, List.of(), fakePreference));
         assertEquals("NOT ((TYPE = \"update\" AND NOT (DOCUMENT_VERSION ENDS WITH \".1\")))",
-                this.filter.filterExpression(randomUser, Collections.emptyList(),
+                this.filter.filterExpression(randomUser, List.of(),
                         NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.ALERT).toString());
     }
@@ -91,9 +91,9 @@ class MinorEventAlertNotificationFilterTest
     void filterExpressionWithWrongParameters()
     {
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
-        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(),
+        assertNull(this.filter.filterExpression(randomUser, List.of(),
                         NotificationFilterType.INCLUSIVE, NotificationFormat.ALERT));
-        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(),
+        assertNull(this.filter.filterExpression(randomUser, List.of(),
                 NotificationFilterType.EXCLUSIVE, NotificationFormat.EMAIL));
     }
 

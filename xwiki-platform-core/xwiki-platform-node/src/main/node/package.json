@@ -3,6 +3,7 @@
   "name": "@xwiki/platform-node",
   "version": "0.0.0",
   "type": "module",
+  "files": [],
   "scripts": {
     "api-extractor:ci": "nx run-many -t api-extractor:ci -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "api-extractor:local": "nx run-many -t api-extractor:local -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",

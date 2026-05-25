@@ -48,6 +48,10 @@ public class ObjectsSynchronizeAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();

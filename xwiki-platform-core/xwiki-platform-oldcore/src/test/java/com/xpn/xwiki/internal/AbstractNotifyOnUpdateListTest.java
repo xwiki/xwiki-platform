@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.internal;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,14 +26,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link AbstractNotifyOnUpdateList}.
  * 
  * @version $Id$
  */
-public class AbstractNotifyOnUpdateListTest
+class AbstractNotifyOnUpdateListTest
 {
     /**
      * The concrete {@link AbstractNotifyOnUpdateList} implementation used in tests.
@@ -52,20 +55,20 @@ public class AbstractNotifyOnUpdateListTest
         @Override
         protected void onUpdate()
         {
-            counter++;
+            this.counter++;
         }
 
         public int getCounter()
         {
-            return counter;
+            return this.counter;
         }
     }
 
     @Test
-    public void testUpdate()
+    void update()
     {
         int expectedCounter = 0;
-        NotifyOnUpdateList list = new NotifyOnUpdateList(new ArrayList<Integer>());
+        NotifyOnUpdateList list = new NotifyOnUpdateList(new ArrayList<>());
         assertEquals(expectedCounter, list.getCounter());
 
         list.add(13);
@@ -85,14 +88,14 @@ public class AbstractNotifyOnUpdateListTest
 
         assertFalse(list.contains(27));
 
-        list.addAll(Arrays.asList(1, 2));
+        list.addAll(List.of(1, 2));
         assertEquals(++expectedCounter, list.getCounter());
         assertEquals(2, list.size());
 
-        assertTrue(list.containsAll(Arrays.asList(2, 1)));
+        assertTrue(list.containsAll(List.of(2, 1)));
 
-        assertEquals(Arrays.asList(1, 2), list);
-        assertNotEquals(Arrays.asList(2, 1), list);
+        assertEquals(List.of(1, 2), list);
+        assertNotEquals(List.of(2, 1), list);
 
         list.remove(Integer.valueOf(3));
         assertEquals(expectedCounter, list.getCounter());
@@ -100,19 +103,19 @@ public class AbstractNotifyOnUpdateListTest
         list.remove(Integer.valueOf(1));
         assertEquals(++expectedCounter, list.getCounter());
 
-        list.removeAll(Arrays.asList(3, 2));
+        list.removeAll(List.of(3, 2));
         assertEquals(++expectedCounter, list.getCounter());
 
-        list.addAll(0, Arrays.asList(4, 5));
+        list.addAll(0, List.of(4, 5));
         assertEquals(++expectedCounter, list.getCounter());
 
-        list.removeAll(Arrays.asList(3, 2));
+        list.removeAll(List.of(3, 2));
         assertEquals(expectedCounter, list.getCounter());
 
-        list.retainAll(Arrays.asList(5, 4, 3));
+        list.retainAll(List.of(5, 4, 3));
         assertEquals(expectedCounter, list.getCounter());
 
-        list.retainAll(Arrays.asList(5, 6));
+        list.retainAll(List.of(5, 6));
         assertEquals(++expectedCounter, list.getCounter());
 
         list.set(0, 25);
@@ -120,14 +123,14 @@ public class AbstractNotifyOnUpdateListTest
     }
 
     @Test
-    public void testToString()
+    void toStringTest()
     {
-        List<Integer> list = Arrays.asList(3, 2, 1);
+        List<Integer> list = List.of(3, 2, 1);
         assertEquals(list.toString(), new NotifyOnUpdateList(list).toString());
     }
 
     @Test
-    public void testSubList()
+    void subList()
     {
         int expectedCounter = 0;
         NotifyOnUpdateList list = new NotifyOnUpdateList(Arrays.asList(5, 4, 3, 2, 1));
@@ -139,10 +142,10 @@ public class AbstractNotifyOnUpdateListTest
     }
 
     @Test
-    public void testIterator()
+    void iterator()
     {
         int expectedCounter = 0;
-        NotifyOnUpdateList list = new NotifyOnUpdateList(new LinkedList<Integer>(Arrays.asList(1, 2)));
+        NotifyOnUpdateList list = new NotifyOnUpdateList(new LinkedList<>(List.of(1, 2)));
         assertEquals(expectedCounter, list.getCounter());
 
         Iterator<Integer> iterator = list.iterator();
@@ -156,10 +159,10 @@ public class AbstractNotifyOnUpdateListTest
     }
 
     @Test
-    public void testListIterator()
+    void listIterator()
     {
         int expectedCounter = 0;
-        NotifyOnUpdateList list = new NotifyOnUpdateList(new LinkedList<Integer>(Arrays.asList(8, 7)));
+        NotifyOnUpdateList list = new NotifyOnUpdateList(new LinkedList<>(List.of(8, 7)));
         assertEquals(expectedCounter, list.getCounter());
 
         ListIterator<Integer> listIterator = list.listIterator();
@@ -171,6 +174,6 @@ public class AbstractNotifyOnUpdateListTest
         listIterator.add(10);
         assertEquals(++expectedCounter, list.getCounter());
 
-        assertEquals(Arrays.asList(9, 7, 10), list);
+        assertEquals(List.of(9, 7, 10), list);
     }
 }

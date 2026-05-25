@@ -19,11 +19,11 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.ClassPropertyReference;
@@ -33,7 +33,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -41,29 +43,39 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultClassPropertyValuesProvider}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
-public class DefaultClassPropertyValuesProviderTest
+@ComponentTest
+class DefaultClassPropertyValuesProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
-        new MockitoComponentMockingRule<ClassPropertyValuesProvider>(DefaultClassPropertyValuesProvider.class);
+    @InjectMockComponents
+    private DefaultClassPropertyValuesProvider provider;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
-    private DocumentReference classReference = new DocumentReference("wiki", "Some", "Class");
+    @MockComponent
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
-    @Before
-    public void configure() throws Exception
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    private final DocumentReference classReference = new DocumentReference("wiki", "Some", "Class");
+
+    @BeforeEach
+    void configure() throws Exception
     {
-        this.xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         XWikiContext xcontext = mock(XWikiContext.class);
         XWiki xwiki = mock(XWiki.class);
         XWikiDocument classDocument = mock(XWikiDocument.class);
@@ -79,49 +91,39 @@ public class DefaultClassPropertyValuesProviderTest
     }
 
     @Test
-    public void getValues() throws Exception
+    void getValues() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
         ClassPropertyValuesProvider dbListValuesProvider = mock(ClassPropertyValuesProvider.class);
-        ComponentManager contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
         PropertyValues values = new PropertyValues();
 
-        when(contextComponentManager.getInstance(ClassPropertyValuesProvider.class, "DBList"))
+        when(this.contextComponentManager.getInstance(ClassPropertyValuesProvider.class, "DBList"))
             .thenReturn(dbListValuesProvider);
         when(dbListValuesProvider.getValues(propertyReference, 13, "one", "two")).thenReturn(values);
 
-        assertSame(values, this.mocker.getComponentUnderTest().getValues(propertyReference, 13, "one", "two"));
+        assertSame(values, this.provider.getValues(propertyReference, 13, "one", "two"));
     }
 
     @Test
-    public void getValuesForMissingProperty() throws Exception
+    void getValuesForMissingProperty()
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("status", this.classReference);
-        EntityReferenceSerializer<String> entityReferenceSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        when(entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
+        when(this.entityReferenceSerializer.serialize(propertyReference)).thenReturn("status reference");
 
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 13);
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("No such property [status reference].", expected.getMessage());
-        }
+        XWikiRestException expected = assertThrows(XWikiRestException.class,
+            () -> this.provider.getValues(propertyReference, 13));
+        assertEquals("No such property [status reference].", expected.getMessage());
     }
 
     @Test
-    public void getValuesWithMissingProvider() throws Exception
+    void getValuesWithMissingProvider() throws Exception
     {
         ClassPropertyReference propertyReference = new ClassPropertyReference("category", this.classReference);
-        ComponentManager contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
-        when(contextComponentManager.getInstance(ClassPropertyValuesProvider.class, "DBList"))
+        when(this.contextComponentManager.getInstance(ClassPropertyValuesProvider.class, "DBList"))
             .thenThrow(new ComponentLookupException("Component not found."));
 
-        try {
-            this.mocker.getComponentUnderTest().getValues(propertyReference, 13, "one");
-            fail();
-        } catch (XWikiRestException expected) {
-            assertEquals("There's no value provider registered for the [DBList] property type.", expected.getMessage());
-        }
+        XWikiRestException expected = assertThrows(XWikiRestException.class,
+            () -> this.provider.getValues(propertyReference, 13, "one"));
+        assertEquals("There's no value provider registered for the [DBList] property type.", expected.getMessage());
     }
 }

@@ -19,16 +19,15 @@
  */
 package org.xwiki.platform.wiki.creationjob.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.slf4j.Logger;
 import org.slf4j.Marker;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -41,9 +40,13 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreationStep;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.calls;
@@ -56,53 +59,54 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class WikiCreationJobTest
+@ComponentTest
+class WikiCreationJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiCreationJob> mocker = new MockitoComponentMockingRule<>(WikiCreationJob.class);
+    @InjectMockComponents
+    private WikiCreationJob wikiCreationJob;
 
+    @MockComponent
     private ObservationManager observationManager;
 
+    @MockComponent
     private LoggerManager loggerManager;
 
+    @MockComponent
     private JobStatusStore store;
 
+    @MockComponent
     private Provider<Execution> executionProvider;
 
+    @MockComponent
     private Provider<ExecutionContextManager> executionContextManagerProvider;
 
+    @MockComponent
     private JobContext jobContext;
-    
-    private JobProgressManager progressManager;
-    
-    private Execution execution = new DefaultExecution();
-    
-    private ExecutionContextManager executionContextManager;
-    
-    @Before
-    public void setUp() throws Exception
-    {
-        observationManager = mocker.getInstance(ObservationManager.class);
-        loggerManager = mocker.getInstance(LoggerManager.class);
-        store = mocker.getInstance(JobStatusStore.class);
-        executionProvider = mock(Provider.class);
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class, Execution.class),
-                executionProvider);
-        when(executionProvider.get()).thenReturn(execution);
-        executionContextManagerProvider = mock(Provider.class);
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class,
-                ExecutionContextManager.class), executionContextManagerProvider);
-        executionContextManager = mock(ExecutionContextManager.class);
-        when(executionContextManagerProvider.get()).thenReturn(executionContextManager);
-        jobContext = mocker.getInstance(JobContext.class);
-        progressManager = mocker.getInstance(JobProgressManager.class);
 
-        execution.pushContext(new ExecutionContext());
+    @MockComponent
+    private JobProgressManager progressManager;
+
+    @MockComponent
+    private Logger logger;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    private final Execution execution = new DefaultExecution();
+
+    private ExecutionContextManager executionContextManager;
+
+    @BeforeEach
+    void setUp()
+    {
+        this.executionContextManager = mock(ExecutionContextManager.class);
+        when(this.executionProvider.get()).thenReturn(this.execution);
+        when(this.executionContextManagerProvider.get()).thenReturn(this.executionContextManager);
+        this.execution.pushContext(new ExecutionContext());
     }
-    
-    
+
     @Test
-    public void runInternal() throws Exception
+    void runInternal() throws Exception
     {
         // Mocks
         WikiCreationStep step1 = mock(WikiCreationStep.class);
@@ -111,55 +115,54 @@ public class WikiCreationJobTest
         when(step1.getOrder()).thenReturn(100);
         when(step2.getOrder()).thenReturn(50);
         when(step3.getOrder()).thenReturn(75);
-        
-        mocker.registerComponent(WikiCreationStep.class, "step1", step1);
-        mocker.registerComponent(WikiCreationStep.class, "step2", step2);
-        mocker.registerComponent(WikiCreationStep.class, "step3", step3);
-        
+
+        this.componentManager.registerComponent(WikiCreationStep.class, "step1", step1);
+        this.componentManager.registerComponent(WikiCreationStep.class, "step2", step2);
+        this.componentManager.registerComponent(WikiCreationStep.class, "step3", step3);
+
         // Test
         WikiCreationRequest request = new WikiCreationRequest();
-        request.setId(Arrays.asList("myrequest"));
-        mocker.getComponentUnderTest().start(request);
-        
+        request.setId(List.of("myrequest"));
+        this.wikiCreationJob.start(request);
+
         // Verify
-        InOrder inOrder = inOrder(step1, step2, step3, progressManager);
+        InOrder inOrder = inOrder(step1, step2, step3, this.progressManager);
         // Verify that the steps are executed in the good order
-        inOrder.verify(progressManager).pushLevelProgress(eq(3), any(Object.class));
-        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
+        inOrder.verify(this.progressManager).pushLevelProgress(eq(3), any(Object.class));
+        inOrder.verify(this.progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step2).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
+        inOrder.verify(this.progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step3).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
+        inOrder.verify(this.progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step1).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager).popLevelProgress(any(Object.class));
+        inOrder.verify(this.progressManager).popLevelProgress(any(Object.class));
     }
 
-
     @Test
-    public void runInternalWithException() throws Exception
+    void runInternalWithException() throws Exception
     {
         // Mocks
         WikiCreationStep step1 = mock(WikiCreationStep.class);
-        mocker.registerComponent(WikiCreationStep.class, "step1", step1);
+        this.componentManager.registerComponent(WikiCreationStep.class, "step1", step1);
         when(step1.getOrder()).thenReturn(100);
 
         WikiCreationException exception = new WikiCreationException("Error in the step");
         doThrow(exception).when(step1).execute(any(WikiCreationRequest.class));
-        
+
         // Test
         WikiCreationRequest request = new WikiCreationRequest();
-        request.setId(Arrays.asList("myrequest"));
+        request.setId(List.of("myrequest"));
         request.setWikiId("wikiId");
-        mocker.getComponentUnderTest().start(request);
+        this.wikiCreationJob.start(request);
 
         // Verify
-        verify(mocker.getMockedLogger()).error(any(Marker.class), eq("Exception thrown during job execution"),
-                eq(new WikiCreationException("Failed to execute creation steps on the wiki [wikiId].", exception)));
+        verify(this.logger).error(any(Marker.class), eq("Exception thrown during job execution"),
+            eq(new WikiCreationException("Failed to execute creation steps on the wiki [wikiId].", exception)));
     }
-    
+
     @Test
-    public void getType() throws Exception
+    void getType()
     {
-        assertEquals("wikicreationjob", mocker.getComponentUnderTest().getType());
+        assertEquals("wikicreationjob", this.wikiCreationJob.getType());
     }
 }

@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class EntityJobTest extends AbstractEntityJobTest
+class EntityJobTest extends AbstractEntityJobTest
 {
     public static class NoopEntityJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
     {

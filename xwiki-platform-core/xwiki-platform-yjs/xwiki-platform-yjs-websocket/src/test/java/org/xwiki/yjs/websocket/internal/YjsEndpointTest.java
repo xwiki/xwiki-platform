@@ -22,6 +22,7 @@ package org.xwiki.yjs.websocket.internal;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.websocket.CloseReason;
@@ -120,11 +121,13 @@ class YjsEndpointTest
     void onOpen() throws Exception
     {
         this.requestParameters.put("room", List.of("Some.Page"));
-        when(this.contextualAuthorizationManager.hasAccess(EDIT, this.documentReference)).thenReturn(true);
+        this.requestParameters.put("locale", List.of("en"));
+        DocumentReference documentReferenceWithLocale = new DocumentReference(this.documentReference, Locale.ENGLISH);
+        when(this.contextualAuthorizationManager.hasAccess(EDIT, documentReferenceWithLocale)).thenReturn(true);
 
         this.endpoint.onOpen(this.session, this.endpointConfig);
 
-        verify(this.roomManager).join(this.session, this.documentReference);
+        verify(this.roomManager).join(this.session, documentReferenceWithLocale);
 
         verify(this.session).setMaxIdleTimeout(75_000L);
         verify(this.session).setMaxBinaryMessageBufferSize(8_192);
@@ -156,11 +159,13 @@ class YjsEndpointTest
     void onOpenUnauthorized() throws Exception
     {
         this.requestParameters.put("room", List.of("Some.Page"));
-        when(this.contextualAuthorizationManager.hasAccess(EDIT, this.documentReference)).thenReturn(false);
+        this.requestParameters.put("locale", List.of("en_UK"));
+        DocumentReference documentReferenceWithLocale = new DocumentReference(this.documentReference, Locale.UK);
+        when(this.contextualAuthorizationManager.hasAccess(EDIT, documentReferenceWithLocale)).thenReturn(false);
 
         this.endpoint.onOpen(this.session, this.endpointConfig);
 
-        verifySessionClosed(CANNOT_ACCEPT, "You are not allowed to edit [test:Some.Page].");
+        verifySessionClosed(CANNOT_ACCEPT, "You are not allowed to edit [test:Some.Page(en_UK)].");
         verify(this.roomManager, never()).join(any(), any());
     }
 
@@ -168,14 +173,16 @@ class YjsEndpointTest
     void onOpenWhenJoinThrows() throws Exception
     {
         this.requestParameters.put("room", List.of("Some.Page"));
-        when(this.contextualAuthorizationManager.hasAccess(EDIT, this.documentReference)).thenReturn(true);
-        doThrow(new RuntimeException("boom")).when(this.roomManager).join(this.session, this.documentReference);
+        this.requestParameters.put("locale", List.of(""));
+        DocumentReference documentReferenceWithLocale = new DocumentReference(this.documentReference, Locale.ROOT);
+        when(this.contextualAuthorizationManager.hasAccess(EDIT, documentReferenceWithLocale)).thenReturn(true);
+        doThrow(new RuntimeException("boom")).when(this.roomManager).join(this.session, documentReferenceWithLocale);
 
         this.endpoint.onOpen(this.session, this.endpointConfig);
 
         verifySessionClosed(UNEXPECTED_CONDITION, "An unexpected error happened while joining the room.");
         assertEquals(1, this.logCapture.size());
-        assertEquals("Failed to join the room [test:Some.Page]. Cause: [RuntimeException: boom]",
+        assertEquals("Failed to join the room [test:Some.Page()]. Cause: [RuntimeException: boom]",
             this.logCapture.getMessage(0));
     }
 

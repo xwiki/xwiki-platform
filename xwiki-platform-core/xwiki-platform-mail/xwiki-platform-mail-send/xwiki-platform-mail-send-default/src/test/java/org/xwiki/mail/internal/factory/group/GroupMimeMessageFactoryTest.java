@@ -26,88 +26,85 @@ import java.util.Map;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.group.GroupMimeMessageFactory}.
+ * Unit tests for {@link GroupMimeMessageFactory}.
  *
  * @version $Id$
  * @since 6.4.1
  */
 @Deprecated
-public class GroupMimeMessageFactoryTest
+@ComponentTest
+class GroupMimeMessageFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<GroupMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(GroupMimeMessageFactory.class);
+    @InjectMockComponents
+    private GroupMimeMessageFactory factory;
 
-    @Test
-    public void createMessageWhenNullParametersPassed() throws Exception
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeComponent
+    void beforeComponent() throws Exception
     {
-        DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
-
-        try {
-            this.mocker.getComponentUnderTest().createMessage(groupReference, null);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("You must pass parameters for this Mime Message Factory to work!", expected.getMessage());
-        }
+        Provider<ComponentManager> contextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(contextProvider.get()).thenReturn(this.componentManager);
     }
 
     @Test
-    public void createMessageWhenNoHintParameterPassed() throws Exception
+    void createMessageWhenNullParametersPassed()
     {
         DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(groupReference, Collections.<String, Object>emptyMap());
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("The parameter [hint] is mandatory.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () ->
+            this.factory.createMessage(groupReference, null));
+        assertEquals("You must pass parameters for this Mime Message Factory to work!", exception.getMessage());
     }
 
     @Test
-    public void createMessageWhenNoSourceParameterPassed() throws Exception
+    void createMessageWhenNoHintParameterPassed()
     {
         DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(groupReference,
-                Collections.<String, Object>singletonMap("hint", "factoryHint"));
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("The parameter [source] is mandatory.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () ->
+            this.factory.createMessage(groupReference, Collections.emptyMap()));
+        assertEquals("The parameter [hint] is mandatory.", exception.getMessage());
     }
 
     @Test
-    public void createMessageWhenNotExistingMimeMessageFactory() throws Exception
+    void createMessageWhenNoSourceParameterPassed()
+    {
+        DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
+
+        Throwable exception = assertThrows(MessagingException.class, () ->
+            this.factory.createMessage(groupReference, Collections.singletonMap("hint", "factoryHint")));
+        assertEquals("The parameter [source] is mandatory.", exception.getMessage());
+    }
+
+    @Test
+    void createMessageWhenNotExistingMimeMessageFactory()
     {
         DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("hint", "factoryHint");
         parameters.put("source", "factorySource");
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
-
-        try {
-            this.mocker.getComponentUnderTest().createMessage(groupReference, parameters);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () ->
+            this.factory.createMessage(groupReference, parameters));
+        assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
+            exception.getMessage());
     }
 }

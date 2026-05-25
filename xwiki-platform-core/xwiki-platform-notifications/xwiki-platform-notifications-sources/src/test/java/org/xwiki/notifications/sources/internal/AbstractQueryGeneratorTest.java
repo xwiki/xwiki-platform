@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public abstract class AbstractQueryGeneratorTest
+abstract class AbstractQueryGeneratorTest
 {
     protected static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "UserA");
     protected static final String SERIALIZED_USER_REFERENCE = "xwiki:XWiki.UserA";
@@ -78,7 +78,7 @@ public abstract class AbstractQueryGeneratorTest
     protected NotificationPreference pref1;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.startDate = new Date(10);
 

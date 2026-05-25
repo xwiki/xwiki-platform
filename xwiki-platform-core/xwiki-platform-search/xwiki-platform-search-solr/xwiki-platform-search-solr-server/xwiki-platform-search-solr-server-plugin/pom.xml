@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server</artifactId>
-    <version>18.4.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
   <name>XWiki Platform - Search - Solr - Server - Plugin</name>
@@ -37,6 +37,9 @@
     <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-search-solr-plugin</xwiki.extension.features>
+
+    <!-- We need to make sure this module is compatible with the minimum version of Java supported by Solr -->
+    <xwiki.java.version>${solr.minimum.java.version}</xwiki.java.version>
   </properties>
   <dependencies>
     <dependency>

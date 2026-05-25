@@ -19,13 +19,12 @@
  */
 package org.xwiki.crypto.store.wiki.internal;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.crypto.BinaryStringEncoder;
-import org.xwiki.crypto.store.SignatureStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.BlockReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,7 +32,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -42,9 +43,8 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceR
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -58,8 +58,9 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
+@ComponentTest
 @ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class})
-public class DefaultSignatureStoreTest
+class DefaultSignatureStoreTest
 {
     private static final byte[] SIGNATURE = "signature".getBytes();
 
@@ -69,42 +70,47 @@ public class DefaultSignatureStoreTest
     private static final EntityReference SPACE_REFERENCE = new EntityReference("space", EntityType.WIKI);
     private static final EntityReference DOCUMENT_REFERENCE = new EntityReference("documents", EntityType.DOCUMENT);
 
-    @Rule
-    public MockitoComponentMockingRule<SignatureStore> mocker =
-        new MockitoComponentMockingRule<SignatureStore>(DefaultSignatureStore.class);
+    @InjectMockComponents
+    private DefaultSignatureStore store;
+
+    @MockComponent
+    @Named("default")
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @MockComponent
+    @Named("current")
+    private EntityReferenceProvider currentEntityReferenceProvider;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    @Named("Base64")
+    private BinaryStringEncoder encoder;
 
     private XWikiContext xcontext;
 
     private XWiki xwiki;
 
-    private SignatureStore store;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        this.mocker.registerMockComponent(EntityReferenceProvider.class, "default");
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
+        when(this.currentEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(DOCUMENT_REFERENCE);
 
-        EntityReferenceProvider valueProvider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
-        when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
-        when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
-        when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
-
-        Provider<XWikiContext> xcontextProvider =
-            this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         this.xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(this.xcontext);
-        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        BinaryStringEncoder encoder = this.mocker.getInstance(BinaryStringEncoder.class, "Base64");
-        when(encoder.encode(SIGNATURE, 64)).thenReturn(ENCODED_SIGNATURE);
-        when(encoder.decode(ENCODED_SIGNATURE)).thenReturn(SIGNATURE);
-
-        this.store = this.mocker.getComponentUnderTest();
+        when(this.encoder.encode(SIGNATURE, 64)).thenReturn(ENCODED_SIGNATURE);
+        when(this.encoder.decode(ENCODED_SIGNATURE)).thenReturn(SIGNATURE);
     }
 
     @Test
-    public void testStoringNewSignature() throws Exception
+    void storingNewSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
@@ -124,7 +130,7 @@ public class DefaultSignatureStoreTest
     }
 
     @Test
-    public void testUpdatingSignature() throws Exception
+    void updatingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
@@ -147,7 +153,7 @@ public class DefaultSignatureStoreTest
     }
 
     @Test
-    public void testRetrievingExistingSignature() throws Exception
+    void retrievingExistingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
@@ -162,21 +168,19 @@ public class DefaultSignatureStoreTest
         when(signatureObject.getLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE)).thenReturn(
             ENCODED_SIGNATURE);
 
-        assertThat(
-            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))),
-            equalTo(SIGNATURE));
+        assertArrayEquals(SIGNATURE,
+            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))));
     }
 
     @Test
-    public void testRetrievingMissingSignature() throws Exception
+    void retrievingMissingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
             .thenReturn(sourceDocument);
 
-        assertThat(
-            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))),
-            nullValue());
+        assertNull(
+            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))));
         verify(sourceDocument).getXObject(
             new DocumentReference(DefaultSignatureStore.SIGNATURECLASS, new WikiReference("wiki")),
             DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE,

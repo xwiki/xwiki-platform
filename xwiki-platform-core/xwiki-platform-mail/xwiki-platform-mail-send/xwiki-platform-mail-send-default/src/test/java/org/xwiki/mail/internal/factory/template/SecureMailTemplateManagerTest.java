@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
  * @since 6.1RC1
  */
 @ComponentTest
-public class SecureMailTemplateManagerTest
+class SecureMailTemplateManagerTest
 {
     @InjectMockComponents
     private SecureMailTemplateManager mailTemplateManager;

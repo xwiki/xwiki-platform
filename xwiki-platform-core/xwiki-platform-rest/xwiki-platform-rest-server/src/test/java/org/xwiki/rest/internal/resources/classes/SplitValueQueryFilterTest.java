@@ -29,23 +29,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link SplitValueQueryFilter}.
- * 
+ *
  * @version $Id$
  * @since 10.6RC1
  */
-public class SplitValueQueryFilterTest
+class SplitValueQueryFilterTest
 {
-    private SplitValueQueryFilter filter = new SplitValueQueryFilter(",|", 2, "a");
+    private final SplitValueQueryFilter filter = new SplitValueQueryFilter(",|", 2, "a");
 
     @Test
-    public void filterResults()
+    void filterResults()
     {
-        List<Object> results = Arrays.asList(new Object[] {"alice,|bob,", 3L}, new Object[] {",carol", 2L},
-            new Object[] {"denis|carol|alice", 1L}, new Object[] {"Carol", 1L});
+        List<Object> results = Arrays.asList(new Object[] { "alice,|bob,", 3L }, new Object[] { ",carol", 2L },
+            new Object[] { "denis|carol|alice", 1L }, new Object[] { "Carol", 1L });
 
         List<Object> filteredResults = this.filter.filterResults(results);
         assertEquals(2, filteredResults.size());
-        assertArrayEquals(new Object[] {"alice", 4L}, (Object[]) filteredResults.get(0));
-        assertArrayEquals(new Object[] {"carol", 3L}, (Object[]) filteredResults.get(1));
+        assertArrayEquals(new Object[] { "alice", 4L }, (Object[]) filteredResults.get(0));
+        assertArrayEquals(new Object[] { "carol", 3L }, (Object[]) filteredResults.get(1));
     }
 }

@@ -211,4 +211,19 @@ public class AllIT
     class NestedSkinActionIT extends SkinActionIT
     {
     }
+
+    @Nested
+    class NestedHTMLExportIT extends HTMLExportIT
+    {
+    }
+
+    @Nested
+    class NestedBreadcrumbsIT extends BreadcrumbsIT
+    {
+    }
+
+    @Nested
+    class NestedCreatePageNestedDocumentsIT extends CreatePageNestedDocumentsIT
+    {
+    }
 }

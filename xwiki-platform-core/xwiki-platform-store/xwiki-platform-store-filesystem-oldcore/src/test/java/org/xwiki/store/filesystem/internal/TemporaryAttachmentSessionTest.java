@@ -19,12 +19,13 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -131,11 +132,11 @@ class TemporaryAttachmentSessionTest
     @Test
     void getFilenames()
     {
-        assertEquals(new HashSet<>(Arrays.asList("foo1", "bar1")),
+        assertEquals(new HashSet<>(List.of("foo1", "bar1")),
             this.temporaryAttachmentSession.getFilenames(this.docRef1));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(),
             this.temporaryAttachmentSession.getFilenames(this.docRef2));
-        assertEquals(Collections.singleton("foo2"),
+        assertEquals(Set.of("foo2"),
             this.temporaryAttachmentSession.getFilenames(this.docRef3));
     }
 
@@ -153,7 +154,7 @@ class TemporaryAttachmentSessionTest
     @Test
     void getAttachments()
     {
-        assertEquals(new HashSet<>(Arrays.asList(this.fooAttachment1, this.barAttachment1)),
+        assertEquals(new HashSet<>(List.of(this.fooAttachment1, this.barAttachment1)),
             this.temporaryAttachmentSession.getAttachments(this.docRef1));
         assertEquals(Collections.emptySet(), this.temporaryAttachmentSession.getAttachments(this.docRef2));
     }

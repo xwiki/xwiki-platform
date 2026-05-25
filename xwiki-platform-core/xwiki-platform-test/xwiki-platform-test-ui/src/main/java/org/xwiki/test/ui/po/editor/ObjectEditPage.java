@@ -161,6 +161,16 @@ public class ObjectEditPage extends EditPage
     }
 
     /**
+     * @return {@code true} if the editor has a warning box about deprecated properties.
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public boolean hasDeprecatedProperties()
+    {
+        return getDriver().hasElement(By.className("deprecatedProperties"));
+    }
+
+    /**
      * @param className a class name
      * @param propertyName a class field name
      * @return {@code true} if the specified class field is listed as deprecated, {@code false} otherwise

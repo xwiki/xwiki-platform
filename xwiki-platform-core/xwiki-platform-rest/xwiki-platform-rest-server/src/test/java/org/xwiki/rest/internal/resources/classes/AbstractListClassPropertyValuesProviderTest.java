@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.8
  */
-public abstract class AbstractListClassPropertyValuesProviderTest
+abstract class AbstractListClassPropertyValuesProviderTest
 {
     protected Query allowedValuesQuery = mock(Query.class, "allowed");
 
@@ -86,7 +86,7 @@ public abstract class AbstractListClassPropertyValuesProviderTest
     @Named("readonly")
     protected Provider<XWikiContext> readonlyXWikiContextProvider;
 
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         BaseClass xclass = mock(BaseClass.class);
@@ -110,11 +110,11 @@ public abstract class AbstractListClassPropertyValuesProviderTest
 
     protected void addProperty(String name, PropertyClass definition, boolean withQueryBuilders) throws Exception
     {
-        XWiki xwiki = this.xcontext.getWiki();
+        XWiki wiki = this.xcontext.getWiki();
         BaseClass xclass = this.classDocument.getXClass();
         ClassPropertyReference propertyReference = new ClassPropertyReference(name, this.classReference);
 
-        when(xwiki.getDocument(propertyReference, this.xcontext)).thenReturn(this.classDocument);
+        when(wiki.getDocument(propertyReference, this.xcontext)).thenReturn(this.classDocument);
         when(xclass.get(name)).thenReturn(definition);
         definition.setOwnerDocument(this.classDocument);
 

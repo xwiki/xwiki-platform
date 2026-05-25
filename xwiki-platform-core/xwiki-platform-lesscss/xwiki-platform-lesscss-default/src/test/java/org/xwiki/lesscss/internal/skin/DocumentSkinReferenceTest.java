@@ -19,39 +19,39 @@
  */
 package org.xwiki.lesscss.internal.skin;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link DocumentSkinReference}.
  *
- * @since 7.0RC1
  * @version $Id$
+ * @since 7.0RC1
  */
-public class DocumentSkinReferenceTest
+class DocumentSkinReferenceTest
 {
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-    
-    @Before
-    public void setUp() throws Exception
+
+    @BeforeEach
+    void setUp()
     {
-        entityReferenceSerializer = mock(EntityReferenceSerializer.class);
+        this.entityReferenceSerializer = mock(EntityReferenceSerializer.class);
     }
 
     @Test
-    public void serialize() throws Exception
+    void serialize()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        DocumentSkinReference documentSkinReference 
-                = new DocumentSkinReference(documentReference, entityReferenceSerializer);
-        
-        when(entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.page");
+        DocumentSkinReference documentSkinReference
+            = new DocumentSkinReference(documentReference, this.entityReferenceSerializer);
+
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.page");
 
         // Test
         assertEquals("SkinDocument[wiki:space.page]", documentSkinReference.serialize());

@@ -113,7 +113,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testRunInternalOverwrite() throws Exception
+    void runInternalOverwrite() throws Exception
     {
         this.request.setOverwrite(true);
         this.request.setRootReference(DOCUMENT_ONE);
@@ -126,7 +126,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testRunInternalUpdateSolrIndexNoChanges() throws Exception
+    void runInternalUpdateSolrIndexNoChanges() throws Exception
     {
         mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
         mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
@@ -138,7 +138,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testRunInternalUpdateSolrIndexAddAction() throws Exception
+    void runInternalUpdateSolrIndexAddAction() throws Exception
     {
         mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
         mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
@@ -151,7 +151,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testGetGroupPathWithoutRootReference()
+    void getGroupPathWithoutRootReference()
     {
         JobGroupPath result = this.indexerJob.getGroupPath();
 
@@ -159,7 +159,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testGetGroupPathWithRootReference()
+    void getGroupPathWithRootReference()
     {
         EntityReference rootReference = new DocumentReference(WIKI, SPACE, "documentRoot");
         String expectedPath = "serializedRootReference";
@@ -174,7 +174,7 @@ class IndexerJobTest
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void testRunInternalUpdateSolrIndexDeleteAction(boolean exists) throws Exception
+    void runInternalUpdateSolrIndexDeleteAction(boolean exists) throws Exception
     {
         mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
         mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
@@ -193,7 +193,7 @@ class IndexerJobTest
     }
 
     @Test
-    void testRunInternalUpdateSolrIndexUpdateAction() throws Exception
+    void runInternalUpdateSolrIndexUpdateAction() throws Exception
     {
         mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
         mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_ONE));

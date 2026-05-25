@@ -19,8 +19,8 @@
  */
 package org.xwiki.mail.internal.factory.html;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 6.1M2
  */
 @ComponentTest
-public class HTMLMimeBodyPartFactoryTest
+class HTMLMimeBodyPartFactoryTest
 {
     @InjectMockComponents
     private HTMLMimeBodyPartFactory htmlMimeBodyPartFactory;
@@ -62,7 +62,7 @@ public class HTMLMimeBodyPartFactoryTest
     private ComponentManager componentManager;
 
     @Test
-    public void createWhenOnlyHTMLContent() throws Exception
+    void createWhenOnlyHTMLContent() throws Exception
     {
         MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>", Collections.emptyMap());
 
@@ -71,7 +71,7 @@ public class HTMLMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createWhenHTMLContentAndHeader() throws Exception
+    void createWhenHTMLContentAndHeader() throws Exception
     {
         MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>",
             Collections.singletonMap("headers", Collections.singletonMap("key", "value")));
@@ -81,7 +81,7 @@ public class HTMLMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createWhenHTMLAndAlternateTextContent() throws Exception
+    void createWhenHTMLAndAlternateTextContent() throws Exception
     {
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory defaultBodyPartFactory = this.componentManager.getInstance(
@@ -98,7 +98,7 @@ public class HTMLMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createWhenHTMLAndEmbeddedImages() throws Exception
+    void createWhenHTMLAndEmbeddedImages() throws Exception
     {
         Attachment attachment = mock(Attachment.class);
 
@@ -108,7 +108,7 @@ public class HTMLMimeBodyPartFactoryTest
         when(attachmentBodyPartFactory.create(same(attachment), any(Map.class))).thenReturn(attachmentBodyPart);
 
         MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create("<p>some html</p>",
-            Collections.singletonMap("attachments", Arrays.asList(attachment)));
+            Collections.singletonMap("attachments", List.of(attachment)));
 
         MimeMultipart multipart = ((MimeMultipart) bodyPart.getContent());
         assertEquals(2, multipart.getCount());
@@ -117,7 +117,7 @@ public class HTMLMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createWhenHTMLAndEmbeddedImagesAndNormalAttachments() throws Exception
+    void createWhenHTMLAndEmbeddedImagesAndNormalAttachments() throws Exception
     {
         Attachment normalAttachment = mock(Attachment.class, "normalAttachment");
         when(normalAttachment.getFilename()).thenReturn("attachment1.png");
@@ -136,7 +136,7 @@ public class HTMLMimeBodyPartFactoryTest
 
         MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create(
             "<p>html... <img src='cid:embeddedAttachment.png'/></p>",
-            Collections.singletonMap("attachments", Arrays.asList(normalAttachment, embeddedAttachment)));
+            Collections.singletonMap("attachments", List.of(normalAttachment, embeddedAttachment)));
 
         MimeMultipart multipart = (MimeMultipart) bodyPart.getContent();
         assertEquals(2, multipart.getCount());
@@ -151,7 +151,7 @@ public class HTMLMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createWhenHTMLAndAlternateTextAndEmbeddedImagesAndNormalAttachments() throws Exception
+    void createWhenHTMLAndAlternateTextAndEmbeddedImagesAndNormalAttachments() throws Exception
     {
         Attachment normalAttachment = mock(Attachment.class, "normalAttachment");
         when(normalAttachment.getFilename()).thenReturn("attachment1.png");
@@ -174,7 +174,7 @@ public class HTMLMimeBodyPartFactoryTest
         when(defaultBodyPartFactory.create(eq("some text"), any(Map.class))).thenReturn(textBodyPart);
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("attachments", Arrays.asList(normalAttachment, embeddedAttachment));
+        parameters.put("attachments", List.of(normalAttachment, embeddedAttachment));
         parameters.put("alternate", "some text");
         MimeBodyPart bodyPart = this.htmlMimeBodyPartFactory.create(
             "<p>html... <img src='cid:embeddedAttachment.png'/></p>", parameters);

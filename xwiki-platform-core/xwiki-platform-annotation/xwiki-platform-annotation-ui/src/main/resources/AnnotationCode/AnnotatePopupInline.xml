@@ -217,10 +217,10 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       constructor(wikiContent) {
          this.wikiContent = wikiContent;
 
-         this._onSelectionChange = debounce(this._onSelectionChange.bind(this), 700);
+         this._onSelection = debounce(this._onSelection.bind(this), 700);
          this._onEscapeKey = this._onEscapeKey.bind(this);
          this._onButtonClick = debounce(this._onButtonClick.bind(this), 75);
-         this._onPageClick = this._onPageClick.bind(this);
+         this._onClickAway = this._onClickAway.bind(this);
          this._onViewportChange = debounce(this._onViewportChange.bind(this), 75);
 
          this._create();
@@ -267,9 +267,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
          this.previousFocusElem = document.activeElement;
          this.popupButton.focus();
 
-         // add event listeners
-         document.addEventListener("click", this._onPageClick);
-         if(window.visualViewport) window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-position on viewport change
+         document.addEventListener("click", this._onClickAway);
+         if(window.visualViewport) window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-positioning on resize/zoom
       }
 
       /**
@@ -284,13 +283,13 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
              this.previousFocusElem.getClientRects().length) {
            this.previousFocusElem.focus();
          } else {
-            this.popupButton.blur(); // this might not be the most accessible way
+            // this might not be the most accessible way
+            this.popupButton.blur();
          }
          this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
          this.popup.setAttribute("aria-hidden", "true");
 
-         // remove event listeners
-         document.removeEventListener("click", this._onPageClick);
+         document.removeEventListener("click", this._onClickAway);
          if(window.visualViewport) window.visualViewport.removeEventListener("resize", this._onViewportChange);
       }
 
@@ -299,14 +298,15 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       _registerListeners() {
          this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
-         this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // listener to close popup on Esc
+         this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // exit when pressing Escape
 
          // open popup on text selection, disable in edit mode
-         document.addEventListener("selectionchange", this._onSelectionChange, { passive: true });
-         this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this._onSelectionChange); });
-         this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this._onSelectionChange, { passive: true }); });
+         document.addEventListener("selectionchange", this._onSelection, { passive: true });
+         this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this._onSelection); });
+         this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this._onSelection, { passive: true }); });
 
-         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false }); // prevent losing focus (the selection) when clicking on popup edges
+         // prevent losing focus (the selection) when clicking on popup edges
+         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });
       }
 
       /**
@@ -318,10 +318,10 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
 
       /*
-       * Event handler for click away
+       * Event handler for a page click (popup click away listener)
        * @param {PointerEvent} event
        */
-      _onPageClick(event) {
+      _onClickAway(event) {
         if(!this.popup.contains(event.target)) {
            this.close();
         }
@@ -330,7 +330,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       /**
        * Event handler for document selection. Checks the current selection and opens the popup
        */
-      _onSelectionChange() {
+      _onSelection() {
          const selection = document.getSelection();
          if (!selection || !this.wikiContent.contains(selection.anchorNode) || !selection.toString().trim()) {
              return;
@@ -363,7 +363,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       /**
        * Get popup positioning (top and left absolute positioning)
        * @param {Selection} selection - A selection
-       * @return {{popupTop: number, popupLeft: number}} The popup element and popup button
+       * @return {{top: number, left: number}} The popup element and popup button
        */
       _getPositioning(selection) {
          if(!selection || selection.rangeCount === 0) {

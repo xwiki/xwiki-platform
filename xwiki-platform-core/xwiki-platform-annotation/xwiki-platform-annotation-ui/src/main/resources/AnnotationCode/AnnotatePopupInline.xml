@@ -142,7 +142,7 @@ const Constants = Object.freeze({
    * The keyboard shortcut that needs to be triggered to create an annotation
    * @type {KeyboardEventInit}
    */
-  ANNOTATE_SHORTCUT: { ctrlKey: true, code: "KeyM", key: "m", keyCode: 77 }, // ShortcutJS still expects the deprecated keyCode property
+  ANNOTATE_SHORTCUT: { ctrlKey: true, code: "KeyM", key: "m", keyCode: 77 }, // shortcuts.js still expects the deprecated keyCode property
   /**
    * The translation key for the popup button title (for accessibility)
    * @type {String}
@@ -252,7 +252,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       open(selection) {
          if(document.getElementsByClassName(Constants.ANNOTATE_BUBBLE_CLASS).length !== 0) {
-           console.debug("Not opening annotate popup because annotate bubble is open");
+           // an annotate bubble is opened already
            return;
          }
 
@@ -333,6 +333,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       _onSelection() {
          const selection = document.getSelection();
          if (!selection || !this.wikiContent.contains(selection.anchorNode) || !selection.toString().trim()) {
+             // selection invalid or not in document content
              return;
          }
 
@@ -367,13 +368,16 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        */
       _getPositioning(selection) {
          if(!selection || selection.rangeCount === 0) {
-            console.debug("Could not determine popup positioning, selection range invalid");
+            // invalid selection
             return;
          }
 
          // use last rectangle of selection, important for correct positioning in multi-line selections
          const rects = selection.getRangeAt(0).getClientRects();
-         if (!rects.length) return;
+         if (!rects.length) {
+            // empty collection
+            return;
+         }
          const rect = rects[rects.length - 1];
 
          return {

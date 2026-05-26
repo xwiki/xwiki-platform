@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
@@ -50,10 +53,18 @@ import org.xwiki.resource.temporary.TemporaryResourceStore;
  */
 @Component
 @Singleton
-public class DefaultTemporaryResourceStore implements TemporaryResourceStore
+public class DefaultTemporaryResourceStore implements TemporaryResourceStore, Initializable
 {
     @Inject
     private Environment environment;
+
+    private Path rootPath;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.rootPath = this.environment.getTemporaryDirectory().toPath().toAbsolutePath();
+    }
 
     @Override
     public File createTemporaryFile(TemporaryResourceReference reference, InputStream content) throws IOException
@@ -88,7 +99,6 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
 
         String path = StringUtils.join(encode(segments), '/');
         String md5 = DigestUtils.md5Hex(path);
-        File rootFolder = this.environment.getTemporaryDirectory();
 
         List<String> finalPathSegments = new ArrayList<>();
 
@@ -101,19 +111,19 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
         finalPathSegments.add(String.valueOf(md5.charAt(1)));
         finalPathSegments.add(String.valueOf(md5.substring(2)));
 
-        File safeFolder = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
+        // Get the path of the folder in which the temporary file is supposed to be stored
+        Path safeFolderPath = this.rootPath.resolve(StringUtils.join(finalPathSegments, '/'));
 
-        finalPathSegments.addAll(reference.getResourcePath());
+        // Get the sub path in which to store the temporary file
+        Path temporaryPath = safeFolderPath.resolve(StringUtils.join(reference.getResourcePath(), '/')).normalize();
 
-        File temporaryFile = new File(rootFolder, StringUtils.join(finalPathSegments, '/'));
-
-        // Make sure the resource path is not relative (e.g. "../../../") and tries to get outside of the safe folder.
-        if (!temporaryFile.getAbsolutePath().startsWith(safeFolder.getAbsolutePath())) {
-            throw new IOException(String.format("Resource path [%s] should be within [%s]",
-                temporaryFile.getAbsolutePath(), safeFolder.getAbsolutePath()));
+        // Make sure the resource path does not try go outside the safe folder.
+        if (!temporaryPath.startsWith(safeFolderPath)) {
+            throw new IOException(
+                String.format("Resource path [%s] should be within [%s]", temporaryPath, safeFolderPath));
         }
 
-        return temporaryFile;
+        return temporaryPath.toFile();
     }
 
     private List<String> encode(List<String> path)

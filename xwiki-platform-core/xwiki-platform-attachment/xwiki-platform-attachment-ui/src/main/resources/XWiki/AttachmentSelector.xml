@@ -484,7 +484,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
       const params = {
         'form_token': $(form).find('[name="form_token"]').val(),
-        'sheet': 'CKEditor.FileUploader',
+        'sheet': 'XWiki.WYSIWYG.FileUploader',
         'outputSyntax': 'plain'
       };
   

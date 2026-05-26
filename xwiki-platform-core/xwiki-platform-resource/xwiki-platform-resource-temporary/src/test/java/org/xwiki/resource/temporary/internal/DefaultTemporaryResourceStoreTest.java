@@ -32,6 +32,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -56,12 +57,19 @@ class DefaultTemporaryResourceStoreTest
     }
 
     @Test
-    void getTemporaryFile()
+    void getTemporaryFile() throws IOException
+    {
+        assertEquals(new File("/tmp/xwiki/tmp/moduleid/c/4/53919da9e226032c090ffc08d7506d/resource/file.txt"),
+            this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", List.of("resource/file.txt"),
+                new DocumentReference("xwiki", "Test", "Test"))));
+    }
+
+    @Test
+    void getTemporaryFileWithPathTraversal()
     {
         // Make sure it's not possible to read a file outside the root temporary directory.
         // This is a security check to prevent path traversal attacks.
-        assertThrows(IOException.class,
-            () -> this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", List.of("../../../../../../../../../../../etc/passwd"),
-                new DocumentReference("xwiki", "Test", "Test"))));
+        assertThrows(IOException.class, () -> this.store.getTemporaryFile(new TemporaryResourceReference("moduleid",
+            List.of("../../../../../../../../../../../etc/passwd"), new DocumentReference("xwiki", "Test", "Test"))));
     }
 }

@@ -63,7 +63,7 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
     @Override
     public void initialize() throws InitializationException
     {
-        this.rootPath = this.environment.getTemporaryDirectory().toPath().toAbsolutePath();
+        this.rootPath = this.environment.getTemporaryDirectory().toPath().resolve("tmp").toAbsolutePath();
     }
 
     @Override
@@ -102,7 +102,6 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
 
         List<String> finalPathSegments = new ArrayList<>();
 
-        finalPathSegments.add("tmp");
         finalPathSegments.add(reference.getModuleId());
 
         // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
@@ -112,15 +111,23 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
         finalPathSegments.add(String.valueOf(md5.substring(2)));
 
         // Get the path of the folder in which the temporary file is supposed to be stored
-        Path safeFolderPath = this.rootPath.resolve(StringUtils.join(finalPathSegments, '/'));
+        Path modulePath = this.rootPath.resolve(StringUtils.join(finalPathSegments, '/'));
+
+        // Make sure the resource folder does not try go outside the module folder.
+        if (!modulePath.startsWith(this.rootPath)) {
+            throw new IOException(
+                String.format("The module path [%s] should be within [%s]", modulePath, this.rootPath));
+        }
+
+        finalPathSegments.addAll(reference.getResourcePath());
 
         // Get the sub path in which to store the temporary file
-        Path temporaryPath = safeFolderPath.resolve(StringUtils.join(reference.getResourcePath(), '/')).normalize();
+        Path temporaryPath = modulePath.resolve(StringUtils.join(reference.getResourcePath(), '/')).normalize();
 
         // Make sure the resource path does not try go outside the safe folder.
-        if (!temporaryPath.startsWith(safeFolderPath)) {
+        if (!temporaryPath.startsWith(modulePath) || !temporaryPath.startsWith(this.rootPath)) {
             throw new IOException(
-                String.format("Resource path [%s] should be within [%s]", temporaryPath, safeFolderPath));
+                String.format("Resource path [%s] should be within [%s]", temporaryPath, modulePath));
         }
 
         return temporaryPath.toFile();

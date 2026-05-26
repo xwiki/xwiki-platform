@@ -60,12 +60,12 @@ class IndexTreeScriptServiceTest
     {
         // Null safe check.
         assertNull(this.indexTreeScriptService.normalizeEntityTreeNodeId(null));
-        assertEquals("Failed to normalize the given entity tree node id [null].", this.logCapture.getMessage(0));
+        assertEquals(0, this.logCapture.size());
 
         // Normalize an invalid entity tree node id.
         assertEquals("unexpectedIdFormat", this.indexTreeScriptService.normalizeEntityTreeNodeId("unexpectedIdFormat"));
         assertEquals("Failed to normalize the given entity tree node id [unexpectedIdFormat].",
-            this.logCapture.getMessage(1));
+            this.logCapture.getMessage(0));
 
         // Normalize an actual entity (attachment) tree node id.
         AttachmentReference attachmentReference =
@@ -76,7 +76,7 @@ class IndexTreeScriptServiceTest
             .thenReturn("attachment:wiki:Current.Page@image.png");
         assertEquals("attachment:wiki:Current.Page@image.png",
             this.indexTreeScriptService.normalizeEntityTreeNodeId("attachment:image.png"));
-        assertEquals(2, this.logCapture.size());
+        assertEquals(1, this.logCapture.size());
 
         // Normalize a document pseudo tree node id.
         DocumentReference documentReference = new DocumentReference("wiki", "Current", "OtherPage");
@@ -86,6 +86,6 @@ class IndexTreeScriptServiceTest
             .thenReturn("document:wiki:Current.OtherPage");
         assertEquals("translations:wiki:Current.OtherPage",
             this.indexTreeScriptService.normalizeEntityTreeNodeId("tranSLations:OtherPage"));
-        assertEquals(2, this.logCapture.size());
+        assertEquals(1, this.logCapture.size());
     }
 }

@@ -20,6 +20,7 @@ import { UniAst } from '@xwiki/platform-uniast-api';
 export const BlocknoteEditor: DefineComponent<    {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
@@ -27,6 +28,9 @@ editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "lin
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
 >>>>>>> 1e2e66bd72 (update)
+=======
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
+>>>>>>> 94cc4892b8 (--wip-- [skip ci])
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
@@ -42,6 +46,7 @@ getContent: () => UniAst | Error;
 }, string, PublicProps, Readonly<{
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
@@ -49,6 +54,9 @@ editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "lin
 =======
 editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
 >>>>>>> 1e2e66bd72 (update)
+=======
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
+>>>>>>> 94cc4892b8 (--wip-- [skip ci])
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
@@ -61,6 +69,7 @@ depsContainer: Container;
 "onDebounced-change"?: ((content: UniAst) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
+'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }

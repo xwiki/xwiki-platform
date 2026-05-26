@@ -55,13 +55,17 @@ export type LinkEmailConfig = {
     messageBody?: string;
 };
 
-// Warning: (ae-forgotten-export) The symbol "__VLS_Props" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export const LinkModal: DefineComponent<__VLS_Props, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
+// @beta
+export const LinkModal: DefineComponent<    {
+current: LinkData;
+linkEditionCtx: LinkEditionContext;
+}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
-}, string, PublicProps, Readonly<__VLS_Props> & Readonly<{
+}, string, PublicProps, Readonly<{
+current: LinkData;
+linkEditionCtx: LinkEditionContext;
+}> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
@@ -95,11 +99,6 @@ export type LinkUrlConfig = {
 
 // @beta
 export function parseLinkTarget(url: string, remoteURLParser: RemoteURLParser): LinkTarget;
-
-// Warnings were encountered during analysis:
-//
-// dist/vue/LinkModal.vue.d.ts:8:5 - (ae-incompatible-release-tags) The symbol "submit" is marked as @public, but its signature references "LinkData" which is marked as @beta
-// dist/vue/LinkModal.vue.d.ts:11:5 - (ae-incompatible-release-tags) The symbol "onSubmit" is marked as @public, but its signature references "LinkData" which is marked as @beta
 
 // (No @packageDocumentation comment for this package)
 

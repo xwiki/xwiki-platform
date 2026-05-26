@@ -108,6 +108,6 @@ export default {
 }
 
 .layout-table tbody tr:first-child td.cell {
-  border-top: 0
+  border-top: 0;
 }
 </style>

@@ -307,7 +307,7 @@ export default {
   padding: var(--padding-large-vertical) 0;
 }
 
-.layout-table .column-name:hover{
+.layout-table .column-name:hover {
   transition: background-color 250ms;
   background-color: rgba(0, 0, 0, 0.03);
 }
@@ -381,7 +381,7 @@ export default {
   padding: var(--table-cell-padding);
   /*Ensure that we have vertical alignment*/
   padding-top: 0;
-  padding-bottom: 0
+  padding-bottom: 0;
 }
 
 .layout-table .draggable-item .property-name {

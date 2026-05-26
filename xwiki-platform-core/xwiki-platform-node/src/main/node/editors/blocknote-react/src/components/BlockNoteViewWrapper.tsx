@@ -268,14 +268,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // joining the session by checking for the absence of an initialContentLoaded key in the document's configuration map
   // (shared across all session participants).
   if (collaboration) {
-    const initialContentLoaded = collaboration.doc
-      .getMap("configuration")
-      .get("initialContentLoaded");
+    const config = collaboration.doc.getMap("configuration");
+    const initialContentLoaded = config.get("initialContentLoaded");
     if (!initialContentLoaded) {
       // This is the first user joining the realtime collaboration session.
-      collaboration.doc
-        .getMap("configuration")
-        .set("initialContentLoaded", true);
+      config.set("initialContentLoaded", true);
       console.debug(
         "Setting initial content for realtime collaboration session.",
         content,

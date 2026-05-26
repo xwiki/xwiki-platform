@@ -19,24 +19,25 @@
  */
 package com.xpn.xwiki.plugin.scheduler.internal;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -55,19 +56,26 @@ public class SchedulersClassLoaderManager
 {
     private SchedulerPlugin schedulerPlugin;
 
-    private final Map<String, Set<BaseObjectReference>> schedulersMapPerNamespace = new HashMap<>();
+    private final Map<String, Set<BaseObjectReference>> schedulersMapPerNamespace = new ConcurrentHashMap<>();
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private Logger logger;
-    
+
     @Inject
     private ClassLoaderManager classLoaderManager;
 
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
+
+    @Inject
+    private ComponentManager componentManager;
+
     /**
      * Define the instance of the scheduler plugin to use.
+     * 
      * @param schedulerPlugin the scheduler plugin instance this instance should use.
      */
     public void setSchedulerPlugin(SchedulerPlugin schedulerPlugin)
@@ -75,16 +83,23 @@ public class SchedulersClassLoaderManager
         this.schedulerPlugin = schedulerPlugin;
     }
 
+    private String toMapKey(String namespace)
+    {
+        // Using empty string instead of null since ConcurrentHashMap doesn't support null keys
+        return StringUtils.defaultString(namespace);
+    }
+
     private void registerScheduler(String namespace, BaseObjectReference objectReference)
     {
-        if (!this.schedulersMapPerNamespace.containsKey(namespace)) {
-            this.schedulersMapPerNamespace.put(namespace, new HashSet<>());
-        }
-        this.schedulersMapPerNamespace.get(namespace).add(objectReference);
+        // Using empty string instead of null since ConcurrentHashMap doesn't support null keys
+        Set<BaseObjectReference> references = this.schedulersMapPerNamespace
+            .computeIfAbsent(toMapKey(namespace), k -> ConcurrentHashMap.newKeySet());
+        references.add(this.entityReferenceFactory.getReference(objectReference));
     }
 
     /**
      * Remove scheduler information related to given object reference.
+     * 
      * @param objectReference the reference of a scheduler object.
      */
     public void removeScheduler(BaseObjectReference objectReference)
@@ -96,42 +111,53 @@ public class SchedulersClassLoaderManager
 
     /**
      * Remove all schedulers information associated to a namespace.
+     * 
      * @param namespace the namespace for which to remove information.
      */
     public void removeSchedulers(String namespace)
     {
-        this.schedulersMapPerNamespace.remove(namespace);
+        this.schedulersMapPerNamespace.remove(toMapKey(namespace));
     }
 
     /**
      * Perform operations when a classloader of a specific namespace is reset.
+     * 
      * @param namespace the namespace for which an event has been triggered.
      */
     public void onClassLoaderReset(String namespace)
     {
         Set<BaseObjectReference> objectReferences =
-            new HashSet<>(schedulersMapPerNamespace.getOrDefault(namespace, Set.of()));
-        for (BaseObjectReference objectReference : objectReferences) {
-            this.reloadScheduler(objectReference);
-        }
+            new HashSet<>(this.schedulersMapPerNamespace.getOrDefault(toMapKey(namespace), Set.of()));
+
+        // Reloading all the schedulers can take a long time, and there is no reason to block the trigger during that
+        // time.
+        Thread.ofVirtual().name("XWiki Reload Schedulers after classloader reload for namespace [" + namespace + "]")
+            .start(new ExecutionContextRunnable(() -> {
+                for (BaseObjectReference objectReference : objectReferences) {
+                    reloadScheduler(objectReference);
+                }
+            }, this.componentManager));
     }
 
     private void reloadScheduler(BaseObjectReference objectReference)
     {
-        XWikiContext context = contextProvider.get();
-        EntityReference documentReference = objectReference.extractReference(EntityType.DOCUMENT);
+        XWikiContext context = this.contextProvider.get();
+
         try {
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            BaseObject jobObject = document.getXObject(SchedulerJobClassDocumentInitializer.XWIKI_JOB_CLASSREFERENCE);
-            this.schedulerPlugin.unscheduleJob(jobObject, context);
-            this.schedulerPlugin.scheduleJob(jobObject, context);
-        } catch (XWikiException e) {
-            this.logger.error("Error while trying to reload scheduler for object [{}]: ", objectReference, e);
+            // Get the job object
+            XWikiDocument document = context.getWiki().getDocument(objectReference, context);
+            BaseObject jobObject = document.getXObject(objectReference);
+
+            // Reschedule the job with the new classloader.
+            this.schedulerPlugin.reloadJob(jobObject, context);
+        } catch (Exception e) {
+            this.logger.error("Error while trying to reload scheduler for object [{}]", objectReference, e);
         }
     }
 
     /**
      * Load a class for a scheduler and register it at the same time.
+     * 
      * @param className the name of the class to load.
      * @param baseObjectReference the reference of the object of the scheduler.
      * @return the instance of the given class name.
@@ -140,18 +166,20 @@ public class SchedulersClassLoaderManager
     public Class<?> loadClassAndRegister(String className, BaseObjectReference baseObjectReference)
         throws ClassNotFoundException
     {
-        String namespace = null;
-
         // Reload the root classloader if needed: it's important if it's been dropped.
         NamespaceURLClassLoader classLoader = this.classLoaderManager.getURLClassLoader(null, true);
         Class<?> result = Class.forName(className, true, classLoader);
 
-        // find the actual namespace of the classloader from where the class has been found.
+        // Find the actual namespace of the classloader from where the class has been found.
+        String namespace;
         if (result.getClassLoader() instanceof NamespaceURLClassLoader namespaceURLClassLoader) {
             namespace = namespaceURLClassLoader.getNamespace();
+        } else {
+            namespace = null;
         }
 
-        this.registerScheduler(namespace, baseObjectReference);
+        registerScheduler(namespace, baseObjectReference);
+
         return result;
     }
 }

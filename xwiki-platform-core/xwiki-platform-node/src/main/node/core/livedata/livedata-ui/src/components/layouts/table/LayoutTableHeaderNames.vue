@@ -351,7 +351,7 @@ export default {
   content: " ";
   position: absolute;
   pointer-events: none;
-  left: 8px; /*center the handle horizontally, should be changed in case the resize-handle are is increased*/
+  left: 8px; /*center the handle horizontally, should be changed in case the resize-handle area is increased*/
   top: calc((1em - (100% / 2)) * -1);
   background: var(--input-border-focus);
   width: 3px;

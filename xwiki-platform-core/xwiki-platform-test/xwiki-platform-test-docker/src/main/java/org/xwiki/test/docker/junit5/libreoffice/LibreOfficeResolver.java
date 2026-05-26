@@ -60,12 +60,11 @@ public final class LibreOfficeResolver
 
     private static String getDownloadPageBody() throws IOException, InterruptedException
     {
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(LIBREOFFICE_STABLE_URL)).GET().build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(LIBREOFFICE_STABLE_URL)).GET().build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-        }
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 
     /**

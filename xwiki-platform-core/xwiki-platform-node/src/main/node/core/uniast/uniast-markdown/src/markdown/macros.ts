@@ -23,13 +23,17 @@ import type { MarkdownToUniAstConverter } from "./markdown-to-uni-ast-converter"
 import type { MacrosService } from "@xwiki/platform-macros-service";
 import type {
   InlineContent,
-  MacroInvocation,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
 } from "@xwiki/platform-uniast-api";
 
 /**
  * A handler called when macro invocations are encountered
  *
  * @param content - The input after the macro opening (e.g. `Hello {{macro /}} world` would give `macro /}} world`)
+ * @param markdownParser - Markdown to UniAst converter
+ * @param macrosService - Service to get all registered macros
+ * @param previousStr - Previous characters before the macro opening (e.g. `Hello {{macro /}} world` would give `Hello `)
  *
  * @returns
  *  - `parseAs` item to indicate the macro invocation is correct and has been parsed
@@ -43,10 +47,11 @@ type MacroHandler = (
   content: string,
   markdownParser: MarkdownToUniAstConverter,
   macrosService: MacrosService,
+  previousStr: string,
 ) => Promise<
   | {
       do: "parseAs";
-      call: MacroInvocation;
+      call: MacroBlockInvocation | InlineMacroInvocation;
       /** The number of input characters consumed for the macro invocation */
       chars: number;
     }
@@ -148,6 +153,7 @@ async function codifyMacros(
         markdown.slice(i + 2),
         markdownParser,
         macrosService,
+        markdown.slice(0, i),
       );
 
       switch (handling.do) {
@@ -199,6 +205,7 @@ const eatMacro: MacroHandler = async (
   content,
   mdParser,
   macrosService,
+  previousChars,
 ): ReturnType<MacroHandler> => {
   // Find the macro's name
   const macroIdMatch = content.match(
@@ -210,6 +217,12 @@ const eatMacro: MacroHandler = async (
   if (!macroIdMatch) {
     return { do: "ignore" };
   }
+
+  // Determine if the macro is at the beginning of the line
+  // Required to determine if the macro is invoked as a block or inline
+  const previousLines = previousChars.split("\n");
+  const currentLine = previousLines[previousLines.length - 1];
+  const isMacroAtLineBeginning = currentLine.trim().length === 0;
 
   const macroId = macroIdMatch[1];
 
@@ -339,10 +352,10 @@ const eatMacro: MacroHandler = async (
       content.slice(offset),
       mdParser,
       macrosService,
-      async (content, mdParser, macrosService) =>
+      async (content, mdParser, macrosService, previousChars) =>
         closingRegex.exec(content)
           ? { do: "break" }
-          : await eatMacro(content, mdParser, macrosService),
+          : await eatMacro(content, mdParser, macrosService, previousChars),
     );
 
     // If everything was parsed without stopping, the macro is not closed properly
@@ -362,6 +375,12 @@ const eatMacro: MacroHandler = async (
     offset += brokeAt + closingMatch[0].length + 2;
   }
 
+  // Determine if the macro is alone on its line (required to determine of the macro is invoked as a block or inline)
+  const nextLines = content.substring(offset).split("\n");
+  const nextLine = nextLines[nextLines.length - 1];
+  const isSyntaxicallyBlock =
+    isMacroAtLineBeginning && nextLine.trim().length === 0;
+
   const macro = macrosService.get(macroId);
 
   // Ensure the macro is known
@@ -372,6 +391,7 @@ const eatMacro: MacroHandler = async (
     return {
       do: "parseAs",
       call: {
+        kind: isSyntaxicallyBlock ? "block" : "inline",
         id: macroId,
         params: parameters,
         body: rawBody ? { type: "raw", content: rawBody } : { type: "none" },
@@ -380,8 +400,24 @@ const eatMacro: MacroHandler = async (
     };
   }
 
-  let body: MacroInvocation["body"];
+  // Inline macros can be invoked using the block syntax (e.g. `\n{{inlineMacro /}}`) in which case they'll be rendered as inline
+  // The opposite isn't possible
+  if (macro.renderAs === "block" && !isSyntaxicallyBlock) {
+    // TODO: properly report an error
+    // Tracking issue: https://jira.xwiki.org/browse/XWIKI-24418
+    return {
+      do: "parseAs",
+      call: {
+        kind: "inline",
+        id: macroId,
+        params: parameters,
+        body: rawBody ? { type: "raw", content: rawBody } : { type: "none" },
+      },
+      chars: offset,
+    };
+  }
 
+  // We can now properly build the macro by looking at its body
   switch (macro.infos.bodyType) {
     case "none":
       if (rawBody && rawBody.trim() !== "") {
@@ -390,8 +426,16 @@ const eatMacro: MacroHandler = async (
         throw new Error("Wrongly provided a body for contentless macro");
       }
 
-      body = { type: "none" };
-      break;
+      return {
+        do: "parseAs",
+        call: {
+          kind: macro.renderAs,
+          id: macroId,
+          params: parameters,
+          body: { type: "none" },
+        },
+        chars: offset,
+      };
 
     case "raw":
       if (rawBody === null) {
@@ -400,8 +444,16 @@ const eatMacro: MacroHandler = async (
         throw new Error(`Missing body for contentful macro "${macroId}"`);
       }
 
-      body = { type: "raw", content: rawBody };
-      break;
+      return {
+        do: "parseAs",
+        call: {
+          kind: macro.renderAs,
+          id: macroId,
+          params: parameters,
+          body: { type: "raw", content: rawBody },
+        },
+        chars: offset,
+      };
 
     case "wysiwyg": {
       if (rawBody === null) {
@@ -439,7 +491,16 @@ const eatMacro: MacroHandler = async (
       }
 
       if (macro.renderAs === "block") {
-        body = { type: "inlineContents", inlineContents };
+        return {
+          do: "parseAs",
+          call: {
+            kind: macro.renderAs,
+            id: macroId,
+            params: parameters,
+            body: { type: "inlineContents", inlineContents },
+          },
+          chars: offset,
+        };
       } else {
         if (inlineContents.length !== 1) {
           // TODO: properly report the error
@@ -449,26 +510,19 @@ const eatMacro: MacroHandler = async (
           );
         }
 
-        body = { type: "inlineContent", inlineContent: inlineContents[0] };
+        return {
+          do: "parseAs",
+          call: {
+            kind: macro.renderAs,
+            id: macroId,
+            params: parameters,
+            body: { type: "inlineContent", inlineContent: inlineContents[0] },
+          },
+          chars: offset,
+        };
       }
-
-      break;
     }
   }
-
-  // We can now properly build the macro
-  // NOTE: If a paragraph only contains an inline macro, it will be converted to a macro block instead
-  //       by the calling function
-
-  return {
-    do: "parseAs",
-    call: {
-      id: macroId,
-      params: parameters,
-      body,
-    },
-    chars: offset,
-  };
 };
 
 /**
@@ -481,7 +535,9 @@ const eatMacro: MacroHandler = async (
  * @since 18.0.0RC1
  * @beta
  */
-function reparseCodifiedMacro(code: string): MacroInvocation {
+function reparseCodifiedMacro(
+  code: string,
+): MacroBlockInvocation | InlineMacroInvocation {
   if (!code.startsWith(CODIFIED_MACRO_PREFIX)) {
     console.error({ code });
     throw new Error(
@@ -489,9 +545,9 @@ function reparseCodifiedMacro(code: string): MacroInvocation {
     );
   }
 
-  return JSON.parse(
-    atob(code.substring(CODIFIED_MACRO_PREFIX.length)),
-  ) as MacroInvocation;
+  return JSON.parse(atob(code.substring(CODIFIED_MACRO_PREFIX.length))) as
+    | MacroBlockInvocation
+    | InlineMacroInvocation;
 }
 
 /**

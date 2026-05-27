@@ -22,7 +22,6 @@ import { MACRO_NAME_PREFIX } from "./blocknote/utils";
 import { createRoot } from "react-dom/client";
 import type { ContextForMacros } from "./blocknote/utils";
 import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
-import type { LinkEditionContext } from "./misc/linkSuggest";
 
 /**
  * Mount a BlockNote editor inside a DOM container
@@ -59,7 +58,7 @@ function mountBlockNote(
 
 export { MACRO_NAME_PREFIX, mountBlockNote };
 
-export type { BlockNoteViewWrapperProps, ContextForMacros, LinkEditionContext };
+export type { BlockNoteViewWrapperProps, ContextForMacros };
 
 export type {
   BlockNoteConcreteMacro,
@@ -91,6 +90,9 @@ export {
   buildMacroRawContent,
   extractMacroRawContent,
 } from "./blocknote/utils";
+
+export { BlockNoteToUniAstConverter } from "./uniast/bn-to-uniast";
+export { UniAstToBlockNoteConverter } from "./uniast/uniast-to-bn";
 
 export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
 

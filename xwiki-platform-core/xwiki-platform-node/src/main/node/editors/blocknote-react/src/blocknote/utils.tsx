@@ -48,6 +48,11 @@ import type {
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
 import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import type {
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  UniAst,
+} from "@xwiki/platform-uniast-api";
 import type { JSX, ReactNode } from "react";
 
 /**
@@ -214,7 +219,7 @@ type BlockNoteConcreteMacro = {
  */
 type ContextForMacros = {
   /**
-   * Request the opening of an UI to edit the macro's parameters (e.g. a modal)
+   * Request the opening of a UI to edit the macro's parameters (e.g. a modal)
    *
    * @param macro - Description of the macro being edited
    * @param params - Current parameters of the macro
@@ -225,6 +230,37 @@ type ContextForMacros = {
     params: UnknownMacroParamsType,
     update: (newProps: UnknownMacroParamsType) => void,
   ): void;
+
+  /**
+   * Request the opening of a UI to insert a new macro (e.g. a modal)
+   *
+   * @param prefill - Informations to prefill the modal with (ID, body, ...)
+   * @param insert - Insert the new macro, replacing the user-selected content (if any)
+   *
+   * @since 18.5.0RC1
+   * @beta
+   */
+  openInsertionEditor(
+    prefill: MacroInsertionEditorParams,
+    insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+  ): void;
+};
+
+/**
+ * Informations to fill the insertion modal UI with
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroInsertionEditorParams = {
+  /** ID of the macro to insert */
+  id: string | null;
+
+  /** Parameters of the macro */
+  params: UnknownMacroParamsType | null;
+
+  /** Body of the macro */
+  body: UniAst | null;
 };
 
 /**
@@ -495,4 +531,8 @@ export {
   extractMacroRawContent,
 };
 
-export type { BlockNoteConcreteMacro, ContextForMacros };
+export type {
+  BlockNoteConcreteMacro,
+  ContextForMacros,
+  MacroInsertionEditorParams,
+};

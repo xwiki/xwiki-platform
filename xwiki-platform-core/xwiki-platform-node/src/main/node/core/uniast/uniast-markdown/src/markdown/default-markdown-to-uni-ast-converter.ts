@@ -108,18 +108,6 @@ export class DefaultMarkdownToUniAstConverter
       case "paragraph": {
         const content = await this.collectInlineContent(block.children, {});
 
-        // Paragraphs only made of a single block macro are actually block macros
-        if (
-          content.length === 1 &&
-          content[0].type === "inlineMacro" &&
-          this.macrosService.get(content[0].call.id)?.renderAs === "block"
-        ) {
-          return {
-            type: "macroBlock",
-            call: content[0].call,
-          };
-        }
-
         return {
           type: "paragraph",
           content,
@@ -275,18 +263,19 @@ export class DefaultMarkdownToUniAstConverter
         });
 
       case "inlineCode": {
-        return [
-          inline.value.startsWith(CODIFIED_MACRO_PREFIX)
-            ? {
-                type: "inlineMacro",
-                call: reparseCodifiedMacro(inline.value),
-              }
-            : {
-                type: "text",
-                content: inline.value,
-                styles: {},
-              },
-        ];
+        if (!inline.value.startsWith(CODIFIED_MACRO_PREFIX)) {
+          return [{ type: "text", content: inline.value, styles: {} }];
+        }
+
+        const call = reparseCodifiedMacro(inline.value);
+
+        if (call.kind === "block") {
+          throw new Error(
+            "Internal error: reparsed codified macro was expected to be inline, found a block",
+          );
+        }
+
+        return [{ type: "inlineMacro", call }];
       }
 
       case "text":

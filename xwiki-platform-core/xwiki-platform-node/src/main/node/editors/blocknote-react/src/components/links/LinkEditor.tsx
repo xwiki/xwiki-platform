@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DepsContainerContext } from "../../contexts";
 import { createLinkSuggestor } from "../../misc/linkSuggest";
 import { SearchBox } from "../SearchBox";
 import {
@@ -29,10 +30,12 @@ import {
 } from "@mantine/core";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFileLine, RiText } from "react-icons/ri";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
+import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
+import type { Container } from "inversify";
 
 type LinkData = {
   title: string;
@@ -40,20 +43,19 @@ type LinkData = {
 };
 
 type LinkEditorProps = {
-  linkEditionCtx: LinkEditionContext;
   current: LinkData | null;
   updateLink: (linkData: LinkData) => void;
   creationMode?: boolean;
 };
 
 export const LinkEditor: React.FC<LinkEditorProps> = ({
-  linkEditionCtx,
   current,
   updateLink,
   creationMode,
 }) => {
   const { t } = useTranslation();
-  const linkSuggestor = createLinkSuggestor(linkEditionCtx);
+  const depsContainer = useContext(DepsContainerContext)!;
+  const linkSuggestor = createLinkSuggestor(depsContainer);
 
   const [title, setTitle] = useState(current?.title ?? "");
   const [url, setUrl] = useState(current?.url ?? "");
@@ -105,11 +107,8 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
       <SearchBox
         placeholder={t("blocknote.linkEditor.placeholder")}
         initialValue={
-          current?.url
-            ? getSerializedReference(current.url, linkEditionCtx)
-            : ""
+          current?.url ? getSerializedReference(current.url, depsContainer) : ""
         }
-        linkEditionCtx={linkEditionCtx}
         getSuggestions={suggestLinks}
         renderSuggestion={(link) => (
           <Stack justify="center">
@@ -138,17 +137,17 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
   );
 };
 
-function getSerializedReference(
-  url: string,
-  linkEditionCtx: LinkEditionContext,
-): string {
-  const reference = tryFallible(() =>
-    linkEditionCtx.remoteURLParser.parse(url),
-  );
+function getSerializedReference(url: string, depsContainer: Container): string {
+  const remoteURLParser = depsContainer
+    .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+    .get()!;
 
-  return reference
-    ? linkEditionCtx.modelReferenceSerializer.serialize(reference)!
-    : url;
+  const modelReferenceSerializer = depsContainer
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+    .get()!;
+
+  const reference = tryFallible(() => remoteURLParser.parse(url));
+  return reference ? modelReferenceSerializer.serialize(reference)! : url;
 }
 
 export type { LinkData, LinkEditorProps };

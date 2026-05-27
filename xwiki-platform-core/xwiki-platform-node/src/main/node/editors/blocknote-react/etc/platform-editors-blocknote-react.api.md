@@ -4,7 +4,6 @@
 
 ```ts
 
-import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { Block } from '@blocknote/core';
 import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
@@ -13,37 +12,36 @@ import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
 import { Collaboration } from '@xwiki/platform-collaboration-api';
+import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
 import { DefaultStyleSchema } from '@blocknote/core';
-import { DocumentService } from '@xwiki/platform-document-api';
 import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
 import { Link } from '@blocknote/core';
-import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
+import { MacroInvocation } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
-import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
 import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
-import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
-import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+<<<<<<< HEAD
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
+=======
+import { UniAst } from '@xwiki/platform-uniast-api';
+>>>>>>> 71057f3a21 (XWIKI-24231: Expose the insert macro action)
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
 
 // Warning: (ae-internal-missing-underscore) The name "BlockNoteConcreteMacro" should be prefixed with an underscore because the declaration is marked as @internal
@@ -61,6 +59,13 @@ export type BlockNoteConcreteMacro = {
 };
 
 // @beta
+export class BlockNoteToUniAstConverter {
+    constructor(depsContainer: Container, macros: MacroWithUnknownParamsType[]);
+    // (undocumented)
+    blocksToUniAst(blocks: BlockType[]): UniAst | Error;
+}
+
+// @beta
 export type BlockNoteViewWrapperProps = {
     blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">>;
     name?: string;
@@ -74,7 +79,7 @@ export type BlockNoteViewWrapperProps = {
     } | false;
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
-    linkEditionCtx: LinkEditionContext;
+    depsContainer: Container;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
@@ -98,6 +103,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 // @beta
 export type ContextForMacros = {
     openParamsEditor(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
+    openInsertionEditor(prefill: MacroInsertionEditorParams, insert: (macro: MacroInvocation) => void): void;
 };
 
 // Warning: (ae-incompatible-release-tags) The symbol "createBlockNoteSchema" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
@@ -716,18 +722,6 @@ export type ImageUpdateResult = {
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
-// @beta (undocumented)
-export type LinkEditionContext = {
-    linkSuggestService: LinkSuggestService | null;
-    modelReferenceParser: ModelReferenceParser;
-    modelReferenceSerializer: ModelReferenceSerializer;
-    modelReferenceHandler: ModelReferenceHandler;
-    remoteURLParser: RemoteURLParser;
-    remoteURLSerializer: RemoteURLSerializer;
-    attachmentsService: AttachmentsService;
-    documentService: DocumentService;
-};
-
 // @beta
 export const MACRO_NAME_PREFIX = "Macro_";
 
@@ -740,6 +734,17 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 //
 // @beta
 export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[], syntax: SyntaxConfig, lang: EditorLanguage): DefaultReactSuggestionItem[];
+
+// @beta
+export class UniAstToBlockNoteConverter {
+    constructor(depsContainer: Container);
+    // (undocumented)
+    uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error;
+}
+
+// Warnings were encountered during analysis:
+//
+// dist/blocknote/utils.d.ts:124:5 - (ae-forgotten-export) The symbol "MacroInsertionEditorParams" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

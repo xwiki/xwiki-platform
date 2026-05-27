@@ -19,8 +19,6 @@
  */
 
 import { EntityType } from "@xwiki/platform-model-api";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
-import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
   Link,
   LinkSuggestService,
@@ -30,30 +28,8 @@ import type {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
-import type {
-  ModelReferenceHandler,
-  ModelReferenceParser,
-  ModelReferenceSerializer,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
-
-/**
- * @since 18.0.0RC1
- * @beta
- */
-type LinkEditionContext = {
-  linkSuggestService: LinkSuggestService | null;
-  modelReferenceParser: ModelReferenceParser;
-  modelReferenceSerializer: ModelReferenceSerializer;
-  modelReferenceHandler: ModelReferenceHandler;
-  remoteURLParser: RemoteURLParser;
-  remoteURLSerializer: RemoteURLSerializer;
-  attachmentsService: AttachmentsService;
-  documentService: DocumentService;
-};
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { Container } from "inversify";
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
@@ -85,13 +61,17 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * @since 18.0.0RC1
  * @beta
  */
-function createLinkSuggestor({
-  linkSuggestService,
-  modelReferenceParser,
-}: LinkEditionContext): LinkSuggestor | null {
+function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
+  const linkSuggestService =
+    depsContainer.get<LinkSuggestService>("LinkSuggestService");
+
   if (!linkSuggestService) {
     return null;
   }
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
 
   // Return an array of suggestions from a query
 
@@ -152,4 +132,4 @@ function queryEqualityOperator(query: string) {
 }
 
 export { createLinkSuggestor };
-export type { LinkEditionContext, LinkSuggestion, LinkSuggestor, LinkType };
+export type { LinkSuggestion, LinkSuggestor, LinkType };

@@ -59,8 +59,10 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
+    "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-uniast-markdown": "workspace:*",
     "i18next": "catalog:",
+    "inversify": "catalog:",
     "lodash-es": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -87,6 +89,9 @@
     "vite": "catalog:",
     "vitest": "catalog:",
     "vue-tsc": "catalog:"
+  },
+  "peerDependencies": {
+    "inversify": "7.x"
   },
   "publishConfig": {
     "exports": {

@@ -3029,15 +3029,28 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
+<<<<<<< HEAD
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../core/syntaxes/syntaxes-config
+=======
+      '@xwiki/platform-uniast-api':
+        specifier: workspace:*
+        version: link:../../core/uniast/uniast-api
+>>>>>>> 71057f3a21 (XWIKI-24231: Expose the insert macro action)
       '@xwiki/platform-uniast-markdown':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-markdown
       i18next:
         specifier: 'catalog:'
+<<<<<<< HEAD
         version: 26.3.1(typescript@5.9.3)
+=======
+        version: 25.10.10(typescript@5.9.3)
+      inversify:
+        specifier: 'catalog:'
+        version: 7.11.0(reflect-metadata@0.2.2)
+>>>>>>> 8dc659584b (XWIKI-24231: Expose the insert macro action)
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1

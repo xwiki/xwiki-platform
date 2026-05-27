@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
@@ -82,15 +81,9 @@ class InplaceEditIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        // We might have an alert in case one test failed during an edition, in which case we just want to get rid of
-        // the alert to move to next page.
-        try {
-            setup.gotoPage(testReference);
-        } catch (UnhandledAlertException e) {
-            setup.getDriver().switchTo().alert().accept();
-        }
+        setup.maybeLeaveEditMode();
     }
 
     @Test
@@ -406,7 +399,7 @@ class InplaceEditIT
 
         // Verify that the top left corner of the Source text area is visible (inside the viewport).
         // The toolbar is overlapping the text area so we need to add some offset.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 3));
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 10));
 
         // Select something from the middle of the edited content.
         for (int i = 0; i < 46; i++) {

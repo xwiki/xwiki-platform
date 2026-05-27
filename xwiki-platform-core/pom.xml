@@ -149,31 +149,8 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>No retro compatibiliity impact, only indicate how to display the macro parameter.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</old>
-                  <new>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature("parameters")</annotation>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>No retro compatibiliity impact, just updated the current schema version.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.field.constantValueChanged</code>
-                  <old>field org.xwiki.search.solr.AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION</old>
-                  <new>field org.xwiki.search.solr.AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION</new>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

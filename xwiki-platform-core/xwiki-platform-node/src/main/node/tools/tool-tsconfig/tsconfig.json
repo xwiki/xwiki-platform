@@ -28,7 +28,8 @@
     "strict": true,
     "noImplicitOverride": true,
     "verbatimModuleSyntax": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "noUncheckedSideEffectImports": false
   },
   "vueCompilerOptions": {
     "strictTemplates": true

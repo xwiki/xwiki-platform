@@ -139,6 +139,7 @@ function generateConfig(
   path: string,
   distPath: string = "dist",
   entryRoot: string = "./src/",
+  dtsOptions: Parameters<typeof dts>[0] = {},
 ): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
   const externalDependencies = [
@@ -187,6 +188,7 @@ function generateConfig(
             copyFileSync(originTypeFile, `${distPath}/index.d.cts`);
           }
         },
+        ...dtsOptions,
       }),
     ],
   });
@@ -194,7 +196,11 @@ function generateConfig(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateConfigVue(path: string): Record<string, any> {
-  const baseConfig = generateConfig(path);
+  // processor:"vue" is required because unplugin-dts's hasVueFilesInDir() only
+  // scans 2 levels deep and misses .vue files nested deeper (e.g. src/vue/*.vue).
+  const baseConfig = generateConfig(path, "dist", "./src/", {
+    processor: "vue",
+  });
   return mergeConfig(
     baseConfig,
     defineConfig({
@@ -210,7 +216,6 @@ function generateConfigVue(path: string): Record<string, any> {
         },
       },
       plugins: [
-        ...(baseConfig.plugins ?? []),
         vue(),
         // This plugin is useful to make the CSS of a given module loaded by the
         // module itself, allowing CSS to be loaded even when Cristal is

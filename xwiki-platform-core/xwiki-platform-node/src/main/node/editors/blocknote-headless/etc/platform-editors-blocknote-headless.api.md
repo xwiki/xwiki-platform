@@ -43,9 +43,7 @@ container: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: UniAst) => any) | undefined;
-}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
-'blocknote-container': HTMLDivElement;
-}, any>;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 export { ContextForMacros }
 

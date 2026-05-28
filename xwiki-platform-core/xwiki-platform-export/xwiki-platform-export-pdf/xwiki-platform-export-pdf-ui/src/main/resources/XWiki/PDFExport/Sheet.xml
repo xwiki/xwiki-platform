@@ -682,11 +682,29 @@ define('paged-polyfill-patched', [
     }
   }
 
+  /**
+   * Logs the time spent to layout each print page, useful for debugging PDF export timeouts.
+   */
+  class LoggingHandler extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforePageLayout(page) {
+      console.time(`Page ${page.position + 1}`);
+    }
+
+    afterPageLayout(pageFragment, page) {
+      console.timeEnd(`Page ${page.position + 1}`);
+    }
+  }
+
   const handlers = [
     ShowInvisibleRowsOnPageBreaks,
     FixFloatingImages,
     FixTableLayout,
-    FixMaxChars
+    FixMaxChars,
+    LoggingHandler
   ];
   // The following handlers are more opionated, so we provide a way to disable them.
   const config = new URLSearchParams(window.location.search);

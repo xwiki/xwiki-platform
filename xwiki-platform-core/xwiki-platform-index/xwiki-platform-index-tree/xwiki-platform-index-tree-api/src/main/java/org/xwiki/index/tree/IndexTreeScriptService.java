@@ -112,7 +112,10 @@ public class IndexTreeScriptService implements ScriptService
             }
         }
 
-        this.logger.warn("Failed to normalize the given entity tree node id [{}].", nodeId);
+        if (nodeId != null) {
+            this.logger.warn("Failed to normalize the given entity tree node id [{}].", nodeId);
+        }
+
         return nodeId;
     }
 }

@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -348,10 +351,10 @@ public class XWiki implements EventListener
     private XWikiStatsService statsService;
 
     /**
-     * volatile: {@link #getURLFactoryService()} uses double-checked locking; without volatile the JVM may reorder
-     * the write with the constructor, letting another thread observe a non-null but partially-initialized instance.
+     * Lazy initialization of XWikiURLFactoryService in a thread-safe way.
      */
-    private volatile XWikiURLFactoryService urlFactoryService;
+    private final Supplier<XWikiURLFactoryService> urlFactoryServiceHolder =
+        Suppliers.memoize(this::initializeURLFactoryService);
 
     private XWikiCriteriaService criteriaService;
 
@@ -369,8 +372,6 @@ public class XWiki implements EventListener
     /** Lock object used for the lazy initialization of the statistics service. */
     private final Object STATS_SERVICE_LOCK = new Object();
 
-    /** Lock object used for the lazy initialization of the URL Factory service. */
-    private final Object URLFACTORY_SERVICE_LOCK = new Object();
 
     private MetaClass metaclass;
 
@@ -6171,42 +6172,35 @@ public class XWiki implements EventListener
 
     public XWikiURLFactoryService getURLFactoryService()
     {
-        if (this.urlFactoryService == null) {
-            synchronized (this.URLFACTORY_SERVICE_LOCK) {
-                if (this.urlFactoryService == null) {
-                    LOGGER.info("Initializing URLFactory Service...");
+        return this.urlFactoryServiceHolder.get();
+    }
 
-                    XWikiURLFactoryService factoryService = null;
+    private XWikiURLFactoryService initializeURLFactoryService()
+    {
+        LOGGER.info("Initializing URLFactory Service...");
 
-                    String urlFactoryServiceClass = getConfiguration().getProperty("xwiki.urlfactory.serviceclass");
-                    if (urlFactoryServiceClass != null) {
-                        try {
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Using custom URLFactory Service Class [" + urlFactoryServiceClass + "]");
-                            }
-                            factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
-                        } catch (Exception e) {
-                            factoryService = null;
-                            LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
-                        }
-                    }
-                    if (factoryService == null) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Using default URLFactory Service Class [" + urlFactoryServiceClass + "]");
-                        }
-                        factoryService = new XWikiURLFactoryServiceImpl(this);
-                    }
+        XWikiURLFactoryService factoryService = null;
 
-                    // Set the urlFactoryService object in one assignment to prevent threading
-                    // issues when checking for
-                    // null above.
-                    this.urlFactoryService = factoryService;
+        String urlFactoryServiceClass = getConfiguration().getProperty("xwiki.urlfactory.serviceclass");
+        if (urlFactoryServiceClass != null) {
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Using custom URLFactory Service Class [" + urlFactoryServiceClass + "]");
                 }
+                factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
+                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+            } catch (Exception e) {
+                LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
             }
         }
+        if (factoryService == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Using default URLFactory Service Class [" + urlFactoryServiceClass + "]");
+            }
+            factoryService = new XWikiURLFactoryServiceImpl(this);
+        }
 
-        return this.urlFactoryService;
+        return factoryService;
     }
 
     public XWikiCriteriaService getCriteriaService(XWikiContext context)

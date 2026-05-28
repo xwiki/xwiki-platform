@@ -58,14 +58,14 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>3.3.0</tika.version>
+    <tika.version>3.3.1</tika.version>
     <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.1.8</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.13.Final</netty.version>
+    <netty.version>4.2.14.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.155.0</metaeffekt.version>
@@ -1187,7 +1187,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.2.8</version>
+        <version>11.4.4</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>

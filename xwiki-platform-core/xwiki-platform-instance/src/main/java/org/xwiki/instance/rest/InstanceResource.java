@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,20 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.instance.rest;
 
-import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-export default generateWebjarNodeConfig(import.meta.url, [
-  "@xwiki/platform-livedata-ui",
-  "dompurify",
-  "eventemitter3",
-  "lz-string",
-  "tippy.js",
-  "u-node",
-  // lodash is a transitive dependency of u-node
-  "lodash",
-  "vue-tippy",
-  "vuedraggable",
-  // Transitive dependency of vuedraggable
-  "sortablejs",
-]);
+import org.xwiki.rest.XWikiRestComponent;
+
+/**
+ * REST resource for retrieving the unique id of the XWiki instance.
+ *
+ * @version $Id$
+ * @since 18.5.0RC1
+ */
+@Unstable
+@Path("/instanceId")
+public interface InstanceResource extends XWikiRestComponent
+{
+    /**
+     * @return the unique id of this XWiki instance as a UUID string
+     */
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    String getInstanceId();
+}

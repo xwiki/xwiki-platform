@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,20 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.instance.test.ui;
 
-import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
-export default generateWebjarNodeConfig(import.meta.url, [
-  "@xwiki/platform-livedata-ui",
-  "dompurify",
-  "eventemitter3",
-  "lz-string",
-  "tippy.js",
-  "u-node",
-  // lodash is a transitive dependency of u-node
-  "lodash",
-  "vue-tippy",
-  "vuedraggable",
-  // Transitive dependency of vuedraggable
-  "sortablejs",
-]);
+/**
+ * All functional tests for the Instance module.
+ *
+ * @version $Id$
+ * @since 18.5.0RC1
+ */
+@UITest
+public class AllIT
+{
+    @Nested
+    class NestedInstanceResourceIT extends InstanceResourceIT
+    {
+    }
+}

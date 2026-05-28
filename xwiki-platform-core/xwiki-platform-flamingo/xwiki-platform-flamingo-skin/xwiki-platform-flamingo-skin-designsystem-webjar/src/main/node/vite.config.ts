@@ -27,10 +27,10 @@ const defaults = generateConfigVue(import.meta.url);
 // TODO: See XWIKI-XYZ
 // We proceed by mutation of the default configuration because the merge strategy of vite does not propose a
 // subtractive operation (i.e., it's only possible to add new externals, but not to remove them).
-defaults.build.rollupOptions.external =
-  defaults.build.rollupOptions.external.filter(
-    (it) => it !== "@xwiki/platform-api",
-  );
+const originalExternal = defaults.build.rollupOptions.external;
+defaults.build.rollupOptions.external = (it) => {
+  return originalExternal(it) && it !== "@xwiki/platform-api";
+};
 
 export default mergeConfig(
   defaults,

@@ -139,11 +139,6 @@ const Constants = Object.freeze({
    */
   ANNOTATE_ICON_NAME: "comment",
   /**
-   * The keyboard shortcut that needs to be triggered to create an annotation
-   * @type {KeyboardEventInit}
-   */
-  ANNOTATE_SHORTCUT: { ctrlKey: true, code: "KeyM", key: "m", keyCode: 77 }, // shortcuts.js still expects the deprecated keyCode property
-  /**
    * The translation key for the popup button title (for accessibility)
    * @type {String}
    */
@@ -186,8 +181,6 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       };
    }
 
-   const annotateTriggerEvent = new KeyboardEvent("keydown", Constants.ANNOTATE_SHORTCUT);
-
    // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
    class AnnotatePopup {
       /**
@@ -195,6 +188,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * @type {HTMLElement}
        */
       wikiContent = null;
+      /**
+       * Callback that opens the annotation bubble to create an annotation
+       * @type {Function}
+       */
+      annotationBubbleCallback = null;
       /**
        * The popup container element
        * @type {HTMLElement}
@@ -213,9 +211,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
       /**
        * @param {HTMLElement} wikiContent - The page container
+       * @param {Function} callback - Callback to call to open an annotation bubble
        */
-      constructor(wikiContent) {
+      constructor(wikiContent, callback) {
          this.wikiContent = wikiContent;
+         this.annotationBubbleCallback = callback;
 
          this._onSelection = debounce(this._onSelection.bind(this), 700);
          this._onEscapeKey = this._onEscapeKey.bind(this);
@@ -313,8 +313,8 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
        * Event handler for popup button click
        */
       _onButtonClick() {
-         this.close();
-         document.dispatchEvent(annotateTriggerEvent);
+        this.close();
+        this.annotationBubbleCallback();
       }
 
       /*

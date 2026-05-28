@@ -28,6 +28,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.instance.rest.InstanceResource;
+import org.xwiki.rest.XWikiResource;
 
 /**
  * Default implementation of {@link InstanceResource}.
@@ -38,7 +39,7 @@ import org.xwiki.instance.rest.InstanceResource;
 @Component
 @Named("org.xwiki.instance.internal.rest.DefaultInstanceResource")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DefaultInstanceResource implements InstanceResource
+public class DefaultInstanceResource extends XWikiResource implements InstanceResource
 {
     @Inject
     private InstanceIdManager instanceIdManager;

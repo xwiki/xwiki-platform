@@ -30,6 +30,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Functional tests for {@link InstanceResource}.
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 18.5.0RC1
  */
 @UITest
-public class InstanceResourceIT
+class InstanceResourceIT
 {
     @Test
     void getInstanceIdReturnsValidUUID(TestUtils setup) throws Exception
@@ -59,6 +60,7 @@ public class InstanceResourceIT
         GetMethod get1 = setup.rest().executeGet(InstanceResource.class);
         String id1;
         try {
+            assertEquals(HttpStatus.SC_OK, get1.getStatusCode());
             id1 = get1.getResponseBodyAsString().trim();
         } finally {
             get1.releaseConnection();
@@ -68,6 +70,7 @@ public class InstanceResourceIT
         GetMethod get2 = setup.rest().executeGet(InstanceResource.class);
         String id2;
         try {
+            assertEquals(HttpStatus.SC_OK, get2.getStatusCode());
             id2 = get2.getResponseBodyAsString().trim();
         } finally {
             get2.releaseConnection();

@@ -175,7 +175,7 @@
             <!-- Instance module has its own Hibernate mapping file -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-instance</artifactId>
+              <artifactId>xwiki-platform-instance-api</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Wiki Workspaces migrator migrates subwikis -->

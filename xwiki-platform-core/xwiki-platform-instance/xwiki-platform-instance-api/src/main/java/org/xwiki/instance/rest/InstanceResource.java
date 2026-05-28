@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.stability.Unstable;
 
 /**
  * REST resource for retrieving the unique id of the XWiki instance.

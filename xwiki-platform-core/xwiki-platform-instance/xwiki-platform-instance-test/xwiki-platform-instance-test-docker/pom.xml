@@ -38,13 +38,12 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-docker</artifactId>
+      <artifactId>xwiki-platform-instance-api</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-instance</artifactId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

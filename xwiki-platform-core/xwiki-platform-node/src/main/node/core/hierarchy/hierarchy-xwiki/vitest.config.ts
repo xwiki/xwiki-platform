@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,7 +19,7 @@
  */
 
 import localConfig from "./vite.config";
-import { vitestVue as defaultConfig } from "@xwiki/cristal-dev-config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
 import { mergeConfig } from "vitest/config";
 
 export default mergeConfig(defaultConfig, localConfig);

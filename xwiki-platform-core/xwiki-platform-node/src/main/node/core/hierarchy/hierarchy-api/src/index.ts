@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -25,7 +25,7 @@ import type {
 
 /**
  * Description of a hierarchy item for a given page.
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  */
 type PageHierarchyItem = {
@@ -37,7 +37,7 @@ type PageHierarchyItem = {
 /**
  * A PageHierarchyResolver computes and returns the hierarchy for a given page.
  *
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  **/
 interface PageHierarchyResolver {
@@ -47,7 +47,7 @@ interface PageHierarchyResolver {
    * @param page - the reference to the page for which to compute the hierarchy
    * @param includeHomePage - whether to include a segment for the home page (default: true)
    * @returns the page hierarchy
-   * @since 0.20
+   * @since 18.5.0RC1
    * @beta
    */
   getPageHierarchy(
@@ -60,7 +60,7 @@ interface PageHierarchyResolver {
  * A PageHierarchyResolverProvider returns the instance of PageHierarchyResolver
  * matching the current wiki configuration.
  *
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  **/
 interface PageHierarchyResolverProvider {
@@ -75,7 +75,7 @@ interface PageHierarchyResolverProvider {
 
 /**
  * The component id of PageHierarchyResolver.
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  */
 const name = "PageHierarchyResolver";

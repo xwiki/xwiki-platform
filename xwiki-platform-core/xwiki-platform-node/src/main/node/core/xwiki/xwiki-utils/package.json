@@ -1,16 +1,16 @@
 {
-  "name": "@xwiki/cristal-xwiki-utils",
-  "version": "1.4.0-rc-1",
+  "name": "@xwiki/platform-xwiki-utils",
+  "version": "18.5.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
-  "homepage": "https://cristal.xwiki.org/",
+  "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/xwiki/xwiki-utils",
-    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
-    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
   "exports": {
@@ -20,7 +20,15 @@
     }
   },
   "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/__tests__"
+  ],
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
@@ -29,11 +37,20 @@
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-api": "workspace:*"
+  },
   "devDependencies": {
-    "@xwiki/platform-api": "catalog:",
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@microsoft/api-extractor": "catalog:",
+    "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "eslint": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "exports": {

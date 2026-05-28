@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -18,17 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { name } from "@xwiki/cristal-hierarchy-api";
-import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
+import { name } from "@xwiki/platform-hierarchy-api";
 import { EntityType } from "@xwiki/platform-model-api";
+import { getRestSpacesApiUrl } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable, named } from "inversify";
-import type {
-  PageHierarchyItem,
-  PageHierarchyResolver,
-} from "@xwiki/cristal-hierarchy-api";
 import type { CristalApp, Logger } from "@xwiki/platform-api";
 import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
+import type {
+  PageHierarchyItem,
+  PageHierarchyResolver,
+} from "@xwiki/platform-hierarchy-api";
 import type {
   DocumentReference,
   SpaceReference,
@@ -39,7 +39,7 @@ import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 /**
  * Implementation of PageHierarchyResolver for the XWiki backend.
  *
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  **/
 @injectable()

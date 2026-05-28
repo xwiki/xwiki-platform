@@ -23,6 +23,8 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-api
@@ -44,6 +46,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react

@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -26,7 +26,7 @@ import type { WikiConfig } from "@xwiki/platform-api";
  * @param wikiConfig - the current wiki configuration
  * @param documentId - the id of the document
  * @returns the crafted URL
- * @since 0.9
+ * @since 18.5.0RC1
  * @beta
  */
 export function getRestSpacesApiUrl(

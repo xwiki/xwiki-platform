@@ -1,0 +1,69 @@
+{
+  "name": "@xwiki/cristal-hierarchy-xwiki",
+  "version": "1.4.0-rc-1",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "core/hierarchy/hierarchy-xwiki",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "api-extractor:local": "api-extractor run --local",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run",
+    "typecheck": "tsc"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-api": "catalog:",
+    "@xwiki/platform-authentication-api": "catalog:",
+    "@xwiki/platform-backend-api": "catalog:",
+    "@xwiki/cristal-hierarchy-api": "workspace:*",
+    "@xwiki/platform-model-api": "catalog:",
+    "@xwiki/platform-model-reference-api": "catalog:",
+    "@xwiki/platform-model-remote-url-api": "catalog:",
+    "@xwiki/cristal-xwiki-utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "inversify": "8.x",
+    "reflect-metadata": "0.x"
+  },
+  "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

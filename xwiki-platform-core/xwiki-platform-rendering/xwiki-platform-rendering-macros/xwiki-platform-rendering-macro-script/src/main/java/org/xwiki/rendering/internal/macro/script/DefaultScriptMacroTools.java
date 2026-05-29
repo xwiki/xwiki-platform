@@ -22,9 +22,8 @@ package org.xwiki.rendering.internal.macro.script;
 import java.lang.reflect.Type;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
-
-import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.ConverterManager;

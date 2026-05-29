@@ -166,7 +166,7 @@ async function codifyMacros(
           }
 
           // Encode the macro as an inline code, which can be decoded through `repaseCodifiedMacro`
-          const encodedMacro = `\`${CODIFIED_MACRO_PREFIX}${btoa(JSON.stringify(handling.call))}\``;
+          const encodedMacro = `${handling.call.kind === "block" ? "```\n" : "`"}${CODIFIED_MACRO_PREFIX}${btoa(JSON.stringify(handling.call))}${handling.call.kind === "block" ? "\n```" : "`"}`;
 
           out += markdown.slice(lastPush + 1, i) + encodedMacro;
 
@@ -376,8 +376,7 @@ const eatMacro: MacroHandler = async (
   }
 
   // Determine if the macro is alone on its line (required to determine of the macro is invoked as a block or inline)
-  const nextLines = content.substring(offset).split("\n");
-  const nextLine = nextLines[nextLines.length - 1];
+  const nextLine = content.substring(offset).split("\n")[0];
   const isSyntaxicallyBlock =
     isMacroAtLineBeginning && nextLine.trim().length === 0;
 

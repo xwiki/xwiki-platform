@@ -44,6 +44,7 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
+import { filterMap } from "@xwiki/platform-fn-utils";
 import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
 import { useEffect } from "react";
 import type {
@@ -352,6 +353,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               <CustomFormattingToolbar
                 formattingToolbarProps={props}
                 imageEditionOverrideFn={overrides?.imageEdition}
+                additionalBlockTypes={filterMap(
+                  builtMacros,
+                  (built) => built.dropdownTransformItem,
+                )}
                 ctxForMacros={macros ? macros.ctx : false}
               />
             )}

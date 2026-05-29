@@ -424,7 +424,7 @@ export class UniAstToBlockNoteConverter {
   }
 
   private convertInlineMacro(call: InlineMacroInvocation): InlineContentType {
-    let content: InlineContent | null = null;
+    let content: InlineContentType | null = null;
 
     const { body } = call;
 
@@ -434,24 +434,31 @@ export class UniAstToBlockNoteConverter {
         break;
 
       case "raw":
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        content = buildMacroRawContent(body.content) as any;
+        content = buildMacroRawContent(body.content);
         break;
 
       case "inlineContent":
-        content = body.inlineContent;
+        content = this.convertInlineContent(body.inlineContent);
         break;
     }
 
     const out: InlineContentType = {
-      // @ts-expect-error: macros are dynamically added to the AST
-      type: `${MACRO_NAME_PREFIX}${inlineContent.call.id}`,
+      type: `${MACRO_NAME_PREFIX}${call.id}`,
       props: call.params,
-    };
+
+      // NOTE: macros are dynamically added to the AST
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
 
     if (content) {
-      // @ts-expect-error: AST is dynamically typed
-      out.content = content;
+      // No assign -> invalid content
+      // Empty array -> invalid content
+      // Array with { type: 'text', text: '...', styles: {} } -> invalid content
+      // { type: 'text', text: '...', styles: {} } -> Unreachable case: 'text' (or whatever we put instead of 'text')
+
+      // NOTE: AST is dynamically typed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (out as any).content = content satisfies InlineContentType;
     }
 
     return out;

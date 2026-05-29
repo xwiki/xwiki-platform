@@ -103,6 +103,7 @@ export class DefaultMarkdownToUniAstConverter
     return blocks instanceof Error ? blocks : { blocks };
   }
 
+  // eslint-disable-next-line max-statements
   private async convertBlock(block: RootContent): Promise<Block> {
     switch (block.type) {
       case "paragraph": {
@@ -153,14 +154,27 @@ export class DefaultMarkdownToUniAstConverter
           styles: {},
         };
 
-      case "code":
-        // TODO: "token.escaped" property
-        // TODO: "token.codeBlockStyle" property
-        return {
-          type: "code",
-          content: block.value,
-          language: block.lang ?? undefined,
-        };
+      case "code": {
+        if (!block.value.startsWith(CODIFIED_MACRO_PREFIX)) {
+          // TODO: "token.escaped" property
+          // TODO: "token.codeBlockStyle" property
+          return {
+            type: "code",
+            content: block.value,
+            language: block.lang ?? undefined,
+          };
+        }
+
+        const call = reparseCodifiedMacro(block.value);
+
+        if (call.kind === "inline") {
+          throw new Error(
+            "Internal error: reparsed codified macro was expected to be a block, found inline",
+          );
+        }
+
+        return { type: "macroBlock", call };
+      }
 
       case "table": {
         const [headers, ...rows] = block.children;

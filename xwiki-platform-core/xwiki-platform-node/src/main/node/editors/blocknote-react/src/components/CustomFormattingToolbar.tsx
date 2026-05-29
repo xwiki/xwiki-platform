@@ -38,7 +38,9 @@ import {
   TableCellMergeButton,
   TextAlignButton,
   UnnestBlockButton,
+  blockTypeSelectItems,
   useComponentsContext,
+  useDictionary,
 } from "@blocknote/react";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ContextForMacros } from "../blocknote/utils";
@@ -50,19 +52,30 @@ import type { JSX } from "react";
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
+  additionalBlockTypes: BlockTypeSelectItem[];
   imageEditionOverrideFn?: ImageEditionOverrideFn;
   ctxForMacros: ContextForMacros | false;
 };
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({ formattingToolbarProps, imageEditionOverrideFn, ctxForMacros }) => {
+> = ({
+  formattingToolbarProps,
+  additionalBlockTypes,
+  imageEditionOverrideFn,
+  ctxForMacros,
+}) => {
   const Components = useComponentsContext()!;
+  const dict = useDictionary();
 
   const editor = useEditor();
 
   // TODO: check if there is a need to update the selection in realtime?
   const currentBlock = editor.getTextCursorPosition().block;
+
+  const combinedBlockTypeSelectItems = (
+    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(dict)
+  ).concat(additionalBlockTypes);
 
   return (
     <Components.FormattingToolbar.Root
@@ -77,7 +90,7 @@ export const CustomFormattingToolbar: React.FC<
       ) : (
         // For others, simply show the "normal", default toolbar
         getDefaultFormattingToolbarItems(
-          formattingToolbarProps.blockTypeSelectItems,
+          combinedBlockTypeSelectItems,
           ctxForMacros,
         )
       )}

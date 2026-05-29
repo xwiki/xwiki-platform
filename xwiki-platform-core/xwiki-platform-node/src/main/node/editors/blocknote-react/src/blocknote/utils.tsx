@@ -25,6 +25,7 @@ import {
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import { RiFileList3Fill } from "react-icons/ri";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -40,6 +41,7 @@ import type {
   StyleSchema,
 } from "@blocknote/core";
 import type {
+  BlockTypeSelectItem,
   ReactCustomBlockImplementation,
   ReactInlineContentImplementation,
 } from "@blocknote/react";
@@ -184,13 +186,13 @@ const MACRO_NAME_PREFIX = "Macro_";
 
 /**
  * Description of a macro adapted by `adaptMacroForBlockNote`
- *
- * @since 18.0.0RC1
- * @internal
  */
 type BlockNoteConcreteMacro = {
   /** Type-erased macro */
   macro: MacroWithUnknownParamsType;
+
+  /** Dropdown item for changing the selection to the current macro */
+  dropdownTransformItem: BlockTypeSelectItem | null;
 
   /** Rendering part */
   bnRendering: // Block macro
@@ -275,6 +277,7 @@ type MacroInsertionEditorParams = {
  * @since 18.0.0RC1
  * @beta
  */
+// eslint-disable-next-line max-statements
 function adaptMacroForBlockNote(
   macro: MacroWithUnknownParamsType,
   ctx: ContextForMacros,
@@ -471,7 +474,20 @@ function adaptMacroForBlockNote(
           }),
         };
 
-  return { macro, bnRendering };
+  const dropdownTransformItem =
+    macro.renderAs === "block"
+      ? ({
+          type: blockNoteName,
+          icon: (props) => <RiFileList3Fill {...props} />,
+          name: `Macro: ${macro.infos.name}`,
+          props:
+            macro.infos.defaultParameters !== false
+              ? macro.infos.defaultParameters
+              : {},
+        } satisfies BlockTypeSelectItem)
+      : null;
+
+  return { macro, bnRendering, dropdownTransformItem };
 }
 
 /**

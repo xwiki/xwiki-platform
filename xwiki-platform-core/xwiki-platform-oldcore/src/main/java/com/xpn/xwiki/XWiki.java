@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 import java.io.ByteArrayInputStream;
@@ -59,6 +58,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;

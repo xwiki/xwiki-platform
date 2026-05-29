@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-u
  * Default implementation of the link suggestion service, for XWiki.
  * Currently limited to guests, and to XWiki instances that have explicitly
  * allowed CORS, see https://cristal.xwiki.org/xwiki/bin/view/Backends/XWiki/
- * @since 0.8
+ * @since 18.5.0RC1
  * @beta
  */
 @injectable()
@@ -62,7 +62,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
   }
 
   private async executeQuery(
-    type: LinkType | undefined | LinkType.PAGE | LinkType.ATTACHMENT,
+    type: LinkType | undefined,
     mimetype: string | undefined,
     query: string,
   ) {
@@ -89,7 +89,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
   }
 
   private initializeSolrQueryParameters(
-    type: LinkType | LinkType.PAGE | LinkType.ATTACHMENT | undefined,
+    type: LinkType | undefined,
     mimetype: string | undefined,
   ) {
     const fqs = ["locale:*", "wiki:xwiki"];
@@ -109,7 +109,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
   }
 
   private filterLinks(
-    type: LinkType | undefined | LinkType.PAGE | LinkType.ATTACHMENT,
+    type: LinkType | undefined,
     mimetype: string | undefined,
   ) {
     return (link: Link) => {

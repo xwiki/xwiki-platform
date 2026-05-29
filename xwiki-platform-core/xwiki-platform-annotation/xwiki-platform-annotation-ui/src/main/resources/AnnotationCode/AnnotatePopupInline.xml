@@ -306,7 +306,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
         if (canRestoreFocus) {
           this.previousFocusElem.focus({ preventScroll: true });
         }
-        this.popupButton.blur(); // ensure popupButton is blurred in-time before calling aria-hidden
+        this.popupButton.blur(); // ensure popupButton is blurred in-time before setting aria-hidden to true
         this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
         this.popup.setAttribute("aria-hidden", "true");
       });

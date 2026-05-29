@@ -104,7 +104,7 @@
         #if ($proxyExtensionObject)
           #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
           #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
-          {{info}}Extension imported from repository [[$repositoryId&gt;&gt;$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
+          {{info}}Extension imported from repository [[$services.rendering.escape($services.rendering.escape($repositoryId, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($repositoryURI, 'xwiki/2.1')]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
         #end
       #end
 

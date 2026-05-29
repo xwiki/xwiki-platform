@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.test.integration.Initialized;
 import org.xwiki.rendering.test.integration.Scope;
 import org.xwiki.rendering.test.integration.junit5.RenderingTest;
@@ -108,10 +107,5 @@ public class IntegrationTests extends RenderingTest
             .thenReturn("XWiki.UserWithExceptionRetrievingAvatarFile@mockAvatar.png");
         when(ers.serialize(userWithExceptionRetrievingAvatarFileReference))
             .thenReturn("XWiki.UserWithExceptionRetrievingAvatarFile");
-
-        // Entity Reference Serializer Mock
-        EntityReferenceValueProvider ervp =
-            componentManager.registerMockComponent(EntityReferenceValueProvider.class, "current");
-        when(ervp.getDefaultValue(EntityType.WIKI)).thenReturn("wiki");
     }
 }

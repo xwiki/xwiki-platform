@@ -144,6 +144,11 @@ const Constants = Object.freeze({
    */
   ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
   /**
+   * The debounce delay added to the selectionstart listener
+   * @type {number}
+   */
+  DEBOUNCE_SELECT_MS: 700,
+  /**
    * The CSS class that needs to be added to show the popup
    * @type {String}
    */
@@ -152,7 +157,12 @@ const Constants = Object.freeze({
    * The element id of the popup
    * @type {String}
    */
-  POPUP_ID: "annotation-popup"
+  POPUP_ID: "annotation-popup",
+  /**
+   * The extra top offset of the popup (so that it does not seem attached to the selected text)
+   * @type {number}
+   */
+  POPUP_TOP_OFFSET: 4
 });
 
 // Icons API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
@@ -167,227 +177,252 @@ define("xwiki-annotate-popup/translation-keys", {
 });
 
 define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys"], function(icons, l10n) {
-   /**
-    * Debounces a function
-    * @param {Function} func
-    * @param {number} delay - Delay time
-    * @returns {Function} - Debounced version of func (result of the function is NOT returned at all)
-    */
-   function debounce(func, delay) {
-      let timeout;
-      return function (...args) {
-          clearTimeout(timeout);
-          timeout = setTimeout(() =&gt; { func.apply(this, args); }, delay);
-      };
-   }
+  /**
+   * Debounces a function
+   * @param {Function} func
+   * @param {number} delay - Delay time
+   * @returns {Function} - Debounced version of func (result of the function is NOT returned at all)
+   */
+  function debounce(func, delay = 75) {
+    let timerId = null;
+    return function(...args) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(() =&gt; {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
 
-   // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
-   class AnnotatePopup {
-      /**
-       * The page container
-       * @type {HTMLElement}
-       */
-      wikiContent = null;
-      /**
-       * Callback that opens the annotation bubble to create an annotation
-       * @type {Function}
-       */
-      annotationBubbleCallback = null;
-      /**
-       * The popup container element
-       * @type {HTMLElement}
-       */
-      popup = null;
-      /**
-       * The popup button
-       * @type {HTMLElement}
-       */
-      annotateButton = null;
-      /**
-       * The last focussed element before focus was set programmatically (see this.open())
-       * @type {HTMLElement}
-       */
-      previousFocusElem = null;
+  // TODO: use private class fields and method once Google Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
+  class AnnotatePopup {
+    /**
+     * The page container
+     * @type {HTMLElement}
+     */
+    wikiContent = null;
+    /**
+     * Callback that opens the annotation bubble to create an annotation
+     * @type {Function}
+     */
+    openAnnotationBubble = null;
+    /**
+     * The popup container element
+     * @type {HTMLElement}
+     */
+    popup = null;
+    /**
+     * The popup button
+     * @type {HTMLElement}
+     */
+    popupButton = null;
+    /**
+     * The last focussed element before focus was set programmatically in open method
+     * @type {HTMLElement}
+     */
+    previousFocusElem = null;
 
-      /**
-       * @param {HTMLElement} wikiContent - The page container
-       * @param {Function} callback - Callback to call to open an annotation bubble
-       */
-      constructor(wikiContent, callback) {
-         this.wikiContent = wikiContent;
-         this.annotationBubbleCallback = callback;
+    /**
+     * @param {HTMLElement} wikiContent - The page container
+     * @param {Function} openAnnotationBubble - Callback that opens the annotation bubble to create an annotation. Signature: () =&gt; void;
+     */
+    constructor(wikiContent, openAnnotationBubble) {
+      this.wikiContent = wikiContent;
+      this.openAnnotationBubble = openAnnotationBubble;
 
-         this._onSelection = debounce(this._onSelection.bind(this), 700);
-         this._onEscapeKey = this._onEscapeKey.bind(this);
-         this._onButtonClick = debounce(this._onButtonClick.bind(this), 75);
-         this._onClickAway = this._onClickAway.bind(this);
-         this._onViewportChange = debounce(this._onViewportChange.bind(this), 75);
+      this._onSelection = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECT_MS);
+      this._onEscapeKey = this._onEscapeKey.bind(this);
+      this._onButtonClick = debounce(this._onButtonClick.bind(this));
+      this._onClickAway = this._onClickAway.bind(this);
+      this._onViewportChange = debounce(this._onViewportChange.bind(this));
 
-         this._create();
-         this._registerListeners();
+      this._create();
+      this._registerListeners();
+    }
+
+    /**
+     * Insert the popup to DOM
+     */
+    _create() {
+      this.popup = document.createElement("div");
+      this.popup.id = Constants.POPUP_ID;
+      this.popup.setAttribute("role", "toolbar");
+      this.popup.setAttribute("aria-hidden", "true");
+
+      this.popupButton = document.createElement("button");
+      this.popupButton.classList.add("btn", "btn-default", "btn-xs");
+      this.popupButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY];
+      this.popupButton.setAttribute("aria-label", l10n[Constants.ANNOTATE_TRANSLATION_KEY]);
+
+      this.popupButton.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
+      this.popup.appendChild(this.popupButton);
+      document.body.appendChild(this.popup);
+    }
+
+    /**
+     * Open the popup
+     * @param {Node|null} focusNode - The currently focussed Node
+     */
+    open(focusNode) {
+      if (document.getElementsByClassName(Constants.ANNOTATE_BUBBLE_CLASS).length !== 0) {
+        return;
       }
 
-      /**
-       * Insert the popup to DOM
-       */
-      _create() {
-         this.popup = document.createElement("div");
-         this.popup.id = Constants.POPUP_ID;
-         this.popup.setAttribute("role", "toolbar");
-         this.popup.setAttribute("aria-hidden", "true");
-
-         this.popupButton = document.createElement("button");
-         this.popupButton.classList.add("btn", "btn-default", "btn-xs");
-         this.popupButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY];
-         this.popupButton.setAttribute("aria-label", l10n[Constants.ANNOTATE_TRANSLATION_KEY]);
-
-         this.popupButton.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
-         this.popup.appendChild(this.popupButton);
-         document.body.appendChild(this.popup);
+      const pos = this._getPositioning();
+      if (!pos) {
+        return;
       }
 
-      /**
-       * Open the popup near the selected text range
-       * @param {Selection} selection - A selection
-       */
-      open(selection) {
-         if(document.getElementsByClassName(Constants.ANNOTATE_BUBBLE_CLASS).length !== 0) {
-           // an annotate bubble is opened already
-           return;
-         }
+      // batch-write to DOM
+      requestAnimationFrame(() =&gt; {
+        this.popup.style.top = pos.top;
+        this.popup.style.left = pos.left;
+        this.popup.classList.add(Constants.POPUP_CLASS_OPEN);
+        this.popup.setAttribute("aria-hidden", "false");
 
-         const { top, left } = this._getPositioning(selection);
-         this.popup.style.top = top;
-         this.popup.style.left = left;
+        this.previousFocusElem = focusNode?.parentElement || document.activeElement;
+        this.popupButton.focus({ preventScroll: true });
+      });
 
-         this.popup.classList.add(Constants.POPUP_CLASS_OPEN);
-         this.popup.setAttribute("aria-hidden", "false");
-
-         // focus popup button
-         this.previousFocusElem = document.activeElement;
-         this.popupButton.focus();
-
-         document.addEventListener("click", this._onClickAway);
-         if(window.visualViewport) window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-positioning on resize/zoom
+      document.addEventListener("click", this._onClickAway);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-positioning on resize/zoom
       }
+    }
 
-      /**
-       * Close the popup
-       */
-      close() {
-          // restore focus
-          if (this.previousFocusElem &amp;&amp;
-             document.contains(this.previousFocusElem) &amp;&amp;
-             typeof this.previousFocusElem.focus === "function" &amp;&amp;
-             !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
-             this.previousFocusElem.getClientRects().length) {
-           this.previousFocusElem.focus();
-         } else {
-            // this might not be the most accessible way
-            this.popupButton.blur();
-         }
-         this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
-         this.popup.setAttribute("aria-hidden", "true");
+    /**
+     * Close the popup
+     */
+    close() {
+      const canRestoreFocus = this.previousFocusElem &amp;&amp;
+        document.contains(this.previousFocusElem) &amp;&amp;
+        typeof this.previousFocusElem.focus === "function" &amp;&amp;
+        !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
+        this.previousFocusElem.getClientRects().length;
 
-         document.removeEventListener("click", this._onClickAway);
-         if(window.visualViewport) window.visualViewport.removeEventListener("resize", this._onViewportChange);
-      }
-
-      /**
-       * Register event listeners
-       */
-      _registerListeners() {
-         this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
-         this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // exit when pressing Escape
-
-         // open popup on text selection, disable in edit mode
-         document.addEventListener("selectionchange", this._onSelection, { passive: true });
-         this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; { document.removeEventListener("selectionchange", this._onSelection); });
-         this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; { document.addEventListener("selectionchange", this._onSelection, { passive: true }); });
-
-         // prevent losing focus (the selection) when clicking on popup edges
-         this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });
-      }
-
-      /**
-       * Event handler for popup button click
-       */
-      _onButtonClick() {
-        this.close();
-        this.annotationBubbleCallback();
-      }
-
-      /*
-       * Event handler for a page click (popup click away listener)
-       * @param {PointerEvent} event
-       */
-      _onClickAway(event) {
-        if(!this.popup.contains(event.target)) {
-           this.close();
+      // batch-write to DOM
+      requestAnimationFrame(() =&gt; {
+        if (canRestoreFocus) {
+          this.previousFocusElem.focus({ preventScroll: true });
         }
+        this.popupButton.blur(); // ensure popupButton is blurred in-time before calling aria-hidden
+        this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
+        this.popup.setAttribute("aria-hidden", "true");
+      });
+
+      document.removeEventListener("click", this._onClickAway);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", this._onViewportChange);
+      }
+    }
+
+    /**
+     * Register event listeners
+     */
+    _registerListeners() {
+      this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
+      this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // exit when pressing Escape
+
+      // open popup on text selection, disable in edit mode
+      document.addEventListener("selectionchange", this._onSelection, { passive: true });
+      this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; {
+        document.removeEventListener("selectionchange", this._onSelection);
+      });
+      this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; {
+        document.addEventListener("selectionchange", this._onSelection, { passive: true });
+      });
+
+      // prevent losing focus (the selection) when clicking on popup edges
+      this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); }, { passive: false });
+    }
+
+    /**
+     * Event handler for popup button click
+     */
+    _onButtonClick() {
+      if (!this.openAnnotationBubble || typeof this.openAnnotationBubble !== "function") {
+        return;
       }
 
-      /**
-       * Event handler for document selection. Checks the current selection and opens the popup
-       */
-      _onSelection() {
-         const selection = document.getSelection();
-         if (!selection || !this.wikiContent.contains(selection.anchorNode) || !selection.toString().trim()) {
-             // selection invalid or not in document content
-             return;
-         }
+      this.close();
+      this.openAnnotationBubble();
+    }
 
-         this.open(selection);
+    /*
+     * Event handler for a page click (popup click away listener)
+     * @param {PointerEvent} event
+     */
+    _onClickAway(event) {
+      if (!this.popup.contains(event.target)) {
+        this.close();
+      }
+    }
+
+    /**
+     * Event handler for document selection. Checks the current selection and opens the popup
+     */
+    _onSelection() {
+      const selection = document.getSelection();
+      if (!selection || !selection.anchorNode || !this.wikiContent.contains(selection.anchorNode) || selection.rangeCount &lt;= 0 || !selection.toString().trim()) {
+        return;
       }
 
-      /**
-       * Event handler for popup button keydown. Closes popup on Escape key press
-       * @param {KeyboardEvent} event
-       */
-      _onEscapeKey(event) {
-         if(event.key === "Escape") {
-            this.close();
-         }
+      this.open(selection.focusNode);
+    }
+
+    /**
+     * Event handler for popup button keydown. Closes popup on Escape key press
+     * @param {KeyboardEvent} event
+     */
+    _onEscapeKey(event) {
+      if (event.key === "Escape") {
+        this.close();
+      }
+    }
+
+    /**
+     * Event handler for window resize/zoom. Recalculates the positioning of the popup
+     */
+    _onViewportChange(event) {
+      const pos = this._getPositioning();
+      if (!pos) {
+        return;
       }
 
-      /**
-       * Event handler for window resize/zoom. Recalculates the positioning of the popup
-       */
-      _onViewportChange(event) {
-         const { top, left } = this._getPositioning(document.getSelection());
-         requestAnimationFrame(() =&gt; {
-            this.popup.style.top = top;
-            this.popup.style.left = left;
-         });
+      // batch-write to DOM
+      requestAnimationFrame(() =&gt; {
+        this.popup.style.top = pos.top;
+        this.popup.style.left = pos.left;
+      });
+    }
+
+    /**
+     * Get popup position that is near the selected text range
+     * @return {{top: number, left: number}} The popup element and popup button
+     */
+    _getPositioning() {
+      const selection = document.getSelection();
+      if (!selection || selection.rangeCount &lt;= 0) {
+        return null;
       }
 
-      /**
-       * Get popup positioning (top and left absolute positioning)
-       * @param {Selection} selection - A selection
-       * @return {{top: number, left: number}} The popup element and popup button
-       */
-      _getPositioning(selection) {
-         if(!selection || selection.rangeCount === 0) {
-            // invalid selection
-            return;
-         }
-
-         // use last rectangle of selection, important for correct positioning in multi-line selections
-         const rects = selection.getRangeAt(0).getClientRects();
-         if (!rects.length) {
-            // empty collection
-            return;
-         }
-         const rect = rects[rects.length - 1];
-
-         return {
-          top: (rect.top + window.scrollY - this.popup.offsetHeight - 4) + "px",
-          left: (rect.left + window.scrollX + rect.width - (this.popup.offsetWidth / 2)) + "px"
-         };
+      // use last rectangle of selection, important for correct positioning in multi-line selections
+      const rects = selection.getRangeAt(0).getClientRects();
+      if (!rects.length) {
+        return null;
       }
-   }
+      const rect = rects[rects.length - 1];
 
-   return AnnotatePopup;
+      const pSize = this.popup.getBoundingClientRect();
+      return {
+        top: (rect.top + window.scrollY - pSize.height - Constants.POPUP_TOP_OFFSET) + "px",
+        left: (rect.left + window.scrollX + rect.width - (pSize.width / 2)) + "px"
+      };
+    }
+  }
+
+  return AnnotatePopup;
 });</code>
     </property>
     <property>
@@ -507,18 +542,18 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
     </property>
     <property>
       <code>#annotation-popup {
-   position: absolute;
-   background-color: var(--xwiki-page-content-bg);
-   padding: 4px;
-   border-radius: 4px;
-   box-shadow: 0 1.65px 3px var(--btn-default-border);
-   visibility: hidden;
-   opacity: 0;
-   transition: opacity .2s ease-in;
-   &amp;.opened {
-      visibility: visible;
-      opacity: 1;
-   }
+  position: absolute;
+  background-color: var(--xwiki-page-content-bg);
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 1.65px 3px var(--btn-default-border);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .2s ease-in;
+  &amp;.opened {
+    visibility: visible;
+    opacity: 1;
+  }
 }</code>
     </property>
     <property>

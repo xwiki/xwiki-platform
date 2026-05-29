@@ -25,73 +25,76 @@ import {
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { useMemo } from "react";
+import { mock } from "vitest-mock-extended";
 import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
-import type { LinkEditionContext } from "../misc/linkSuggest";
-import type { ModelReferenceParser } from "@xwiki/platform-model-reference-api";
+import type { LinkSuggestService } from "@xwiki/platform-link-suggest-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { Container } from "inversify";
 
 export type BlockNoteForTestProps = Omit<
   BlockNoteViewWrapperProps,
-  "lang" | "syntax" | "label"
+  "lang" | "syntax" | "label" | "depsContainer"
 > & { syntax?: SyntaxConfig };
 
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   syntax,
   ...props
 }) => {
-  const linkEditionCtx = useMemo(linkEditionCtxMock, []);
+  const depsContainer = useMemo(depsContainerMock, []);
 
   return (
     <BlockNoteViewWrapper
       lang="en"
       label="Some Label"
-      linkEditionCtx={linkEditionCtx}
       syntax={syntax ?? FULL_SYNTAX}
+      depsContainer={depsContainer}
       {...props}
     />
   );
 };
 
-function linkEditionCtxMock(): LinkEditionContext {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    attachmentsService: null as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    documentService: null as any,
-    linkSuggestService: {
-      async getLinks() {
-        return [
-          {
-            id: "some page id",
-            hint: "some page hint",
-            label: "some page label",
-            reference: "some page reference",
-            type: 0,
-            url: "some page url",
-          },
-          {
-            id: "some attachment id",
-            hint: "some attachment hint",
-            label: "some attachment label",
-            reference: "some attachment reference",
-            type: 1,
-            url: "some attachment url",
-          },
-        ];
+function depsContainerMock(): Container {
+  const container = mock<Container>();
+
+  container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
+    get: () => ({
+      parse(url, type) {
+        throw new Error("TODO");
       },
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    modelReferenceHandler: null as any,
-    modelReferenceParser: {
-      parse(reference, opts) {
-        return parseModelReference(reference, opts);
+    }),
+  } satisfies RemoteURLParserProvider);
+
+  container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
+    get: () => ({
+      serialize(reference) {
+        throw new Error("TODO");
+      },
+    }),
+  } satisfies RemoteURLSerializerProvider);
+
+  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    get: () => ({
+      parse(reference, options) {
+        return parseModelReference(reference, options);
       },
 
-      async parseAsync(reference, opts) {
-        return parseModelReference(reference, opts);
+      async parseAsync(reference, options) {
+        return parseModelReference(reference, options);
       },
-    },
-    modelReferenceSerializer: {
+    }),
+  } satisfies ModelReferenceParserProvider);
+
+  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
+    get: () => ({
       serialize(reference) {
         if (!reference) {
           throw new Error("Please provide a reference to serialize");
@@ -107,12 +110,36 @@ function linkEditionCtxMock(): LinkEditionContext {
 
         throw new Error("Invalid reference provided");
       },
+    }),
+  } satisfies ModelReferenceSerializerProvider);
+
+  container.get.calledWith("LinkSuggestService").mockReturnValue({
+    async getLinks() {
+      return [
+        {
+          id: "some page id",
+          hint: "some page hint",
+          label: "some page label",
+          reference: "some page reference",
+          type: 0,
+          url: "some page url",
+        },
+        {
+          id: "some attachment id",
+          hint: "some attachment hint",
+          label: "some attachment label",
+          reference: "some attachment reference",
+          type: 1,
+          url: "some attachment url",
+        },
+      ];
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    remoteURLParser: null as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    remoteURLSerializer: null as any,
-  };
+  } satisfies LinkSuggestService);
+
+  container.get.calledWith("AttachmentsService").mockReturnValue(null);
+  container.get.calledWith("DocumentsService").mockReturnValue(null);
+
+  return container;
 }
 
 const parseModelReference: ModelReferenceParser["parse"] = (

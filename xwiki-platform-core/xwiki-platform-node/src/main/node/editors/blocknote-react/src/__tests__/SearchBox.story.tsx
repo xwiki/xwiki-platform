@@ -34,7 +34,6 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
       <SearchBox
         initialValue="Some great initial value"
         placeholder="Some super placeholder"
-        linkEditionCtx={null}
         getSuggestions={async (query) => [
           {
             type: 1,

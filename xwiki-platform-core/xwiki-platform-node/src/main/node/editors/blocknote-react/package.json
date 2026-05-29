@@ -87,6 +87,7 @@
     "postcss-simple-vars": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
+    "vitest-mock-extended": "catalog:",
     "vitest": "catalog:",
     "vue-tsc": "catalog:"
   },

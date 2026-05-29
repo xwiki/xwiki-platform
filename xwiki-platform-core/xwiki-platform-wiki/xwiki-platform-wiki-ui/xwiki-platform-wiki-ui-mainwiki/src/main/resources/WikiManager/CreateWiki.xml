@@ -672,24 +672,10 @@
     #end
   #else
     #set($wikiId = $request.wikiId)
-<<<<<<< HEAD
-    {{html}}
-      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
-=======
     {{html clean="false"}}
       #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp')))
->>>>>>> 91ae16ac470 (XWIKI-24236: Improve wiki creation translation display)
       &lt;div class="wizard-body"&gt;
         #if($request.deleteOk)
-<<<<<<< HEAD
-          &lt;p class="successmessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
-        #else
-          &lt;p class="errormessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
-=======
 
           {{success}}
             #set ($stepCleaningupSuccessParameters = ["""${request.wikiname}"""])
@@ -703,7 +689,6 @@
             {{translation key="platform.wiki.create.wizard.step.cleaningup.error", scriptParameters="stepCleaningupErrorParameters"/}}
           {{/error}}
 
->>>>>>> 91ae16ac470 (XWIKI-24236: Improve wiki creation translation display)
         #end
       &lt;/div&gt;
       &lt;/form&gt;

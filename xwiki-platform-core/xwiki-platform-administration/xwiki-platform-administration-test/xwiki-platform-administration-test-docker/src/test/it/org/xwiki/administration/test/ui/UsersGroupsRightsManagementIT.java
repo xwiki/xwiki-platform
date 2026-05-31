@@ -725,4 +725,36 @@ class UsersGroupsRightsManagementIT
         assertTrue(vp.getContent().contains("ALLOWED"),
             "Custom right should be allowed on child page when set as page-only on parent");
     }
+
+    /**
+     * Verify that the page/space Rights administration section ("Rights: Page") displays the listing of Users and
+     * Groups.
+     */
+    @Test
+    @Order(13)
+    void spaceRightsShowUsersAndGroups(TestUtils setup, TestReference testReference)
+    {
+        // Ensure the space exists so it has a Page Administration with a Rights: Page section.
+        setup.createPage(testReference, "", testReference.getName());
+
+        // Create the admin user so that we can verify it's listed in the Rights table.
+        setup.createAdminUser();
+
+        // Administer Page -> Users & Rights -> Rights: Page.
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Rights: Page");
+
+        EditRightsPane editRightsPane = new EditRightsPane();
+
+        // Select Users: the user listing is displayed (default Admin user present).
+        editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", "Admin");
+        assertTrue(editRightsPane.hasEntity("Admin"));
+
+        // Select Groups: the groups listing is displayed (default groups present).
+        editRightsPane.switchToGroups();
+        editRightsPane.getRightsTable().filterColumn("name", "XWikiAdminGroup");
+        assertTrue(editRightsPane.hasEntity("XWikiAdminGroup"));
+    }
 }

@@ -19,7 +19,7 @@
  */
 package org.xwiki.administration.test.ui;
 
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AdministrationIT
 {
     /**
-     * Validate presence of default sections for Administration UIs (Global, Page).
+     * Validate the presence of default sections for Administration UIs (Global, Page).
      */
     @Test
     void verifyAdministrationSections(TestUtils setup, TestReference testReference)
@@ -62,9 +62,9 @@ class AdministrationIT
         assertTrue(wikiAdministrationPage.getBreadcrumbContent().endsWith("/Global Administration"));
 
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
-        Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
+        Stream.of("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
             "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral")
-            .stream().forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
+            .forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
                 String.format("Menu section [%s] is missing.", sectionId)));
 
         // These are page-only sections.
@@ -86,9 +86,9 @@ class AdministrationIT
         assertTrue(pageAdministrationPage.hasSection("PageRights"));
 
         // All these sections should not be present (they provide wiki-wide configuration).
-        Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
+        Stream.of("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
             "Editing", "emailSend", "emailStatus", "emailGeneral")
-            .stream().forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
+            .forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
     }
 }

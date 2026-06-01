@@ -21,10 +21,11 @@ import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
+import { InlineMacroInvocation } from '@xwiki/platform-uniast-api';
 import { Link } from '@blocknote/core';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
-import { MacroInvocation } from '@xwiki/platform-uniast-api';
+import { MacroBlockInvocation } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
@@ -103,7 +104,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 // @beta
 export type ContextForMacros = {
     openParamsEditor(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
-    openInsertionEditor(prefill: MacroInsertionEditorParams, insert: (macro: MacroInvocation) => void): void;
+    openInsertionEditor(prefill: MacroInsertionEditorParams, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
 };
 
 // Warning: (ae-incompatible-release-tags) The symbol "createBlockNoteSchema" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
@@ -738,6 +739,10 @@ export function querySuggestionsMenuItems(editor: EditorType, query: string, mac
 // @beta
 export class UniAstToBlockNoteConverter {
     constructor(depsContainer: Container);
+    // (undocumented)
+    inlineMacroInvocationToBlockNote(call: InlineMacroInvocation): InlineContentType | Error;
+    // (undocumented)
+    macroBlockInvocationToBlockNote(call: MacroBlockInvocation): BlockType | Error;
     // (undocumented)
     uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error;
 }

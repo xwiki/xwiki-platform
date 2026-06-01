@@ -86,7 +86,7 @@ class AdministrationIT
         assertTrue(pageAdministrationPage.hasSection("Presentation"));
         assertTrue(pageAdministrationPage.hasSection("PageAndChildrenRights"));
         // Note: the "PageRights" section presence is verified by
-        // UsersGroupsRightsManagementIT.spaceRightsShowUsersAndGroups, so it's not re-checked here.
+        // UsersGroupsRightsManagementIT.rightsShowUsersAndGroups, so it's not re-checked here.
 
         // All these sections should not be present (they provide wiki-wide configuration).
         Stream.of("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",

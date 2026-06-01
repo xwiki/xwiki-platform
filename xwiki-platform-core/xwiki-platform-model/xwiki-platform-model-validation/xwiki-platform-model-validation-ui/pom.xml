@@ -39,4 +39,14 @@
   <scm>
     <tag>stable-17.10.x</tag>
   </scm>
+
+  <dependencies>
+    <dependency>
+      <!-- The Administration page renders its content with the {{display}} macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

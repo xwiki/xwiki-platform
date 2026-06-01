@@ -92,9 +92,7 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
   // Trigger the image edition UI
   //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
   //   > There is no other real identifying DOM attribute for these buttons
-  const imgEditBtnEl = page.locator(
-    'button[aria-label="blocknote.imageToolbar.buttons.edit"]',
-  );
+  const imgEditBtnEl = page.locator('button[aria-label="Change image"]');
   await imgEditBtnEl.waitFor({ state: "attached" });
   await imgEditBtnEl.click();
 

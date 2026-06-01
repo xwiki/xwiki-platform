@@ -86,7 +86,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   onSelect,
   onSubmit,
 }) => {
-  const depsContainer = useContext(DepsContainerContext)!;
+  const depsContainer = useContext(DepsContainerContext);
+
+  if (!depsContainer) {
+    throw new Error("Missing dependencies container in React context");
+  }
 
   const modelReferenceParser = depsContainer
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")

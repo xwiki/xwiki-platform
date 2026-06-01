@@ -17,10 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
-import { BlockNoteViewWrapper } from "../components/BlockNoteViewWrapper";
-import { useMemo } from "react";
-import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
+
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityType,
+  SpaceReference,
+} from "@xwiki/platform-model-api";
+import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceParser,
@@ -31,32 +35,9 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
-export type BlockNoteForTestProps = Omit<
-  BlockNoteViewWrapperProps,
-  "lang" | "syntax" | "label" | "depsContainer"
-> & { syntax?: SyntaxConfig };
-
-export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
-  syntax,
-  ...props
-}) => {
-  const depsContainer = useMemo(depsContainerMock, []);
-
-  return (
-    <BlockNoteViewWrapper
-      lang="en"
-      label="Some Label"
-      syntax={syntax ?? FULL_SYNTAX}
-      depsContainer={depsContainer}
-      {...props}
-    />
-  );
-};
-
-function depsContainerMock(): Container {
+export function depsContainerMock(): Container {
   const container = mock<Container>();
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
@@ -160,87 +141,4 @@ const parseModelReference: ModelReferenceParser["parse"] = (
   }
 
   throw new Error("Invalid reference provided");
-};
-
-const FULL_SYNTAX: SyntaxConfig = {
-  id: "default-syntax",
-  features: {
-    blocks: {
-      headings: {
-        levels1To3: true,
-        levels4To6: true,
-      },
-      images: {
-        basicImages: true,
-        altText: true,
-        caption: true,
-        customBorder: true,
-        customDimensions: true,
-        insideLinks: true,
-      },
-      lists: {
-        bulletLists: true,
-        blockInListItems: true,
-        checkableLists: true,
-        contiguousNumberedLists: true,
-        contiguousNumberedListsAnyStartIndex: true,
-        mixableCheckableListItems: true,
-        multipleBlocksInListItems: true,
-        unorderedNumberedLists: true,
-        listsNesting: true,
-      },
-      quotes: true,
-      code: {
-        basicCodeBlocks: true,
-        language: true,
-      },
-      dividers: true,
-      macros: true,
-      nesting: true,
-      styling: {
-        justifyAlignment: true,
-        lcrAlignment: true,
-      },
-      tables: {
-        basicTables: true,
-        blockInTableCells: true,
-        colRows: true,
-        colSpan: true,
-        headerColumns: true,
-        multipleBlocksInTableCells: true,
-        multipleFooterRows: true,
-        multipleHeaderRows: true,
-        noHeaderRowTable: true,
-        singleFooterRow: true,
-        singleHeaderRow: true,
-      },
-    },
-    inlineContents: {
-      images: true,
-      links: {
-        basicLinks: true,
-        customText: true,
-        customTextStyling: true,
-        descriptiveTooltip: true,
-        metadata: true,
-      },
-      code: {
-        basicInlineCode: true,
-        language: true,
-      },
-      macros: true,
-      rawHtml: true,
-      textStyles: {
-        bold: true,
-        italic: true,
-        strikethrough: true,
-        underline: true,
-        nesting: true,
-        fontFamily: true,
-        fontSize: true,
-        subscript: true,
-        superscript: true,
-      },
-    },
-  },
 };

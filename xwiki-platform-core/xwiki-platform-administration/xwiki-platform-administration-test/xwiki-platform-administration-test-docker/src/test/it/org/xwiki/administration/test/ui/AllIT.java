@@ -75,4 +75,9 @@ public class AllIT
     class NestedUserEditIT extends UserEditIT
     {
     }
+
+    @Nested
+    class NestedEditingIT extends EditingIT
+    {
+    }
 }

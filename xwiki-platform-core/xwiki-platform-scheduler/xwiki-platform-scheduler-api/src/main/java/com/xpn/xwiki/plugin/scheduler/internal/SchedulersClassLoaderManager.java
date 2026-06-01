@@ -131,12 +131,15 @@ public class SchedulersClassLoaderManager
 
         // Reloading all the schedulers can take a long time, and there is no reason to block the trigger during that
         // time.
-        Thread.ofVirtual().name("XWiki Reload Schedulers after classloader reload for namespace [" + namespace + "]")
-            .start(new ExecutionContextRunnable(() -> {
-                for (BaseObjectReference objectReference : objectReferences) {
-                    reloadScheduler(objectReference);
-                }
-            }, this.componentManager));
+        Thread thread = new Thread(new ExecutionContextRunnable(() ->
+        {
+            for (BaseObjectReference objectReference : objectReferences) {
+                reloadScheduler(objectReference);
+            }
+        }, this.componentManager));
+        thread.setName("XWiki Reload Schedulers after classloader reload for namespace [" + namespace + "]");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void reloadScheduler(BaseObjectReference objectReference)

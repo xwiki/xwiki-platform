@@ -565,7 +565,7 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
   #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
-  {{html}}
+  {{html clean="false"}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
     &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
@@ -675,6 +675,7 @@
     {{html clean="false"}}
       #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp')))
       &lt;div class="wizard-body"&gt;
+      {{/html}}
         #if($request.deleteOk)
 
           {{success}}
@@ -690,6 +691,7 @@
           {{/error}}
 
         #end
+        {{html clean="false"}}
       &lt;/div&gt;
       &lt;/form&gt;
     {{/html}}

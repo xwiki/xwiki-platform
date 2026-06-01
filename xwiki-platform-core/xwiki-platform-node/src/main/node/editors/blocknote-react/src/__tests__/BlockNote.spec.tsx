@@ -20,6 +20,7 @@
 import { BlockNoteForTest } from "./BlockNote.story";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockOfType, BlockType } from "../blocknote";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
@@ -161,6 +162,80 @@ test("Disallowed syntax features should be unavailable", async ({
   expect(menuItemsText).not.toContain("Quote");
 });
 
+// eslint-disable-next-line max-statements
+test("Macros can be inserted", async ({ mount, page }) => {
+  let macroInsertionModalTriggered = false;
+
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: Math.random().toString(),
+          type: "paragraph",
+          children: [],
+          content: [{ type: "text", text: "Yeah", styles: {} }],
+          props: {
+            backgroundColor: "default",
+            textAlignment: "left",
+            textColor: "default",
+          },
+        },
+      ]}
+      macros={{
+        ctx: {
+          openParamsEditor() {
+            throw new Error("Unreachable");
+          },
+
+          openInsertionEditor() {
+            macroInsertionModalTriggered = true;
+          },
+        },
+        list: macros,
+      }}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+
+  await editorEl.press("/");
+
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+
+  await slashMenuEl.waitFor({ state: "attached" });
+
+  const menuItems = await slashMenuEl
+    .locator(".bn-suggestion-menu-item p:first-child")
+    .all();
+
+  const menuItemsText = await Promise.all(
+    menuItems.map((item) => item.textContent()),
+  );
+
+  expect(menuItemsText).not.toContain("Table");
+  expect(menuItemsText).not.toContain("Quote");
+  // <div class="bn-block-content" data-content-type="paragraph"><p class="bn-inline-content">Yeah</p></div>
+
+  const paragraph = editorEl.locator(
+    'div.bn-block-content[data-content-type="paragraph"]',
+  );
+
+  // Trigger the formatting toolbar
+  await paragraph.dblclick();
+
+  await editorEl.click();
+  //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
+  //   > There is no other real identifying DOM attribute for these buttons
+  const macroInsertBtnEl = page.locator('button[aria-label="Insert a macro"]');
+  await macroInsertBtnEl.waitFor({ state: "attached" });
+
+  expect(macroInsertionModalTriggered).toBe(false);
+  await macroInsertBtnEl.click();
+  expect(macroInsertionModalTriggered).toBe(true);
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),
@@ -284,3 +359,18 @@ const FULL_SYNTAX: SyntaxConfig = {
     },
   },
 };
+const macros: MacroWithUnknownParamsType[] = [
+  {
+    renderAs: "block",
+    infos: {
+      id: "sample-macro",
+      name: "Sample Macro",
+      description: "A sample macro",
+      params: {},
+      bodyType: "none",
+      defaultParameters: {},
+      paramsDescription: {},
+    },
+    render: () => [],
+  },
+];

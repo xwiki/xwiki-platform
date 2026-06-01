@@ -42,8 +42,6 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  * Contains all the blocks usable inside the editor
  *
  * @returns The created schema
- * @since 18.0.0RC1
- * @beta
  */
 function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   // Get rid of some block types
@@ -100,8 +98,6 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
  * @param lang - The dictionary's language
  *
  * @returns The dictionary in the requested language
- * @since 18.0.0RC1
- * @beta
  */
 function createDictionary(lang: EditorLanguage) {
   // eslint-disable-next-line import-x/namespace
@@ -120,8 +116,6 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
  * @param editor - the editor type
  * @param query - the query to filter the suggestions by
  * @param macros - the available macros
- * @since 18.0.0RC1
- * @beta
  */
 // eslint-disable-next-line max-statements
 function querySuggestionsMenuItems(
@@ -345,7 +339,6 @@ type EditorStyledText = StyledText<EditorStyleSchema>;
 type EditorLink = Link<EditorStyleSchema>;
 
 export type {
-  BlockNoteConcreteMacro,
   BlockOfType,
   BlockType,
   EditorBlockSchema,

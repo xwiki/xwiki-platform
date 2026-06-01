@@ -61,7 +61,6 @@ export { MACRO_NAME_PREFIX, mountBlockNote };
 export type { BlockNoteViewWrapperProps, ContextForMacros };
 
 export type {
-  BlockNoteConcreteMacro,
   BlockOfType,
   BlockType,
   EditorBlockSchema,
@@ -75,22 +74,6 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
-export {
-  createBlockNoteSchema,
-  createDictionary,
-  querySuggestionsMenuItems,
-} from "./blocknote";
-
-export type {
-  createCustomBlockSpec,
-  createCustomInlineContentSpec,
-} from "./blocknote/utils";
-
-export {
-  buildMacroRawContent,
-  extractMacroRawContent,
-} from "./blocknote/utils";
-
 export { BlockNoteToUniAstConverter } from "./uniast/bn-to-uniast";
 export { UniAstToBlockNoteConverter } from "./uniast/uniast-to-bn";
 
@@ -100,3 +83,8 @@ export type {
   ImageEditionOverrideFn,
   ImageUpdateResult,
 } from "./components/images/CustomImageToolbar";
+
+export {
+  buildMacroRawContent,
+  extractMacroRawContent,
+} from "./blocknote/utils";

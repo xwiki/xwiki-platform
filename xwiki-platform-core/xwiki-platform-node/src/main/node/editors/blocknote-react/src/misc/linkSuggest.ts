@@ -21,7 +21,7 @@
 import { EntityType } from "@xwiki/platform-model-api";
 import type {
   Link,
-  LinkSuggestService,
+  LinkSuggestServiceProvider,
   LinkType,
 } from "@xwiki/platform-link-suggest-api";
 import type {
@@ -62,8 +62,9 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * @beta
  */
 function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
-  const linkSuggestService =
-    depsContainer.get<LinkSuggestService>("LinkSuggestService");
+  const linkSuggestService = depsContainer
+    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
+    .get()!;
 
   if (!linkSuggestService) {
     return null;

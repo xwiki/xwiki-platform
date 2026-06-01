@@ -27,7 +27,7 @@ import {
 import { useMemo } from "react";
 import { mock } from "vitest-mock-extended";
 import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
-import type { LinkSuggestService } from "@xwiki/platform-link-suggest-api";
+import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceParser,
   ModelReferenceParserProvider,
@@ -67,16 +67,16 @@ function depsContainerMock(): Container {
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({
-      parse(url, type) {
-        throw new Error("TODO");
+      parse() {
+        throw new Error("Unreachable");
       },
     }),
   } satisfies RemoteURLParserProvider);
 
   container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
     get: () => ({
-      serialize(reference) {
-        throw new Error("TODO");
+      serialize() {
+        throw new Error("Unreachable");
       },
     }),
   } satisfies RemoteURLSerializerProvider);
@@ -113,28 +113,30 @@ function depsContainerMock(): Container {
     }),
   } satisfies ModelReferenceSerializerProvider);
 
-  container.get.calledWith("LinkSuggestService").mockReturnValue({
-    async getLinks() {
-      return [
-        {
-          id: "some page id",
-          hint: "some page hint",
-          label: "some page label",
-          reference: "some page reference",
-          type: 0,
-          url: "some page url",
-        },
-        {
-          id: "some attachment id",
-          hint: "some attachment hint",
-          label: "some attachment label",
-          reference: "some attachment reference",
-          type: 1,
-          url: "some attachment url",
-        },
-      ];
-    },
-  } satisfies LinkSuggestService);
+  container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue({
+    get: () => ({
+      async getLinks() {
+        return [
+          {
+            id: "some page id",
+            hint: "some page hint",
+            label: "some page label",
+            reference: "some page reference",
+            type: 0,
+            url: "some page url",
+          },
+          {
+            id: "some attachment id",
+            hint: "some attachment hint",
+            label: "some attachment label",
+            reference: "some attachment reference",
+            type: 1,
+            url: "some attachment url",
+          },
+        ];
+      },
+    }),
+  } satisfies LinkSuggestServiceProvider);
 
   container.get.calledWith("AttachmentsService").mockReturnValue(null);
   container.get.calledWith("DocumentsService").mockReturnValue(null);

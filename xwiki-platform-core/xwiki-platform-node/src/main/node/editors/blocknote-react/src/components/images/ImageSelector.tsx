@@ -43,7 +43,7 @@ import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../../misc/linkSuggest";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
-import type { LinkSuggestService } from "@xwiki/platform-link-suggest-api";
+import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
@@ -86,8 +86,9 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   const attachmentsService =
     depsContainer.get<AttachmentsService>("AttachmentsService")!;
 
-  const linkSuggestService =
-    depsContainer.get<LinkSuggestService>("LinkSuggestService");
+  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+    "LinkSuggestServiceProvider",
+  ).get!();
 
   const [initialQuery, selectedEntityPath] = useMemo(() => {
     if (!currentSelection) {

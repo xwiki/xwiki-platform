@@ -275,7 +275,12 @@ public class DownloadAction extends XWikiAction
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             try (InputStream data = attachment.getContentInputStream(context)) {
                 InputStream boundedData = new BoundedInputStream(data, end + 1);
-                boundedData.skip(start);
+                long skip = boundedData.skip(start);
+                if (skip != start) {
+                    throw new IOException(
+                        String.format("Error while skipping [%s] data for [%s]: [%s] data skipped.",
+                            start, attachment.getReference(), skip));
+                }
                 setCommonHeaders(attachment, response, context);
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 if ((end - start + 1L) < Integer.MAX_VALUE) {

@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 class MacrosTest extends PageTest
 {
     private static final Pattern TRANSLATION_MACRO_OUTPUT_REGEX =
-        Pattern.compile("\\{\\{translation key=\"key\" parameters=\"(txparams_key_.....)\"/}}");
+        Pattern.compile("\\{\\{translation key=\"key\" scriptParameters=\"(txparams_key_.....)\"/}}");
 
     private VelocityManager velocityManager;
 
@@ -417,7 +417,7 @@ class MacrosTest extends PageTest
     {
         StringWriter writer = new StringWriter();
         this.velocityManager.evaluate(writer, "translations", new StringReader("""
-            #wikiTranslation('key' ['string1', 41])
+            #wikiTranslation('key' ['string1'])
             #wikiTranslation('key' ['string2', 42])"""));
 
         Matcher matcher = TRANSLATION_MACRO_OUTPUT_REGEX.matcher(writer.toString());
@@ -430,7 +430,7 @@ class MacrosTest extends PageTest
         assertNotEquals(parameters1, parameters2);
 
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
-        assertEquals(List.of("string1", 41), velocityContext.get(parameters1));
+        assertEquals(List.of("string1"), velocityContext.get(parameters1));
         assertEquals(List.of("string2", 42), velocityContext.get(parameters2));
     }
 }

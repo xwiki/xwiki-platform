@@ -3178,7 +3178,7 @@ $!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="fa
 #set ($_cleantxKey = $txkey.replaceAll('[^a-zA-Z0-9-_]', ''))
 #set ($_translationParametersVariableName = "txparams_${_cleantxKey}_${util.generateRandomString(5)}")
 #setVariable($_translationParametersVariableName $txparameters)##
-{{translation key="$txkey" parameters="$_translationParametersVariableName"/}}##
+{{translation key="$txkey" scriptParameters="$_translationParametersVariableName"/}}##
 #else
 {{translation key="$txkey"/}}##
 #end

@@ -740,6 +740,11 @@ class UsersGroupsRightsManagementIT
 
         // Create the admin user so that we can verify it's listed in the Rights table.
         setup.createAdminUser();
+        // createAdminUser() logs in as the non-superadmin "Admin" user; log back in as superadmin so that
+        // navigating to the (global and page) administration is race-free, matching the rest of this class. The
+        // "Admin" user document is created via REST regardless of who is logged in, so it's still listed in the
+        // Rights table below.
+        setup.loginAsSuperAdmin();
 
         // Global level -> Administer Wiki -> Users & Rights -> Rights.
         AdministrationPage administrationPage = AdministrationPage.gotoPage();

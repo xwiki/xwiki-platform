@@ -490,7 +490,9 @@
             if (!item.disabled) {
               item.prop('disabled', true);
               let notification = new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.inProgress'], "inprogress");
-              $.post(item.href).done(function(data) {
+              $.post(item.attr('data-action'), {
+                'form_token': xm.form_token
+              }).done(function(data) {
                 // Remove deprecated properties box
                 container.find(".deprecatedProperties").remove();
                 notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.done'], "done"));

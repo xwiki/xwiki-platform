@@ -218,12 +218,6 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   color: $theme.textColor;
 }
 
-.syncProperties {
-  font-weight: 900;
-  display: inline-block;
-  padding: 2px 0 2px 0;
-  color: $theme.notificationErrorColor;
-}
 /* XProperty tools */
 .disabletool label {
   font-weight: 900;

@@ -355,119 +355,133 @@ XWiki.widgets.LiveTable = Class.create({
       // The column's display name to be used when displaying the responsive version.
       var displayName = descriptor.displayName || column;
       var fieldName = column.replace(/^doc\./, 'doc_');
-      // When a cell is part of a non-viewable row (except for the actions that simply stays empty), we display a 
+      // When a cell is part of a non-viewable row (except for the actions that simply stays empty), we display a
       // message indicating that the content is not present because the current user does not have the right to view it.
       if (!row['doc_viewable'] && !row[fieldName]) {
-        const notViewableCellMessage = $jsontool.serialize($services.localization.render('platform.livetable.docNotViewable'));
-        var td = new Element('td', {
-          'class': [
-            fieldName,
-            'link' + (descriptor.link || ''),
-            'type' + (descriptor.type || '')
-          ].join(' '),
-          'data-title': displayName
-        });
-        if (column !== '_actions') {
-          td.update(notViewableCellMessage + "<sup>*</sup>");
-        }
-        tr.appendChild(td);
+        this._handleNonViewableCell(fieldName, descriptor, displayName, column, tr);
       } else if (column === '_actions') {
-        var adminActions = ['admin', 'rename', 'rights'];
-        var td = new Element('td', {
-          'class': 'actions',
-          'data-title': displayName
-        });
-        td.toggleClassName('hide-labels', descriptor.labels === false);
-        (descriptor.actions || []).forEach(function(action, index) {
-          if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
-              (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {
-            var link = new Element('a', {
-              'href': row['doc_' + action.id + '_url'] || row['doc_url'],
-              'class': 'action action' + action.id
-            }).update('<span class="action-icon"></span><span class="action-label"></span>');
-            link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
-            link.down('.action-label').update(action.label.escapeHTML());
-            if (action.async) {
-              link.observe('click', function(event) {
-                event.stop();
-                var notification = new XWiki.widgets.Notification(
-                  $jsontool.serialize($services.localization.render('platform.livetable.asyncActionInProgress')),
-                  'inprogress'
-                );
-                new Ajax.Request(link.href, {
-                  onSuccess: function() {
-                    if (typeof action.callback === 'string') {
-                      new Function('row', 'i', 'table', action.callback)(row, i, table);
-                    }
-                    notification.replace(new XWiki.widgets.Notification(
-                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionDone')),
-                      'done'
-                    ));
-                  },
-                  onFailure: function() {
-                    notification.replace(new XWiki.widgets.Notification(
-                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionFailed')),
-                      'error'
-                    ));
-                  }
-                });
-              });
-            }
-            td.insert(link);
-          }
-        });
-        tr.appendChild(td);
+        this._handleActionsCell(displayName, descriptor, row, i, table, tr);
       } else {
-        var td = new Element('td', {
-          'class': [
-            fieldName,
-            'link' + (descriptor.link || ''),
-            'type' + (descriptor.type || '')
-          ].join(' '),
-          'data-title': displayName
-        });
-        var container = td;
-        if (descriptor.link && row['doc_viewable']) {
-          var link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
-          // Automatic: the link URL is in JSON results, with the '_url' sufix.
-          if (descriptor.link === 'auto') {
-            link.href = row[fieldName + '_url'] || row['doc_url'];
-          } else if (descriptor.link === 'field') {
-            if (row[fieldName + '_url']) {
-              link.href = row[fieldName + '_url'];
-            }
-          // Property editor
-          } else if (descriptor.link === 'editor') {
-            var propertyClassName = descriptor['class'] || table.options.xclass;
-            td.observe('click', function(event) {
-              var tag = event.element().down('span') || event.element();
-              editProperty(row['doc_fullName'], propertyClassName, column, function(value) {
-                tag.innerHTML = value;
-              });
-            });
-          // Author, space or wiki link.
-          } else if (row['doc_' + descriptor.link + '_url']) {
-            link.href = row['doc_' + descriptor.link + '_url'];
-          } else {
-            link.href = row['doc_url'];
-          }
-          td.appendChild(link);
-          container = link;
-        }
-        // The value can be passed as a string..
-        if (descriptor.html + '' === 'true') {
-          container.innerHTML = row[fieldName] || '';
-        } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
-          var text = row[fieldName] + '';
-          if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
-            container.addClassName('docTitleComputed');
-          }
-          container.update(text.escapeHTML());
-        }
-        tr.appendChild(td);
+        this._handleCell(fieldName, descriptor, displayName, row, table, column, showFilterNote, tr);
       }
     });
     return tr;
+  },
+  _handleNonViewableCell(fieldName, descriptor, displayName, column, tr)
+  {
+    const notViewableCellMessage = $jsontool.serialize(
+      $services.localization.render('platform.livetable.docNotViewable'));
+    const td = new Element('td', {
+      'class': [
+        fieldName,
+        'link' + (descriptor.link || ''),
+        'type' + (descriptor.type || '')
+      ].join(' '),
+      'data-title': displayName
+    });
+    if (column !== '_actions') {
+      td.update(notViewableCellMessage + "<sup>*</sup>");
+    }
+    tr.appendChild(td);
+  },
+  _handleActionsCell(displayName, descriptor, row, i, table, tr)
+  {
+    const adminActions = ['admin', 'rename', 'rights'];
+    const td = new Element('td', {
+      'class': 'actions',
+      'data-title': displayName
+    });
+    td.toggleClassName('hide-labels', descriptor.labels === false);
+    (descriptor.actions || []).forEach(function(action) {
+      if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
+        (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0)))
+      {
+        const link = new Element('a', {
+          'href': row['doc_' + action.id + '_url'] || row['doc_url'],
+          'class': 'action action' + action.id
+        }).update('<span class="action-icon"></span><span class="action-label"></span>');
+        link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
+        link.down('.action-label').update(action.label.escapeHTML());
+        if (action.async) {
+          link.observe('click', function(event) {
+            event.stop();
+            var notification = new XWiki.widgets.Notification(
+              $jsontool.serialize($services.localization.render('platform.livetable.asyncActionInProgress')),
+              'inprogress'
+            );
+            new Ajax.Request(link.href, {
+              onSuccess: function() {
+                if (typeof action.callback === 'string') {
+                  new Function('row', 'i', 'table', action.callback)(row, i, table);
+                }
+                notification.replace(new XWiki.widgets.Notification(
+                  $jsontool.serialize($services.localization.render('platform.livetable.asyncActionDone')),
+                  'done'
+                ));
+              },
+              onFailure: function() {
+                notification.replace(new XWiki.widgets.Notification(
+                  $jsontool.serialize($services.localization.render('platform.livetable.asyncActionFailed')),
+                  'error'
+                ));
+              }
+            });
+          });
+        }
+        td.insert(link);
+      }
+    });
+    tr.appendChild(td);
+  },
+  _handleCell(fieldName, descriptor, displayName, row, table, column, showFilterNote, tr)
+  {
+    const td = new Element('td', {
+      'class': [
+        fieldName,
+        'link' + (descriptor.link || ''),
+        'type' + (descriptor.type || '')
+      ].join(' '),
+      'data-title': displayName
+    });
+    var container = td;
+    if (descriptor.link && row['doc_viewable']) {
+      const link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
+      // Automatic: the link URL is in JSON results, with the '_url' sufix.
+      if (descriptor.link === 'auto') {
+        link.href = row[fieldName + '_url'] || row['doc_url'];
+      } else if (descriptor.link === 'field') {
+        if (row[fieldName + '_url']) {
+          link.href = row[fieldName + '_url'];
+        }
+        // Property editor
+      } else if (descriptor.link === 'editor') {
+        var propertyClassName = descriptor['class'] || table.options.xclass;
+        td.observe('click', function(event) {
+          var tag = event.element().down('span') || event.element();
+          editProperty(row['doc_fullName'], propertyClassName, column, function(value) {
+            tag.innerHTML = value;
+          });
+        });
+        // Author, space or wiki link.
+      } else if (row['doc_' + descriptor.link + '_url']) {
+        link.href = row['doc_' + descriptor.link + '_url'];
+      } else {
+        link.href = row['doc_url'];
+      }
+      td.appendChild(link);
+      container = link;
+    }
+    // The value can be passed as a string.
+    if (descriptor.html + '' === 'true') {
+      container.innerHTML = row[fieldName] || '';
+    } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
+      const text = row[fieldName] + '';
+      if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
+        container.addClassName('docTitleComputed');
+      }
+      container.update(text.escapeHTML());
+    }
+    tr.appendChild(td);
   },
 
   /**

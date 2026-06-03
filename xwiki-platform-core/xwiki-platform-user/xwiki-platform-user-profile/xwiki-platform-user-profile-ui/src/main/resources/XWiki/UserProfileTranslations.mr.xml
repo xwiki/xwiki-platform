@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=विकीमध्ये डीफॉल्टनुसार प्रदर्शित नसलेली कागदपत्रे आहेत. ही लपविलेले कागदपत्रे तांत्रिक सामग्रीचे प्रतिनिधित्व करतात, जसे अप्लिकेशन क्लास, कॉन्फिगरेशन पृष्ठे, मॅक्रो, स्टाईल, स्क्रिप्ट इ.
-### Missing: XWiki.XWikiUsers_underline.hint=Choose if links should be underlined.
+### Missing: XWiki.XWikiUsers_underline.hint=
 XWiki.XWikiUsers_timezone.hint=विशिष्ट टाईमझोन वापरा जेणेकरून तारखा आपल्या वर्तमान स्थानावर प्रतिबिंबित होतील.
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
 XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
@@ -58,9 +58,9 @@ user.profile.network.unfollow=Stop following
 user.profile.network.done=Done
 user.profile.network.saving=Saving...
 user.profile.network.error=Error saving the notification setting
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status
+user.profile.status.done=Done
+user.profile.status.saving=Saving...
+user.profile.status.error=Error saving the user status
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

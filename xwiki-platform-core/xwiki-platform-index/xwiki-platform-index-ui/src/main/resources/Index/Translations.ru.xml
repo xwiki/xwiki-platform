@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Пространства
+  <content>index.deletedDocuments.deleteAll=Удалить всё
+index.administration.remainingTasks.heading=Оставшиеся задачи анализа документов
+index.administration.remainingTasks.emptyQueue=Нет оставшихся задач.
+admin.documentanalysis=Анализ документов
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Пространства
 index.spacesMacro.spaceIndex.title=Смотреть страницы пространства
 index.spacesMacro.spaceIndex.alt=Страницы пространства
 index.spacesMacro.spaceAdministration.title=Администрирование пространства
@@ -44,9 +53,5 @@ index.spacesMacro.spaceAdministration.alt=Администрирование п�
 index.spacesMacro.createSpace.link=Создать новое пространство
 index.spacesMacro.createSpace.defaultSpaceName=Имя пространства
 index.spacesMacro.createSpace.submit=Создать
-index.deletedDocuments.deleteAll=Удалить всё
-index.administration.remainingTasks.heading=Оставшиеся задачи анализа документов
-index.administration.remainingTasks.emptyQueue=Нет оставшихся задач.
-admin.documentanalysis=Анализ документов
 </content>
 </xwikidoc>

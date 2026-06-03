@@ -124,9 +124,9 @@ platform.wiki.users.leave.confirmation.no=Nē
 platform.wiki.users.leave.success=Lietotājs {0}{1}{2} veiksmīgi pameta viki {3}{4}{5}.
 platform.wiki.users.join.title=Pievienoties viki
 platform.wiki.users.leave.title=Pamest viki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.empty=Leave Wiki
 platform.wiki.users.delete.title=Dzēst viki "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
+platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Nosūtāmais atbildes ziņojums, kuru redzēs viki administrators un kurā varat pamatot savu lēmumu.
 platform.wiki.users.join.request.hint=Lai pievienotos viki {0}{1}{2}, jums vispirms ir jāizveido uzaicināšanas pieprasījums. Pēc tam administratori izskatīs jūsu pieprasījumu un izlems, vai apstiprināt, vai noraidīt to.
 platform.wiki.users.join.request.message.hint=Nosūtāmais ziņojums viki administratoriem, kurā jūs varat pamatot savu pieprasījumu.
@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Rādīt visus viki
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Darbavirsmas (novecojis)
 rendering.macro.workspaces.description=Novecojis makross, kuru nevajadzētu izmantot, kas ir atstāts tikai savietojamībai. Lūdzu tā vietā lietojiet "wikis" makrosu.
-
-## Browse
-platform.wiki.browse=Pārlūkot viki
 platform.wiki.browse.emptyvalue=–
 platform.wiki.browse.wikiprettyname=Nosaukums
 platform.wiki.browse.description=Apraksts
@@ -226,7 +223,6 @@ platform.wiki.create.wizard.step.dw=Pēc klikšķa uz "Izveidot" pogas, tiks izv
 platform.wiki.create.wizard.step.previous=Iepriekšējais solis
 platform.wiki.create.wizard.step.next=Doties uz nākamo soli
 platform.wiki.create.wizard.step.create=Izveidot
-
 platform.wiki.create.wizard.step.creation=Viki izveide
 platform.wiki.create.wizard.step.creation.wait=Uzgaidtiet, kamēr viki tiek izveidots.
 platform.wiki.create.wizard.step.creation.complete=Viki {0} ir veiksmīgi izveidots. Tagad jūs to varat izmantot.
@@ -302,6 +298,10 @@ platform.wiki.create.wizard.step.provisioning.finalize=Pabeigt
 platform.wiki.delete.confirmation.yes=Jā, lūdzu izdzēsiet šo viki!
 platform.wiki.delete.confirmation.no=Nē, vediet mani atpakaļ!
 
+## Browse
+platform.wiki.browse=Pārlūkot viki
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

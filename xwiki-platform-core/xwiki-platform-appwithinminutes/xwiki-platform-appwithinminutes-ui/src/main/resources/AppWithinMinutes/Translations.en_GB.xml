@@ -51,7 +51,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 platform.appwithinminutes.appPanelCreateEntry=Create your own!
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
+### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} — {1}
 ### Missing: appWithinMinutes.wizardStep.name.name=Name
 ### Missing: appWithinMinutes.wizardStep.name.title=Name your application
 ### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name

@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Espaces
+  <content>index.deletedDocuments.deleteAll=Tout supprimer
+index.administration.remainingTasks.heading=Tâches restantes pour l’analyse de document
+index.administration.remainingTasks.emptyQueue=Aucune tâche restante.
+admin.documentanalysis=Analyse de document
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Espaces
 index.spacesMacro.spaceIndex.title=Afficher les pages de l'espace
 index.spacesMacro.spaceIndex.alt=Index des documents de l'espace
 index.spacesMacro.spaceAdministration.title=Administrer l'espace
@@ -44,9 +53,5 @@ index.spacesMacro.spaceAdministration.alt=Administrer l'espace
 index.spacesMacro.createSpace.link=Créer un nouvel espace
 index.spacesMacro.createSpace.defaultSpaceName=Nom de l'espace
 index.spacesMacro.createSpace.submit=Créer
-index.deletedDocuments.deleteAll=Tout supprimer
-index.administration.remainingTasks.heading=Tâches restantes pour l’analyse de document
-index.administration.remainingTasks.emptyQueue=Aucune tâche restante.
-admin.documentanalysis=Analyse de document
 </content>
 </xwikidoc>

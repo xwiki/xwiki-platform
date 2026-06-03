@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=Pārvaldīt viki dalībniekus: pievienot,
 admin.xwiki.usersconfiguration.title=Iestatījumi
 admin.xwiki.members.title=Tekošie dalībnieki
 admin.xwiki.users.title=Visi lietotāji
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Sākums</content>
+platform.wiki.drawer.homeWiki=Sākums
+</content>
 </xwikidoc>

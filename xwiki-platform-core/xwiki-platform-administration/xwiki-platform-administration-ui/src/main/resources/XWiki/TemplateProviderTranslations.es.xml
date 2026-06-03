@@ -44,5 +44,6 @@ administration.templateProvider.creationRestrictions=Restricciones de creación
 administration.templateProvider.creationRestrictions.hint=La lista de ubicaciones (incluyendo sus hijos) donde se permite crear páginas con esta plantilla
 administration.templateProvider.creationRestrictions.none=Esta plantilla puede crear páginas en cualquier lugar
 administration.templateProvider.creationRestrictionsAreSuggestions=Limitaciones de creación como sugerencias
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite al usuario seleccionar cualquier ubicación para crear la página con esta plantilla, utilizando la primera restricción de creación como ubicación predeterminada cuando se selecciona la plantilla de la lista.</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite al usuario seleccionar cualquier ubicación para crear la página con esta plantilla, utilizando la primera restricción de creación como ubicación predeterminada cuando se selecciona la plantilla de la lista.
+</content>
 </xwikidoc>

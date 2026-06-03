@@ -36,10 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>legacy.event.migration.description=En la versi\u00F3n 12.6, XWiki pasa a un nuevo almacenamiento de eventos (notificaciones). Puesto que copiar eventos puede ser un proceso muy largo en wikis antiguas con registro de eventos y no siempre se desea mantenerlos, la elecci\u00F3n de hacerlo se deja al administrador de la wiki. No copiarlos implica que cualquier notificaci\u00F3n anterior parecer\u00E1 haber desaparecido. La migraci\u00F3n se ejecuta en segundo plano y no tienes que esperar a que termine para avanzar al siguiente paso.
-### Missing: legacy.event.count.store=Number of events in the standard store
-### Missing: legacy.event.count.legacy=Number of events in the legacy store
+  <content>legacy.event.migration.description=En la versión 12.6, XWiki pasa a un nuevo almacenamiento de eventos (notificaciones). Puesto que copiar eventos puede ser un proceso muy largo en wikis antiguas con registro de eventos y no siempre se desea mantenerlos, la elección de hacerlo se deja al administrador de la wiki. No copiarlos implica que cualquier notificación anterior parecerá haber desaparecido. La migración se ejecuta en segundo plano y no tienes que esperar a que termine para avanzar al siguiente paso.
+legacy.event.count.store=Number of events in the standard store
+legacy.event.count.legacy=Number of events in the legacy store
 legacy.event.migration.alltime=Todos
 legacy.event.migration.since=Desde
-legacy.event.migration.start=Comenzar la migraci\u00F3n</content>
+legacy.event.migration.start=Comenzar la migración
+</content>
 </xwikidoc>

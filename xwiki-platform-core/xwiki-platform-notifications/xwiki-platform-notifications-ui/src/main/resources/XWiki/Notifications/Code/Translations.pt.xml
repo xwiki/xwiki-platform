@@ -259,6 +259,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Você está ignorando esta página e suas subpáginas: você não receberá nenhuma notificação sobre elas.
 notifications.watch.modal.title.CUSTOM=Configurações de monitoramento personalizadas
 notifications.watch.modal.description.CUSTOM=Você está usando configurações de notificação personalizadas para esta página: você pode estar seguindo ou bloqueando eventos específicos para a página ou pode direcionar apenas canais específicos para as notificações. Recomendamos que você revise suas configurações de notificação em seu perfil.
+### Missing: notifications.watch.modal.option.hint.toggle=
 notifications.watch.modal.option.watchpage.title=Seguir a página atual
 notifications.watch.modal.option.watchpage.hint=Você receberá notificações apenas para essa página.
 notifications.watch.modal.option.watchspace.title=Seguir a página atual e suas subpáginas

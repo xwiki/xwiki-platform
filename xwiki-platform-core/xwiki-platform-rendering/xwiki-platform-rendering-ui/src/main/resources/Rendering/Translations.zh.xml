@@ -39,5 +39,6 @@
   <content>admin.syntaxes=语法
 admin.syntaxes.description=选择默认页面语法并配置可用的标记语法。
 Rendering.RenderingConfigClass_disabledSyntaxes=禁用的语法
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=无法写入页面的标记语法列表</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=无法写入页面的标记语法列表
+</content>
 </xwikidoc>

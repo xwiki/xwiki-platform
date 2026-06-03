@@ -80,10 +80,18 @@ rendering.macro.menu.name=Menu
 rendering.macro.menu.description=Wyświetla menu utworzone przy użyciu prostej składni wiki (zagnieżdżone listy i linki).
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Opcjonalny identyfikator menu, który zostanie ustawiony na elemencie HTML, który otacza menu. Możesz użyć tego identyfikatora w kodzie JavaScript, aby uzyskać dostęp do DOM menu lub w testach funkcjonalnych, aby potwierdzić pozycje menu.
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
 rendering.macro.menu.parameter.type.name=Typ
 rendering.macro.menu.parameter.type.description=Opcjonalny typ menu określa wygląd i zachowanie menu. Obsługiwane wartości to: pozioma (wartość domyślna) i pionowa.
 rendering.macro.menu.content.description=Zdefiniuj strukturę menu za pomocą składni wiki. Każda pozycja menu powinna być pozycją na liście i powinna zawierać etykietę lub link do pozycji menu. Możesz użyć zagnieżdżonych list do pozycji podmenu.
 
+# Menu UI
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
+
 # Menu WebHome
-menu.description=Jest to prosta aplikacja, która pomaga tworzyć menu nawigacyjne wyświetlane w poziomie jako górny pasek po nagłówku strony lub pionowo w panelu bocznym.</content>
+menu.description=Jest to prosta aplikacja, która pomaga tworzyć menu nawigacyjne wyświetlane w poziomie jako górny pasek po nagłówku strony lub pionowo w panelu bocznym.
+</content>
 </xwikidoc>

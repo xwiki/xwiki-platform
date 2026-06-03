@@ -36,9 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>attachment.picker.ckeditor.pluginsImageSelector.title=图库
+  <content>### Missing: attachment.picker.wysiwyg.imageSelector.title=
 attachment.picker.searchField.placeholder=搜索...
 attachment.picker.searchField.scope.currentPage=当前页面
 attachment.picker.searchField.scope.allPages=所有页面
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+attachment.picker.ckeditor.pluginsImageSelector.title=图库
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

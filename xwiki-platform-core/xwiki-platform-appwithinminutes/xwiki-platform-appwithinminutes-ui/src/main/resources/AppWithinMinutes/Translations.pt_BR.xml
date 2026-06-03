@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Esconder painel de configu
 platform.appwithinminutes.classEditorMoveFieldLabel=Mover
 platform.appwithinminutes.classEditorMoveFieldHint=Arrastar e soltar para mudar a ordem
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valor padrão
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Adicionar
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Remover
 appWithinMinutes.templateProviderEditor.hint=As entradas do aplicativo são páginas wiki que contêm dados estruturados.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=O ícone associado a uma entrada de aplicativo.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Breve descrição de uma entrada de aplicativo.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=De onde criar as entradas
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Se nenhum local for selecionado, as entradas podem ser criadas a partir de qualquer página.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Onde criar as 
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Se nenhum local for selecionado, as entradas podem ser criadas em qualquer lugar do wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Não imponha o local de entrada
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use os locais especificados acima apenas como sugestões, permitindo que o usuário selecione um local diferente ao criar uma entrada de aplicativo.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Se as entradas do aplicativo devem ser páginas terminais ou não.
 
 ### Wizard Step 3: Application Presentation

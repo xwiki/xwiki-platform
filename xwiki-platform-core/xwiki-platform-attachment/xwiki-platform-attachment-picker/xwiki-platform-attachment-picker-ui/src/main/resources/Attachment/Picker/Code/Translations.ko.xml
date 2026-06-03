@@ -36,9 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>attachment.picker.ckeditor.pluginsImageSelector.title=갤러리
+  <content>### Missing: attachment.picker.wysiwyg.imageSelector.title=Gallery
 attachment.picker.searchField.placeholder=찾기 ...
 attachment.picker.searchField.scope.currentPage=현재 페이지
 attachment.picker.searchField.scope.allPages=모든 페이지
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+attachment.picker.ckeditor.pluginsImageSelector.title=갤러리
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

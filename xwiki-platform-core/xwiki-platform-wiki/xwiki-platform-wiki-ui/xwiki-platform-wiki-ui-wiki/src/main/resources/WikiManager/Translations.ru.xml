@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=Управление участникам
 admin.xwiki.usersconfiguration.title=Настройка
 admin.xwiki.members.title=Текущие участники
 admin.xwiki.users.title=Все пользователи
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Домашняя страница</content>
+platform.wiki.drawer.homeWiki=Домашняя страница
+</content>
 </xwikidoc>

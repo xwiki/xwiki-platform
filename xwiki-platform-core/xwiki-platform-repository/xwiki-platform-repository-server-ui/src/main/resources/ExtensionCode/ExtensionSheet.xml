@@ -310,7 +310,7 @@
       #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
       = Versions =
 
-      {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
     #elseif ($lastVersionObject)
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))

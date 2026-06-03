@@ -111,7 +111,7 @@ public class RepositoryManager
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
 
     private static final LocalDocumentReference VERSIONSHOME_REFERENCE =
-        new LocalDocumentReference("ExtensionCode", "WebVersionsHome");
+        new LocalDocumentReference("ExtensionCode", "VersionsHome");
 
     /**
      * Get the reference of the class in the current wiki.
@@ -720,6 +720,11 @@ public class RepositoryManager
         cleanNotExistingVersionPages(extensionDocument, extension.getId().getVersion(), extensionVersions,
             featureVersions, versionProxyEnabled, xcontext);
 
+        // Make sure the Versions home page exist
+        if (this.extensionStore.isVersionPageEnabled(extensionObject)) {
+            updateVersionHome(extensionDocument, xcontext);
+        }
+
         // Update features versions
         long index = 0;
         for (Map.Entry<Version, String> entry : featureVersions.entrySet()) {
@@ -805,7 +810,7 @@ public class RepositoryManager
             }
 
             // Update version related informations
-            return updateExtensionVersion(versionExtension, extensionDocument, index, true);
+            return updateExtensionVersion(versionExtension, extensionDocument, index);
         } catch (Exception e) {
             this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
                 + "] on repository [" + repository + "]", e);
@@ -1378,8 +1383,8 @@ public class RepositoryManager
         return needSave;
     }
 
-    private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument extensiondocument, long index,
-        boolean save) throws XWikiException
+    private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument extensiondocument, long index)
+        throws XWikiException
     {
         boolean needSave = false;
 
@@ -1394,26 +1399,18 @@ public class RepositoryManager
         }
 
         // Avoid modifying the cached document
-        if (save) {
-            extensionVersionDocument = extensionVersionDocument.clone();
-        }
+        extensionVersionDocument = extensionVersionDocument.clone();
 
         needSave |= updateExtensionVersion(extensionVersion, extensionVersionDocument, index, xcontext);
 
-        // Save if dedicated version page
-        if (save) {
-            // Make sure the Versions home page exist
-            updateVersionHome(extensiondocument, xcontext);
+        if (needSave) {
+            boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensiondocument);
+            if (versionPageEnabled) {
+                // Save the version
+                saveDocument(extensionVersionDocument, "Update", xcontext);
 
-            if (needSave) {
-                boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensiondocument);
-                if (versionPageEnabled) {
-                    // Save the version
-                    saveDocument(extensionVersionDocument, "Update", xcontext);
-
-                    // Since the data are saved, there is no point saving the extension document
-                    return false;
-                }
+                // Since the data are saved, there is no point saving the extension document
+                return false;
             }
         }
 
@@ -1426,7 +1423,11 @@ public class RepositoryManager
 
         XWikiDocument versionsDocument = xcontext.getWiki().getDocument(versionsReference, xcontext);
 
-        if (this.documentSheetBinder.bind(extensiondocument, VERSIONSHOME_REFERENCE)) {
+        // Avoid modifying the cached document
+        versionsDocument = versionsDocument.clone();
+
+        // Bind the Versions sheet to the Versions page if not already done
+        if (this.documentSheetBinder.bind(versionsDocument, VERSIONSHOME_REFERENCE)) {
             saveDocument(versionsDocument, "", xcontext);
         }
     }

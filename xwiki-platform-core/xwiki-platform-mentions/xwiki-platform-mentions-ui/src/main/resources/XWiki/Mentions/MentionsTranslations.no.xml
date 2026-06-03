@@ -52,6 +52,7 @@ org.xwiki.mentions.DisplayStyle.LOGIN=Brukernavn
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Omtalefarge
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Fargen på omtalen til den nåværende brukeren (merk: brukes som verdi i et bakgrunnsfarge css-attributt).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farge på din egen omtale
+### Missing: XWiki.Mentions.MentionsConfigurationClass_selfMentionsForeground=Self Mentions Foreground
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Aktiver sitater
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Definerer om et sitat av teksten rundt en omtale er inkludert i varsler om brukeromtale.
 mentions.tip=Når du redigerer i WYSIWYG, skriver du @ og begynn å skrive bokstaver for å få forslag om å omtale en bruker.

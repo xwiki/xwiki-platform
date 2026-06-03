@@ -80,10 +80,18 @@ rendering.macro.menu.name=Menú
 rendering.macro.menu.description=Muestra un menú creado utilizando una sintaxis wiki simple (listas anidadas y enlaces).
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Identificador de menú opcional que se establecerá en el elemento HTML que envuelve el menú. Puede utilizar este identificador en código JavaScript para acceder al menú DOM o en pruebas funcionales para afirmar los elementos del menú.
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
 rendering.macro.menu.parameter.type.name=Tipo
 rendering.macro.menu.parameter.type.description=El tipo de menú opcional determina la apariencia y el comportamiento del menú. Los valores soportados son: horizontal (valor por defecto) y vertical.
 rendering.macro.menu.content.description=Define la estructura del menú usando sintaxis wiki. Cada elemento del menú debe ser un elemento de la lista y debe contener la etiqueta o enlace del elemento del menú. Puede utilizar listas anidadas para elementos de submenú.
 
+# Menu UI
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
+
 # Menu WebHome
-menu.description=Esto es una sencilla aplicación que le ayuda a crear menús de navegación que se mostrarán horizontalmente como una barra superior después del encabezado de la página o verticalmente en un panel lateral.</content>
+menu.description=Esto es una sencilla aplicación que le ayuda a crear menús de navegación que se mostrarán horizontalmente como una barra superior después del encabezado de la página o verticalmente en un panel lateral.
+</content>
 </xwikidoc>

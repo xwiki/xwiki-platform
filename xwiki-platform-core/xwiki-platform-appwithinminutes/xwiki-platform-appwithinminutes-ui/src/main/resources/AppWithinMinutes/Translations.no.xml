@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Vennligst skriv inn applikasjonsnavn
 platform.appwithinminutes.classEditorPaletteTitle=Feltpalett
 platform.appwithinminutes.classEditorPaletteHint=Dra og slipp felt fra paletten for å lage skjemaet som skal brukes til å skrive inn dataene dine.
 platform.appwithinminutes.classEditorCanvasHint=Dra felt fra paletten og slipp dem i dette området.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Oppdater malen
 platform.appwithinminutes.classEditorUpdateTemplateHint=Malen ({0}) lagrer standardfeltverdiene.
 platform.appwithinminutes.classEditorUpdateSheetLabel=Oppdater klassens presentasjonsmal
 platform.appwithinminutes.classEditorUpdateSheetHint=Presentasjonsmalen for klassen ({0}) brukes til å vise og redigere strukturerte data.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Oppdater oversettelsen
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Oppdater oversettelsen av feltnavn og listeverdier ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Denne klassen har flere presentasjonsmaler.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felt med samme navn: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Oppdater standardverdier
 platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klassens presentasjonsmal
 platform.appwithinminutes.classEditorSheetSaveComment=Oppdater klassens presentasjonsmal
 platform.appwithinminutes.classEditorTranslationsSaveComment=Oppdater oversettelser
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standard
 platform.appwithinminutes.classEditorPickersCategoryName=Velgere
 platform.appwithinminutes.classEditorDocumentCategoryName=Side
 platform.appwithinminutes.classEditorAdvancedCategoryName=Avansert
-
 platform.appwithinminutes.classEditorDBListFieldName=Databaseliste
 platform.appwithinminutes.classEditorGroupsFieldName=Gruppe
 platform.appwithinminutes.classEditorUsersFieldName=Bruker
@@ -126,15 +122,15 @@ platform.appwithinminutes.classEditorStringFieldName=Kort tekst
 platform.appwithinminutes.classEditorContentFieldName=Innhold
 platform.appwithinminutes.classEditorTitleFieldName=Tittel
 platform.appwithinminutes.classEditorPageFieldName=Side
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Slett
 platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurer
 platform.appwithinminutes.classEditorPreviewFieldLabel=Forhåndsvisning
 platform.appwithinminutes.classEditorPreviewFieldHint=Skjul konfigurasjonspanel og bruk endringer
 platform.appwithinminutes.classEditorMoveFieldLabel=Flytt
 platform.appwithinminutes.classEditorMoveFieldHint=Dra og slipp for å endre rekkefølgen
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standardverdi
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -147,9 +143,10 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Verdi
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Legg til
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Slett
-
 appWithinMinutes.templateProviderEditor.hint=Applikasjonsoppføringer er wiki-sider som inneholder strukturerte data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=Ikonet knyttet til en applikasjon.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Kort beskrivelse av en applikasjon.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Hvor skal oppføringene lagres
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Hvis ingen plassering er valgt, kan oppføringene opprettes fra hvilken som helst side.
@@ -157,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Hvor skal oppf
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Hvis ingen plassering er valgt, kan oppføringene opprettes hvor som helst i wikien.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Deaktiver restriksjoner på plassering
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Bruk stedene som er angitt ovenfor bare som forslag, slik at brukeren kan velge et annet sted når du oppretter en applikasjonsoppføring.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Hvorvidt applikasjonsoppføringene skal være terminalsider eller ikke.
 
 ### Wizard Step 3: Application Presentation
@@ -210,6 +208,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Rediger applikasjon
 platform.appwithinminutes.appHomePageTranslateAppLabel=Oversett applikasjon
 platform.appwithinminutes.appHomePageDeleteAppLabel=Slett applikasjon
 platform.appwithinminutes.appHomePageMovedWarning=Applikasjonen fungerer kanskje ikke riktig fordi den er omdøpt eller flyttet uten å oppdatere koden. Vennligst rediger programmet og følg stegene for å oppdatere koden.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
 AppWithinMinutes.LiveTableClass_description=Beskrivelse
 AppWithinMinutes.LiveTableClass_columns=Livetabell kolonner
 
@@ -219,6 +218,10 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALLE oppføringene i appl
 platform.appwithinminutes.deleteAppDoesNotExistError=Den angitte applikasjonen eksisterer ikke.
 platform.appwithinminutes.deleteAppInvalidAppError=Det angitte navnet er ikke en gyldig Applikasjon på minutter.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Applikasjonsnavn ble ikke spesifisert.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Du kan endre applikasjonens tittel uten å omdøpe programmet ved å redigere applikasjonens startside.
@@ -238,7 +241,6 @@ appWithinMinutes.renameApp.failed=Kunne ikke gi nytt navn til applikasjonen
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Applikasjonsklasse
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Applikasjonens dataplassering
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Rom
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Navnet på rommet som inneholder applikasjonen
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidens fulle navn
@@ -266,5 +268,6 @@ platform.appwithinminutes.wizardStep3Description=Tilpass applikasjonens startsid
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Applikasjonsnavn
 appWithinMinutes.classEditor.title={0} Struktur
-appWithinMinutes.templateProviderEditor.title={0} Oppføringer</content>
+appWithinMinutes.templateProviderEditor.title={0} Oppføringer
+</content>
 </xwikidoc>

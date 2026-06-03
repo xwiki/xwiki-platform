@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=У вас нет полномочий 
 platform.panels.applications.ajax.error=Ошибка сохранения изменений.
 admin.panels.applications=Панель приложений
 admin.panels.applications.description=Управляйте отображением приложений на панели приложений.
-
 admin.panels.navigation=Панель навигации
 admin.panels.navigation.description=Управляйте отображением страниц в Панели навигации.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Исключить страницы расширения верхнего уровня
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=Ничего
 platform.panels.navigation.configuration.topLevelExtensionPages=Страницы расширения верхнего уровня
 platform.panels.navigation.configuration.topLevelApplicationPages=Страницы приложения верхнего уровня
 platform.panels.navigation.configuration.otherPages=Другие страницы
-platform.panels.navigation.configuration.saveComment=Настройки панели навигации обновлены администратором</content>
+platform.panels.navigation.configuration.saveComment=Настройки панели навигации обновлены администратором
+</content>
 </xwikidoc>

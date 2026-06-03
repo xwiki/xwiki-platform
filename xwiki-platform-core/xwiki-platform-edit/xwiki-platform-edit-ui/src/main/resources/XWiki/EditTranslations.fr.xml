@@ -53,5 +53,6 @@ edit.inplace.page.original=Vous modifiez la page originale ({0})
 edit.inplace.page.translation=Vous modifiez la traduction suivante : {0}.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

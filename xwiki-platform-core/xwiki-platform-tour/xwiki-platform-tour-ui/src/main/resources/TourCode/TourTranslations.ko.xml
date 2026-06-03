@@ -76,6 +76,7 @@ TourCode.StepClass_placement=놓기
 TourCode.StepClass_targetPage=대상 페이지
 TourCode.StepClass_action=타겟 액션
 TourCode.StepClass_queryString=쿼리 문자열
+### Missing: TourCode.StepClass_reflex=
 tour.steps=단계
 tour.steps.new_step=새로운 단계
 tour.steps.add_step=단계 추가

@@ -44,7 +44,7 @@
 === 1.0 Escapes ===
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
-|Pour un caractère|{{{Ceci n'est pas un \[lien\]}}}|{{{Ceci n'est pas un [lien]}}}
+|Pour un caractère|{{{Ceci n'est pas un [lien]}}}|{{{Ceci n'est pas un [lien]}}}
 
 === 2.0 Escapes ===
 

@@ -48,6 +48,7 @@ annotations.annotated.loaderror=Не вдалося:
 annotations.annotated.loaderror.wrongresponse=Неправильно відформатована відповідь сервера
 annotations.annotated.error.noannotatedelement=Примітки неможливо завантажити оскільки вміст недоступний.
 annotations.annotated.error.wrongsyntax=Примітки не доступні для документів написаних синтаксисом XWiki/1.0.
+### Missing: annotations.annotated.highlight.toggle.hint=
 annotations.action.edit.text=[Змінити]
 annotations.action.edit.tooltip=Змінити цю примітку
 annotations.action.edit.submit.text=Оновити

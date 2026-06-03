@@ -107,7 +107,7 @@ platform.wiki.currentwiki.candidates.accept.label=Aceitar
 platform.wiki.currentwiki.candidates.reject.label=Rejeitar
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Cancelar Convite
 platform.wiki.currentwiki.wikiusers.title=Usuários do Wiki
-### Missing: platform.wiki.currentwiki.managewikis.title=Wiki
+platform.wiki.currentwiki.managewikis.title=Wiki
 WikiManager.WikiCandidateMemberClass_status_pending=Pendente
 WikiManager.WikiCandidateMemberClass_status_accepted=Aceito
 WikiManager.WikiCandidateMemberClass_status_rejected=Rejeitado
@@ -133,6 +133,6 @@ admin.xwiki.members.title=Membros atuais
 admin.xwiki.users.title=Todos os usuários
 
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home
+platform.wiki.drawer.homeWiki=Home
 </content>
 </xwikidoc>

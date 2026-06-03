@@ -94,7 +94,7 @@ platform.wiki.create.error.wikiname.empty=Identificatorul nu poate fi gol
 platform.wiki.error.wikidoesnotexist=Wiki-ul [{0}] nu există
 platform.wiki.error.oneParameterNotSpecified=Parametrul ''{0}'' nu a fost specificat.
 platform.wiki.error.parameterAcceptsMultipleValues=Acceptă valori multiple.
-platform.wiki.error.exceptionWithMessage=Exceptie\: {0}
+platform.wiki.error.exceptionWithMessage=Exceptie: {0}
 platform.wiki.form.requiredField=Obligatoriu
 platform.wiki.csrf.error=Tokenul de securitate este invalid. Reîncearcă operațiunea.
 
@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Listează toate wiki-urile
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Spații de lucru (versiune veche)
 rendering.macro.workspaces.description=Macro-ul este învechit și nu ar trebui utilizat aici din motive de compatibilitate. Te rugăm să folosești în schimb macro-ul "wikis".
-
-## Browse
-platform.wiki.browse=Explorează wiki-urile
 platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Nume
 platform.wiki.browse.description=Descriere
@@ -189,7 +186,7 @@ WikiManager.WikiUserClass_userScope_global_only=Acest wiki este disponibil doar 
 WikiManager.WikiUserClass_userScope_local_and_global=Acest wiki este disponibil atât utilizatorilor globali, cât și celor locali
 platform.wiki.prop.wikiname=Identificator wiki
 platform.wiki.prop.wikiprettyname=Nume afișat
-### Missing: platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Descriere
 platform.wiki.prop.owner=Posesor
 platform.wiki.prop.membershipType.label=Categorie de membru
@@ -258,9 +255,9 @@ platform.wiki.sheet.desc.homepage=Pagina principală a wiki-ului.
 platform.wiki.sheet.prop.wikiprettyname=Nume afișat
 platform.wiki.sheet.prop.owner=Posesor
 platform.wiki.sheet.prop.secure=Securizat (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
+platform.wiki.sheet.prop.port=Port
 platform.wiki.sheet.prop.description=Descriere
-### Missing: platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Pagina de start
 platform.wiki.sheet.prop.iswikitemplate=Șablon Wiki
 platform.wiki.sheet.descriptor=Această pagină definește modul de accesare a wiki-ului "{0}" și câteva dintre proprietățile sale. Pentru mai multe configurări, accesează pagina
@@ -278,28 +275,31 @@ platform.wiki.sheet.aliases=Un alias este un alt nume pentru wiki. Poți adăuga
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 
 #######################################
 ## until 9.5-rc-1
 #######################################
 platform.wiki.delete.confirmation.yes=Da
 platform.wiki.delete.confirmation.no=Nu
+
+## Browse
+platform.wiki.browse=Explorează wiki-urile
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

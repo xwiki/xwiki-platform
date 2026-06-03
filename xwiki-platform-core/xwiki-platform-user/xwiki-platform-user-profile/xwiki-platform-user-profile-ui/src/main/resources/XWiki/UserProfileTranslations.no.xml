@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Wikien inneholder dokumenter som ikke vises som standard. Disse skjulte dokumenter representerer teknisk innhold, som applikasjonsklasser, konfigurasjonssider, makroer, stiler, skript osv.
-XWiki.XWikiUsers_accessibility.hint=Ekstra tilgjengelighet vil aktivere ulike visuelle forbedringer som: større skrift, understrekede lenker osv.
+### Missing: XWiki.XWikiUsers_underline.hint=
 XWiki.XWikiUsers_timezone.hint=Bruk en bestemt tidssone slik at datoene gjenspeiler din nåværende posisjon.
 XWiki.XWikiUsers_editor.hint=Velg hvilket redigeringsprogram som er standard, og overstyr innstillinger satt globalt. Hvis ikke definert, velges standard redigeringsprogram avhengig av hva som redigeres.
 XWiki.XWikiUsers_usertype.hint=Velg hvilken type bruker som vil være standard. Avanserte brukere vil ha tilgang til flere redigeringsfunksjoner, terminalsideopprettelse osv.
@@ -60,5 +60,14 @@ user.profile.network.saving=Lagrer…
 user.profile.network.error=Feil ved lagring av varslingsinnstillingen
 user.profile.status.done=Ferdig
 user.profile.status.saving=Lagrer...
-user.profile.status.error=Feil ved lagring av brukerstatus</content>
+user.profile.status.error=Feil ved lagring av brukerstatus
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=Ekstra tilgjengelighet vil aktivere ulike visuelle forbedringer som: større skrift, understrekede lenker osv.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

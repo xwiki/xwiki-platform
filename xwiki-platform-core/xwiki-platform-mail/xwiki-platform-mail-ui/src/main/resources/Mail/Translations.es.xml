@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Acciones
 Mail.SendMailStatus_livetable.resend=Reenviar
+### Missing: Mail.SendMailStatus_livetable.delete=
 mailSender.admin.resendSuccess=El mensaje de correo electrónico se ha reenviado exitosamente
-mailSender.admin.resendFailure=Error al reenviar. Clica para más detalles.</content>
+mailSender.admin.resendFailure=Error al reenviar. Clica para más detalles.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
+</content>
 </xwikidoc>

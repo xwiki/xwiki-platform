@@ -39,5 +39,6 @@
   <content>admin.syntaxes=Syntakser
 admin.syntaxes.description=Velg standard sidesyntax og konfigurer de tilgjengelige merkesyntaxene.
 Rendering.RenderingConfigClass_disabledSyntaxes=Deaktiverte syntakser
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste med markeringssyntakser som sider ikke kan bruke</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste med markeringssyntakser som sider ikke kan bruke
+</content>
 </xwikidoc>

@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=मोकळी जागा
+  <content>index.deletedDocuments.deleteAll=सर्व हटवा
+### Missing: index.administration.remainingTasks.heading=Remaining Document Analysis tasks
+### Missing: index.administration.remainingTasks.emptyQueue=No remaining tasks.
+### Missing: admin.documentanalysis=Document Analysis
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=मोकळी जागा
 index.spacesMacro.spaceIndex.title=स्पेस इंडेक्स पहा
 index.spacesMacro.spaceIndex.alt=स्पेस इंडेक्स
 index.spacesMacro.spaceAdministration.title=स्पेस प्रशासन पहा
@@ -44,5 +53,5 @@ index.spacesMacro.spaceAdministration.alt=स्पेस प्रशासि�
 index.spacesMacro.createSpace.link=एक नवीन स्पेस तयार करा
 index.spacesMacro.createSpace.defaultSpaceName=स्पेस नाव
 index.spacesMacro.createSpace.submit=बनवा
-index.deletedDocuments.deleteAll=सर्व हटवा</content>
+</content>
 </xwikidoc>

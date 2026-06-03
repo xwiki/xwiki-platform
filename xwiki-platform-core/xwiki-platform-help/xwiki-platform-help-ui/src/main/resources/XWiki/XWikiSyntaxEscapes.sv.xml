@@ -46,7 +46,7 @@
 Kontrollsekvenser för wikisymboler
 
 |=Formateringstyp|=XWiki syntax 1.0|=Resultat
-|Kontrollsekvens för enstaka tecken|{{{Detta är inte en \[länk\]}}}|{{{Detta är inte en [länk]}}}
+|Kontrollsekvens för enstaka tecken|{{{Detta är inte en [länk]}}}|{{{Detta är inte en [länk]}}}
 
 
 === 2.0 Escapes ===

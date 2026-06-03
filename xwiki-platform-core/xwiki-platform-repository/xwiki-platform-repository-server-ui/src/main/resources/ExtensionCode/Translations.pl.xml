@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=Aktywny
 ## Support plans
 repository.supportplan.sheet.description=Ta strona kontroluje sposób wyświetlania stron ExtensionSupportPlan zarówno w trybie widoku, jak i edycji.
 repository.supportplan.sheet.noObject=Bieżąca strona nie ma oczekiwanego obiektu ExtensionSupportPlan.
+### Missing: repository.supportplan.sheet.supportedExtensions=
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Nazwa
 ExtensionCode.ExtensionSupportPlanClass_supporter=Wspierający

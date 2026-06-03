@@ -85,7 +85,7 @@ platform.wiki.create.button=Criar Wiki
 platform.wiki.create.title=Criar uma nova wiki
 platform.wiki.create.members=MEMBROS
 platform.wiki.create.prettyname.empty=Nome de exibição não pode ser vazio
-platform.wiki.create.error=Criação da divisão "{0}" falhou\: {1}.
+platform.wiki.create.error=Criação da divisão "{0}" falhou: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Uma base de dados com esse identificador já existe
 platform.wiki.create.error.wikiname.wikialreadyexists=Esse identificador já foi usado
 platform.wiki.create.error.wikiname.empty=O identificador não pode ser vazio
@@ -94,7 +94,7 @@ platform.wiki.create.error.wikiname.empty=O identificador não pode ser vazio
 platform.wiki.error.wikidoesnotexist=Divisão [{0}] não existe
 platform.wiki.error.oneParameterNotSpecified=O parâmetro ''{0}'' não foi informado.
 platform.wiki.error.parameterAcceptsMultipleValues=Mais de um valor aceito.
-platform.wiki.error.exceptionWithMessage=Exceção\: {0}
+platform.wiki.error.exceptionWithMessage=Exceção: {0}
 platform.wiki.form.requiredField=Obrigatório
 platform.wiki.csrf.error=Token de segurança inválido. Por favor, repita sua operação.
 
@@ -126,7 +126,7 @@ platform.wiki.users.join.title=Entrar na Divisão
 platform.wiki.users.leave.title=Sair da Divisão "{0}"
 platform.wiki.users.leave.empty=Sair da Wiki
 platform.wiki.users.delete.title=Remover Divisão "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
+platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Uma resposta para enviar, visualizada pelo administrador da divisão, na qual você pode explicar sua decisão.
 platform.wiki.users.join.request.hint=Para entrar na divisão {0}{1}{2} você deve primeiro fazer uma solicitação. Então, um administrador da divisão vai revisar sua solicitação e aceitá-la ou rejeitá-la.
 platform.wiki.users.join.request.message.hint=Uma mensagem para o administrador da Wiki na qual você pode explicar porque deseja entrar.
@@ -136,7 +136,7 @@ platform.wiki.users.invitation.reply.title=Responder
 platform.wiki.users.invitation.accept.label=Aceitar
 platform.wiki.users.invitation.reject.label=Rejeitar
 platform.wiki.users.invitation.postpone.label=Mais tarde
-### Missing: platform.wiki.users.join.request.message.label=Message
+platform.wiki.users.join.request.message.label=Message
 platform.wiki.users.join.request.send.label=Enviar pedido
 platform.wiki.users.join.request.cancel.label=Voltar
 
@@ -157,28 +157,25 @@ platform.wiki.delete.success=O usuário {0}{1}{2} excluiu com sucesso a wiki ''{
 
 ## Wiki macro
 platform.wiki.macro.noWikis=Atualmente não há wikis criados (exceto esta principal).
-### Missing: rendering.macro.wikis.name=Wikis
+rendering.macro.wikis.name=Wikis
 rendering.macro.wikis.description=Listar todas as wikis
 
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Espaços de trabalho (Legado)
 rendering.macro.workspaces.description=Macro obsoleta que não deve ser usada aqui por motivos de compatibilidade. Em vez disso, use a macro "wikis".
-
-## Browse
-platform.wiki.browse=Navegar nas Wikis
-### Missing: platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Nome
 platform.wiki.browse.description=Descrição
 platform.wiki.browse.owner=Dono
 platform.wiki.browse.membershipType=Tipo de Membro
 platform.wiki.browse.doc.creationDate=Data da Criação
 platform.wiki.browse._actions=Ações
-### Missing: platform.wiki.browse._actions.join=Join
+platform.wiki.browse._actions.join=Join
 platform.wiki.browse._actions.requestJoin=Solicitar Entrada
 platform.wiki.browse._actions.viewInvitation=Ver convite
 platform.wiki.browse._actions.cancelJoinRequest=Cancelar pedido
 platform.wiki.browse._actions.leave=Sair
-### Missing: platform.wiki.browse._actions.delete=Delete
+platform.wiki.browse._actions.delete=Delete
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=Aberto para qualquer usuário participar
@@ -189,7 +186,7 @@ WikiManager.WikiUserClass_userScope_global_only=Somente usuários globais estão
 WikiManager.WikiUserClass_userScope_local_and_global=Usuários globais e locais estão disponíveis na wiki
 platform.wiki.prop.wikiname=Identificador Wiki
 platform.wiki.prop.wikiprettyname=Nome de exibição
-### Missing: platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Descrição
 platform.wiki.prop.owner=Dono
 platform.wiki.prop.membershipType.label=Tipo de Membro
@@ -214,14 +211,14 @@ platform.wiki.create.wizard.step.cleaningup.error=Erro, a wiki {0} não foi excl
 platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Você está prestes a excluir a wiki {0}. Por favor confirme.
 platform.wiki.create.wizard.step.cleaningUp.confirm=Confirme
 platform.wiki.create.wizard.setAsTemplate.label=Esta wiki será um modelo
-### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
+platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=Escopo do usuário
 platform.wiki.create.wizard.userScope.hint=Selecione que tipo de usuário pode acessar o wiki
-### Missing: platform.wiki.create.wizard.template.label=Template
+platform.wiki.create.wizard.template.label=Template
 platform.wiki.create.wizard.flavortemplate.label=Flavor / Modelo
 platform.wiki.create.wizard.flavortemplate.hint=Flavor ou Modelo para usar como conteúdo inicial da nova wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
-### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
+platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+platform.wiki.create.wizard.flavortemplate.templateTab=Template
 platform.wiki.create.wizard.step.dw=Após clicar no botão "Criar", a wiki será criada e o Assistente de Distribuição será iniciado para ajudá-lo a inicializar sua wiki. Se você ignorar o assistente, sua wiki ficará vazia.
 platform.wiki.create.wizard.step.previous=Passo anterior
 platform.wiki.create.wizard.step.next=Próxima Etapa
@@ -238,15 +235,15 @@ admin.wikis.description=Gerenciamento das wikis.
 admin.wikis.templates=Modelos Wiki
 admin.wikis.templates.description=Gerenciar os modelos wiki
 admin.wikis.templates.hint=Um template é uma wiki que será considerada como um modelo para criar novas wikis. Quando um usuário seleciona um modelo para criar uma nova wiki, todo o conteúdo do modelo é copiado na nova wiki.
-### Missing: admin.wikis.rights=Creation Right
+admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descritor da wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=O alias Wiki "{0}" já existe.
 platform.wiki.sheet.erroraliasdoesnotexists=O alias do wiki "{0}" não existe.
-### Missing: platform.wiki.sheet.title.settings=Wiki properties
+platform.wiki.sheet.title.settings=Wiki properties
 platform.wiki.sheet.title.createnewalias=Criar novo apelido
-### Missing: platform.wiki.sheet.title.viewaliases=View aliases
+platform.wiki.sheet.title.viewaliases=View aliases
 platform.wiki.sheet.desc.wikiprettyname=O nome de exibição do wiki.
 platform.wiki.sheet.desc.owner=Um usuário que terá todos os direitos sobre esta wiki.
 platform.wiki.sheet.desc.secure=Se ativado, todas as URLs externas geradas por esta wiki começarão com "https".
@@ -254,17 +251,17 @@ platform.wiki.sheet.desc.port=A porta a ser usada para todas as URLs externas ge
 platform.wiki.sheet.desc.iswikitemplate=Indique se esta wiki pode ser usada como modelo ao criar uma nova wiki.
 platform.wiki.sheet.desc.server=O alias usado para acessar a wiki.
 platform.wiki.sheet.desc.description=Uma breve descrição da wiki.
-### Missing: platform.wiki.sheet.desc.homepage=The homepage of the wiki.
+platform.wiki.sheet.desc.homepage=The homepage of the wiki.
 platform.wiki.sheet.prop.wikiprettyname=Nome exibição
 platform.wiki.sheet.prop.owner=Dono
 platform.wiki.sheet.prop.secure=Seguro (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
-### Missing: platform.wiki.sheet.prop.description=Description
-### Missing: platform.wiki.sheet.prop.server=Alias
-### Missing: platform.wiki.sheet.prop.homepage=Homepage
-### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
+platform.wiki.sheet.prop.port=Port
+platform.wiki.sheet.prop.description=Description
+platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.homepage=Homepage
+platform.wiki.sheet.prop.iswikitemplate=Wiki template
 platform.wiki.sheet.descriptor=Esta página define como acessar a wiki "{0}" e algumas propriedades sobre ela. Para mais configurações, por favor, vá para o
-### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
+platform.wiki.sheet.descriptor.admin=administration page of the wiki.
 platform.wiki.sheet.aliases=Um alias é outro nome para a wiki. Você pode adicionar aliases para criar URLs diferentes para a wiki.
 
 ###############################################################################
@@ -283,8 +280,8 @@ platform.wiki.dependencies.applicationmanager.missing=O plugin {0}Gerenciador de
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalizar
 #######################################
 platform.wiki.delete.confirmation.yes=Sim, por favor exclua esta wiki!
 platform.wiki.delete.confirmation.no=Não, me leve de volta!
+
+## Browse
+platform.wiki.browse=Navegar nas Wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -46,10 +46,10 @@ help.tipsPanel.advancedHiddenShortcutTip=Pressione a combinação de teclas x+x+
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Ao editar em WYSIWYG, digite ##[## e comece a digitar letras para obter sugestões para criar um link.
 help.tipsPanel.WYSIWYGEditorTip=Ao editar no modo WYSIWYG, o atalho {0}Alt + 0{1} ({0}⌥0{1} no macOS) abre um modal de ajuda com informações sobre como usar o teclado para navegar no editor.
 help.macroList.title=Macros Disponíveis
-### Missing: help.macroList.id=Id
-### Missing: help.macroList.name=Name
+help.macroList.id=Id
+help.macroList.name=Name
 help.macroList.categories=Categorias
-### Missing: help.macroList.description=Description
+help.macroList.description=Description
 help.macroList.visibility=Visibilidade
 
 ###############################################################################

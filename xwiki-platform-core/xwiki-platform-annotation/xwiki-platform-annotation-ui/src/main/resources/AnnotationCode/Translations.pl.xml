@@ -40,17 +40,15 @@
 annotations.menu.loading=Ładowanie ustawień adnotacji
 annotations.menu.loaderror=Niepowodzenie:
 annotations.tab.info.noannotations=Brak adnotacji na tej stronie
-
 annotations.settings.display=Pokaż adnotacje
 annotations.settings.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
 annotations.settings.error.notarget=Nie podano strony, dla której można uzyskać ustawienia adnotacji.
-
 annotations.annotated.loading=Ładowanie strony z adnotacjami
 annotations.annotated.loaderror=Niepowodzenie:
 annotations.annotated.loaderror.wrongresponse=Niepoprawnie sformatowana odpowiedź serwera
 annotations.annotated.error.noannotatedelement=Nie można załadować adnotacji, ponieważ treść nie jest dostępna.
 annotations.annotated.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
-
+### Missing: annotations.annotated.highlight.toggle.hint=
 annotations.action.edit.text=[Edytuj]
 annotations.action.edit.tooltip=Edytuj adnotacje
 annotations.action.edit.submit.text=Aktualizacja
@@ -58,14 +56,12 @@ annotations.action.edit.cancel.text=Anuluj
 annotations.action.edit.success=Adnotacja zaaktualizowana.
 annotations.action.edit.loaderror=Niepowodzenie:
 annotations.action.edit.error.notfound=Ta adnotacja już nie istnieje. Odśwież stronę, aby uzyskać zaktualizowany widok.
-
 annotations.action.delete.text=[Usuń]
 annotations.action.delete.tooltip=Usuń adnotacje
 annotations.action.delete.confirm=Jesteś pewny że chcesz usunąć tą adnotacje?
 annotations.action.delete.inProgress=Usuwanie adnotacji...
 annotations.action.delete.done=Adnotacja usunięta
 annotations.action.delete.failed=Nie udało się usunąć adnotacji:
-
 annotations.action.create.submit.text=Dodaj adnotacje
 annotations.action.create.cancel.text=Anuluj
 annotations.action.create.selection.invalid=Wybierz niepusty tekst w treści strony.
@@ -77,24 +73,20 @@ annotations.action.create.error.unauthorizedguest=Nie masz uprawnień do dodawan
 annotations.action.create.helpmessage=Aby dodać adnotację do tekstu, zaznacz go i naciśnij {0}.
 annotations.action.create.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
 annotations.action.create.error.notarget=Nieokreślony cel (strona), dla którego mają zostać utworzone adnotacje.
-
 annotations.action.view.hide.text=Chować
 annotations.action.view.form.loaderror=Niepowodzenie:
 annotations.action.view.error.notfound=Ta adnotacja już nie istnieje. Odśwież stronę, aby uzyskać zaktualizowany widok.
 annotations.action.view.thread=Wyświetl wątek
-
 annotations.altered.text=Nie można wyświetlić tej adnotacji, ponieważ na stronie nie znaleziono tekstu z adnotacjami:
 annotations.updated.text=Adnotacja ta została automatycznie zmieniona po aktualizacji strony. Pierwotnie:
 annotations.action.validate.text=[Zweryfikowano]
 annotations.action.validate.tooltip=Sprawdź poprawność automatycznej aktualizacji wybranego tekstu tej adnotacji
 annotations.action.validate.success=Zweryfikowano adnotację.
 annotations.action.validate.loaderror=Niepowodzenie:
-
 annotations.filters.show=Filtr
 annotations.filters.nooption=Brak wartości do filtrowania dla „{0}”
 annotations.filters.anyvalue=dowolna wartość
 annotations.filters.clearvalue=jasny
-
 annotations.config.title=Panel konfiguracji adnotacji
 annotations.config.display.title=Wyświetlanie adnotacji
 annotations.config.type.title=Typ adnotacji
@@ -103,7 +95,6 @@ annotations.config.activate.explanation=Poniższe dwa ustawienia pozwalają skon
 annotations.config.type.explanation=Dodaj właściwości do tej klasy, jeśli chcesz mieć dodatkowe właściwości dla swoich adnotacji.
 admin.annotations=Adnotacje
 admin.annotations.description=Skonfiguruj adnotacje na stronie
-
 AnnotationCode.AnnotationConfig_activated=Adnotacje są aktywne
 AnnotationCode.AnnotationConfig_activated.hint=Zdecyduj, czy adnotacje są aktywne na wiki
 AnnotationCode.AnnotationConfig_exceptionSpaces=Z wyjątkiem następujących lokalizacji
@@ -112,5 +103,6 @@ AnnotationCode.AnnotationConfig_displayed=Domyślnie wyświetlaj adnotacje
 AnnotationCode.AnnotationConfig_displayed.hint=Zdecyduj, czy adnotacje mają być wyświetlane domyślnie, czy tylko wtedy, gdy na każdej stronie jest zaznaczone „Pokaż adnotacje”
 AnnotationCode.AnnotationConfig_displayHighlight=Domyślnie zaznacz adnotacje
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Zdecyduj, czy wyróżnienie adnotacji powinno być wyświetlane zawsze, czy tylko po najechaniu kursorem na adnotację lub strukturę adnotacji
-AnnotationCode.AnnotationConfig_annotationClass=Klasa XWiki definiująca strukturę adnotacji</content>
+AnnotationCode.AnnotationConfig_annotationClass=Klasa XWiki definiująca strukturę adnotacji
+</content>
 </xwikidoc>

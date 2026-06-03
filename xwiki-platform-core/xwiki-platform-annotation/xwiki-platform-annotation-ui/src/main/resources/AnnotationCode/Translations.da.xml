@@ -48,6 +48,7 @@ annotations.annotated.loaderror=Fejl:
 annotations.annotated.loaderror.wrongresponse=Forkert formet på svar fra server
 annotations.annotated.error.noannotatedelement=Annotationer kunne ikke indlæses fordi indholdet ikke er tilgængeligt.
 annotations.annotated.error.wrongsyntax=Annotationer kan ikke anvendes i dokumenter i XWiki/1.0 syntaks.
+### Missing: annotations.annotated.highlight.toggle.hint=
 annotations.action.edit.text=[Ret]
 annotations.action.edit.tooltip=Ret denne annotation
 annotations.action.edit.submit.text=Opdatér

@@ -52,6 +52,7 @@ org.xwiki.mentions.DisplayStyle.LOGIN=ユーザー名
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=メンションの色
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=現在のユーザーのメンションの色（メモ：CSSのbackground-colorの属性に使用します）。
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=自分のメンションの色
+### Missing: XWiki.Mentions.MentionsConfigurationClass_selfMentionsForeground=
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=引用を有効にする
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=メンションを囲むテキストの引用をユーザーメンションの通知に含むかどうかを規定。
 mentions.tip=WYSIWYGで編集中の場合、@の後に文字を入力すると、メンションするユーザーの候補が表示されます。

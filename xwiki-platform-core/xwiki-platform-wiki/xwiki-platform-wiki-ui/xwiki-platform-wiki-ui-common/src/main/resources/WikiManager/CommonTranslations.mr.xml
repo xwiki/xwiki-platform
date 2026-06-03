@@ -56,8 +56,9 @@ platform.wiki.admin.wiki.ownerWarning=चेतावणीः एकदा आ�
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wiki=Wiki
+admin.wiki=Wiki
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

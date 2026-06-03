@@ -285,12 +285,6 @@ catalogs:
     vuedraggable:
       specifier: 4.1.0
       version: 4.1.0
-    y-prosemirror:
-      specifier: 1.3.7
-      version: 1.3.7
-    y-protocols:
-      specifier: 1.0.7
-      version: 1.0.7
     y-websocket:
       specifier: 3.0.0
       version: 3.0.0
@@ -1710,7 +1704,7 @@ importers:
         version: 4.18.1
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.2.8(vue@3.5.34(typescript@5.9.3))
+        version: 11.4.4(vue@3.5.34(typescript@5.9.3))
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -1750,13 +1744,13 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)
+        version: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.12.4)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
+        version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.4)(happy-dom@20.8.7)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2)))
+        version: 4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.34(typescript@5.9.3)
@@ -3226,6 +3220,7 @@ importers:
         version: 3.3.4(typescript@5.9.3)
 =======
         version: 3.3.0(typescript@5.9.3)
+<<<<<<< HEAD
       y-prosemirror:
         specifier: 'catalog:'
         version: 1.3.7(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.4)(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -3236,6 +3231,8 @@ importers:
         specifier: 'catalog:'
         version: 13.6.30
 >>>>>>> 7248e54da0 (--wip-- [skip ci])
+=======
+>>>>>>> cb37121355 (Cleanup mistakenly push temporary fix)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-apiextractorconfig: {}
 

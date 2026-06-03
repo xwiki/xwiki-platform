@@ -67,7 +67,7 @@ skin.sheet.js.addingDone=Szablon został dodany!
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Overridden templates
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

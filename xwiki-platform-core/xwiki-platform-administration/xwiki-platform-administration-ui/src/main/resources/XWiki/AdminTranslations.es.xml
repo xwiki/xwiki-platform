@@ -44,7 +44,7 @@ administration.sectionTitle=Administración: {0}
 administration.sectionTitle.page=Administración de la página: {0}
 administration.sectionTitle.wiki=Administración del Wiki: {0}
 administration.sectionTitle.global=Administración Global: {0}
-### Missing: administration.menu.label=Administration sections.
+administration.menu.label=Administration sections.
 administration.menu.search.hint=Buscar...
 administration.menu.search.noResults=No hay resultados.
 
@@ -143,9 +143,9 @@ admin.usersgroups.extensionrights=Extension Rights
 ### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
-### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Other Category
 admin.other=Otro
@@ -158,26 +158,26 @@ admin.social=Social
 admin.social.description=Configuración de funciones sociales.
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
-### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
-### Missing: XWiki.ConfigurableClass_heading=Heading
-### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
-### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
-### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
-### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
-### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
-### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
-### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
-### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
-### Missing: XWiki.ConfigurableClass_scope=Scope
-### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
-### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
-### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
-### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
-### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+XWiki.ConfigurableClass_displayInSection=Display in section
+XWiki.ConfigurableClass_heading=Heading
+XWiki.ConfigurableClass_configurationClass=Configuration class
+XWiki.ConfigurableClass_linkPrefix=Link prefix
+XWiki.ConfigurableClass_propertiesToShow=Properties to show
+XWiki.ConfigurableClass_codeToExecute=Code to execute
+XWiki.ConfigurableClass_iconAttachment=Icon attachment
+XWiki.ConfigurableClass_displayInCategory=Display in category
+XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+XWiki.ConfigurableClass_categoryIcon=Category icon
+XWiki.ConfigurableClass_scope=Scope
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Current space
+XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+XWiki.ConfigurableClass_sectionOrder=Section order
 
 
 ## Used to indicate where deprecated keys end

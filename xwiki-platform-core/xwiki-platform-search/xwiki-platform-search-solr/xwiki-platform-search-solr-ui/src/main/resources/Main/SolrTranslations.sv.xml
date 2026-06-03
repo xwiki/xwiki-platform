@@ -70,7 +70,7 @@ solr.admin.indexing.query.hint=Sökutryck för att begränsa de dokument i index
 ### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
 ### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
 ### Missing: search.solr.options.showHighlight=Show highlights of matches
-### Missing: solr.options.highlight.title=
+### Missing: solr.options.highlight.title=Display an extract of what was matched in each result
 ### Missing: search.solr.options.showFacet=Show filters
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
 solr.result.language=Språk
@@ -158,7 +158,7 @@ solr.field.comment=Kommentarer
 solr.field.objcontent=Objekt
 solr.field.mimetype=Filtyp
 solr.field.attauthor=Uppladdad av
-### Missing: solr.field.attauthor_display=Uploaded by
+solr.field.attauthor_display=Uploaded by
 solr.field.attdate=Uppladdningsdatum
 solr.field.attsize=Filstorlek
 ### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
@@ -183,7 +183,7 @@ solr.sortBy.attdate_sort=Uppladdningsdatum
 solr.sortBy.attauthor_display_sort=Uppladdad av
 ### Missing: solr.options=Show:
 ### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.facet=
+### Missing: solr.options.facet=Filters
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Список всех вики
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Рабочие пространства (устаревшее)
 rendering.macro.workspaces.description=Устаревший макрос, который не следует использовать здесь из соображений совместимости. Пожалуйста, используйте вместо этого макрос "Вики".
-
-## Browse
-platform.wiki.browse=Обзор всех Вики
 platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Название
 platform.wiki.browse.description=Описание
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Завершить
 #######################################
 platform.wiki.delete.confirmation.yes=Да, пожалуйста, удалите эту Вики!
 platform.wiki.delete.confirmation.no=Нет, верни назад!
+
+## Browse
+platform.wiki.browse=Обзор всех Вики
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

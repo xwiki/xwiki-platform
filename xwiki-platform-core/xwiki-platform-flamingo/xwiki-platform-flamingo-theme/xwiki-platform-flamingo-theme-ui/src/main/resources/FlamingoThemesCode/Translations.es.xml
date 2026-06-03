@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=Vista previa
 platform.flamingo.themes.autorefresh=Actualización automática
 platform.flamingo.themes.refresh=Refrescar
 platform.flamingo.themes.refreshwarning=La actualización puede durar varios segundos.
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=Cargando...
 platform.flamingo.themes.category.logos=Logos
 platform.flamingo.themes.category.base-colors=Colores base
@@ -72,6 +73,7 @@ platform.flamingo.themes.defaultvalue=Predeterminado
 platform.flamingo.themes.lessCode.description=En este campo, puede escribir directamente un código LESS que se añadirá al skin.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

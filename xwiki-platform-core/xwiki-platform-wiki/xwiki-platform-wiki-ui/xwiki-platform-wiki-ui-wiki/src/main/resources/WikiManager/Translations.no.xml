@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=Administrer wiki-medlemmer: Legg til, fje
 admin.xwiki.usersconfiguration.title=Konfigurasjon
 admin.xwiki.members.title=Nåværende medlemmer
 admin.xwiki.users.title=Alle brukere
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Hjem</content>
+platform.wiki.drawer.homeWiki=Hjem
+</content>
 </xwikidoc>

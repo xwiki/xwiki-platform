@@ -61,37 +61,37 @@ menu.livetable.emptyvalue=-
 menu.livetable.content1=मेनू रचना
 
 # Administration keys
-### Missing: admin.menu.name=Menus
+admin.menu.name=Menus
 
 # UIX keys
 menu.uix.extensionPoint.label=मेनू प्रदर्शन स्थान
-### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
+menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
 menu.uix.extensionPoint.value.nowhere=कोठेही नाही
 menu.uix.extensionPoint.value.template.header.after=पृष्ठ शीर्षलेखानंतर
 menu.uix.extensionPoint.value.panels.rightPanels=राइट पॅनेलच्या आत
 menu.uix.extensionPoint.value.panels.leftPanels=राइट पॅनेलच्या आत
 menu.uix.content.label=यूआय विस्तार सामग्री
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
 menu.uix.scope.label=मेनू दृश्यमानता व्याप्ती
 menu.uix.scope.hint=मेनू दृश्यमान आहे त्या संदर्भात निर्दिष्ट करते.
 
 # Menu Macro
 rendering.macro.menu.name=मेनू
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-### Missing: rendering.macro.menu.parameter.label.name=Label
-### Missing: rendering.macro.menu.parameter.label.description=Optional menu label used to describe the content of the menu. Especially important for assistive technologies and accessibility of the menu.
-### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
+rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 
 # Menu UI
-### Missing: menu.ui.openSubMenu=Open the submenu.
-### Missing: menu.ui.closeSubMenu=Close the submenu.
-### Missing: menu.ui.horizontal.toggler.description=Toggle the horizontal menu.
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
 </content>
 </xwikidoc>

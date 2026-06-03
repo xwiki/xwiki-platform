@@ -44,7 +44,7 @@ platform.flamingo.themes.home.warningCurrentOldColorTheme=Trenutna tema je Colib
 platform.flamingo.themes.home.useThisTheme=Upotrijebi ovu temu
 platform.flamingo.themes.home.newThemeName=Ime teme…
 platform.flamingo.themes.home.create=Izradi novu temu
-platform.flamingo.themes.home.create.invalid=Ime teme nije valjano\!
+platform.flamingo.themes.home.create.invalid=Ime teme nije valjano!
 platform.flamingo.themes.home.create.csrf=Iz sigurnosnih razloga, molim potvrdite da želite izraditi temu imena "{0}".
 platform.flamingo.themes.home.create.confirm=Potvrdi
 platform.flamingo.themes.home.set.success=Tema postavljena na "{0}".
@@ -53,6 +53,7 @@ platform.flamingo.themes.title.preview=Pretpregled
 platform.flamingo.themes.autorefresh=Automatsko osvježavanje
 platform.flamingo.themes.refresh=Osvježi
 platform.flamingo.themes.refreshwarning=Osvježavanje može potrajati nekoliko sekundi
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=Učitavanje...
 platform.flamingo.themes.category.logos=Logotipovi
 platform.flamingo.themes.category.base-colors=Osnovne boje
@@ -69,6 +70,7 @@ platform.flamingo.themes.defaultvalue=Pretpostavljeno
 platform.flamingo.themes.lessCode.description=U ovo polje možete izravno unijeti LESS kod koji će biti dodan koži.
 platform.flamingo.themes.local=Lokalno
 platform.flamingo.themes.global=Globalno
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

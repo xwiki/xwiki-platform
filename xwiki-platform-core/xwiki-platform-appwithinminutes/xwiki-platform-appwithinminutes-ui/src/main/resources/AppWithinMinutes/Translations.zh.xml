@@ -164,7 +164,7 @@ platform.appwithinminutes.liveTableEditorHelpTitle=提示信息
 platform.appwithinminutes.liveTableEditorHelpDescription=通用动态列表的字段独立于你的应用结构。它们提供了你的应用数据页面的信息。
 platform.appwithinminutes.liveTableEditorDocTitleColumnName=页面标题
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=应用数据页面的标题
-### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=应用数据页面的名称
 platform.appwithinminutes.liveTableEditorDocLocationColumnName=位置
 platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=应用数据页面的位置
@@ -172,35 +172,35 @@ platform.appwithinminutes.liveTableEditorDocAuthorColumnName=最后作者
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=最后编辑应用数据的用户
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=创建者
 platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=创建此应用数据的用户
-### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnName=Date
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Date
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=此应用数据的最后修改时间
-### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation Date
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation Date
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=此应用数据的创建时间
-### Missing: platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
+platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 platform.appwithinminutes.liveTableEditorActionsColumnDescription=可用于此应用数据的操作列表，例如编辑和删除
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=附件
 platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=显示数据页附件链接的特殊列
 platform.appwithinminutes.liveTableEditorImagesColumnName=图像
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=显示数据页图像附件的特殊列
-### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=显示用户头像的特殊列。仅当表格绑定到XWiki.XWikiUsers类时有效
 platform.appwithinminutes.liveTableEditorTitleHint=显示在应用主页、应用面板、动态列表或路径栏等位置的应用标题。
 platform.appwithinminutes.liveTableEditorDescriptionHint=显示在首页、位于动态列表之上的应用数据内容。用于描述此应用。
 platform.appwithinminutes.liveTableEditorColumnsHint=选择要显示在应用首页动态列表中的列。
 platform.appwithinminutes.liveTableEditorSaveComment=更新动态列表
 platform.appwithinminutes.liveTableEditorMoveColumnHint=拖放以更改顺序
-### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=添加选中的列
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;
-### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
+platform.appwithinminutes.liveTableEditorIcon=Icon
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=应用图标。你可以直接选择一个，或者引用附件中的图像。
 
 ### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=条目
 platform.appwithinminutes.appLiveTableEditEntryActionName=编辑
-### Missing: platform.appwithinminutes.appLiveTableDeleteEntryActionName=Delete
-### Missing: platform.appwithinminutes.appHomePageActionsHeading=Actions
-### Missing: platform.appwithinminutes.appHomePageAddEntryLabel=Add
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Delete
+platform.appwithinminutes.appHomePageActionsHeading=Actions
+platform.appwithinminutes.appHomePageAddEntryLabel=Add
 platform.appwithinminutes.appHomePageAddEntryHint=添加新条目
 platform.appwithinminutes.appHomePageEntryNameLabel=条目名称：
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=删除所有条目
@@ -209,7 +209,7 @@ platform.appwithinminutes.appHomePageTranslateAppLabel=翻译应用
 platform.appwithinminutes.appHomePageDeleteAppLabel=删除应用
 platform.appwithinminutes.appHomePageMovedWarning=此应用可能无法正常工作，因为其已经被改名或移动但没有更新代码。请编辑此应用，按步骤更新代码。
 platform.appwithinminutes.appHomePageNoScriptRight=您没有创建或编辑应用程序所需的脚本权限。继续时，应用程序可能无法正常工作。
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_description=Description
 AppWithinMinutes.LiveTableClass_columns=动态列表字段
 
 ### Delete application dialog
@@ -243,7 +243,7 @@ platform.appwithinminutes.appNamePreviewClassReferenceLabel=应用类
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=应用数据位置
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=空间
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=包含应用条目的空间名称
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
 platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=包含应用数据的页面名称，以空间名为前缀
 
 #@deprecated appWithinMinutes.wizardStep.name.name
@@ -267,7 +267,7 @@ platform.appwithinminutes.wizardStep3Description=自定义应用主页
 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=应用名称
-### Missing: appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.templateProviderEditor.title={0} 个条目
 </content>
 </xwikidoc>

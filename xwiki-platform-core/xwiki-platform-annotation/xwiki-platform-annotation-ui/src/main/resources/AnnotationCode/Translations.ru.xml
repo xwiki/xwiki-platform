@@ -48,6 +48,7 @@ annotations.annotated.loaderror=Неудача:
 annotations.annotated.loaderror.wrongresponse=Неправильно отформатированный ответ сервера
 annotations.annotated.error.noannotatedelement=Не удалось загрузить аннотации, поскольку контент недоступен.
 annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki / 1.0.
+### Missing: annotations.annotated.highlight.toggle.hint=Open the annotation about this text.
 annotations.action.edit.text=[Изменить]
 annotations.action.edit.tooltip=Изменить аннотацию
 annotations.action.edit.submit.text=Обновить

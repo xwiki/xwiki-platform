@@ -56,10 +56,10 @@ office.config.serverType.hint=ऑफिस सर्व्हर प्रका
 office.config.serverPort.hint=Office सर्व्हरच्या उदाहरणाशी कनेक्ट होण्यासाठी वापरलेला पोर्ट क्रमांक
 office.config.autoStart.hint=ऑफिस सर्व्हर Xwiki स्टार्टअपवेळी स्वयंचलितरित्या चालू / कनेक्ट केलेला असेल तर निर्दिष्ट करा
 office.config.serverPath.hint=ऑफिस स्थापनेचा मार्ग
-### Missing: office.config.serverState.connected=Connected
-### Missing: office.config.serverState.notConnected=Not Connected
-### Missing: office.config.serverState.confError=Invalid Configuration
-### Missing: office.config.serverState.error=Error
+office.config.serverState.connected=Connected
+office.config.serverState.notConnected=Not Connected
+office.config.serverState.confError=Invalid Configuration
+office.config.serverState.error=Error
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

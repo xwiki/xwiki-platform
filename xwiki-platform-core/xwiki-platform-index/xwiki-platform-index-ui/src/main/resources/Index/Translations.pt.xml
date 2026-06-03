@@ -47,9 +47,9 @@ admin.documentanalysis=Análise Documento
 
 index.spacesMacro.title=Espaços
 index.spacesMacro.spaceIndex.title=Ver o índice do espaço
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceIndex.alt=Space Index
 index.spacesMacro.spaceAdministration.title=Ver a administração do espaço
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Criar um novo espaço
 index.spacesMacro.createSpace.defaultSpaceName=Nome do Espaço
 index.spacesMacro.createSpace.submit=Criar

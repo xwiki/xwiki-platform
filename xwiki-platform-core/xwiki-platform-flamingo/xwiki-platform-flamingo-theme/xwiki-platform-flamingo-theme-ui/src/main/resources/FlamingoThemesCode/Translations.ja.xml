@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=プレビュー
 platform.flamingo.themes.autorefresh=自動更新
 platform.flamingo.themes.refresh=更新
 platform.flamingo.themes.refreshwarning=更新には数秒かかる可能性があります。
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=読み込んでいます…
 platform.flamingo.themes.category.logos=ロゴ
 platform.flamingo.themes.category.base-colors=ベースカラー
@@ -72,6 +73,7 @@ platform.flamingo.themes.defaultvalue=既定
 platform.flamingo.themes.lessCode.description=このフィールドに、スキンに追加するLESSコードを直接記述できます。
 platform.flamingo.themes.local=ローカル
 platform.flamingo.themes.global=共通
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

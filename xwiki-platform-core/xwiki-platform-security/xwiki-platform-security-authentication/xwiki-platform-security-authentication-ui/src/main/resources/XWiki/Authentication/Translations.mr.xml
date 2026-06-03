@@ -48,5 +48,13 @@ authentication.admin.isAuthenticationSecurityEnabled.label=प्रमाणी
 authentication.admin.isAuthenticationSecurityEnabled.hint=प्रमाणीकरण सुरक्षा यंत्रणा अक्षम केल्याने प्रमाणीकरण अयशस्वी रेकॉर्ड देखील रीसेट होईल.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=निष्क्रिय केलेले
 authentication.admin.isAuthenticationSecurityEnabled.enabled=सक्रीय केलेले
-### Missing: authentication.admin.heading=Authentication Security</content>
+authentication.admin.heading=Authentication Security
+### Missing: security.authservice.admin.title=
+### Missing: security.authservice.admin.currentAuthService=
+### Missing: security.authservice.admin.component.label=
+### Missing: security.authservice.admin.component.save=
+### Missing: security.authservice.admin.component.noService=
+### Missing: security.authservice.admin.other.warning=
+### Missing: security.authservice.admin.class.warning=
+</content>
 </xwikidoc>

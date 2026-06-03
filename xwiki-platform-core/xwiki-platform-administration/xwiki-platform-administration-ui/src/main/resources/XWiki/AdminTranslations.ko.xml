@@ -143,8 +143,8 @@ admin.usersgroups.extensionrights=확장 권한
 ### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 administration.section.groups.deleteUserFromGroup.failure=그룹에서 멤버를 제거하지 못했습니다
 
 # Other Category
@@ -158,8 +158,8 @@ admin.social=소셜
 admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=섹션에 표시

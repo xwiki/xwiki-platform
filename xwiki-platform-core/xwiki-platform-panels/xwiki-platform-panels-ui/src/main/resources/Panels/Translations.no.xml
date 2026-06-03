@@ -42,11 +42,20 @@ panels.description=Beskrivelse
 panels.type=Type
 panels.category=Kategori
 panels._actions=Handlinger
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=Undersider
 panels.siblings.title=Sider på samme nivå
+### Missing: panels.customize=You can customize the side column(s) using the {0}
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=Konfigurer flere syntakser
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Vil du også konvertere dokumentets innhold og objekter til den valgte syntaks? Hvis du velger 'avbryt', tilbakestilles syntaksen til den forrige og gjør ingenting. Merk at hvis du velger 'ok', mister du endringer og dette vil lagre dokumentet automatisk, kan du avbryte denne modifiseringen ved å gå til dokumenthistorikkgrensesnittet og tilbakestille den siste versjonen.
 panels.documentInformation.confirmChangeSyntax=Vil du også konvertere dokumentets innhold og objekter til den valgte syntaks? Valg av 'avbryt' vil bare endre syntaksidentifikatoren, uten å endre dokumentets innhold. Merk at hvis du velger "ok" vil dette lagre dokumentet automatisk, du kan avbryte denne modifiseringen ved å gå til dokumenthistorikkgrensesnittet og tilbakestille den siste versjonen.
-panels.documentInformation.failedSyntaxConversion=Kunne ikke konvertere til valgt syntaks. Hvis du uansett vil bruke denne syntaks, kan du velge den igjen og velge ikke utfør konvertering.</content>
+panels.documentInformation.failedSyntaxConversion=Kunne ikke konvertere til valgt syntaks. Hvis du uansett vil bruke denne syntaks, kan du velge den igjen og velge ikke utfør konvertering.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

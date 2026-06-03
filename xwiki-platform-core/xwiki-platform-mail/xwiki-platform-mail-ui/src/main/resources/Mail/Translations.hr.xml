@@ -46,7 +46,7 @@ admin.emailstatus=Status slanja e-pošte
 admin.emailstatus.description=Pregledajte statuse poslane e-pošte i ponovo pošaljite e-poštu koja nije uspjela biti poslana.
 admin.emailstatus.hint=Ukoliko ne možete pronaći status e-pošte tada je moguće da funkcionalnost koja je poslala e-poštu nije naznačila da status e-pošte treba biti zadržan.
 Mail.GeneralMailConfigClass_obfuscate=Zatamni adrese e-pošte
-Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok zadani prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer\: a...@domena.org
+Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok zadani prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer: a...@domena.org
 Mail.SendMailConfigClass_from=Adresa e-pošte s koje se šalje
 Mail.SendMailConfigClass_from.hint=Zadana adresa e-pošte koja se koristi za slanje obavijesne e-pošte
 Mail.SendMailConfigClass_bcc=BCC adrese e-pošte
@@ -60,7 +60,7 @@ Mail.SendMailConfigClass_username.hint=Korisničko ime za povezivanje na SMTP po
 Mail.SendMailConfigClass_password=Lozinka na poslužitelju e-pošte
 Mail.SendMailConfigClass_password.hint=Lozinka za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
 Mail.SendMailConfigClass_properties=Dodatna svojstva
-Mail.SendMailConfigClass_properties.hint=Lista dodatnih JavaMail svojstava (npr. "mail.smtp.starttls.enable\=true" za TLS)
+Mail.SendMailConfigClass_properties.hint=Lista dodatnih JavaMail svojstava (npr. "mail.smtp.starttls.enable=true" za TLS)
 Mail.SendMailConfigClass_sendWaitTime=Vrijeme čekanja na slanje
 Mail.SendMailConfigClass_sendWaitTime.hint=Vrijeme čekanja između slanja pojedine e-pošte, u milisekundama (zadano je 8 sekundi)
 Mail.SendMailConfigClass_discardSuccessStatuses=Zanemariti statuse o uspjehu?
@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Greška
 Mail.SendMailStatus_livetable.actions=Akcije
 Mail.SendMailStatus_livetable.resend=Ponovo pošalji
+### Missing: Mail.SendMailStatus_livetable.delete=
 mailSender.admin.resendSuccess=E-pošta je uspješno ponovo poslana
-mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.</content>
+mailSender.admin.resendFailure=Ponovno slanje e-pošte nije uspjelo. Kliknite za više detalja.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
+</content>
 </xwikidoc>

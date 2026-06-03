@@ -154,7 +154,7 @@ administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in Google Analytics™ aktiv ist oder nicht
 
 # Social category
-### Missing: admin.social=Social
+admin.social=Social
 admin.social.description=Konfiguration für soziale Funktionen.
 
 # Network category

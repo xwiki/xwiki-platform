@@ -39,8 +39,19 @@
   <content>office.createForm.type.name=Página de Office
 office.createForm.type.description=Importar documentos de Office a páginas wiki
 office.form.error.noDocument=Debe utilizar la acción {0}create{1} para importar un documento de Office.
-office.form.append.hint=¡El documento ya existe! Añada el resultado a la página wiki existente
-
+### Missing: office.import.document.hint=
+### Missing: office.import.target.hint=
+### Missing: office.import.overwriteContent=
+### Missing: office.import.overwriteContent.hint=
+### Missing: office.import.overwriteContent.confirmationMessage=
+### Missing: office.import.overwriteContent.confirmationAction=
+### Missing: office.import.headingLevelsToSplit.hint=
+### Missing: office.import.childPagesNaming.hint=
+### Missing: office.import.terminalChildPages=
+### Missing: office.import.terminalChildPages.hint=
+### Missing: office.import.inProgress=
+### Missing: office.import.done=
+### Missing: office.import.failed=
 office.config.serverType.hint=El tipo de servidor de Office. Puede ser gestionado internamente (local) o externamente (remoto).
 office.config.serverPort.hint=El número de puerto utilizado para conectarse al servidor de Office
 office.config.autoStart.hint=Especifique si el servidor de Office debe iniciarse o conectarse automáticamente al inicio de XWiki
@@ -48,5 +59,14 @@ office.config.serverPath.hint=La ruta a la instalación de Office
 office.config.serverState.connected=Conectado
 office.config.serverState.notConnected=No conectado
 office.config.serverState.confError=Configuración no válida
-office.config.serverState.error=Error</content>
+office.config.serverState.error=Error
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=¡El documento ya existe! Añada el resultado a la página wiki existente
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

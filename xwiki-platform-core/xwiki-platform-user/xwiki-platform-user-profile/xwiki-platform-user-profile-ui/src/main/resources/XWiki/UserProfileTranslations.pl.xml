@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Wiki zawiera dokumenty, które nie są domyślnie wyświetlane. Te ukryte dokumenty reprezentują treść techniczną, taką jak klasy aplikacji, strony konfiguracji, makra, style, skrypty itp.
-XWiki.XWikiUsers_accessibility.hint=Dodatkowa dostępność umożliwi różne ulepszenia wizualne, takie jak: większe czcionki, podkreślone łącza itp.
+### Missing: XWiki.XWikiUsers_underline.hint=
 XWiki.XWikiUsers_timezone.hint=Użyj określonej strefy czasowej, aby daty odzwierciedlały Twoją bieżącą lokalizację.
 XWiki.XWikiUsers_editor.hint=Wybierz edytor, który będzie domyślny, zastępując domyślny zestaw edytorów globalnie. Jeśli nie zdefiniowano, wybierany jest domyślny edytor, w zależności od tego, co jest edytowane.
 XWiki.XWikiUsers_usertype.hint=Wybierz typ użytkownika, który będzie domyślny. Zaawansowani użytkownicy będą mieli dostęp do wielu funkcji edycji, tworzenia stron terminali itp.
@@ -60,5 +60,14 @@ user.profile.network.saving=zapisywanie...
 user.profile.network.error=Błąd podczas zapisywania ustawienia powiadomienia
 ### Missing: user.profile.status.done=Done
 ### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+### Missing: user.profile.status.error=Error saving the user status
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=Dodatkowa dostępność umożliwi różne ulepszenia wizualne, takie jak: większe czcionki, podkreślone łącza itp.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

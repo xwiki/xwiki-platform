@@ -40,7 +40,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * change, the location of the entity (e.g., in a document or a comment), the reference of the changed entity, and the
  * version of the entity after the change.
  *
- * @version $Id: 94b713464500bcab5b5d3e249a8d7c6b897fd36d $
+ * @version $Id$
  * @since 12.6
  */
 public class MentionNotificationParameters implements Serializable

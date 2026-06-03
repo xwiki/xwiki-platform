@@ -46,7 +46,7 @@
 Consente di commentare e quindi non valutare la sintassi XWiki
 
 |=Caratteristica|=Sintassi XWiki 1.0|=Risultato
-|Commentare un carattere|{{{Questo non è un \[link\]}}}|{{{Questo non è un [link]}}}
+|Commentare un carattere|{{{Questo non è un [link]}}}|{{{Questo non è un [link]}}}
 
 === 2.0 Escapes ===
 

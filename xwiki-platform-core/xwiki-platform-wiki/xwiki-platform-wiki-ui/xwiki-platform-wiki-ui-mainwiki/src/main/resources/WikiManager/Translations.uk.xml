@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Список усіх вікі
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Робочі простори (застарілі)
 rendering.macro.workspaces.description=Застарілий макрос, який не слід використовувати тут з причин сумісності. Будь ласка, використовуйте замість цього макрос "wikis".
-
-## Browse
-platform.wiki.browse=Переглянути Вікі
 platform.wiki.browse.emptyvalue=Відсутнє
 platform.wiki.browse.wikiprettyname=Назва
 platform.wiki.browse.description=Опис
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Завершення
 #######################################
 platform.wiki.delete.confirmation.yes=Так, будь ласка, видалити цю вікі!
 platform.wiki.delete.confirmation.no=Ні, поверніть мене назад!
+
+## Browse
+platform.wiki.browse=Переглянути Вікі
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -38,7 +38,6 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=याद्वारे पूर्वावलोकन करा:
 platform.icon.picker.loading=लोड होत आहे
-
 rendering.macro.iconPicker.name=आयकॉन निवडक
 rendering.macro.iconPicker.description=XWiki आयकॉन संचातील एक आयकॉन निवडा.
 rendering.macro.iconPicker.parameter.id.name=आयडी
@@ -46,5 +45,6 @@ rendering.macro.iconPicker.parameter.id.description=निवडकर्ता 
 rendering.macro.iconPicker.parameter.class.name=वर्ग
 rendering.macro.iconPicker.parameter.class.description=निवडक ज्या ठिकाणी लागू होईल अशा इनपुटचा सीएसएस क्लास
 rendering.macro.iconPicker.parameter.prefix.name=उपसर्ग
-rendering.macro.iconPicker.parameter.prefix.description=इनपुट फील्डमधील आयकॉनच्या नावापूर्वी जोडण्यासाठी उपसर्ग (डीफॉल्ट:"image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=इनपुट फील्डमधील आयकॉनच्या नावापूर्वी जोडण्यासाठी उपसर्ग (डीफॉल्ट:"image:icon:")
+</content>
 </xwikidoc>

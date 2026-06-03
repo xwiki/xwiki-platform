@@ -122,11 +122,11 @@ platform.wiki.users.leave.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}
 platform.wiki.users.leave.confirmation.yes=Ja
 platform.wiki.users.leave.confirmation.no=Nein
 platform.wiki.users.leave.success=Der Benutzer {0}{1}{2} hat das Wiki {3}{4}{5} erfolgreich verlassen.
-### Missing: platform.wiki.users.join.title=Join Wiki
+platform.wiki.users.join.title=Join Wiki
 platform.wiki.users.leave.title=Verlassen Sie das Wiki "{0}"
 platform.wiki.users.leave.empty=Verlassen Sie das Wiki
 platform.wiki.users.delete.title=Wiki "{0}" löschen
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
+platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Eine für den Wiki-Administrator einsehbare Antwortnachricht zum Senden, in der Sie Ihre Entscheidung begründen können.
 platform.wiki.users.join.request.hint=Um dem Wiki {0}{1}{2} beizutreten, müssen Sie zuerst eine Beitrittsanfrage stellen. Danach wird ein Wiki-Administrator Ihre Anfrage prüfen und berücksichtigen.
 platform.wiki.users.join.request.message.hint=Eine für den Wiki-Administrator einsehbare Nachricht zum Senden, in der Sie Ihre Entscheidung begründen können.
@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Zeigt Liste aller Wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Arbeitsgebiete (veraltet)
 rendering.macro.workspaces.description=Veraltetes Makro, das nur noch aus Gründen der Rückwärtskompatibilität vorhanden ist. Bitte verwenden Sie statt dessen das "Wikis" Makro.
-
-## Browse
-platform.wiki.browse=Wikis durchsuchen
 platform.wiki.browse.emptyvalue=n/a
 platform.wiki.browse.wikiprettyname=Name
 platform.wiki.browse.description=Beschreibung
@@ -189,7 +186,7 @@ WikiManager.WikiUserClass_userScope_global_only=Das Wiki kennt nur globale Benut
 WikiManager.WikiUserClass_userScope_local_and_global=Das Wiki kennt sowohl lokale als auch globale Benutzer
 platform.wiki.prop.wikiname=Wiki Bezeichner
 platform.wiki.prop.wikiprettyname=Name
-### Missing: platform.wiki.prop.wikialias=Alias
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Beschreibung
 platform.wiki.prop.owner=Besitzer
 platform.wiki.prop.membershipType.label=Art der Mitgliedschaft
@@ -221,17 +218,17 @@ platform.wiki.create.wizard.template.label=Vorlage
 platform.wiki.create.wizard.flavortemplate.label=Vorlage / Template
 platform.wiki.create.wizard.flavortemplate.hint=Vorlage oder Template, die als anfänglicher Inhalt des neuen Wikis verwendet werden soll
 platform.wiki.create.wizard.flavortemplate.flavorTab=Variante
-### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
+platform.wiki.create.wizard.flavortemplate.templateTab=Template
 platform.wiki.create.wizard.step.dw=Nachdem Sie auf "Erstellen" klicken, wird das Wiki erstellt und es erscheint der Installationsassistent, um das Wiki zu initialisieren. Wenn Sie den Assistenten abbrechen, wird das Wiki leer sein.
 platform.wiki.create.wizard.step.previous=Vorheriger Schritt
 platform.wiki.create.wizard.step.next=Zum nächsten Schritt
 platform.wiki.create.wizard.step.create=Erstellen
-### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
+platform.wiki.create.wizard.step.creation=Wiki creation
 platform.wiki.create.wizard.step.creation.wait=Bitte warten Sie, bis das Wiki erstellt ist.
 platform.wiki.create.wizard.step.creation.complete=Das Wiki {0} wurde erfolgreich erstellt. Sie können es nun benutzen.
 platform.wiki.create.wizard.step.creation.errorlog=Während dieses Vorgangs wurden Fehler generiert, die Sie möglicherweise überprüfen möchten.
 platform.wiki.create.wizard.step.creation.error=Die Erstellung des Wikis {0} scheiterte. Es wird empfohlen, es zu löschen.
-### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
+platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
 admin.wikis.description=Wiki-Verwaltung.
@@ -258,7 +255,7 @@ platform.wiki.sheet.desc.homepage=Die Startseite des Wikis.
 platform.wiki.sheet.prop.wikiprettyname=Name
 platform.wiki.sheet.prop.owner=Besitzer
 platform.wiki.sheet.prop.secure=Sicher (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
+platform.wiki.sheet.prop.port=Port
 platform.wiki.sheet.prop.description=Beschreibung
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Startseite
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Fertigstellen
 #######################################
 platform.wiki.delete.confirmation.yes=Ja, das Wiki bitte löschen!
 platform.wiki.delete.confirmation.no=Nein, bring mich zurück!
+
+## Browse
+platform.wiki.browse=Wikis durchsuchen
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

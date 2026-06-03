@@ -39,8 +39,19 @@
   <content>office.createForm.type.name=ऑफिस मधील पान
 office.createForm.type.description=विकी पानांमध्ये कार्यालयाची कागदपत्रे आयात करा
 office.form.error.noDocument=ऑफिस दस्तऐवज आयात करण्यासाठी आपण {0} कृती तयार करा {1} वापरणे आवश्यक आहे.
-office.form.append.hint=दस्तऐवज आधीपासून विद्यमान आहे! परिणाम विद्यमान विकी पृष्ठावर जोडा
-
+### Missing: office.import.document.hint=
+### Missing: office.import.target.hint=
+### Missing: office.import.overwriteContent=
+### Missing: office.import.overwriteContent.hint=
+### Missing: office.import.overwriteContent.confirmationMessage=
+### Missing: office.import.overwriteContent.confirmationAction=
+### Missing: office.import.headingLevelsToSplit.hint=
+### Missing: office.import.childPagesNaming.hint=
+### Missing: office.import.terminalChildPages=
+### Missing: office.import.terminalChildPages.hint=
+### Missing: office.import.inProgress=
+### Missing: office.import.done=
+### Missing: office.import.failed=
 office.config.serverType.hint=ऑफिस सर्व्हर प्रकार. हे अंतर्गत व्यवस्थापित (स्थानिक) किंवा बाह्य (रिमोट) केले जाऊ शकते.
 office.config.serverPort.hint=Office सर्व्हरच्या उदाहरणाशी कनेक्ट होण्यासाठी वापरलेला पोर्ट क्रमांक
 office.config.autoStart.hint=ऑफिस सर्व्हर Xwiki स्टार्टअपवेळी स्वयंचलितरित्या चालू / कनेक्ट केलेला असेल तर निर्दिष्ट करा
@@ -48,5 +59,14 @@ office.config.serverPath.hint=ऑफिस स्थापनेचा मार
 ### Missing: office.config.serverState.connected=Connected
 ### Missing: office.config.serverState.notConnected=Not Connected
 ### Missing: office.config.serverState.confError=Invalid Configuration
-### Missing: office.config.serverState.error=Error</content>
+### Missing: office.config.serverState.error=Error
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=दस्तऐवज आधीपासून विद्यमान आहे! परिणाम विद्यमान विकी पृष्ठावर जोडा
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

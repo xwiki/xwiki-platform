@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: index.deletedDocuments.deleteAll=Delete all
+  <content>index.deletedDocuments.deleteAll=Delete all
 ### Missing: index.administration.remainingTasks.heading=
 ### Missing: index.administration.remainingTasks.emptyQueue=
 ### Missing: admin.documentanalysis=

@@ -45,7 +45,7 @@ panels._actions=Handlinger
 ### Missing: panels.emptyvalue=
 panels.children.title=Undersider
 panels.siblings.title=Sider på samme nivå
-### Missing: panels.customize=You can customize the side column(s) using the {0}
+### Missing: panels.customize=
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

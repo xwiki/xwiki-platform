@@ -280,8 +280,8 @@ platform.wiki.dependencies.applicationmanager.missing=El {0}Plugin Application M
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2

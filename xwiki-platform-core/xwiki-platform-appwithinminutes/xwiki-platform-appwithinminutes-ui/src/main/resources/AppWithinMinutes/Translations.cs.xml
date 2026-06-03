@@ -41,14 +41,14 @@ platform.appwithinminutes.homePageTitle=Aplikace za pár minut
 platform.appwithinminutes.description=Vytvoření webové aplikace s možností společného přístupu  a úprav během pár minut na základě mocného strukturovaného systému správy dat platformy XWiki.
 platform.appwithinminutes.createAppButtonLabel=Vytvořit aplikaci
 platform.appwithinminutes.appsLiveTableHeading=Aplikace
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
+platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Poslední autor
 platform.appwithinminutes.appsLiveTable.doc.date=Datum aktualizace
-### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
-### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
+platform.appwithinminutes.appsLiveTable._actions=Actions
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
 
 ### AWM Applications panel entry
-### Missing: platform.appwithinminutes.appPanelCreateEntry=Create your own!
+platform.appwithinminutes.appPanelCreateEntry=Create your own!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Krok {0} — {1}
@@ -58,9 +58,9 @@ appWithinMinutes.wizardStep.name.description=Zadejte název aplikace
 appWithinMinutes.wizardStep.structure.name=Struktura
 appWithinMinutes.wizardStep.structure.title=Určete strukturu vaší aplikace
 appWithinMinutes.wizardStep.structure.description=Vygenerujte strukturu vaší aplikace určením, jaké typy polí bude obsahovat.
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.entries.name=Entries
+appWithinMinutes.wizardStep.entries.title=Locate your data
+appWithinMinutes.wizardStep.entries.description=Choose where to store the data
 appWithinMinutes.wizardStep.presentation.name=Prezentace
 appWithinMinutes.wizardStep.presentation.title=Upravte domovskou stránku aplikace.
 appWithinMinutes.wizardStep.presentation.description=Přizpůsobte domovskou stránku aplikace.
@@ -71,22 +71,22 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Na úvodní stránku aplikac
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Předchozí krok
 platform.appwithinminutes.wizardStepPreviousButtonTip=Jdi na předchozí krok
 platform.appwithinminutes.wizardStepHelpTitle=Kroky
-platform.appwithinminutes.wizardStepHelpDescription=Tento průvodce vám pomůže při vytvoření vaší aplikace. Tyto kroky nastaví způsob zobrazení aplikace a jaké informace bude obsahovat\:
+platform.appwithinminutes.wizardStepHelpDescription=Tento průvodce vám pomůže při vytvoření vaší aplikace. Tyto kroky nastaví způsob zobrazení aplikace a jaké informace bude obsahovat:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.createApp.location.label=Location
+appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+appWithinMinutes.createApp.parent.label=Parent
+appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
+appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.codeSpace.title=Code
+appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
 platform.appwithinminutes.appNamePageTitle=Vytvořit aplikaci
 platform.appwithinminutes.appNameLabel=Název aplikace
 platform.appwithinminutes.appNameHint=Název aplikace určuje URL úvodní stránky aplikace, prostor kde se data budou  ukládat, stejně jako jméno třídy, která bude popisovat strukturu aplikace.
 platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL úvodní stránky aplikace
-### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
 platform.appwithinminutes.appNameIsUsedWarning=Tato aplikace již existuje. Přejdete-li k dalšímu kroku, budete upravovat tuto existující aplikací.
 platform.appwithinminutes.appNameEmptyError=Zadejte název aplikace,prosím.
 
@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Zadejte název aplikace,prosím.
 platform.appwithinminutes.classEditorPaletteTitle=Paleta polí
 platform.appwithinminutes.classEditorPaletteHint=Přetáhněte myší pole z palety pro vytvoření formuláře.
 platform.appwithinminutes.classEditorCanvasHint=Přetáhněte pole z palety a umístěte je do této oblasti
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Aktualizace šablony třídy
 platform.appwithinminutes.classEditorUpdateTemplateHint=Uložte výchozí hodnoty pole v šabloně třídy ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Aktualizace listu vzhledu třídy
 platform.appwithinminutes.classEditorUpdateSheetHint=Znovu vytvořit list vzhledu pro zobrazení a úpravy objektů této třídy ({0}).
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
-
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Tato třída má více listů vzhledu
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Třída má dvě pole se stejným jménem\: {0}
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Třída má dvě pole se stejným jménem: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Aktualizace výchozích hodnot
 platform.appwithinminutes.classEditorBindSheetSaveComment=Vytvořit vazbu na vzhled třídy
 platform.appwithinminutes.classEditorSheetSaveComment=Aktualizace vzhledu třídy
-### Missing: platform.appwithinminutes.classEditorTranslationsSaveComment=Update translations
-
+platform.appwithinminutes.classEditorTranslationsSaveComment=Update translations
 platform.appwithinminutes.classEditorStandardCategoryName=Standard
 platform.appwithinminutes.classEditorPickersCategoryName=Výběry
-### Missing: platform.appwithinminutes.classEditorDocumentCategoryName=Page
+platform.appwithinminutes.classEditorDocumentCategoryName=Page
 platform.appwithinminutes.classEditorAdvancedCategoryName=Pokročilý
-
 platform.appwithinminutes.classEditorDBListFieldName=Databázový seznam
 platform.appwithinminutes.classEditorGroupsFieldName=Skupina
 platform.appwithinminutes.classEditorUsersFieldName=Uživatel
@@ -123,18 +119,18 @@ platform.appwithinminutes.classEditorBooleanFieldName=Boolean
 platform.appwithinminutes.classEditorNumberFieldName=Číslo
 platform.appwithinminutes.classEditorTextAreaFieldName=Text dlouhý
 platform.appwithinminutes.classEditorStringFieldName=Text krátký
-### Missing: platform.appwithinminutes.classEditorContentFieldName=Content
-### Missing: platform.appwithinminutes.classEditorTitleFieldName=Title
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
-
+platform.appwithinminutes.classEditorContentFieldName=Content
+platform.appwithinminutes.classEditorTitleFieldName=Title
+platform.appwithinminutes.classEditorPageFieldName=Page
 platform.appwithinminutes.classEditorDeleteFieldLabel=Smazat
 platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurace
 platform.appwithinminutes.classEditorPreviewFieldLabel=Náhled
 platform.appwithinminutes.classEditorPreviewFieldHint=Ukrýt konfigurační panel a provést změny
 platform.appwithinminutes.classEditorMoveFieldLabel=Přesunout
 platform.appwithinminutes.classEditorMoveFieldHint=Přetáhněte myší pro změnu pořadí
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Výchozí hodnota
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -147,17 +143,19 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Hodnota
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Přidat
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Smazat
-
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
+appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
+appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
+appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Pole třídy
@@ -168,8 +166,8 @@ platform.appwithinminutes.liveTableEditorDocTitleColumnName=Nadpis stránky
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Nadpis stránky, která obsahuje položku aplikace
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Název stránky
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Název stránky, která obsahuje položku aplikace
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Poslední autor
 platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Uživatel, který naposledy upravil položku aplikace
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Tvůrce
@@ -186,16 +184,16 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=obrázky
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Speciální sloupec pro zobrazení obrázků přiložených ke stránce položky
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Speciální sloupec pro zobrazení avataru (obrázku uživatele). Funguje pouze pro tabulku spřaženou s třídou XWiki.XWikiUsers
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Popis stručně shrnuje co aplikace dělá a jaký druh údajů bude zpracovávat.
 platform.appwithinminutes.liveTableEditorColumnsHint=Vyberte sloupce, které chcete zahrnout do "živé" tabulky zobrazené na úvodní stránce aplikace.
 platform.appwithinminutes.liveTableEditorSaveComment=Aktualizace "živé" tabulky
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Přetáhněte myší pro změnu pořadí
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Smazat
 platform.appwithinminutes.liveTableEditorAddColumnHint=Přidat
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění? &lt;a href\=""&gt; Ano &lt;/ a&gt; / &lt;a href\=""&gt; Ne &lt;/ a&gt;
-### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
-### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění? &lt;a href=""&gt; Ano &lt;/ a&gt; / &lt;a href=""&gt; Ne &lt;/ a&gt;
+platform.appwithinminutes.liveTableEditorIcon=Icon
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
 ### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Položky
@@ -204,41 +202,45 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Smazat
 platform.appwithinminutes.appHomePageActionsHeading=Akce
 platform.appwithinminutes.appHomePageAddEntryLabel=Přidat
 platform.appwithinminutes.appHomePageAddEntryHint=Přidejte novou položku
-platform.appwithinminutes.appHomePageEntryNameLabel=Název položky\:
-### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
-### Missing: platform.appwithinminutes.appHomePageEditAppLabel=Edit application
-### Missing: platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
-### Missing: platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+platform.appwithinminutes.appHomePageEntryNameLabel=Název položky:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
+platform.appwithinminutes.appHomePageEditAppLabel=Edit application
+platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
+platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
+AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
-### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
+platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
+platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=New Name
+appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+appWithinMinutes.renameApp.location.label=New Location
+appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+appWithinMinutes.renameApp.parent.label=New Parent
+appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=Renaming application...
+appWithinMinutes.renameApp.done=Application renamed
+appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Třída aplikace
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Prostor dat aplikace
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Prostor
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Název prostoru, který obsahuje položku aplikace
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Celý název stránky
@@ -265,6 +267,7 @@ platform.appwithinminutes.wizardStep3Description=Přizpůsobte domovskou stránk
 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
-### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+appWithinMinutes.classEditor.title={0} Structure
+appWithinMinutes.templateProviderEditor.title={0} Entries
+</content>
 </xwikidoc>

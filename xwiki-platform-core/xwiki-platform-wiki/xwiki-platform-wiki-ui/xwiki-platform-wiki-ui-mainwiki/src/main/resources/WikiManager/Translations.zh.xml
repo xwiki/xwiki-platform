@@ -163,9 +163,6 @@ rendering.macro.wikis.description=List all Wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=工作区（旧版）
 rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "Wikis" 宏代替。
-
-## Browse
-platform.wiki.browse=浏览Wiki
 ### Missing: platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=描述
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=完成
 #######################################
 platform.wiki.delete.confirmation.yes=是的，请删除这个Wiki！
 platform.wiki.delete.confirmation.no=不，带我回去！
+
+## Browse
+platform.wiki.browse=浏览Wiki
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -37,17 +37,47 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Navn
 extension.repository.summary=Resume
 extension.repository.type=Type
-### Missing: extension.repository.category=Category
+extension.repository.category=Category
 extension.repository.authors=Forfattere
 extension.repository.doc.creationDate=Opretttet
 extension.repository.doc.date=Senest rettet
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.rating=Rating
+extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Udvidelsesdepot</content>
+admin.repository=Udvidelsesdepot
+
+## Support
+### Missing: repository.support.createsupporter=
+
+## Supporters
+### Missing: repository.supporter.sheet.description=
+### Missing: repository.supporter.sheet.noObject=
+### Missing: repository.supporter.sheet.createplan=
+### Missing: repository.supporter.sheet.plans=
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupporterClass_summary=
+### Missing: ExtensionCode.ExtensionSupporterClass_url=
+### Missing: ExtensionCode.ExtensionSupporterClass_email=
+### Missing: ExtensionCode.ExtensionSupporterClass_content=
+### Missing: ExtensionCode.ExtensionSupporterClass_active=
+
+## Support plans
+### Missing: repository.supportplan.sheet.description=
+### Missing: repository.supportplan.sheet.noObject=
+### Missing: repository.supportplan.sheet.supportedExtensions=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_url=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_content=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_active=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=
+</content>
 </xwikidoc>

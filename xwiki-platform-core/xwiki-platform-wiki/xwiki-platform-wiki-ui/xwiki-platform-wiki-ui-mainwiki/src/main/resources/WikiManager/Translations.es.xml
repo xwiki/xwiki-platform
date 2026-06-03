@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Mostrar todas las wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Espacios de trabajo ("Legacy", en desuso)
 rendering.macro.workspaces.description=Macro obsoleta que no debería utilizarse aquí por razones de compatibilidad. Por favor, utiliza la macro "wikis" en su lugar.
-
-## Browse
-platform.wiki.browse=Examinar wikis
 platform.wiki.browse.emptyvalue=N/D
 platform.wiki.browse.wikiprettyname=Nombre
 platform.wiki.browse.description=Descripción
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalizar
 #######################################
 platform.wiki.delete.confirmation.yes=Sí, por favor, ¡borra esta wiki!
 platform.wiki.delete.confirmation.no=No, ¡vuelve atrás!
+
+## Browse
+platform.wiki.browse=Examinar wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

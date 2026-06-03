@@ -48,6 +48,7 @@ annotations.annotated.loaderror=失败：
 annotations.annotated.loaderror.wrongresponse=服务器返回了错误格式的响应
 annotations.annotated.error.noannotatedelement=由于内容无效，注解无法载入。
 annotations.annotated.error.wrongsyntax=使用XWiki/1.0语法编写的页面中注解不可用。
+### Missing: annotations.annotated.highlight.toggle.hint=
 annotations.action.edit.text=[编辑]
 annotations.action.edit.tooltip=编辑注解
 annotations.action.edit.submit.text=更新

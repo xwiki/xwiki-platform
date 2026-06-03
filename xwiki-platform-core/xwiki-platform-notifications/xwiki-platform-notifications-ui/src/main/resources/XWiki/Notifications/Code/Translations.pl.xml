@@ -67,32 +67,12 @@ notifications.filters.description.minorEventAlertNotificationFilter=Ukryj powiad
 notifications.filters.name.minorEventEmailNotificationFilter=drugorzędne wydarzenie (email)
 notifications.filters.description.minorEventEmailNotificationFilter=Ukryj powiadomienia dotyczące drobnych zmian na stronach
 
-## Filter Types
-notifications.filters.type.inclusive=włącznie
-notifications.filters.type.exclusive=wyłączny
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Filtr powiadomień o zakresie
 notifications.filters.preferences.scopeNotificationFilter.page=tylko strona
 notifications.filters.preferences.scopeNotificationFilter.space=Strona i dziecko
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
-notifications.filters.preferences.allEvents=-
-
-notifications.filters.preferences.addPreference.filterType.inclusive=włącznie
-notifications.filters.preferences.addPreference.filterType.exclusive=Wyłączny
-notifications.filters.preferences.addPreference.notificationFormat.label=Format powiadomienia
-notifications.filters.preferences.addPreference.notificationFormat.hint=Do jakiego formatu powiadomienia powinien stosować filtr?
-notifications.filters.preferences.addPreference.eventType.label=Typ wydarzenia
-notifications.filters.preferences.addPreference.eventType.hint=Który typ zdarzenia powinien być kierowany przez filtr?
-notifications.filters.preferences.addPreference.location.label=Filtruj zakres
-notifications.filters.preferences.addPreference.location.hint=Która strona powinna być kierowana przez filtr?
-notifications.filters.preferences.delete.inProgress=Usuwam ...
-notifications.filters.preferences.delete.done=Usunięto preferencję filtra!
-notifications.filters.preferences.delete.error=Nie udało się usunąć preferencji filtra
-notifications.filters.preferences.setEnabled.inProgress=Zaoisywanie...
-notifications.filters.preferences.setEnabled.done=Filtr preferencji zapisany!
-notifications.filters.preferences.setEnabled.error=Nie udało się zapisać preferencji filtra
+### Missing: notifications.filters.preferences.scopeNotificationFilter.user=
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Aby oglądać te lokalizacje, musisz włączyć powiadomienia w ustawieniach
@@ -100,20 +80,50 @@ notifications.toggle.disabled.hint=Aby oglądać te lokalizacje, musisz włączy
 ## Notifications formats
 notifications.format.alert=Alarm
 notifications.format.email=Poczta
+notifications.filters.preferences.delete.inProgress=Usuwam ...
+notifications.filters.preferences.delete.done=Usunięto preferencję filtra!
+notifications.filters.preferences.delete.error=Nie udało się usunąć preferencji filtra
+notifications.filters.preferences.setEnabled.inProgress=Zaoisywanie...
+notifications.filters.preferences.setEnabled.done=Filtr preferencji zapisany!
+notifications.filters.preferences.setEnabled.error=Nie udało się zapisać preferencji filtra
+notifications.filters.preferences.allEvents=-
 
-## Filter preferences settings
-notifications.settings.filters.preferences.title=Filtry
-notifications.settings.filters.preferences.hint=Twórz filtry, aby precyzyjniej kontrolować, kiedy aktywne zdarzenia powinny wyzwalać powiadomienia.
-notifications.settings.filters.preferences.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać filtry powiadomień.
-
+## System Filter preferences settings
+### Missing: notifications.settings.filters.preferences.system.title=
+### Missing: notifications.settings.filters.preferences.system.hint=
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Nazwa
-notifications.settings.filters.preferences.table.filterType=Rodzaj filtra
-notifications.settings.filters.preferences.table.eventTypes=Wydarzenia
-notifications.settings.filters.preferences.table.notificationFormats=Formaty
-notifications.settings.filters.preferences.table.isEnabled=Jest włączony?
-notifications.settings.filters.preferences.table._actions=działania
+### Missing: notifications.settings.filters.preferences.system.table.name=
+### Missing: notifications.settings.filters.preferences.system.table.filterDescription=
+### Missing: notifications.settings.filters.preferences.system.table.filterType=
+### Missing: notifications.settings.filters.preferences.system.table.notificationFormats=
+### Missing: notifications.settings.filters.preferences.system.table.isEnabled=
 
+## Custom Filter preferences settings
+### Missing: notifications.settings.filters.preferences.custom.title=
+### Missing: notifications.settings.filters.preferences.custom.hint=
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=
+### Missing: notifications.settings.filters.preferences.custom.table.scope=
+### Missing: notifications.settings.filters.preferences.custom.table.location=
+### Missing: notifications.settings.filters.preferences.custom.table.filterType=
+### Missing: notifications.settings.filters.preferences.custom.table.eventTypes=
+### Missing: notifications.settings.filters.preferences.custom.table.notificationFormats=
+### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=
+### Missing: notifications.settings.filters.preferences.custom.table._actions=
+### Missing: notifications.filters.type.custom.inclusive=
+### Missing: notifications.filters.type.custom.exclusive=
+notifications.settings.addFilter=Dodaj filtr
+### Missing: notifications.settings.addFilter.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.location.label=
+### Missing: notifications.filters.preferences.custom.addFilter.location.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.type.label=
+### Missing: notifications.filters.preferences.custom.addFilter.type.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.filterType.inclusive=
+### Missing: notifications.filters.preferences.custom.addFilter.filterType.exclusive=
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.label=
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.label=
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=
 notifications.menu.header=Powiadomienia
 notifications.menu.header.settings=Ustawienia
 notifications.menu.clear=Wyczyść wszystko
@@ -135,7 +145,6 @@ notifications.settings.saving=Twoje ustawienia są zapisywane ...
 notifications.settings.saved=Zapisano!
 notifications.settings.savingfailed=Nie udało się zapisać ustawień
 notifications.settings.filters=Filtry ({0})
-notifications.settings.addFilter=Dodaj filtr
 notifications.settings.errorFilterWiki=Błąd: musisz wybrać wiki, a nie stronę
 notifications.settings.preferences=Preferencje
 notifications.settings.preferences.hint=Przechwytuj wydarzenia, które mają miejsce, i przesyłaj je strumieniowo lub pocztą e-mail.
@@ -143,6 +152,7 @@ notifications.settings.applications.title=Aplikacje
 notifications.settings.applications.hint=To jest lista aplikacji, które mogą wysyłać powiadomienia. Możesz włączyć lub wyłączyć dowolny z nich.
 notifications.settings.applications.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać ustawienia powiadomień.
 notifications.settings.applications.appName=Nazwa
+### Missing: notifications.settings.applications.table.dropdown.toggle.label=
 notifications.settings.events=Wydarzenia
 notifications.settings.watch.title=Obejrzane strony
 notifications.settings.watch.autowatchmode=Automatyczne oglądanie strony
@@ -157,7 +167,7 @@ notifications.preferences.scope.table.location=Lokalizacja
 notifications.preferences.scope.table.scopeFilterType=Rodzaj filtra
 notifications.preferences.scope.table._actions=działania
 notifications.email.title=Zdarzenia na wiki:
-### Missing: notifications.email.subject={0} event(s) on the wiki
+notifications.email.subject={0} event(s) on the wiki
 notifications.email.seeChanges=Zmiany: {0}
 notifications.email.linkDetails=Patrz szczegóły
 notifications.rss.feedLink=Kanał RSS
@@ -165,8 +175,8 @@ notifications.rss.feedLinkDescription=Kanał zdarzeń dla powiadomień
 notifications.rss.feedTitle=Powiadomienia Kanał RSS
 notifications.rss.feedDescription=Ten kanał RSS można dostosować na stronie swojego profilu.
 notifications.rss.seeChanges=Zmiany: {0}
-### Missing: notifications.rss.defaultTitleWithPage=New event on {0}
-### Missing: notifications.rss.defaultTitle=New event
+notifications.rss.defaultTitleWithPage=New event on {0}
+notifications.rss.defaultTitle=New event
 notifications.globalsettings.email=Powiadomienia e-mail
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Codziennie
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Cogodzinny
@@ -182,6 +192,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Za każd
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Za każdym razem, gdy dokonam ważnej modyfikacji
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Tylko wtedy, gdy utworzę nową stronę
 
+## Common notification settings errors
+### Missing: notifications.settings.error.userReferenceNotSupported=
+### Missing: notifications.settings.error.userReferenceAdminForbidden=
+### Missing: notifications.settings.error.badCSRF=
+### Missing: notifications.settings.badParameters=
+
 ## User profile
 notifications.userprofile.following=Następujący
 notifications.userprofile.notfollowing=Nie śledzić
@@ -196,7 +212,6 @@ rendering.macro.notificationsApplicationsPreferences.name=Powiadomienia Preferen
 rendering.macro.notificationsApplicationsPreferences.description=Wyświetl preferencje bieżącego użytkownika dotyczące aplikacji powiadomień.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cel
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cel makra (może to być „użytkownik” dla bieżącego użytkownika lub „wiki” dla bieżącej wiki)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Powiadomienia Preferencje automatycznego oglądania
 rendering.macro.notificationsAutoWatchPreferences.description=Wyświetl preferencje bieżącego użytkownika dotyczące automatycznie oglądanych stron.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cel
@@ -212,5 +227,92 @@ notifications.switches.tooltip.page=Obejrzyj tę stronę
 notifications.switches.tooltip.pageAndChildren=Obejrzyj tę stronę i jej dzieci
 notifications.switches.tooltip.space=Obejrzyj stronę nadrzędną i jej dzieci
 notifications.switches.tooltip.wiki=Obejrzyj tę wiki
-notifications.switches.changeStatusError=Nie udało się zmienić statusu powiadomień.</content>
+notifications.switches.changeStatusError=Nie udało się zmienić statusu powiadomień.
+
+## Watch button and modal
+
+### Missing: notifications.watch.button.title=
+### Missing: notifications.watch.button.status.notset=
+### Missing: notifications.watch.button.status.followed=
+### Missing: notifications.watch.button.status.blocked=
+### Missing: notifications.watch.button.status.custom=
+### Missing: notifications.watch.modal.title=
+### Missing: notifications.watch.modal.description.options=
+### Missing: notifications.watch.modal.description.ancestoroption=
+### Missing: notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.NOT_SET=
+### Missing: notifications.watch.modal.description.NOT_SET=
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=
+### Missing: notifications.watch.modal.title.CUSTOM=
+### Missing: notifications.watch.modal.description.CUSTOM=
+### Missing: notifications.watch.modal.option.hint.toggle=
+### Missing: notifications.watch.modal.option.watchpage.title=
+### Missing: notifications.watch.modal.option.watchpage.hint=
+### Missing: notifications.watch.modal.option.watchspace.title=
+### Missing: notifications.watch.modal.option.watchspace.hint=
+### Missing: notifications.watch.modal.option.watchwiki.title=
+### Missing: notifications.watch.modal.option.watchwiki.hint=
+### Missing: notifications.watch.modal.option.blockpage.title=
+### Missing: notifications.watch.modal.option.blockpage.hint=
+### Missing: notifications.watch.modal.option.blockspace.title=
+### Missing: notifications.watch.modal.option.blockspace.hint=
+### Missing: notifications.watch.modal.option.unwatchpage.title=
+### Missing: notifications.watch.modal.option.unwatchpage.hint=
+### Missing: notifications.watch.modal.option.unwatchspace.title=
+### Missing: notifications.watch.modal.option.unwatchspace.hint=
+### Missing: notifications.watch.modal.option.unwatchwiki.title=
+### Missing: notifications.watch.modal.option.unwatchwiki.hint=
+### Missing: notifications.watch.modal.option.unblockpage.title=
+### Missing: notifications.watch.modal.option.unblockpage.hint=
+### Missing: notifications.watch.modal.option.unblockspace.title=
+### Missing: notifications.watch.modal.option.unblockspace.hint=
+### Missing: notifications.watch.modal.option.unblockwiki.title=
+### Missing: notifications.watch.modal.option.unblockwiki.hint=
+### Missing: notifications.watch.modal.close=
+### Missing: notifications.watch.modal.savechanges=
+### Missing: notifications.watch.modal.gotosettings=
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filtry
+notifications.settings.filters.preferences.hint=Twórz filtry, aby precyzyjniej kontrolować, kiedy aktywne zdarzenia powinny wyzwalać powiadomienia.
+notifications.settings.filters.preferences.forGuest=Zaloguj się lub zarejestruj, aby obsługiwać filtry powiadomień.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Nazwa
+notifications.settings.filters.preferences.table.filterType=Rodzaj filtra
+notifications.settings.filters.preferences.table.eventTypes=Wydarzenia
+notifications.settings.filters.preferences.table.notificationFormats=Formaty
+notifications.settings.filters.preferences.table.isEnabled=Jest włączony?
+notifications.settings.filters.preferences.table._actions=działania
+notifications.filters.preferences.addPreference.filterType.inclusive=włącznie
+notifications.filters.preferences.addPreference.filterType.exclusive=Wyłączny
+notifications.filters.preferences.addPreference.notificationFormat.label=Format powiadomienia
+notifications.filters.preferences.addPreference.notificationFormat.hint=Do jakiego formatu powiadomienia powinien stosować filtr?
+notifications.filters.preferences.addPreference.eventType.label=Typ wydarzenia
+notifications.filters.preferences.addPreference.eventType.hint=Który typ zdarzenia powinien być kierowany przez filtr?
+notifications.filters.preferences.addPreference.location.label=Filtruj zakres
+notifications.filters.preferences.addPreference.location.hint=Która strona powinna być kierowana przez filtr?
+
+## Filter Types
+notifications.filters.type.inclusive=włącznie
+notifications.filters.type.exclusive=wyłączny
+
+## until 16.2.0RC1
+### Missing: notifications.settings.filters.preferences.custom.table.description=
+### Missing: notifications.settings.filters.preferences.system.table.description=
+### Missing: notifications.settings.filters.preferences.custom.table.name=
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

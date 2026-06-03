@@ -62,5 +62,6 @@ tour.homepageTour.header.contentA=Du kan søke etter innhold, se etter endringer
 tour.homepageTour.header.contentB=Knappen {0} åpner en skuff som inneholder wiki-relaterte handlinger som Administrasjon og oversikter.
 tour.homepageTour.tourComplete.title=Rundreise fullført
 tour.homepageTour.tourComplete.contentA=Dette fullfører rundreisen din på XWiki-grensesnittet og grunnleggende funksjoner.
-tour.homepageTour.tourComplete.contentB=For mer informasjon om hver funksjon, gå til {0}dokumentasjonen{1}.</content>
+tour.homepageTour.tourComplete.contentB=For mer informasjon om hver funksjon, gå til {0}dokumentasjonen{1}.
+</content>
 </xwikidoc>

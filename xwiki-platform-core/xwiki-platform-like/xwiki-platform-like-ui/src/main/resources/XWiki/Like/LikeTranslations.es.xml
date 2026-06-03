@@ -49,6 +49,7 @@ like.unlike.error=Error al intentar dar "ya no me gusta" a la página.
 like.userprofile.menu=Páginas que me gustan
 ### Missing: like.toggle.hint.like=Like this page.
 ### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
+### Missing: like.toggle.hint.like.noright=
 ### Missing: like.likers.link.zero={0} Likes
 ### Missing: like.likers.link.one={0} Like
 ### Missing: like.likers.link.many={0} Likes

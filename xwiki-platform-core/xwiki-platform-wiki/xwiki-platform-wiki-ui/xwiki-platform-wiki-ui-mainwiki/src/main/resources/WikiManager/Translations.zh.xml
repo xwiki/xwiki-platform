@@ -163,7 +163,7 @@ rendering.macro.wikis.description=List all Wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=工作区（旧版）
 rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "Wikis" 宏代替。
-### Missing: platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=描述
 platform.wiki.browse.owner=所有者

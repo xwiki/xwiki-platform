@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=Nie masz praw by edytować kody panelu
 platform.panels.applications.ajax.error=Nie udało się zapisać twojej zmiany.
 admin.panels.applications=Panel Aplikacji
 admin.panels.applications.description=Zarządź jakie aplikacje są wyświetlane w Panelu Aplikacji.
-
 admin.panels.navigation=Panel Nawigacyjny
 admin.panels.navigation.description=Zarządź jakie strony są wyświetlane w Panelu Nawigacyjnym.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Wyklucz strony rozszerzeń najwyższego poziomu
@@ -57,12 +56,13 @@ PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Ten
 PanelsCode.NavigationConfigurationClass_exclusions=wykluczenie
 PanelsCode.NavigationConfigurationClass_exclusions.hint=lista stron do wykluczenia z drzewa nawigacji.
 PanelsCode.NavigationConfigurationClass_inclusions=zawarcie
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
+PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+platform.panels.navigation.configuration.excludedPages=Excluded Pages
+platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+platform.panels.navigation.configuration.excludedPages.empty=None
+platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
+platform.panels.navigation.configuration.otherPages=Other Pages
+platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+</content>
 </xwikidoc>

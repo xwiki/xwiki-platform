@@ -50,5 +50,34 @@ extension.repository.installedCount=Instalações
 
 ## Administration UI
 admin.repository=Repositório da extensão
+
+## Support
+### Missing: repository.support.createsupporter=
+
+## Supporters
+### Missing: repository.supporter.sheet.description=
+### Missing: repository.supporter.sheet.noObject=
+### Missing: repository.supporter.sheet.createplan=
+### Missing: repository.supporter.sheet.plans=
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupporterClass_summary=
+### Missing: ExtensionCode.ExtensionSupporterClass_url=
+### Missing: ExtensionCode.ExtensionSupporterClass_email=
+### Missing: ExtensionCode.ExtensionSupporterClass_content=
+### Missing: ExtensionCode.ExtensionSupporterClass_active=
+
+## Support plans
+### Missing: repository.supportplan.sheet.description=
+### Missing: repository.supportplan.sheet.noObject=
+### Missing: repository.supportplan.sheet.supportedExtensions=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_url=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_content=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_active=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=
 </content>
 </xwikidoc>

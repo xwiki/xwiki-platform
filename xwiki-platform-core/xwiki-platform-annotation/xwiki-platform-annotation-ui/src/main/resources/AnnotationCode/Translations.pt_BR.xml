@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>annotations.title=Anotações
 annotations.menu.loading=Carregando as configurações de anotações
-annotations.menu.loaderror=Falha\:
+annotations.menu.loaderror=Falha:
 annotations.tab.info.noannotations=Nenhuma anotação para esse documento
 annotations.settings.display=Mostrar anotações
 annotations.settings.error.wrongsyntax=As anotações não estão disponíveis para páginas escritas na sintaxe XWiki/1.0.

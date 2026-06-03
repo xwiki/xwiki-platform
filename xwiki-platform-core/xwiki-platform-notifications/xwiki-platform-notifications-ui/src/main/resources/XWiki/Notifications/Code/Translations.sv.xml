@@ -259,6 +259,7 @@ notifications.switches.changeStatusError=Misslyckades att ändra status på noti
 ### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
 ### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
 ### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.hint.toggle=Toggle details about this option
 ### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
 ### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
 ### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children

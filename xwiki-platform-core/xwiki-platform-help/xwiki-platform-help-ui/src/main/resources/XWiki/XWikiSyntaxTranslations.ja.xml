@@ -43,5 +43,6 @@
 help.syntaxtitle=XWikiシンタックス {0}
 help.syntaxall=全て
 help.changesyntax=シンタックスを変更
-help.choose_syntax=シンタックスを選択</content>
+help.choose_syntax=シンタックスを選択
+</content>
 </xwikidoc>

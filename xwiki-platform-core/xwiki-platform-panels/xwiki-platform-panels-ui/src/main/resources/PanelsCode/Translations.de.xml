@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=Sie haben nicht das Recht, PanelsCode.
 platform.panels.applications.ajax.error=Fehler beim Speichern Ihrer Änderungen.
 admin.panels.applications=Anwendungspanel
 admin.panels.applications.description=Entscheiden Sie, welche Anwendungen im Anwendungspanel angezeigt werden.
-
 admin.panels.navigation=Navigationspanel
 admin.panels.navigation.description=Entscheiden Sie, welche Seiten im Navigationspanel angezeigt werden.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Startseiten von Erweiterungen ausblenden
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=Keine
 platform.panels.navigation.configuration.topLevelExtensionPages=Startseiten von Erweiterungen
 platform.panels.navigation.configuration.topLevelApplicationPages=Startseiten von Anwendungen
 platform.panels.navigation.configuration.otherPages=Andere Seiten
-platform.panels.navigation.configuration.saveComment=Die Konfiguration des Navigationspanels wurde über die Administration aktualisiert</content>
+platform.panels.navigation.configuration.saveComment=Die Konfiguration des Navigationspanels wurde über die Administration aktualisiert
+</content>
 </xwikidoc>

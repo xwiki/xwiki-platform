@@ -44,5 +44,6 @@ administration.templateProvider.creationRestrictions=Ограничения со
 administration.templateProvider.creationRestrictions.hint=Список мест (включая дочерние), где этот шаблон может использоваться для создания страниц
 administration.templateProvider.creationRestrictions.none=Этот шаблон может создавать страницы везде
 administration.templateProvider.creationRestrictionsAreSuggestions=Ограничения создания как рекомендации
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Позволяет пользователю выбрать любое место для создания страницы с этим шаблоном, при выборе шаблона из списка первое ограничение используется в качестве предустановленного расположения по умолчанию.</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Позволяет пользователю выбрать любое место для создания страницы с этим шаблоном, при выборе шаблона из списка первое ограничение используется в качестве предустановленного расположения по умолчанию.
+</content>
 </xwikidoc>

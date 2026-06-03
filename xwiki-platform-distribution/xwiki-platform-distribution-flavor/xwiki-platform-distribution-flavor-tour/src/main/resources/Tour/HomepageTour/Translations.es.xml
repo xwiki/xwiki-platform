@@ -62,5 +62,6 @@ tour.homepageTour.header.contentA=Puedes buscar contenido, seguir los cambios en
 tour.homepageTour.header.contentB=El botón {0} abre un cajón que contiene acciones relacionadas con la wiki como Administración e Índices.
 tour.homepageTour.tourComplete.title=Tour completado
 tour.homepageTour.tourComplete.contentA=Esto completa tu recorrido por la interfaz y funcionalidades básicas de XWiki.
-tour.homepageTour.tourComplete.contentB=Para obtener más detalles de cada funcionalidad, accede a la {0}documentación{1}.</content>
+tour.homepageTour.tourComplete.contentB=Para obtener más detalles de cada funcionalidad, accede a la {0}documentación{1}.
+</content>
 </xwikidoc>

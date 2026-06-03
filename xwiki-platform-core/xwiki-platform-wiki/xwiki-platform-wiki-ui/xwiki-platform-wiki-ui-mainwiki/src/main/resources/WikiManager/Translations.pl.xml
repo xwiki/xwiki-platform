@@ -124,9 +124,9 @@ platform.wiki.users.leave.confirmation.no=Nie
 platform.wiki.users.leave.success=Użytkownik {0}{1}{2} pomyślnie opuścił wiki {3}{4}{5}.
 platform.wiki.users.join.title=Dołącz do wiki
 platform.wiki.users.leave.title=Opuść wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.empty=Leave Wiki
 platform.wiki.users.delete.title=Usuń wiki "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
+platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Wiadomość zwrotna do wysłania, widoczna przez administratora wiki, w której możesz zmotywować swoją decyzję.
 platform.wiki.users.join.request.hint=Aby dołączyć do wiki {0} {1} {2}, musisz najpierw wysłać prośbę o dołączenie. Po wykonaniu tej czynności administrator wiki przejrzy i rozpatrzy Twoją prośbę.
 platform.wiki.users.join.request.message.hint=Wiadomość do wysłania, widoczna przez administratora Wiki, w której możesz zmotywować tę prośbę o dołączenie.
@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Lista wiki
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Obszary robocze (starsze)
 rendering.macro.workspaces.description=Nieaktualne makro, którego nie należy tutaj używać ze względu na kompatybilność. Zamiast tego użyj makro "wiki".
-
-## Browse
-platform.wiki.browse=Przeglądaj wiki
 platform.wiki.browse.emptyvalue=N/D
 platform.wiki.browse.wikiprettyname=Nazwa
 platform.wiki.browse.description=Opis
@@ -226,7 +223,6 @@ platform.wiki.create.wizard.step.dw=Po kliknięciu na "utwórz" wiki zostanie ut
 platform.wiki.create.wizard.step.previous=Poprzedni krok
 platform.wiki.create.wizard.step.next=Przejdź do następnego kroku
 platform.wiki.create.wizard.step.create=Utwórz
-
 platform.wiki.create.wizard.step.creation=Tworzenie Wiki
 platform.wiki.create.wizard.step.creation.wait=Zaczekaj aż wiki zostanie utworzone.
 platform.wiki.create.wizard.step.creation.complete=Wiki {0} zostało pomyślnie utworzone. Może się już zalogować.
@@ -302,6 +298,10 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalizuj
 platform.wiki.delete.confirmation.yes=Tak
 platform.wiki.delete.confirmation.no=Nie
 
+## Browse
+platform.wiki.browse=Przeglądaj wiki
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

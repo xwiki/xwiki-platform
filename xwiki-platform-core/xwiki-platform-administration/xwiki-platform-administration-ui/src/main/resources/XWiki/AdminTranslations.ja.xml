@@ -44,7 +44,7 @@ administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=ページの管理：{0}
 administration.sectionTitle.wiki=ウィキの管理：{0}
 administration.sectionTitle.global=共通設定：{0}
-### Missing: administration.menu.label=Administration sections.
+administration.menu.label=Administration sections.
 administration.menu.search.hint=検索…
 administration.menu.search.noResults=結果がありません。
 
@@ -143,9 +143,9 @@ admin.usersgroups.extensionrights=拡張機能の権限
 ### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
-### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Other Category
 admin.other=その他
@@ -158,8 +158,8 @@ admin.social=ソーシャル
 admin.social.description=ソーシャル機能を設定。
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=セクションに表示

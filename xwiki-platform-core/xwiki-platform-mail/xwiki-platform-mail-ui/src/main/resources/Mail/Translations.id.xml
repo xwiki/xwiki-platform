@@ -74,7 +74,10 @@ Mail.GeneralMailConfigClass_obfuscate.hint=Ini hanya memengaruhi alamat email ya
 ### Missing: Mail.SendMailStatus_livetable.error=Error
 ### Missing: Mail.SendMailStatus_livetable.actions=Actions
 ### Missing: Mail.SendMailStatus_livetable.resend=Resend
+### Missing: Mail.SendMailStatus_livetable.delete=
 ### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
+### Missing: mailSender.admin.resendFailure=Failed to resend mail. Click for more details.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
 </content>
 </xwikidoc>

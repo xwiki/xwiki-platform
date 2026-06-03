@@ -39,8 +39,19 @@
   <content>office.createForm.type.name=Side fra Office
 office.createForm.type.description=Importer Office-dokumenter til wikisider
 office.form.error.noDocument=Du må bruke {0}opprette handling{1} for å importere et Office-dokument.
-office.form.append.hint=Dokumentet finnes allerede! Legg resultatet til den eksisterende wikisiden
-
+### Missing: office.import.document.hint=
+### Missing: office.import.target.hint=
+### Missing: office.import.overwriteContent=
+### Missing: office.import.overwriteContent.hint=
+### Missing: office.import.overwriteContent.confirmationMessage=
+### Missing: office.import.overwriteContent.confirmationAction=
+### Missing: office.import.headingLevelsToSplit.hint=
+### Missing: office.import.childPagesNaming.hint=
+### Missing: office.import.terminalChildPages=
+### Missing: office.import.terminalChildPages.hint=
+### Missing: office.import.inProgress=
+### Missing: office.import.done=
+### Missing: office.import.failed=
 office.config.serverType.hint=Office-servertypen. Den kan styres internt (lokalt) eller eksternt (eksternt).
 office.config.serverPort.hint=Portnummeret som brukes til å koble til Office-serverforekomsten
 office.config.autoStart.hint=Spesifiser om Office-serveren skal startes / kobles automatisk ved XWiki-oppstart
@@ -48,5 +59,14 @@ office.config.serverPath.hint=Stien til Office-installasjonen
 office.config.serverState.connected=Koblet til
 office.config.serverState.notConnected=Ikke tilkoblet
 office.config.serverState.confError=Ugyldig konfigurasjon
-office.config.serverState.error=Feil</content>
+office.config.serverState.error=Feil
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Dokumentet finnes allerede! Legg resultatet til den eksisterende wikisiden
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -19,7 +19,7 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { expect, test } from "@playwright/experimental-ct-react";
-import type { BlockOfType, BlockType } from "../blocknote";
+import type { BlockOfType, BlockType } from "../../blocknote";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 

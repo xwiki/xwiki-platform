@@ -1,5 +1,5 @@
 {
   "extends": "@xwiki/platform-tool-tsconfig",
-  "include": ["*.tsx", "*.ts"],
+  "include": ["**/*.tsx", "**/*.ts"],
   "exclude": []
 }

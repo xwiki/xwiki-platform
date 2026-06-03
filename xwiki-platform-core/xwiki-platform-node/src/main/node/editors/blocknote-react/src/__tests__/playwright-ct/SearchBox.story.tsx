@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { depsContainerMock } from "./depsContainer.mock";
-import { SearchBox } from "../components/SearchBox";
-import { DepsContainerContext } from "../contexts";
+import { SearchBox } from "../../components/SearchBox";
+import { DepsContainerContext } from "../../contexts";
 import { MantineProvider } from "@mantine/core";
 import { useMemo } from "react";
 

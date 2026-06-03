@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { depsContainerMock } from "./depsContainer.mock";
-import { BlockNoteViewWrapper } from "../components/BlockNoteViewWrapper";
+import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
+import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
 import type { BlockNoteViewWrapperProps } from "../components/BlockNoteViewWrapper";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {

@@ -40,5 +40,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>application.index.title=Перелік додатків
-application.index.drawer=Перелік додатків</content>
+application.index.drawer=Перелік додатків
+</content>
 </xwikidoc>

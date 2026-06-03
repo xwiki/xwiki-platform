@@ -62,7 +62,7 @@ platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Du har tilmeldt dig d
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Din tilmelding til wiki "{0}" er modtaget.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Din tilmelding til wiki "{0}" er blevet afslået.
 platform.wiki.currentwiki.candidateHandledSaveComment=Behandlet kandidat {0} ({1}]
-platform.wiki.currentwiki.candidateHandledComment=Bemærkning\:
+platform.wiki.currentwiki.candidateHandledComment=Bemærkning:
 platform.wiki.currentwiki.candidateAcceptedSuccess=Anmodning modtaget.
 platform.wiki.currentwiki.candidateRejectedSuccess=Anmodning afvist.
 platform.wiki.currentwiki.inviteUserAlreadyMember={0} er allerede medlem i wikien.
@@ -98,11 +98,11 @@ platform.wiki.currentwiki.invite.username.label=Brugernavn
 platform.wiki.currentwiki.invite.message.label=Besked
 platform.wiki.currentwiki.invite.button.label=Invitér
 platform.wiki.currentwiki.candidates.label=Kandidater
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Type\:
-platform.wiki.currentwiki.candidates.reviewer.label=Administrator\:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Besked fra Administrator\:
-platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privat bemærkning\:
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Type:
+platform.wiki.currentwiki.candidates.reviewer.label=Administrator:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Besked fra Administrator:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privat bemærkning:
 platform.wiki.currentwiki.candidates.accept.label=Godkend
 platform.wiki.currentwiki.candidates.reject.label=Afvis
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Afvis invitation
@@ -119,19 +119,20 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Wikiens officielle navn
 platform.wiki.currentwiki.prop.description.hint=En kort beskrivelse af wikien og dens formål.
 platform.wiki.currentwiki.prop.owner.hint=En bruger som har alle rettigheder over wikien.
 platform.wiki.currentwiki.prop.membershipType.hint=Hvordan en bruger kan tilmelde sig denne wiki.
-platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne URL''er starte med {0}https\:~/~/{1}.
+platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne URL''er starte med {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Navn på bruger, der skal inviteres til wikien.
 platform.wiki.currentwiki.invite.message.hint=Besked til brugeren.
 platform.wiki.currentwiki.candidates.hint=Brugere som har anmodet om eller er inviteret til medlemskab i wikien.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Håndter indstillinger, såsom wiki navn, beskrivelse og medlemsskaber.
-admin.xwiki.workspaceusers.description=Håndter medlemskaber\: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
+admin.xwiki.workspaceusers.description=Håndter medlemskaber: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
 admin.xwiki.usersconfiguration.title=Konfiguration
 admin.xwiki.members.title=Nuværende medlemmer
-### Missing: admin.xwiki.users.title=All Users
-    
+admin.xwiki.users.title=All Users
+
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home</content>
+platform.wiki.drawer.homeWiki=Home
+</content>
 </xwikidoc>

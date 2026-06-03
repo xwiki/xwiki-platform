@@ -40,16 +40,15 @@
 XWiki.UserDirectoryPreferencesClass_columns_hint=Liste med kolonner, som tilsvarer egenskapene til brukerklassen, som skal vises i brukerkatalogen
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Skjul deaktiverte brukerprofiler
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Ekskluder brukere som har profilen deaktivert fra brukerkatalogen
-
 userdirectory.userScopeFilter=Brukertype:
 userdirectory.userScopeFilter.hint=Velg kategorien av brukere du vil vise.
 userdirectory.userScopeFilter.local=Lokale brukere
 userdirectory.userScopeFilter.global=Globale brukere som er medlemmer av denne wikien
 userdirectory.configuration.title=Innstillinger
 userdirectory.configuration.columns.editHint=Klikk for å velge kolonner
-
 platform.userdirectory.customizeNotAllowed=Du har ikke tilgang til å tilpasse denne brukerkatalogen.
 platform.userdirectory.configTitle=Brukerkatalogkonfigurasjon
 platform.userdirectory.configSheetTitle=Brukerkatalogkonfigurasjonsark
-platform.userdirectory.configSheetApplyOnConfiguration=Dette arket må brukes på brukerkatalogkonfigurasjonsdokumentet.</content>
+platform.userdirectory.configSheetApplyOnConfiguration=Dette arket må brukes på brukerkatalogkonfigurasjonsdokumentet.
+</content>
 </xwikidoc>

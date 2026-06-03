@@ -39,14 +39,34 @@
   <content>office.createForm.type.name=Stranica iz Officea
 office.createForm.type.description=Uvezite Office dokumente u wiki stranice
 office.form.error.noDocument=Morate upotrijebiti {0}akciju izrade{1} za uvesti Office dokument.
-office.form.append.hint=Dokument već postoji\! Dodajte rezultat postojećoj wiki stranici.
-
+### Missing: office.import.document.hint=
+### Missing: office.import.target.hint=
+### Missing: office.import.overwriteContent=
+### Missing: office.import.overwriteContent.hint=
+### Missing: office.import.overwriteContent.confirmationMessage=
+### Missing: office.import.overwriteContent.confirmationAction=
+### Missing: office.import.headingLevelsToSplit.hint=
+### Missing: office.import.childPagesNaming.hint=
+### Missing: office.import.terminalChildPages=
+### Missing: office.import.terminalChildPages.hint=
+### Missing: office.import.inProgress=
+### Missing: office.import.done=
+### Missing: office.import.failed=
 office.config.serverType.hint=Tip Office poslužitelja. Može biti interno upravljani (lokalni) ili vanjski (udaljeni).
 office.config.serverPort.hint=Broj priključka za spajanje na instancu Office poslužitelja
 office.config.autoStart.hint=Naznačite bi li Office poslužitelj trebao biti pokrenut / automatski povezan pri pokretanju XWikija
 office.config.serverPath.hint=Putanja prema Office instalaciji
-### Missing: office.config.serverState.connected=Connected
-### Missing: office.config.serverState.notConnected=Not Connected
-### Missing: office.config.serverState.confError=Invalid Configuration
-### Missing: office.config.serverState.error=Error</content>
+office.config.serverState.connected=Connected
+office.config.serverState.notConnected=Not Connected
+office.config.serverState.confError=Invalid Configuration
+office.config.serverState.error=Error
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Dokument već postoji! Dodajte rezultat postojećoj wiki stranici.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

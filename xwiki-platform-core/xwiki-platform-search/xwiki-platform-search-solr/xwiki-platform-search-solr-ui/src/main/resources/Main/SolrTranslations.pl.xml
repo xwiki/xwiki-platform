@@ -168,7 +168,7 @@ solr.uix.attachmentdoesnotexist.title=Czy szukasz zamiast tego jednego z następ
 #@deprecatedstart
 
 ## until 7.2M3
-### Missing: solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+### Missing: solr.result.location=Located in {0} » {1} » {2}
 
 ## until 7.2RC1
 ### Missing: solr.field.space=Location

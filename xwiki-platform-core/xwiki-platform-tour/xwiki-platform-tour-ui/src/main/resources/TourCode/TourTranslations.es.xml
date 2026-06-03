@@ -62,6 +62,7 @@ tour.livetable.targetClass=Clase destino
 tour.popover.previous=« Ant
 tour.popover.next=Sig »
 tour.popover.end=Fin del tour
+### Missing: tour.popover.quit=
 tour.popover.show=Mostrar tour
 tour.popover.show.hint=Puedes volver a ver el tour cuando lo desees, clicando en este botón
 
@@ -75,6 +76,7 @@ TourCode.StepClass_placement=Colocación
 TourCode.StepClass_targetPage=Página destino
 TourCode.StepClass_action=Acción destino
 TourCode.StepClass_queryString=Cadena de consulta
+### Missing: TourCode.StepClass_reflex=
 tour.steps=Pasos
 tour.steps.new_step=Paso nuevo
 tour.steps.add_step=Añadir paso
@@ -95,5 +97,6 @@ tour.upgrade.successNothing=¡No tienes nada que actualizar!
 
 # Template
 tour.template.name=Tour
-tour.template.description=Tour paso a paso</content>
+tour.template.description=Tour paso a paso
+</content>
 </xwikidoc>

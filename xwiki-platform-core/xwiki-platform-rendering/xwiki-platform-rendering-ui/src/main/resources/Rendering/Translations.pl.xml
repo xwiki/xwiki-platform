@@ -39,5 +39,6 @@
   <content>admin.syntaxes=Składnie
 admin.syntaxes.description=Wybierz domyślną stronę składni i skonfiguruj dostępne znaczniki składni.
 Rendering.RenderingConfigClass_disabledSyntaxes=wyłączone składnie
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista znaczników składni, w których stron nie można zapisać</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista znaczników składni, w których stron nie można zapisać
+</content>
 </xwikidoc>

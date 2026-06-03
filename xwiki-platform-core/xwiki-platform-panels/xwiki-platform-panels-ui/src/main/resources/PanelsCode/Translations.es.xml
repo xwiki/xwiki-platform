@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=No tiene derecho a editar PanelsCode.A
 platform.panels.applications.ajax.error=Error guardando sus cambio(s).
 admin.panels.applications=Panel de aplicaciones
 admin.panels.applications.description=Administre qué aplicaciones se muestran en el Panel de aplicaciones.
-
 admin.panels.navigation=Panel de navegación
 admin.panels.navigation.description=Administre qué páginas se muestran en el Panel de navegación.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Excluir páginas de extensión de nivel superior
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=Ninguno
 platform.panels.navigation.configuration.topLevelExtensionPages=Páginas de extensión de nivel superior
 platform.panels.navigation.configuration.topLevelApplicationPages=Páginas de aplicación de nivel superior
 platform.panels.navigation.configuration.otherPages=Otras páginas
-platform.panels.navigation.configuration.saveComment=Actualizada la configuración del Panel de Navegación desde la Administración</content>
+platform.panels.navigation.configuration.saveComment=Actualizada la configuración del Panel de Navegación desde la Administración
+</content>
 </xwikidoc>

@@ -38,7 +38,6 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=Forhåndsvisning med:
 platform.icon.picker.loading=Laster
-
 rendering.macro.iconPicker.name=Ikonvelger
 rendering.macro.iconPicker.description=Velg et ikon i XWiki-ikonsettet.
 rendering.macro.iconPicker.parameter.id.name=Id
@@ -46,5 +45,6 @@ rendering.macro.iconPicker.parameter.id.description=DOM-ID for inndatafeltet vel
 rendering.macro.iconPicker.parameter.class.name=Klasse
 rendering.macro.iconPicker.parameter.class.description=CSS-klasse med inndatafelter velgeren skal gjelde for
 rendering.macro.iconPicker.parameter.prefix.name=Prefiks
-rendering.macro.iconPicker.parameter.prefix.description=Prefiks som legges til før navnet på ikonet i inndatafeltet (standard: "image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=Prefiks som legges til før navnet på ikonet i inndatafeltet (standard: "image:icon:")
+</content>
 </xwikidoc>

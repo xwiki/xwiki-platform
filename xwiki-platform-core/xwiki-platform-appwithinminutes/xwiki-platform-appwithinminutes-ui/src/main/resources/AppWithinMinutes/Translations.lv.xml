@@ -41,7 +41,7 @@ platform.appwithinminutes.homePageTitle=Lietotne dažās minūtēs
 platform.appwithinminutes.description=Balstoties uz Xwiki strukturēto datu pārvaldības sistēmu, dažu minūšu laikā varat izveidot savu tīmekļa lietotni.
 platform.appwithinminutes.createAppButtonLabel=Izveidot lietotni
 platform.appwithinminutes.appsLiveTableHeading=Lietotnes
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
+platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Autors
 platform.appwithinminutes.appsLiveTable.doc.date=Atjaunots
 platform.appwithinminutes.appsLiveTable._actions=Darbības
@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Lūdzu ievadiet lietotnes nosaukumu.
 platform.appwithinminutes.classEditorPaletteTitle=Lauku palete
 platform.appwithinminutes.classEditorPaletteHint=Velciet un nometiet laukus, lai izveidotu savu formu.
 platform.appwithinminutes.classEditorCanvasHint=Velciet laukus no paletes uz šo lauku.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Atjaunot klases veidni
 platform.appwithinminutes.classEditorUpdateTemplateHint=Saglabāt noklusētās vērtības klases veidnē ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Atjaunot klases lapu
 platform.appwithinminutes.classEditorUpdateSheetHint=Pārizveidot šīs klases {0} attēlojuma un mainīšanas lapu.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Atjaunot klases tulkojumu paku
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Atjauno lauku iezīmju un sarakstu tulkojumus ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Šai klasei ir vairākas izkājlapas.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasei ir divi lauki ar vienādu nosaukumu: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Atjaunot noklusētās vērtības
 platform.appwithinminutes.classEditorBindSheetSaveComment=Klasei piesaistītā lapa
 platform.appwithinminutes.classEditorSheetSaveComment=Atjaunot klases lapu
 platform.appwithinminutes.classEditorTranslationsSaveComment=Atjaunot tulkojumus
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standarta
 platform.appwithinminutes.classEditorPickersCategoryName=Atlasītāji
 platform.appwithinminutes.classEditorDocumentCategoryName=Dokuments
 platform.appwithinminutes.classEditorAdvancedCategoryName=Papildus
-
 platform.appwithinminutes.classEditorDBListFieldName=Datu bāzes saraksts
 platform.appwithinminutes.classEditorGroupsFieldName=Grupa
 platform.appwithinminutes.classEditorUsersFieldName=Lietotājs
@@ -126,15 +122,15 @@ platform.appwithinminutes.classEditorStringFieldName=Īss teksts
 platform.appwithinminutes.classEditorContentFieldName=Saturs
 platform.appwithinminutes.classEditorTitleFieldName=Virsraksts
 platform.appwithinminutes.classEditorPageFieldName=Lapa
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Dzēst
 platform.appwithinminutes.classEditorConfigureFieldLabel=Iestatīt
 platform.appwithinminutes.classEditorPreviewFieldLabel=Priekšskats
 platform.appwithinminutes.classEditorPreviewFieldHint=Aizvērt iestatījumu paneli un pielietot izmaiņas
 platform.appwithinminutes.classEditorMoveFieldLabel=Pārvietot
 platform.appwithinminutes.classEditorMoveFieldHint=Velciet un nometiet, lai mainītu kārtību
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Noklusētā vērtība
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Labi
@@ -147,9 +143,10 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Vērtība
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Pievienot
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Dzēst
-
 appWithinMinutes.templateProviderEditor.hint=Lietotnes ieraksti ir viki lapas, kuras satur strukturētus datus.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=Lietotnes norādes ikona.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Īss lietotnes norādes apraksts.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=No kurienes sagatavot ierakstus
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot no jebkuras lapas.
@@ -157,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Kur izveidot i
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Ja vieta nav norādīta, ierakstus var izveidot jebkurā viki vietā.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Neuzspiest ierakstu atrašanās vietu
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Izmantot augšminētās vietas tikai kā ieteikumus, atļaujot lietotājam norādīt arī citu lietotnes ieraksta atrašanās vietu.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Vai lietotnes ierakstiem jābūt beigu lapai, vai nē.
 
 ### Wizard Step 3: Application Presentation
@@ -186,7 +184,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Attēli
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Īpaša kolonna, kurā attēlot ierakstam pievienoto attēlus
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Iemiesojums
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Kolonna ierakstu lapā, kurā parādīt lietotāja iemiesojumu. Strādā tikai XWiki.XWikiUsers klasei
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Aprakstā norāda, ko lietotne dara un kādus datus tā apstrādā.
 platform.appwithinminutes.liveTableEditorColumnsHint=Izvēlieties kolonnas, kuras vēlaties parādīt lietotnes mājas lapas tabulā.
 platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
@@ -209,9 +207,10 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Dzēst visus ierakstus
 platform.appwithinminutes.appHomePageEditAppLabel=Mainīt lietotni
 platform.appwithinminutes.appHomePageTranslateAppLabel=Tulkot lietotni
 platform.appwithinminutes.appHomePageDeleteAppLabel=Dzēst lietotni
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
+AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Lietotne {0} un VISI tās ieraksti tiks izdzēsti. Vai tiešām vēlaties turpināt?
@@ -221,24 +220,27 @@ platform.appwithinminutes.deleteAppInvalidAppError=Lietotne ar norādīto nosauk
 platform.appwithinminutes.deleteAppNotSpecifiedError=Nav norādīts lietotnes nosaukums.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=New Name
+appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+appWithinMinutes.renameApp.location.label=New Location
+appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+appWithinMinutes.renameApp.parent.label=New Parent
+appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=Renaming application...
+appWithinMinutes.renameApp.done=Application renamed
+appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Lietotnes klase
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Lietotnes vieta
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Vieta
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Lietotnes sākuma lapas nosaukums
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Lapas pilnais nosaukums
@@ -266,5 +268,6 @@ platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
 appWithinMinutes.classEditor.title={0} struktūra
-appWithinMinutes.templateProviderEditor.title={0} ieraksti</content>
+appWithinMinutes.templateProviderEditor.title={0} ieraksti
+</content>
 </xwikidoc>

@@ -52,32 +52,32 @@ extension.repository.installedCount=インストール数
 admin.repository=拡張機能のレポジトリー
 
 ## Support
-### Missing: repository.support.createsupporter=Register
+### Missing: repository.support.createsupporter=
 
 ## Supporters
-### Missing: repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
-### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
-### Missing: repository.supporter.sheet.createplan=Add
-### Missing: repository.supporter.sheet.plans=Plans
+### Missing: repository.supporter.sheet.description=
+### Missing: repository.supporter.sheet.noObject=
+### Missing: repository.supporter.sheet.createplan=
+### Missing: repository.supporter.sheet.plans=
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
-### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
-### Missing: ExtensionCode.ExtensionSupporterClass_content=Details
-### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
+### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupporterClass_summary=
+### Missing: ExtensionCode.ExtensionSupporterClass_url=
+### Missing: ExtensionCode.ExtensionSupporterClass_email=
+### Missing: ExtensionCode.ExtensionSupporterClass_content=
+### Missing: ExtensionCode.ExtensionSupporterClass_active=
 
 ## Support plans
-### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
-### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
-### Missing: repository.supportplan.sheet.supportedExtensions=Supported extensions
+### Missing: repository.supportplan.sheet.description=
+### Missing: repository.supportplan.sheet.noObject=
+### Missing: repository.supportplan.sheet.supportedExtensions=
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
-### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
-### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_url=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_content=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_active=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=
 </content>
 </xwikidoc>

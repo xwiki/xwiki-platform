@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>index.deletedDocuments.deleteAll=刪除全部
-### Missing: index.administration.remainingTasks.heading=Remaining Document Analysis tasks
+index.administration.remainingTasks.heading=Remaining Document Analysis tasks
 index.administration.remainingTasks.emptyQueue=沒有正在等待執行的任務。
 admin.documentanalysis=文件分析
 

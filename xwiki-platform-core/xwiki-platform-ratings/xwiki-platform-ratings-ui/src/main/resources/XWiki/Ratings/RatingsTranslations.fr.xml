@@ -37,7 +37,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=Votes
-
 rating.rate=Votez !
 rating.saveexception=Erreur à l'enregistrement du vote.
 rating.votenotvalid=Vous ne pouvez pas voter avec la valeur 0.
@@ -58,11 +57,11 @@ admin.ratings.uninstallratings=Dé-installer l'application de gestion des votes 
 admin.ratings.ratingsactivated=Les votes ont été activés
 admin.ratings.ratingsdeactivated=Les votes ont été désactivés
 admin.ratings.illegalrequest=Requête interdite
-
 rating.yourvote=Votre vote
 rating.logintorate=Connectez-vous pour voter
 rating.novotes=Aucun vote
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

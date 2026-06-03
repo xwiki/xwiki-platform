@@ -48,6 +48,7 @@ annotations.annotated.loaderror=失敗しました：
 annotations.annotated.loaderror.wrongresponse=誤ったフォーマットによるサーバーの応答です
 annotations.annotated.error.noannotatedelement=コンテンツが利用できないため注釈は読み込めませんでした。
 annotations.annotated.error.wrongsyntax=注釈はXWikiシンタックス1.0で書かれたページでは利用できません。
+### Missing: annotations.annotated.highlight.toggle.hint=
 annotations.action.edit.text=[編集]
 annotations.action.edit.tooltip=注釈を編集
 annotations.action.edit.submit.text=更新

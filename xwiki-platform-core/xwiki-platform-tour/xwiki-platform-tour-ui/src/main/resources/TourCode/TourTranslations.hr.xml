@@ -62,6 +62,7 @@ tour.livetable.targetClass=Odredišna klasa
 tour.popover.previous=« Prethodno
 tour.popover.next=Sljedeće »
 tour.popover.end=Završi obilazak
+### Missing: tour.popover.quit=
 tour.popover.show=Prikaži obilazak
 tour.popover.show.hint=U bilo kojem trenutku možete klikanjem na ovaj gumb ponovo pokrenuti obilazak
 
@@ -75,13 +76,14 @@ TourCode.StepClass_placement=Smještaj
 TourCode.StepClass_targetPage=Odredišna stranica
 TourCode.StepClass_action=Odredišna akcija
 TourCode.StepClass_queryString=Niz znakova za upit
+### Missing: TourCode.StepClass_reflex=
 tour.steps=Koraci
 tour.steps.new_step=Novi korak
 tour.steps.add_step=Dodaj korak
 tour.steps.edit_step=Uredi korak
 tour.steps.save_step=Spremi
 tour.steps.delete_confirm=Jeste li sigurni da želite obrisati korak?
-tour.steps.delete_done=Brisanje koraka obavljeno\!
+tour.steps.delete_done=Brisanje koraka obavljeno!
 tour.steps.deleting=Brisanje koraka...
 tour.steps.yes=Da
 tour.steps.no=Ne
@@ -90,10 +92,11 @@ tour.steps.delete=Obriši
 
 # Upgrade
 tour.upgrade.title=Nadogradnja
-tour.upgrade.successList=Uspješno su pretvorene sljedeće stranice\:
-tour.upgrade.successNothing=Nema ničega za nadograditi\!
+tour.upgrade.successList=Uspješno su pretvorene sljedeće stranice:
+tour.upgrade.successNothing=Nema ničega za nadograditi!
 
 # Template
 tour.template.name=Obilazak
-tour.template.description=Obilazak korak po korak</content>
+tour.template.description=Obilazak korak po korak
+</content>
 </xwikidoc>

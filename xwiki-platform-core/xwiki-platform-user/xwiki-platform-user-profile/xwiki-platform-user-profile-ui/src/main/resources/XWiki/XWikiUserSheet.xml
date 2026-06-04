@@ -121,7 +121,7 @@
 (((
   #foreach($category in $userMenu)
     #foreach($subcategory in $category.get('children'))
-      #set($tabKey = $subcategory.get('id')) 
+      #set($tabKey = $services.rendering.escape($subcategory.get('id'), 'xwiki/2.1'))
       (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
       (((
         {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}

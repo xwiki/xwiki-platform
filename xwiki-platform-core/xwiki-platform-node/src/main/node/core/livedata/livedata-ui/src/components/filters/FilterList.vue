@@ -178,24 +178,46 @@ export default {
         label: this.$t("livedata.filter.list.emptyLabel"),
       };
     },
+
+    // Synchronize the selectize widget display with the current filter entry (value and operator). This is needed
+    // because the filter entry can be updated outside of this widget (e.g., from the advanced filtering panel).
+    syncSelectizeValue() {
+      if (!this.$refs.input) {
+        // The input might not be in the DOM yet (e.g., an external filter change while the widget is still loading).
+        return;
+      }
+      const input = this.jQuery(this.$refs.input);
+      if (this.filterEntry?.operator === "empty") {
+        // Make sure the empty option exists so the widget can display its label even when the operator was switched
+        // to empty after the widget creation (e.g., from the advanced filtering panel).
+        this.$refs.input.selectize?.addOption(this.getDefaultEmptyOption());
+        // The empty string is ignored by default. We change the value to empty string plus a comma value separator to
+        // take it into account.
+        input.val(",").trigger("change");
+      } else {
+        input.val(this.value).trigger("change");
+      }
+    },
   },
 
-  // Update the selectize widget whenever the filter value changes.
+  // Update the selectize widget whenever the filter entry changes.
   watch: {
-    value(newValue) {
-      this.jQuery(this.$refs.input).val(newValue).trigger("change");
+    value() {
+      this.syncSelectizeValue();
+    },
+    // The operator can be changed outside of this widget (e.g., from the advanced filtering panel), so the displayed
+    // value must be kept consistent with the active operator.
+    "filterEntry.operator"() {
+      this.syncSelectizeValue();
     },
     async fullyReady(isReady) {
       if (isReady) {
         // It is important to wait for the next tick to be sure that the input reference is available in the dom, for
         // selectize to be able to enhance it.
         await this.$nextTick();
-        const $ = this.jQuery;
-        $(this.$refs.input).xwikiSelectize(this.selectizeSettings);
+        this.jQuery(this.$refs.input).xwikiSelectize(this.selectizeSettings);
         if (this.filterEntry?.operator === "empty") {
-          // The empty string is ignored by default. We change the value to empty string plus a coma value separator to
-          // take it into account.
-          $(this.$refs.input).val(",").trigger("change");
+          this.syncSelectizeValue();
         }
       }
     },

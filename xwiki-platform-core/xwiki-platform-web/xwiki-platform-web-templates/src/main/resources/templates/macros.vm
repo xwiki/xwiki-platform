@@ -2294,6 +2294,15 @@ $displayName##
  *        'cssClass' : specific css class for this menu
  *#
 #macro(verticalNavigation $menu $options)
+#set ($currentSyntax = $options.syntax)
+#if ("$!currentSyntax" == '')
+  #set ($currentSyntax = $doc.syntax)
+#end
+#if ("$!currentSyntax" == '')
+  #set ($currentSyntax = 'XWiki/2.1')
+#end
+#set ($options.syntax = $currentSyntax)
+#set ($escapedClass = $services.rendering.escape($options.cssClass, $options.syntax))
 (% class="vertical-menu $!{options.cssClass}" %)(((
   #foreach ($item in $menu)
     #verticalNavigationItem($item '*' $options)
@@ -2341,7 +2350,10 @@ $displayName##
   #if ($name == '')
     #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
-  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  #set ($escapedId = $services.rendering.escape(${item.id}, $options.syntax))
+  #set ($escapedUrl = $escapetool.xml(${item.url}))
+  #set ($escapedClass = $services.rendering.escape($class, $options.syntax))
+  $level (% id="vertical-menu-${escapedId}" class="${escapedClass}" %){{html}}<a #if ("$!{item.url}" != '')href="$escapedUrl"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)

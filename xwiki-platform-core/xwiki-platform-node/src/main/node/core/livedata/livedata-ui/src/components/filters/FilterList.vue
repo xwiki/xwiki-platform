@@ -96,9 +96,17 @@ export default {
             // Note that this imply that any filter list descriptor needs to have an empty operator defined.
             if (value === "") {
               this.applyFilter(value, "empty");
-            } else {
-              // Fallback on default operator.
+            } else if (this.isAdvanced) {
+              // In the advanced filtering panel the operator is selected separately, so keep the current operator.
               this.applyFilter(value);
+            } else {
+              // In the top filter, selecting a value always uses the default operator. Passing it explicitly is
+              // required so that switching away from the "empty" operator resets to the default operator instead of
+              // keeping the "empty" operator (which would make the backend ignore the value).
+              this.applyFilter(
+                value,
+                this.logic.getFilterDefaultOperator(this.propertyId),
+              );
             }
           }
         },

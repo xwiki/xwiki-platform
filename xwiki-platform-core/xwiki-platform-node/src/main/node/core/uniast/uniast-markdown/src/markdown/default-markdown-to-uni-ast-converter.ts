@@ -138,7 +138,6 @@ export class DefaultMarkdownToUniAstConverter
         };
 
       case "list":
-        // TODO: "token.loose" property
         return {
           type: "list",
           items: await Promise.all(
@@ -156,8 +155,6 @@ export class DefaultMarkdownToUniAstConverter
 
       case "code": {
         if (!block.value.startsWith(CODIFIED_MACRO_PREFIX)) {
-          // TODO: "token.escaped" property
-          // TODO: "token.codeBlockStyle" property
           return {
             type: "code",
             content: block.value,
@@ -354,13 +351,18 @@ export class DefaultMarkdownToUniAstConverter
   }
 
   private async convertImage(image: MdImage): Promise<Image> {
-    // TODO: "token.text" property
+    // TODO: image.title
+    // Tracking issue: https://jira.xwiki.org/browse/XWIKI-24456
+
     let target: LinkTarget;
-    const url = image.url;
+
+    const { url } = image;
+
     try {
       const parsed = await this.modelReferenceParserProvider
         .get()!
         .parseAsync(url, { type: EntityType.ATTACHMENT });
+
       target = {
         type: "internal",
         parsedReference: parsed,

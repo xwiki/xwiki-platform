@@ -65,7 +65,11 @@ public class ExtensionSecurityTest extends AbstractTest
 
         getDriver().navigate().refresh();
 
-        List<String> cveIDs = extensionVulnerabilitiesAdminPage.getCveIDsToReview();
+        List<String> cveIDs = extensionVulnerabilitiesAdminPage.getCveIDsToReview()
+            .stream()
+            // CVE-2026-1605 impacts jetty, that we are not updating on stable-16.10.x
+            .filter(cve -> !"CVE-2026-1605".equals(cve))
+            .toList();
 
         assertTrue(cveIDs.isEmpty(), () -> {
             StringBuilder stringBuilder = new StringBuilder();

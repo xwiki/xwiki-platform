@@ -59,7 +59,6 @@ public abstract class AbstractWikiTest
         // Get rid of annoying listeners we don't need
         this.componentManager.unregisterComponent(EventListener.class, "XObjectEventGeneratorListener");
         this.componentManager.unregisterComponent(EventListener.class, "AttachmentEventGeneratorListener");
-        this.componentManager.unregisterComponent(EventListener.class, "XClassPropertyEventGeneratorListener");
         this.componentManager.unregisterComponent(EventListener.class, "refactoring.automaticRedirectCreator");
         this.componentManager.unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
         this.componentManager.unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");

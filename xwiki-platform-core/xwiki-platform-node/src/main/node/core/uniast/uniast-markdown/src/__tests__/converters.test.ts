@@ -1543,7 +1543,6 @@ describe("MarkdownToUniAstConverter", () => {
 const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {
   someBlockMacro: {
     infos: {
-      kind: "block",
       id: "someBlockMacro",
       name: "-",
       description: "-",
@@ -1572,7 +1571,6 @@ const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {
 
   someBlockMacroWithContent: {
     infos: {
-      kind: "block",
       id: "someBlockMacroWithContent",
       name: "-",
       description: "-",
@@ -1602,7 +1600,6 @@ const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {
 
   someInlineMacro: {
     infos: {
-      kind: "inline",
       id: "someInlineMacro",
       name: "-",
       description: "-",
@@ -1617,7 +1614,6 @@ const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {
 
   someInlineMacroWithContent: {
     infos: {
-      kind: "inline",
       id: "someInlineMacro",
       name: "-",
       description: "-",

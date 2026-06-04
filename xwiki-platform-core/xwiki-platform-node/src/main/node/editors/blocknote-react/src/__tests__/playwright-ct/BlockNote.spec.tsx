@@ -91,9 +91,9 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
   await toolbarEl.waitFor({ state: "attached" });
 
   // Trigger the image edition UI
-  //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
-  //   > There is no other real identifying DOM attribute for these buttons
-  const imgEditBtnEl = page.locator('button[aria-label="Change image"]');
+  const imgEditBtnEl = page.locator(
+    'button[data-test="blocknote.imageToolbar.buttons.edit"]',
+  );
   await imgEditBtnEl.waitFor({ state: "attached" });
   await imgEditBtnEl.click();
 
@@ -224,11 +224,8 @@ test("Macros can be inserted", async ({ mount, page }) => {
 
   // Trigger the formatting toolbar
   await paragraph.dblclick();
-
   await editorEl.click();
-  //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
-  //   > There is no other real identifying DOM attribute for these buttons
-  const macroInsertBtnEl = page.locator('button[aria-label="Insert a macro"]');
+  const macroInsertBtnEl = page.locator('button[data-test="insertMacro"]');
   await macroInsertBtnEl.waitFor({ state: "attached" });
 
   expect(macroInsertionModalTriggered).toBe(false);

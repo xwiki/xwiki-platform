@@ -505,7 +505,7 @@ function adaptMacroForBlockNote(
       ? ({
           type: blockNoteName,
           icon: (props) => <RiFileList3Fill {...props} />,
-          name: `Macro: ${macro.infos.name}`,
+          name: macro.infos.name,
           props:
             macro.infos.defaultParameters !== false
               ? macro.infos.defaultParameters

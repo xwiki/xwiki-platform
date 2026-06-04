@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { BlockNoteToUniAstConverter } from "../../uniast/bn-to-uniast";
-import { UniAstToBlockNoteConverter } from "../../uniast/uniast-to-bn";
-import { depsContainerMock } from "../playwright-ct/depsContainer.mock";
+import { depsContainerMock } from "./depsContainer.mock";
+import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
+import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { describe, expect, test } from "vitest";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 import type { UniAst } from "@xwiki/platform-uniast-api";

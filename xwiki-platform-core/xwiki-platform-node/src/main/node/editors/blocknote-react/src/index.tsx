@@ -18,9 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { App } from "./App";
-import { MACRO_NAME_PREFIX } from "./blocknote/utils";
 import { createRoot } from "react-dom/client";
-import type { ContextForMacros } from "./blocknote/utils";
 import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
 
 /**
@@ -56,9 +54,8 @@ function mountBlockNote(
   };
 }
 
-export { MACRO_NAME_PREFIX, mountBlockNote };
-
-export type { BlockNoteViewWrapperProps, ContextForMacros };
+export { mountBlockNote };
+export type { BlockNoteViewWrapperProps };
 
 export type {
   BlockOfType,
@@ -74,9 +71,6 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
-export { BlockNoteToUniAstConverter } from "./uniast/bn-to-uniast";
-export { UniAstToBlockNoteConverter } from "./uniast/uniast-to-bn";
-
 export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
 
 export type {
@@ -85,6 +79,12 @@ export type {
 } from "./components/images/CustomImageToolbar";
 
 export {
+  MACRO_NAME_PREFIX,
   buildMacroRawContent,
   extractMacroRawContent,
+} from "./blocknote/utils";
+
+export type {
+  ContextForMacros,
+  InlineMacroInvocation,
 } from "./blocknote/utils";

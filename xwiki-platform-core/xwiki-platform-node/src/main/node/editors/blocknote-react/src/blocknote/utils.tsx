@@ -26,6 +26,7 @@ import {
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
 import { RiFileList3Fill } from "react-icons/ri";
+import type { BlockType, InlineContentType } from ".";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -50,11 +51,6 @@ import type {
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
 import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
-import type {
-  InlineMacroInvocation,
-  MacroBlockInvocation,
-  UniAst,
-} from "@xwiki/platform-uniast-api";
 import type { JSX, ReactNode } from "react";
 
 /**
@@ -234,7 +230,7 @@ type ContextForMacros = {
   ): void;
 
   /**
-   * Request the opening of a UI to insert a new macro (e.g. a modal)
+   * Request the opening of a UI (e.g. modal) to insert a new block macro
    *
    * @param prefill - Informations to prefill the modal with (ID, body, ...)
    * @param insert - Insert the new macro, replacing the user-selected content (if any)
@@ -243,7 +239,7 @@ type ContextForMacros = {
    * @beta
    */
   openInsertionEditor(
-    prefill: MacroInsertionEditorParams,
+    prefill: MacroInsertionEditorPrefillData,
     insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
   ): void;
 };
@@ -254,7 +250,7 @@ type ContextForMacros = {
  * @since 18.5.0RC1
  * @beta
  */
-type MacroInsertionEditorParams = {
+type MacroInsertionEditorPrefillData = {
   /** ID of the macro to insert */
   id: string | null;
 
@@ -262,7 +258,37 @@ type MacroInsertionEditorParams = {
   params: UnknownMacroParamsType | null;
 
   /** Body of the macro */
-  body: UniAst | null;
+  body: BlockType[] | null;
+};
+
+/**
+ * Information about a macro block invocation
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroBlockInvocation = {
+  kind: "block";
+  id: string;
+  params: MacroWithUnknownParamsType;
+  // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body: InlineContentType[] | null;
+};
+
+/**
+ * Information about an inline macro invocation
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type InlineMacroInvocation = {
+  kind: "inline";
+  id: string;
+  params: MacroWithUnknownParamsType;
+  // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body: InlineContentType | null;
 };
 
 /**
@@ -550,5 +576,7 @@ export {
 export type {
   BlockNoteConcreteMacro,
   ContextForMacros,
-  MacroInsertionEditorParams,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
 };

@@ -28,11 +28,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import {
-  BlockNoteToUniAstConverterContext,
-  DepsContainerContext,
-} from "../contexts";
-import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
+import { DepsContainerContext } from "../contexts";
 import { blocksToYXmlFragment } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -314,11 +310,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
-  const bnToUniAstConverter = new BlockNoteToUniAstConverter(
-    depsContainer,
-    macros ? macros.list : [],
-  );
-
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
@@ -346,37 +337,36 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             }
           />
 
-          {/* TODO: suggestions menu for inline macros */}
+        {/* TODO: suggestions menu for inline macros */}
 
-          <FormattingToolbarController
-            formattingToolbar={(props) => (
-              <CustomFormattingToolbar
-                formattingToolbarProps={props}
-                imageEditionOverrideFn={overrides?.imageEdition}
-                additionalBlockTypes={filterMap(
-                  builtMacros,
-                  (built) => built.dropdownTransformItem,
-                )}
-                ctxForMacros={macros ? macros.ctx : false}
-              />
-            )}
-          />
+        <FormattingToolbarController
+          formattingToolbar={(props) => (
+            <CustomFormattingToolbar
+              formattingToolbarProps={props}
+              imageEditionOverrideFn={overrides?.imageEdition}
+              additionalBlockTypes={filterMap(
+                builtMacros,
+                (built) => built.dropdownTransformItem,
+              )}
+              ctxForMacros={macros ? macros.ctx : false}
+            />
+          )}
+        />
 
-          <LinkToolbarController
-            linkToolbar={(props) => (
-              <FormattingToolbar>
-                <CustomLinkToolbar linkToolbarProps={props} />
-              </FormattingToolbar>
-            )}
-          />
+        <LinkToolbarController
+          linkToolbar={(props) => (
+            <FormattingToolbar>
+              <CustomLinkToolbar linkToolbarProps={props} />
+            </FormattingToolbar>
+          )}
+        />
 
-          <FilePanelController
-            filePanel={({ blockId }) => (
-              <FilePanel blockId={blockId} editor={editor} />
-            )}
-          />
-        </BlockNoteView>
-      </BlockNoteToUniAstConverterContext.Provider>
+        <FilePanelController
+          filePanel={({ blockId }) => (
+            <FilePanel blockId={blockId} editor={editor} />
+          )}
+        />
+      </BlockNoteView>
     </DepsContainerContext.Provider>
   );
 };

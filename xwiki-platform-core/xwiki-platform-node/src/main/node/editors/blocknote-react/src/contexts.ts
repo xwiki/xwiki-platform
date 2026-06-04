@@ -17,13 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteToUniAstConverter } from "./uniast/bn-to-uniast";
 import { createContext } from "react";
 import type { Container } from "inversify";
 
 const DepsContainerContext = createContext<Container | null>(null);
 
-const BlockNoteToUniAstConverterContext =
-  createContext<BlockNoteToUniAstConverter | null>(null);
-
-export { BlockNoteToUniAstConverterContext, DepsContainerContext };
+export { DepsContainerContext };

@@ -451,11 +451,6 @@ export class UniAstToBlockNoteConverter {
     } as any;
 
     if (content) {
-      // No assign -> invalid content
-      // Empty array -> invalid content
-      // Array with { type: 'text', text: '...', styles: {} } -> invalid content
-      // { type: 'text', text: '...', styles: {} } -> Unreachable case: 'text' (or whatever we put instead of 'text')
-
       // NOTE: AST is dynamically typed
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (out as any).content = content satisfies InlineContentType;

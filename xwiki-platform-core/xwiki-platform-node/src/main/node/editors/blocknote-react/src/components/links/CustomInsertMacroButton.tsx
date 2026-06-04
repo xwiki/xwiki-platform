@@ -17,22 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  BlockNoteToUniAstConverterContext,
-  DepsContainerContext,
-} from "../../contexts";
+import { MACRO_NAME_PREFIX } from "../../blocknote/utils";
 import { useEditor } from "../../hooks";
-import { UniAstToBlockNoteConverter } from "../../uniast/uniast-to-bn";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { useComponentsContext } from "@blocknote/react";
 import { assertUnreachable } from "@xwiki/platform-fn-utils";
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import type { ContextForMacros } from "../../blocknote/utils";
+import type { BlockType, InlineContentType } from "../../blocknote";
 import type {
+  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
-} from "@xwiki/platform-uniast-api";
+} from "../../blocknote/utils";
 
 export type CustomInsertMacroButtonProps = {
   openEditor: ContextForMacros["openInsertionEditor"];
@@ -45,25 +42,14 @@ export const CustomInsertMacroButton: React.FC<
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
-  const bnToUniAstConverter = useContext(BlockNoteToUniAstConverterContext)!;
-
-  const depsContainer = useContext(DepsContainerContext)!;
-  const uniAstToBnConverter = new UniAstToBlockNoteConverter(depsContainer);
-
   // TODO: check if we need to update in realtime when the selection change?
   const selected = editor.getSelection();
 
   const openPrefilledEditor = useCallback(() => {
-    const body = selected
-      ? bnToUniAstConverter.blocksToUniAst(selected.blocks)
-      : null;
-
-    if (body instanceof Error) {
-      // TODO: error handling
-      return;
-    }
-
-    openEditor({ id: null, params: null, body }, insertMacro);
+    openEditor(
+      { id: null, params: null, body: selected?.blocks ?? null },
+      insertMacro,
+    );
   }, [openEditor, selected]);
 
   const insertMacro = useCallback(
@@ -71,12 +57,16 @@ export const CustomInsertMacroButton: React.FC<
     (call: MacroBlockInvocation | InlineMacroInvocation) => {
       switch (call.kind) {
         case "block": {
-          const block =
-            uniAstToBnConverter.macroBlockInvocationToBlockNote(call);
+          const block: BlockType = {
+            // @ts-expect-error: AST is dynamically typed
+            type: MACRO_NAME_PREFIX + call.id,
+            id: Math.random().toString(),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            props: call.params as any,
+          };
 
-          if (block instanceof Error) {
-            // TODO: error handling
-            return;
+          if (call.body) {
+            block.content = call.body;
           }
 
           insertOrUpdateBlockForSlashMenu(editor, block);
@@ -84,17 +74,20 @@ export const CustomInsertMacroButton: React.FC<
         }
 
         case "inline": {
-          const inlineContent =
-            uniAstToBnConverter.inlineMacroInvocationToBlockNote(call);
+          const inlineContent: InlineContentType = {
+            // @ts-expect-error: AST is dynamically typed
+            type: `${MACRO_NAME_PREFIX}${call.id}`,
+            props: call.params,
+          };
 
-          if (inlineContent instanceof Error) {
-            // TODO: error handling
-            return;
+          if (call.body) {
+            // NOTE: AST is dynamically typed
+            (
+              inlineContent as unknown as { content: InlineContentType }
+            ).content = call.body;
           }
 
-          editor.insertInlineContent([inlineContent], {
-            updateSelection: true,
-          });
+          editor.insertInlineContent([], { updateSelection: true });
           break;
         }
 

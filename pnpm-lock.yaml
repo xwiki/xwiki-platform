@@ -3030,6 +3030,7 @@ importers:
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
 <<<<<<< HEAD
+<<<<<<< HEAD
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../core/syntaxes/syntaxes-config
@@ -3041,6 +3042,8 @@ importers:
       '@xwiki/platform-uniast-markdown':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-markdown
+=======
+>>>>>>> f66dbd6618 (update)
       i18next:
         specifier: 'catalog:'
 <<<<<<< HEAD

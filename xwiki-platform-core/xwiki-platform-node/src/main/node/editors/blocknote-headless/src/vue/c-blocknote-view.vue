@@ -20,11 +20,9 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import messages from "../translations";
-import {
-  BlockNoteToUniAstConverter,
-  UniAstToBlockNoteConverter,
-  mountBlockNote,
-} from "@xwiki/platform-editors-blocknote-react";
+import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
+import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
+import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
@@ -49,11 +47,7 @@ type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    | "content"
-    | "linkEditionCtx"
-    | "macroAstToReactJsxConverter"
-    | "macros"
-    | "depsContainer"
+    "content" | "macros" | "depsContainer"
   >;
 
   /** Set to `false` to disable macros entirely */

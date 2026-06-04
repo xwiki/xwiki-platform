@@ -21,11 +21,9 @@ import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
-import { InlineMacroInvocation } from '@xwiki/platform-uniast-api';
 import { Link } from '@blocknote/core';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
-import { MacroBlockInvocation } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
@@ -39,18 +37,14 @@ import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 =======
 import { UniAst } from '@xwiki/platform-uniast-api';
 >>>>>>> 71057f3a21 (XWIKI-24231: Expose the insert macro action)
+=======
+>>>>>>> 7a5d422bfa (update)
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
-
-// @beta
-export class BlockNoteToUniAstConverter {
-    constructor(depsContainer: Container, macros: MacroWithUnknownParamsType[]);
-    // (undocumented)
-    blocksToUniAst(blocks: BlockType[]): UniAst | Error;
-}
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -90,7 +84,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 // @beta
 export type ContextForMacros = {
     openParamsEditor(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
-    openInsertionEditor(prefill: MacroInsertionEditorParams, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
+    openInsertionEditor(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
 };
 
 // @beta
@@ -142,6 +136,14 @@ export type ImageUpdateResult = {
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta
+export type InlineMacroInvocation = {
+    kind: "inline";
+    id: string;
+    params: MacroWithUnknownParamsType;
+    body: InlineContentType | null;
+};
+
+// @beta
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
@@ -149,6 +151,7 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
     unmount: () => void;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 // Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
 //
@@ -168,9 +171,12 @@ export class UniAstToBlockNoteConverter {
     uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error;
 }
 
+=======
+>>>>>>> 7a5d422bfa (update)
 // Warnings were encountered during analysis:
 //
-// dist/blocknote/utils.d.ts:123:5 - (ae-forgotten-export) The symbol "MacroInsertionEditorParams" needs to be exported by the entry point index.d.ts
+// dist/blocknote/utils.d.ts:123:5 - (ae-forgotten-export) The symbol "MacroInsertionEditorPrefillData" needs to be exported by the entry point index.d.ts
+// dist/blocknote/utils.d.ts:123:5 - (ae-forgotten-export) The symbol "MacroBlockInvocation" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

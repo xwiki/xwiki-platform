@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.groovy.internal.DefaultGroovyConfiguration;
 import org.xwiki.groovy.internal.GroovyScriptEngineFactory;
+import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.logging.logback.internal.DefaultLoggerManager;
 import org.xwiki.logging.script.LoggingScriptService;
 import org.xwiki.model.reference.DocumentReference;
@@ -101,6 +102,7 @@ import static org.mockito.Mockito.when;
     TocMacro.class,
     InfoMessageMacro.class,
     TemplateMacro.class,
+    TranslationMacro.class,
 })
 class ExtensionSheetPageTest extends PageTest
 {
@@ -236,7 +238,7 @@ class ExtensionSheetPageTest extends PageTest
         this.context.setDoc(this.testPageDocument);
         Document document = renderHTMLPage(this.extensionSheetDocument);
 
-        assertEquals("Extension imported from repository %s".formatted(this.testString),
+        assertEquals("extension.repository.sheet.imported %s".formatted(this.testString),
             document.select("span.infomessage").text());
         assertEquals("http://example.com]]MARKER", document.select("span.infomessage a").attr("href"));
     }

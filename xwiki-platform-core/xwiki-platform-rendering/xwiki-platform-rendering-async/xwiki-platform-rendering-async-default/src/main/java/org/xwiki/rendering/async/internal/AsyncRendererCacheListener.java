@@ -40,9 +40,6 @@ import org.xwiki.security.authorization.event.RightUpdatedEvent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.EntityEvent;
-import com.xpn.xwiki.internal.event.XClassPropertyAddedEvent;
-import com.xpn.xwiki.internal.event.XClassPropertyDeletedEvent;
-import com.xpn.xwiki.internal.event.XClassPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectEvent;
@@ -74,8 +71,7 @@ public class AsyncRendererCacheListener extends AbstractEventListener
      */
     public AsyncRendererCacheListener()
     {
-        super(NAME, new WikiDeletedEvent(), new XClassPropertyAddedEvent(), new XClassPropertyDeletedEvent(),
-            new XClassPropertyUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
+        super(NAME, new WikiDeletedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
             new XObjectUpdatedEvent(), new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(), new ComponentDescriptorAddedEvent(), new ComponentDescriptorRemovedEvent(),
             new RightUpdatedEvent());

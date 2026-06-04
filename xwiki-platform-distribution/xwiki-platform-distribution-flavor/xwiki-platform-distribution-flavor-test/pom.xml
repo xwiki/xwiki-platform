@@ -495,6 +495,12 @@
         <browser>*custom ${browserPath}</browser>
       </properties>
     </profile>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-distribution-flavor-test-docker</module>
+      </modules>
+    </profile>
   </profiles>
   <modules>
     <module>xwiki-platform-distribution-flavor-test-misc</module>

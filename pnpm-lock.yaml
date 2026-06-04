@@ -94,8 +94,8 @@ catalogs:
       specifier: 1.13.1
       version: 1.13.1
     dompurify:
-      specifier: 3.4.2
-      version: 3.4.2
+      specifier: 3.4.7
+      version: 3.4.7
     eslint:
       specifier: 10.4.0
       version: 10.4.0
@@ -1802,7 +1802,7 @@ importers:
         version: link:../../localization/localization-api
       dompurify:
         specifier: 'catalog:'
-        version: 3.4.2
+        version: 3.4.7
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.4
@@ -4995,8 +4995,8 @@ packages:
     resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
     engines: {node: '>=0.3.1'}
 
-  dompurify@3.4.2:
-    resolution: {integrity: sha512-lHeS9SA/IKeIFFyYciHBr2n0v1VMPlSj843HdLOwjb2OxNwdq9Xykxqhk+FE42MzAdHvInbAolSE4mhahPpjXA==}
+  dompurify@3.4.7:
+    resolution: {integrity: sha512-2jBxDJY4RR06tQNy4w5FlFH7kfxsQZlufd0sbv+chfHCxeJwrFw2baUDsSwvBISD4K4RDbd0PTfy3uNXsR6siA==}
 
   dotenv-expand@12.0.3:
     resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
@@ -9505,7 +9505,7 @@ snapshots:
 
   diff@8.0.4: {}
 
-  dompurify@3.4.2:
+  dompurify@3.4.7:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 

@@ -164,3 +164,7 @@ catalog:
   vuedraggable: 4.1.0
   y-websocket: 3.0.0
   yjs: 13.6.30
+allowBuilds:
+  esbuild: true
+  nx: true
+  unrs-resolver: true

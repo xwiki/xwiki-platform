@@ -38,13 +38,10 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- Runtime dependencies.
-         We depend on the flavor base UI so that the shipped default configuration documents (such as
-         XWiki.EntityNameValidation.Configuration, which selects the Character Replacement strategy and forbids
-         "/" and "\" by default) are present in the tested instance. -->
+    <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-ui-base</artifactId>
+      <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>

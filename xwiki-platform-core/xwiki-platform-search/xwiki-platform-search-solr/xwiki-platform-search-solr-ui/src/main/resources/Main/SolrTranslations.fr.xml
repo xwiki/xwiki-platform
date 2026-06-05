@@ -79,7 +79,7 @@ solr.result.author=Modifié par {0} le {1}
 solr.result.mediaType=Ficher de type {0}
 solr.result.uploadedBy=Enregistré par {0} le {1} ({2})
 solr.result.highlightAll=Afficher et surligner toutes les occurrences
-solr.facets.title=Affinez les résultats
+solr.facets.title=Filtrez vos résultats de recherche
 solr.facets.hint=Sélectionnez des éléments pour filtrer les résultats
 solr.facets.resetAll=Tout réinitialiser
 solr.facets.expandAll=Tout étendre
@@ -183,7 +183,7 @@ solr.sortBy.attdate_sort=Date d'enregistrement
 solr.sortBy.attauthor_display_sort=Enregistré par
 solr.options=Afficher :
 solr.options.highlight=Surligner
-solr.options.facet=Facettes
+solr.options.facet=Filtres
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -31,6 +31,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
@@ -46,6 +48,8 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XarUtils
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XarUtils.class);
+
     public static final RelativeStringEntityReferenceResolver RESOLVER =
         new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
 
@@ -89,7 +93,7 @@ public final class XarUtils
         try {
             xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(documentStream);
         } catch (XMLStreamException e) {
-            throw new XarException("Failed to create a XML read", e);
+            throw new XarException("Failed to create a XML reader", e);
         }
 
         EntityReference reference = null;
@@ -170,7 +174,7 @@ public final class XarUtils
             try {
                 xmlReader.close();
             } catch (XMLStreamException e) {
-                throw new XarException("Failed to close XML reader", e);
+                LOGGER.warn("Failed to close XML reader", e);
             }
         }
 

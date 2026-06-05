@@ -31,8 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
@@ -48,8 +46,6 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XarUtils
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XarUtils.class);
-
     public static final RelativeStringEntityReferenceResolver RESOLVER =
         new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
 
@@ -101,6 +97,9 @@ public final class XarUtils
 
         String legacySpace = null;
         String legacyPage = null;
+
+        XarException parseException = null;
+        XarException closeException = null;
 
         try {
             // <xwikidoc>
@@ -169,13 +168,25 @@ public final class XarUtils
                 }
             }
         } catch (XMLStreamException e) {
-            throw new XarException("Failed to parse document", e);
+            parseException = new XarException("Failed to parse document", e);
         } finally {
             try {
                 xmlReader.close();
             } catch (XMLStreamException e) {
-                LOGGER.warn("Failed to close XML reader", e);
+                closeException = new XarException("Failed to close XML reader", e);
             }
+        }
+
+        // Propagate exceptions outside the finally block so neither masks the other.
+        // Mirrors the suppression semantics of try-with-resources for non-AutoCloseable resources.
+        if (parseException != null) {
+            if (closeException != null) {
+                parseException.addSuppressed(closeException);
+            }
+            throw parseException;
+        }
+        if (closeException != null) {
+            throw closeException;
         }
 
         if (reference == null) {

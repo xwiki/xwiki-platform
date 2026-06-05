@@ -48,7 +48,7 @@ type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    "content" | "macroAstToReactJsxConverter" | "macros"
+    "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros"
   >;
 
   /** Set to `false` to disable macros entirely */

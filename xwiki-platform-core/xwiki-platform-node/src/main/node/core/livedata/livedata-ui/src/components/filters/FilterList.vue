@@ -187,16 +187,16 @@ export default {
         return;
       }
       const input = this.jQuery(this.$refs.input);
+      let value = this.value;
       if (this.filterEntry?.operator === "empty") {
         // Make sure the empty option exists so the widget can display its label even when the operator was switched
         // to empty after the widget creation (e.g., from the advanced filtering panel).
         this.$refs.input.selectize?.addOption(this.getDefaultEmptyOption());
         // The empty string is ignored by default. We change the value to empty string plus a comma value separator to
         // take it into account.
-        input.val(",").trigger("change");
-      } else {
-        input.val(this.value).trigger("change");
+        value = ",";
       }
+      input.val(value).trigger("change");
     },
   },
 
@@ -216,6 +216,8 @@ export default {
         // selectize to be able to enhance it.
         await this.$nextTick();
         this.jQuery(this.$refs.input).xwikiSelectize(this.selectizeSettings);
+        // For non-empty operators, selectize picks up the initial value from the HTML input attribute. For the empty
+        // operator, selectize ignores empty string values, so we must sync explicitly after widget creation.
         if (this.filterEntry?.operator === "empty") {
           this.syncSelectizeValue();
         }

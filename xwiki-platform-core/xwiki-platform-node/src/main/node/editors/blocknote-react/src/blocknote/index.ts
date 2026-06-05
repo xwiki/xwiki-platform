@@ -161,7 +161,7 @@ function querySuggestionsMenuItems(
   );
 
   // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
-  // eslint-disable-next-line import/namespace
+  // eslint-disable-next-line import-x/namespace
   const locale = locales[lang].slash_menu;
 
   const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>

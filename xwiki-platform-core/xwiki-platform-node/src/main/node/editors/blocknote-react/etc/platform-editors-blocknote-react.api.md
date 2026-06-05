@@ -4,6 +4,7 @@
 
 ```ts
 
+import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { Block } from '@blocknote/core';
 import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
@@ -11,32 +12,53 @@ import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
-import { BlockTypeSelectItem } from '@blocknote/react';
 import { Collaboration } from '@xwiki/platform-collaboration-api';
-import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
+import { DefaultReactSuggestionItem } from '@blocknote/react';
 import { DefaultStyleSchema } from '@blocknote/core';
+import { DocumentService } from '@xwiki/platform-document-api';
 import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
 import { Link } from '@blocknote/core';
+import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
+import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
 import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
+import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
+import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
+
+// Warning: (ae-internal-missing-underscore) The name "BlockNoteConcreteMacro" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type BlockNoteConcreteMacro = {
+    macro: MacroWithUnknownParamsType;
+    bnRendering: {
+        type: "block";
+        block: ReturnType<typeof createCustomBlockSpec<string, PropSchema, "inline">> | ReturnType<typeof createCustomBlockSpec<string, PropSchema, "none">>;
+    } | {
+        type: "inline";
+        inlineContent: ReturnType<typeof createCustomInlineContentSpec>;
+    };
+};
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -52,10 +74,11 @@ export type BlockNoteViewWrapperProps = {
     } | false;
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
-    depsContainer: Container;
+    linkEditionCtx: LinkEditionContext;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
+    syntax: SyntaxConfig;
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -75,7 +98,576 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 // @beta
 export type ContextForMacros = {
     openParamsEditor(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
-    openInsertionEditor(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
+};
+
+// Warning: (ae-incompatible-release-tags) The symbol "createBlockNoteSchema" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
+//
+// @beta
+export function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
+bulletListItem: BlockSpec<"bulletListItem", {
+readonly backgroundColor: {
+default: "default";
+};
+readonly textColor: {
+default: "default";
+};
+readonly textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "inline">;
+checkListItem: BlockSpec<"checkListItem", {
+readonly checked: {
+readonly default: false;
+readonly type: "boolean";
+};
+readonly backgroundColor: {
+default: "default";
+};
+readonly textColor: {
+default: "default";
+};
+readonly textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "inline">;
+codeBlock: BlockSpec<"codeBlock", {
+readonly language: {
+readonly default: string;
+};
+}, "inline">;
+divider: BlockSpec<"divider", {}, "none">;
+heading: BlockSpec<"heading", {
+readonly isToggleable?: {
+readonly default: false;
+readonly optional: true;
+} | undefined;
+readonly level: {
+readonly default: 1 | 4 | 2 | 3 | 5 | 6;
+readonly values: readonly number[];
+};
+readonly backgroundColor: {
+default: "default";
+};
+readonly textColor: {
+default: "default";
+};
+readonly textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "inline">;
+image: BlockSpec<"image", {
+readonly textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+readonly backgroundColor: {
+default: "default";
+};
+readonly name: {
+readonly default: "";
+};
+readonly url: {
+readonly default: "";
+};
+readonly caption: {
+readonly default: "";
+};
+readonly showPreview: {
+readonly default: true;
+};
+readonly previewWidth: {
+readonly default: undefined;
+readonly type: "number";
+};
+}, "none">;
+numberedListItem: BlockSpec<"numberedListItem", {
+readonly start: {
+readonly default: undefined;
+readonly type: "number";
+};
+readonly backgroundColor: {
+default: "default";
+};
+readonly textColor: {
+default: "default";
+};
+readonly textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "inline">;
+paragraph: BlockSpec<"paragraph", {
+backgroundColor: {
+default: "default";
+};
+textColor: {
+default: "default";
+};
+textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "inline">;
+quote: BlockSpec<"quote", {
+readonly backgroundColor: {
+default: "default";
+};
+readonly textColor: {
+default: "default";
+};
+}, "inline">;
+table: LooseBlockSpec<"table", {
+textColor: {
+default: "default";
+};
+}, "table">;
+}>, InlineContentSchemaFromSpecs<    {
+text: {
+config: "text";
+implementation: any;
+};
+link: {
+config: "link";
+implementation: any;
+};
+}>, StyleSchemaFromSpecs<    {
+bold: {
+config: {
+type: string;
+propSchema: "boolean";
+};
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
+};
+italic: {
+config: {
+type: string;
+propSchema: "boolean";
+};
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
+};
+underline: {
+config: {
+type: string;
+propSchema: "boolean";
+};
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
+};
+strike: {
+config: {
+type: string;
+propSchema: "boolean";
+};
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
+};
+code: {
+config: {
+type: string;
+propSchema: "boolean";
+};
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
+};
+textColor: StyleSpec<    {
+readonly type: "textColor";
+readonly propSchema: "string";
+}>;
+backgroundColor: StyleSpec<    {
+readonly type: "backgroundColor";
+readonly propSchema: "string";
+}>;
+}>>;
+
+// Warning: (ae-internal-missing-underscore) The name "createCustomBlockSpec" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">(input: {
+    config: BlockConfig<Name, Props, InlineType>;
+    implementation: ReactCustomBlockImplementation<BlockConfig<Name, Props, InlineType>>;
+    slashMenu: false | {
+        title: string;
+        aliases?: string[];
+        group: string;
+        icon: ReactNode;
+        default: () => PartialBlockFromConfig<BlockConfig<Name, Props, InlineType>, InlineContentSchema, StyleSchema>;
+    };
+    customToolbar: (() => ReactNode) | null;
+}): {
+    block: (options?: undefined) => BlockSpec<Name, Props, InlineType>;
+    slashMenuEntry: false | ((editor: BlockNoteEditor<any, any, any>) => {
+        title: string;
+        aliases: string[] | undefined;
+        group: string;
+        icon: ReactNode;
+        onItemClick: () => void;
+    });
+    customToolbar: (() => ReactNode) | null;
+};
+
+// Warning: (ae-internal-missing-underscore) The name "createCustomInlineContentSpec" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>(input: {
+    config: I;
+    implementation: ReactInlineContentImplementation<I, S>;
+    slashMenu: false | {
+        title: string;
+        aliases?: string[];
+        group: string;
+        icon: ReactNode;
+        default: () => PartialInlineContent<Record<I["type"], I>, S>;
+    };
+    customToolbar: (() => ReactNode) | null;
+}): {
+    inlineContent: InlineContentSpec<I>;
+    slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
+        title: string;
+        aliases: string[] | undefined;
+        group: string;
+        icon: ReactNode;
+        onItemClick: () => void;
+    });
+    customToolbar: (() => ReactNode) | null;
+};
+
+// @beta
+export function createDictionary(lang: EditorLanguage): {
+    slash_menu: {
+        heading: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        heading_2: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        heading_3: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        heading_4: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        heading_5: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        heading_6: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        toggle_heading: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        toggle_heading_2: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        toggle_heading_3: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        quote: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        toggle_list: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        numbered_list: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        bullet_list: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        check_list: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        paragraph: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        code_block: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        page_break: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        table: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        image: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        video: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        audio: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        file: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        emoji: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+        divider: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
+    };
+    placeholders: Record<string | "default" | "emptyDocument", string | undefined>;
+    file_blocks: {
+        add_button_text: Record<string, string>;
+    };
+    toggle_blocks: {
+        add_block_button: string;
+    };
+    side_menu: {
+        add_block_label: string;
+        drag_handle_label: string;
+    };
+    drag_handle: {
+        delete_menuitem: string;
+        colors_menuitem: string;
+        header_row_menuitem: string;
+        header_column_menuitem: string;
+    };
+    table_handle: {
+        delete_column_menuitem: string;
+        delete_row_menuitem: string;
+        add_left_menuitem: string;
+        add_right_menuitem: string;
+        add_above_menuitem: string;
+        add_below_menuitem: string;
+        split_cell_menuitem: string;
+        merge_cells_menuitem: string;
+        background_color_menuitem: string;
+    };
+    suggestion_menu: {
+        no_items_title: string;
+    };
+    color_picker: {
+        text_title: string;
+        background_title: string;
+        colors: {
+            default: string;
+            gray: string;
+            brown: string;
+            red: string;
+            orange: string;
+            yellow: string;
+            green: string;
+            blue: string;
+            purple: string;
+            pink: string;
+        };
+    };
+    formatting_toolbar: {
+        bold: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        italic: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        underline: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        strike: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        code: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        colors: {
+            tooltip: string;
+        };
+        link: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        file_caption: {
+            tooltip: string;
+            input_placeholder: string;
+        };
+        file_replace: {
+            tooltip: Record<string, string>;
+        };
+        file_rename: {
+            tooltip: Record<string, string>;
+            input_placeholder: Record<string, string>;
+        };
+        file_download: {
+            tooltip: Record<string, string>;
+        };
+        file_delete: {
+            tooltip: Record<string, string>;
+        };
+        file_preview_toggle: {
+            tooltip: string;
+        };
+        nest: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        unnest: {
+            tooltip: string;
+            secondary_tooltip: string;
+        };
+        align_left: {
+            tooltip: string;
+        };
+        align_center: {
+            tooltip: string;
+        };
+        align_right: {
+            tooltip: string;
+        };
+        align_justify: {
+            tooltip: string;
+        };
+        table_cell_merge: {
+            tooltip: string;
+        };
+        comment: {
+            tooltip: string;
+        };
+    };
+    file_panel: {
+        upload: {
+            title: string;
+            file_placeholder: Record<string, string>;
+            upload_error: string;
+        };
+        embed: {
+            title: string;
+            embed_button: Record<string, string>;
+            url_placeholder: string;
+        };
+    };
+    link_toolbar: {
+        delete: {
+            tooltip: string;
+        };
+        edit: {
+            text: string;
+            tooltip: string;
+        };
+        open: {
+            tooltip: string;
+        };
+        form: {
+            title_placeholder: string;
+            url_placeholder: string;
+        };
+    };
+    comments: {
+        edited: string;
+        save_button_text: string;
+        cancel_button_text: string;
+        deleted_reference_text: string;
+        actions: {
+            add_reaction: string;
+            resolve: string;
+            reopen: string;
+            edit_comment: string;
+            delete_comment: string;
+            more_actions: string;
+        };
+        reactions: {
+            reacted_by: string;
+        };
+        sidebar: {
+            marked_as_resolved: string;
+            more_replies: (count: number) => string;
+        };
+    };
+    generic: {
+        ctrl_shortcut: string;
+    };
 };
 
 // @beta
@@ -95,8 +687,6 @@ export type EditorLanguage = keyof typeof locales & keyof typeof _default;
 // @beta
 export type EditorLink = Link<EditorStyleSchema>;
 
-// Warning: (ae-forgotten-export) The symbol "createBlockNoteSchema" needs to be exported by the entry point index.d.ts
-//
 // @beta
 export type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
 
@@ -126,12 +716,16 @@ export type ImageUpdateResult = {
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
-// @beta
-export type InlineMacroInvocation = {
-    kind: "inline";
-    id: string;
-    params: MacroWithUnknownParamsType;
-    body: InlineContentType | null;
+// @beta (undocumented)
+export type LinkEditionContext = {
+    linkSuggestService: LinkSuggestService | null;
+    modelReferenceParser: ModelReferenceParser;
+    modelReferenceSerializer: ModelReferenceSerializer;
+    modelReferenceHandler: ModelReferenceHandler;
+    remoteURLParser: RemoteURLParser;
+    remoteURLSerializer: RemoteURLSerializer;
+    attachmentsService: AttachmentsService;
+    documentService: DocumentService;
 };
 
 // @beta
@@ -142,10 +736,10 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
     unmount: () => void;
 };
 
-// Warnings were encountered during analysis:
+// Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
 //
-// dist/blocknote/utils.d.ts:123:5 - (ae-forgotten-export) The symbol "MacroInsertionEditorPrefillData" needs to be exported by the entry point index.d.ts
-// dist/blocknote/utils.d.ts:123:5 - (ae-forgotten-export) The symbol "MacroBlockInvocation" needs to be exported by the entry point index.d.ts
+// @beta
+export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[], syntax: SyntaxConfig, lang: EditorLanguage): DefaultReactSuggestionItem[];
 
 // (No @packageDocumentation comment for this package)
 

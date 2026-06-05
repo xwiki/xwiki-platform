@@ -2854,7 +2854,7 @@ importers:
         version: link:../../model/model-api
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
-        version: link:../platform-config
+        version: link:../syntaxes-config
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -2887,7 +2887,7 @@ importers:
         specifier: 'catalog:'
         version: 4.1.6(@types/node@24.12.4)(happy-dom@20.7.0)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.8.2))
 
-  xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/platform-config:
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config:
     dependencies:
       '@xwiki/platform-model-api':
         specifier: workspace:*
@@ -3529,7 +3529,7 @@ importers:
         version: link:../../core/model/model-remote-url/model-remote-url-api
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
-        version: link:../../core/syntaxes/platform-config
+        version: link:../../core/syntaxes/syntaxes-config
       '@xwiki/platform-uniast-markdown':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-markdown

@@ -89,7 +89,7 @@ public final class XarUtils
         try {
             xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(documentStream);
         } catch (XMLStreamException e) {
-            throw new XarException("Failed to create a XML read", e);
+            throw new XarException("Failed to create a XML reader", e);
         }
 
         EntityReference reference = null;
@@ -97,6 +97,9 @@ public final class XarUtils
 
         String legacySpace = null;
         String legacyPage = null;
+
+        XarException parseException = null;
+        XarException closeException = null;
 
         try {
             // <xwikidoc>
@@ -165,13 +168,25 @@ public final class XarUtils
                 }
             }
         } catch (XMLStreamException e) {
-            throw new XarException("Failed to parse document", e);
+            parseException = new XarException("Failed to parse document", e);
         } finally {
             try {
                 xmlReader.close();
             } catch (XMLStreamException e) {
-                throw new XarException("Failed to close XML reader", e);
+                closeException = new XarException("Failed to close XML reader", e);
             }
+        }
+
+        // Propagate exceptions outside the finally block so neither masks the other.
+        // Mirrors the suppression semantics of try-with-resources for non-AutoCloseable resources.
+        if (parseException != null) {
+            if (closeException != null) {
+                parseException.addSuppressed(closeException);
+            }
+            throw parseException;
+        }
+        if (closeException != null) {
+            throw closeException;
         }
 
         if (reference == null) {

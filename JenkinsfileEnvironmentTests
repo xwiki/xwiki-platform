@@ -126,9 +126,7 @@ private def getCustomJobProperties()
   return [
     parameters([string(defaultValue: 'none', description: 'Docker Job type', name: 'type')]),
     pipelineTriggers([
-      parameterizedCron('''H 22 * * * %type=docker-latest
-H 0 * * 6 %type=docker-all
-@monthly %type=docker-unsupported'''),
+      parameterizedCron('''H 3 * * * %type=docker-latest'''),
       cron("@monthly")
     ])
   ]

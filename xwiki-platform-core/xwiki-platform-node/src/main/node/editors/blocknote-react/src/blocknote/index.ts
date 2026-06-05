@@ -160,9 +160,6 @@ function querySuggestionsMenuItems(
     query,
   );
 
-  // NOTE: there is no "clean" way to filter these elements as of now, so we rely on their hardcoded title instead
-  // See https://github.com/TypeCellOS/BlockNote/issues/1816
-
   // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
   // eslint-disable-next-line import/namespace
   const locale = locales[lang].slash_menu;

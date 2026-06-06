@@ -36,7 +36,7 @@ public class AttachmentValidationException extends Exception
 
     private final String translationKey;
 
-    private final List<Object> translationParameters;
+    private final transient List<Object> translationParameters;
 
     private final String contextMessage;
 
@@ -135,6 +135,8 @@ public class AttachmentValidationException extends Exception
      */
     public List<Object> getTranslationParameters()
     {
-        return this.translationParameters;
+        // The field is transient, so it can be null after deserialization. Always return a non-null list to preserve
+        // the contract expected by the callers.
+        return this.translationParameters == null ? List.of() : this.translationParameters;
     }
 }

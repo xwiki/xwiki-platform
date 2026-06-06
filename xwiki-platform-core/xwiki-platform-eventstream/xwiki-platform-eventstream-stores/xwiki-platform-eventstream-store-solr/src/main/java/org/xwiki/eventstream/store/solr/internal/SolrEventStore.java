@@ -98,6 +98,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 {
     private static final Map<String, SearchFieldMapping> SEARCH_FIELD_MAPPING = new HashMap<>();
 
+    /**
+     * Solr range query matching any value, i.e. used to check that a field exists.
+     */
+    private static final String SOLR_RANGE_ALL = "[* TO *]";
+
     private static class SearchFieldMapping
     {
         String solrFieldName;
@@ -579,11 +584,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('(');
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
                 builder.append(':');
-                builder.append("[* TO *]");
+                builder.append(SOLR_RANGE_ALL);
                 builder.append(" OR ");
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                 builder.append(':');
-                builder.append("[* TO *]");
+                builder.append(SOLR_RANGE_ALL);
                 builder.append(')');
             }
 
@@ -635,7 +640,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         builder.append(':');
 
         if (values.isEmpty()) {
-            builder.append("[* TO *]");
+            builder.append(SOLR_RANGE_ALL);
 
             return "(-" + builder.toString() + ')';
         } else {

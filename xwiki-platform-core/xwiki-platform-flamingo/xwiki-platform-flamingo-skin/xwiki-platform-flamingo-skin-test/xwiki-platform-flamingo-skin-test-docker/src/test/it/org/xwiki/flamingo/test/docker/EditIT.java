@@ -73,16 +73,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
     }
 )
-public class EditIT
+class EditIT
 {
     @BeforeAll
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
 
     @AfterEach
-    public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
+    void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
@@ -103,7 +103,7 @@ public class EditIT
      */
     @Test
     @Order(1)
-    public void showAndHideEditComments(TestUtils setup, TestReference reference) throws Exception
+    void showAndHideEditComments(TestUtils setup, TestReference reference) throws Exception
     {
         ViewPage vp = setup.gotoPage(reference);
 
@@ -122,6 +122,17 @@ public class EditIT
         } finally {
             setup.setPropertyInXWikiCfg("xwiki.editcomment.hidden=0");
         }
+
+        // Verify that disabling the version summary feature from Administration (Editing > Edit Mode,
+        // "Enable Version Summaries" = No, i.e. the "editcomment" wiki preference) removes the field entirely.
+        try {
+            setup.setWikiPreference("editcomment", "0");
+            vp = setup.gotoPage(reference);
+            wep = vp.editWiki();
+            assertFalse(wep.hasEditComment());
+        } finally {
+            setup.setWikiPreference("editcomment", "1");
+        }
     }
 
     /**
@@ -129,7 +140,7 @@ public class EditIT
      */
     @Test
     @Order(2)
-    public void minorEdit(TestUtils setup, TestReference reference) throws Exception
+    void minorEdit(TestUtils setup, TestReference reference) throws Exception
     {
         setup.deletePage(reference);
         ViewPage vp = setup.gotoPage(reference);
@@ -189,7 +200,7 @@ public class EditIT
      */
     @Test
     @Order(3)
-    public void emptyDocumentContentIsAllowed(TestUtils setup, TestReference reference)
+    void emptyDocumentContentIsAllowed(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         setup.createPage(reference, "this is some content", "EmptyContentAllowed");
@@ -204,7 +215,7 @@ public class EditIT
 
     @Test
     @Order(4)
-    public void emptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved(TestUtils setup, TestReference reference)
+    void emptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         String content = "\n== Section ==\n\ntext";
@@ -218,7 +229,7 @@ public class EditIT
     @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
         + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24487 .")
     @Order(5)
-    public void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
+    void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
     {
         testToolBarButton(setup, reference, "Bold", "**%s**", "Text in Bold");
         testToolBarButton(setup, reference, "Italics", "//%s//", "Text in Italics");
@@ -266,7 +277,7 @@ public class EditIT
      */
     @Test
     @Order(6)
-    public void saveAndFormManipulation(TestUtils setup, TestReference reference)
+    void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         ViewPage viewPage = setup.gotoPage(reference);
@@ -311,7 +322,7 @@ public class EditIT
 
     @Test
     @Order(7)
-    public void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
+    void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
     {
         try {
             DocumentReference invalidateCSRF = new DocumentReference("InvalidateCSRF",
@@ -455,7 +466,7 @@ public class EditIT
      */
     @Test
     @Order(8)
-    public void editWithConflict(TestUtils setup, TestReference testReference)
+    void editWithConflict(TestUtils setup, TestReference testReference)
     {
         // Fixture
         String title = testReference.getLastSpaceReference().getName();
@@ -802,7 +813,7 @@ public class EditIT
      */
     @Test
     @Order(9)
-    public void createDocumentLongTitle(TestUtils setup, TestReference reference)
+    void createDocumentLongTitle(TestUtils setup, TestReference reference)
     {
         String spaceName1 = "Company Presentation Events";
         String spaceName2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
@@ -831,7 +842,7 @@ public class EditIT
      */
     @Test
     @Order(10)
-    public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
+    void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
     {
         setup.deletePage(testReference);
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
@@ -867,7 +878,7 @@ public class EditIT
 
     @Test
     @Order(11)
-    public void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
+    void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
         TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.deletePage(testReference);
@@ -947,7 +958,7 @@ public class EditIT
 
     @Test
     @Order(12)
-    public void switchSyntaxFromWikiEditMode(TestUtils setup, TestReference testReference) throws Exception
+    void switchSyntaxFromWikiEditMode(TestUtils setup, TestReference testReference) throws Exception
     {
         // Fixture: enable the XHTML syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
@@ -1049,7 +1060,7 @@ public class EditIT
 
     @Test
     @Order(13)
-    public void saveActionValidatesWhenXValidateIsPresent(TestUtils setup, TestReference testReference)
+    void saveActionValidatesWhenXValidateIsPresent(TestUtils setup, TestReference testReference)
     {
         String content = "{{velocity}}"
             + "value: $doc.display('prop')\n\n"
@@ -1090,7 +1101,7 @@ public class EditIT
 
     @Test
     @Order(14)
-    public void logoutDuringEdit(TestUtils setup, TestReference testReference)
+    void logoutDuringEdit(TestUtils setup, TestReference testReference)
     {
         // fixture: deny right edit to the guest user on the page, since we want to get a 401 as in XWiki Standard
         setup.createPage(testReference, "", "");

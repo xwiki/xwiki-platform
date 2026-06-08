@@ -364,7 +364,8 @@ XWiki.widgets.LiveTable = Class.create({
       } else {
         this._handleCell(fieldName, descriptor, displayName, row, table, column, showFilterNote, tr);
       }
-    });
+    // Pass 'this' as the context for the forEach call back, otherwise 'this' is undefined.
+    }, this);
     return tr;
   },
   _handleNonViewableCell(fieldName, descriptor, displayName, column, tr)

@@ -94,6 +94,7 @@ import org.xwiki.search.solr.SolrUtils;
 @Component
 @Singleton
 @Named("solr")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class SolrEventStore extends AbstractAsynchronousEventStore
 {
     private static final Map<String, SearchFieldMapping> SEARCH_FIELD_MAPPING = new HashMap<>();
@@ -103,11 +104,20 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
      */
     private static final String SOLR_RANGE_ALL = "[* TO *]";
 
-    private static class SearchFieldMapping
-    {
-        String solrFieldName;
+    /**
+     * Solr boolean OR operator used to combine query clauses.
+     */
+    private static final String SOLR_OR = " OR ";
 
-        Type type;
+    private static final String FAILED_COMMIT = "Failed to commit";
+
+    private static final String FAILED_QUERY = "Failed to execute Solr query";
+
+    private static final class SearchFieldMapping
+    {
+        private String solrFieldName;
+
+        private Type type;
 
         SearchFieldMapping(String solrFieldName)
         {
@@ -173,7 +183,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         try {
             commit();
         } catch (EventStreamException e) {
-            this.logger.error("Failed to commit", e);
+            this.logger.error(FAILED_COMMIT, e);
         }
 
         super.afterTasks(tasks);
@@ -391,10 +401,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         try {
             this.client.commit();
         } catch (Exception e) {
-            throw new EventStreamException("Failed to commit", e);
+            throw new EventStreamException(FAILED_COMMIT, e);
         }
     }
 
+    /**
+     * @param eventId the identifier of the event to retrieve
+     * @return the Solr document matching the passed event identifier, or {@code null} if none exists
+     * @throws SolrServerException if there is an error while querying the Solr server
+     * @throws IOException if there is a communication error with the Solr server
+     */
     public SolrDocument getEventDocument(String eventId) throws SolrServerException, IOException
     {
         return this.client.getById(eventId);
@@ -422,7 +438,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             events.stream().map(Event::getId).collect(Collectors.toList())));
 
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
-            + " OR " + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));
+            + SOLR_OR + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));
 
         // Without it the query will only return 10 first results.
         solrQuery.setRows(events.size());
@@ -431,7 +447,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         try {
             response = this.client.query(solrQuery);
         } catch (Exception e) {
-            throw new EventStreamException("Failed to execute Solr query", e);
+            throw new EventStreamException(FAILED_QUERY, e);
         }
 
         SolrDocumentList documents = response.getResults();
@@ -504,19 +520,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         }
 
         if (query instanceof PageableEventQuery) {
-            PageableEventQuery pageableQuery = (PageableEventQuery) query;
-
-            if (pageableQuery.getOffset() > 0) {
-                solrQuery.setStart((int) pageableQuery.getOffset());
-            }
-
-            // FIXME: this should probably be fixed in the future, we shouldn't allow to try retrieving unlimited
-            // results since it's not allowed by Solr API.
-            if (pageableQuery.getLimit() >= 0) {
-                solrQuery.setRows((int) pageableQuery.getLimit());
-            } else {
-                solrQuery.setRows(Integer.MAX_VALUE - 1);
-            }
+            applyPageable(solrQuery, (PageableEventQuery) query);
         }
 
         if (query instanceof SortableEventQuery) {
@@ -533,6 +537,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         }
 
         return solrQuery;
+    }
+
+    private void applyPageable(SolrQuery solrQuery, PageableEventQuery pageableQuery)
+    {
+        if (pageableQuery.getOffset() > 0) {
+            solrQuery.setStart((int) pageableQuery.getOffset());
+        }
+
+        // FIXME: this should probably be fixed in the future, we shouldn't allow to try retrieving unlimited
+        // results since it's not allowed by Solr API.
+        if (pageableQuery.getLimit() >= 0) {
+            solrQuery.setRows((int) pageableQuery.getLimit());
+        } else {
+            solrQuery.setRows(Integer.MAX_VALUE - 1);
+        }
     }
 
     private void addConditions(List<QueryCondition> conditions, SolrQuery solrQuery)
@@ -585,7 +604,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
                 builder.append(':');
                 builder.append(SOLR_RANGE_ALL);
-                builder.append(" OR ");
+                builder.append(SOLR_OR);
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                 builder.append(':');
                 builder.append(SOLR_RANGE_ALL);
@@ -599,7 +618,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
             builder.append(':');
             builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
-            builder.append(" OR ");
+            builder.append(SOLR_OR);
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
             builder.append(':');
             builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
@@ -646,7 +665,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         } else {
             builder.append('(');
             builder.append(
-                StringUtils.join(values.stream().map(this.utils::toCompleteFilterQueryString).iterator(), " OR "));
+                StringUtils.join(values.stream().map(this.utils::toCompleteFilterQueryString).iterator(), SOLR_OR));
             builder.append(')');
 
             return builder.toString();
@@ -669,7 +688,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         for (QueryCondition condition : group.getConditions()) {
             if (builder.length() > 1) {
                 if (group.isOr()) {
-                    builder.append(" OR ");
+                    builder.append(SOLR_OR);
                 } else {
                     builder.append(" AND ");
                 }
@@ -699,18 +718,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (condition.isCustom()) {
             Type customType = condition.getCustomType();
             if (customType == null) {
-                Object value = null;
-                if (condition instanceof CompareQueryCondition) {
-                    value = ((CompareQueryCondition) condition).getValue();
-                } else if (condition instanceof InQueryCondition) {
-                    List<Object> values = ((InQueryCondition) condition).getValues();
-                    if (values != null && !values.isEmpty()) {
-                        value = values.get(0);
-                    }
-                }
-                if (value != null) {
-                    customType = value.getClass();
-                }
+                customType = resolveCustomType(condition);
             }
 
             // It's a custom parameter
@@ -718,6 +726,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         } else {
             return condition.getProperty();
         }
+    }
+
+    private Type resolveCustomType(AbstractPropertyQueryCondition condition)
+    {
+        Object value = null;
+        if (condition instanceof CompareQueryCondition) {
+            value = ((CompareQueryCondition) condition).getValue();
+        } else if (condition instanceof InQueryCondition) {
+            List<Object> values = ((InQueryCondition) condition).getValues();
+            if (values != null && !values.isEmpty()) {
+                value = values.getFirst();
+            }
+        }
+
+        return value != null ? value.getClass() : null;
     }
 
     private String toSolrFieldName(SortClause sort)
@@ -772,6 +795,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('*');
                 builder.append(this.utils.toFilterQueryString(condition.getValue()));
                 builder.append('*');
+                break;
+
+            default:
                 break;
         }
 
@@ -848,7 +874,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         try {
             response = this.client.query(solrQuery);
         } catch (Exception e) {
-            throw new EventStreamException("Failed to execute Solr query", e);
+            throw new EventStreamException(FAILED_QUERY, e);
         }
 
         SolrDocumentList documents = response.getResults();

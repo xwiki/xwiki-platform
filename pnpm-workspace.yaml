@@ -1,5 +1,6 @@
 packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-bootstrap/src/main/node
   - xwiki-platform-core/xwiki-platform-component/xwiki-platform-component-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-componentstore/src/main/node
@@ -76,6 +77,7 @@ catalog:
   "@mantine/hooks": 8.3.14
   "@microsoft/api-extractor": 7.58.7
   "@playwright/experimental-ct-react": 1.61.0-alpha-2026-06-08
+  "@playwright/test": 1.61.0-alpha-2026-06-08
   "@tsconfig/node24": 24.0.4
   "@types/jquery": 4.0.0
   "@types/jsdom": 28.0.3
@@ -130,6 +132,7 @@ catalog:
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
   publint: 0.3.21
+  qunit: 2.26.0
   react: 19.2.7
   react-dom: 19.2.7
   react-i18next: 17.0.8

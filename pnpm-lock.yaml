@@ -36,6 +36,9 @@ catalogs:
     '@playwright/experimental-ct-react':
       specifier: 1.61.0-alpha-2026-06-08
       version: 1.61.0-alpha-2026-06-08
+    '@playwright/test':
+      specifier: 1.61.0-alpha-2026-06-08
+      version: 1.61.0-alpha-2026-06-08
     '@tsconfig/node24':
       specifier: 24.0.4
       version: 24.0.4
@@ -198,6 +201,9 @@ catalogs:
     publint:
       specifier: 0.3.21
       version: 0.3.21
+    qunit:
+      specifier: 2.26.0
+      version: 2.26.0
     react:
       specifier: 19.2.7
       version: 19.2.7
@@ -420,6 +426,36 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.4(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-bootstrap/src/main/node:
+    devDependencies:
+      '@eslint/js':
+        specifier: 'catalog:'
+        version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.61.0-alpha-2026-06-08
+      cross-env:
+        specifier: 'catalog:'
+        version: 7.0.3
+      eslint:
+        specifier: 'catalog:'
+        version: 10.4.0(jiti@2.7.0)
+      globals:
+        specifier: 'catalog:'
+        version: 17.6.0
+      jquery:
+        specifier: 'catalog:'
+        version: 4.0.0
+      qunit:
+        specifier: 'catalog:'
+        version: 2.26.0
+      typescript-eslint:
+        specifier: 'catalog:'
+        version: 8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)
 
   xwiki-platform-core/xwiki-platform-component/xwiki-platform-component-webjar/src/main/node:
     dependencies:
@@ -3811,6 +3847,11 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@playwright/test@1.61.0-alpha-2026-06-08':
+    resolution: {integrity: sha512-JgwFFggy+h/q9N/hsooZnE4Xnnqbq68e4WtAvw6kzq1kEHH2bKzSyD+6DCmOYGt9blqCcwvie9D/1ow/vu7Azg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
@@ -4879,6 +4920,10 @@ packages:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
     engines: {node: '>=14'}
 
+  commander@7.2.0:
+    resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
+    engines: {node: '>= 10'}
+
   comment-parser@1.4.6:
     resolution: {integrity: sha512-ObxuY6vnbWTN6Od72xfwN9DbzC7Y2vv8u1Soi9ahRKL37gb6y1qk6/dgjs+3JWuXJHWvsg3BXIwzd/rkmAwavg==}
     engines: {node: '>= 12.0.0'}
@@ -5439,6 +5484,12 @@ packages:
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
+
+  globalyzer@0.1.0:
+    resolution: {integrity: sha512-40oNTM9UfG6aBmuKxk/giHn5nQ8RVz/SS4Ir6zgzOv9/qC3kKZ9v4etGTcJbEl/NyVQH7FGU7d+X1egr57Md2Q==}
+
+  globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -6103,6 +6154,10 @@ packages:
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
 
+  node-watch@0.7.3:
+    resolution: {integrity: sha512-3l4E8uMPY1HdMMryPRUAl+oIHtXtyiTlIiESNSVSNxcPfzAFzeTbXFQkZfAwBbo0B1qMSG8nUABx+Gd+YrbKrQ==}
+    engines: {node: '>=6'}
+
   nopt@7.2.1:
     resolution: {integrity: sha512-taM24ViiimT/XntxbPyJQzCG+p4EKOpgD3mxFwW38mGjVUrfERQOeY4EDHjdnptttfHuHQXFx+lTP08Q+mLa/w==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -6483,6 +6538,11 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  qunit@2.26.0:
+    resolution: {integrity: sha512-KSv16YomcYmiK90qTOJl3Bm5IvTf2upqQDdBQWCvSQWe94FWobnUgKOpvpvZdG7VkDt3TJSI8k8g9+GGGEd7Fw==}
+    engines: {node: '>=10'}
+    hasBin: true
 
   react-dom@19.2.7:
     resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
@@ -6904,6 +6964,9 @@ packages:
   tar-stream@2.2.0:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
+
+  tiny-glob@0.2.9:
+    resolution: {integrity: sha512-g/55ssRPUjShh+xkfx9UPDXqhckHEsHr4Vd9zX55oSdGZc/MD0m3sferOkwWtp98bv+kcVfEHtRJgBVJzelrzg==}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -8290,6 +8353,10 @@ snapshots:
       - vite
       - yaml
 
+  '@playwright/test@1.61.0-alpha-2026-06-08':
+    dependencies:
+      playwright: 1.61.0-alpha-2026-06-08
+
   '@popperjs/core@2.11.8': {}
 
   '@publint/pack@0.1.4': {}
@@ -9404,6 +9471,8 @@ snapshots:
 
   commander@10.0.1: {}
 
+  commander@7.2.0: {}
+
   comment-parser@1.4.6: {}
 
   compare-versions@6.1.1: {}
@@ -10058,6 +10127,10 @@ snapshots:
     dependencies:
       define-properties: 1.2.1
       gopd: 1.2.0
+
+  globalyzer@0.1.0: {}
+
+  globrex@0.1.2: {}
 
   gopd@1.2.0: {}
 
@@ -10944,6 +11017,8 @@ snapshots:
 
   node-releases@2.0.27: {}
 
+  node-watch@0.7.3: {}
+
   nopt@7.2.1:
     dependencies:
       abbrev: 2.0.0
@@ -11453,6 +11528,12 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
+  qunit@2.26.0:
+    dependencies:
+      commander: 7.2.0
+      node-watch: 0.7.3
+      tiny-glob: 0.2.9
+
   react-dom@19.2.7(react@19.2.7):
     dependencies:
       react: 19.2.7
@@ -11950,6 +12031,11 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
+
+  tiny-glob@0.2.9:
+    dependencies:
+      globalyzer: 0.1.0
+      globrex: 0.1.2
 
   tinybench@2.9.0: {}
 

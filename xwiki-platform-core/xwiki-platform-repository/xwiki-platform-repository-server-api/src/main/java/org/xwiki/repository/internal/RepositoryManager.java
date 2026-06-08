@@ -97,6 +97,9 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -108,6 +111,11 @@ import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 
+/**
+ * Expose various tools to manipulate extensions in the wiki.
+ * 
+ * @version $Id$
+ */
 @Component(roles = RepositoryManager.class)
 @Singleton
 public class RepositoryManager implements Initializable, Disposable
@@ -184,6 +192,9 @@ public class RepositoryManager implements Initializable, Disposable
 
     @Inject
     protected ExtensionStore extensionStore;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private Logger logger;
@@ -619,7 +630,7 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     public DocumentReference importExtension(String extensionId, ExtensionRepository repository, Type type)
-        throws QueryException, XWikiException, ResolveException
+        throws QueryException, XWikiException, ResolveException, AccessDeniedException
     {
         TreeMap<Version, String> extensionVersions = new TreeMap<>();
 
@@ -660,6 +671,10 @@ public class RepositoryManager implements Initializable, Disposable
 
             needSave = true;
         }
+
+        // Make sure the current user is allowed to edit the extension document before performing any side effect
+        // (saving the extension document, creating or deleting version pages, etc.).
+        this.authorization.checkAccess(Right.EDIT, document.getDocumentReference());
 
         // Update document
 

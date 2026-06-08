@@ -23,6 +23,7 @@ import flushPromises from "flush-promises";
 import $ from "jquery";
 import _ from "lodash-es";
 import { describe, expect, it, vi } from "vitest";
+import { reactive } from "vue";
 
 vi.mock("../../services/require.js", () => {
   return {
@@ -108,6 +109,37 @@ describe("FilterList.vue", () => {
     expect(wrapper.find("span").html()).toBe(
       '<span><input class="filter-list livedata-filter" aria-label="livedata.filter.list.label"></span>',
     );
+  });
+
+  it("Displays the empty option when the operator is switched to empty externally", async () => {
+    // Reactive filter group so that mutating the operator (as the advanced filtering panel does) triggers the
+    // component reactivity.
+    const filterGroup = reactive({
+      constraints: [{ value: "U1", operator: "contains" }],
+    });
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getQueryFilterGroup() {
+              return filterGroup;
+            },
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // The column filter initially displays the selected value.
+    expect(wrapper.vm.$refs.input.value).toBe("U1");
+
+    // Simulate selecting the "empty" operator in the advanced filtering panel.
+    filterGroup.constraints[0].operator = "empty";
+    await wrapper.vm.$nextTick();
+
+    // Verify the value is the empty operator (the comma is the convention used to display the empty
+    // option).
+    expect(wrapper.vm.$refs.input.value).toBe(",");
   });
 
   it("Render the filter list when Empty filter and advanced", async () => {

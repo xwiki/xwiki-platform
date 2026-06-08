@@ -38,7 +38,7 @@
     <xwiki.extension.name>Extension Repository Server</xwiki.extension.name>
     <!-- Needs to be installed on root to be available via REST -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -98,6 +98,13 @@
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

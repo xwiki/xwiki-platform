@@ -722,7 +722,8 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(3);
 
         // Filter the user list column by (empty): only the entry with Nikolay is expected.
-        tableLayout.filterColumn(USER_COLUMN, CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
+        tableLayout.filterColumn(USER_COLUMN, CHOICE_EMPTY, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
 

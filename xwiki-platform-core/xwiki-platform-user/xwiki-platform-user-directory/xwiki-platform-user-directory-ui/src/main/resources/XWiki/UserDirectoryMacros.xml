@@ -211,7 +211,7 @@
 ##
 #macro (displayUserDirectoryCustomizationForm)
   #if (!$configurationDoc.hasAccessLevel('edit'))
-    {{error}}$services.localization.render('platform.userdirectory.customizeNotAllowed'){{/error}}
+    {{error}}{{translation key="platform.userdirectory.customizeNotAllowed"/}}{{/error}}
   #else
     #handleUserDirectoryAction()
     ##
@@ -303,25 +303,19 @@
     #displayUserDirectoryCustomizationForm()
   #elseif ($isCustomized)
     {{warning}}
-    $services.localization.render('xe.userdirectory.isCustomizedWarning', [
-      "$doc.fullName",
-      $escapetool.url({
-        'customize': true,
-        'action': 'reset',
-        'xredirect': $xredirect,
-        'form_token': $services.csrf.token
-      }),
-      "$doc.fullName",
-      'customize=true'
-    ])
+      {{translation key="platform.userdirectory.isCustomizedWarning"/}}
+
+      [[{{translation key="platform.userdirectory.resetButton"/}}&gt;&gt;||queryString="customize=true&amp;action=reset&amp;xredirect=$escapetool.xml($xredirect)&amp;form_token=$escapetool.xml($services.csrf.token)" class="btn btn-default"]] [[{{translation key="platform.userdirectory.customizeButton"/}}&gt;&gt;||queryString="customize=true" class="btn btn-default"]]
     {{/warning}}
   #elseif ($isGuest)
     {{info}}
-    $services.localization.render('xe.userdirectory.canCustomizeInfoGuest', ["path:$doc.getURL('login')"])
+      {{translation key="platform.userdirectory.canCustomizeInfoGuest"/}}
     {{/info}}
   #else
     {{info}}
-    $services.localization.render('xe.userdirectory.canCustomizeInfo', ["$doc.fullName", 'customize=true'])
+      {{translation key="platform.userdirectory.canCustomizeInfo"/}}
+
+      [[{{translation key="platform.userdirectory.customizeButton"/}}&gt;&gt;||queryString="customize=true" class="btn btn-default"]]
     {{/info}}
   #end
 #end

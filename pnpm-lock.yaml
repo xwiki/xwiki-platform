@@ -129,9 +129,6 @@ catalogs:
     globals:
       specifier: 17.6.0
       version: 17.6.0
-    happy-dom:
-      specifier: 20.9.0
-      version: 20.9.0
     i18next:
       specifier: 26.3.1
       version: 26.3.1
@@ -1004,12 +1001,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1123,9 +1120,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1163,9 +1160,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1239,9 +1236,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1282,9 +1279,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1362,9 +1359,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1408,9 +1405,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1447,9 +1444,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1597,9 +1594,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1776,9 +1773,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1855,12 +1852,12 @@ importers:
       flush-promises:
         specifier: 'catalog:'
         version: 1.0.2
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       jquery:
         specifier: 'catalog:'
         version: 4.0.0
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -2047,9 +2044,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2090,9 +2087,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2129,9 +2126,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2178,12 +2175,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -2227,12 +2224,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2269,9 +2266,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
+      jsdom:
         specifier: 'catalog:'
-        version: 20.9.0
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2312,12 +2309,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2361,12 +2358,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2566,12 +2563,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.9.0
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -8671,11 +8668,13 @@ snapshots:
 
   '@types/use-sync-external-store@1.5.0': {}
 
-  '@types/whatwg-mimetype@3.0.2': {}
+  '@types/whatwg-mimetype@3.0.2':
+    optional: true
 
   '@types/ws@8.18.1':
     dependencies:
       '@types/node': 24.12.4
+    optional: true
 
   '@typescript-eslint/eslint-plugin@8.59.4(@typescript-eslint/parser@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3)':
     dependencies:
@@ -10050,6 +10049,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    optional: true
 
   has-bigints@1.1.0: {}
 
@@ -12456,7 +12456,8 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  whatwg-mimetype@3.0.0: {}
+  whatwg-mimetype@3.0.0:
+    optional: true
 
   whatwg-mimetype@5.0.0: {}
 
@@ -12542,7 +12543,8 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@8.21.0: {}
+  ws@8.21.0:
+    optional: true
 
   xml-name-validator@4.0.0: {}
 

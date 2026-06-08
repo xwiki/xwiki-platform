@@ -49,7 +49,7 @@
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "happy-dom": "catalog:",
+    "jsdom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

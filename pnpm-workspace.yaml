@@ -107,7 +107,6 @@ catalog:
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
   globals: 17.6.0
-  happy-dom: 20.9.0
   i18next: 26.3.1
   inversify: 7.11.0
   jiti: 2.7.0

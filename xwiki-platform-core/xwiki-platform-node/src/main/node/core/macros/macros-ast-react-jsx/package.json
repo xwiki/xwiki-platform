@@ -55,6 +55,7 @@
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
+    "jsdom": "catalog:",
     "react": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

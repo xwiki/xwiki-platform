@@ -1007,6 +1007,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1669,6 +1672,9 @@ importers:
       jquery:
         specifier: 'catalog:'
         version: 4.0.0
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -1980,6 +1986,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       react:
         specifier: 'catalog:'
         version: 19.2.5
@@ -2026,6 +2035,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2105,6 +2117,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2151,6 +2166,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2353,6 +2371,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)
+      jsdom:
+        specifier: 'catalog:'
+        version: 29.1.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -7311,8 +7332,8 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  ws@8.19.0:
-    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -10047,7 +10068,7 @@ snapshots:
       '@types/ws': 8.18.1
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.19.0
+      ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -12573,7 +12594,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@8.19.0:
+  ws@8.21.0:
     optional: true
 
   xml-name-validator@4.0.0: {}

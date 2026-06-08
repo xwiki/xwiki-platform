@@ -72,6 +72,7 @@
     "eslint": "catalog:",
     "flush-promises": "catalog:",
     "jquery": "catalog:",
+    "jsdom": "catalog:",
     "lodash-es": "catalog:",
     "sinon": "catalog:",
     "typescript": "catalog:",

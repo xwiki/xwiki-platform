@@ -244,8 +244,8 @@ catalogs:
       specifier: 4.0.1
       version: 4.0.1
     vite-plugin-dts:
-      specifier: 5.0.2
-      version: 5.0.2
+      specifier: 4.5.4
+      version: 4.5.4
     vitest:
       specifier: 4.1.6
       version: 4.1.6
@@ -710,7 +710,7 @@ importers:
         version: 4.0.1(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.2(@microsoft/api-extractor@7.58.7(@types/node@24.12.4))(esbuild@0.27.3)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
+        version: 4.5.4(@types/node@24.12.4)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
@@ -4517,6 +4517,9 @@ packages:
   '@vue/compiler-ssr@3.5.34':
     resolution: {integrity: sha512-cDtTHKibkThKGHH1SP+WdccquNRYQDFH6rRjQCqT9G2ltFAfoR5pUftpab/z+aM5mW9HLLVQW7hfKKQe/1GBeQ==}
 
+  '@vue/compiler-vue2@2.7.16':
+    resolution: {integrity: sha512-qYC3Psj9S/mfu9uVi5WvNZIzq+xnXMhOwbTFKKDD7b1lhpnn71jXSFdTQ+WsIEk0ONCd7VV2IMm7ONl6tbQ86A==}
+
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
@@ -4551,6 +4554,14 @@ packages:
       eslint: ^9.10.0 || ^10.0.0
       eslint-plugin-vue: ^9.28.0 || ^10.0.0
       typescript: '>=4.8.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@vue/language-core@2.2.0':
+    resolution: {integrity: sha512-O1ZZFaaBGkKbsRfnVH1ifOK1/1BUkyK+3SQsfnh6PmMmD4qJcTU8godCeA96jjDRTL6zgnK7YzCHfaUlH2r0Mw==}
+    peerDependencies:
+      typescript: '*'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -4638,6 +4649,9 @@ packages:
 
   ajv@8.18.0:
     resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
+
+  alien-signals@0.4.14:
+    resolution: {integrity: sha512-itUAVzhczTmP2U5yX67xVpsbbOiquusbWVyA9N+sy6+r6YVbFkahXvNCeEPWEOMhwDYwbVbGHFkVL03N9I5g+Q==}
 
   alien-signals@3.2.1:
     resolution: {integrity: sha512-I8FjmltrfnDFoZedi5CG8DghVYNhzb/Ijluz7tCSJH0xpd0484Kowhbb1XDYOxfJpU1p5wnM2X54dA+IfGyD1g==}
@@ -4923,6 +4937,9 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
+
+  de-indent@1.0.2:
+    resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -5497,6 +5514,10 @@ packages:
 
   hastscript@9.0.1:
     resolution: {integrity: sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==}
+
+  he@1.2.0:
+    resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
+    hasBin: true
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
@@ -7037,43 +7058,9 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
-  unplugin-dts@1.0.2:
-    resolution: {integrity: sha512-VbNiMD0LMl/t6nJueGtrCp79N7ZO1nquxj/FUybJDnKwZGsnW2wjdwBSzA3QEHujoxmxZIptsG43hL7LzXE96w==}
-    peerDependencies:
-      '@microsoft/api-extractor': '>=7'
-      '@rspack/core': ^1
-      '@vue/language-core': ~3.1.5
-      esbuild: '*'
-      rolldown: '*'
-      rollup: '>=3'
-      typescript: '>=4'
-      vite: '>=3'
-      webpack: ^4 || ^5
-    peerDependenciesMeta:
-      '@microsoft/api-extractor':
-        optional: true
-      '@rspack/core':
-        optional: true
-      '@vue/language-core':
-        optional: true
-      esbuild:
-        optional: true
-      rolldown:
-        optional: true
-      rollup:
-        optional: true
-      vite:
-        optional: true
-      webpack:
-        optional: true
-
   unplugin-utils@0.3.1:
     resolution: {integrity: sha512-5lWVjgi6vuHhJ526bI4nlCOmkCIF3nnfXkCMDeMJrtdvxTs6ZFCM8oNufGTsDbKv/tJ/xj8RpvXjRuPBZJuJog==}
     engines: {node: '>=20.19.0'}
-
-  unplugin@2.3.11:
-    resolution: {integrity: sha512-5uKD0nqiYVzlmCRs01Fhs2BdkEgBS3SAVP6ndrBsuK42iC2+JHyxM05Rm9G8+5mkmRtzMZGY8Ct5+mliZxU/Ww==}
-    engines: {node: '>=18.12.0'}
 
   unplugin@3.0.0:
     resolution: {integrity: sha512-0Mqk3AT2TZCXWKdcoaufeXNukv2mTrEZExeXlHIOZXdqYoHHr4n51pymnwV8x2BOVxwXbK2HLlI7usrqMpycdg==}
@@ -7167,17 +7154,12 @@ packages:
     peerDependencies:
       vite: '>2.0.0-0'
 
-  vite-plugin-dts@5.0.2:
-    resolution: {integrity: sha512-lNeHS+dwGju6eRmNvZQt8Shwv9j3m98hbHse/lIbLq9q3yE2DcIOBBYQEVUF6tS0kOmv+VA9Z5FqmzFnGe4U8g==}
+  vite-plugin-dts@4.5.4:
+    resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
     peerDependencies:
-      '@microsoft/api-extractor': '>=7'
-      rollup: '>=3'
-      vite: '>=3'
+      typescript: '*'
+      vite: '*'
     peerDependenciesMeta:
-      '@microsoft/api-extractor':
-        optional: true
-      rollup:
-        optional: true
       vite:
         optional: true
 
@@ -9034,6 +9016,11 @@ snapshots:
       '@vue/compiler-dom': 3.5.34
       '@vue/shared': 3.5.34
 
+  '@vue/compiler-vue2@2.7.16':
+    dependencies:
+      de-indent: 1.0.2
+      he: 1.2.0
+
   '@vue/devtools-api@6.6.4': {}
 
   '@vue/devtools-api@7.7.9':
@@ -9093,6 +9080,19 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
+
+  '@vue/language-core@2.2.0(typescript@5.9.3)':
+    dependencies:
+      '@volar/language-core': 2.4.28
+      '@vue/compiler-dom': 3.5.34
+      '@vue/compiler-vue2': 2.7.16
+      '@vue/shared': 3.5.34
+      alien-signals: 0.4.14
+      minimatch: 9.0.5
+      muggle-string: 0.4.1
+      path-browserify: 1.0.1
+    optionalDependencies:
+      typescript: 5.9.3
 
   '@vue/language-core@3.3.4':
     dependencies:
@@ -9177,6 +9177,8 @@ snapshots:
       fast-uri: 3.1.0
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
+
+  alien-signals@0.4.14: {}
 
   alien-signals@3.2.1: {}
 
@@ -9457,6 +9459,8 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
+
+  de-indent@1.0.2: {}
 
   debug@4.4.3:
     dependencies:
@@ -10197,6 +10201,8 @@ snapshots:
       hast-util-parse-selector: 4.0.0
       property-information: 7.1.0
       space-separated-tokens: 2.0.2
+
+  he@1.2.0: {}
 
   hookable@5.5.3: {}
 
@@ -12098,36 +12104,10 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-dts@1.0.2(@microsoft/api-extractor@7.58.7(@types/node@24.12.4))(esbuild@0.27.3)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)):
-    dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.55.1)
-      '@volar/typescript': 2.4.28
-      compare-versions: 6.1.1
-      debug: 4.4.3
-      kolorist: 1.8.0
-      local-pkg: 1.1.2
-      magic-string: 0.30.21
-      typescript: 5.9.3
-      unplugin: 2.3.11
-    optionalDependencies:
-      '@microsoft/api-extractor': 7.58.7(@types/node@24.12.4)
-      esbuild: 0.27.3
-      rollup: 4.55.1
-      vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)
-    transitivePeerDependencies:
-      - supports-color
-
   unplugin-utils@0.3.1:
     dependencies:
       pathe: 2.0.3
       picomatch: 4.0.4
-
-  unplugin@2.3.11:
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      acorn: 8.16.0
-      picomatch: 4.0.4
-      webpack-virtual-modules: 0.6.2
 
   unplugin@3.0.0:
     dependencies:
@@ -12235,21 +12215,24 @@ snapshots:
     dependencies:
       vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)
 
-  vite-plugin-dts@5.0.2(@microsoft/api-extractor@7.58.7(@types/node@24.12.4))(esbuild@0.27.3)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)):
+  vite-plugin-dts@4.5.4(@types/node@24.12.4)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)):
     dependencies:
-      unplugin-dts: 1.0.2(@microsoft/api-extractor@7.58.7(@types/node@24.12.4))(esbuild@0.27.3)(rollup@4.55.1)(typescript@5.9.3)(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0))
-    optionalDependencies:
       '@microsoft/api-extractor': 7.58.7(@types/node@24.12.4)
-      rollup: 4.55.1
+      '@rollup/pluginutils': 5.3.0(rollup@4.55.1)
+      '@volar/typescript': 2.4.28
+      '@vue/language-core': 2.2.0(typescript@5.9.3)
+      compare-versions: 6.1.1
+      debug: 4.4.3
+      kolorist: 1.8.0
+      local-pkg: 1.1.2
+      magic-string: 0.30.21
+      typescript: 5.9.3
+    optionalDependencies:
       vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.14))(yaml@2.9.0)
     transitivePeerDependencies:
-      - '@rspack/core'
-      - '@vue/language-core'
-      - esbuild
-      - rolldown
+      - '@types/node'
+      - rollup
       - supports-color
-      - typescript
-      - webpack
 
   vite@6.4.1(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.9.0):
     dependencies:

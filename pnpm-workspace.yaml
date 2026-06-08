@@ -75,7 +75,7 @@ catalog:
   "@mantine/core": 8.3.14
   "@mantine/hooks": 8.3.14
   "@microsoft/api-extractor": 7.58.7
-  "@playwright/experimental-ct-react": 1.60.0
+  "@playwright/experimental-ct-react": 1.61.0-alpha-2026-06-08
   "@tsconfig/node24": 24.0.4
   "@types/jquery": 4.0.0
   "@types/jsdom": 28.0.3

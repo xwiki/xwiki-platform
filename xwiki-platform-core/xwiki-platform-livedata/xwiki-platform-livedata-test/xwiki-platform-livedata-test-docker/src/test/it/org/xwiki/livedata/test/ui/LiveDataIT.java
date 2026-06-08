@@ -696,6 +696,42 @@ class LiveDataIT
         assertThat(viewPage.getContent(), containsString(velocityError));
     }
 
+    /**
+     * Non-regression test (see XWIKI-24421). Makes sure that, for a selectize filter in the header of a column, moving
+     * from the (empty) filter to another value actually update the filters to the new value.
+     */
+    @Test
+    @Order(10)
+    void filterListSwitchFromEmptyToValue(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // The user filter suggestions are built from the existing users, so make sure they exist.
+        testUtils.createUser("U1", "U1", null);
+        testUtils.createUser("U2", "U2", null);
+
+        // Reuse the shared class/objects: O1 has user U1, O2 has user U2 and O3 has an empty user.
+        List<String> properties = List.of(NAME_COLUMN, USER_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter the user list column by (empty): only the entry with Nikolay is expected.
+        tableLayout.filterColumn(USER_COLUMN, CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
+
+        // Switch the filter from (empty) to an U1:  only the entry with Lynda is expected.
+        tableLayout.filterColumn(USER_COLUMN, "U1");
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+    }
+
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception
     {
         DocumentReference translationDocumentReference =

@@ -132,6 +132,39 @@ describe("FilterList.vue", () => {
     expect(wrapper.vm.$refs.input.value).toBe(",");
   });
 
+  it("Applies the default operator when switching from the empty filter to a value", async () => {
+    const filter = vi.fn();
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getFilterDefaultOperator() {
+              return "equals";
+            },
+            filter,
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // Simulate a selectize widget with one selected (non-empty) value.
+    wrapper.vm.$refs.input.selectize = { items: ["U1"] };
+    // Simulate the user selecting a non-empty value while the empty operator is active.
+    wrapper.vm.selectizeSettings.onChange("U1");
+
+    // Make sure the filter is called with the right value.
+    expect(filter).toHaveBeenCalledWith(
+      "user1",
+      0,
+      { value: "U1" },
+      {
+        filterOperator: "equals",
+        skipFetch: false,
+      },
+    );
+  });
+
   it("Render the filter list when Empty filter and advanced", async () => {
     const wrapper = initWrapper({
       props: { index: 0, isAdvanced: true },

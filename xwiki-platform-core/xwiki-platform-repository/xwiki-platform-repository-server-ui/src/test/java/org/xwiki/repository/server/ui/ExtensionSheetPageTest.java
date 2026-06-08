@@ -238,7 +238,7 @@ class ExtensionSheetPageTest extends PageTest
         this.context.setDoc(this.testPageDocument);
         Document document = renderHTMLPage(this.extensionSheetDocument);
 
-        assertEquals("extension.repository.sheet.imported %s".formatted(this.testString),
+        assertEquals("repository.extension.sheet.imported %s".formatted(this.testString),
             document.select("span.infomessage").text());
         assertEquals("http://example.com]]MARKER", document.select("span.infomessage a").attr("href"));
     }

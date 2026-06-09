@@ -27,10 +27,10 @@ import javax.script.ScriptContext;
 
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.Initialized;
@@ -66,8 +66,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("entranslationmessage"
-                    + Arrays.toString(parameters)) : new WordBlock("entranslationmessage");
+                return parameters.length > 0 ? new WordBlock("entranslationmessage" + Arrays.toString(parameters))
+                    : new WordBlock("entranslationmessage");
             }
 
             @Override
@@ -106,8 +106,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("frtranslationmessage"
-                    + Arrays.toString(parameters)) : new WordBlock("frtranslationmessage");
+                return parameters.length > 0 ? new WordBlock("frtranslationmessage" + Arrays.toString(parameters))
+                    : new WordBlock("frtranslationmessage");
             }
 
             @Override

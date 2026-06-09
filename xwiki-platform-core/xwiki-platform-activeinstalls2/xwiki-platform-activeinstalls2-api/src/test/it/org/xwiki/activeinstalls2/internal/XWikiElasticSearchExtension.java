@@ -52,7 +52,7 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
 
     // Provide a default version to make it easy to execute from the IDE, as otherwise you need to pass the
     // elasticsearch.version system property.
-    private static final String ELASTICSEARCH_VERSION = System.getProperty("elasticsearch.version", "8.2.0");
+    private static final String ELASTICSEARCH_VERSION = System.getProperty("elasticsearch.version", "8.14.3");
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(XWikiElasticSearchExtension.class);
     @Override
@@ -71,6 +71,11 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
         container.setEnv(List.of(
             "discovery.type=single-node",
             "xpack.security.enabled=false",
+            // Disable the disk-based shard allocation thresholds. By default ES stops allocating shards when the disk
+            // hosting the Docker daemon is above the high watermark (90% full). Since our test data is tiny and
+            // discarded, the host disk usage is irrelevant; without this, index creation hangs (waiting for a shard
+            // that ES refuses to allocate) until the client socket timeout fires on a full-ish dev/CI disk.
+            "cluster.routing.allocation.disk.threshold_enabled=false",
             // ES uses 50% of the available RAM by default. We don't need that much for our functional tests and this
             // can bring the build machine to its knees. Thus, we force a max RAM limit.
             "ES_JAVA_OPTS=-Xms256m -Xmx256m"));

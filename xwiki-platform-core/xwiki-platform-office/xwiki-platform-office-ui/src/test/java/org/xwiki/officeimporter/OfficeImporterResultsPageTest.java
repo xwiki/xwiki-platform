@@ -133,7 +133,7 @@ class OfficeImporterResultsPageTest extends PageTest
         when(((OfficeImporterScriptService) this.officeImporterScriptService).getErrorMessage())
             .thenReturn(ERROR_MESSAGE);
 
-        this.stubRequest.put("target", "Space.Page");
+        this.request.put("target", "Space.Page");
     }
 
     @Test
@@ -164,7 +164,7 @@ class OfficeImporterResultsPageTest extends PageTest
     @Test
     void escapeWarningMessageWhenSplitSaveFails() throws Exception
     {
-        this.stubRequest.put("splitDocument", "true");
+        this.request.put("splitDocument", "true");
         TargetDocumentDescriptor targetDocumentDescriptor =
             new TargetDocumentDescriptor(new DocumentReference("xwiki", "Space", "Child"), this.componentManager);
         XDOMOfficeDocument childOfficeDocument = mock();
@@ -182,7 +182,7 @@ class OfficeImporterResultsPageTest extends PageTest
     @Test
     void escapeErrorMessageWhenSplitFails() throws Exception
     {
-        this.stubRequest.put("splitDocument", "true");
+        this.request.put("splitDocument", "true");
         when(((OfficeImporterScriptService) this.officeImporterScriptService)
             .split(this.xdomOfficeDocument, new String[] {"1"}, null, false, TARGET_DOCUMENT_REFERENCE))
             .thenReturn(null);

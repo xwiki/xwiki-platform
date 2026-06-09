@@ -65,7 +65,7 @@
               Property visibility checkbox
               Checkbox is surrounded by a div with padding to facilitate the user click
             -->
-            <div
+            <label
               class="visibility"
               @click.self="$event.currentTarget.querySelector('input').click()"
             >
@@ -76,10 +76,10 @@
                   logic.setPropertyVisible(property.id, $event.target.checked)
                 "
               />
-            </div>
 
-            <!-- Property name -->
-            <span class="property-name">{{ property.name }}</span>
+              <!-- Property name -->
+              <span class="property-name">{{ property.name }}</span>
+            </label>
           </XWikiDraggableItem>
         </template>
       </draggable>
@@ -147,6 +147,7 @@ export default {
 
 .livedata-advanced-panel-properties .visibility {
   padding: 6px 1rem;
+  margin-bottom: 0;
 }
 
 .livedata-advanced-panel-properties .visibility input {

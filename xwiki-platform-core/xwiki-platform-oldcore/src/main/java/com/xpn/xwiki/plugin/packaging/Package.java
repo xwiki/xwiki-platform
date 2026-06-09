@@ -1056,7 +1056,7 @@ public class Package
      *
      * @param context the current XWiki context
      * @return a package.xml file for this package as a String
-     * @since 2.3M2
+     * @since 18.5.0RC1
      */
     public String toXMLString(XWikiContext context)
     {
@@ -1068,15 +1068,6 @@ public class Package
             e.printStackTrace();
             return "";
         }
-    }
-
-    /**
-     * @deprecated since 2.3M2, use {@link #toXMLString(XWikiContext)} instead
-     */
-    @Deprecated
-    public String toXml(XWikiContext context)
-    {
-        return toXMLString(context);
     }
 
     /**

@@ -44,7 +44,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 </script>
 
 <template>
-  <div class="container">
+  <div :class="$style.container">
     <url-config
       v-if="linkData.target.type === 'url'"
       v-model="linkData.target.config"
@@ -69,7 +69,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
       :link-data="linkData"
     />
 
-    <div class="actions">
+    <div :class="$style.actions">
       <x-btn variant="success" @click="$emit('submit', linkData)">
         {{ t("link-modal.buttons.submit") }}
       </x-btn>
@@ -81,7 +81,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
   </div>
 </template>
 
-<style scoped>
+<style module>
 .container {
   display: flex;
   flex-direction: column;

@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.io.StringReader;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
@@ -35,14 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.stability.Unstable;
@@ -94,6 +86,15 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Identifier prefix used to specify that the property has a custom displayer in a velocity template.
      */
     private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
+
+    /**
+     * Matches content that consists of a single top level {@code <p>...</p>} paragraph (optionally surrounded by
+     * whitespace). The inner group {@code (?:(?!</p>).)*} forbids a nested closing tag, so {@code <p>a</p><p>b</p>}
+     * does NOT match and is left untouched: only a lone paragraph (the wrapper added by the standalone block
+     * rendering of a custom display) is stripped.
+     */
+    private static final Pattern SINGLE_PARAGRAPH =
+        Pattern.compile("\\s*<p>((?:(?!</p>).)*)</p>\\s*", Pattern.DOTALL);
 
     private static final String NAME = "name";
     private static final String VALUE = "value";
@@ -458,7 +459,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Render the custom display content for the given custom displayer.
      *
      * @param customDisplayer the custom displayer to use (see {@link #getCachedDefaultCustomDisplayer(XWikiContext)})
-     * @param type the type of script (e.g. {@code view}, {@code edit})
+     * @param type the type of display (e.g. {@code view}, {@code edit})
      * @param context the current context
      * @return the rendered custom display content
      * @throws Exception in case of problem when rendering the custom display
@@ -496,25 +497,47 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             content = renderContentInContext(rawContent, displayerDocSyntax, authorReference,
                 displayerDoc.getDocumentReference(), context);
         } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
+            // Template based displayers are not rendered as wiki content so we return their output as is (in
+            // particular they're not concerned by the inline conversion done below).
             return context.getWiki().evaluateTemplate(
                 StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
         }
 
         // In view mode the property value is expected to be displayed inline, like the default displayView() output.
         // Custom displayers based on wiki content are rendered as standalone blocks though, which wraps the result in
-        // a paragraph. Remove that wrapping paragraph so that the value is displayed inline. This doesn't concern
-        // template based displayers since their output is not rendered as wiki content (it's returned above).
-        // See https://jira.xwiki.org/browse/XWIKI-21845
+        // a paragraph. Remove that wrapping paragraph so the value is displayed inline.
         if ("view".equals(type)) {
-            content = convertToInlineContent(content);
+            content = removeTopLevelParagraph(content);
         }
 
         return content;
     }
 
     /**
+     * Remove the wrapping top level paragraph introduced when a custom display is rendered as standalone block content,
+     * so that a property displayed in view mode is rendered inline (like the default {@link #displayView} output). The
+     * paragraph is only removed when the whole content consists of a single top level paragraph; more complex
+     * displayers (e.g. multi-valued ones producing several top level blocks) are left untouched.
+     *
+     * @param content the rendered content (in the current output syntax) to convert to inline
+     * @return the inline version of the passed content, or the passed content unchanged when it doesn't consist of a
+     *         single top level paragraph
+     */
+    private String removeTopLevelParagraph(String content)
+    {
+        if (StringUtils.isBlank(content)) {
+            return content;
+        }
+        Matcher matcher = SINGLE_PARAGRAPH.matcher(content);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return content;
+    }
+
+    /**
      * Render content in the current document's context with the rights of the given user.
-     * 
+     *
      * @since 8.3M2
      * @deprecated since 10.11RC1, use
      *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
@@ -558,48 +581,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 secureDocument);
     }
 
-    /**
-     * Convert the given rendered content to its inline version by removing the top level paragraph that the rendering
-     * introduces when the custom display content is rendered as standalone block content. This is needed so that a
-     * property displayed in view mode is rendered inline (like the default {@link #displayView} output) rather than
-     * being wrapped in a paragraph.
-     *
-     * @param content the rendered content (in the current output syntax) to convert to inline
-     * @return the inline version of the passed content, or the passed content unchanged when it cannot be converted or
-     *         when it doesn't consist of a single top level paragraph
-     */
-    private String convertToInlineContent(String content)
-    {
-        if (StringUtils.isBlank(content)) {
-            return content;
-        }
-
-        Syntax targetSyntax = Utils.getComponent(RenderingContext.class).getTargetSyntax();
-        if (targetSyntax == null) {
-            return content;
-        }
-
-        String syntaxId = targetSyntax.toIdString();
-        try {
-            Parser parser = Utils.getComponent(Parser.class, syntaxId);
-            XDOM xdom = parser.parse(new StringReader(content));
-            // ParserUtils only removes the top level paragraph when there's a single top level element and it's a
-            // paragraph, leaving more complex displayers (e.g. multi-valued ones) untouched.
-            new ParserUtils().removeTopLevelParagraph(xdom.getChildren());
-
-            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, syntaxId);
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(xdom, printer);
-
-            return printer.toString();
-        } catch (Exception e) {
-            // If we can't convert to inline (e.g. there's no parser or renderer for the target syntax) then keep the
-            // content unchanged so that we don't make the display worse than it was before.
-            LOGGER.warn("Failed to convert the custom display of field [{}] to inline content. Root cause: [{}]",
-                getName(), ExceptionUtils.getRootCauseMessage(e));
-            return content;
-        }
-    }
 
     @Override
     public String getClassName()

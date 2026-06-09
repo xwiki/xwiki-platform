@@ -20,7 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
@@ -36,10 +35,7 @@ import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
@@ -100,11 +96,6 @@ class PropertyClassTest
     @MockComponent
     @Named("html/5.0")
     private BlockRenderer htmlRenderer;
-
-    // Used to convert the rendered custom display to inline content in view mode.
-    @MockComponent
-    @Named("html/5.0")
-    private Parser htmlParser;
 
     private BaseClass xclass = new BaseClass();
 
@@ -252,16 +243,6 @@ class PropertyClassTest
             return null;
         }).when(this.htmlRenderer).render(same(displayerXDOM), any());
 
-        // The inline conversion re-parses the rendered output and re-renders it without the top level paragraph.
-        XDOM parsedXDOM = new XDOM(List.of(new ParagraphBlock(List.of(new WordBlock("value")))));
-        when(this.htmlParser.parse(any())).thenReturn(parsedXDOM);
-        doAnswer(invocationOnMock -> {
-            // The top level paragraph must have been removed before rendering, leaving the value inline.
-            assertEquals(WordBlock.class, parsedXDOM.getChildren().getFirst().getClass());
-            ((WikiPrinter) invocationOnMock.getArgument(1)).print("value");
-            return null;
-        }).when(this.htmlRenderer).render(same(parsedXDOM), any());
-
         PropertyClass propertyClass = new PropertyClass();
         propertyClass.setCustomDisplay(CUSTOM_DISPLAY);
         propertyClass.setObject(this.xclass);
@@ -270,6 +251,7 @@ class PropertyClassTest
         propertyClass.displayCustom(buffer, "date", "Path.To.Class_0_", "view", new BaseObject(),
             this.oldCore.getXWikiContext());
 
+        // The wrapping top level paragraph has been removed, leaving the value inline.
         assertEquals("value", buffer.toString());
     }
 
@@ -287,17 +269,6 @@ class PropertyClassTest
             return null;
         }).when(this.htmlRenderer).render(same(displayerXDOM), any());
 
-        // More than one top level block: nothing must be removed so we don't alter complex displayers.
-        XDOM parsedXDOM = new XDOM(List.of(new ParagraphBlock(List.of(new WordBlock("a"))),
-            new ParagraphBlock(List.of(new WordBlock("b")))));
-        when(this.htmlParser.parse(any())).thenReturn(parsedXDOM);
-        doAnswer(invocationOnMock -> {
-            assertEquals(2, parsedXDOM.getChildren().size());
-            assertEquals(ParagraphBlock.class, parsedXDOM.getChildren().getFirst().getClass());
-            ((WikiPrinter) invocationOnMock.getArgument(1)).print("<p>a</p><p>b</p>");
-            return null;
-        }).when(this.htmlRenderer).render(same(parsedXDOM), any());
-
         PropertyClass propertyClass = new PropertyClass();
         propertyClass.setCustomDisplay(CUSTOM_DISPLAY);
         propertyClass.setObject(this.xclass);
@@ -306,6 +277,7 @@ class PropertyClassTest
         propertyClass.displayCustom(buffer, "date", "Path.To.Class_0_", "view", new BaseObject(),
             this.oldCore.getXWikiContext());
 
+        // More than one top level block: nothing must be removed so we don't alter complex displayers.
         assertEquals("<p>a</p><p>b</p>", buffer.toString());
     }
 

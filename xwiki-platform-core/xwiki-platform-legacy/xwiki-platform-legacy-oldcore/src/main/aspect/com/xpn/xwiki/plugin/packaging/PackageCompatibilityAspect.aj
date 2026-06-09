@@ -25,15 +25,16 @@ import com.xpn.xwiki.XWikiContext;
  * Add a backward compatibility layer to the {@link Package} class.
  *
  * @version $Id$
+ * @since 18.5.0RC1
  */
 public privileged aspect PackageCompatibilityAspect
 {
     /**
      * @param context the current XWiki context
      * @return a package.xml file for this package as a String
-     * @deprecated since 18.5.0RC1, use {@link Package#toXMLString(XWikiContext)} instead
+     * @deprecated use {@link Package#toXMLString(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "18.5.0RC1")
     public String Package.toXml(XWikiContext context)
     {
         return toXMLString(context);

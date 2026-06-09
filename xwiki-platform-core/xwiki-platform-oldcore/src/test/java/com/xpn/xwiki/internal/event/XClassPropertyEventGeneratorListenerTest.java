@@ -84,12 +84,14 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
 
         this.listener.onEvent(new DocumentCreatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
+        // Make sure the listener generated a property added event
         verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager).notify(eq(classEvent), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -98,12 +100,14 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclassOrigin.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
 
         this.listener.onEvent(new DocumentDeletedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
+        // Make sure the listener generated a property deleted event
         verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager).notify(eq(classEvent), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -112,12 +116,14 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
+        // Make sure the listener generated a property added event
         verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager).notify(eq(classEvent), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -126,12 +132,14 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclassOrigin.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
+        // Make sure the listener generated a property deleted event
         verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager).notify(eq(classEvent), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -141,11 +149,13 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "New Property", 30);
 
         final Event event = new XClassPropertyUpdatedEvent(this.xclassOrigin.getField("property").getReference());
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a xobject added event
         verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager).notify(eq(classEvent), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 }

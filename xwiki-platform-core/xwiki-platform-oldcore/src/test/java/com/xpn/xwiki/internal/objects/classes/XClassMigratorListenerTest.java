@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import java.util.Arrays;
 
+import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList({ DefaultObservationManager.class, PropertyConverter.class })
+@ComponentList({ DefaultObservationManager.class, PropertyConverter.class, XClassPropertyEventGeneratorListener.class })
 @ReferenceComponentList
 public class XClassMigratorListenerTest
 {

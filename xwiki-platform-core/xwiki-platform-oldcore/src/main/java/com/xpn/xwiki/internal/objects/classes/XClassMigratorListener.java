@@ -29,6 +29,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.internal.event.XClassUpdatedEvent;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -99,58 +101,26 @@ public class XClassMigratorListener extends AbstractEventListener
      */
     public XClassMigratorListener()
     {
-        super(XClassMigratorListener.class.getName(), new DocumentCreatedEvent(), new DocumentUpdatedEvent());
+        super(XClassMigratorListener.class.getName(), new XClassUpdatedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiDocument doc = (XWikiDocument) source;
-        if (event instanceof DocumentUpdatedEvent) {
-            onDocumentUpdatedEvent(doc.getOriginalDocument(), doc);
-        } else if (event instanceof DocumentCreatedEvent) {
-            onDocumentCreatedEvent(doc);
-        }
-    }
-
-    /**
-     * @param doc the new version of the document
-     */
-    private void onDocumentCreatedEvent(XWikiDocument doc)
-    {
-        BaseClass baseClass = doc.getXClass();
-        Collection<PropertyInterface> fieldList = baseClass.getFieldList();
-        List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(fieldList.size());
-        for (PropertyInterface property : fieldList) {
-            maybeAddPropertyToUpdate((PropertyClass) property, null, propertiesToUpdate);
-        }
-
-        if (propertiesToUpdate.isEmpty()) {
-            // the class wasn't modified
-            return;
-        }
-
-        updateProperties(baseClass.getReference(), propertiesToUpdate);
-    }
-
-    /**
-     * @param originalDoc the previous version of the document
-     * @param doc the new version of the document
-     */
-    private void onDocumentUpdatedEvent(XWikiDocument originalDoc, XWikiDocument doc)
-    {
-        BaseClass baseClass = doc.getXClass();
-        BaseClass baseClassOriginal = originalDoc.getXClass();
-
-        List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>();
-        for (List<ObjectDiff> objectChanges : doc.getClassDiff(originalDoc, doc, xcontextProvider.get())) {
-            for (ObjectDiff diff : objectChanges) {
-                PropertyClass property = (PropertyClass) baseClass.getField(diff.getPropName());
-                PropertyClass propertyOriginal = (PropertyClass) baseClassOriginal.getField(diff.getPropName());
-                maybeAddPropertyToUpdate(property, propertyOriginal, propertiesToUpdate);
+        if (event instanceof XClassUpdatedEvent xClassUpdatedEvent) {
+            Collection<PropertyInterface[]> updatedProperties = xClassUpdatedEvent.getUpdatedProperties();
+            List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
+            for (PropertyInterface[] p : updatedProperties) {
+                if (p.length == 2
+                    && (p[0] instanceof PropertyClass || p[0] == null)
+                    && (p[1] instanceof PropertyClass || p[1] == null)
+                ) {
+                    maybeAddPropertyToUpdate((PropertyClass) p[1], (PropertyClass) p[0], propertiesToUpdate);
+                }
             }
+
+            updateProperties(xClassUpdatedEvent.getReference(), propertiesToUpdate);
         }
-        updateProperties(baseClass.getReference(), propertiesToUpdate);
     }
 
     private void maybeAddPropertyToUpdate(PropertyClass newPropertyClass, PropertyClass previousPropertyClass,
@@ -180,7 +150,8 @@ public class XClassMigratorListener extends AbstractEventListener
     private void updateProperties(DocumentReference classReference, List<PropertyToUpdate> propertiesToUpdate)
     {
         if (propertiesToUpdate.isEmpty()) {
-            // to property to update in the end
+            // no property to update in the end
+            // this happens for property deletions for instance
             return;
         }
 

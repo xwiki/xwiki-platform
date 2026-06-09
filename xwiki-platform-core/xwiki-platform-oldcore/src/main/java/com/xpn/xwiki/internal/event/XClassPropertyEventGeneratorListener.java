@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.event;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -96,9 +97,13 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
-        for (PropertyInterface property : (Collection<PropertyInterface>) doc.getXClass().getFieldList()) {
+        Collection<PropertyInterface> fieldList = doc.getXClass().getFieldList();
+        Collection<PropertyInterface[]> updatedProperties = new ArrayList<>(fieldList.size());
+        for (PropertyInterface property : fieldList) {
+            updatedProperties.add(new PropertyInterface[] {null, property});
             this.observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
         }
+        notifyClassUpdate(doc, context, updatedProperties);
     }
 
     /**
@@ -108,9 +113,13 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private void onDocumentDeletedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
-        for (PropertyInterface property : (Collection<PropertyInterface>) originalDoc.getXClass().getFieldList()) {
+        Collection<PropertyInterface> fieldList = originalDoc.getXClass().getFieldList();
+        Collection<PropertyInterface[]> updatedProperties = new ArrayList<>(fieldList.size());
+        for (PropertyInterface property : fieldList) {
+            updatedProperties.add(new PropertyInterface[] {property, null});
             this.observation.notify(new XClassPropertyDeletedEvent(property.getReference()), doc, context);
         }
+        notifyClassUpdate(doc, context, updatedProperties);
     }
 
     /**
@@ -122,11 +131,13 @@ public class XClassPropertyEventGeneratorListener implements EventListener
     {
         BaseClass baseClass = doc.getXClass();
         BaseClass baseClassOriginal = originalDoc.getXClass();
+        Collection<PropertyInterface[]> updatedProperties = new ArrayList<>();
 
         for (List<ObjectDiff> objectChanges : doc.getClassDiff(originalDoc, doc, context)) {
             for (ObjectDiff diff : objectChanges) {
                 PropertyInterface property = baseClass.getField(diff.getPropName());
                 PropertyInterface propertyOriginal = baseClassOriginal.getField(diff.getPropName());
+                updatedProperties.add(new PropertyInterface[] { propertyOriginal, property});
 
                 if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
                     this.observation.notify(
@@ -137,6 +148,14 @@ public class XClassPropertyEventGeneratorListener implements EventListener
                     this.observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
                 }
             }
+        }
+        notifyClassUpdate(doc, context, updatedProperties);
+    }
+
+    private void notifyClassUpdate(XWikiDocument doc, XWikiContext context, Collection<PropertyInterface[]> props)
+    {
+        if (!props.isEmpty()) {
+            this.observation.notify(new XClassUpdatedEvent(doc.getDocumentReference(), props), doc, context);
         }
     }
 }

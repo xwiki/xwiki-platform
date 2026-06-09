@@ -44,11 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest(properties = {
     // The Instance module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
     "xwikiDbHbmCommonExtraMappings=instance.hbm.xml"
-    },
-    extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
-        "org.xwiki.platform:xwiki-platform-instance"
     }
 )
 class ActiveInstallsIT

@@ -497,7 +497,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         // Remove that wrapping paragraph so the value is displayed inline, like the default displayView()/displayEdit()
         // output. Only a single top level paragraph is removed; block level displayers (e.g. multi-valued ones
         // producing several top level blocks) are left untouched.
-        // See https://jira.xwiki.org/browse/XWIKI-21845
         return removeTopLevelParagraph(content);
     }
 

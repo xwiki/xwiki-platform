@@ -49,8 +49,7 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
   }
 
   public async getAuthorizationHeader(): Promise<string | undefined> {
-    // TODO
-    throw new Error("Method not implemented.");
+    return undefined;
   }
 
   public async isAuthenticated(): Promise<boolean> {

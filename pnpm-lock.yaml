@@ -341,6 +341,9 @@ importers:
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
+      '@xwiki/platform-link-suggest-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki
       '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/macros/macros-api
@@ -1756,7 +1759,7 @@ importers:
         version: 3.5.34(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.0(typescript@5.9.3)
+        version: 3.3.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:

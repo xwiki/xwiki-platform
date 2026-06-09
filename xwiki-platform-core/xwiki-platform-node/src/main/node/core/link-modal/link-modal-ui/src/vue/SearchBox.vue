@@ -189,6 +189,19 @@ function onEnterKey(): void {
   }
 }
 
+function onKeydown(event: KeyboardEvent): void {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    onEnterKey();
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    focusRelativeSuggestion(-1);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    focusRelativeSuggestion(+1);
+  }
+}
+
 watch(query, (query) => {
   if (justDynamicallyUpdatedQuery.value) {
     justDynamicallyUpdatedQuery.value = false;
@@ -212,9 +225,7 @@ watch(suggestions, (suggestions) => {
       :label
       :placeholder
       v-model="query"
-      @keydown.enter.prevent="onEnterKey()"
-      @keydown.up.prevent="focusRelativeSuggestion(-1)"
-      @keydown.down.prevent="focusRelativeSuggestion(+1)"
+      @keydown="onKeydown"
       @focus="performSearch(query)"
       @blur="closeSuggestions()"
     />

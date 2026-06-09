@@ -96,5 +96,7 @@ watch(linkTargetTypeSelect, (label) => {
 summary {
   cursor: pointer;
   user-select: none;
+  /* Explicitly set the display to list item because it can be overridden in some context. */
+  display: list-item;
 }
 </style>

@@ -23,7 +23,6 @@ import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
-import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
@@ -48,6 +47,7 @@ import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
+import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
@@ -80,7 +80,6 @@ DefaultAuthenticationManagerProvider.bind(container);
 XWikiAuthenticationManager.bind(container);
 
 DefaultLinkSuggestServiceProvider.bind(container);
-XWikiLinkSuggestService.bind(container);
 
 DefaultSkinManager.bind(container);
 
@@ -91,6 +90,7 @@ new MacroServiceComponentList(container);
 
 new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
+new LinkSuggestXWikiComponentList(container);
 
 DefaultUniAstIterator.bind(container);
 XWikiUniAstProcessor.bind(container);

@@ -62,10 +62,38 @@
     </p>
   </user>
   <groupContainer name="group1">
+    <p>
+      <parameters>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-20 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-21 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>append</string>
+          <boolean>true</boolean>
+        </entry>
+      </parameters>
+    </p>
     <groupMemberUser name="user1" />
     <groupMemberUser name="user2" />
   </groupContainer>
   <groupContainer name="group2">
+    <p>
+      <parameters>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-20 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-21 00:00:00.0 UTC</date>
+        </entry>
+      </parameters>
+    </p>
     <groupMemberGroup name="group1" />
   </groupContainer>
   <groupContainer name="emptygroup" />

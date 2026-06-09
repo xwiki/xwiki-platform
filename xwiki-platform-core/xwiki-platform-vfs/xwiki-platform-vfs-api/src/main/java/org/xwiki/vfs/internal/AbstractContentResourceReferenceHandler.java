@@ -73,21 +73,9 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
             // Set the content type
             response.setContentType(actualContentType);
 
-            // The inline attribute of Content-Disposition tells the browser that they should display
-            // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
-            // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
-            // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
-            // Save dialog box (exe, zip, xar, etc).
-            String dispType = "inline";
-
-            // If the mimetype is not authorized to be displayed inline,
-            // let's force its content disposition to download.
-            if (attachmentSecurityManager.shouldBeDownloaded(actualContentType)) {
-                dispType = "attachment";
-            }
-            // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
-            // See http://tools.ietf.org/html/rfc2231 for more details.
-            response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + resourceName);
+            boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(actualContentType);
+            response.addHeader("Content-disposition",
+                attachmentSecurityManager.getContentDispositionHeader(resourceName, shouldBeDownloaded));
 
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {

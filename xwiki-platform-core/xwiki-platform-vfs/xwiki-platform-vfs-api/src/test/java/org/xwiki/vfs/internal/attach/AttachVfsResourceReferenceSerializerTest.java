@@ -20,7 +20,7 @@
 package org.xwiki.vfs.internal.attach;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -37,7 +37,7 @@ import org.xwiki.url.URLNormalizer;
 import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AttachVfsResourceReferenceSerializer}.
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
  * @since 7.4M2
  */
 @ComponentTest
-public class AttachVfsResourceReferenceSerializerTest
+class AttachVfsResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private AttachVfsResourceReferenceSerializer vfsResourceReferenceSerializer;
@@ -63,42 +63,42 @@ public class AttachVfsResourceReferenceSerializerTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Test
-    public void serialize() throws Exception
+    void serialize() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:attachment"), "path1/path2/test.txt");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
+        ExtendedURL extendedURL = new ExtendedURL(List.of(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));
-        when(urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        when(this.urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
 
         AttachmentReference attachmentReference = new AttachmentReference("attachment",
-            new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        when(attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
+            new DocumentReference("wiki", List.of("space"), "page"));
+        when(this.attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
 
-        when(entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
+        when(this.entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
 
         assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
-            vfsResourceReferenceSerializer.serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 
     @Test
-    public void serializeWithSpace() throws Exception
+    void serializeWithSpace() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:attachment"), "path1/path2/xwiki logo.png");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
+        ExtendedURL extendedURL = new ExtendedURL(List.of(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "xwiki logo.png"));
-        when(urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        when(this.urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
 
         AttachmentReference attachmentReference = new AttachmentReference("attachment",
-            new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        when(attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
+            new DocumentReference("wiki", List.of("space"), "page"));
+        when(this.attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
 
-        when(entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
+        when(this.entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
 
         assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/xwiki+logo.png",
-            vfsResourceReferenceSerializer.serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 }

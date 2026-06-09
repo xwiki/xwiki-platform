@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.4.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.4.0-SNAPSHOT</version>
+  <version>18.5.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -58,35 +58,32 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>3.3.0</tika.version>
+    <tika.version>3.3.1</tika.version>
     <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.1.8</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.12.Final</netty.version>
+    <netty.version>4.2.15.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.154.0</metaeffekt.version>
+    <metaeffekt.version>0.155.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
+    <solr.minimum.java.version>11</solr.minimum.java.version>
     <jersey.version>2.48</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.5</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
+    <calcite.version>1.42.0</calcite.version>
 
     <!-- The default Tomcat cache size  -->
-    <xwiki.tomcat.cacheMaxSize>100176</xwiki.tomcat.cacheMaxSize>
+    <xwiki.tomcat.cacheMaxSize>120176</xwiki.tomcat.cacheMaxSize>
 
-    <!-- Versions of other software we need in our functional tests -->
-    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
-         Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
-         (e.g. 7.2.7).
-    -->
-    <libreoffice.version>25.8.6</libreoffice.version>
+	<!-- Test with latest version of previous branch (what we call LTS) of LibreOffice by default. -->
+    <libreoffice.version>lts</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -126,7 +123,7 @@
     <pgsql.version>42.7.11</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc17</oracle.artifactId>
-    <oracle.version>23.26.1.0.0</oracle.version>
+    <oracle.version>23.26.2.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
@@ -314,7 +311,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>7.5.10</version>
+        <version>7.6.0</version>
       </dependency>
 
       <dependency>
@@ -428,7 +425,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>tom-select</artifactId>
-        <version>2.5.2</version>
+        <version>2.6.1</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -938,17 +935,17 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.27.0</version>
+        <version>1.28.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1186,27 +1183,17 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.30</version>
+        <version>3.5.34</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.2.8</version>
+        <version>11.4.4</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
         <version>7.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>inversify</artifactId>
-        <version>7.10.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>reflect-metadata</artifactId>
-        <version>0.2.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1404,30 +1391,27 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16/140,
-                  bouncycastle:bcmail-jdk15/140,
                   bouncycastle:bcmail-jdk14/140,
-                  bouncycastle:bcmail-jdk13/140,
-                  bouncycastle:bcmail-jdk12/140,
-                  org.bouncycastle:bcmail-jdk16,
-                  org.bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk15/140,
+                  bouncycastle:bcmail-jdk16/140,
                   org.bouncycastle:bcmail-jdk14,
-                  org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk15+,
                   org.bouncycastle:bcmail-jdk15on
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk16
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcjmail-jdk18on</id>
+                <features>
+                  org.bouncycastle:bcjmail-jdk15on,
+                  org.bouncycastle:bcjmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>commons-beanutils:commons-beanutils</id>
                 <features>commons-beanutils:commons-beanutils-core</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>org.jdom:jdom</id>
-                <features>
-                  jdom:jdom,
-                  org.jdom:jdom-legacy
-                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:jakarta.mail</id>
@@ -1544,7 +1528,7 @@
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.webjars.npm:momentjs</id>
+                <id>org.webjars.npm:moment</id>
                 <features>org.webjars:momentjs</features>
               </extensionOverride>
               <extensionOverride>
@@ -1573,7 +1557,7 @@
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.3.1</version>
+          <version>5.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

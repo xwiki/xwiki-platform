@@ -345,20 +345,20 @@ if (typeof XWiki.index.trash.documents == "undefined") {
 XWiki.index.trash.documents.displayEntry = function (row, i, table) {
   var tr = new Element('tr'); // The resulting table row
   var pageTd = new Element('td');
-  var page = new Element('a', {'href' : row.url}).update(row.fullname);
+  var page = new Element('a', {'href' : row.url}).update((row.fullname || '').escapeHTML());
   pageTd.appendChild(page);
   if (row.language &amp;&amp; row.language.trim().length != 0) {
-    var language = new Element('span').update('(' + row.language.trim() + ')');
+    var language = new Element('span').update('(' + row.language.trim().escapeHTML() + ')');
     pageTd.appendChild(document.createTextNode(' '));
     pageTd.appendChild(language);
   }
   tr.appendChild(pageTd);
-  tr.appendChild(new Element('td').update(row.title));
-  tr.appendChild(new Element('td').update(row.date));
-  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
+  tr.appendChild(new Element('td').update((row.title || '').escapeHTML()));
+  tr.appendChild(new Element('td').update((row.date || '').escapeHTML()));
+  var deleter = new Element('a', {'href' : row.deleterurl}).update((row.deletername || '').escapeHTML());
   tr.appendChild(new Element('td').update(deleter));
   if (row.batchId != '') {
-    var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId);
+    var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId.escapeHTML());
     tr.appendChild(new Element('td').update(batchId));
   } else {
     tr.appendChild(new Element('td'));

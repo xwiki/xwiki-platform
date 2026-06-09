@@ -845,26 +845,28 @@ var Validate = {
       caseSensitive: true,
       negate:          false
     }, paramsObj || {});
-    if(params.allowNull && value == null) return true;
-    if(!params.allowNull && value == null) Validate.fail(params.failureMessage);
-    //if case insensitive, make all strings in the array lowercase, and the value too
-    if(!params.caseSensitive){ 
-      var lowerWithin = [];
-      params.within.each( function(item){
-        if(typeof item == 'string') item = item.toLowerCase();
-        lowerWithin.push(item);
-      });
-      params.within = lowerWithin;
-      if(typeof value == 'string') value = value.toLowerCase();
+    if(value == null) {
+      if(!params.allowNull) Validate.fail(params.failureMessage);
+    } else {
+      //if case insensitive, make all strings in the array lowercase, and the value too
+      if(!params.caseSensitive){
+        var lowerWithin = [];
+        params.within.each( function(item){
+          if(typeof item == 'string') item = item.toLowerCase();
+          lowerWithin.push(item);
+        });
+        params.within = lowerWithin;
+        if(typeof value == 'string') value = value.toLowerCase();
+      }
+      var found = (params.within.indexOf(value) == -1) ? false : true;
+      if(params.partialMatch){
+        found = false;
+        params.within.each( function(arrayVal){
+          if(value.indexOf(arrayVal) != -1 ) found = true;
+        });
+      }
+      if( (!params.negate && !found) || (params.negate && found) ) Validate.fail(params.failureMessage);
     }
-    var found = (params.within.indexOf(value) == -1) ? false : true;
-    if(params.partialMatch){
-      found = false;
-      params.within.each( function(arrayVal){
-        if(value.indexOf(arrayVal) != -1 ) found = true;
-      }); 
-    }
-    if( (!params.negate && !found) || (params.negate && found) ) Validate.fail(params.failureMessage);
     return true;
   },
     

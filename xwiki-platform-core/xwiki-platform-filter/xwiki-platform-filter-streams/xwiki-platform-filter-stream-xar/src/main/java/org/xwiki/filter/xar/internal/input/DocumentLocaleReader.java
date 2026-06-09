@@ -77,7 +77,7 @@ public class DocumentLocaleReader extends AbstractReader
     private XARXMLReader<WikiObjectReader.WikiObject> objectReader;
 
     @Inject
-    private XARXMLReader<WikiObjectPropertyReader.WikiObjectProperty> objectPropertyReader;
+    private XARXMLReader<AbstractWikiObjectPropertyReader.WikiObjectProperty> objectPropertyReader;
 
     @Inject
     private XARXMLReader<ClassReader.WikiClass> classReader;

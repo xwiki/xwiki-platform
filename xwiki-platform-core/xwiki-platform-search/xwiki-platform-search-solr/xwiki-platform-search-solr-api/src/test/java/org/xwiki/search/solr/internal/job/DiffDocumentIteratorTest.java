@@ -20,33 +20,32 @@
 package org.xwiki.search.solr.internal.job;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link DiffDocumentIterator}.
- * 
+ *
  * @version $Id$
  * @since 5.4.5
  */
-public class DiffDocumentIteratorTest
+class DiffDocumentIteratorTest
 {
-    public static class DocumentIteratorStub<T> implements DocumentIterator<T>
+    static class DocumentIteratorStub<T> implements DocumentIterator<T>
     {
         private int size;
 
@@ -61,19 +60,19 @@ public class DiffDocumentIteratorTest
         @Override
         public boolean hasNext()
         {
-            return iterator.hasNext();
+            return this.iterator.hasNext();
         }
 
         @Override
         public Pair<DocumentReference, T> next()
         {
-            return iterator.next();
+            return this.iterator.next();
         }
 
         @Override
         public void remove()
         {
-            iterator.remove();
+            this.iterator.remove();
         }
 
         @Override
@@ -84,7 +83,7 @@ public class DiffDocumentIteratorTest
         @Override
         public long size()
         {
-            return size;
+            return this.size;
         }
     }
 
@@ -96,7 +95,7 @@ public class DiffDocumentIteratorTest
     }
 
     @Test
-    public void iterate()
+    void iterate()
     {
         List<Pair<DocumentReference, DocumentIteratorEntry>> previous =
             new ArrayList<Pair<DocumentReference, DocumentIteratorEntry>>();
@@ -134,7 +133,7 @@ public class DiffDocumentIteratorTest
     }
 
     @Test
-    public void deleteAll()
+    void deleteAll()
     {
         List<Pair<DocumentReference, DocumentIteratorEntry>> previous =
             new ArrayList<Pair<DocumentReference, DocumentIteratorEntry>>();
@@ -142,7 +141,7 @@ public class DiffDocumentIteratorTest
         previous.add(entry("wiki", "X", "Y", 2, "5.2"));
         DocumentIterator<DocumentIteratorEntry> previousIterator = new DocumentIteratorStub<>(previous);
 
-        List<Pair<DocumentReference, DocumentIteratorEntry>> next = Collections.emptyList();
+        List<Pair<DocumentReference, DocumentIteratorEntry>> next = List.of();
         DocumentIterator<DocumentIteratorEntry> nextIterator = new DocumentIteratorStub<>(next);
 
         DiffDocumentIterator iterator = new DiffDocumentIterator(previousIterator, nextIterator);
@@ -160,7 +159,7 @@ public class DiffDocumentIteratorTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void setRootReference()
+    void setRootReference()
     {
         DocumentIterator<DocumentIteratorEntry> previous = mock(DocumentIterator.class, "previous");
         DocumentIterator<DocumentIteratorEntry> next = mock(DocumentIterator.class, "next");
@@ -175,18 +174,12 @@ public class DiffDocumentIteratorTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void remove()
+    void remove()
     {
         DocumentIterator<DocumentIteratorEntry> previous = mock(DocumentIterator.class, "previous");
         DocumentIterator<DocumentIteratorEntry> next = mock(DocumentIterator.class, "next");
         DiffDocumentIterator iterator = new DiffDocumentIterator(previous, next);
-        try {
-            iterator.remove();
-            fail();
-        } catch (Exception e) {
-            if (!(e instanceof UnsupportedOperationException)) {
-                fail();
-            }
-        }
+
+        assertThrows(UnsupportedOperationException.class, iterator::remove);
     }
 }

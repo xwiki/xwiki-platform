@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>18.4.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -40,6 +40,11 @@
     <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.previousIds>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.features>
+    <xwiki.extension.javascript.modules.importmap>
+     {
+       "fuse": "org.webjars.npm:fuse.js/dist/fuse.basic.min.mjs"
+     }
+     </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
@@ -82,7 +87,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>fuse.js</artifactId>
-      <version>7.1.0</version>
+      <version>7.4.1</version>
       <scope>runtime</scope>
     </dependency>
 

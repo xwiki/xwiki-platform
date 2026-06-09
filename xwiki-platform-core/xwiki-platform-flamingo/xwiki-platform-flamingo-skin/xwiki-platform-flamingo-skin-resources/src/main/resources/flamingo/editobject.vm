@@ -115,11 +115,12 @@
         #end
       </dl>
       <div>
-        <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
+        <button class="btn btn-danger syncProperties"
+          data-action='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">
           $services.icon.renderHTML('cross')
           $services.localization.render('core.editors.object.removeDeprecatedProperties.link')
-        </a>
+        </button>
       </div>
     #end
     #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
@@ -275,10 +276,13 @@
   #if ($mustSync)
     #define ($warningMessageContent)
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" 
-        title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+      <div>
+        <button class="btn btn-danger syncProperties syncAllProperties" data-action="$doc.getURL('objectsync')"
+              title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+        $services.icon.renderHTML('cross')
         $services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')
-      </a></div>
+        </button>
+      </div>
     #end
     #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
   #end

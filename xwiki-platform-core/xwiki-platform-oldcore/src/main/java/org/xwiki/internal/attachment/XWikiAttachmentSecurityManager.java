@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
+import org.xwiki.http.URIUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -154,5 +155,24 @@ public class XWikiAttachmentSecurityManager
     public boolean shouldBeDownloaded(String mimeType)
     {
         return shouldBeDownloaded(mimeType, false);
+    }
+
+    /**
+     * Provide the value to use for a {@code Content-Disposition} header based on the filename and whether the
+     * resource should be downloaded or not.
+     * @param filename the name of the resource to serve
+     * @param shouldBeDownloaded whether the resource should be downloaded or served inline
+     * @return the value to be used in a {@code Content-Disposition} response header
+     * @since 18.4.0
+     */
+    public String getContentDispositionHeader(String filename, boolean shouldBeDownloaded)
+    {
+        // The inline attribute of Content-Disposition tells the browser that they should display
+        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
+        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
+        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
+        // Save dialog box (exe, zip, xar, etc).
+        String dispType = (shouldBeDownloaded) ? "attachment" : "inline";
+        return String.format("%s; filename*=utf-8''%s", dispType, URIUtils.encodePathSegment(filename));
     }
 }

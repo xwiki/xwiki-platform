@@ -19,13 +19,14 @@
  */
 package org.xwiki.wiki.internal.manager;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
@@ -39,52 +40,51 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class WikiDescriptorCacheTest
+@ComponentTest
+class WikiDescriptorCacheTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiDescriptorCache> mocker =
-        new MockitoComponentMockingRule<WikiDescriptorCache>(WikiDescriptorCache.class);
+    @InjectMockComponents
+    private WikiDescriptorCache wikiDescriptorCache;
+
+    @MockComponent
+    private CacheManager cacheManager;
 
     private Cache<WikiDescriptor> wikiAliasCache;
 
     private Cache<WikiDescriptor> wikiIdCache;
 
-    private CacheManager cacheManager;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeComponent
+    void beforeComponent() throws Exception
     {
-        wikiAliasCache = mock(Cache.class);
-        wikiIdCache = mock(Cache.class);
-        cacheManager = this.mocker.getInstance(CacheManager.class);
-        when(cacheManager.<WikiDescriptor>createNewCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
-            wikiIdCache);
+        this.wikiAliasCache = mock(Cache.class);
+        this.wikiIdCache = mock(Cache.class);
+        when(this.cacheManager.<WikiDescriptor>createNewCache(any(CacheConfiguration.class)))
+            .thenReturn(this.wikiAliasCache, this.wikiIdCache);
     }
 
     @Test
-    public void add() throws Exception
+    void add()
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
         descriptor.addAlias("alias2");
 
-        this.mocker.getComponentUnderTest().add(descriptor);
+        this.wikiDescriptorCache.add(descriptor);
 
-        verify(wikiIdCache).set("wikiid", descriptor);
-        verify(wikiAliasCache).set("wikialias", descriptor);
-        verify(wikiAliasCache).set("alias2", descriptor);
+        verify(this.wikiIdCache).set("wikiid", descriptor);
+        verify(this.wikiAliasCache).set("wikialias", descriptor);
+        verify(this.wikiAliasCache).set("alias2", descriptor);
     }
 
     @Test
-    public void remove() throws Exception
+    void remove()
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
         descriptor.addAlias("alias2");
 
-        this.mocker.getComponentUnderTest().remove(descriptor.getId(), descriptor.getAliases());
+        this.wikiDescriptorCache.remove(descriptor.getId(), descriptor.getAliases());
 
-        verify(wikiIdCache).remove("wikiid");
-        verify(wikiAliasCache).remove("wikialias");
-        verify(wikiAliasCache).remove("alias2");
+        verify(this.wikiIdCache).remove("wikiid");
+        verify(this.wikiAliasCache).remove("wikialias");
+        verify(this.wikiAliasCache).remove("alias2");
     }
-
 }

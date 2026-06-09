@@ -71,11 +71,11 @@
       this.groups = {};
 
       // Initialize the quick action search asynchronously.
-      this.searchReady = new Promise(function(resolve, reject) {
-        require(['fuse'], function(Fuse) {
+      this.searchReady = new Promise((resolve, reject) => {
+        require(['es-module!fuse'], ({'default': Fuse}) => {
           resolve(new Fuse(this.actions, this.config.search));
-        }.bind(this), reject);
-      }.bind(this));
+        }, reject);
+      });
     }
 
     /**

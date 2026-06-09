@@ -19,36 +19,40 @@
  */
 package org.xwiki.sheet.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-import org.junit.Assert;
+import javax.inject.Named;
 
-import org.jmock.Expectations;
-import org.jmock.Sequence;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.sheet.SheetBinder;
-import org.xwiki.sheet.SheetManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultSheetManager}.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
-@AllComponents
-@MockingRequirement(value = DefaultSheetManager.class, exceptions = { DocumentReferenceResolver.class })
-public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<SheetManager>
+@ComponentTest
+class DefaultSheetManagerTest
 {
     /**
      * The name of the execution context sheet property.
@@ -68,8 +72,51 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<Sh
     /**
      * The sheet descriptor class reference.
      */
-    private static final DocumentReference SHEET_CLASS_REFERENCE = new DocumentReference(WIKI_NAME, "XWiki",
-        "SheetDescriptorClass");
+    private static final DocumentReference SHEET_CLASS_REFERENCE =
+        new DocumentReference(WIKI_NAME, "XWiki", "SheetDescriptorClass");
+
+    /**
+     * The reference of the document whose sheets are retrieved.
+     */
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference(WIKI_NAME, "Space", "Page");
+
+    @InjectMockComponents
+    private DefaultSheetManager sheetManager;
+
+    /**
+     * The component used to access the documents.
+     */
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The component used to retrieve the custom document sheets.
+     */
+    @MockComponent
+    @Named("document")
+    private SheetBinder documentSheetBinder;
+
+    /**
+     * The component used to retrieve the class sheets.
+     */
+    @MockComponent
+    @Named("class")
+    private SheetBinder classSheetBinder;
+
+    /**
+     * The component used to access the old model.
+     */
+    @MockComponent
+    private ModelBridge modelBridge;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * The execution context.
@@ -77,181 +124,88 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<Sh
     private ExecutionContext context = new ExecutionContext();
 
     /**
-     * The component used to access the documents.
-     */
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * The component used to retrieve the custom document sheets.
-     */
-    private SheetBinder documentSheetBinder;
-
-    /**
-     * The component used to retrieve the class sheets.
-     */
-    private SheetBinder classSheetBinder;
-
-    /**
-     * The component used to access the old model.
-     */
-    private ModelBridge modelBridge;
-
-    /**
      * The document whose sheets are retrieved.
      */
     private DocumentModelBridge document;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure()
     {
-        documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        documentSheetBinder = getComponentManager().getInstance(SheetBinder.class, "document");
-        classSheetBinder = getComponentManager().getInstance(SheetBinder.class, "class");
-        modelBridge = getComponentManager().getInstance(ModelBridge.class);
-        document = getMockery().mock(DocumentModelBridge.class);
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(execution).getContext();
-                will(returnValue(context));
-
-                allowing(document).getDocumentReference();
-                will(returnValue(new DocumentReference(WIKI_NAME, "Space", "Page")));
-            }
-        });
+        this.document = mock(DocumentModelBridge.class);
+        when(this.execution.getContext()).thenReturn(this.context);
+        when(this.document.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.documentReferenceResolver.resolve(eq("XWiki.SheetDescriptorClass"), any(DocumentReference.class)))
+            .thenReturn(SHEET_CLASS_REFERENCE);
     }
 
     /**
      * Tests that the sheet specified on the execution context overwrites the document and class sheets.
-     * 
-     * @throws Exception if the test fails to lookup components
      */
     @Test
-    public void testExecutionContextSheet() throws Exception
+    void executionContextSheet() throws Exception
     {
         // (1) The sheet is specified on the execution context and the target document is the current document.
-        context.setProperty(SHEET_PROPERTY, "Code.Sheet");
-        final DocumentReference sheetReference = new DocumentReference(WIKI_NAME, "Code", "Sheet");
+        this.context.setProperty(SHEET_PROPERTY, "Code.Sheet");
+        DocumentReference sheetReference = new DocumentReference(WIKI_NAME, "Code", "Sheet");
+        when(this.documentReferenceResolver.resolve("Code.Sheet", DOCUMENT_REFERENCE)).thenReturn(sheetReference);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.documentAccessBridge.exists(sheetReference)).thenReturn(true);
+        when(this.documentAccessBridge.getProperty(sheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY))
+            .thenReturn("");
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(document.getDocumentReference()));
-
-                oneOf(documentAccessBridge).exists(sheetReference);
-                will(returnValue(true));
-
-                // The specified sheet matches the current action.
-                oneOf(documentAccessBridge).getProperty(sheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY);
-                will(returnValue(""));
-            }
-        });
-
-        Assert.assertEquals(Arrays.asList(sheetReference), getMockedComponent().getSheets(document, "view"));
+        assertEquals(List.of(sheetReference), this.sheetManager.getSheets(this.document, "view"));
 
         // (2) The sheet is specified on the execution context but the target document is not the current document.
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(null));
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(null);
+        when(this.documentSheetBinder.getSheets(this.document)).thenReturn(Collections.emptyList());
+        when(this.modelBridge.getXObjectClassReferences(this.document)).thenReturn(Collections.emptySet());
 
-                oneOf(documentSheetBinder).getSheets(document);
-                will(returnValue(Collections.emptyList()));
-
-                oneOf(modelBridge).getXObjectClassReferences(document);
-                will(returnValue(Collections.emptySet()));
-            }
-        });
-        Assert.assertTrue(getMockedComponent().getSheets(document, "edit").isEmpty());
+        assertTrue(this.sheetManager.getSheets(this.document, "edit").isEmpty());
 
         // (3) The sheet is not specified on the execution context.
-        context.removeProperty(SHEET_PROPERTY);
+        this.context.removeProperty(SHEET_PROPERTY);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentSheetBinder).getSheets(document);
-                will(returnValue(Collections.emptyList()));
-
-                oneOf(modelBridge).getXObjectClassReferences(document);
-                will(returnValue(Collections.emptySet()));
-            }
-        });
-
-        Assert.assertTrue(getMockedComponent().getSheets(document, "get").isEmpty());
+        assertTrue(this.sheetManager.getSheets(this.document, "get").isEmpty());
     }
 
     /**
      * Tests the order in which sheets are determined: execution context, document sheets and finally class sheets.
-     * 
-     * @throws Exception shouldn't happen, but some methods include "throws" in their signature
      */
     @Test
-    public void testSheetResolutionSequence() throws Exception
+    void sheetResolutionSequence() throws Exception
     {
-        final String contextSheetName = "ContextSheet";
-        context.setProperty(SHEET_PROPERTY, contextSheetName);
-        final DocumentReference documentSheetReference = new DocumentReference(WIKI_NAME, "ABC", "DocumentSheet");
-        final DocumentReference classSheetReference = new DocumentReference(WIKI_NAME, "BlogCode", "BlogPostSheet");
-        final DocumentReference classReference = new DocumentReference(WIKI_NAME, "Blog", "BlogPostClass");
-        final DocumentModelBridge classDocument = getMockery().mock(DocumentModelBridge.class, "xclass");
-        final String currentAction = "foo";
-        final Sequence sheetResolutionSequence = getMockery().sequence("sheetResolutionSequence");
+        String contextSheetName = "ContextSheet";
+        this.context.setProperty(SHEET_PROPERTY, contextSheetName);
+        DocumentReference documentSheetReference = new DocumentReference(WIKI_NAME, "ABC", "DocumentSheet");
+        DocumentReference classSheetReference = new DocumentReference(WIKI_NAME, "BlogCode", "BlogPostSheet");
+        DocumentReference classReference = new DocumentReference(WIKI_NAME, "Blog", "BlogPostClass");
+        DocumentModelBridge classDocument = mock(DocumentModelBridge.class, "xclass");
+        String currentAction = "foo";
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                // (1) Look for the sheet specified in the execution context.
-                oneOf(documentAccessBridge).getCurrentDocumentReference();
-                inSequence(sheetResolutionSequence);
-                will(returnValue(document.getDocumentReference()));
+        DocumentReference contextSheetRef = new DocumentReference(WIKI_NAME, "Space", contextSheetName);
+        when(this.documentReferenceResolver.resolve(contextSheetName, DOCUMENT_REFERENCE)).thenReturn(contextSheetRef);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
 
-                // The sheet is resolved relative to the target document.
-                oneOf(documentAccessBridge).exists(
-                    new DocumentReference(document.getDocumentReference().getWikiReference().getName(), document
-                        .getDocumentReference().getLastSpaceReference().getName(), contextSheetName));
-                inSequence(sheetResolutionSequence);
-                will(returnValue(false));
+        // (1) Look for the sheet specified in the execution context.
+        when(this.documentAccessBridge.exists(contextSheetRef)).thenReturn(false);
 
-                // (2) Look for the custom document sheets.
-                oneOf(documentSheetBinder).getSheets(document);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(Collections.singletonList(documentSheetReference)));
+        // (2) Look for the custom document sheets.
+        when(this.documentSheetBinder.getSheets(this.document))
+            .thenReturn(Collections.singletonList(documentSheetReference));
+        when(this.documentAccessBridge.exists(documentSheetReference)).thenReturn(true);
+        when(this.documentAccessBridge.getProperty(documentSheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY))
+            .thenReturn("bar");
 
-                oneOf(documentAccessBridge).exists(documentSheetReference);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(true));
+        // (3) Look for the class sheets.
+        when(this.modelBridge.getXObjectClassReferences(this.document))
+            .thenReturn(Collections.singleton(classReference));
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(classReference)).thenReturn(classDocument);
+        when(this.classSheetBinder.getSheets(classDocument))
+            .thenReturn(Collections.singletonList(classSheetReference));
+        when(this.documentAccessBridge.exists(classSheetReference)).thenReturn(true);
+        when(this.documentAccessBridge.getProperty(classSheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY))
+            .thenReturn(currentAction);
 
-                oneOf(documentAccessBridge).getProperty(documentSheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY);
-                inSequence(sheetResolutionSequence);
-                will(returnValue("bar"));
-
-                // (3) Look for the class sheets.
-                oneOf(modelBridge).getXObjectClassReferences(document);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(Collections.singleton(classReference)));
-
-                oneOf(documentAccessBridge).getTranslatedDocumentInstance(classReference);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(classDocument));
-
-                oneOf(classSheetBinder).getSheets(classDocument);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(Collections.singletonList(classSheetReference)));
-
-                oneOf(documentAccessBridge).exists(classSheetReference);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(true));
-
-                oneOf(documentAccessBridge).getProperty(classSheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY);
-                inSequence(sheetResolutionSequence);
-                will(returnValue(currentAction));
-            }
-        });
-
-        getMockedComponent().getSheets(document, currentAction);
+        assertEquals(List.of(classSheetReference), this.sheetManager.getSheets(this.document, currentAction));
     }
 }

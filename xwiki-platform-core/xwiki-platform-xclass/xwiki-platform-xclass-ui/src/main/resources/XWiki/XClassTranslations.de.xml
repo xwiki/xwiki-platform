@@ -40,7 +40,7 @@
 # Default Class Sheet
 #
 
-platform.xclass.defaultClassSheet.title=Standard-Klassenblatt
+platform.xclass.defaultClassSheet.title=Standard-Klassenbogen
 platform.xclass.defaultClassSheet.description=Du kannst diese Seite bearbeiten, um die Standarddarstellung der Klassen zu ändern, oder sie kopieren, um eine benutzerdefinierte Ansicht nur für eine oder mehrere Klassen zu erstellen.
 platform.xclass.defaultClassSheet.properties.heading=Klassen-Eigenschaften
 platform.xclass.defaultClassSheet.properties.empty=Diese Klasse hat noch keine Eigenschaften. Du kannst den {0}Klasseneditor{1} verwenden, um sie zu definieren.

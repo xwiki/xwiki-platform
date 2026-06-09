@@ -19,20 +19,17 @@
  */
 package org.xwiki.mail.script;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailResender;
@@ -42,12 +39,16 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,56 +58,69 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
+@ComponentTest
 @ComponentList({
     MemoryMailListener.class
 })
-public class DeprecatedMailStorageScriptServiceTest
+class DeprecatedMailStorageScriptServiceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DeprecatedMailStorageScriptService> mocker =
-        new MockitoComponentMockingRule<>(DeprecatedMailStorageScriptService.class);
+    @InjectMockComponents
+    private DeprecatedMailStorageScriptService service;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    @Named("database")
+    private MailResender resender;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager cm)
     {
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
+        when(this.componentManagerProvider.get()).thenReturn(cm);
+    }
 
-        Execution execution = this.mocker.getInstance(Execution.class);
+    @BeforeEach
+    void setUp()
+    {
         ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
     }
 
     @Test
-    public void resendWhenMailResendingFailed() throws Exception
+    void resendWhenMailResendingFailed() throws Exception
     {
-        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
-        when(resender.resendAsynchronously("batchId", "messageId")).thenThrow(new MailStoreException("error"));
+        when(this.resender.resendAsynchronously("batchId", "messageId")).thenThrow(new MailStoreException("error"));
 
-        ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
+        ScriptMailResult result = this.service.resend("batchId", "messageId");
 
         assertNull(result);
-        assertEquals("error", this.mocker.getComponentUnderTest().getLastError().getMessage());
+        assertEquals("error", this.service.getLastError().getMessage());
     }
 
     @Test
-    public void resend() throws Exception
+    void resend() throws Exception
     {
-        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
         MailStatusResult statusResult = mock(MailStatusResult.class);
-        when(resender.resendAsynchronously("batchId", "messageId")).thenReturn(statusResult);
+        when(this.resender.resendAsynchronously("batchId", "messageId")).thenReturn(statusResult);
 
-        ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
+        ScriptMailResult result = this.service.resend("batchId", "messageId");
 
         assertEquals("batchId", result.getBatchId());
         assertNotNull(result.getStatusResult());
     }
 
     @Test
-    public void resendAsynchronouslySeveralMessages() throws Exception
+    void resendAsynchronouslySeveralMessages() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map filterMap = Map.of("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
@@ -122,50 +136,44 @@ public class DeprecatedMailStorageScriptServiceTest
         MailStatusResult statusResult2 = mock(MailStatusResult.class, "status2");
         when(statusResult2.getTotalMailCount()).thenReturn(2L);
 
-        List<Pair<MailStatus, MailStatusResult>> results = new ArrayList<>();
-        results.add(new ImmutablePair<>(status1, statusResult1));
-        results.add(new ImmutablePair<>(status2, statusResult2));
+        List<Pair<MailStatus, MailStatusResult>> results = List.of(
+            new ImmutablePair<>(status1, statusResult1),
+            new ImmutablePair<>(status2, statusResult2)
+        );
 
-        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
-        when(resender.resendAsynchronously(filterMap, 5, 10)).thenReturn(results);
+        when(this.resender.resendAsynchronously(filterMap, 5, 10)).thenReturn(results);
 
-        List<ScriptMailResult> scriptResults =
-            this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 5, 10);
+        List<ScriptMailResult> scriptResults = this.service.resendAsynchronously(filterMap, 5, 10);
 
         assertEquals(2, scriptResults.size());
-        assertEquals("batch1", scriptResults.get(0).getBatchId());
-        assertEquals(1L, scriptResults.get(0).getStatusResult().getTotalMailCount());
-        assertEquals("batch2", scriptResults.get(1).getBatchId());
-        assertEquals(2L, scriptResults.get(1).getStatusResult().getTotalMailCount());
+        assertEquals("batch1", scriptResults.getFirst().getBatchId());
+        assertEquals(1L, scriptResults.getFirst().getStatusResult().getTotalMailCount());
+        assertEquals("batch2", scriptResults.getLast().getBatchId());
+        assertEquals(2L, scriptResults.getLast().getStatusResult().getTotalMailCount());
     }
 
     @Test
-    public void resendAsynchronouslySeveralMessagesWhenMailResendingFailed() throws Exception
+    void resendAsynchronouslySeveralMessagesWhenMailResendingFailed() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map filterMap = Map.of("state", "prepare_%");
 
-        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
-        when(resender.resendAsynchronously(filterMap, 5, 10)).thenThrow(new MailStoreException("error"));
+        when(this.resender.resendAsynchronously(filterMap, 5, 10)).thenThrow(new MailStoreException("error"));
 
-        List<ScriptMailResult> scriptResults =
-            this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 5, 10);
+        List<ScriptMailResult> scriptResults = this.service.resendAsynchronously(filterMap, 5, 10);
 
         assertNull(scriptResults);
-        assertEquals("error", this.mocker.getComponentUnderTest().getLastError().getMessage());
+        assertEquals("error", this.service.getLastError().getMessage());
     }
 
     @Test
-    public void loadWhenNotAuthorized() throws Exception
+    void loadWhenNotAuthorized() throws Exception
     {
-        ContextualAuthorizationManager authorizationManager =
-            this.mocker.getInstance(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
 
-        List<MailStatus> result = this.mocker.getComponentUnderTest().load(
-            Collections.<String, Object>emptyMap(), 0, 0, null, false);
+        List<MailStatus> result = this.service.load(Map.of(), 0, 0, null, false);
 
         assertNull(result);
         assertEquals("You need Admin rights to load mail statuses",
-            this.mocker.getComponentUnderTest().getLastError().getMessage());
+            this.service.getLastError().getMessage());
     }
 }

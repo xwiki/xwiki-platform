@@ -49,7 +49,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public abstract class AbstractTestWiki
 {
-
     /** The subdirectory in the classpath were the test wiki definitions will be found. */
     private final static String TEST_WIKI_DEFINITIONS_DIRECTORY = "testwikis";
 
@@ -63,12 +62,12 @@ public abstract class AbstractTestWiki
      * The object (wiki, space or document) that have access control objects that is currently being parsed and built is
      * at the top of this stack.
      */
-    private final Stack<HasAcl> currentRightsHolder = new Stack<HasAcl>();
+    private final Stack<HasAcl> currentRightsHolder = new Stack<>();
 
     /**
      * The object (wiki or group) that have users that is currently being parsed and built is at the top of this stack.
      */
-    private final Stack<HasUsers> currentUsersHolder = new Stack<HasUsers>();
+    private final Stack<HasUsers> currentUsersHolder = new Stack<>();
 
     /**
      * Add a wiki definition.

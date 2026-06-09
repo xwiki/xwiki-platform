@@ -19,17 +19,17 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}.
  */
-public class MailTest
+class MailTest
 {
     @Test
-    public void testToString()
+    void mailToString()
     {
         Mail mail = new Mail();
         mail.setFrom("john@acme.org");

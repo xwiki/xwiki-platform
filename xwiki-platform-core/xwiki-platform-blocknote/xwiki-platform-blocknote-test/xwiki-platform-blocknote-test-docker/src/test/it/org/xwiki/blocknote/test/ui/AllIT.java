@@ -50,4 +50,9 @@ class AllIT
     class NestedMacroIT extends MacroIT
     {
     }
+
+    @Nested
+    class NestedCollaborationIT extends CollaborationIT
+    {
+    }
 }

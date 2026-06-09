@@ -258,7 +258,7 @@
 ## Escape special characters in the macro parameter value.
 #set ($sort = $xcontext.macro.params.sort.replaceAll('([~"])', '~$1'))
 #if ("$!xcontext.macro.params.root" != '')
-  #set ($root = $xcontext.macro.params.root)
+  #set ($root = $xcontext.macro.params.root.replaceAll('([~"])', '~$1'))
 #else
   #set ($root = 'document:')
 #end

@@ -93,6 +93,7 @@ class ImportmapMojoTest
 
         assertDoesNotThrow(mojo::execute);
         verify(logMock).debug("Checking key [my-module/] for webjar reference "
-            + "[WebjarPathDescriptor[webjarId=org.test:my-artifact, namespace=null, path=dist/main.js, params=null]]");
+            + "[ImportmapPathDescriptor[descriptor=WebjarPathDescriptor[webjarId=org.test:my-artifact, namespace=null, "
+            + "path=dist/main.js, params={}], eager=false, anonymous=false]]");
     }
 }

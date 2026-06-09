@@ -5,7 +5,7 @@
 ```ts
 
 import { BlockNoteViewWrapperProps } from '@xwiki/platform-editors-blocknote-react';
-import { CollaborationInitializer } from '@xwiki/platform-collaboration-api';
+import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
@@ -24,7 +24,7 @@ list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
+collaboration?: Collaboration;
 container: Container;
 }, {
 getContent: () => UniAst | Error;
@@ -38,7 +38,7 @@ list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
+collaboration?: Collaboration;
 container: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;

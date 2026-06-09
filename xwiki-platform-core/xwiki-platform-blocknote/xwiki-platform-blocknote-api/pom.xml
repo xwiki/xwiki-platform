@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blocknote</artifactId>
-    <version>18.4.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-blocknote-api</artifactId>
@@ -66,6 +66,13 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-blocknote-webjar</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Used for realtime collaboration. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-yjs-websocket</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

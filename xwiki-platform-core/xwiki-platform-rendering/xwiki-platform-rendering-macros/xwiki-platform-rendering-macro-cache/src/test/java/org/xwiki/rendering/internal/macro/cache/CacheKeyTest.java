@@ -19,9 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.cache;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.cache.CacheKey}.
@@ -29,10 +29,10 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @Since 6.3RC1
  */
-public class CacheKeyTest
+class CacheKeyTest
 {
     @Test
-    public void verifyToString()
+    void verifyToString()
     {
         CacheKey key = new CacheKey(300, 1000);
         assertEquals("300s-1000", key.toString());

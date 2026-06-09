@@ -19,19 +19,20 @@
  */
 package org.xwiki.notifications.notifiers.internal.rss;
 
-import java.util.Collections;
+import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.notifiers.internal.ModelBridge;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,40 +42,37 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.6RC1
  */
-public class DefaultNotificationRSSManagerTest
+@ComponentTest
+class DefaultNotificationRSSManagerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultNotificationRSSManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultNotificationRSSManager.class);
+    @InjectMockComponents
+    private DefaultNotificationRSSManager rssManager;
 
+    @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
 
+    @MockComponent
     private ModelBridge modelBridge;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.contextualLocalizationManager = this.mocker.registerMockComponent(ContextualLocalizationManager.class);
-
-        this.modelBridge = this.mocker.registerMockComponent(ModelBridge.class);
-
-        this.wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
     }
 
     @Test
-    public void renderFeed() throws Exception
+    void renderFeed()
     {
         when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedTitle"))
-                .thenReturn("FeedTitle");
-        when(this.modelBridge.getDocumentURL(
-                any(), any(), any())).thenReturn("url");
+            .thenReturn("FeedTitle");
+        when(this.modelBridge.getDocumentURL(any(), any(), any())).thenReturn("url");
         when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedDescription"))
-                .thenReturn("FeedDescription");
+            .thenReturn("FeedDescription");
 
-        SyndFeed feed = this.mocker.getComponentUnderTest().renderFeed(Collections.EMPTY_LIST);
+        SyndFeed feed = this.rssManager.renderFeed(List.of());
 
         assertEquals("FeedTitle", feed.getTitle());
         assertEquals("FeedDescription", feed.getDescription());

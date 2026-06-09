@@ -14,6 +14,7 @@
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-backend-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
+    "@xwiki/platform-collaboration-xwiki": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-editors-blocknote-headless": "workspace:*",

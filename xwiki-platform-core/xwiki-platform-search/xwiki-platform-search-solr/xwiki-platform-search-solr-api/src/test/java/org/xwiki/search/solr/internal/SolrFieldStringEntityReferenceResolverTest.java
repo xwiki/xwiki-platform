@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -62,12 +62,12 @@ class SolrFieldStringEntityReferenceResolverTest
             "test"));
 
         DocumentReference documentReference =
-            new DocumentReference("test", Arrays.asList("My App", "Code", "Model"), "A Class");
+            new DocumentReference("test", List.of("My App", "Code", "Model"), "A Class");
         assertEquals(new ClassPropertyReference("title", documentReference),
             new ClassPropertyReference(this.resolver.resolve("My App.Code.Model.A Class.title",
                 EntityType.CLASS_PROPERTY)));
 
-        documentReference = new DocumentReference("test", Arrays.asList("My.App", "Co.de"), "A.Class");
+        documentReference = new DocumentReference("test", List.of("My.App", "Co.de"), "A.Class");
         assertEquals(new ClassPropertyReference("ti.tle", documentReference),
             new ClassPropertyReference(this.resolver.resolve("My..App.Co..de.A..Class.ti..tle",
                 EntityType.CLASS_PROPERTY)));
@@ -78,7 +78,7 @@ class SolrFieldStringEntityReferenceResolverTest
         // Relative reference resolved based on the given parameters.
 
         assertEquals(
-            new ClassPropertyReference("title", new DocumentReference("foo", Arrays.asList("Code", "Model"), "A Class")),
+            new ClassPropertyReference("title", new DocumentReference("foo", List.of("Code", "Model"), "A Class")),
             new ClassPropertyReference(this.resolver.resolve("Code.Model.A Class.title", EntityType.CLASS_PROPERTY,
                 new SpaceReference("My App", new WikiReference("foo")))));
 
@@ -88,7 +88,7 @@ class SolrFieldStringEntityReferenceResolverTest
             new EntityReference("Code", EntityType.SPACE, new EntityReference("My App", EntityType.SPACE)));
         assertEquals(
             new ClassPropertyReference("title",
-                new DocumentReference("bar", Arrays.asList("My App", "Code"), "A Class")),
+                new DocumentReference("bar", List.of("My App", "Code"), "A Class")),
             new ClassPropertyReference(this.resolver.resolve("A Class.title", EntityType.CLASS_PROPERTY,
                 new WikiReference("bar"))));
     }

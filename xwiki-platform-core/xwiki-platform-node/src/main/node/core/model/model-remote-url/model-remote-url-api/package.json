@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-model-remote-url-api",
-  "version": "18.4.0-SNAPSHOT",
+  "version": "18.5.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -54,6 +54,7 @@
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
+    "jsdom": "catalog:",
     "reflect-metadata": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

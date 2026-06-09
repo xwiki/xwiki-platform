@@ -19,17 +19,18 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -42,34 +43,30 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.7RC1
  */
-public class UserProfileNotificationPreferenceProviderTest
+@ComponentTest
+class UserProfileNotificationPreferenceProviderTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<UserProfileNotificationPreferenceProvider> mocker =
-            new MockitoComponentMockingRule<>(UserProfileNotificationPreferenceProvider.class);
+    @InjectMockComponents
+    private UserProfileNotificationPreferenceProvider provider;
 
+    @MockComponent
+    @Named("cached")
     private NotificationPreferenceModelBridge cachedNotificationPreferenceModelBridge;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        cachedNotificationPreferenceModelBridge = mocker.registerMockComponent(NotificationPreferenceModelBridge.class, "cached");
-    }
-
     @Test
-    public void providerName() throws Exception
+    void providerName()
     {
         assertEquals("userProfile", UserProfileNotificationPreferenceProvider.NAME);
     }
 
     @Test
-    public void getProviderPriority() throws Exception
+    void getProviderPriority()
     {
-        assertEquals(500, mocker.getComponentUnderTest().getProviderPriority());
+        assertEquals(500, this.provider.getProviderPriority());
     }
 
     @Test
-    public void savePreferencesWithTargetable() throws Exception
+    void savePreferencesWithTargetable() throws Exception
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "user");
         DocumentReference userReference2 = new DocumentReference("wiki", "space", "user2");
@@ -81,11 +78,11 @@ public class UserProfileNotificationPreferenceProviderTest
         TargetableNotificationPreference pref3 = mock(TargetableNotificationPreference.class);
         when(pref3.getTarget()).thenReturn(userReference2);
 
-        mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2, pref3));
+        this.provider.savePreferences(List.of(pref1, pref2, pref3));
 
-        verify(cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference),
+        verify(this.cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference),
                 any(List.class));
-        verify(cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference2),
+        verify(this.cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference2),
                 any(List.class));
     }
 }

@@ -21,15 +21,16 @@ package org.xwiki.notifications.filters.internal;
 
 import javax.script.ScriptContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,48 +44,48 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.8RC1
  */
-public class DefaultNotificationFilterDisplayerTest
+@ComponentTest
+class DefaultNotificationFilterDisplayerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultNotificationFilterDisplayer> mocker =
-            new MockitoComponentMockingRule<>(DefaultNotificationFilterDisplayer.class);
+    @InjectMockComponents
+    private DefaultNotificationFilterDisplayer defaultNotificationFilterDisplayer;
 
+    @MockComponent
     private TemplateManager templateManager;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private ScriptContextManager scriptContextManager;
+
+    @BeforeEach
+    void setUp()
     {
-        templateManager = mocker.registerMockComponent(TemplateManager.class);
-        ScriptContextManager scriptContextManager = mocker.registerMockComponent(ScriptContextManager.class);
-        when(scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
     }
 
     @Test
-    public void displayWithCustomTemplate() throws Exception
+    void displayWithCustomTemplate() throws Exception
     {
         Template fakeTemplate = mock(Template.class);
-        when(templateManager.getTemplate(any(String.class))).thenReturn(fakeTemplate);
+        when(this.templateManager.getTemplate(any(String.class))).thenReturn(fakeTemplate);
 
         NotificationFilter filter = mock(NotificationFilter.class);
         when(filter.getName()).thenReturn("filterName");
 
-        mocker.getComponentUnderTest()
-                .display(filter, mock(NotificationFilterPreference.class));
+        this.defaultNotificationFilterDisplayer.display(filter, mock(NotificationFilterPreference.class));
 
-        verify(templateManager).execute(eq(fakeTemplate));
+        verify(this.templateManager).execute(eq(fakeTemplate));
     }
 
     @Test
-    public void displayWithDefaultTemplate() throws Exception
+    void displayWithDefaultTemplate() throws Exception
     {
-        when(templateManager.getTemplate(any(String.class))).thenReturn(null);
+        when(this.templateManager.getTemplate(any(String.class))).thenReturn(null);
 
         NotificationFilter filter = mock(NotificationFilter.class);
         when(filter.getName()).thenReturn("filterName");
 
-        mocker.getComponentUnderTest()
-                .display(filter, mock(NotificationFilterPreference.class));
+        this.defaultNotificationFilterDisplayer.display(filter, mock(NotificationFilterPreference.class));
 
-        verify(templateManager).execute(eq("notification/filters/default.vm"));
+        verify(this.templateManager).execute(eq("notification/filters/default.vm"));
     }
 }

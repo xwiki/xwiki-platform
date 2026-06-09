@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-tool-eslintconfig",
-  "version": "18.4.0-SNAPSHOT",
+  "version": "18.5.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -38,7 +38,7 @@
     "@eslint/js": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-headers": "catalog:",
-    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-import-x": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "eslint-plugin-promise": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",

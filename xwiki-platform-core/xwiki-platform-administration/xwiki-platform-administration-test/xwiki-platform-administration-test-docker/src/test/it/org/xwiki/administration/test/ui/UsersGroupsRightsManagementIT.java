@@ -480,6 +480,7 @@ class UsersGroupsRightsManagementIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
         editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", userName);
         assertTrue(editRightsPane.hasEntity(userName));
         editRightsPane.setRight(userName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
 
@@ -513,7 +514,9 @@ class UsersGroupsRightsManagementIT
         administrationPage = AdministrationPage.gotoPage();
         editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
         editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", userName);
         assertFalse(editRightsPane.hasEntity(userName));
+        editRightsPane.getRightsTable().filterColumn("name", newUserName);
         assertTrue(editRightsPane.hasEntity(newUserName));
         assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newUserName, EditRightsPane.Right.VIEW));
         // Reset the right to avoid interference with other tests.
@@ -721,5 +724,49 @@ class UsersGroupsRightsManagementIT
         vp = setup.gotoPage(childRef);
         assertTrue(vp.getContent().contains("ALLOWED"),
             "Custom right should be allowed on child page when set as page-only on parent");
+    }
+
+    /**
+     * Verify that the Rights administration section displays the listing of Users and Groups, both at the global
+     * (wiki) level ("Rights" section, see XWIKI-22286) and at the page/space level ("Rights: Page" section, see
+     * XWIKI-23066).
+     */
+    @Test
+    @Order(13)
+    void rightsShowUsersAndGroups(TestUtils setup, TestReference testReference)
+    {
+        // Ensure the space exists so it has a Page Administration with a Rights: Page section.
+        setup.createPage(testReference, "", testReference.getName());
+
+        // Create the admin user so that we can verify it's listed in the Rights table.
+        setup.createAdminUser();
+        // createAdminUser() logs in as the non-superadmin "Admin" user; log back in as superadmin so that
+        // navigating to the (global and page) administration is race-free, matching the rest of this class. The
+        // "Admin" user document is created via REST regardless of who is logged in, so it's still listed in the
+        // Rights table below.
+        setup.loginAsSuperAdmin();
+
+        // Global level -> Administer Wiki -> Users & Rights -> Rights.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        assertRightsTableShowsUsersAndGroups(administrationPage.clickGlobalRightsSection().getEditRightsPane());
+
+        // Page/space level -> Administer Page -> Users & Rights -> Rights: Page.
+        AdministrationPage adminPage =
+            AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference());
+        adminPage.clickSection("Users & Rights", "Rights: Page");
+        assertRightsTableShowsUsersAndGroups(new EditRightsPane());
+    }
+
+    private void assertRightsTableShowsUsersAndGroups(EditRightsPane editRightsPane)
+    {
+        // Select Users: the user listing is displayed (default Admin user present).
+        editRightsPane.switchToUsers();
+        editRightsPane.getRightsTable().filterColumn("name", "Admin");
+        assertTrue(editRightsPane.hasEntity("Admin"));
+
+        // Select Groups: the groups listing is displayed (default groups present).
+        editRightsPane.switchToGroups();
+        editRightsPane.getRightsTable().filterColumn("name", "XWikiAdminGroup");
+        assertTrue(editRightsPane.hasEntity("XWikiAdminGroup"));
     }
 }

@@ -19,9 +19,7 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -69,14 +67,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         @Override
         protected InputStream openStream() throws IOException
         {
-            InputStream stream;
-            if (this.content.isInMemory()) {
-                stream = new ByteArrayInputStream(this.content.getData());
-            } else {
-                stream = new FileInputStream(this.content.getFile());
-            }
-
-            return new Base64InputStream(stream);
+            return new Base64InputStream(this.content.toInputStream());
         }
 
         @Override
@@ -324,17 +315,17 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             throw new FilterException(e);
         }
 
-        // Create a deferred file based content (if the content is bigger than 10000 bytes it will end up in
+        // Create a deferred file-based content (if the content is bigger than 100 thousand bytes, it will end up in
         // a file)
         content.content = new DeferredFileOutputStream(100000, temporaryFile);
 
-        // Copy the content to byte array or file depending on its size
-        for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
-            try {
-                content.content.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new FilterException(e);
+        // Copy the content to byte array or file depending on its size and close the stream afterward.
+        try (DeferredFileOutputStream outputStream = content.content) {
+            for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
+                outputStream.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
             }
+        } catch (IOException e) {
+            throw new FilterException(e);
         }
     }
 }

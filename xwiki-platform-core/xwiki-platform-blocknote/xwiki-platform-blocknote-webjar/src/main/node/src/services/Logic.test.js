@@ -26,6 +26,15 @@ define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
 
 container.bind("XWikiMeta").toConstantValue({});
 
+globalThis.XWiki = {
+  currentDocument: {
+    documentReference: {},
+  },
+  Model: {
+    serialize: () => "",
+  },
+};
+
 globalThis.matchMedia = vi.fn().mockImplementation((query) => ({
   matches: false,
   media: query,

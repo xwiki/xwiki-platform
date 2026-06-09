@@ -17,17 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.repository.test.ui.repository;
+package org.xwiki.repository.test.docker;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
@@ -46,6 +46,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.Resources;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
+import org.xwiki.repository.test.RepositoryTestUtils;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.repository.test.TestExtension;
 import org.xwiki.repository.test.po.ExtensionImportPage;
 import org.xwiki.repository.test.po.ExtensionPage;
@@ -58,26 +60,41 @@ import org.xwiki.repository.test.po.RepositoryAdminPage;
 import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupportPlanInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
-import org.xwiki.repository.test.ui.AbstractExtensionAdminAuthenticatedIT;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Repository Test.
- * 
+ *
  * @version $Id$
+ * @since 18.5.0RC1
  */
-public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
+@UITest(
+    // Provides the XWikiExtensionRepositoryFactory-equivalent for the "maven" repository type used by the maven-test
+    // repository. It must be in WEB-INF/lib at startup so that the maven-test repository (configured by
+    // DynamicTestConfigurationExtension) can be registered.
+    extraJARs = {
+        "org.xwiki.commons:xwiki-commons-extension-repository-maven"
+    }
+)
+class RepositoryIT
 {
-    public static final UsernamePasswordCredentials USER_CREDENTIALS =
-        new UsernamePasswordCredentials("Author", "password");
+    private static final String USER_NAME = "Author";
+
+    private static final String USER_PASSWORD = "password";
 
     private static final String IDPREFIX = "prefix-";
+
+    private static RepositoryTestUtils repositoryTestUtils;
+
+    private TestUtils setup;
 
     private TestExtension baseExtension;
 
@@ -87,16 +104,34 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 
     private long sizeOfFile;
 
-    @Before
-    @Override
-    public void setUp() throws Exception
+    @BeforeAll
+    static void beforeAll(TestUtils setup) throws Exception
     {
-        super.setUp();
+        setup.loginAsSuperAdmin();
+        setup.recacheSecretToken();
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        // Reuse the RepositoryUtils initialized (before XWiki started) by DynamicTestConfigurationExtension so that the
+        // maven repository location and the generated test extension files match what was configured in
+        // xwiki.properties.
+        repositoryTestUtils = new RepositoryTestUtils(setup, DynamicTestConfigurationExtension.getRepositoryUtils(),
+            new SolrTestUtils(setup));
+    }
+
+    @BeforeEach
+    void setUp(TestUtils setup) throws Exception
+    {
+        this.setup = setup;
+
+        // Make sure to have the proper token and admin credentials.
+        setup.loginAsSuperAdmin();
+        setup.recacheSecretToken();
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         // base extension informations
 
         this.baseExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId(IDPREFIX + "macro-jar-extension", "1.0"), "jar");
+            repositoryTestUtils.getTestExtension(new ExtensionId(IDPREFIX + "macro-jar-extension", "1.0"), "jar");
 
         this.baseExtension.setName("Macro JAR extension");
         this.baseExtension.setDescription("extension description");
@@ -105,8 +140,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         this.baseLicense = new ExtensionLicense("Do What The Fuck You Want To Public License 2", null);
         this.baseExtension.addLicense(this.baseLicense);
 
-        this.baseAuthor =
-            new DefaultExtensionAuthor("User Name", getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName()));
+        this.baseAuthor = new DefaultExtensionAuthor("User Name", setup.getURL("XWiki", USER_NAME));
         this.baseExtension.addAuthor(this.baseAuthor);
 
         this.baseExtension
@@ -116,11 +150,11 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 
         this.sizeOfFile = FileUtils.sizeOf(this.baseExtension.getFile().getFile());
 
-        getRepositoryTestUtils().deleteExtension(baseExtension);
+        repositoryTestUtils.deleteExtension(this.baseExtension);
     }
 
     @Test
-    public void validateAllFeatures() throws Exception
+    void validateAllFeatures() throws Exception
     {
         setUpXWiki();
         addSupportPlans();
@@ -139,9 +173,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         repositoryAdminPage.setDefaultIdPrefix(IDPREFIX);
         repositoryAdminPage.clickUpdateButton();
 
-        getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), "first_name",
-            "User", "last_name", "Name");
-
+        this.setup.createUserAndLogin(USER_NAME, USER_PASSWORD, "first_name", "User", "last_name", "Name");
     }
 
     private void addSupportPlans()
@@ -190,27 +222,28 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         ExtensionPage extensionPage = extensionEdit.clickSaveAndView();
 
         // Test summary
-        getDriver().findElementsWithoutWaiting(By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
+        this.setup.getDriver()
+            .findElementsWithoutWaiting(By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
 
         assertFalse(extensionPage.isValidExtension());
 
         // Add versions
         // TODO: add XR UI to manipulate versions
-        getRepositoryTestUtils().addVersionObject(this.baseExtension);
-        getRepositoryTestUtils().addVersionObject(this.baseExtension, "10.0", getUtil().getAttachmentURL("Extension",
+        repositoryTestUtils.addVersionObject(this.baseExtension);
+        repositoryTestUtils.addVersionObject(this.baseExtension, "10.0", this.setup.getAttachmentURL("Extension",
             this.baseExtension.getName(), this.baseExtension.getFile().getName()));
-        getRepositoryTestUtils().addVersionObject(this.baseExtension, "2.0",
+        repositoryTestUtils.addVersionObject(this.baseExtension, "2.0",
             "attach:" + this.baseExtension.getFile().getName());
 
         // Add dependencies
         // TODO: add XR UI to manipulate dependencies
-        getRepositoryTestUtils().addDependencies(this.baseExtension, "10.0");
+        repositoryTestUtils.addDependencies(this.baseExtension, "10.0");
 
         // Add attachment
-        getRepositoryTestUtils().attachFile(this.baseExtension);
+        repositoryTestUtils.attachFile(this.baseExtension);
 
         // Wait until all asynchronous tasks are done
-        getRepositoryTestUtils().waitUntilReady();
+        repositoryTestUtils.waitUntilReady();
 
         // Check livetable
 
@@ -237,7 +270,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // Resolve
 
         ExtensionVersion extension =
-            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "1.0");
+            this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "1.0");
 
         assertEquals(this.baseExtension.getId().getId(), extension.getId());
         assertEquals(this.baseExtension.getType(), extension.getType());
@@ -245,15 +278,15 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals("1.0", extension.getVersion());
 
-        assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
+        assertSameURL(this.setup.getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         // File
 
-        assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+        assertEquals(this.sizeOfFile, this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
             this.baseExtension.getId().getId(), "1.0").length);
 
         // //////////////////////////////////////////
@@ -263,7 +296,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // Resolve
 
         extension =
-            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "2.0");
+            this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "2.0");
 
         assertEquals(this.baseExtension.getId().getId(), extension.getId());
         assertEquals(this.baseExtension.getType(), extension.getType());
@@ -271,15 +304,15 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals("2.0", extension.getVersion());
 
-        assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
+        assertSameURL(this.setup.getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         // File
 
-        assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+        assertEquals(this.sizeOfFile, this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
             this.baseExtension.getId().getId(), "2.0").length);
 
         // //////////////////////////////////////////
@@ -289,17 +322,17 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // Resolve
 
         extension =
-            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "10.0");
+            this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "10.0");
 
         assertEquals(this.baseExtension.getId().getId(), extension.getId());
         assertEquals(this.baseExtension.getType(), extension.getType());
         assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals("10.0", extension.getVersion());
 
-        assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
+        assertSameURL(this.setup.getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         ExtensionDependency dependency1 = extension.getDependencies().get(0);
@@ -311,14 +344,14 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 
         // File
 
-        assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+        assertEquals(this.sizeOfFile, this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
             this.baseExtension.getId().getId(), this.baseExtension.getId().getVersion().getValue()).length);
 
         // //////////////////////////////////////////
         // Extensions
         // //////////////////////////////////////////
 
-        Extensions extensions = getUtil().rest().getResource(Resources.EXTENSIONS, Map.of());
+        Extensions extensions = this.setup.rest().getResource(Resources.EXTENSIONS, Map.of());
 
         assertEquals(1, extensions.getTotalHits());
         assertEquals(this.baseExtension.getId().getId(), extensions.getExtensionSummaries().get(0).getId());
@@ -341,7 +374,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals("10.0", extension.getVersion());
 
         // TODO: add support for dependencies in XR search
@@ -351,7 +384,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"macro"});
 
-        ExtensionsSearchResult result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = this.setup.rest().getResource(Resources.SEARCH, queryParams);
 
         assertEquals(1, result.getTotalHits());
         assertEquals(0, result.getOffset());
@@ -362,7 +395,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals("10.0", extension.getVersion());
 
         // Wrong search pattern
@@ -370,7 +403,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         queryParams.clear();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"notexisting"});
 
-        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
+        result = this.setup.rest().getResource(Resources.SEARCH, queryParams);
 
         assertEquals(0, result.getTotalHits());
         assertEquals(0, result.getOffset());
@@ -381,7 +414,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         queryParams.clear();
         queryParams.put(Resources.QPARAM_LIST_START, new Object[] {1});
 
-        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
+        result = this.setup.rest().getResource(Resources.SEARCH, queryParams);
 
         assertEquals(1, result.getOffset());
         assertEquals(result.getTotalHits() - 1, result.getExtensions().size());
@@ -391,7 +424,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         queryParams.clear();
         queryParams.put(Resources.QPARAM_LIST_NUMBER, new Object[] {0});
 
-        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
+        result = this.setup.rest().getResource(Resources.SEARCH, queryParams);
 
         assertTrue(result.getTotalHits() >= 1);
         assertEquals(0, result.getOffset());
@@ -401,7 +434,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
     private ExtensionVersion searchExtension(String id) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
-        ExtensionsSearchResult result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = this.setup.rest().getResource(Resources.SEARCH, queryParams);
 
         assertTrue(result.getTotalHits() >= 0);
         assertEquals(0, result.getOffset());
@@ -420,10 +453,10 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
     private ExtensionPage importExtension() throws Exception
     {
         // Make sure to clean the extension if it's already there
-        getUtil().rest().delete(new LocalDocumentReference(List.of("Extension", "name"), "WebHome"));
+        this.setup.rest().delete(new LocalDocumentReference(List.of("Extension", "name"), "WebHome"));
 
         // Use an account without script right
-        getUtil().login(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword());
+        this.setup.login(USER_NAME, USER_PASSWORD);
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
@@ -454,12 +487,12 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // 2.0
 
         TestExtension emptyExtension =
-            getRepositoryTestUtils().getTestExtension(new ExtensionId("emptyjar", "1.0"), "jar");
+            repositoryTestUtils.getTestExtension(new ExtensionId("emptyjar", "1.0"), "jar");
 
         long fileSize = FileUtils.sizeOf(emptyExtension.getFile().getFile());
 
         ExtensionVersion extension =
-            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "2.0");
+            this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "2.0");
 
         assertEquals("maven:extension", extension.getId());
         assertEquals("jar", extension.getType());
@@ -468,7 +501,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("summary2", extension.getSummary());
         assertEquals("summary2\n      some more details", extension.getDescription());
         assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertSameURL(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         assertEquals(Arrays.asList("maven:oldextension", "maven:oldversionnedextension"),
             extension.getFeatures());
         assertEquals("maven:oldextension", extension.getExtensionFeatures().get(0).getId());
@@ -485,11 +518,11 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("groupid:artifactid", extension.getDependencies().get(0).getExclusions().get(0));
 
         assertEquals(fileSize,
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "2.0").length);
+            this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "2.0").length);
 
         // 1.0
 
-        extension = getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "1.0");
+        extension = this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "1.0");
 
         assertEquals("maven:extension", extension.getId());
         assertEquals("jar", extension.getType());
@@ -515,11 +548,11 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         }
 
         assertEquals(FileUtils.sizeOf(emptyExtension.getFile().getFile()),
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "1.0").length);
+            this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "1.0").length);
 
         // 0.9
 
-        extension = getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "0.9");
+        extension = this.setup.rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "0.9");
 
         assertEquals("maven:oldextension", extension.getId());
         assertEquals("jar", extension.getType());
@@ -541,7 +574,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         }
 
         assertEquals(fileSize,
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "0.9").length);
+            this.setup.rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "0.9").length);
 
     }
 
@@ -556,7 +589,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertTrue(getNumberOfExtensionVersionsPages(extensionPageReference) > 1);
 
         // indicate that the history of the extension should be proxied
-        getUtil().updateObject(extensionPageReference, XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel",
+        this.setup.updateObject(extensionPageReference, XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel",
             "history");
 
         // refresh extension
@@ -566,14 +599,14 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(1, getNumberOfExtensionVersionsPages(extensionPageReference));
 
         // Remember the page version
-        Page restPage = getUtil().rest().get(extensionPageReference);
+        Page restPage = this.setup.rest().get(extensionPageReference);
         String extensionPageVersion = restPage.getVersion();
 
         // in rest access nothing should change after enabling proxy
         testRestAccessToImportedExtension(true);
 
         // Make sure the REST access does not modify the document
-        restPage = getUtil().rest().get(extensionPageReference);
+        restPage = this.setup.rest().get(extensionPageReference);
         assertEquals(extensionPageVersion, restPage.getVersion());
     }
 
@@ -581,9 +614,9 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
     {
         EntityReference versionReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
             EntityType.SPACE, extensionPageReference.getParent());
-        String result = getUtil().executeWikiPlain(
+        String result = this.setup.executeWikiPlain(
             "{{velocity}}$services.query.xwql(\"select space.reference from Space space where space.parent='"
-                + getUtil().serializeLocalReference(versionReference) + "'\").execute().size(){{/velocity}}",
+                + this.setup.serializeLocalReference(versionReference) + "'\").execute().size(){{/velocity}}",
             Syntax.XWIKI_2_1);
 
         return Integer.parseInt(result);
@@ -607,10 +640,10 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         extentionInlinePage.clickSaveAndContinue();
 
         // Turn on Recommendation/Support filtering. There's no Admin UI yet for this.
-        getUtil().loginAsSuperAdmin();
-        getUtil().updateObject("ExtensionCode", "RepositoryConfig", "ExtensionCode.RepositoryConfigClass", 0,
+        this.setup.loginAsSuperAdmin();
+        this.setup.updateObject("ExtensionCode", "RepositoryConfig", "ExtensionCode.RepositoryConfigClass", 0,
             "useRecommendations", 1);
-        getUtil().login(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword());
+        this.setup.login(USER_NAME, USER_PASSWORD);
 
         // Verify that the home page now lists only the Supported extension.
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
@@ -637,6 +670,23 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         extensionsPage = new ExtensionsPage();
         livetable = extensionsPage.getLiveTable();
         assertEquals(1, livetable.getRowCount());
+    }
+
+    /**
+     * Asserts that two URLs are equal, ignoring the scheme and host parts. In the Docker test topology the in-container
+     * browser reaches the host XWiki through {@code host.testcontainers.internal} (so {@link TestUtils#getURL} builds
+     * URLs with that host) while REST responses are generated server-side using {@code localhost}. Only the host part
+     * differs, so we compare the path part only.
+     */
+    private static void assertSameURL(String expected, String actual)
+    {
+        assertEquals(stripHost(expected), stripHost(actual),
+            String.format("expected <%s> but was <%s>", expected, actual));
+    }
+
+    private static String stripHost(String url)
+    {
+        return url == null ? null : url.replaceFirst("^https?://[^/]+", "");
     }
 
     private String getProperty(String key, AbstractExtension extension)

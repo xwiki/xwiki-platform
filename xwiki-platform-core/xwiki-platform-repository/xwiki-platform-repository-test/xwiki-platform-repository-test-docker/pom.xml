@@ -27,33 +27,36 @@
     <artifactId>xwiki-platform-repository-test</artifactId>
     <version>18.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-repository-test-tests</artifactId>
-  <name>XWiki Platform - Repository - Tests - Functional Tests</name>
+  <artifactId>xwiki-platform-repository-test-docker</artifactId>
+  <name>XWiki Platform - Repository - Tests - Functional Docker Tests</name>
   <packaging>jar</packaging>
-  <description>Tests for the Repository Application</description>
+  <description>Functional Docker-based tests for the Repository Application</description>
   <properties>
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
-    <!-- Make sure to use the expected runtime version of Maven during tests -->
+    <!-- Make sure to use the expected runtime version of Maven during tests (the maven extension repository type
+         resolves extensions using Maven) -->
     <maven.version>${maven.runtime.version}</maven.version>
     <maven.resolver.version>${maven.resolver.runtime.version}</maven.resolver.version>
   </properties>
   <dependencies>
+    <!-- ================================
+         Runtime dependencies (installed as extensions / added to the test WAR)
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
-    <!-- Server side test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
+      <type>xar</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -61,6 +64,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the "maven" extension repository factory needed at startup to register the maven-test repository -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-repository-maven</artifactId>
@@ -74,10 +78,19 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Test dependencies -->
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides org.xwiki.repository.Resources and XWikiRepositoryModel used by the test -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-repository-server-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -113,33 +126,6 @@
   </build>
   <profiles>
     <profile>
-      <id>package</id>
-      <activation>
-        <property>
-          <name>!skipITs</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-               https://jira.xwiki.org/browse/XWIKI-7683 -->
-          <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-              <execution>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>package</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
            It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
@@ -151,19 +137,16 @@
       </dependencies>
       <build>
         <plugins>
-          <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
-               that have been instrumented with Clover (XWiki oldcore for example) -->
           <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.openclover</groupId>
-                <artifactId>clover</artifactId>
-                <version>${clover.version}</version>
-              </dependency>
-            </dependencies>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
+            </configuration>
           </plugin>
         </plugins>
       </build>

@@ -90,7 +90,6 @@ class TestConfigurationTest
     @BeforeEach
     void setUp()
     {
-        System.clearProperty("xwiki.test.ui.browser");
         System.clearProperty("xwiki.test.ui.servletEngine");
         System.clearProperty("xwiki.test.ui.verbose");
         System.clearProperty("xwiki.test.ui.databaseTag");

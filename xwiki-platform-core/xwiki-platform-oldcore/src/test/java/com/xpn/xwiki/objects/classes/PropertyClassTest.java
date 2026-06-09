@@ -256,6 +256,33 @@ class PropertyClassTest
     }
 
     @Test
+    void displayCustomInEditModeRemovesTopLevelParagraph() throws Exception
+    {
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Alice");
+        this.xclass.getOwnerDocument().setAuthorReference(authorReference);
+        mockAuthorExecutor(authorReference);
+
+        // The custom display is rendered as standalone block content, wrapping the value in a paragraph.
+        XDOM displayerXDOM = mock();
+        when(this.documentDisplayer.display(any(), any())).thenReturn(displayerXDOM);
+        doAnswer(invocationOnMock -> {
+            ((WikiPrinter) invocationOnMock.getArgument(1)).print("<p>value</p>");
+            return null;
+        }).when(this.htmlRenderer).render(same(displayerXDOM), any());
+
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setCustomDisplay(CUSTOM_DISPLAY);
+        propertyClass.setObject(this.xclass);
+
+        StringBuffer buffer = new StringBuffer();
+        propertyClass.displayCustom(buffer, "date", "Path.To.Class_0_", "edit", new BaseObject(),
+            this.oldCore.getXWikiContext());
+
+        // The wrapping top level paragraph is removed in edit mode too (not only in view mode).
+        assertEquals("value", buffer.toString());
+    }
+
+    @Test
     void displayCustomInViewModeKeepsMultipleTopLevelBlocks() throws Exception
     {
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Alice");

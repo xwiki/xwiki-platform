@@ -20,8 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.script.ScriptContext;
 
@@ -87,14 +85,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
 
-    /**
-     * Matches content that consists of a single top level {@code <p>...</p>} paragraph (optionally surrounded by
-     * whitespace). The inner group {@code (?:(?!</p>).)*} forbids a nested closing tag, so {@code <p>a</p><p>b</p>}
-     * does NOT match and is left untouched: only a lone paragraph (the wrapper added by the standalone block
-     * rendering of a custom display) is stripped.
-     */
-    private static final Pattern SINGLE_PARAGRAPH =
-        Pattern.compile("\\s*<p>((?:(?!</p>).)*)</p>\\s*", Pattern.DOTALL);
+    private static final String PARAGRAPH_START = "<p>";
+
+    private static final String PARAGRAPH_END = "</p>";
 
     private static final String NAME = "name";
     private static final String VALUE = "value";
@@ -444,7 +437,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
-                content = getCustomDisplayContent(customDisplayer, type, context);
+                content = getCustomDisplayContent(customDisplayer, context);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
@@ -459,12 +452,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Render the custom display content for the given custom displayer.
      *
      * @param customDisplayer the custom displayer to use (see {@link #getCachedDefaultCustomDisplayer(XWikiContext)})
-     * @param type the type of display (e.g. {@code view}, {@code edit})
      * @param context the current context
      * @return the rendered custom display content
      * @throws Exception in case of problem when rendering the custom display
      */
-    private String getCustomDisplayContent(String customDisplayer, String type, final XWikiContext context)
+    private String getCustomDisplayContent(String customDisplayer, final XWikiContext context)
         throws Exception
     {
         String content = "";
@@ -497,25 +489,21 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             content = renderContentInContext(rawContent, displayerDocSyntax, authorReference,
                 displayerDoc.getDocumentReference(), context);
         } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
-            // Template based displayers are not rendered as wiki content so we return their output as is (in
-            // particular they're not concerned by the inline conversion done below).
-            return context.getWiki().evaluateTemplate(
+            content = context.getWiki().evaluateTemplate(
                 StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
         }
 
-        // In view mode the property value is expected to be displayed inline, like the default displayView() output.
-        // Custom displayers based on wiki content are rendered as standalone blocks though, which wraps the result in
-        // a paragraph. Remove that wrapping paragraph so the value is displayed inline.
-        if ("view".equals(type)) {
-            content = removeTopLevelParagraph(content);
-        }
-
-        return content;
+        // Custom displayers are rendered as standalone block content, which wraps an inline value in a paragraph.
+        // Remove that wrapping paragraph so the value is displayed inline, like the default displayView()/displayEdit()
+        // output. Only a single top level paragraph is removed; block level displayers (e.g. multi-valued ones
+        // producing several top level blocks) are left untouched.
+        // See https://jira.xwiki.org/browse/XWIKI-21845
+        return removeTopLevelParagraph(content);
     }
 
     /**
      * Remove the wrapping top level paragraph introduced when a custom display is rendered as standalone block content,
-     * so that a property displayed in view mode is rendered inline (like the default {@link #displayView} output). The
+     * so that a property is rendered inline (like the default {@link #displayView} / {@link #displayEdit} output). The
      * paragraph is only removed when the whole content consists of a single top level paragraph; more complex
      * displayers (e.g. multi-valued ones producing several top level blocks) are left untouched.
      *
@@ -528,9 +516,15 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         if (StringUtils.isBlank(content)) {
             return content;
         }
-        Matcher matcher = SINGLE_PARAGRAPH.matcher(content);
-        if (matcher.matches()) {
-            return matcher.group(1);
+        // The content is a single top level paragraph only when there's exactly one "<p>" and one "</p>". This leaves
+        // more complex (e.g. multi-valued or block level) displayers untouched.
+        if (content.indexOf(PARAGRAPH_START) == content.lastIndexOf(PARAGRAPH_START)
+            && content.indexOf(PARAGRAPH_END) == content.lastIndexOf(PARAGRAPH_END)) {
+            String strippedContent = content.strip();
+            if (strippedContent.startsWith(PARAGRAPH_START) && strippedContent.endsWith(PARAGRAPH_END)) {
+                return strippedContent.substring(PARAGRAPH_START.length(),
+                    strippedContent.length() - PARAGRAPH_END.length());
+            }
         }
         return content;
     }

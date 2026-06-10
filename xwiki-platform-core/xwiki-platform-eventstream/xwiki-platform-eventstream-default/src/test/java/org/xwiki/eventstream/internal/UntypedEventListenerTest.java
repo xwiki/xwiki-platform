@@ -123,11 +123,6 @@ class UntypedEventListenerTest
         Template template = mock(Template.class);
         when(this.templateManager.createStringTemplate(anyString(), any(), any(), any())).thenReturn(template);
         when(this.templateManager.execute(template)).thenReturn(mock(XDOM.class));
-    }
-
-    @BeforeEach
-    void watchObservationManager()
-    {
         this.answer = new MyAnswer();
         doAnswer(this.answer).when(this.observationManager)
             .notify(any(DefaultUntypedRecordableEvent.class), anyString(), any());

@@ -27,11 +27,11 @@
 
 .location-picker > dd > .breadcrumb-container > .location-actions {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 0 .5em;
+  padding: 4px .5em;
 }
 
 .location-action {

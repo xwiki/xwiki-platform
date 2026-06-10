@@ -19,8 +19,8 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -59,7 +59,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class LegacyEventMigrationJobTest
+class LegacyEventMigrationJobTest
 {
     @InjectMockComponents
     private LegacyEventMigrationJob migrationJob;
@@ -124,7 +124,7 @@ public class LegacyEventMigrationJobTest
         when(this.eventStream.countEvents()).thenReturn(105L);
 
         LegacyEventMigrationRequest request = new LegacyEventMigrationRequest(new Date(42),
-            Arrays.asList("myId", "42"));
+            List.of("myId", "42"));
         Query query = mock(Query.class);
         when(this.queryManager.createQuery("WHERE event.date >= :since ORDER BY event.date desc", Query.HQL)).thenReturn(query);
         Query statusQuery = mock(Query.class);
@@ -136,7 +136,7 @@ public class LegacyEventMigrationJobTest
         Event event3 = mock(Event.class);
         Event event4 = mock(Event.class);
 
-        when(this.eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4));
+        when(this.eventStream.searchEvents(query)).thenReturn(List.of(event1, event2, event3, event4));
 
         // event1 is already present: it won't be migrated
         when(event1.getId()).thenReturn("event1");

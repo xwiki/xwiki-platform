@@ -98,7 +98,7 @@ async function codifyMacros(
   let lastPush = -1;
 
   /** Current offset in the input */
-  let i = 0;
+  let i;
 
   for (i = 0; i < markdown.length; i++) {
     // Ignore any character following a backslash

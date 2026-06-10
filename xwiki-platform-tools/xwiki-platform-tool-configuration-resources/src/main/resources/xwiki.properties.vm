@@ -700,6 +700,16 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
+# Repository
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.3.0 and 17.10.8]
+#-# Indicate if the REST API allows passing a custom repository type and URI to resolve extensions.
+#-# 
+#-# This is disabled by default for security reasons.
+# repository.rest.allowCustomRepository=false
+
+#-------------------------------------------------------------------------------------
 # Extension Manager - Security
 #-------------------------------------------------------------------------------------
 
@@ -785,7 +795,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 12.6]
 #-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
-#-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
+#-# The default is "xwiki" which will produce core names likes "xwiki_events_9", for example.
 # solr.remote.corePrefix=xwiki
 
 #-# [Since 5.1M1]

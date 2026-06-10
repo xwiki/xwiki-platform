@@ -19,48 +19,43 @@
  */
 package org.xwiki.extension.versioncheck.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class DefaultVersionCheckConfigurationTest
+@ComponentTest
+class DefaultVersionCheckConfigurationTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultVersionCheckConfiguration> mocker =
-            new MockitoComponentMockingRule<>(DefaultVersionCheckConfiguration.class);
+    @InjectMockComponents
+    private DefaultVersionCheckConfiguration configuration;
 
+    @MockComponent
     private ConfigurationSource configurationSource;
 
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void environmentCheckEnabled()
     {
-        configurationSource = mocker.registerMockComponent(ConfigurationSource.class);
+        when(this.configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
+            .thenReturn(false);
+        assertFalse(this.configuration.isEnvironmentCheckEnabled());
+
+        when(this.configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
+            .thenReturn(true);
+        assertTrue(this.configuration.isEnvironmentCheckEnabled());
     }
 
     @Test
-    public void testEnvironmentCheckEnabled() throws Exception
+    void environmentCheckInterval()
     {
-        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
-                .thenReturn(false);
-        assertFalse(mocker.getComponentUnderTest().isEnvironmentCheckEnabled());
-
-        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
-                .thenReturn(true);
-        assertTrue(mocker.getComponentUnderTest().isEnvironmentCheckEnabled());
-    }
-
-    @Test
-    public void testEnvironmentCheckInterval() throws Exception
-    {
-        when(configurationSource.getProperty("extension.versioncheck.environment.interval", 3600))
-                .thenReturn(1);
-        assertEquals(1, mocker.getComponentUnderTest().environmentCheckInterval());
+        when(this.configurationSource.getProperty("extension.versioncheck.environment.interval", 3600))
+            .thenReturn(1);
+        assertEquals(1, this.configuration.environmentCheckInterval());
     }
 }

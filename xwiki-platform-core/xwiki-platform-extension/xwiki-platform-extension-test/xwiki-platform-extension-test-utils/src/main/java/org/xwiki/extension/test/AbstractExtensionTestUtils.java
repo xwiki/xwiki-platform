@@ -37,7 +37,6 @@ import org.xwiki.test.ui.TestUtils;
  * 
  * @version $Id$
  * @since 18.3.0RC1
- * @since 17.10.6
  */
 public abstract class AbstractExtensionTestUtils
 {

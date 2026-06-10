@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-public abstract class AbstractMoveJobTest extends AbstractEntityJobTest
+abstract class AbstractMoveJobTest extends AbstractEntityJobTest
 {
     protected MoveRequest createRequest(EntityReference source, EntityReference destination)
     {

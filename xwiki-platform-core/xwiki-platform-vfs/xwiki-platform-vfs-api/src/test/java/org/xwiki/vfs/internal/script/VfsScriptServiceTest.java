@@ -34,17 +34,17 @@ import static org.mockito.Mockito.verify;
 
 /**
  * Validate {@link VfsScriptService}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
-public class VfsScriptServiceTest
+class VfsScriptServiceTest
 {
     @MockComponent
-    VfsManager vfsManager;
+    private VfsManager vfsManager;
 
     @InjectMockComponents
-    VfsScriptService scriptService;
+    private VfsScriptService scriptService;
 
     @Test
     void urlWithContentType() throws VfsException

@@ -109,27 +109,27 @@
   &lt;div class="wizard-footer buttons"&gt;
     #if("$!prev" !='')
       &lt;span class="buttonwrapper left"&gt;
-        &lt;button value="$prev" title="$services.localization.render('platform.wiki.create.wizard.step.previous')" name="step" id="wizard-previous" class="button secondary"&gt;$services.localization.render('platform.wiki.create.wizard.step.previous')&lt;/button&gt;
+        &lt;button value="$prev" title="$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.previous'))" name="step" id="wizard-previous" class="button secondary"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.previous'))&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!next" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$next" title="$services.localization.render('platform.wiki.create.wizard.step.next')" name="step" id="wizard-next" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.next')&lt;/button&gt;
+        &lt;button value="$next" title="$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.next'))" name="step" id="wizard-next" class="button"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.next'))&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!create" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$create" title="$services.localization.render('platform.wiki.create.wizard.step.create')" name="step" id="wizard-create" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.create')&lt;/button&gt;
+        &lt;button value="$create" title="$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.create'))" name="step" id="wizard-create" class="button"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.create'))&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="finalize" title="$services.localization.render('platform.wiki.create.wizard.step.creation.go')" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.creation.go')&lt;/button&gt;
+        &lt;button value="finalize" title="$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.creation.go'))" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.creation.go'))&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!cleanUp" != '')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="cleanUp" title="$services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp')" name="step" id="cleanUp" class="button #if($cleanupHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp')&lt;/button&gt;
+        &lt;button value="cleanUp" title="$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp'))" name="step" id="cleanUp" class="button #if($cleanupHidden)hidden#end"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp'))&lt;/button&gt;
       &lt;/span&gt;
     #end
   &lt;/div&gt;
@@ -139,7 +139,7 @@
 ##
 ## Add a required message
 ##################################
-#macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;#end
+#macro(required)&lt;span class='xRequired'&gt;($escapetool.xml($services.localization.render('platform.wiki.form.requiredField')))&lt;/span&gt;#end
 ##################################
 ##        TEMPLATE FIELDS
 ##
@@ -148,7 +148,7 @@
 #macro(displayTemplateFields $templates)
   #if ($templates.size() &gt; 0)
     &lt;select name="template" id="template"&gt;
-      &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
+      &lt;option value="xwikinotemplate"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.template.noTemplate'))&lt;/option&gt;
       #foreach ($template in $templates)
         #set ($name = $template.id)
         #if ($stringtool.isNotBlank("$!template.prettyName"))
@@ -168,7 +168,7 @@
       #set ($isTemplate = 'checked="checked"')
     #end
     &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
-    &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
+    &lt;label for="set_as_template" id="label_set_as_template"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.setAsTemplate.label'))&lt;/label&gt;
   &lt;/div&gt;
 #end
 ##################################
@@ -180,7 +180,7 @@
   #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.nameAndType'), 1)
+      #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.nameAndType')), 1)
       ### WIZARD BODY ###
       &lt;div class="wizard-body"&gt;
         ### SECOND STEP VALUES
@@ -193,8 +193,8 @@
           ### PRETTY NAME ###
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="prettyname"&gt;$services.localization.render('platform.wiki.prop.wikiprettyname')#required()&lt;/label&gt;
-              &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiprettyname')&lt;/span&gt;
+              &lt;label for="prettyname"&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.wikiprettyname'))#required()&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.wikiprettyname'))&lt;/span&gt;
               &lt;span id="wikiprettynamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
@@ -204,8 +204,8 @@
           ### WIKI NAME ###
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="wikiname"&gt;$services.localization.render('platform.wiki.prop.wikiname')#required()&lt;/label&gt;
-              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiname')&lt;/span&gt;
+              &lt;label for="wikiname"&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.wikiname'))#required()&lt;/label&gt;
+              &lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.wikiname'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
               &lt;input size="60" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
@@ -216,8 +216,8 @@
           #if(!$services.wiki.isPathMode())
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="wikialias"&gt;$services.localization.render('platform.wiki.prop.wikialias')#required()&lt;/label&gt;
-                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikialias')&lt;/span&gt;
+                &lt;label for="wikialias"&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.wikialias'))#required()&lt;/label&gt;
+                &lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.wikialias'))&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 &lt;input size="60" id="wikialias" name="wikialias" type="text"  value="$!escapetool.xml($request.wikialias)"/&gt;
@@ -227,8 +227,8 @@
           ### DESCRIPTION ###
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="description"&gt;$services.localization.render('platform.wiki.prop.description')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
+                &lt;label for="description"&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.description'))&lt;/label&gt;
+                &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.description'))&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!escapetool.xml($request.getParameter('description'))&lt;/textarea&gt;
@@ -244,8 +244,8 @@
             #template('flavor/macros.vm')
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.label')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
+                &lt;label&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.flavortemplate.label'))&lt;/label&gt;
+                &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.flavortemplate.hint'))&lt;/span&gt;
               &lt;/dt&gt;
               #set ($currentTab = 'flavors')
               #if ("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
@@ -253,8 +253,8 @@
               #end
               &lt;dd class="flavor_template"&gt;
                 &lt;ul class="xwikitabbar"&gt;
-                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
-                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
+                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab'))&lt;/a&gt;&lt;/li&gt;
+                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab'))&lt;/a&gt;&lt;/li&gt;
                 &lt;/ul&gt;
                 &lt;div class="xwiki-createwiki-tabs-content"&gt;
                   #set ($defaultFlavor = "$!request.flavor")
@@ -276,10 +276,10 @@
             &lt;dl&gt;
               &lt;dt&gt;
                 #if ($templates.size() &gt; 0)
-                  &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
+                  &lt;label for="template"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.template.label'))&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint'))&lt;/span&gt;
                 #else
-                  &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+                  &lt;label&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.template.label'))&lt;/label&gt;
                 #end
               &lt;/dt&gt;
               &lt;dd&gt;
@@ -305,7 +305,7 @@
   #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
+      #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.users')), 2)
       ### WIZARD BODY ###
       &lt;div class="wizard-body"&gt;
         ### FIRST STEP VALUES
@@ -324,8 +324,8 @@
           #if ($hasAdmin)
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="owner"&gt;$services.localization.render('platform.wiki.prop.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.owner')&lt;/span&gt;
+                &lt;label for="owner"&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.owner')) &lt;span class="xRequired"&gt;($escapetool.xml($services.localization.render('platform.wiki.form.requiredField')))&lt;/span&gt;&lt;/label&gt;
+                &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.owner'))&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 #set($value = $escapetool.xml($request.getParameter('ownerId')))
@@ -346,8 +346,8 @@
           ### USERS SCOPE ###
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="userScope"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.label')&lt;/label&gt;
-              &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.hint')&lt;/span&gt;
+              &lt;label for="userScope"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.userScope.label'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.userScope.hint'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
               #set($value = $escapetool.xml($request.getParameter('userScope')))
@@ -366,7 +366,7 @@
                   #set($checked = 'checked="checked"')
                 #end
                 &lt;input type="radio" id="$userScopeValueId" name="userScope" value="$userScopeValue" $checked/&gt;
-                $services.localization.render("${wikiUserClassDocument.fullName}_${userScopeProperty.name}_${userScopeDetailsMap.get($userScopeValue).getValue()}")
+                $escapetool.xml($services.localization.render("${wikiUserClassDocument.fullName}_${userScopeProperty.name}_${userScopeDetailsMap.get($userScopeValue).getValue()}"))
                 &lt;/label&gt;
                 &lt;/div&gt;
               #end
@@ -383,8 +383,8 @@
           #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label&gt;$services.localization.render('platform.wiki.prop.membershipType.label')&lt;/label&gt;
-              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.prop.membershipType.hint')&lt;/span&gt;
+              &lt;label&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.membershipType.label'))&lt;/label&gt;
+              &lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('platform.wiki.prop.membershipType.hint'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
             #foreach ($membershipTypeValue in $membershipTypeValues)
@@ -396,7 +396,7 @@
                     #set($checked = 'checked="checked"')
                   #end
                   &lt;input type="radio" id="$membershipTypeValueId" name="membershipType" value="$membershipTypeValue" $checked/&gt;
-                  $services.localization.render("${wikiUserClassDocument.fullName}_${membershipTypeProperty.name}_${membershipTypeDetailsMap.get($membershipTypeValue).getValue()}")
+                  $escapetool.xml($services.localization.render("${wikiUserClassDocument.fullName}_${membershipTypeProperty.name}_${membershipTypeDetailsMap.get($membershipTypeValue).getValue()}"))
                 &lt;/label&gt;
               &lt;/div&gt;
             #end
@@ -405,8 +405,8 @@
           ### MEMBERS
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="members"&gt;$services.localization.render('platform.wiki.create.members')&lt;/label&gt;
-              &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
+              &lt;label for="members"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.members'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.desc.members'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
               #set ($userPickerParams = {
@@ -532,7 +532,10 @@
   ## Start the creation job
   #set($job = $services.wiki.creationjob.createWiki($wikiCreationRequest))
   #if (!$job)
-    {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.creationjob.lastError]){{/error}}
+    {{error}}
+      #set ($wikiCreateErrorParameters = [$request.wikiname, $services.wiki.creationjob.lastError])
+      {{translation key="platform.wiki.create.error", scriptParameters="wikiCreateErrorParameters"/}}
+    {{/error}}
   #else
     #creation()
   #end
@@ -566,11 +569,11 @@
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
     &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-    #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.creation'))
+    #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.creation')))
     &lt;div class="wizard-body"&gt;
       #if ($status.state != 'FINISHED')
       &lt;div class="ui-progress" id="ui-progress"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.creation.wait')
+        $escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.creation.wait'))
         &lt;div class="ui-progress-background"&gt;
           #set ($percent = $status.progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
@@ -584,19 +587,22 @@
       #end
       #set($hasErrors = $status.logTail.hasLogLevel('ERROR'))
       {{/html}}
-      
+
       {{success cssClass="successMessage #if($status.error || $state != 'FINISHED')hidden#end"}}
-        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+        #set ($stepCreationCompleParameters = ["""${request.wikiname}"""])
+        {{translation key="platform.wiki.create.wizard.step.creation.complete", scriptParameters="stepCreationCompleParameters"/}}
       {{/success}}
-      
+
       {{warning cssClass="errorlogMessage #if(!$hasErrors || $state != 'FINISHED')hidden#end"}}
-        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+        #set ($stepCreationErrorlogParameters = ["""${request.wikiname}"""])
+        {{translation key="platform.wiki.create.wizard.step.creation.errorlog", scriptParameters="stepCreationErrorlogParameters"/}}
       {{/warning}}
-      
+
       {{error cssClass="errorMessage #if(!$status.error || $state != 'FINISHED')hidden#end"}}
-        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+        #set ($stepCreationErrorParameters = ["""${request.wikiname}"""])
+        {{translation key="platform.wiki.create.wizard.step.creation.error", scriptParameters="stepCreationErrorParameters"/}}
       {{/error}}
-      
+
       {{html clean="false"}}
     &lt;/div&gt;
     ## Log
@@ -649,15 +655,15 @@
       $response.sendRedirect($doc.getURL('view', "step=cleanUp&amp;deleteOk=$ok&amp;wikiId=$wikiId"))
     #else
       {{html}}
-        #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
+        #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp')))
         &lt;form action="$doc.getURL()" method="post"&gt;
         &lt;div class="wizard-body"&gt;
-          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirmmessage', ["&lt;strong&gt;$request.wikiId&lt;/strong&gt;"])&lt;/p&gt;
+          &lt;p&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirmmessage', ["""${escapetool.xml($request.wikiId)}"""]))&lt;/p&gt;
           &lt;input type="hidden" name="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
           &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($request.wikiId)" /&gt;
           &lt;div class="wizard-footer buttons"&gt;
             &lt;span class="buttonwrapper"&gt;
-              &lt;button value="cleanUp" title="Confirm" name="step" id="cleanUp" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirm')&lt;/button&gt;
+              &lt;button value="cleanUp" title="Confirm" name="step" id="cleanUp" class="button"&gt;$escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirm'))&lt;/button&gt;
             &lt;/span&gt;
           &lt;/div&gt;
         &lt;/div&gt;
@@ -667,21 +673,23 @@
   #else
     #set($wikiId = $request.wikiId)
     {{html clean="false"}}
-      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
+      #wizardHeader($escapetool.xml($services.localization.render('platform.wiki.create.wizard.step.cleaningUp')))
       &lt;div class="wizard-body"&gt;
       {{/html}}
         #if($request.deleteOk)
-        
+
           {{success}}
-            {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
+            #set ($stepCleaningupSuccessParameters = ["""${request.wikiname}"""])
+            {{translation key="platform.wiki.create.wizard.step.cleaningup.success", scriptParameters="stepCleaningupSuccessParameters"/}}
           {{/success}}
-          
+
         #else
-        
+
           {{error}}
-            {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
+            #set ($stepCleaningupErrorParameters = ["""${request.wikiname}"""])
+            {{translation key="platform.wiki.create.wizard.step.cleaningup.error", scriptParameters="stepCleaningupErrorParameters"/}}
           {{/error}}
-          
+
         #end
         {{html clean="false"}}
       &lt;/div&gt;

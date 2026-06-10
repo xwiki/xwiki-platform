@@ -112,7 +112,6 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
 
     /**
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     protected ComponentManager loadComponentManager(ExtensionContext context)
     {
@@ -121,7 +120,6 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
 
     /**
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     protected ExtensionTestUtils loadExtensionTestUtils(ExtensionContext context)
     {
@@ -130,7 +128,6 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
 
     /**
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     protected void addServletContainerExecutor(ExtensionContext context, ServletContainerExecutor executor)
     {
@@ -148,7 +145,6 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
 
     /**
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     protected List<ServletContainerExecutor> loadServletContainerExecutors(ExtensionContext context)
     {
@@ -158,7 +154,6 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
 
     /**
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     protected ServletContainerExecutor loadServletContainerExecutor(int index, ExtensionContext context)
     {

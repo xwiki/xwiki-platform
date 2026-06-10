@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -88,6 +89,9 @@ public class SkinAction extends XWikiAction
 
     @Inject
     private Environment environment;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -502,7 +506,14 @@ public class SkinAction extends XWikiAction
             } else {
                 // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
-                IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
+                boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
+
+                response.setHeader("Content-Disposition",
+                    attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(),
+                        shouldBeDownloaded));
+                try (InputStream input = attachment.getContentInputStream(context)) {
+                    IOUtils.copy(input, response.getOutputStream());
+                }
             }
 
             return true;
@@ -575,6 +586,7 @@ public class SkinAction extends XWikiAction
      * @since 11.10
      * @since 11.3.6
      * @since 10.11.10
+     * @deprecated this API manipulates {@link XWikiResponse} which is deprecated.
      */
     @Deprecated(since = "17.0.0RC1")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)

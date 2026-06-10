@@ -189,8 +189,9 @@ public class UploadAction extends XWikiAction
 
         XWikiAttachment attachment;
         try {
-            InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context);
-            attachment = doc.setAttachment(filename, contentInputStream, context);
+            try (InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context)) {
+                attachment = doc.setAttachment(filename, contentInputStream, context);
+            }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",

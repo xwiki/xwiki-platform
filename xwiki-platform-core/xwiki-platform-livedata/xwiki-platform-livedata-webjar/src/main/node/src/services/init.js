@@ -41,7 +41,18 @@ function init(element, $) {
 
   const data = element.dataset.config
   element.removeAttribute("data-config")
-  const contentTrusted = element.getAttribute("data-config-content-trusted") === "true";
+  let contentTrusted = false;
+  try {
+    const scriptEl = element.querySelector(':scope > script[type="application/json"]');
+    if(!scriptEl) {
+      console.error("Missing live data configuration for element", element, "The HTML content is" +
+        " considered unsafe.");
+    }
+    contentTrusted = scriptEl?.getAttribute('data-config-content-trusted') === 'true';
+  } catch (e) {
+    console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
+      " considered unsafe.", e);
+  }
 
   // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
   const placeholderElement = document.createElement("div");

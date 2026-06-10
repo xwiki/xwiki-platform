@@ -363,7 +363,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @param xwikiExecutor the current {@link XWikiExecutor}
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static void addXWikiExecutor(ExtensionContext context, XWikiExecutor xwikiExecutor)
     {
@@ -382,7 +381,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @return the executors
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static List<XWikiExecutor> getXWikiExecutors(ExtensionContext context)
     {
@@ -395,7 +393,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @return the requested {@link XWikiExecutor}
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static XWikiExecutor getXWikiExecutor(int index, ExtensionContext context)
     {
@@ -406,7 +403,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @return the current {@link XWikiExecutor}
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static XWikiExecutor getCurrentXWikiExecutor(ExtensionContext context)
     {
@@ -420,7 +416,6 @@ public final class DockerTestUtils
      * @param index the index of the {@link XWikiExecutor} to set as current
      * @param context the context where to find the store
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static void setCurrentXWikiExecutor(int index, ExtensionContext context)
     {
@@ -473,7 +468,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @return the component manager
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static ExtensionTestUtils getExtensionTestUtils(ExtensionContext context)
     {
@@ -493,7 +487,6 @@ public final class DockerTestUtils
      * @param context the context where to find the store
      * @return the component manager
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public static PersistentTestContext getPersistentTestContext(ExtensionContext context)
     {

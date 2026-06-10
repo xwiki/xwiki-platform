@@ -806,7 +806,6 @@ public class TestConfiguration
     /**
      * @return the output directory where Maven produce files. Assume ./target if the system property
      *         {@code maven.build.dir} is not set.
-     * @since 17.10.6
      * @since 18.3.0RC1
      */
     public String getMavenBuildDirectory()
@@ -957,7 +956,6 @@ public class TestConfiguration
     /**
      * @return the mode to use
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public SolrMode getSolrMode()
     {
@@ -971,7 +969,6 @@ public class TestConfiguration
     /**
      * @param solrMode the Solr mode to use
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public void setSolrMode(SolrMode solrMode)
     {
@@ -981,7 +978,6 @@ public class TestConfiguration
     /**
      * @return the docker image tag to use for the remote solr container (if not specified, uses the "latest" tag)
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public String getRemoteSolrTag()
     {
@@ -991,7 +987,6 @@ public class TestConfiguration
     /**
      * @param remoteSolrTag see {@link #getRemoteSolrTag()}
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public void setRemoteSolrTag(String remoteSolrTag)
     {
@@ -1001,7 +996,6 @@ public class TestConfiguration
     /**
      * @return the XWiki instances configuration
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public XWikiInstances getXWikiInstances()
     {
@@ -1011,7 +1005,6 @@ public class TestConfiguration
     /**
      * @param xwikiInstances see {@link #getXWikiInstances()}
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public void setXWikiInstances(XWikiInstances xwikiInstances)
     {
@@ -1021,7 +1014,6 @@ public class TestConfiguration
     /**
      * @return true if the test configuration is for a cluster setup (i.e. more than 1 XWiki instance), false otherwise
      * @since 18.3.0RC1
-     * @since 17.10.5
      */
     public boolean isCluster()
     {

@@ -54,6 +54,11 @@
   #else
     #set ($langParams = {})
   #end
+  ## Get the real current version of the document. This is needed because when viewing a specific revision
+  ## (e.g., via ?rev=1.1), $tdoc.getRCSVersion() returns that revision's version instead of the latest
+  ## version. $xwiki.getDocument() by default loads the latest version from the document cache, ignoring
+  ## the rev request parameter.
+  #set ($currentDocVersion = $xwiki.getDocument($tdoc.getDocumentReferenceWithLocale()).getRCSVersion())
 ##
 #set ($documentExtensions = $services.extension.xar.getInstalledExtensions($doc.getDocumentReferenceWithLocale()))
 #set ($displayCompare = $totalVersions > 1 || ($totalVersions == 1 && $documentExtensions.size() > 0))
@@ -140,7 +145,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #set ($discard = $_revParams.putAll($langParams))
     #set ($_actionParams = {'form_token' : $services.csrf.getToken(), 'rev' : $version})
     #set ($discard = $_actionParams.putAll($langParams))
-    #if ($tdoc.getRCSVersion() == $version)
+    #if ($currentDocVersion == $version)
       <tr class="currentversion odd">
     #else
        <tr class="#if($foreach.count % 2 == 0) even #else odd #end">
@@ -162,7 +167,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.comment'))">$!{escapetool.xml($revinfo.comment)}</td>
     #end
     #if ($hasEdit || $hasAdmin)
-      #if ($tdoc.getRCSVersion()==$version)
+      #if ($currentDocVersion == $version)
         <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><span class="currentversionlabel">$services.localization.render('core.viewers.history.currentVersion')</span></td>
       #else
         <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$tdoc.getURL('rollback', $escapetool.url($_actionParams))" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>

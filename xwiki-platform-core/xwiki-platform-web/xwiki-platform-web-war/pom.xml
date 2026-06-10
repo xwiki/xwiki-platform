@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>18.3.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>
@@ -136,6 +136,9 @@
             </goals>
             <configuration>
               <excludes>
+                <!-- Closure Compiler fails to minify scripts with dynamic imports.
+                  See https://github.com/google/closure-compiler/issues/4126 -->
+                <exclude>**/es-module.js</exclude>
                 <!-- See the next execution for the reason we exclude these files. -->
                 <exclude>**/panelWizard.js</exclude>
               </excludes>
@@ -232,7 +235,7 @@
               <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
               <targetPath>META-INF</targetPath>
             </resource>
-            <!-- Include version.properties file -->
+            <!-- Include resources in which to resolve variables -->
             <resource>
               <directory>${basedir}/src/main/filteredResources</directory>
               <targetPath />

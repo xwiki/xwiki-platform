@@ -256,21 +256,18 @@ public @interface UITest
      * 
      * @return true if a remote Solr instance should be used for the tests, instead of an embedded one
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     SolrMode solrMode() default SolrMode.DEFAULT;
 
     /**
      * @return the docker image tag to use for Solr (if not specified, uses the "latest" tag)
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     String remoteSolrTag() default "";
 
     /**
      * @return the number of instances to run during tests.
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;
 }

@@ -106,7 +106,8 @@ class MentionsIT
         runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
             setup.deletePage(reference);
             setup.createPage(reference,
-                "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
+                "<strong>Quote</strong> "
+                    + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
                 pageName);
         });
 
@@ -129,7 +130,7 @@ class MentionsIT
             assertEquals("mentioned you on page Mention Test Page", mentionNotificationPage.getText(0, 0));
             assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
-            assertEquals("@U2", mentionNotificationPage.getSummary(0, 0));
+            assertEquals("<strong>Quote</strong> @U2", mentionNotificationPage.getSummary(0, 0));
             tray.clearAllNotifications();
         });
     }
@@ -172,6 +173,7 @@ class MentionsIT
             properties
                 .put("comment",
                     "AAAAA\n\n"
+                        + "<strong>Quote</strong> "
                         + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
                         + "type=\"user\" /}} XYZ\n\nBBBBB");
             setup.addObject(reference, "XWiki.XWikiComments", properties);
@@ -197,7 +199,7 @@ class MentionsIT
                 mentionNotificationPage.getText(0, 0));
             assertEquals("U3", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
-            assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
+            assertEquals("<strong>Quote</strong> @U2 XYZ", mentionNotificationPage.getSummary(0, 0));
             tray.clearAllNotifications();
         });
     }

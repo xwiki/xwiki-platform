@@ -19,7 +19,6 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { computeCurrentUser } from "../components/currentUser";
 import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
@@ -32,11 +31,11 @@ import {
   onMounted,
   ref,
   shallowRef,
+  toRaw,
   useTemplateRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
+import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
   ContextForMacros,
@@ -63,8 +62,7 @@ type Props = {
   /** Content to initialize the editor with */
   editorContent: UniAst | Error;
 
-  /** Collaboration initialization method */
-  collaborationProvider?: () => CollaborationInitializer;
+  collaboration?: Collaboration;
 
   /** InversifyJS container to inject dependencies from */
   container: Container;
@@ -74,7 +72,7 @@ const {
   editorProps,
   editorContent: uniAst,
   macros,
-  collaborationProvider = undefined,
+  collaboration = undefined,
   container,
 } = defineProps<Props>();
 
@@ -118,28 +116,6 @@ function notifyChanges(): void {
 
 const notifyChangesDebounced = debounce(notifyChanges, 500);
 
-/**
- * This function's purpose is to build the realtime provider that will be used throughout the app
- */
-async function getRealtimeOptions(): Promise<
-  BlockNoteViewWrapperProps["realtime"]
-> {
-  const authenticationManager = container
-    .get<AuthenticationManagerProvider>("AuthenticationManagerProvider")
-    .get()!;
-
-  if (!collaborationProvider) {
-    return undefined;
-  }
-
-  const user = await computeCurrentUser(authenticationManager);
-
-  return {
-    collaborationProvider,
-    user,
-  };
-}
-
 const { t } = useI18n({
   messages,
 });
@@ -157,7 +133,9 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   blockNoteOptions: editorProps.blockNoteOptions,
   macros,
   linkEditionCtx,
-  realtime: await getRealtimeOptions(),
+  // We need to pass the raw version of the collaboration session (but most importantly for the yjs document inside it),
+  // otherwise realtime synchronization fails.
+  collaboration: toRaw(collaboration),
   refs: {
     setEditor(editor) {
       editorRef.value = editor;

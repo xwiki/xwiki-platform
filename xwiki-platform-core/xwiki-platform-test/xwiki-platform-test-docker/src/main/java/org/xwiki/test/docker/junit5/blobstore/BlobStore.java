@@ -30,7 +30,6 @@ public enum BlobStore
     /**
      * Represents the default blob store.
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     DEFAULT(null),
 

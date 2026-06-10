@@ -68,7 +68,6 @@ public class NotificationsRSS
      *
      * @param testUtils the test related utilities
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public void loadEntries(TestUtils testUtils)
     {

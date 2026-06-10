@@ -15,6 +15,7 @@
     "@see": true,
     "@public": true,
     "@beta": true,
-    "@internal": true
+    "@internal": true,
+    "@typeParam": true
   }
 }

@@ -53,6 +53,7 @@ import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -246,7 +247,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                             Iterable<EntityReference> references = retrieveReferences(queueEntry);
 
                             for (EntityReference reference : references) {
-                                indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
+                                indexQueue.put(new IndexQueueEntry(
+                                    DefaultSolrIndexer.this.entityReferenceFactory.getReference(reference),
+                                    queueEntry.operation));
                             }
                             break;
                         default:
@@ -254,7 +257,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                                 indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
                                     queueEntry.operation));
                             } else if (queueEntry.reference != null) {
-                                indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
+                                indexQueue.put(new IndexQueueEntry(
+                                    DefaultSolrIndexer.this.entityReferenceFactory.getReference(queueEntry.reference),
+                                    queueEntry.operation));
                             }
                     }
                 } catch (Throwable e) {
@@ -353,6 +358,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
     @Inject
     private Provider<XWikiContext> xWikiContextProvider;
+
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
 
     /**
      * The queue of index operation to perform.
@@ -748,7 +756,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         if (!this.disposed) {
             // Don't block because the capacity of the resolver queue is not limited.
             try {
-                this.resolveQueue.put(new ResolveQueueEntry(reference, recurse, operation));
+                this.resolveQueue.put(
+                    new ResolveQueueEntry(this.entityReferenceFactory.getReference(reference), recurse, operation));
             } catch (InterruptedException e) {
                 this.logger.error("Failed to add reference [{}] to Solr indexing queue", reference, e);
             }

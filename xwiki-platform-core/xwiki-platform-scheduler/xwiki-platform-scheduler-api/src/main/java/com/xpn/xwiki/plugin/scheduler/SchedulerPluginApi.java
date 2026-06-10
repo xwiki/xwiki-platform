@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.util.Date;
 import java.util.List;
 
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
@@ -90,12 +89,12 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner value of the state
      * and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException
+    public JobState getJobStatus(BaseObject object) throws SchedulerPluginException
     {
         return getProtectedPlugin().getJobStatus(object, this.context);
     }
 
-    public JobState getJobStatus(Object object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(Object object) throws SchedulerPluginException
     {
         return getProtectedPlugin().getJobStatus(retrieveBaseObject(object), this.context);
     }

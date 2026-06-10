@@ -19,6 +19,7 @@
  */
 package org.xwiki.lesscss.resources;
 
+import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -31,12 +32,14 @@ public interface WikiLESSResourceReference extends LESSResourceReference
 {
     /**
      * @return the reference of the document to use as secure document (generally the document containing the code to
-     *         execute) or null if the template is not associated with any document (for example filesystem template)
+     *     execute) or null if the template is not associated with any document (for example filesystem template)
+     * @throws LESSCompilerException in case of issue when resolving the document reference
      */
-    DocumentReference getDocumentReference();
+    DocumentReference getDocumentReference() throws LESSCompilerException;
 
     /**
      * @return the author of this resource
+     * @throws LESSCompilerException in case of issue when resolving the author reference
      */
-    DocumentReference getAuthorReference();
+    DocumentReference getAuthorReference() throws LESSCompilerException;
 }

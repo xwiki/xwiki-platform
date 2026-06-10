@@ -20,7 +20,7 @@
 package org.xwiki.vfs.internal.attach;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -63,14 +63,15 @@ class AttachURIVfsResourceReferenceSerializerTest
             URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/test.txt");
 
         AttachmentReference attachmentReference = new AttachmentReference("testvfs.zip",
-            new DocumentReference("xwiki", Arrays.asList("Toto"), "WebHome"));
-        when(attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip")).thenReturn(attachmentReference);
+            new DocumentReference("xwiki", List.of("Toto"), "WebHome"));
+        when(this.attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip"))
+            .thenReturn(attachmentReference);
 
-        when(entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
+        when(this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
             .thenReturn("xwiki:Toto.WebHome");
 
         assertEquals("attach://xwiki:Toto.WebHome/testvfs.zip/path1/path2/test.txt",
-            vfsResourceReferenceSerializer.serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 
     @Test
@@ -80,13 +81,14 @@ class AttachURIVfsResourceReferenceSerializerTest
             URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/xwiki logo.png");
 
         AttachmentReference attachmentReference = new AttachmentReference("testvfs.zip",
-            new DocumentReference("xwiki", Arrays.asList("Toto"), "WebHome"));
-        when(attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip")).thenReturn(attachmentReference);
+            new DocumentReference("xwiki", List.of("Toto"), "WebHome"));
+        when(this.attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip"))
+            .thenReturn(attachmentReference);
 
-        when(entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
+        when(this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
             .thenReturn("xwiki:Toto.WebHome");
 
         assertEquals("attach://xwiki:Toto.WebHome/testvfs.zip/path1/path2/xwiki%20logo.png",
-            vfsResourceReferenceSerializer.serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 }

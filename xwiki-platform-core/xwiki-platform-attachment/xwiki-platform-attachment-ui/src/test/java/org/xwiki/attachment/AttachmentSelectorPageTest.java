@@ -330,6 +330,52 @@ class AttachmentSelectorPageTest extends PageTest
         assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
     }
 
+    @Test
+    void cssClassEscapingWithDisplayImageTrue() throws Exception
+    {
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        XWikiDocument xwikiDocument = commonFixup("test.png");
+
+        xwikiDocument.setContent("""
+            {{attachmentSelector \
+                classname="Space.Test" \
+                property="avatar" \
+                savemode="direct" \
+                displayImage="true" \
+                cssClass="test ]] {{noscript/}}"/}}
+            """);
+
+        Document document = renderHTMLPage(xwikiDocument);
+        var div = document.select(".attachment-picker > .displayed.x-attachment");
+
+        assertEquals("displayed x-attachment test ]] {{noscript/}}", div.attr("class"));
+    }
+
+    @Test
+    void cssClassEscapingWithDisplayImageFalse() throws Exception
+    {
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        XWikiDocument xwikiDocument = commonFixup("test.png");
+
+        xwikiDocument.setContent("""
+            {{attachmentSelector
+                classname="Space.Test"
+                property="avatar"
+                savemode="direct"
+                displayImage="false"
+                cssClass="test ]] {{noscript/}}"
+                link="true"
+            /}}
+            """);
+
+        Document document = renderHTMLPage(xwikiDocument);
+        var div = document.select(".attachment-picker > p > .displayed.x-attachment");
+
+        assertEquals("displayed x-attachment test ]] {{noscript/}}", div.attr("class"));
+    }
+
     private XWikiDocument commonFixup(String fileName) throws XWikiException, IOException
     {
         // Initialize a document containing an XClass definition and an XObject of this XClass.

@@ -20,19 +20,20 @@
 package org.xwiki.vfs.internal;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.Test;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsResourceReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,43 +42,36 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.4M2
  */
-public class DefaultVfsManagerTest
+@ComponentTest
+class DefaultVfsManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultVfsManager> mocker =
-        new MockitoComponentMockingRule<>(DefaultVfsManager.class);
+    @InjectMockComponents
+    private DefaultVfsManager manager;
+
+    @MockComponent
+    private ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer;
 
     @Test
-    public void getURL() throws Exception
+    void getURL() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
 
-        ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                ExtendedURL.class));
-        when(serializer.serialize(reference)).thenReturn(new ExtendedURL(Arrays.asList("generated", "url")));
+        when(this.serializer.serialize(reference)).thenReturn(new ExtendedURL(List.of("generated", "url")));
 
-        assertEquals("/generated/url", this.mocker.getComponentUnderTest().getURL(reference));
+        assertEquals("/generated/url", this.manager.getURL(reference));
     }
 
     @Test
-    public void getURLerror() throws Exception
+    void getURLError() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
 
-        ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                ExtendedURL.class));
-        when(serializer.serialize(reference)).thenThrow(new SerializeResourceReferenceException("error"));
+        when(this.serializer.serialize(reference)).thenThrow(new SerializeResourceReferenceException("error"));
 
-        try {
-            this.mocker.getComponentUnderTest().getURL(reference);
-            fail("Should have thrown an exception");
-        } catch (VfsException expected) {
-            assertEquals("Failed to compute URL for [scheme = [attach], reference = [xwiki:space.page@attachment], "
-                + "path = [path1/path2/test.txt], parameters = []]", expected.getMessage());
-        }
+        VfsException exception = assertThrows(VfsException.class, () -> this.manager.getURL(reference));
+        assertEquals("Failed to compute URL for [scheme = [attach], reference = [xwiki:space.page@attachment], "
+            + "path = [path1/path2/test.txt], parameters = []]", exception.getMessage());
     }
 }

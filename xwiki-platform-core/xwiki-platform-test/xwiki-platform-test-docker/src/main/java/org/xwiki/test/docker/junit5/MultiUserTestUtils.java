@@ -49,7 +49,6 @@ public class MultiUserTestUtils
      * 
      * @param setup the test setup
      * @since 18.3.0RC1
-     * @since 17.10.6
      */
     public MultiUserTestUtils(TestUtils setup)
     {

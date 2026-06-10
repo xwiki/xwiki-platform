@@ -89,6 +89,8 @@ public class DefaultGadgetSource implements GadgetSource
 
     static final Pattern TRANSLATION_SCRIPT_PATTERN =
         Pattern.compile("\\s*\\$services\\.localization\\.render\\(\\s*'([a-zA-Z0-9.]+)'\\s*\\)\\s*");
+    static final Pattern TRANSLATION_MACRO_PATTERN =
+        Pattern.compile("^\\s*(\\{\\{)\\s*(translation)\\s*(key=\")[a-zA-Z0-9.]+(\")\\s*(/}})\\s*$");
 
     /**
      * The execution context, to grab XWiki context and access to documents.
@@ -216,10 +218,15 @@ public class DefaultGadgetSource implements GadgetSource
                 XWikiDocument ownerDocument = xObject.getOwnerDocument();
                 String gadgetTitle = evaluateTitle(title, ownerDocument, velocityContext, velocityEngine, key);
 
-                // parse both the title and content in the syntax of the transformation context
+                // We evaluate title as plain text: we don't want to  support XWiki syntax for them.
+                Syntax titleSyntax = Syntax.PLAIN_1_0;
+                if (TRANSLATION_MACRO_PATTERN.matcher(gadgetTitle).matches()) {
+                    titleSyntax = sourceSyntax;
+                }
                 List<Block> titleBlocks =
-                    renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(),
+                    renderGadgetProperty(gadgetTitle, titleSyntax, xObject.getDocumentReference(),
                         ownerDocument, context);
+                // We evaluate content with the syntax of the doc.
                 List<Block> contentBlocks =
                     renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(),
                         ownerDocument, context);

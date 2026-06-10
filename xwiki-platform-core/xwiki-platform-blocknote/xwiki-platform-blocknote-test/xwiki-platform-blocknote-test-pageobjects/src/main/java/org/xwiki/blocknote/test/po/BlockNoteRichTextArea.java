@@ -26,6 +26,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Represents the BlockNote rich text area.
  *
@@ -68,31 +71,49 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Clears the content of the rich text area.
+     * @return the HTML content of the rich text area
+     * @since 18.4.0RC1
      */
-    public void clear()
+    public String getContent()
+    {
+        return this.container.getDomProperty("innerHTML");
+    }
+
+    /**
+     * Clears the content of the rich text area.
+     *
+     * @return this rich text area instance
+     */
+    public BlockNoteRichTextArea clear()
     {
         this.container.clear();
+        return this;
     }
 
     /**
      * Clicks on the rich text area.
+     *
+     * @return this rich text area instance
      */
-    public void click()
+    public BlockNoteRichTextArea click()
     {
-        this.container.click();
+        // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
+        getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
+        return this;
     }
 
     /**
      * Simulate typing in the rich text area.
      * 
      * @param keysToSend the sequence of keys to by typed
+     * @return this rich text area instance
      */
-    public void sendKeys(CharSequence... keysToSend)
+    public BlockNoteRichTextArea sendKeys(CharSequence... keysToSend)
     {
         if (keysToSend.length > 0) {
             getActiveElement().sendKeys(keysToSend);
         }
+        return this;
     }
 
     /**
@@ -123,14 +144,16 @@ public class BlockNoteRichTextArea extends BaseElement
      * Clicks on the image with the specified index in the rich text area.
      *
      * @param index the index of the image to click, starting from 0
+     * @return this rich text area instance
      * @since 18.3.0RC1
      */
-    public void clickImage(int index)
+    public BlockNoteRichTextArea clickImage(int index)
     {
         // The image might not be loaded yet, so wait until it's clickable before clicking on it.
         WebElement image = this.container.findElements(By.tagName("img")).get(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
+        return this;
     }
 
     /**
@@ -150,5 +173,103 @@ public class BlockNoteRichTextArea extends BaseElement
             .get(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Waits until the rich text area contains the specified plain text.
+     * 
+     * @param textFragment the text fragment to wait for
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilTextContains(String textFragment)
+    {
+        try {
+            getDriver().waitUntilCondition(driver -> getText().contains(textFragment));
+        } catch (Exception e) {
+            String text = getText();
+            assertTrue(text.contains(textFragment), "Unexpected content: " + text);
+        }
+        return this;
+    }
+
+    /**
+     * Waits until the rich text area text is exactly the specified plain text.
+     *
+     * @param text the expected text, optionally including the position of the user cursors using the "%s" placeholder
+     * @param cursors the list of users whose cursor position is displayed inside the edited content
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilTextIs(String text, String... cursors)
+    {
+        String expectedText = getExpectedText(text, cursors);
+        try {
+            getDriver().waitUntilCondition(driver -> expectedText.equals(getText()));
+        } catch (Exception e) {
+            assertEquals(expectedText, getText());
+        }
+        return this;
+    }
+
+    private String getExpectedText(String expectedText, String... cursors)
+    {
+        Object[] args = new Object[cursors.length];
+        for (int i = 0; i < cursors.length; i++) {
+            args[i] = "\u2060%n%s%n\u2060".formatted(cursors[i]);
+        }
+        return expectedText.formatted(args);
+    }
+
+    /**
+     * Asserts that the rich text area text is exactly the specified plain text.
+     *
+     * @param expectedText the expected text, optionally including the position of the user cursors using the "%s"
+     *            placeholder
+     * @param cursors the list of users whose cursor position is displayed inside the edited content
+     * @since 18.4.0RC1
+     */
+    public void assertTextIs(String expectedText, String... cursors)
+    {
+        assertEquals(getExpectedText(expectedText, cursors), getText());
+    }
+
+    /**
+     * Waits until the rich text area is focused. This is especially needed when switching between browser tabs because:
+     * <ul>
+     * <li>when a browser tab becomes inactive its active element gets blurred (loses the focus)</li>
+     * <li>when a browser tab becomes active its active element gets back the focus; however, this doesn't always happen
+     * instantly; moreover, besides the focus, the selection (caret position) also needs to be restored; if you try to
+     * send keys to the active element right after activating the tab they might be ignored</li>
+     * </ul>
+     * 
+     * @return this rich text area instance
+     * @since 18.4.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilFocused()
+    {
+        // Wait for the rich text area to be focused for two consecutive ticks.
+        String script = """
+            const richTextArea = arguments[0];
+            const selectionContainer = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
+            const focused = document.visibilityState === 'visible'
+              && document.hasFocus()
+              && richTextArea.contains(document.activeElement)
+              && richTextArea.contains(selectionContainer);
+            if (focused) {
+              richTextArea.__focusCount = (richTextArea.__focusCount || 0) + 1;
+              if (richTextArea.__focusCount > 1) {
+                delete richTextArea.__focusCount;
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              delete richTextArea.__focusCount;
+              return false;
+            }
+            """;
+        getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
+        return this;
     }
 }

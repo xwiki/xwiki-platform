@@ -152,13 +152,13 @@ class ModelFactoryTest
     @BeforeEach
     void mockUpTestDocument() throws Exception
     {
-        baseURI = new URI("https://localhost/");
+        this.baseURI = new URI("https://localhost/");
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
-        when(testDocument.getPrefixedFullName()).thenReturn("wiki:Path.To.Page");
-        when(testDocument.getWiki()).thenReturn("wiki");
-        when(testDocument.getSpace()).thenReturn("Path.To");
-        when(testDocument.getName()).thenReturn("Page");
-        when(testDocument.getDocumentReference()).thenReturn(documentReference);
+        when(this.testDocument.getPrefixedFullName()).thenReturn("wiki:Path.To.Page");
+        when(this.testDocument.getWiki()).thenReturn("wiki");
+        when(this.testDocument.getSpace()).thenReturn("Path.To");
+        when(this.testDocument.getName()).thenReturn("Page");
+        when(this.testDocument.getDocumentReference()).thenReturn(documentReference);
 
         this.xcontext = this.oldCore.getXWikiContext();
         this.xcontext.setWikiReference(documentReference.getWikiReference());
@@ -168,7 +168,7 @@ class ModelFactoryTest
 
     /**
      * A separate set up only for tests which needs an object.
-     * 
+     *
      * @return the object for test, prefilled witha few values
      */
     private BaseObject setUpTestObject() throws Exception
@@ -177,7 +177,7 @@ class ModelFactoryTest
         BaseClass xwikiClass = mock(BaseClass.class);
 
         when(xwikiObject.getPropertyNames()).thenReturn(new String[] {});
-        when(xwikiObject.getXClass(xcontext)).thenReturn(xwikiClass);
+        when(xwikiObject.getXClass(this.xcontext)).thenReturn(xwikiClass);
         when(xwikiObject.getClassName()).thenReturn("Some.XClass");
         when(xwikiObject.getNumber()).thenReturn(0);
 
@@ -198,7 +198,7 @@ class ModelFactoryTest
         ComputedFieldClass computedField = new ComputedFieldClass();
         computedField.setName(TEST_COMPUTED_FIELD);
 
-        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField, computedField});
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { stringField, pwField, computedField });
 
         return xwikiObject;
     }
@@ -206,11 +206,11 @@ class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForNonAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
 
         BaseObject xwikiObject = setUpTestObject();
 
-        Object result = modelFactory.toRestObject(baseURI, testDocument, xwikiObject, false, false);
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
 
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
@@ -221,11 +221,11 @@ class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(true);
 
         BaseObject xwikiObject = setUpTestObject();
 
-        Object result = modelFactory.toRestObject(baseURI, testDocument, xwikiObject, false, false);
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
 
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);

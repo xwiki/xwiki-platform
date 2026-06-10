@@ -131,11 +131,11 @@ public class CommentsTab extends BaseElement
      */
     public void toggleCommentThread(int id)
     {
-        getDriver().findElement(
-            By.xpath(String.format("//div[@id='xwikicomment_%d']//button[contains(@class, 'thread-toggle')]", id)))
-            .click();
-        getDriver().waitUntilElementIsVisible(By.xpath(String.format(
-            "//div[@id='xwikicomment_%d']//following-sibling::div[contains(@class, 'commentthread')]", id)));
+        WebElement threadButton = getDriver().findElement(
+            By.xpath(String.format("//div[@id='xwikicomment_%d']//button[contains(@class, 'thread-toggle')]", id)));
+        threadButton.click();
+        getDriver().waitUntilElementIsVisible(
+            By.cssSelector(threadButton.getAttribute("data-target") + ".collapse.in"));
     }
 
     /**
@@ -278,6 +278,7 @@ public class CommentsTab extends BaseElement
     {
         getDriver().findElement(
             By.xpath(String.format("//div[@id='xwikicomment_%d']//a[contains(@class, 'commentreply')]", id))).click();
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".collapse.in form#AddComment"));
     }
 
     /**

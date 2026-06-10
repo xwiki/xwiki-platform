@@ -107,11 +107,6 @@ ul.commentreplies {
   padding-left: 60px;
 }
 
-.commentthread {
-  /* Disable the default bootstrap toggle transition, because it messes with tests...*/
-  transition: none;
-}
-
 .commentthread #AddComment fieldset {
   padding-left: 35px;
 }

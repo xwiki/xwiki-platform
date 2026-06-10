@@ -100,7 +100,6 @@ class CommentsIT
         // Reply as anonymous.
         int commentIndex = commentsTab.postCommentAsGuest(COMMENT_CONTENT, COMMENT_AUTHOR_GUEST, true);
         commentsTab.replyToCommentByID(commentIndex, COMMENT_REPLY);
-        commentsTab.toggleCommentThread(commentIndex);
         assertEquals(COMMENT_REPLY, commentsTab.getCommentContentByID(commentsTab.getCommentID(COMMENT_REPLY)));
         assertEquals(COMMENT_AUTHOR_GUEST, commentsTab.getCommentAuthorByID(commentsTab.getCommentID(COMMENT_REPLY)));
         

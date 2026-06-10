@@ -163,8 +163,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithDocFullNameAppliesViewableFilter() throws Exception
     {
-        String sqlWithFullName = "select distinct doc.fullName as permissionCheck, doc.web from XWikiDocument doc "
-            + "where doc.name = 'WebHome' order by doc.web";
+        String sqlWithFullName = "select distinct doc.fullName as unfilterableRightCheck, doc.web from XWikiDocument "
+            + "doc where doc.name = 'WebHome' order by doc.web";
         this.dbListClass.setSql(sqlWithFullName);
 
         Query query = mock(Query.class);
@@ -173,7 +173,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         assertSame(query, this.builder.build(this.dbListClass));
 
         verify(query).setWiki("math");
-        // SQL contains "doc.fullName as permissionCheck", so the viewable value filter must be applied.
+        // SQL contains "doc.fullName as unfilterableRightCheck", so the viewable value filter must be applied.
         verify(query).addFilter(this.viewableValueFilter);
     }
 }

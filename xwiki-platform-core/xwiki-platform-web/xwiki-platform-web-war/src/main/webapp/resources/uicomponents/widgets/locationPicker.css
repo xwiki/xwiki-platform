@@ -21,18 +21,17 @@
   /* Sets up a flex display for breadcrumbs and location actions. */
   display: flex;
   flex-wrap: nowrap;
+  background-color: var(--breadcrumb-bg);
+  border-radius: var(--border-radius-base);
 }
 
 .location-picker > dd > .breadcrumb-container > .location-actions {
-  margin-bottom: 0;
-  /* Keeps all actions on one line. */
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  /* Combine with .breadcrumb. */
-  border-left: none;
-  padding-left: 3px;
+  padding: 0 .5em;
 }
 
 .location-action {

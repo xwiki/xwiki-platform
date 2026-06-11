@@ -125,7 +125,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private String name;
 
         /** Number of the statistic. */
-        private int number;
+        private int statNumber;
 
         /**
          * Return the new identifier for a statistic having given name and number.
@@ -137,7 +137,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long getId(String name, int number)
         {
             this.name = name;
-            this.number = number;
+            this.statNumber = number;
             return super.getId();
         }
 
@@ -150,7 +150,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         @Override
         public int getNumber()
         {
-            return this.number;
+            return this.statNumber;
         }
     }
 
@@ -223,21 +223,21 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public static final String DOCID = "docId";
 
         /** The old identifier. */
-        private long oldId;
+        private long currentOldId;
 
         /** The new identifier. */
-        private long newId;
+        private long currentNewId;
 
         @Override
         public void setNewId(long newId)
         {
-            this.newId = newId;
+            this.currentNewId = newId;
         }
 
         @Override
         public void setOldId(long oldId)
         {
-            this.oldId = oldId;
+            this.currentOldId = oldId;
         }
 
         @Override
@@ -276,7 +276,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("update ").append(name).append(" klass set klass.").append(field).append('=').append(':')
                 .append(NEWID).append(" where klass.").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createQuery(sb.toString()).setParameter(NEWID, this.newId).setParameter(OLDID, this.oldId)
+            this.session.createQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -294,7 +294,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("UPDATE ").append(name).append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createSQLQuery(sb.toString()).setParameter(NEWID, this.newId).setParameter(OLDID, this.oldId)
+            this.session.createSQLQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }

@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +55,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 @Deprecated(since = "17.0.0RC1")
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
@@ -902,7 +905,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (filename != null) {
+        if (rdoc == null) {
+            rdoc = getMainDocumentRevisionForTranslation(doc, context);
+        }
+        if (rdoc != null && filename != null) {
             attachment = rdoc.getAttachment(filename);
         }
 
@@ -912,9 +918,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public long findDeletedAttachmentForDocRevision(XWikiDocument doc, String docRevision, String filename,
         XWikiContext context) throws XWikiException
     {
-        XWikiAttachment attachment = null;
+        XWikiAttachment attachment;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
+        if (rdoc == null) {
+            rdoc = getMainDocumentRevisionForTranslation(doc, context);
+        }
+        if (rdoc != null && context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
                 List<DeletedAttachment> deleted = context.getWiki().getAttachmentRecycleBinStore()
@@ -929,6 +938,33 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         return -1;
+    }
+
+    private XWikiDocument getMainDocumentRevisionForTranslation(XWikiDocument doc, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+        if (tdoc != null && !Locale.ROOT.equals(tdoc.getLocale())) {
+            XWikiDocument rdoc = getDocumentRevisionAtDate(doc, tdoc.getDate(), context);
+            if (rdoc != null) {
+                return rdoc;
+            }
+        }
+        return doc;
+    }
+
+    private XWikiDocument getDocumentRevisionAtDate(XWikiDocument doc, Date date, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocumentArchive archive = doc.getDocumentArchive(context);
+        if (archive != null) {
+            for (XWikiRCSNodeInfo node : archive.getNodes()) {
+                if (!node.getDate().after(date)) {
+                    return context.getWiki().getDocument(doc, node.getVersion().toString(), context);
+                }
+            }
+        }
+        return null;
     }
 
     /**

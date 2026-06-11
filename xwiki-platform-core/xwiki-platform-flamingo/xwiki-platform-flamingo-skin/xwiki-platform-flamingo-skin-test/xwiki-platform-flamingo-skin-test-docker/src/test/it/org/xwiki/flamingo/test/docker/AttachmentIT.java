@@ -283,7 +283,7 @@ class AttachmentIT
         setup.gotoPage(testReference);
 
         DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
-        ViewPage viewPage = deletePageOutcomePage.clickRestore();
+        deletePageOutcomePage.clickRestore();
 
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
@@ -291,9 +291,9 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink("toto.txt").click();
         assertEquals("v2.1", setup.getDriver().findElement(By.tagName("html")).getText());
 
-        viewPage = setup.gotoPage(testReference);
+        ViewPage viewPage = setup.gotoPage(testReference);
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
-        viewPage = historyPane.rollbackToVersion("2.1");
+        historyPane.rollbackToVersion("2.1");
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("toto.txt"));
@@ -305,10 +305,10 @@ class AttachmentIT
     @Order(5)
     void filterAttachmentsLiveData(TestUtils setup, TestReference testReference) throws Exception
     {
-        ViewPage viewPage = setup.createPage(testReference, "", "");
+        setup.createPage(testReference, "", "");
 
         // Upload attachments with 2 different users.
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        new AttachmentsViewPage().openAttachmentsDocExtraPane();
         setup.attachFile(testReference, FIRST_ATTACHMENT,
             getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), false);
         setup.attachFile(testReference, SECOND_ATTACHMENT,
@@ -316,7 +316,7 @@ class AttachmentIT
 
         setup.login("User2", "pass");
         setup.gotoPage(testReference);
-        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         setup.attachFile(testReference, SMALL_SIZE_ATTACHMENT,
             getClass().getResourceAsStream("/AttachmentIT/" + SMALL_SIZE_ATTACHMENT), false);
 
@@ -474,15 +474,11 @@ class AttachmentIT
 
     private String getAttachmentsMacroContent(DocumentReference docRef)
     {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("{{velocity}}\n");
-        sb.append("#template('attachment_macros.vm')\n");
-        sb.append("#set($attachmentsDoc = $xwiki.getDocument(\"" + docRef + "\"))\n");
-        sb.append("#showAttachmentsLiveData($attachmentsDoc 'testAttachments')\n");
-        sb.append("{{/velocity}}");
-
-        return sb.toString();
+        return "{{velocity}}\n"
+            + "#template('attachment_macros.vm')\n"
+            + "#set($attachmentsDoc = $xwiki.getDocument(\"" + docRef + "\"))\n"
+            + "#showAttachmentsLiveData($attachmentsDoc 'testAttachments')\n"
+            + "{{/velocity}}";
     }
 
     @Test

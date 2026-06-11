@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { registerAsyncComponent } from "@xwiki/platform-api";
-import { injectable } from "inversify";
+import { injectable } from "@xwiki/platform-component-annotation-default";
 import type { DesignSystemLoader } from "@xwiki/platform-api";
 import type { App } from "vue";
 

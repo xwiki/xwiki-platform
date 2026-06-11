@@ -20,16 +20,16 @@
 package org.xwiki.vfs.internal;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsResourceReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link VfsResourceReferenceResolver}.
@@ -37,21 +37,21 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 7.4M2
  */
-public class VfsResourceReferenceResolverTest
+@ComponentTest
+class VfsResourceReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<VfsResourceReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(VfsResourceReferenceResolver.class);
+    @InjectMockComponents
+    private VfsResourceReferenceResolver resolver;
 
     @Test
-    public void resolve() throws Exception
+    void resolve() throws Exception
     {
         ExtendedURL extendedURL = new ExtendedURL(
-            Arrays.asList("attach:wiki:space.page@attachment", "path1", "path2", "test.txt"),
-            Collections.singletonMap("key", Arrays.asList("value")));
+            List.of("attach:wiki:space.page@attachment", "path1", "path2", "test.txt"),
+            Collections.singletonMap("key", List.of("value")));
 
-        VfsResourceReference reference = this.mocker.getComponentUnderTest().resolve(extendedURL,
-            VfsResourceReference.TYPE, Collections.<String, Object>emptyMap());
+        VfsResourceReference reference = this.resolver.resolve(extendedURL,
+            VfsResourceReference.TYPE, Collections.emptyMap());
 
         VfsResourceReference expected = new VfsResourceReference(URI.create("attach:wiki:space.page@attachment"),
             "path1/path2/test.txt");

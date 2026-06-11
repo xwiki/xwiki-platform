@@ -21,10 +21,11 @@ package org.xwiki.vfs.internal;
 
 import java.net.URI;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.vfs.VfsResourceReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Unit tests for {@link VfsResourceReference}.
@@ -32,10 +33,10 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 7.4M2
  */
-public class VfsResourceReferenceTest
+class VfsResourceReferenceTest
 {
     @Test
-    public void constructor()
+    void constructor()
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:Sandbox.WebHome@my.zip/path/to/file"));
@@ -52,7 +53,7 @@ public class VfsResourceReferenceTest
     }
 
     @Test
-    public void equality()
+    void equality()
     {
         VfsResourceReference reference1 =
             new VfsResourceReference(URI.create("scheme:specific"), "a/b");
@@ -68,7 +69,7 @@ public class VfsResourceReferenceTest
     }
 
     @Test
-    public void toURI()
+    void toURI()
     {
         VfsResourceReference reference =
             new VfsResourceReference(URI.create("scheme:specific"), "a/b");
@@ -78,7 +79,7 @@ public class VfsResourceReferenceTest
     }
 
     @Test
-    public void stringValue()
+    void stringValue()
     {
         VfsResourceReference reference =
             new VfsResourceReference(URI.create("scheme:specific"), "a/b");

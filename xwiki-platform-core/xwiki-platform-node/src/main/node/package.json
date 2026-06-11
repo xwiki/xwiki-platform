@@ -3,19 +3,21 @@
   "name": "@xwiki/platform-node",
   "version": "0.0.0",
   "type": "module",
+  "files": [],
   "scripts": {
     "api-extractor:ci": "nx run-many -t api-extractor:ci -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "api-extractor:local": "nx run-many -t api-extractor:local -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "build": "nx run-many -t build -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "deploy": "node scripts/deploy.js",
-    "lint": "nx run-many -t lint -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "lint": "nx run-many -t lint --parallel=2 -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "publint": "pnpm --filter \"./**\" -r exec publint --pack pnpm --strict ",
-    "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
+    "test:unit": "nx run-many -t test --parallel=2 -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "eslint": "catalog:",
     "globals": "catalog:",
     "publint": "catalog:",
     "vite": "catalog:",

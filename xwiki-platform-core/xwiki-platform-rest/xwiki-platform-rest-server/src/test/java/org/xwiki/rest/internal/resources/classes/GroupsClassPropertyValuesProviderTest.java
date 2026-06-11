@@ -65,10 +65,11 @@ class GroupsClassPropertyValuesProviderTest extends AbstractListClassPropertyVal
     @MockComponent
     private WikiUserManager wikiUserManager;
 
-    private ClassPropertyReference propertyReference = new ClassPropertyReference("band", this.classReference);
+    private final ClassPropertyReference propertyReference = new ClassPropertyReference("band", this.classReference);
 
+    @Override
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         super.configure();
 

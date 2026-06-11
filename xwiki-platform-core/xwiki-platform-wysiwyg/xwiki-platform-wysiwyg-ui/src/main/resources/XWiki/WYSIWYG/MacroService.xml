@@ -228,13 +228,19 @@
   #end
 #end
 
-#macro (getMacroParameters $macroId $macroParameters)
+#macro (getMacroParameters $macroId $macroParameters $inputSyntax)
   #set ($macroId = $services.rendering.resolveMacroId($macroId))
   #set ($macroParameters = $jsontool.fromString($macroParameters))
   #foreach($macroParameter in $macroParameters.entrySet())
     ## TODO: Do we need to take into account the macro parameter type? We could have a macro parameter that is editable
     ## inline but whose value is not a List&lt;Block&gt; but rather a String (plain text).
-    #set ($macroParameter.value = $services.wysiwyg.fromAnnotatedXHTML($macroParameter.value, $macroId.syntax))
+    #if ("$!inputSyntax" == '')
+      #set ($macroParameter.value = $services.wysiwyg.fromAnnotatedXHTML($macroParameter.value, $macroId.syntax))
+    #else
+      ## Convert from the input syntax to the macro syntax without executing rendering transformations.
+      #set ($xdom = $services.rendering.parse($macroParameter.value, $inputSyntax))
+      #set ($macroParameter.value = $services.rendering.render($xdom, $macroId.syntax))
+    #end
   #end
   #set ($data = $macroParameters)
 #end
@@ -251,7 +257,7 @@
 #elseif ($request.data == 'descriptor')
   #maybeGetMacroDescriptor($request.macroId)
 #elseif ($request.data == 'macroParameters')
-  #getMacroParameters($request.macroId, $request.macroParameters)
+  #getMacroParameters($request.macroId, $request.macroParameters, $request.inputSyntax)
 #end
 #if ($response.isCommitted())
   ## Do nothing.

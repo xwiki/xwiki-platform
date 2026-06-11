@@ -44,7 +44,7 @@
        we have to manually increase the cache size value to higher value 
        that stop causing catalina.out warnings on "evicting expired cache entries". 
   -->
-  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="[[xwiki.tomcat.cacheMaxSize]]"/>
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="${xwiki.tomcat.cacheMaxSize}"/>
 
   <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">

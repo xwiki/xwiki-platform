@@ -31,7 +31,6 @@ import org.xwiki.ckeditor.test.po.LinkTreeElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -66,11 +65,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LinkIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void beforeAll(TestUtils setup) throws Exception
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
 
         createAndLoginStandardUser(setup);
     }

@@ -24,12 +24,15 @@ import type { Ref } from "vue";
 import type { Composer } from "vue-i18n";
 
 /**
- * @param resolver - the resolve to use to load the translations.
+ * Vue composer that takes a resolver and a query, a returns an object with two keys:
+ * * isLoading: a reactive value that becomes false once the requested translations are done
+ * * t: a vue-i18n locale translation function
+ * @param resolver - the resolver to use to load the translations.
  * @param query - the query to execute
  * @since 18.3.0RC1
  * @beta
  */
-export function useRemoteI18n(
+export function useI18nAdapter(
   resolver: Resolver,
   query: Query,
 ): {

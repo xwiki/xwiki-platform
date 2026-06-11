@@ -79,6 +79,7 @@ public class NotificationsTrayPage extends ViewPage
      * Wait until the given number of unread notification is received. This method uses a request to the REST
      * notification endpoint to compute how many unread notifications the given user has on the given wiki, using user
      * preferences.
+     * Note that the given userId needs to be the logged-in user.
      *
      * @param userId the serialized user reference for which to get notifications
      * @param wiki the wiki on which to get notifications

@@ -20,6 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -131,7 +132,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
                 actualFilename = part.getSubmittedFileName();
             }
             xWikiAttachment.setFilename(actualFilename);
-            xWikiAttachment.setContent(part.getInputStream());
+            try (InputStream inputStream = part.getInputStream()) {
+                xWikiAttachment.setContent(inputStream);
+            }
             xWikiAttachment.setAuthorReference(context.getUserReference());
             // Initialize an empty document with the right document reference and locale. We don't set the actual
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the

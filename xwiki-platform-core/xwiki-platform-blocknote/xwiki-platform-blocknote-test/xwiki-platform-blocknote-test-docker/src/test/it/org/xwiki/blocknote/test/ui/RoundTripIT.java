@@ -40,7 +40,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 18.1.0RC1
  */
-@UITest
+@UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    },
+    extraJARs = {
+        // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
+        "org.xwiki.platform:xwiki-platform-websocket",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+
+        // Solr search is used to get suggestions for the link quick action.
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
+)
 class RoundTripIT extends AbstractBlockNoteIT
 {
     @Test
@@ -359,8 +377,7 @@ class RoundTripIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.PAGE_DOWN, "end");
 
-        // FIXME: XWIKI-23717: BlockNote's editing area fails accessibility tests
-        page = disableWCAG(setup, page::save);
+        page = page.save();
         WikiEditPage wikiEditor = page.editWiki();
         String ending = """
 

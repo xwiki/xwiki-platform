@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 
 /**
  * Represents the BlockNote toolbar.
@@ -82,5 +83,17 @@ public class BlockNoteToolBar extends BaseElement
     public boolean isButtonToggled(String action)
     {
         return "true".equals(getButton(action).getAttribute("aria-pressed"));
+    }
+
+    /**
+     * Clicks the button to edit the selected image. This opens the image edit modal.
+     * 
+     * @return the image edit modal
+     * @since 18.3.0RC1
+     */
+    public ImageDialogEditModal editImage()
+    {
+        clickButton("changeimage");
+        return new ImageDialogEditModal();
     }
 }

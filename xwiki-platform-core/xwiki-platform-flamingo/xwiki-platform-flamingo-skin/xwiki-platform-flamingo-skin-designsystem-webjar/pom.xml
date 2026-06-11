@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>18.3.0-SNAPSHOT</version>
+    <version>18.5.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-flamingo-skin-designsystem-webjar</artifactId>
@@ -37,25 +37,14 @@
     <xwiki.minification.skip>true</xwiki.minification.skip>
     <!-- TODO: Move to a shared location as part of XWIKI-24047. -->
     <xwiki.extension.javascript.modules.importmap>{
-        "inversify": "org.webjars.npm:inversify/lib/esm/index.js",
-        "@inversifyjs/common": "org.webjars.npm:inversifyjs__common/lib/esm/index.js",
-        "@inversifyjs/container": "org.webjars.npm:inversifyjs__container/lib/esm/index.js",
-        "@inversifyjs/core": "org.webjars.npm:inversifyjs__core/lib/esm/index.js",
-        "@inversifyjs/reflect-metadata-utils": "org.webjars.npm:inversifyjs__reflect-metadata-utils/lib/esm/index.js",
-        "@inversifyjs/plugin": "org.webjars.npm:inversifyjs__plugin/lib/esm/index.js",
-        "@inversifyjs/prototype-utils": "org.webjars.npm:inversifyjs__prototype-utils/lib/esm/index.js",
-        "reflect-metadata": "org.webjars.npm:reflect-metadata/Reflect.js"
+        "_xwiki-platform-flamingo-skin-designsystem-webjar": "!org.xwiki.platform:xwiki-platform-flamingo-skin-designsystem-webjar/index.es.js"
     }</xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>inversify</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>reflect-metadata</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

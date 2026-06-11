@@ -28,7 +28,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -121,7 +120,7 @@ class SolrIndexerIT
     private static final String WEB_HOME = "WebHome";
 
     @Test
-    void sortOrder(TestReference testReference, TestUtils testUtils, TestConfiguration testConfiguration)
+    void sortOrder(TestReference testReference, TestUtils testUtils)
         throws Exception
     {
         testUtils.loginAsSuperAdmin();
@@ -147,7 +146,7 @@ class SolrIndexerIT
         testUtils.rest().savePage(new DocumentReference(WEB_HOME, new SpaceReference("A-b", testSpace)));
         testUtils.rest().savePage(new DocumentReference(WEB_HOME, new SpaceReference("AAb", testSpace)));
 
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Get the output from the test script.
         String jsonContent = testUtils.executeWiki(TEST_SCRIPT, Syntax.XWIKI_2_1);

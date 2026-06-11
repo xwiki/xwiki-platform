@@ -38,7 +38,6 @@ type Data = {
 export class Logic {
   private readonly _host: HTMLElement;
   private readonly _name?: string;
-  private readonly _realtimeServerURL?: string;
   private readonly _data: Data;
   private readonly _ready: Promise<Logic>;
   private _resolveReady?: (logic: Logic) => void;
@@ -50,7 +49,7 @@ export class Logic {
   constructor(host: HTMLElement) {
     this._host = host;
     this._name = host.getAttribute("name") ?? host.id ?? host.dataset.name;
-    this._data = reactive(this._parseDataFromHost());
+    this._data = reactive(this.parseDataFromHost());
 
     this._ready = new Promise((resolve) => {
       this._resolveReady = resolve;
@@ -113,10 +112,6 @@ export class Logic {
     return this._ready;
   }
 
-  get realtimeServerURL(): string | undefined {
-    return this._realtimeServerURL;
-  }
-
   /**
    * Returns a translation only once the translations have been loaded from the server.
    *
@@ -144,8 +139,9 @@ export class Logic {
   /**
    * @returns the data parsed from the host element
    */
-  _parseDataFromHost(): Data {
+  private parseDataFromHost(): Data {
     const data = Object.assign(
+      this.getBaseConfig(),
       this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {},
       {
         ...this._host.dataset,
@@ -154,5 +150,19 @@ export class Logic {
     delete data.config;
     data.initialValue = data.value;
     return data;
+  }
+
+  /**
+   * @returns the base configuration for all BlockNote instances on the page
+   */
+  private getBaseConfig(): Data {
+    try {
+      return JSON.parse(
+        document.getElementById("blocknote-config")?.textContent ?? "{}",
+      );
+    } catch (e) {
+      console.error("Failed to parse the base BlockNote configuration.", e);
+      return {};
+    }
   }
 }

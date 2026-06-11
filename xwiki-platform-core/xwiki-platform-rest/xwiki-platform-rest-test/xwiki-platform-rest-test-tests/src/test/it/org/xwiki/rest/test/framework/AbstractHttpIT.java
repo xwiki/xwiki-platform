@@ -78,7 +78,7 @@ import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 
-public abstract class AbstractHttpIT
+public abstract class AbstractHttpIT extends AbstractTest
 {
     /**
      * Validate stdout/stderr for problems.
@@ -106,9 +106,6 @@ public abstract class AbstractHttpIT
 
     protected ObjectFactory objectFactory;
 
-    // TODO: Refactor TestUtils to move REST tools to xwiki-platform-test-integration
-    protected TestUtils testUtils = new TestUtils();
-
     protected SolrTestUtils solrUtils;
 
     static {
@@ -130,17 +127,17 @@ public abstract class AbstractHttpIT
         objectFactory = new ObjectFactory();
 
         // Make sure guest does not have edit right
-        Page page = this.testUtils.rest().page(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"));
-        org.xwiki.rest.model.jaxb.Object rightObject = this.testUtils.rest().object("XWiki.XWikiGlobalRights");
-        rightObject.withProperties(this.testUtils.rest().property("users", "XWiki.XWikiGuest"),
-            this.testUtils.rest().property("levels", "edit"), this.testUtils.rest().property("allow", "0"));
+        Page page = getUtil().rest().page(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"));
+        org.xwiki.rest.model.jaxb.Object rightObject = getUtil().rest().object("XWiki.XWikiGlobalRights");
+        rightObject.withProperties(getUtil().rest().property("users", "XWiki.XWikiGuest"),
+            getUtil().rest().property("levels", "edit"), getUtil().rest().property("allow", "0"));
         Objects objects = new Objects();
         objects.withObjectSummaries(rightObject);
         page.setObjects(objects);
-        this.testUtils.rest().save(page);
+        getUtil().rest().save(page);
 
         // Init solr utils
-        this.solrUtils = new SolrTestUtils(this.testUtils);
+        this.solrUtils = new SolrTestUtils(getUtil());
     }
 
     public static void initializeSystem() throws Exception
@@ -196,12 +193,12 @@ public abstract class AbstractHttpIT
 
     protected String getBaseURL()
     {
-        return this.testUtils.rest().getBaseURL();
+        return getUtil().rest().getBaseURL();
     }
 
     protected String getFullUri(Class<?> resourceClass)
     {
-        return this.testUtils.rest().createUri(resourceClass, null).toString();
+        return getUtil().rest().createUri(resourceClass, null).toString();
     }
 
     public abstract void testRepresentation() throws Exception;

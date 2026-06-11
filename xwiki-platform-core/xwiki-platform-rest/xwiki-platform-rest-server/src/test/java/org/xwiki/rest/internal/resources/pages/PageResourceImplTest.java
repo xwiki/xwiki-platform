@@ -30,6 +30,8 @@ import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.UriInfo;
 
+import jakarta.inject.Named;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,8 +57,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
-
-import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -147,8 +147,10 @@ class PageResourceImplTest
         assertEquals("delete", rights.get(2).getName());
         assertFalse(rights.get(2).isValue());
 
+        List<String> unknownRightsList = List.of("unknownRight");
+        List<String> supportedSyntaxesList = List.of();
         assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
-            false, false, false, List.of("unknownRight"), List.of()));
+            false, false, false, unknownRightsList, supportedSyntaxesList));
     }
 
     @Test

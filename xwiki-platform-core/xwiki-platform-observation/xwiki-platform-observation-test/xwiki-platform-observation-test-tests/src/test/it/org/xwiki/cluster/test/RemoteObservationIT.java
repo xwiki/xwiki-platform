@@ -43,11 +43,11 @@ public class RemoteObservationIT extends AbstractClusterHttpIT
             """;
 
         getUtil().switchExecutor(0);
-        assertEquals(String.valueOf(getUtil().getCurrentExecutor().getPort()),
+        assertEquals(String.valueOf(getUtil().getCurrentExecutor().getBrowserPort()),
             getUtil().executeWikiPlain(script, Syntax.XWIKI_2_1));
 
         getUtil().switchExecutor(1);
-        assertEquals(String.valueOf(getUtil().getCurrentExecutor().getPort()),
+        assertEquals(String.valueOf(getUtil().getCurrentExecutor().getBrowserPort()),
             getUtil().executeWikiPlain(script, Syntax.XWIKI_2_1));
     }
 }

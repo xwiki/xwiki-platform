@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal.factory.template;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -66,28 +65,28 @@ import static org.mockito.Mockito.when;
  * @since 6.1RC1
  */
 @ComponentTest
-public class DefaultMailTemplateManagerTest
+class DefaultMailTemplateManagerTest
 {
     @InjectMockComponents
-    DefaultMailTemplateManager templateManager;
+    private DefaultMailTemplateManager templateManager;
 
     @InjectComponentManager
-    MockitoComponentManager componentManager;
+    private MockitoComponentManager componentManager;
 
     @MockComponent
-    Provider<XWikiContext> contextProvider;
+    private Provider<XWikiContext> contextProvider;
 
     @Mock
-    XWikiContext xwikiContext;
+    private XWikiContext xwikiContext;
 
     @Mock
-    XWiki xwiki;
+    private XWiki xwiki;
 
     @MockComponent
-    VelocityEvaluator velocityEvaluator;
+    private VelocityEvaluator velocityEvaluator;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.xwikiContext);
 
@@ -108,7 +107,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluate() throws Exception
+    void evaluate() throws Exception
     {
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -128,7 +127,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWithLanguage() throws Exception
+    void evaluateWithLanguage() throws Exception
     {
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -159,7 +158,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWithObjectNotFoundWithLanguagePassed() throws Exception
+    void evaluateWithObjectNotFoundWithLanguagePassed() throws Exception
     {
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -189,7 +188,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWithObjectNotFoundWithDefaultLanguage() throws Exception
+    void evaluateWithObjectNotFoundWithDefaultLanguage() throws Exception
     {
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
@@ -219,7 +218,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWithErrorNoObjectMatches() throws Exception
+    void evaluateWithErrorNoObjectMatches() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(any(DocumentReference.class), any())).thenReturn(document);
@@ -227,7 +226,7 @@ public class DefaultMailTemplateManagerTest
         BaseObject object1 = mock(BaseObject.class);
         BaseObject object2 = mock(BaseObject.class);
 
-        List<BaseObject> xobjects = Arrays.asList(object1, object2);
+        List<BaseObject> xobjects = List.of(object1, object2);
         when(document.getXObjects(any())).thenReturn(xobjects);
 
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
@@ -246,7 +245,7 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWhenVelocityError() throws Exception
+    void evaluateWhenVelocityError() throws Exception
     {
         DocumentAccessBridge documentBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");

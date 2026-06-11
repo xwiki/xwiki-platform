@@ -17,23 +17,76 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import remapping from "@jridgewell/remapping";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig, mergeConfig } from "vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import dts from "vite-plugin-dts";
-import { copyFileSync, existsSync, readFileSync } from "node:fs";
-import { basename, dirname, resolve } from "node:path";
+import {
+  copyFileSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { UserConfig } from "vite";
+
+/**
+ * Vite plugin to resolve sourcemap chains during the bundle step.
+ * When reexporting components from packages built in a previous step, Vite
+ * will minify the results of this previous build which might already be
+ * minified. In this scenario, this plugin will attempt to find the sourcemaps
+ * from the previous build and apply them to this build's sourcemaps, so that
+ * the sources can still be derived from the newly minified files.
+ * @param buildOutDir - the directory that contains sourcemaps to flatten
+ * @returns the Vite plugin for {@link buildOutDir}
+ */
+function flattenSourceMaps(buildOutDir: string) {
+  return {
+    name: "flatten-sourcemaps",
+    async closeBundle() {
+      // We list all the source maps in the output directory.
+      const mapFiles = readdirSync(buildOutDir, {
+        recursive: true,
+        withFileTypes: true,
+      })
+        .filter((file) => file.name.endsWith(".map"))
+        .map((file) => join(file.parentPath, file.name));
+
+      for (const mapFile of mapFiles) {
+        const map = JSON.parse(readFileSync(mapFile, "utf-8"));
+
+        // remapping's loader function needs to return the map's content for
+        // each source recursively listed in the sourcemap chain.
+        const flattened = remapping(map, (sourceFile) => {
+          // We need to resolve the relative paths.
+          const absolutePath = resolve(dirname(mapFile), sourceFile);
+
+          try {
+            return JSON.parse(readFileSync(absolutePath + ".map", "utf-8"));
+          } catch {
+            return null;
+          }
+        });
+
+        // We save the flattened map.
+        writeFileSync(mapFile, JSON.stringify(flattened));
+      }
+    },
+  };
+}
 
 function generateWebjarNodeConfig(
   path: string,
   toBundle: string[] = [],
 ): UserConfig {
+  const WEBJAR_NODE_OUT_DIR = "../../../target/node-dist";
   const __dirname = dirname(fileURLToPath(path));
   return defineConfig({
     build: {
-      outDir: "../../../target/node-dist",
+      outDir: WEBJAR_NODE_OUT_DIR,
       lib: {
         entry: resolve(__dirname, "src/index.ts"),
         fileName: (format, entryName) => `${entryName}.${format}.js`,
@@ -43,10 +96,7 @@ function generateWebjarNodeConfig(
       rollupOptions: {
         external: (id) => {
           // Force the inclusion of direct or transitive dependencies to keep bundled.
-          if (
-            toBundle.find((s) => id === s || id.startsWith(`${s}/`)) !==
-            undefined
-          ) {
+          if (toBundle.some((s) => id === s || id.startsWith(`${s}/`))) {
             return false;
           }
 
@@ -66,6 +116,7 @@ function generateWebjarNodeConfig(
         },
       },
     },
+    plugins: [flattenSourceMaps(WEBJAR_NODE_OUT_DIR)],
   });
 }
 
@@ -90,6 +141,12 @@ function generateConfig(
   entryRoot: string = "./src/",
 ): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
+  const externalDependencies = [
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+  ];
+  const isCssRequest = (value: string | undefined): boolean =>
+    value !== undefined && /\.css($|\?)/.test(value);
 
   const libFileName = (format: string) => `index.${format}.js`;
 
@@ -102,10 +159,19 @@ function generateConfig(
         fileName: libFileName,
       },
       rollupOptions: {
-        external: [
-          ...Object.keys(pkg.dependencies || {}),
-          ...Object.keys(pkg.peerDependencies || {}),
-        ],
+        // Externalize both package roots (e.g. "@scope/pkg") and subpaths
+        // (e.g. "@scope/pkg/subpath") to avoid rebundling transitive runtimes.
+        external: (id) => {
+          // Keep CSS subpath imports internal.
+          if (isCssRequest(id)) {
+            return false;
+          }
+
+          return externalDependencies.some(
+            (dependency) =>
+              id === dependency || id.startsWith(`${dependency}/`),
+          );
+        },
       },
     },
     plugins: [

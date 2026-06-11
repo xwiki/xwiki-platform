@@ -75,8 +75,8 @@ public class ObjectsResourceIT extends AbstractHttpIT
         this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
 
         // Create a clean test page.
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
 
         GetMethod getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
@@ -677,10 +677,10 @@ public class ObjectsResourceIT extends AbstractHttpIT
         DocumentReference ref2 = new DocumentReference(getWiki(), spaces2, pageName2);
 
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1);
-            this.testUtils.rest().savePage(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1);
+            getUtil().rest().savePage(ref2);
 
             // Add TagClass objects to both pages
             createObjectIfDoesNotExists(className, spaces1, pageName1);
@@ -722,8 +722,8 @@ public class ObjectsResourceIT extends AbstractHttpIT
             Assert.assertEquals(400, getMethod.getStatusCode());
             Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 }

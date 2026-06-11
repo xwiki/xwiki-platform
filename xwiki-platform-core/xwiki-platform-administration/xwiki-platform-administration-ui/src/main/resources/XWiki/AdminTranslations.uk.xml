@@ -139,6 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=У вибраного к
 administration.section.users.deleteUser.newAuthor.programming=програмування
 administration.section.users.deleteUser.newAuthor.script=скрипт
 admin.usersgroups.extensionrights=Права розширення
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Видалення учасника з групи

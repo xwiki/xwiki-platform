@@ -19,20 +19,20 @@
  */
 package org.xwiki.url.internal.filesystem;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.url.filesystem.FilesystemExportContext}.
  *
  * @version $Id$
  */
-public class FilesystemExportContextTest
+class FilesystemExportContextTest
 {
     @Test
-    public void getSetDocParentLevels()
+    void getSetDocParentLevels()
     {
         FilesystemExportContext context = new FilesystemExportContext();
         context.setDocParentLevels(5);

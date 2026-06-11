@@ -31,7 +31,6 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
-import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +38,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 
 /**
  * The PDF export job.

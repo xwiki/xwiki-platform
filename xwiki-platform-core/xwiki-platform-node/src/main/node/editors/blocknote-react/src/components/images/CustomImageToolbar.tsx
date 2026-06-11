@@ -99,6 +99,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
               (note: this comment is from BlockNote's source code but may remain relevant here) */}
           <Components.FormattingToolbar.Button
             className="bn-button"
+            mainTooltip={t("blocknote.imageToolbar.buttons.edit")}
             label={t("blocknote.imageToolbar.buttons.edit")}
             icon={<RiPencilLine />}
             onClick={openEditor}
@@ -117,6 +118,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
 
       <Components.FormattingToolbar.Button
         className="bn-button"
+        mainTooltip={t("blocknote.imageToolbar.buttons.open")}
         label={t("blocknote.imageToolbar.buttons.open")}
         icon={<RiExternalLinkLine />}
         onClick={() => window.open(currentBlock.props.url)}

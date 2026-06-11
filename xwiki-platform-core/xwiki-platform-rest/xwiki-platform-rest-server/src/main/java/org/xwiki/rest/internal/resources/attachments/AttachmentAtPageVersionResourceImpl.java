@@ -20,13 +20,11 @@
 package org.xwiki.rest.internal.resources.attachments;
 
 import javax.inject.Named;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.resources.attachments.AttachmentAtPageVersionResource;
 
 import com.xpn.xwiki.XWikiException;
@@ -37,7 +35,8 @@ import com.xpn.xwiki.api.Document;
  */
 @Component
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentAtPageVersionResourceImpl")
-public class AttachmentAtPageVersionResourceImpl extends XWikiResource implements AttachmentAtPageVersionResource
+public class AttachmentAtPageVersionResourceImpl extends BaseAttachmentsResource
+    implements AttachmentAtPageVersionResource
 {
     @Override
     public Response getAttachment(String wikiName, String spaceName, String pageName, String version,
@@ -48,12 +47,7 @@ public class AttachmentAtPageVersionResourceImpl extends XWikiResource implement
 
             Document doc = documentInfo.getDocument();
 
-            final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-
-            return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
+            return answerWithAttachment(doc.getAttachment(attachmentName));
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

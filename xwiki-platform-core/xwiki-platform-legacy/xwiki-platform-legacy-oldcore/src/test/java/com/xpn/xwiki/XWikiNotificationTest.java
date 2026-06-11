@@ -19,18 +19,12 @@
  */
 package com.xpn.xwiki;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+
+import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -38,9 +32,16 @@ import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * Verify that notifications are correctly sent in the {@link XWiki} class.
@@ -48,115 +49,69 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  */
 @Deprecated
-public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest(mockXWiki = false)
+@AllComponents
+class XWikiNotificationTest
 {
-    public class TestListener implements XWikiDocChangeNotificationInterface
+    class TestListener implements XWikiDocChangeNotificationInterface
     {
-        public boolean hasListenerBeenCalled = false;
+        boolean hasListenerBeenCalled = false;
 
-        public boolean expectedNewStatus = true;
+        boolean expectedNewStatus = true;
 
+        @Override
         public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
             XWikiContext context)
         {
             assertEquals("Space.Page", newdoc.getFullName());
-            assertNotNull("Shouldn't have been null", olddoc);
-            assertEquals("Should have been new, since this is a new document", this.expectedNewStatus, olddoc.isNew());
+            assertNotNull(olddoc, "Shouldn't have been null");
+            assertEquals(this.expectedNewStatus, olddoc.isNew(),
+                "Should have been new, since this is a new document");
             this.hasListenerBeenCalled = true;
         }
     }
 
-    XWiki xwiki;
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Override
-    public void setUp() throws Exception
+    private XWiki xwiki;
+
+    @BeforeEach
+    void setUp()
     {
-        super.setUp();
-
-        this.xwiki = new XWiki();
-        getContext().setWiki(this.xwiki);
-
-        Mock mockStore = mock(XWikiStoreInterface.class);
-        mockStore.stubs().method("getLimitSize").will(returnValue(255));
-        mockStore.expects(atLeastOnce()).method("saveXWikiDoc");
-        mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
-        {
-            public Object invoke(Invocation invocation) throws Throwable
-            {
-                return invocation.parameterValues.get(0);
-            }
-        });
-        this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
-    }
-
-    private XWikiNotificationManager getNotificationManager() throws IllegalArgumentException, SecurityException,
-        IllegalAccessException, InvocationTargetException, NoSuchMethodException
-    {
-        return (XWikiNotificationManager) XWiki.class.getMethod("getNotificationManager")
-            .invoke(getContext().getWiki());
+        this.xwiki = this.oldcore.getSpyXWiki();
     }
 
     /**
      * We only verify here that the saveDocument API calls the Notification Manager. Detailed tests of the notification
      * classes are implemented in the notification package.
      */
-    public void testSaveDocumentSendNotifications() throws Exception
+    @Test
+    void saveDocumentSendNotifications() throws Exception
     {
         TestListener listener = new TestListener();
-        getNotificationManager().addGeneralRule(new DocChangeRule(listener));
+        this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
 
-        this.xwiki.saveDocument(document, getContext());
-        assertTrue("Listener not called", listener.hasListenerBeenCalled);
+        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        assertTrue(listener.hasListenerBeenCalled, "Listener not called");
     }
 
     /**
      * We only verify here that the saveDocument API calls the Notification Manager. Detailed tests of the notification
      * classes are implemented in the notification package.
      */
-    public void testSaveDocumentFromAPIUsesCorrectOriginalDocument() throws Exception
+    @Test
+    void saveDocumentFromAPIUsesCorrectOriginalDocument() throws Exception
     {
-        Mock mockRights = mock(XWikiRightService.class);
-        mockRights.stubs().method("hasAccessLevel").will(returnValue(true));
-        mockRights.stubs().method("hasProgrammingRights").will(returnValue(true));
-        this.xwiki.setRightService((XWikiRightService) mockRights.proxy());
-
-        Mock mockUserReferenceResolver = mock(UserReferenceResolver.class);
-        Mock userReference = mock(UserReference.class);
-        mockUserReferenceResolver.stubs().method("resolve").will(returnValue(userReference.proxy()));
-
-        DefaultComponentDescriptor<UserReferenceResolver<CurrentUserReference>> userReferenceResolverDescriptor =
-            new DefaultComponentDescriptor<>();
-        userReferenceResolverDescriptor.setRoleType(
-            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class));
-        userReferenceResolverDescriptor.setRoleHint("default");
-        getComponentManager().registerComponent(userReferenceResolverDescriptor,
-            (UserReferenceResolver<CurrentUserReference>) mockUserReferenceResolver.proxy());
-
-        Mock mockDocumentUserReferenceResolver = mock(UserReferenceResolver.class);
-        DefaultComponentDescriptor<UserReferenceResolver<DocumentReference>> documentUserReferenceResolverDescriptor =
-            new DefaultComponentDescriptor<>();
-        documentUserReferenceResolverDescriptor.setRoleType(
-            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class));
-        documentUserReferenceResolverDescriptor.setRoleHint("document");
-        getComponentManager().registerComponent(documentUserReferenceResolverDescriptor,
-            (UserReferenceResolver<DocumentReference>) mockDocumentUserReferenceResolver.proxy());
-
-        Mock mockDocumentUserReferenceSerializer = mock(UserReferenceSerializer.class);
-        DefaultComponentDescriptor<UserReferenceSerializer<DocumentReference>>
-            documentUserReferenceSerializerDescriptor = new DefaultComponentDescriptor<>();
-        documentUserReferenceSerializerDescriptor.setRoleType(
-            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class));
-        documentUserReferenceSerializerDescriptor.setRoleHint("document");
-        getComponentManager().registerComponent(documentUserReferenceSerializerDescriptor,
-            (UserReferenceSerializer<DocumentReference>) mockDocumentUserReferenceSerializer.proxy());
-        mockDocumentUserReferenceSerializer.stubs().method("serialize")
-            .will(returnValue(new DocumentReference("wiki", "XWiki", "User")));
+        XWikiRightService mockRights = this.oldcore.getMockRightService();
+        when(mockRights.hasAccessLevel(anyString(), anyString(), anyString(), any())).thenReturn(true);
+        when(mockRights.hasProgrammingRights(any())).thenReturn(true);
 
         TestListener listener = new TestListener();
         listener.expectedNewStatus = false;
-        getNotificationManager().addGeneralRule(new DocChangeRule(listener));
+        this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
         XWikiDocument original = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
         original.setNew(false);
@@ -165,8 +120,8 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         document.setContent("New content");
         document.setOriginalDocument(original);
 
-        Document api = new Document(document, getContext());
+        Document api = new Document(document, this.oldcore.getXWikiContext());
         api.save();
-        assertTrue("Listener not called", listener.hasListenerBeenCalled);
+        assertTrue(listener.hasListenerBeenCalled, "Listener not called");
     }
 }

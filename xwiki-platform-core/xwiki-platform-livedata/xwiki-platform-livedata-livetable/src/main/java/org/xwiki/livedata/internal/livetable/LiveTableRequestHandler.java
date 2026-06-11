@@ -236,7 +236,7 @@ public class LiveTableRequestHandler
 
             List<String> matchType = filter.getConstraints().stream()
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
-                .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
+                .map(operator -> operator == null ? "" : MATCH_TYPE.getOrDefault(operator, operator))
                 .collect(Collectors.toList());
             requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
 

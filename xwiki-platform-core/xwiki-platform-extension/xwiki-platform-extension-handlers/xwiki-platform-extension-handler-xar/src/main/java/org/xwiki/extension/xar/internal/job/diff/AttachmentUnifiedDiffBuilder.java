@@ -151,13 +151,15 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     private String getContentAsString(XWikiAttachment attachment)
     {
-        try {
-            return attachment == null ? null : IOUtils.toString(attachment.getContentInputStream(this.xcontextProvider
-                .get()));
-        } catch (Exception e) {
-            this.logger.warn("Failed to read the content of attachment [{}]. Root cause: {}", attachment.getFilename(),
-                ExceptionUtils.getRootCauseMessage(e));
-            return null;
+        if (attachment != null) {
+            try (InputStream stream = attachment.getContentInputStream(this.xcontextProvider.get())) {
+                return IOUtils.toString(stream);
+            } catch (Exception e) {
+                this.logger.warn("Failed to read the content of attachment [{}]. Root cause: {}",
+                    attachment.getFilename(), ExceptionUtils.getRootCauseMessage(e));
+            }
         }
+
+        return null;
     }
 }

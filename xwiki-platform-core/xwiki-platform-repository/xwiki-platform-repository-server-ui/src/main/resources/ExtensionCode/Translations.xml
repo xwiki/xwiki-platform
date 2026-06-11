@@ -81,7 +81,67 @@ ExtensionCode.ExtensionSupportPlanClass_summary=Summary
 ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Details
 ExtensionCode.ExtensionSupportPlanClass_active=Active
-ExtensionCode.ExtensionSupportPlanClass_paying=Paying</content>
+ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+
+## Extension sheet
+repository.extension.sheet.name=Name
+repository.extension.sheet.type=Type
+repository.extension.sheet.category=Category
+repository.extension.sheet.summary=Summary
+repository.extension.sheet.authors=Authors
+repository.extension.sheet.rating=Rating
+repository.extension.sheet.title=Extension sheet
+repository.extension.sheet.imported=Extension imported from repository
+repository.extension.sheet.updateExtension=Update extension
+repository.extension.sheet.developedBy=Developed by
+repository.extension.sheet.unknown=Unknown
+repository.extension.sheet.support=Support
+repository.extension.sheet.activeInstalls=Active Installs
+repository.extension.sheet.license=License
+repository.extension.sheet.installable=Installable with the Extension Manager
+repository.extension.sheet.documentation=Documentation
+repository.extension.sheet.sources=Sources
+repository.extension.sheet.issues=Issues
+repository.extension.sheet.download=Download v{0}
+repository.extension.sheet.toc=Table of contents
+repository.extension.sheet.documentationHelp=Documentation Help
+repository.extension.sheet.rulesIntro=Here are some rules to follow when contributing an extension:
+repository.extension.sheet.ruleSummary=Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.
+repository.extension.sheet.ruleImported=When an extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+repository.extension.sheet.autoSync=Automatically synchronize the extension informations
+repository.extension.sheet.source=Source
+repository.extension.sheet.iconLocation=Display Icon Location
+repository.extension.sheet.iconLocationSyntax=Syntax:
+repository.extension.sheet.iconLocationLinkText=icon name
+repository.extension.sheet.showActiveInstalls=Show Active Installs
+repository.extension.sheet.supportPlans=Support plans
+repository.extension.sheet.description=Description
+repository.extension.sheet.prerequisites=Prerequisites &amp; Installation Instructions
+repository.extension.sheet.customInstallationOnly=Custom installation only
+repository.extension.sheet.standardInstallationInstructions=Standard installation instructions
+repository.extension.sheet.customInstallationInstructions=Custom installation instructions
+repository.extension.sheet.versions=Versions
+repository.extension.sheet.releaseNotes=Release Notes
+repository.extension.sheet.dependencies=Dependencies
+repository.extension.sheet.dependenciesIntro=Dependencies for this extension ({0}):
+repository.extension.sheet.currentDownloads=Current Downloads
+repository.extension.sheet.addDownloads=Add Downloads
+repository.extension.sheet.addDownloadsSaveFirst=In order to add Download information for this extension, save this page first and edit it again.
+repository.extension.sheet.addDownloadsWarning=If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.
+repository.extension.sheet.addDownloadsProcess=We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and >>target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+repository.extension.sheet.addDownloadsAttach=If you''re providing a new download, {0}attach the new version to this page{1} and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).
+repository.extension.sheet.addDownloadsInfo=Add Download information for the new attachment by filing in a new {0}Extension Version{1}. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {2}.
+repository.extension.sheet.currentDependencies=Current Dependencies
+repository.extension.sheet.addDependencies=Add Dependencies
+repository.extension.sheet.addDependenciesIntro=You can also associate dependencies to each version by filing in the following information in a new {0}Dependency{1}:
+repository.extension.sheet.addDependenciesVersion=Extension version is the version on which this dependency is assigned
+repository.extension.sheet.addDependenciesId=Dependency id is the identifier of the dependency extension on the repository where it is localed
+repository.extension.sheet.addDependenciesConstraint=Dependency version constraint is the version related information of the dependency. Can be a version (e.g. 1.0) or one or several ranges of versions based on Maven standard syntax (e.g. [1.0,) which mean at least 1.0)
+repository.extension.sheet.wrongObject=This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object</content>
   <object>
     <name>ExtensionCode.Translations</name>
     <number>0</number>

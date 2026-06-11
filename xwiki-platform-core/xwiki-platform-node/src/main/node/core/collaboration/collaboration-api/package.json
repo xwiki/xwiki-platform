@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-collaboration-api",
-  "version": "18.3.0-SNAPSHOT",
+  "version": "18.5.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -39,6 +39,10 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-document-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*",
+    "@xwiki/platform-model-reference-api": "workspace:*",
     "yjs": "catalog:"
   },
   "peerDependencies": {
@@ -49,10 +53,13 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
+    "jsdom": "catalog:",
     "reflect-metadata": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

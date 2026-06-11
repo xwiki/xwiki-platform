@@ -6,7 +6,7 @@
 
 import { Translator } from '@xwiki/platform-localization-api';
 
-// @beta (undocumented)
+// @beta
 export function translatorFactory(target: string): Translator;
 
 // (No @packageDocumentation comment for this package)

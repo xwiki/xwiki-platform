@@ -57,14 +57,18 @@ declare global {
       serialize: (reference: XWikiEntityReference) => string;
     };
     Document: new (reference: XWikiEntityReference) => {
-      getURL: () => string;
+      getURL: (action?: string, parameters?: URLSearchParams) => string;
     };
     Attachment: new (reference: XWikiEntityReference) => {
       getURL: () => string;
     };
     currentDocument: {
       documentReference: XWikiEntityReference;
+      getURL: (action?: string, parameters?: URLSearchParams) => string;
     };
+    currentWiki: string;
+    contextPath: string;
+    docsyntax: string;
   };
 }
 

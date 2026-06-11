@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class NotificationPreferenceEventTest
+class NotificationPreferenceEventTest
 {
     @Test
-    public void match()
+    void match()
     {
         NotificationPreferenceAddedEvent event1 = new NotificationPreferenceAddedEvent();
         NotificationPreferenceAddedEvent event2 = new NotificationPreferenceAddedEvent();

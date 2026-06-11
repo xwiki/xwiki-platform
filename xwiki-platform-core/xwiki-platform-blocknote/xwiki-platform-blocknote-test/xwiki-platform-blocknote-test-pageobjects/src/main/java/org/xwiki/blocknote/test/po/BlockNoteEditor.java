@@ -71,7 +71,8 @@ public class BlockNoteEditor extends BaseElement
      */
     public BlockNoteToolBar getToolBar()
     {
-        return new BlockNoteToolBar(this.container.findElement(By.className("bn-toolbar")));
+        // The toolbar is rendered via FloatingPortal into document.body (outside the component root)
+        return new BlockNoteToolBar(this.getDriver().findElement(By.cssSelector(".bn-root .bn-toolbar")));
     }
 
     /**

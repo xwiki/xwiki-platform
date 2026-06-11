@@ -34,9 +34,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.xwiki.javascript.importmap.internal.parser.ImportmapPathDescriptor;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
-import org.xwiki.webjars.WebjarPathDescriptor;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.VERIFY;
 import static org.apache.maven.plugins.annotations.ResolutionScope.RUNTIME;
@@ -74,13 +74,14 @@ public class ImportmapMojo extends AbstractMojo
         try {
             var importMap = new JavascriptImportmapParser().parse(property);
             var dependencies = this.project.getArtifacts();
-            for (Map.Entry<String, WebjarPathDescriptor> entry : importMap.entrySet()) {
+            for (Map.Entry<String, ImportmapPathDescriptor> entry : importMap.entrySet()) {
                 var key = entry.getKey();
                 var value = entry.getValue();
-                var webjarId = value.webjarId().split(":", 2);
+                var descriptor = value.descriptor();
+                var webjarId = descriptor.webjarId().split(":", 2);
                 var groupIdWebjar = webjarId[0];
                 var artifactIdWebjar = webjarId[1];
-                var path = value.path();
+                var path = descriptor.path();
                 getLog().debug("Checking key [%s] for webjar reference [%s]".formatted(key, value));
                 var isSelf =
                     areDependenciesEquals(model.getGroupId(), model.getArtifactId(), groupIdWebjar, artifactIdWebjar);
@@ -105,7 +106,7 @@ public class ImportmapMojo extends AbstractMojo
                 }
                 if (dependencyNotFound) {
                     throw new MojoExecutionException(
-                        "Unable to find a declared dependency for [%s]".formatted(value.webjarId()));
+                        "Unable to find a declared dependency for [%s]".formatted(descriptor.webjarId()));
                 }
             }
         } catch (JavascriptImportmapException e) {
@@ -128,7 +129,10 @@ public class ImportmapMojo extends AbstractMojo
             throw new MojoExecutionException("Unable to resolve jar for dependency [%s]".formatted(artifact));
         }
         try {
-            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, artifact.getVersion(), path))) {
+            // We need to use the base version instead of the version because the version can contain a timestamp
+            // when the artifact has a snaapshot version and is fetched remotely (i.e., not found directly in the
+            // target directory of the module in the current repository).
+            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, artifact.getBaseVersion(), path))) {
                 throw new MojoExecutionException("Unable to find path [%s] in jar [%s]".formatted(path, jar));
             }
         } catch (IOException e) {

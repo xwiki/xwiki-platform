@@ -74,7 +74,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to verify that the ping sender correctly sends all the ping data to an Elasticsearch instance
- * (the tests used the official Elasticsearch docker image to ensure this).
+ * (the tests use the official Elasticsearch docker image to ensure this).
  *
  * @version $Id$
  * @since 14.4RC1

@@ -214,33 +214,52 @@ class DefaultGadgetSourceTest
         when(gadgetObject2.getStringValue("position")).thenReturn("3");
         when(gadgetObject2.getNumber()).thenReturn(13);
 
+        BaseObject gadgetObject3 = mock();
+        when(gadgetObject3.getOwnerDocument()).thenReturn(this.ownerDocument);
+        when(gadgetObject3.getStringValue("title")).thenReturn("{{translation key=\"my.translation.key\" /}}");
+        when(gadgetObject3.getLargeStringValue("content")).thenReturn("Localized other content");
+        when(gadgetObject3.getStringValue("position")).thenReturn("3");
+        when(gadgetObject3.getNumber()).thenReturn(14);
+
         when(this.localizationManager.getTranslationPlain("xwiki.gadget2")).thenReturn("Translated Title");
 
-        when(this.xWikiDocument.getXObjects(this.gadgetClassReference)).thenReturn(List.of(gadgetObject1,
-            gadgetObject2));
+        when(this.xWikiDocument.getXObjects(this.gadgetClassReference)).thenReturn(List.of(
+            gadgetObject1,
+            gadgetObject2,
+            gadgetObject3
+        ));
 
         when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, this.ownerAuthorReference,
             this.ownerSourceReference)).thenReturn(false);
 
         List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(TEST_SOURCE, this.macroTransformationContext);
-        assertEquals(2, gadgets.size());
+        assertEquals(3, gadgets.size());
         Gadget gadget = gadgets.get(0);
         assertEquals("Gadget 2", gadget.getTitle().get(0).toString());
         assertEquals("Some other content", gadget.getContent().get(0).toString());
         assertEquals("12", gadget.getId());
         verify(this.contentExecutor)
-            .execute(eq("Gadget 2"), any(), any(), any());
+            .execute(eq("Gadget 2"), eq(Syntax.PLAIN_1_0), any(), any());
         verify(this.contentExecutor)
-            .execute(eq("Some other content"), any(), any(), any());
+            .execute(eq("Some other content"), eq(Syntax.XWIKI_2_1), any(), any());
 
         Gadget gadget2 = gadgets.get(1);
         assertEquals("Translated Title", gadget2.getTitle().get(0).toString());
         assertEquals("Localized content", gadget2.getContent().get(0).toString());
         assertEquals("13", gadget2.getId());
         verify(this.contentExecutor)
-            .execute(eq("Translated Title"), any(), any(), any());
+            .execute(eq("Translated Title"), eq(Syntax.PLAIN_1_0), any(), any());
         verify(this.contentExecutor)
-            .execute(eq("Localized content"), any(), any(), any());
+            .execute(eq("Localized content"), eq(Syntax.XWIKI_2_1), any(), any());
+
+        Gadget gadget3 = gadgets.get(2);
+        assertEquals("{{translation key=\"my.translation.key\" /}}", gadget3.getTitle().get(0).toString());
+        assertEquals("Localized other content", gadget3.getContent().get(0).toString());
+        assertEquals("14", gadget3.getId());
+        verify(this.contentExecutor)
+            .execute(eq("{{translation key=\"my.translation.key\" /}}"), eq(Syntax.XWIKI_2_1), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Localized other content"), eq(Syntax.XWIKI_2_1), any(), any());
     }
 
     @Test

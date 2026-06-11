@@ -49,7 +49,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
      */
     public AbstractAttachmentEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

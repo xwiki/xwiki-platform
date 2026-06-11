@@ -101,8 +101,8 @@ public class SpacesResourceIT extends AbstractHttpIT
     public void testSearch() throws Exception
     {
         DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
-        this.testUtils.rest().delete(reference);
-        this.testUtils.rest().savePage(reference, "content " + getTestMethodName(), "title " + getTestMethodName());
+        getUtil().rest().delete(reference);
+        getUtil().rest().savePage(reference, "content " + getTestMethodName(), "title " + getTestMethodName());
 
         this.solrUtils.waitEmptyQueue();
 
@@ -132,9 +132,9 @@ public class SpacesResourceIT extends AbstractHttpIT
     public void testAttachments() throws Exception
     {
         DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
-        this.testUtils.rest().delete(reference);
-        this.testUtils.rest().savePage(reference);
-        this.testUtils.rest().attachFile(new AttachmentReference("attachment.txt", reference),
+        getUtil().rest().delete(reference);
+        getUtil().rest().savePage(reference);
+        getUtil().rest().attachFile(new AttachmentReference("attachment.txt", reference),
             new ReaderInputStream(new StringReader("content"), StandardCharsets.UTF_8), true);
 
         // Matches Sandbox.WebHome@XWikLogo.png
@@ -158,10 +158,10 @@ public class SpacesResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(getWiki(), getTestClassName() + "A", "WebHome");
         DocumentReference ref2 = new DocumentReference(getWiki(), getTestClassName() + "B", "WebHome");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "content1", "title1");
-            this.testUtils.rest().savePage(ref2, "content2", "title2");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet("%s?number=-1".formatted(buildURI(SpacesResource.class, getWiki())));
@@ -188,8 +188,8 @@ public class SpacesResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, spaces.getSpaces().size());
             Assert.assertNotEquals(firstName, spaces.getSpaces().get(0).getName());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 
@@ -201,10 +201,10 @@ public class SpacesResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "A");
         DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "B");
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "searchcontent", "searchtitleA");
-            this.testUtils.rest().savePage(ref2, "searchcontent", "searchtitleB");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "searchcontent", "searchtitleA");
+            getUtil().rest().savePage(ref2, "searchcontent", "searchtitleB");
 
             this.solrUtils.waitEmptyQueue();
 
@@ -241,8 +241,8 @@ public class SpacesResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, results.getSearchResults().size());
             Assert.assertNotEquals(firstName, results.getSearchResults().get(0).getPageName());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 
@@ -252,13 +252,13 @@ public class SpacesResourceIT extends AbstractHttpIT
         // Setup: Ensure at least 2 attachments exist in the space
         String spaceName = getTestClassName();
         DocumentReference ref = new DocumentReference(getWiki(), spaceName, getTestMethodName());
-        this.testUtils.rest().delete(ref);
-        this.testUtils.rest().savePage(ref);
+        getUtil().rest().delete(ref);
+        getUtil().rest().savePage(ref);
 
         try {
-            this.testUtils.rest().attachFile(new AttachmentReference("att1.txt", ref),
+            getUtil().rest().attachFile(new AttachmentReference("att1.txt", ref),
                 new ByteArrayInputStream("content1".getBytes(StandardCharsets.UTF_8)), true);
-            this.testUtils.rest().attachFile(new AttachmentReference("att2.txt", ref),
+            getUtil().rest().attachFile(new AttachmentReference("att2.txt", ref),
                 new ByteArrayInputStream("content2".getBytes(StandardCharsets.UTF_8)), true);
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
@@ -292,7 +292,7 @@ public class SpacesResourceIT extends AbstractHttpIT
             Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up
-            this.testUtils.rest().delete(ref);
+            getUtil().rest().delete(ref);
         }
     }
 }

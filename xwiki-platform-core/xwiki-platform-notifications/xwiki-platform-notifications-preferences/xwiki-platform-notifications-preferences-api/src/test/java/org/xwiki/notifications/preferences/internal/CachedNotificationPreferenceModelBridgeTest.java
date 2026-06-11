@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ class CachedNotificationPreferenceModelBridgeTest
     @Test
     void getNotificationsPreferences() throws NotificationException
     {
-        assertEquals(Collections.emptyList(),
+        assertEquals(List.of(),
             this.preferenceModelBridge.getNotificationsPreferences((DocumentReference) null));
 
         DocumentReference documentReference = mock(DocumentReference.class);
@@ -102,7 +101,7 @@ class CachedNotificationPreferenceModelBridgeTest
     @Test
     void getNotificationsPreferencesForWiki() throws NotificationException
     {
-        assertEquals(Collections.emptyList(),
+        assertEquals(List.of(),
             this.preferenceModelBridge.getNotificationsPreferences((WikiReference) null));
 
         WikiReference wikiReference = mock(WikiReference.class);

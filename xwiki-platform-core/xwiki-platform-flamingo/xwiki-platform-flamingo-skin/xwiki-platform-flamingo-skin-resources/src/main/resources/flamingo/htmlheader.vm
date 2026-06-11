@@ -34,7 +34,11 @@
 ## ---------------------------------------------------------------------------------------------------------------
 #set ($metaAttributes = [])
 ## Target the paper paged media by default when using the print feature provided by the web browser.
-#addMetaAttribute($metaAttributes, 'paged-media', 'paper')
+#set ($pagedMedia = "$!request.pagedMedia")
+#if ($pagedMedia == '')
+  #set ($pagedMedia = 'paper')
+#end
+#addMetaAttribute($metaAttributes, 'paged-media', $pagedMedia)
 #if("$!doc" != "" && "$!tdoc" != "")
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
   ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
@@ -118,6 +122,12 @@
       #evaluate($spacePreferenceMeta )
     #else
       #template("meta.vm")
+    #end
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Add all HTML tags contributed by UIX for the "org.xwiki.platform.html.head" UIXP.
+    ## ---------------------------------------------------------------------------------------------------------------
+    #foreach($uix in $services.uix.getExtensions("org.xwiki.platform.html.head", {'sortByParameter' : 'order'}))
+      $services.rendering.render($uix.execute(), 'xhtml/1.0')
     #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.

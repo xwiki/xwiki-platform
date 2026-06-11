@@ -315,7 +315,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
         EntityReference reference = this;
         while (reference != null) {
             if (reference.getType() == EntityType.SPACE) {
-                references.add((SpaceReference) reference);
+                references.add(new SpaceReference(reference));
             }
             reference = reference.getParent();
         }

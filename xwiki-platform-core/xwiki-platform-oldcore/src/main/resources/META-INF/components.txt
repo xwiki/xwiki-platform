@@ -285,6 +285,7 @@ org.xwiki.security.authservice.script.AuthServiceScriptService
 org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.attachment.XWikiAttachmentSecurityManager
 org.xwiki.internal.authentication.LoginLinkUIExtension
 org.xwiki.internal.authentication.RegisterLinkUIExtension
 org.xwiki.internal.filter.Importer

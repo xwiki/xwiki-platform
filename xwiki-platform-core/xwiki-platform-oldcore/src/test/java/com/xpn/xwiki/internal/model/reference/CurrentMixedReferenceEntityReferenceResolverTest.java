@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -28,14 +28,21 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link CurrentMixedReferenceEntityReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
-public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
+@OldcoreTest
+@ReferenceComponentList
+class CurrentMixedReferenceEntityReferenceResolverTest
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -43,41 +50,44 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
 
     private static final String CURRENT_PAGE = "currentpage";
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     private EntityReferenceResolver<EntityReference> resolver;
 
-    @Override
-    public void setUp() throws Exception
+    @BeforeEach
+    void beforeEach() throws Exception
     {
-        super.setUp();
-
-        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "currentmixed");
+        this.resolver =
+            this.oldcore.getMocker().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "currentmixed");
     }
 
     @Test
-    public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
+    void resolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setWikiId(CURRENT_WIKI);
-        getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
+        this.oldcore.getXWikiContext()
+            .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
-            resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+            this.resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
 
-        Assert.assertEquals("WebHome", reference.getParent().getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
-        Assert.assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
-        Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+        assertEquals("WebHome", reference.getParent().getName());
+        assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
+        assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
+        assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
     }
 
     @Test
-    public void testResolveDocumentFromObjectReference()
+    void resolveDocumentFromObjectReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         ObjectReference objectReference = new ObjectReference("object", documentReference);
 
         EntityReference reference = this.resolver.resolve(objectReference, EntityType.DOCUMENT);
 
-        Assert.assertEquals(documentReference, reference);
+        assertEquals(documentReference, reference);
     }
 }

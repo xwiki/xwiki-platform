@@ -222,7 +222,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     /**
      * @return return the content of the version section in the page footer
      */
-    public String getVersion()
+    public String getFooterVersion()
     {
         return this.getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }

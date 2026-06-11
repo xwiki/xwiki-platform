@@ -168,13 +168,13 @@ class PresentationIT
         // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
         assertEquals("test-copyright", presentationSectionPage.getCopyright());
         
-        String defaultVersion = presentationSectionPage.getVersion();
+        String defaultVersion = presentationSectionPage.getFooterVersion();
         // The default version should contain the xwiki-platform project version.
         assertFalse(defaultVersion.isEmpty());
         presentationSectionPage.setVersion("test-version");
         presentationSectionPage.clickSave();
         // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
-        assertEquals("test-version", presentationSectionPage.getVersion());
+        assertEquals("test-version", presentationSectionPage.getFooterVersion());
     }
 
     private static PresentationAdministrationSectionPage gotoPresentationAdministration()

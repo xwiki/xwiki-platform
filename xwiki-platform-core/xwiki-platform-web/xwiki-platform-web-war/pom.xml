@@ -136,6 +136,9 @@
             </goals>
             <configuration>
               <excludes>
+                <!-- Closure Compiler fails to minify scripts with dynamic imports.
+                  See https://github.com/google/closure-compiler/issues/4126 -->
+                <exclude>**/es-module.js</exclude>
                 <!-- See the next execution for the reason we exclude these files. -->
                 <exclude>**/panelWizard.js</exclude>
               </excludes>

@@ -834,14 +834,14 @@ $fn
 <div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)">
-<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>
+<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$escapetool.xml($title)</h2>
 <div class="xwikipanelcontents">
 #else
 (% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)"
 %)(((
-{{html}}<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>{{/html}}
+{{html}}<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$escapetool.xml($title)</h2>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
@@ -2423,6 +2423,15 @@ $displayName##
  *        'cssClass' : specific css class for this menu
  *#
 #macro(verticalNavigation $menu $options)
+#set ($currentSyntax = $options.syntax)
+#if ("$!currentSyntax" == '')
+  #set ($currentSyntax = $doc.syntax)
+#end
+#if ("$!currentSyntax" == '')
+  #set ($currentSyntax = 'XWiki/2.1')
+#end
+#set ($options.syntax = $currentSyntax)
+#set ($escapedClass = $services.rendering.escape($options.cssClass, $options.syntax))
 (% class="vertical-menu $!{options.cssClass}" %)(((
   #foreach ($item in $menu)
     #verticalNavigationItem($item '*' $options)
@@ -2470,7 +2479,10 @@ $displayName##
   #if ($name == '')
     #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
-  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  #set ($escapedId = $services.rendering.escape(${item.id}, $options.syntax))
+  #set ($escapedUrl = $escapetool.xml(${item.url}))
+  #set ($escapedClass = $services.rendering.escape($class, $options.syntax))
+  $level (% id="vertical-menu-${escapedId}" class="${escapedClass}" %){{html}}<a #if ("$!{item.url}" != '')href="$escapedUrl"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
@@ -3289,4 +3301,23 @@ Recursive title display detected!##
  *#
 #macro (unwrapXPropertyDisplay $displayOutput)
 $!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')##
+#end
+
+#**
+ * A helper to insert a wiki translation macro with parameters provider by script variable.
+ *
+ * @since 17.10.10
+ * @since 18.4.1
+ * @since 18.5.0RC1
+ *#
+#macro(wikiTranslation $txkey $txparameters)
+#if ($txparameters)
+## Generate a unique variable name to store the translation parameters to avoid any conflict with other translation macro calls.
+#set ($_cleantxKey = $txkey.replaceAll('[^a-zA-Z0-9-_]', ''))
+#set ($_translationParametersVariableName = "txparams_${_cleantxKey}_${util.generateRandomString(5)}")
+#setVariable($_translationParametersVariableName $txparameters)##
+{{translation key="$txkey" scriptParameters="$_translationParametersVariableName"/}}##
+#else
+{{translation key="$txkey"/}}##
+#end
 #end

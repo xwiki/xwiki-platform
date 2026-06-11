@@ -1,16 +1,44 @@
 {
   "mcpServers": {
+    "discourse": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@discourse/mcp@latest",
+        "--site",
+        "https://forum.xwiki.org"
+      ]
+    },
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "https://jira.xwiki.org",
+        "JIRA_USERNAME": "${JIRA_USER}",
+        "JIRA_API_TOKEN": "${JIRA_TOKEN}"
+      }
+    },
     "sonarqube": {
       "command": "docker",
       "args": [
-        "run", "-i", "--rm", "--pull=always",
-        "-e", "SONARQUBE_URL",
-        "-e", "SONARQUBE_TOKEN",
-        "-e", "SONARQUBE_ORG",
-        "-e", "SONARQUBE_PROJECT_KEY",
-        "-e", "SONARQUBE_TOOLSETS",
-        "-e", "SONARQUBE_ADVANCED_ANALYSIS_ENABLED",
-        "-v", "${PWD}:/app/mcp-workspace:rw",
+        "run",
+        "-i",
+        "--rm",
+        "--pull=always",
+        "-e",
+        "SONARQUBE_URL",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "-e",
+        "SONARQUBE_ORG",
+        "-e",
+        "SONARQUBE_PROJECT_KEY",
+        "-e",
+        "SONARQUBE_TOOLSETS",
+        "-e",
+        "SONARQUBE_ADVANCED_ANALYSIS_ENABLED",
+        "-v",
+        "${PWD}:/app/mcp-workspace:rw",
         "mcp/sonarqube"
       ],
       "env": {

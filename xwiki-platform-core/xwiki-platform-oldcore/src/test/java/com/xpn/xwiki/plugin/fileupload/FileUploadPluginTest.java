@@ -92,6 +92,7 @@ class FileUploadPluginTest
         when(this.context.getRequest()).thenReturn(this.request);
         when(this.request.getParts()).thenReturn(List.of(this.part0));
         when(this.part0.getName()).thenReturn(FILE_FIELD_NAME + "_aaa");
+        when(this.part0.getSubmittedFileName()).thenReturn("file.png");
     }
 
     @Test

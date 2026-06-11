@@ -633,7 +633,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      * @param context the XWiki context
      * @throws SchedulerPluginException when failing to reschedule the job
      * @since 18.5.0RC1
-     * @since 17.10.9
+     * @since 18.4.1
+     * @since 17.10.10
      */
     public void reloadJob(BaseObject jobObject, XWikiContext context) throws SchedulerPluginException
     {
@@ -653,6 +654,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
             // Replace the job in the scheduler (it is dormant)
             try {
+                // #addJob apparently does not remove the triggers associated to the existing job, even with replace=true
+                getScheduler().deleteJob(job.getKey());
                 getScheduler().addJob(job, true);
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,

@@ -216,39 +216,43 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         try {
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                String elementName = xmlReader.getLocalName();
-
-                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
-
-                if (parameter != null) {
-                    Object wsValue = convert(parameter.type, xmlReader.getElementText());
-                    if (wsValue != null) {
-                        wikiAttachmentSource.parameters.put(parameter.name, wsValue);
-                    }
-                } else {
-                    if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
-                        wikiAttachmentSource.name = xmlReader.getElementText();
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
-                        wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
-                        readContent(xmlReader, wikiAttachmentSource);
-                    } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
-                        // Skip revisions if history is disabled
-                        if (properties.isWithHistory()) {
-                            readRevisions(xmlReader, wikiAttachmentSource);
-                        } else {
-                            StAXUtils.skipElement(xmlReader);
-                        }
-                    } else {
-                        unknownElement(xmlReader);
-                    }
-                }
+                readAttachmentElement(xmlReader, properties, wikiAttachmentSource);
             }
 
             return wikiAttachmentSource;
         } catch (Exception e) {
             IOUtils.closeQuietly(wikiAttachmentSource);
             throw e;
+        }
+    }
+
+    private void readAttachmentElement(XMLStreamReader xmlReader, XARInputProperties properties,
+        WikiAttachmentInputSource wikiAttachmentSource) throws XMLStreamException, FilterException
+    {
+        String elementName = xmlReader.getLocalName();
+
+        EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+
+        if (parameter != null) {
+            Object wsValue = convert(parameter.type, xmlReader.getElementText());
+            if (wsValue != null) {
+                wikiAttachmentSource.parameters.put(parameter.name, wsValue);
+            }
+        } else if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
+            wikiAttachmentSource.name = xmlReader.getElementText();
+        } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+            wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
+        } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+            readContent(xmlReader, wikiAttachmentSource);
+        } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
+            // Skip revisions if history is disabled
+            if (properties.isWithHistory()) {
+                readRevisions(xmlReader, wikiAttachmentSource);
+            } else {
+                StAXUtils.skipElement(xmlReader);
+            }
+        } else {
+            unknownElement(xmlReader);
         }
     }
 

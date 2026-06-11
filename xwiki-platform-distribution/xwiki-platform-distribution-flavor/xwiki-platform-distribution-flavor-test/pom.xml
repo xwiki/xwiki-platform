@@ -135,7 +135,7 @@
           <dependencies>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-instance</artifactId>
+              <artifactId>xwiki-platform-instance-api</artifactId>
               <version>${project.version}</version>
               <scope>runtime</scope>
             </dependency>
@@ -494,6 +494,12 @@
       <properties>
         <browser>*custom ${browserPath}</browser>
       </properties>
+    </profile>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-distribution-flavor-test-docker</module>
+      </modules>
     </profile>
   </profiles>
   <modules>

@@ -69,7 +69,7 @@
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-macro-include:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-store:*:jar:*</exclude>
-                    <exclude>org.xwiki.platform:xwiki-platform-instance:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-instance-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-mail-send-storage:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-filters-api:*:jar:*</exclude>
@@ -151,7 +151,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-instance</artifactId>
+          <artifactId>xwiki-platform-instance-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>

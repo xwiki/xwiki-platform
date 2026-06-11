@@ -74,7 +74,7 @@ class DocumentsDeletingListenerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeComponent
-    void setUp(MockitoComponentManager mockitoComponentManager) throws Exception
+    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         this.repository = mock(XarInstalledExtensionRepository.class);
         mockitoComponentManager.registerComponent(InstalledExtensionRepository.class, "xar", this.repository);

@@ -50,7 +50,7 @@ XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Si la case n'est pas 
 XWiki.Extension.Security.Code.ConfigClass_scanDelay=Délai d'analyse
 XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Nombre d'heures d'attente entre deux analyses de sécurité (par défaut : 24h)
 XWiki.Extension.Security.Code.ConfigClass_scanURL=URL du scan
-XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=L'URL à utiliser comme source distante pour l'analyse de sécurité (valeur par défaut : https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=L'URL à utiliser comme source distante pour l'analyse de sécurité (valeur par défaut : https://api.osv.dev/v1/query)
 XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=URL des revues de sécurité
 XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=L'URL à utiliser comme source distante des scans de sécurité commentés (valeur par défaut : https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>

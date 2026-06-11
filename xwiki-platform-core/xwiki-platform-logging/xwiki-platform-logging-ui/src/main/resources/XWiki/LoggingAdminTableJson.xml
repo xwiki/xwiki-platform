@@ -144,7 +144,7 @@
       "actions" : "${escapetool.javascript("&lt;form action='' method='post'&gt;
         &lt;fieldset&gt;
           &lt;input name='logger_name' value='$logger.key' type='hidden'/&gt;
-          &lt;select name='logger_level'&gt;
+          &lt;select name='logger_level' aria-label='${escapetool.xml($services.localization.render('logging.admin.livetable.actions.select.hint', $logger.key))}'&gt;
             #if ($loggLevelName != 'TRACE')
               &lt;option label='TRACE' value='TRACE'&gt;TRACE&lt;/option&gt;
             #end

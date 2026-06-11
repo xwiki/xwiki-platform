@@ -38,7 +38,8 @@
   <hidden>true</hidden>
   <content>logging.admin.unsetLevel.success=Logger "{0}" level has been unset.
 logging.admin.setLevel.success=Logger "{0}" level has been set to "{1}".
-logging.admin.setLevel.error=Failed to set log level: the logger "{0}" doesn't exist.</content>
+logging.admin.setLevel.error=Failed to set log level: the logger "{0}" doesn't exist.
+logging.admin.livetable.actions.select.hint=Action for the "{0}" logger.</content>
   <object>
     <name>XWiki.Logging.Code.Translations</name>
     <number>0</number>

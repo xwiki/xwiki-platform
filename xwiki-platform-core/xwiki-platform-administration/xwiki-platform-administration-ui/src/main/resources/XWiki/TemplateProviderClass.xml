@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.7" reference="XWiki.TemplateProviderClass" locale="">
+<xwikidoc version="1.6" reference="XWiki.TemplateProviderClass" locale="">
   <web>XWiki</web>
   <name>TemplateProviderClass</name>
   <language/>
@@ -296,7 +296,7 @@
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
-    <property type="String">
+    <property>
       <sheet>XWiki.TemplateProviderSheet</sheet>
     </property>
   </object>
@@ -340,7 +340,7 @@
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </sheet>
     </class>
-    <property type="String">
+    <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>

@@ -1976,7 +1976,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
+     * Retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -2007,7 +2007,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an entity in any mode, optionally adding a query string The URL is generated
+     * Retrieve the URL of an entity in any mode, optionally adding a query string The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
@@ -2027,7 +2027,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
+     * Retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -2043,7 +2043,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in any mode. The URL is generated differently depending on the
+     * Retrieve the URL of a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
      * is important to always use the URL functions to generate URL and never hardcode URLs.
@@ -2059,7 +2059,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
+     * Retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
@@ -2078,7 +2078,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
+     * Retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
@@ -2098,7 +2098,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of a Wiki Document in any mode, optionally adding an anchor. The URL is generated
+     * Retrieve the URL of a Wiki Document in any mode, optionally adding an anchor. The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
@@ -2118,7 +2118,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a viewable referer text for a referer Referers are URL where users have clicked on a link to an
+     * Retrieve a viewable referer text for a referer Referers are URL where users have clicked on a link to an
      * XWiki page Search engine referer URLs are transformed to a nicer view (Google: search query string) For other URL
      * the http:// part is stripped
      *
@@ -2135,7 +2135,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a viewable referer text for a referer with a maximum length Referers are URL where users have
+     * Retrieve a viewable referer text for a referer with a maximum length Referers are URL where users have
      * clicked on a link to an XWiki page Search engine referer URLs are transformed to a nicer view (Google: search
      * query string) For other URL the http:// part is stripped
      *
@@ -2153,10 +2153,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Generate and return an unescaped user display name.
-     *
+     * @return an unescaped user display name.
      * @param userReference the user reference
-     * @return the unescaped display user name
      * @since 6.4RC1
      */
     public String getPlainUserName(DocumentReference userReference)
@@ -2165,11 +2163,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
-     * will link to the page on the wiki where the user is registered
-     *
+     * @return an HTML-encoded link to the user profile of the given user.
+     *         The link's text is the first and last name of the user.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getUserName(String user)
     {
@@ -2177,13 +2173,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
-     * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
-     *
+     * @return an HTML-encoded link to the user profile of the given user.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param format formatting to be used ("$first_name $last_name", "$first_name")
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param format the format to use for the text (e.g. "$first_name $last_name", "$first_name").
+     *               Available variables: $first_name $last_name $email $city
      */
     public String getUserName(String user, String format)
     {
@@ -2191,11 +2184,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
-     * will link to the page on the local wiki even if the user is registered on a different wiki.
+     * @return an HTML-encoded link to the user profile of the given user.
+     *         The link's text is the first and last name of the user.
+     *         The user will be fetched in the local wiki.
+     *         The link will point to the local wiki even if the user is registered in another wiki.
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getLocalUserName(String user)
     {
@@ -2207,14 +2201,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city)
-     *
+     * @return an HTML-encoded link to the user profile of the given user.
+     *         The user will be fetched in the local wiki.
+     *         The link will point to the local wiki even if the user is registered in another wiki.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param format formatting to be used ("$first_name $last_name", "$first_name")
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param format the format to use for the text (e.g. "$first_name $last_name", "$first_name").
+     *               Available variables: $first_name $last_name $email $city
      */
     public String getLocalUserName(String user, String format)
     {
@@ -2226,13 +2218,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the wiki where the user was registered.
-     *
+     * @return the HTML-encoded first and last name of the user.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param link false to not add an HTML link to the user profile
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param link Whether the text should be an HTML link to the user profile page.
+     *             If false, the output is still XML-escaped.
      */
     public String getUserName(String user, boolean link)
     {
@@ -2240,15 +2229,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
-     * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered. The formating is done using the format parameter which can contain velocity scripting and access all
-     * properties of the User profile using variables ($first_name $last_name $email $city)
-     *
+     * @return an HTML-encoded user name following the given format.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param format formatting to be used ("$first_name $last_name", "$first_name")
-     * @param link false to not add an HTML link to the user profile
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param format the format to use for the text (e.g. "$first_name $last_name", "$first_name").
+     *               Available variables: $first_name $last_name $email $city
+     * @param link Whether the text should be an HTML link to the user profile page.
+     *             If false, the output is still XML-escaped.
      */
     public String getUserName(String user, String format, boolean link)
     {
@@ -2256,13 +2242,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with the first name and last name of the user. With the link param
-     * set to false it will not link to the user page. With the link param set to true, the link will link to the page
-     * on the local wiki even if the user is registered on a different wiki.
-     *
+     * @return the HTML-encoded first and last name of the user. The user will be fetched in the local wiki.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param link false to not add an HTML link to the user profile
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param link Whether the text should be an HTML link to the user profile page.
+     *             The link will point to the local wiki even if the user is registered in another wiki.
+     *             If false, the output is still XML-escaped.
      */
     public String getLocalUserName(String user, boolean link)
     {
@@ -2274,15 +2258,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view. The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
-     *
+     * @return an HTML-encoded name of the user following the given format. The user will be fetched in the local wiki.
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
-     * @param format formatting to be used ("$first_name $last_name", "$first_name")
-     * @param link false to not add an HTML link to the user profile
-     * @return The first name and last name fields surrounded with a link to the user page
+     * @param format the format to use for the text (e.g. "$first_name $last_name", "$first_name").
+     *               Available variables: $first_name $last_name $email $city
+     * @param link Whether the text should be an HTML link to the user profile page.
+     *             The link will point to the local wiki even if the user is registered in another wiki.
+     *             If false, the output is still XML-escaped.
      */
     public String getLocalUserName(String user, String format, boolean link)
     {
@@ -2304,10 +2286,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Retrieve a user from its document reference.
-     *
-     * @param userReference the reference of the user.
      * @return the user corresponding to the reference.
+     * @param userReference the reference of the user.
      * @since 11.8RC1
      */
     public User getUser(DocumentReference userReference)
@@ -2353,7 +2333,7 @@ public class XWiki extends Api
 
     /**
      * Returns a plugin from the plugin API. Plugin Rights can be verified. Note that although this API is a duplicate
-     * of {@link #getPlugin(String)} it used to provide an easy access from Velocity to XWiki plugins. Indeed Velocity
+     * of {@link #getPlugin(String)} it used to provide easy access from Velocity to XWiki plugins. Indeed, Velocity
      * has a feature in that if a class has a get method, using the dot notation will automatically call the get method
      * for the class. See http://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#propertylookuprules.
      * This this allows the following constructs: <code>$xwiki.pluginName.somePluginMethod()</code>

@@ -29,14 +29,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.internal.event.XClassUpdatedEvent;
-import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
@@ -107,19 +103,20 @@ public class XClassMigratorListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof XClassUpdatedEvent xClassUpdatedEvent) {
-            Collection<PropertyInterface[]> updatedProperties = xClassUpdatedEvent.getUpdatedProperties();
+        if (event instanceof XClassUpdatedEvent ev) {
+            Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties = ev.getUpdatedProperties();
             List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
-            for (PropertyInterface[] p : updatedProperties) {
-                if (p.length == 2
-                    && (p[0] instanceof PropertyClass || p[0] == null)
-                    && (p[1] instanceof PropertyClass || p[1] == null)
+            for (Pair<PropertyInterface, PropertyInterface> p : updatedProperties) {
+                PropertyInterface oldProp = p.getLeft();
+                PropertyInterface newProp = p.getRight();
+                if ((oldProp instanceof PropertyClass || oldProp == null)
+                        &&  (newProp instanceof PropertyClass || newProp == null)
                 ) {
-                    maybeAddPropertyToUpdate((PropertyClass) p[1], (PropertyClass) p[0], propertiesToUpdate);
+                    maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
                 }
             }
 
-            updateProperties(xClassUpdatedEvent.getReference(), propertiesToUpdate);
+            updateProperties(ev.getReference(), propertiesToUpdate);
         }
     }
 
@@ -157,14 +154,9 @@ public class XClassMigratorListener extends AbstractEventListener
 
         // Get all the documents containing at least one object of the modified class
         List<String> documents;
-        XWikiContext context = xcontextProvider.get();
-        XWiki wiki = context.getWiki();
         String className = this.localSerializer.serialize(classReference);
         String wikiName = classReference.getWikiReference().getName();
         this.logger.info("Migrating objects in the [{}] wiki after the update of the [{}] class", wikiName, className);
-        String currentWikiId = context.getWikiId();
-        // Switch to class wiki to be safer
-        context.setWikiId(wikiName);
         try {
             Query query = this.queryManager.createQuery(
                     "select distinct obj.name from BaseObject as obj where obj.className = :className", Query.HQL);
@@ -177,8 +169,25 @@ public class XClassMigratorListener extends AbstractEventListener
             } else {
                 this.logger.info("[{}] documents will be migrated in the [{}] wiki after the [{}] class update",
                         documents.size(), wikiName, className);
+                migrateDocuments(documents, propertiesToUpdate, classReference);
+                this.logger.info("Migration of the [{}] class finished in the [{}] wiki", className, wikiName);
             }
+        } catch (QueryException e) {
+            this.logger.error("Failed to get the documents to migrate after the update of class [{}] in the [{}] wiki",
+                    className, wikiName, e);
+        }
+    }
 
+    private void migrateDocuments(List<String> documents, List<PropertyToUpdate> propertiesToUpdate,
+            DocumentReference classReference)
+    {
+        XWikiContext context = xcontextProvider.get();
+        XWiki wiki = context.getWiki();
+        String currentWikiId = context.getWikiId();
+        String className = this.localSerializer.serialize(classReference);
+        try {
+            // Switch to class wiki to be safer
+            context.setWikiId(classReference.getWikiReference().getName());
             for (String documentName : documents) {
                 try {
                     DocumentReference ref = this.resolver.resolve(documentName, classReference);
@@ -193,10 +202,6 @@ public class XClassMigratorListener extends AbstractEventListener
                             documentName, className, e);
                 }
             }
-            this.logger.info("Migration of the [{}] class finished in the [{}] wiki", className, wikiName);
-        } catch (QueryException e) {
-            this.logger.error("Failed to get the documents to migrate after the update of class [{}] in the [{}] wiki",
-                    className, wiki, e);
         } finally {
             // Restore context wiki
             context.setWikiId(currentWikiId);

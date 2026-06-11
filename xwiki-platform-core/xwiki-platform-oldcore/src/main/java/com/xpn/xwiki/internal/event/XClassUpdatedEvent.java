@@ -20,19 +20,28 @@
 package com.xpn.xwiki.internal.event;
 
 import com.xpn.xwiki.objects.PropertyInterface;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Class updated entity event. The entity is the class reference.
+ * <p>
+ * The following parameters get sent:
+ * </p>
+ * <ul>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance from which you can get the "original" document
+ * (the version before all the modifications)</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * @since 18.5.0
  * @version $Id$
  */
 public class XClassUpdatedEvent extends AbstractEntityEvent
 {
-    private final Collection<PropertyInterface[]> updatedProperties;
+    private final Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties;
 
     /**
      * Default constructor. Matches any {@link XClassUpdatedEvent}.
@@ -47,7 +56,8 @@ public class XClassUpdatedEvent extends AbstractEntityEvent
      * @param updatedProperties the pairs of [old, new] property updates.
      *                          old is null for new properties and new is null for removed properties
      */
-    public XClassUpdatedEvent(DocumentReference classReference, Collection<PropertyInterface[]> updatedProperties)
+    public XClassUpdatedEvent(DocumentReference classReference,
+            Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties)
     {
         super(classReference);
         this.updatedProperties = updatedProperties;
@@ -63,8 +73,25 @@ public class XClassUpdatedEvent extends AbstractEntityEvent
      * @return the pairs of [old, new] property updates.
      *         old is null for new properties and new is null for removed properties
      */
-    public Collection<PropertyInterface[]> getUpdatedProperties()
+    public Collection<Pair<PropertyInterface, PropertyInterface>> getUpdatedProperties()
     {
         return this.updatedProperties;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (super.equals(obj)) {
+            return true;
+        }
+
+        return getClass() == obj.getClass()
+                && Objects.equals(this.updatedProperties, ((XClassUpdatedEvent) obj).getUpdatedProperties());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return 3 * super.hashCode() + (updatedProperties == null ? 0 : 5 * updatedProperties.hashCode());
     }
 }

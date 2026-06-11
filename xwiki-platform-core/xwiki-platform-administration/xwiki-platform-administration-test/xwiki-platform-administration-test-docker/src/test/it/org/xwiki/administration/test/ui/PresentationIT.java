@@ -173,7 +173,7 @@ class PresentationIT
         assertFalse(defaultVersion.isEmpty());
         presentationSectionPage.setVersion("test-version");
         presentationSectionPage.clickSave();
-        // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
+        // The page is reloaded, we can see directly on this page if the version is correctly applied.
         assertEquals("test-version", presentationSectionPage.getFooterVersion());
     }
 

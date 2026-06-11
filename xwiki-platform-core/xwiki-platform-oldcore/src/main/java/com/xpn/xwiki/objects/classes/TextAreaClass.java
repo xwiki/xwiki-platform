@@ -397,7 +397,7 @@ public class TextAreaClass extends StringClass
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
-        parameters.put("sourceDocumentReference", object.getDocumentReference());
+        parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());
         Syntax syntax = null;
         String contentType = getContentType();
 

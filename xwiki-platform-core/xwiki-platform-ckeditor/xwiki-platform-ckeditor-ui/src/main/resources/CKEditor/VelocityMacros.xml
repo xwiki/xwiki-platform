@@ -47,7 +47,7 @@
   #end
   #if ($toHTML)
     #set ($source = {
-      'documentReference': $doc.documentReference,
+      'documentReferenceWithLocale': $tdoc.documentReferenceWithLocale,
       'syntax': $sourceSyntax,
       'restricted' : $request.wysiwygRestricted
     })
@@ -95,9 +95,9 @@
   #set ($discard = $xcontext.setDisplayMode('view'))
   #set ($restricted = "$!source.restricted" == 'true')
   #if ($source.html)
-    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReferenceWithLocale, $restricted))
   #else
-    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference, $restricted))
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReferenceWithLocale, $restricted))
   #end
   #if ("$!html" == '')
     ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
@@ -158,10 +158,10 @@
   ##
   #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))
   #if (!$sourceDocumentReference)
-    #set ($sourceDocumentReference = $tdoc.documentReference)
+    #set ($sourceDocumentReference = $tdoc.documentReferenceWithLocale)
   #end
   #set ($source = {
-    'documentReference': $sourceDocumentReference,
+    'documentReferenceWithLocale': $sourceDocumentReference,
     'syntax': $syntaxId,
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
@@ -172,7 +172,7 @@
   ## they don't have edit right on. They are allowed to add the comment but they can't upload files because that
   ## requires edit right. We check if the source is in restricted mode because in some cases (such as for Change Request
   ## Application) we want to allow file upload even if the current user doesn't have edit right on the source document.
-  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReference))
+  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReferenceWithLocale))
     #set ($parameters.attributes.data-upload-disabled = 'true')
   #end
   ## We use the velocity template context to convey the startupFocus parameter to CKEditor.

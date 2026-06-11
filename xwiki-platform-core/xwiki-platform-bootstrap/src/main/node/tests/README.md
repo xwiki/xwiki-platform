@@ -6,8 +6,9 @@ Bootstrap uses [QUnit](https://api.qunitjs.com/), a powerful, easy-to-use JavaSc
 * `vendor/` contains jQuery.
 * `visual/` contains "visual" tests which are run interactively in real browsers and require manual verification by humans.
 
-To run our unit tests on a real web browser [Karma](https://karma-runner.github.io/2.0/index.html), run `grunt test-js` or you can 
-open `index.html`.
+To run the unit tests in a real (headless) web browser, run `pnpm run test:unit` (which
+drives `index.html` with [Playwright](https://playwright.dev/)); you can also open
+`index.html` directly in a browser.
 
 
 ## How do I add a new unit test?
@@ -15,7 +16,7 @@ open `index.html`.
 1. Locate and open the file dedicated to the plugin which you need to add tests to (`unit/<plugin-name>.js`).
 2. Review the [QUnit API Documentation](https://api.qunitjs.com/) and use the existing tests as references for how to structure your new tests.
 3. Write the necessary unit test(s) for the new or revised functionality.
-4. Run `grunt test-js` to see the results of your newly-added test(s).
+4. Run `pnpm run test:unit` to see the results of your newly-added test(s).
 
 **Note:** Your new unit tests should fail before your changes are applied to the plugin, and should pass after your changes are applied to the plugin.
 

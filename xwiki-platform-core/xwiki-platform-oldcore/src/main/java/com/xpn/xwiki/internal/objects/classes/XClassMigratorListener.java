@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.event.XClassUpdatedEvent;
 import com.xpn.xwiki.objects.PropertyInterface;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -53,6 +52,8 @@ import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+
+import static com.xpn.xwiki.internal.event.XClassUpdatedEvent.PropertyUpdate;
 
 /**
  * Listen to classes modifications and automatically update objects accordingly when needed.
@@ -104,19 +105,30 @@ public class XClassMigratorListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof XClassUpdatedEvent ev) {
-            Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties = ev.getUpdatedProperties();
-            List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
-            for (Pair<PropertyInterface, PropertyInterface> p : updatedProperties) {
-                PropertyInterface oldProp = p.getLeft();
-                PropertyInterface newProp = p.getRight();
-                if ((oldProp instanceof PropertyClass || oldProp == null)
-                        &&  (newProp instanceof PropertyClass || newProp == null)
-                ) {
-                    maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
+            if (data instanceof Collection<?> updatedProperties) {
+                List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
+                for (Object p : updatedProperties) {
+                    if (p instanceof PropertyUpdate(PropertyInterface oldProp, PropertyInterface newProp)) {
+                        if ((oldProp instanceof PropertyClass || oldProp == null)
+                                    && (newProp instanceof PropertyClass || newProp == null)
+                        ) {
+                            maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
+                        }
+                    } else {
+                        logger.error("Unexpected entry of type [{}], this should not happen",
+                                p == null ? null : p.getClass());
+                        return;
+                    }
                 }
-            }
 
-            updateProperties(ev.getReference(), propertiesToUpdate);
+                updateProperties(ev.getReference(), propertiesToUpdate);
+            } else {
+                logger.error("Unexpected data of type [{}], this should not happen",
+                        data == null ? null : data.getClass());
+            }
+        } else {
+            logger.error("Unexpected event of type [{}], this should not happen",
+                    event == null ? null : event.getClass());
         }
     }
 

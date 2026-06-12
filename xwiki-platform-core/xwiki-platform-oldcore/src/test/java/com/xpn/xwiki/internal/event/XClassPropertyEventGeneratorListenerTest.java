@@ -84,7 +84,7 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
-        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
 
         this.listener.onEvent(new DocumentCreatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
@@ -100,7 +100,7 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclassOrigin.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
-        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
 
         this.listener.onEvent(new DocumentDeletedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
@@ -116,7 +116,7 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
-        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
@@ -132,7 +132,7 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclassOrigin.addTextField("property", "Property", 30);
 
         final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
-        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
@@ -149,7 +149,7 @@ class XClassPropertyEventGeneratorListenerTest
         this.xclass.addTextField("property", "New Property", 30);
 
         final Event event = new XClassPropertyUpdatedEvent(this.xclassOrigin.getField("property").getReference());
-        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference(), null);
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());

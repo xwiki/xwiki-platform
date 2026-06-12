@@ -20,11 +20,8 @@
 package com.xpn.xwiki.internal.event;
 
 import com.xpn.xwiki.objects.PropertyInterface;
-import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.model.reference.DocumentReference;
 
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Class updated entity event. The entity is the class reference.
@@ -34,64 +31,38 @@ import java.util.Objects;
  * <ul>
  * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance from which you can get the "original" document
  * (the version before all the modifications)</li>
- * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * <li>data: the collection of property updates ({@code Collection<PropertyUpdate>})</li>
  * </ul>
  * @since 18.5.0
  * @version $Id$
  */
 public class XClassUpdatedEvent extends AbstractEntityEvent
 {
-    private final Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties;
+    /**
+     * @param oldProperty the property before the document update, null if the document is new
+     * @param newProperty the property after the document update, null if it was removed
+     */
+    public record PropertyUpdate(PropertyInterface oldProperty, PropertyInterface newProperty) { }
 
     /**
      * Default constructor. Matches any {@link XClassUpdatedEvent}.
      */
     public XClassUpdatedEvent()
     {
-        updatedProperties = null;
+        // Nothing to do
     }
 
     /**
      * @param classReference the class reference
-     * @param updatedProperties the pairs of [old, new] property updates.
-     *                          old is null for new properties and new is null for removed properties
      */
-    public XClassUpdatedEvent(DocumentReference classReference,
-            Collection<Pair<PropertyInterface, PropertyInterface>> updatedProperties)
+    public XClassUpdatedEvent(DocumentReference classReference)
     {
         super(classReference);
-        this.updatedProperties = updatedProperties;
     }
 
     @Override
     public DocumentReference getReference()
     {
         return (DocumentReference) super.getReference();
-    }
-
-    /**
-     * @return the pairs of [old, new] property updates.
-     *         old is null for new properties and new is null for removed properties
-     */
-    public Collection<Pair<PropertyInterface, PropertyInterface>> getUpdatedProperties()
-    {
-        return this.updatedProperties;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (super.equals(obj)) {
-            return true;
-        }
-
-        return getClass() == obj.getClass()
-                && Objects.equals(this.updatedProperties, ((XClassUpdatedEvent) obj).getUpdatedProperties());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return 3 * super.hashCode() + (updatedProperties == null ? 0 : 5 * updatedProperties.hashCode());
     }
 }

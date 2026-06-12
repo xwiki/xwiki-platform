@@ -171,11 +171,13 @@ class PresentationIT
     }
 
     @Test
-    void customizeVersion(TestUtils setup, TestReference testReference) {
+    void customizeVersion(TestUtils setup, TestReference testReference) throws Exception
+    {
         PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
         String defaultVersion = presentationSectionPage.getFooterVersion();
         // The default version should contain the xwiki-platform project version.
-        assertFalse(defaultVersion.isEmpty());
+        String version = setup.getVersion();
+        assertTrue(defaultVersion.contains(version));
         presentationSectionPage.setVersion("test-version");
         presentationSectionPage.clickSave();
         // The page is reloaded, we can see directly on this page if the version is correctly applied.

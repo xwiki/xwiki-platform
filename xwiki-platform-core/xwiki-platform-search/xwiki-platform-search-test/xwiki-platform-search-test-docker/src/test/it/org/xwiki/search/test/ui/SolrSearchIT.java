@@ -199,9 +199,9 @@ class SolrSearchIT
     }
 
     /**
-     * Verifies the "Delete from index", "Add to index" and "Reindex" administration actions, covering the
-     * corresponding manual tests. The three actions are tested together in a single flow (delete, then add to index,
-     * then reindex) so that the test restores the index state for the other tests running on the same instance.
+     * Verifies the "Delete from index", "Add to index" and "Reindex" administration actions. The three actions are
+     * tested together in a single flow (delete, then add to index, then reindex) so that the test restores the index
+     * state for the other tests running on the same instance.
      */
     @Test
     @Order(5)

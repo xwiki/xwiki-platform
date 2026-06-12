@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -45,6 +46,7 @@ import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,6 +75,7 @@ class SolrSearchIT
     private static final String GET_ACTION = "get";
 
     @Test
+    @Order(1)
     void verifySpaceFaucetEscaping(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -90,6 +93,7 @@ class SolrSearchIT
 
     @ParameterizedTest
     @ValueSource(strings = { "de_DE", "fr_FR", "fr_BE" })
+    @Order(2)
     void verifySearchInLocale(String locale, TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -130,6 +134,7 @@ class SolrSearchIT
     }
 
     @Test
+    @Order(3)
     void searchLimit(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -161,6 +166,7 @@ class SolrSearchIT
     }
 
     @Test
+    @Order(4)
     void suggestService(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference)
         throws Exception
     {
@@ -192,7 +198,64 @@ class SolrSearchIT
         assertThat(pageSource, containsString(formattedExpectedError));
     }
 
+    /**
+     * Verifies the "Delete from index" and "Reindex" administration actions, covering the corresponding manual tests.
+     * The two actions are tested together (delete, then reindex) so that the test restores the index state for the
+     * other tests running on the same instance.
+     */
     @Test
+    @Order(5)
+    void deleteFromIndexAndReindex(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String matchedWord = "antidisestablishmentarianism";
+        String pageTitle = "Delete Reindex Test";
+        DocumentReference pageReference = new DocumentReference("WebHome",
+            new SpaceReference("DeleteReindex", testReference.getLastSpaceReference()));
+        setup.rest().savePage(pageReference, matchedWord, pageTitle);
+
+        SolrTestUtils solrUtils = new SolrTestUtils(setup);
+        solrUtils.waitEmptyQueue();
+
+        // The page is initially indexed and thus found by the search.
+        SolrSearchPage searchPage = SolrSearchPage.gotoPage().search(matchedWord);
+        assertThat("The page should be found before deleting it from the index.",
+            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(), hasItem(pageTitle));
+
+        // Delete the entire farm from the index (Administer Wiki > Search > Search > Delete from index > Entire farm).
+        SearchAdministrationPage adminPage = SearchAdministrationPage.gotoPage();
+        adminPage.getIndexingActionField().selectByValue("delete");
+        adminPage.getIndexingWikiField().selectByValue("");
+        adminPage.submitIndexingAction();
+        assertThat(adminPage.getActionResultMessage(), containsString("Delete successfully triggered"));
+
+        solrUtils.waitEmptyQueue();
+        // Once the deletion is done the queue size displayed in the administration section is 0.
+        assertEquals(0, SearchAdministrationPage.gotoPage().getQueueSize());
+
+        // The page is no longer found by the search.
+        searchPage = SolrSearchPage.gotoPage().search(matchedWord);
+        assertTrue(searchPage.getSearchResults().isEmpty(),
+            "The page should not be found after deleting it from the index.");
+
+        // Reindex the entire farm (Administer Wiki > Search > Search > Reindex > Entire farm).
+        adminPage = SearchAdministrationPage.gotoPage();
+        adminPage.getIndexingActionField().selectByValue("reindex");
+        adminPage.getIndexingWikiField().selectByValue("");
+        adminPage.submitIndexingAction();
+        assertThat(adminPage.getActionResultMessage(), containsString("Reindex successfully triggered"));
+
+        solrUtils.waitEmptyQueue();
+
+        // The page is found again after reindexing.
+        searchPage = SolrSearchPage.gotoPage().search(matchedWord);
+        assertThat("The page should be found again after reindexing.",
+            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(), hasItem(pageTitle));
+    }
+
+    @Test
+    @Order(6)
     void searchExclusions(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();

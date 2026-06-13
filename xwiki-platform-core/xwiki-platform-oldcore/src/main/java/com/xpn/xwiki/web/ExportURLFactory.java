@@ -504,18 +504,35 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     /**
-     * Generate an url targeting attachment in provided wiki page.
+     * Generates a relative {@code file://} URL referencing an attachment within an export, ensuring the attachment's
+     * content is available at that location so the exported content can be used offline.
+     * <p>
+     * {@link ExportURLFactory} produces {@code file://} URLs so that exported content — a self-contained copy of wiki
+     * pages usable without a running XWiki server, as needed for example by the HTML export — can resolve its
+     * resources locally. For a given attachment, this returns a URL relative to the export directory and makes the
+     * attachment's content available there. The URL is relative so that it remains valid even when used from within an
+     * exported CSS file.
+     * <p>
+     * If the attachment does not exist, no content is exported but a URL is still returned. This supports callers that
+     * build an attachment URL regardless of whether the attachment exists (for example the Color Theme Sheet, which
+     * uses {@code $xwiki.getAttachmentURL($doc.fullName, '__tochange__')}), as well as links to missing attachments,
+     * which correctly become broken links in the export.
+     * <p>
+     * Example: for an attachment named {@code logo.png} on page {@code Main.WebHome} of wiki {@code xwiki}, this
+     * returns a relative URL of the form {@code file://attachment/xwiki/Main/WebHome/logo.png}.
      *
-     * @param filename the name of the attachment.
-     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
-     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
-     * @param name the name of the page containing the attachment.
-     * @param xwikidb the wiki of the page containing the attachment.
-     * @param context the XWiki context.
-     * @return the generated url.
-     * @throws XWikiException error when retrieving document attachment.
-     * @throws IOException error when retrieving document attachment.
-     * @throws URISyntaxException when retrieving document attachment.
+     * @param filename the name of the attachment (e.g. {@code "logo.png"})
+     * @param spaces a serialized space reference which can contain one or several nested spaces (e.g.
+     *        {@code "space1.space2"}); if a space name contains a dot ({@code "."}) it must be passed escaped, as in
+     *        {@code "space1\.with\.dot.space2"}
+     * @param name the name of the page holding the attachment
+     * @param xwikidb the identifier of the wiki holding the page, or {@code null} to use the current wiki from the
+     *        context
+     * @param context the XWiki context
+     * @return a relative {@code file://} URL referencing the attachment within the export directory
+     * @throws XWikiException if the document holding the attachment cannot be loaded
+     * @throws IOException if the attachment's content cannot be written to the export directory
+     * @throws URISyntaxException if a valid relative URL cannot be computed for the exported attachment
      */
     private URL createAttachmentURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
         throws XWikiException, IOException, URISyntaxException

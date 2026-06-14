@@ -31,8 +31,17 @@ import java.net.URL;
 @Deprecated(since = "3.5M1")
 public interface ApplicationContext
 {
+    /**
+     * @param resourceName the name of the resource to load
+     * @return the content of the resource as a stream, or {@code null} if the resource does not exist
+     */
     InputStream getResourceAsStream(String resourceName);
 
+    /**
+     * @param resourceName the name of the resource to locate
+     * @return the URL of the resource, or {@code null} if the resource does not exist
+     * @throws MalformedURLException if the resource name cannot be converted into a valid URL
+     */
     URL getResource(String resourceName) throws MalformedURLException;
 
     /**

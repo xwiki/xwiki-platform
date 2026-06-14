@@ -38,8 +38,6 @@
      <!-- only used in 6.2M1 -->
      org.xwiki.platform:xwiki-platform-less-css-default
      </xwiki.extension.features>
-    <!-- There is a bug on the RedundantThrows detector on the file CustomLESSSource.java -->
-     <checkstyle.excludes>**/CustomLESSSource.java</checkstyle.excludes>
   </properties>
   <dependencies>
     <dependency>

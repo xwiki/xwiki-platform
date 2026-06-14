@@ -59,6 +59,9 @@ public class InstanceOutputFilterStreamFactory extends
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
+    /**
+     * Default constructor.
+     */
     public InstanceOutputFilterStreamFactory()
     {
         super(FilterStreamType.XWIKI_INSTANCE);

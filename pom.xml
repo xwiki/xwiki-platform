@@ -88,12 +88,6 @@
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
 
-    <!-- Check that tests don't generate any file outside of the "target" directory (so that "mvn clean" removes them
-         and no file leaks outside the build workspace). This controls both the runtime check (the
-         CaptureWorkingDirectoryFilesExtension) and the checkstyle check (the TemporaryFileCheck "test" execution).
-         TODO: Set back to false once the platform tests that currently violate this have been fixed. -->
-    <xwiki.surefire.captureworkingdir.skip>true</xwiki.surefire.captureworkingdir.skip>
-
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
 

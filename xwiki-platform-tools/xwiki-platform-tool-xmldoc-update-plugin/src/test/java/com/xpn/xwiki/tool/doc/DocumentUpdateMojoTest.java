@@ -59,7 +59,7 @@ public class DocumentUpdateMojoTest
         XWikiDocument doc = mojo.loadFromXML(resourceFile);
         assertEquals(doc.getName(), "Install");
 
-        File outputFile = File.createTempFile("output", "xml");
+        File outputFile = this.tempFolder.newFile("output.xml");
         mojo.writeToXML(doc, outputFile);
 
         String outputContent = IOUtils.toString(new FileReader(outputFile));

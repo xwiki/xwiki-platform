@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -65,6 +66,11 @@ public class FilterIT extends AbstractTest
     // Login as superadmin to have delete rights.
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    // Generate temporary files under the module's "target" directory so that they don't leak outside the build
+    // workspace (TemporaryFolder is rooted at java.io.tmpdir, which the build redirects to "target").
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void applicationRegistration()
@@ -104,7 +110,7 @@ public class FilterIT extends AbstractTest
 
         // Set output
         page.setOutputFilter("filter+xml");
-        File tmp = File.createTempFile("result", ".xml");
+        File tmp = this.temporaryFolder.newFile("result.xml");
         page.setTarget("file:" + tmp.getAbsolutePath());
 
         // Start conversion

@@ -43,6 +43,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -225,6 +226,8 @@ class WikiEditIT
     }
 
     @Test
+    @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
+        + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24487 .")
     @Order(5)
     void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
     {

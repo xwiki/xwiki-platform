@@ -138,6 +138,23 @@
 
                  Single justification example:
             -->
+            <revapi.differences>
+              <justification>
+                The serial version UID changed because new fields needed to be added, but it shouldn't be a real
+                breakage as the SavedRequest should never be persisted.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.serialVersionUIDChanged</code>
+                  <old>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</old>
+                  <new>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</new>
+                  <oldSerialVersionUID>8779129900717599986</oldSerialVersionUID>
+                  <newSerialVersionUID>4295744004102683007</newSerialVersionUID>
+                </item>
+              </differences>
+            </revapi.differences>
             
 
             

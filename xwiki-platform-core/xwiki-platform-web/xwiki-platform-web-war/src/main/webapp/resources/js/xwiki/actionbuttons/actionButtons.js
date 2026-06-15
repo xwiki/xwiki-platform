@@ -514,29 +514,42 @@ var XWiki = (function(XWiki) {
         };
 
         var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
-        var buttonsDiv =  new Element('div');
 
-        content.insert("<p>$services.localization.render('csrf.confirmation.status')</p>" +
-          "<p>$services.localization.render('csrf.confirmation.possibleReasons.description')</p>" +
-          "<ul><li>$services.localization.render('csrf.confirmation.possibleReasons.firstReason')</li>" +
-          "<li>$services.localization.render('csrf.confirmation.possibleReasons.secondReason')</li>" +
-          "<li>$services.localization.render('csrf.confirmation.possibleReasons.thirdReason')</li></ul>" +
-          "<p class='force-underline'>" +
-          "$services.localization.render('csrf.confirmation.unsure', ['<a href=\"http://jira.xwiki.org/\">', '</a>'])" +
+        content.insert("<p class=\"main-explanation\">$services.localization.render('csrf.error.message')</p>" +
+          "<p class=\"resubmit-causes-introduction\">" +
+          "  $services.localization.render('csrf.error.causes.introduction')" +
           "</p>" +
-          "<p>$services.localization.render('csrf.confirmation.question', ['<strong>', '</strong>'])</p>");
-        content.insert(new Element('br'));
-        var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
-        buttonCreate.insert("$services.localization.render('yes')");
-        buttonsDiv.insert(buttonCreate);
-        buttonCreate.on("click", resubmit);
+          "<ul class=\"resubmit-causes\">" +
+          "  <li>$services.localization.render('csrf.error.causes.stalesession')</li>" +
+          "  <li>$services.localization.render('csrf.error.causes.forgedrequest')</li>" +
+          "</ul>");
+        if (answerJson.allowResubmit === 'true') {
+          content.insert("<div class=\"resubmit-question\">" +
+            "  $services.localization.render('csrf.error.resubmit.question')" +
+            "</div>");
 
-        buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
-        buttonCreate.insert("$services.localization.render('no')");
-        buttonsDiv.insert(buttonCreate);
-        buttonCreate.on("click", function () {
-          modal.closeDialog();
-        });
+          var buttonsDiv =  new Element('div', {'class': 'csrf-warning-buttons'});
+          var buttonCreate = new Element('button', {'class': 'resubmit-primary btn btn-primary', 'id': 'cancel-save-csrf'});
+          buttonCreate.insert("$services.localization.render('csrf.error.resubmit.question.no')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", function () {
+            modal.closeDialog();
+          });
+
+          buttonCreate = new Element('button', {'class': 'btn btn-default resubmit-secondary', 'id': 'force-save-csrf'});
+          buttonCreate.insert("$services.localization.render('csrf.error.resubmit.question.yes')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", resubmit);
+        } else {
+          content.insert("<p>$services.localization.render('csrf.confirmation.noResubmit')</p>");
+          buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
+          buttonCreate.insert("$services.localization.render('close')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", function () {
+            modal.closeDialog();
+          });
+        }
+
         content.insert(buttonsDiv);
         return content;
       };

@@ -20,7 +20,9 @@
 package org.xwiki.container.servlet.filters;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Allows to save a request and restore it later from the stored request identifier (SRID).
@@ -49,10 +52,14 @@ public final class SavedRequestManager
     public static class SavedRequest implements Serializable
     {
         /** Unique serialization identifier. */
-        private static final long serialVersionUID = 8779129900717599986L;
+        private static final long serialVersionUID = 4295744004102683007L;
 
         /** Saved request data. */
         private Map<String, String[]> parameters;
+
+        private String method;
+
+        private Map<String, List<String>> headers;
 
         /**
          * The request URL; does not include the query string. The data is reused only if the new URL matches this
@@ -70,6 +77,15 @@ public final class SavedRequestManager
         {
             this.parameters = new HashMap<>(request.getParameterMap());
             this.requestUrl = request.getRequestURL().toString();
+            this.method = request.getMethod();
+            this.headers = new HashMap<>();
+            if (request.getHeaderNames() != null) {
+                request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                    List<String> headerValues = new ArrayList<>();
+                    request.getHeaders(headerName).asIterator().forEachRemaining(headerValues::add);
+                    this.headers.put(headerName, headerValues);
+                });
+            }
         }
 
         /**
@@ -123,6 +139,30 @@ public final class SavedRequestManager
         public String getRequestUrl()
         {
             return this.requestUrl;
+        }
+
+        /**
+         * @return the original method of the request.
+         * @since 18.6.0RC1
+         * @since 17.10.10
+         * @since 18.4.3
+         */
+        @Unstable
+        public String getMethod()
+        {
+            return this.method;
+        }
+
+        /**
+         * @return the original headers of the request.
+         * @since 18.6.0RC1
+         * @since 17.10.10
+         * @since 18.4.3
+         */
+        @Unstable
+        public Map<String, List<String>> getHeaders()
+        {
+            return this.headers;
         }
     }
 

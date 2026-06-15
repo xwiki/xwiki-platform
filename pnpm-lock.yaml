@@ -37,8 +37,8 @@ catalogs:
       specifier: 1.61.0-alpha-2026-06-08
       version: 1.61.0-alpha-2026-06-08
     '@playwright/test':
-      specifier: 1.61.0-alpha-2026-06-08
-      version: 1.61.0-alpha-2026-06-08
+      specifier: 1.61.0
+      version: 1.61.0
     '@tsconfig/node24':
       specifier: 24.0.4
       version: 24.0.4
@@ -434,7 +434,7 @@ importers:
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
       '@playwright/test':
         specifier: 'catalog:'
-        version: 1.61.0-alpha-2026-06-08
+        version: 1.61.0
       cross-env:
         specifier: 'catalog:'
         version: 7.0.3
@@ -3847,8 +3847,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@playwright/test@1.61.0-alpha-2026-06-08':
-    resolution: {integrity: sha512-JgwFFggy+h/q9N/hsooZnE4Xnnqbq68e4WtAvw6kzq1kEHH2bKzSyD+6DCmOYGt9blqCcwvie9D/1ow/vu7Azg==}
+  '@playwright/test@1.61.0':
+    resolution: {integrity: sha512-cKA5B6lpFEMyMGjxF54QihfYpB4FkEGH+qZhtArDEG+wezQAJY8Pq6C7T1SjWz+FFzt3TbyoXBQYk/0292TdJA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -6343,8 +6343,18 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
+  playwright-core@1.61.0:
+    resolution: {integrity: sha512-caX7TrY3Ml6egyDX0WUcTHDxodl/b51y5wJOdCEA36QviK/s2g081hvmGs8eaE3DWb6NYZQ6BjO/QkNRPenoPA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   playwright-core@1.61.0-alpha-2026-06-08:
     resolution: {integrity: sha512-y8933sP5tXvLtv0GEX3LC1Yxnwl7++whoK/Dwze2qY4eSiFnVKaiWmlZYdtoaOgmnk9pSq97WrBsxjYkNiH4cQ==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.61.0:
+    resolution: {integrity: sha512-Z+7BeeqQPRRzklHsVFP4KTGIyMxKUmfeRA4WisM6G3/XW6nwGeX6fX9qYaDa+CiUqpOkb2f6X3nar05R3kSuJQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -8353,9 +8363,9 @@ snapshots:
       - vite
       - yaml
 
-  '@playwright/test@1.61.0-alpha-2026-06-08':
+  '@playwright/test@1.61.0':
     dependencies:
-      playwright: 1.61.0-alpha-2026-06-08
+      playwright: 1.61.0
 
   '@popperjs/core@2.11.8': {}
 
@@ -11332,7 +11342,15 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
+  playwright-core@1.61.0: {}
+
   playwright-core@1.61.0-alpha-2026-06-08: {}
+
+  playwright@1.61.0:
+    dependencies:
+      playwright-core: 1.61.0
+    optionalDependencies:
+      fsevents: 2.3.2
 
   playwright@1.61.0-alpha-2026-06-08:
     dependencies:

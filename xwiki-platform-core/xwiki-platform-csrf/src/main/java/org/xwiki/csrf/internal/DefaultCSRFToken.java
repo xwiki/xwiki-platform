@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,6 +33,9 @@ import javax.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -69,6 +73,8 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
 
     /** Resubmission template name. */
     private static final String RESUBMIT_TEMPLATE = "resubmit";
+
+    private static final String SEC_FETCH_SITE_HEADER = "Sec-Fetch-Site";
 
     /** Token storage (one token per user). */
     private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<>();
@@ -182,26 +188,78 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public String getResubmissionURL()
     {
-        String query = "resubmit=" + urlEncode(getRequestURI());
-
         // back URL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
         String backUrl = getDocumentURL(this.docBridge.getCurrentDocumentReference(), null);
-        query += "&xback=" + urlEncode(backUrl);
+        String query = "xpage=" + RESUBMIT_TEMPLATE;
+
+        if (this.isResubmitAllowedForCurrentRequest()) {
+            Pair<String, String> requestURIInfo = buildRequestURI();
+            query += "&xback=" + urlEncode(backUrl);
+            query += "&resubmit=" + urlEncode(requestURIInfo.getValue());
+            // note we don't use srid so that it doesn't trigger the SavedRequestRestorerFilter
+            query += "&sridKey=" + requestURIInfo.getKey();
+        }
 
         // redirect to the resubmission template
-        query += "&xpage=" + RESUBMIT_TEMPLATE;
         return backUrl + "?" + query;
+    }
+
+    @Override
+    public boolean isResubmitAllowedForCurrentRequest()
+    {
+        boolean result = false;
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (httpServletRequest != null) {
+            result = Strings.CI.equals("POST", httpServletRequest.getMethod())
+                && !Strings.CI.equals("cross-site", httpServletRequest.getHeader(SEC_FETCH_SITE_HEADER));
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isResubmitAllowedForRequestId(String srid)
+    {
+        boolean result = false;
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (!StringUtils.isBlank(srid) && httpServletRequest != null) {
+            Map<String, SavedRequestManager.SavedRequest> savedRequests =
+                (Map<String, SavedRequestManager.SavedRequest>) httpServletRequest.getSession()
+                    .getAttribute(SavedRequestManager.getSavedRequestKey());
+            if (savedRequests != null) {
+                return savedRequests.containsKey(srid);
+            }
+        }
+        return result;
+    }
+
+    private HttpServletRequest getHttpServletRequest()
+    {
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest servletRequest)
+        {
+            return servletRequest.getRequest();
+        }
+        return null;
+    }
+
+    private Pair<String, String> buildRequestURI()
+    {
+        String resubmitUrl = getRequest().getRequestURI();
+        // request URL is the one that performs the modification
+        String srid = SavedRequestManager.saveRequest(getRequest());
+        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
+        return Pair.of(srid, resubmitUrl);
     }
 
     @Override
     public String getRequestURI()
     {
-        // request URL is the one that performs the modification
-        String srid = SavedRequestManager.saveRequest(getRequest());
-        String resubmitUrl = getRequest().getRequestURI();
-        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
-        return resubmitUrl;
+        if (isResubmitAllowedForCurrentRequest()) {
+            return buildRequestURI().getValue();
+        } else {
+            return null;
+        }
     }
 
     /**

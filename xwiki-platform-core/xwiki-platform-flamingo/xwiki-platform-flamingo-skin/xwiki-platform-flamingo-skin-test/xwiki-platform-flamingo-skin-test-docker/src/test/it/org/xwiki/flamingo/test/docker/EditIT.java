@@ -364,6 +364,7 @@ public class EditIT
             editWiki.getPreviewButton().click();
             ResubmissionPage resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
 
             // check cancelling: it leads back to the page in view mode without any change
             resubmissionPage.cancel();
@@ -379,6 +380,7 @@ public class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and go back to editor
             resubmissionPage.resubmit();
             PreviewEditPage previewEditPage = new PreviewEditPage(editWiki);
@@ -398,6 +400,7 @@ public class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and save and continue: it should led back to the editor with the saved changes
             resubmissionPage.resubmit();
             previewEditPage = new PreviewEditPage(editWiki);
@@ -418,6 +421,7 @@ public class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and save and view
             resubmissionPage.resubmit();
             previewEditPage = new PreviewEditPage(editWiki);

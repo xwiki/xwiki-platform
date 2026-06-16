@@ -93,7 +93,7 @@ catalog:
   "@vitest/eslint-plugin": 1.6.17
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.7.0
-  "@vue/test-utils": 2.4.10
+  "@vue/test-utils": 2.4.11
   "@vue/tsconfig": 0.9.1
   axe-core: 4.11.4
   bootstrap-icons: 1.13.1

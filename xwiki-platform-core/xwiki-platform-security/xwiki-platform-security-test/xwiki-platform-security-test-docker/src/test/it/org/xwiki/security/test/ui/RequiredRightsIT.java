@@ -52,8 +52,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @UITest
+@SuppressWarnings({"checkstyle:MultipleStringLiterals", "checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS"})
 class RequiredRightsIT
 {
+    private static final String SCRIPT_RIGHT_EXPLANATION =
+        "Scripting: Allows running scripts (macros, Velocity, JavaScript, CSS, etc.)";
+
     @ParameterizedTest
     @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
     @Order(1)
@@ -70,9 +74,10 @@ class RequiredRightsIT
         ViewPage viewPage = setup.createPage(testReference, "Content");
 
         InformationPane informationPane = viewPage.openInformationDocExtraPane();
-        assertThat(informationPane.getRequiredRightsStatusMessage(), containsString("not enforcing any right"));
+        assertThat(informationPane.getRequiredRightsStatusMessage(),
+            containsString("No rights are currently enforced"));
         assertEquals(List.of(), informationPane.getRequiredRights());
-        assertEquals("Review the required rights and enforce them to increase the security of this page.",
+        assertEquals("Improve the security of this page by requiring rights.",
             informationPane.getRequiredRightsModificationMessage().orElseThrow());
         assertTrue(informationPane.canReviewRequiredRights());
         RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
@@ -84,7 +89,7 @@ class RequiredRightsIT
         assertEquals("None", requiredRights.get(0).label());
         assertEquals("enough", requiredRights.get(0).suggestionClass());
         assertEquals("Enough", requiredRights.get(0).suggestionText());
-        assertEquals("The automated analysis hasn't found any content that requires any rights.",
+        assertEquals("The analysis shows that no special rights are required for this page to work correctly.",
             requiredRights.get(0).suggestionTooltip());
         assertEquals("Script", requiredRights.get(1).label());
         assertEquals("Wiki Admin", requiredRights.get(2).label());
@@ -101,7 +106,7 @@ class RequiredRightsIT
         // Wait for the required rights information to reload.
         setup.getDriver()
             .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
-                "This page is enforcing required rights but no rights"));
+                "Required rights are enabled for this page, but none are defined"));
         assertEquals(List.of(), informationPane.getRequiredRights());
         assertFalse(informationPane.getRequiredRightsModificationMessage().isPresent());
     }
@@ -128,10 +133,10 @@ class RequiredRightsIT
         assertFalse(viewPage.hasRequiredRightsWarning(false));
         InformationPane informationPane = viewPage.openInformationDocExtraPane();
         assertThat(informationPane.getRequiredRightsStatusMessage(),
-            containsString("This page is enforcing required rights"));
+            containsString("Required rights are enabled for this page, but none are defined"));
         assertEquals(List.of(), informationPane.getRequiredRights());
         assertThat(informationPane.getRequiredRightsModificationMessage().orElseThrow(),
-            containsString("This document's content might be missing a required right"));
+            containsString("This page may need an additional right"));
         RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
         assertTrue(requiredRightsModal.isDisplayed());
         assertTrue(requiredRightsModal.isEnforceRequiredRights());
@@ -146,11 +151,12 @@ class RequiredRightsIT
         requiredRightsModal.toggleAnalysisDetails();
         assertTrue(requiredRightsModal.isAnalysisDetailsDisplayed());
         requiredRightsModal.clickSave(true);
-        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().contains("Script right"));
+        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights()
+            .contains(SCRIPT_RIGHT_EXPLANATION));
         assertThat(informationPane.getRequiredRightsStatusMessage(),
-            containsString("This page is enforcing required rights. The following"));
+            containsString("The content of this page runs with the following right"));
         assertThat(informationPane.getRequiredRightsModificationMessage().orElseThrow(),
-            containsString("This document's content might not need the configured required"));
+            containsString("This page may not need one of its configured rights"));
     }
 
     @ParameterizedTest
@@ -174,10 +180,10 @@ class RequiredRightsIT
         assertTrue(viewPage.hasRequiredRightsWarning(true));
         InformationPane informationPane = viewPage.openInformationDocExtraPane();
         assertThat(informationPane.getRequiredRightsStatusMessage(),
-            containsString("This page is enforcing required rights"));
+            containsString("Required rights are enabled for this page, but none are defined."));
         assertEquals(List.of(), informationPane.getRequiredRights());
         assertThat(informationPane.getRequiredRightsModificationMessage().orElseThrow(),
-            containsString("This document's content is missing a required right."));
+            containsString("This page is missing a right to run correctly."));
         RequiredRightsModal requiredRightsModal = viewPage.openRequiredRightsModal();
         assertTrue(requiredRightsModal.isDisplayed());
         assertTrue(requiredRightsModal.isEnforceRequiredRights());
@@ -192,9 +198,10 @@ class RequiredRightsIT
         requiredRightsModal.toggleAnalysisDetails();
         assertTrue(requiredRightsModal.isAnalysisDetailsDisplayed());
         requiredRightsModal.clickSave(true);
-        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().contains("Script right"));
+        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights()
+            .contains(SCRIPT_RIGHT_EXPLANATION));
         assertThat(informationPane.getRequiredRightsStatusMessage(),
-            containsString("This page is enforcing required rights. The following"));
+            containsString("The content of this page runs with the following right"));
         assertTrue(informationPane.getRequiredRightsModificationMessage().isEmpty());
         // The warning should disappear - wait for that to happen.
         ViewPage finalViewPage = viewPage;
@@ -230,8 +237,9 @@ class RequiredRightsIT
         String previousRight = "";
 
         Map<String, String> displayForRight =
-            Map.of("script", "Script right", "admin", "Admin right on the wiki level", "programming",
-                "Programming right");
+            Map.of("script", SCRIPT_RIGHT_EXPLANATION, "admin",
+                "Administrating the wiki: Allows making administrative changes at the wiki level.", "programming",
+                "Programming: Allows advanced scripts with full access to the wiki farm.");
 
         for (Map.Entry<String, String> entry : displayForRight.entrySet()) {
             String right = entry.getKey();
@@ -312,8 +320,9 @@ class RequiredRightsIT
         // Assert that only the empty and the script right are available.
         assertAvailableRights(requiredRightsModal, List.of("", "script"));
         requiredRightsModal.clickSave(true);
-        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().contains("Script right"));
-        assertEquals(List.of("Script right"), informationPane.getRequiredRights());
+        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights()
+            .contains(SCRIPT_RIGHT_EXPLANATION));
+        assertEquals(List.of(SCRIPT_RIGHT_EXPLANATION), informationPane.getRequiredRights());
         assertEquals("Script", viewPage.getContent());
 
         // Verify that the user without script right cannot edit the page.
@@ -437,6 +446,6 @@ class RequiredRightsIT
         requiredRightsModal.clickSave(true);
         setup.getDriver()
             .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
-                "This page is enforcing required rights but no rights"));
+                "Required rights are enabled for this page, but none are defined"));
     }
 }

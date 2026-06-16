@@ -19,7 +19,7 @@
  */
 package org.xwiki.index.tree;
 
-import jakarta.inject.Named;
+import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;

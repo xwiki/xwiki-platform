@@ -19,14 +19,16 @@
  */
 package org.xwiki.livedata.internal.solr;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -42,7 +44,6 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.WithParameters;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -50,22 +51,23 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 
 /**
- * {@link LiveDataEntryStore} implementation that runs a Solr search query and exposes the matching documents as live
+ * {@link LiveDataEntryStore} implementation backed by a Solr search query, exposing the matching documents as live
  * data entries.
  * <p>
- * The Solr query string is taken from the {@code query} source parameter (defaulting to {@code *:*}). Columns are
- * referenced through {@code doc.*} property identifiers (the same ones used by the other live data sources and the
- * default configuration), which are mapped internally to the corresponding Solr fields; callers never deal with raw
- * Solr field names. The live data column filters and the sort are translated into Solr filter queries and sort
- * clauses. View rights are enforced by the underlying {@code solr} query executor, which removes from the result the
- * documents the current user cannot see.
+ * Columns are referenced through {@code doc.*} property identifiers (the same ones used by the other live data sources
+ * and the default configuration), which are mapped internally to the corresponding Solr fields; callers never deal
+ * with raw Solr field names. The live data column filters and the sort are translated into Solr filter queries and
+ * sort clauses.
  * <p>
- * Only document entities are exposed for now ({@code type:DOCUMENT}). Support for other entity types (attachments,
- * objects) and for object properties is left for a later version.
+ * Only document entities are exposed for now. This is why the component uses the {@code documentSolrSearch} hint rather
+ * than a generic {@code solr} one: support for other entity types (attachments, objects) and for object properties is
+ * left for a later version. The source is still experimental and its parameters / behavior may change in a backward
+ * incompatible way until it is stabilized.
  *
  * @version $Id$
  * @since 18.5.0RC1
@@ -78,7 +80,7 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
     /**
      * The hint of this component implementation.
      */
-    public static final String ROLE_HINT = "solr";
+    public static final String ROLE_HINT = "documentSolrSearch";
 
     /**
      * The source parameter holding the base Solr query string.
@@ -97,15 +99,21 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
     protected static final String URL_PROPERTY = "url";
 
     /**
-     * The live data property holding the full name of the matching document. It is the {@code idProperty} of the
-     * {@code solr} source configuration, so it is always added to each entry (even when not among the requested
-     * columns) for the live data widget to be able to identify the rows.
+     * The live data property holding the unique identifier of the matching entry. Its value is the Solr document id
+     * (unique per indexed document, including across wikis and per translation), so it is used as the
+     * {@code idProperty} of this source and always added to each entry (even when not among the requested columns) for
+     * the live data widget to be able to identify the rows.
+     */
+    protected static final String ID_PROPERTY = "doc.id";
+
+    /**
+     * The live data property holding the full name of the matching document, available as a (local, friendly) display
+     * column when requested.
      */
     protected static final String FULLNAME_PROPERTY = "doc.fullName";
 
     /**
-     * Maps the supported {@code doc.*} live data property identifiers to the Solr field holding their value. The title
-     * is handled separately because it is a localized field (see {@link #getTitle(SolrDocument)}).
+     * Maps the supported {@code doc.*} live data property identifiers to the Solr field holding their value.
      */
     protected static final Map<String, String> SOLR_FIELDS;
 
@@ -116,9 +124,21 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
     protected static final Map<String, String> SOLR_SORT_FIELDS;
 
     /**
-     * The Solr query language id used to run the query. It happens to be the same as this component's role hint.
+     * The {@code doc.*} live data property identifiers backed by a Solr date field.
      */
-    private static final String SOLR = ROLE_HINT;
+    protected static final List<String> DATE_PROPERTIES;
+
+    /**
+     * The {@code doc.*} live data property identifier backed by a Solr boolean field.
+     */
+    protected static final String HIDDEN_PROPERTY = "doc.hidden";
+
+    /**
+     * The Solr query language id used to run the query (the {@code solr} query language registered by the Solr query
+     * executor). Kept separate from {@link #ROLE_HINT} on purpose: this component's hint is document-specific while the
+     * underlying query language stays generic.
+     */
+    private static final String SOLR_QUERY_LANGUAGE = "solr";
 
     private static final String DEFAULT_QUERY = "*:*";
 
@@ -134,6 +154,21 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
 
     private static final String DOC_DATE = "doc.date";
 
+    // Live data filter operators (see the live data filter widgets).
+    private static final String CONTAINS_OPERATOR = "contains";
+
+    private static final String EQUALS_OPERATOR = "equals";
+
+    private static final String STARTS_WITH_OPERATOR = "startsWith";
+
+    private static final String BEFORE_OPERATOR = "before";
+
+    private static final String AFTER_OPERATOR = "after";
+
+    private static final String BETWEEN_OPERATOR = "between";
+
+    private static final String WILDCARD = "*";
+
     static {
         Map<String, String> fields = new LinkedHashMap<>();
         // The generic "title_" field aggregates the title of all locales (copyField of title_*) and uses the generic
@@ -145,7 +180,7 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
         fields.put("doc.creator", FieldUtils.CREATOR_DISPLAY);
         fields.put(DOC_CREATION_DATE, FieldUtils.CREATIONDATE);
         fields.put(DOC_DATE, FieldUtils.DATE);
-        fields.put("doc.hidden", FieldUtils.HIDDEN);
+        fields.put(HIDDEN_PROPERTY, FieldUtils.HIDDEN);
         SOLR_FIELDS = Map.copyOf(fields);
 
         Map<String, String> sortFields = new LinkedHashMap<>();
@@ -153,6 +188,8 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
         sortFields.put(DOC_CREATION_DATE, FieldUtils.CREATIONDATE);
         sortFields.put(DOC_DATE, FieldUtils.DATE);
         SOLR_SORT_FIELDS = Map.copyOf(sortFields);
+
+        DATE_PROPERTIES = List.of(DOC_CREATION_DATE, DOC_DATE);
     }
 
     @Inject
@@ -169,6 +206,9 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
 
     @Inject
     private SolrUtils solrUtils;
+
+    @Inject
+    private SecurityConfiguration securityConfiguration;
 
     @Override
     public Optional<Map<String, Object>> get(Object entryId)
@@ -187,7 +227,7 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
             String solrQueryString =
                 StringUtils.defaultIfBlank((String) parameters.get(QUERY_PARAMETER), DEFAULT_QUERY);
 
-            Query solrQuery = this.queryManager.createQuery(solrQueryString, SOLR);
+            Query solrQuery = this.queryManager.createQuery(solrQueryString, SOLR_QUERY_LANGUAGE);
             // Enforce view rights: the Solr query executor removes from the result the documents the current user
             // cannot see.
             ((SecureQuery) solrQuery).checkCurrentUser(true);
@@ -198,7 +238,7 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
                 solrQuery.bindValue("sort", StringUtils.join(sortClauses, ", "));
             }
             solrQuery.setOffset(query.getOffset() == null ? 0 : query.getOffset().intValue());
-            solrQuery.setLimit(query.getLimit() == null ? DEFAULT_LIMIT : query.getLimit());
+            solrQuery.setLimit(validateAndGetLimit(query.getLimit()));
 
             QueryResponse response = execute(solrQuery);
             SolrDocumentList documents = response.getResults();
@@ -217,6 +257,28 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
         } catch (Exception e) {
             throw new LiveDataException("Failed to execute the Solr live data query.", e);
         }
+    }
+
+    /**
+     * Validates the requested limit against the configured maximum number of items a query is allowed to return, to
+     * avoid denial of service through arbitrarily large result requests (mirrors the REST resources behavior).
+     *
+     * @param limit the limit carried by the query (may be {@code null})
+     * @return the limit to use, never {@code 0} (see {@link #DEFAULT_LIMIT})
+     * @throws LiveDataException if the requested limit is negative or exceeds the configured maximum
+     */
+    private int validateAndGetLimit(Integer limit) throws LiveDataException
+    {
+        if (limit == null) {
+            return DEFAULT_LIMIT;
+        }
+        int configuredLimit = this.securityConfiguration.getQueryItemsLimit();
+        if (configuredLimit >= 0 && (limit < 0 || limit > configuredLimit)) {
+            throw new LiveDataException(String.format(
+                "Invalid limit value [%s]. The limit must be a positive integer lower than or equal to [%s].",
+                limit, configuredLimit));
+        }
+        return limit;
     }
 
     private QueryResponse execute(Query solrQuery) throws QueryException, LiveDataException
@@ -260,42 +322,113 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
 
         if (query.getFilters() != null) {
             for (Filter filter : query.getFilters()) {
-                String filterQuery = toFilterQuery(filter);
-                if (filterQuery != null) {
-                    filterQueries.add(filterQuery);
-                }
+                toFilterQuery(filter).ifPresent(filterQueries::add);
             }
         }
         return filterQueries;
     }
 
-    private String toFilterQuery(Filter filter)
+    private Optional<String> toFilterQuery(Filter filter)
     {
         String field = SOLR_FIELDS.get(filter.getProperty());
         if (field == null) {
             // Unknown / unsupported property (e.g. an object property): ignore the filter for now.
-            return null;
+            return Optional.empty();
         }
         List<String> clauses = filter.getConstraints().stream()
-            .map(constraint -> toClause(field, constraint.getValue()))
+            .map(constraint -> toClause(filter.getProperty(), field, constraint.getOperator(), constraint.getValue()))
             .filter(StringUtils::isNotEmpty)
             .toList();
         if (clauses.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         String operator = filter.isMatchAll() ? " AND " : " OR ";
-        return "(" + StringUtils.join(clauses, operator) + ")";
+        return Optional.of("(" + StringUtils.join(clauses, operator) + ")");
     }
 
-    private String toClause(String field, Object value)
+    /**
+     * Translates a single live data filter constraint into a Solr clause, taking the constraint operator and the
+     * property type (text, date or boolean) into account.
+     */
+    private String toClause(String property, String field, String operator, Object value)
     {
-        if (value == null) {
+        if (value == null || StringUtils.isEmpty(value.toString())) {
             return null;
         }
-        // Use a tokenized match through SolrUtils rather than raw wildcards: wildcards bypass the Solr tokenizer and
-        // lead to surprising results (e.g. multi-word queries not matching). The value is escaped and analyzed by the
-        // field's query analyzer.
-        return field + ':' + this.solrUtils.toFilterQueryString(value);
+        String effectiveOperator = StringUtils.defaultString(operator);
+        if (DATE_PROPERTIES.contains(property)) {
+            return toDateClause(field, effectiveOperator, value.toString());
+        } else if (HIDDEN_PROPERTY.equals(property)) {
+            // Boolean field: an exact match on true/false.
+            return field + ':' + this.solrUtils.toFilterQueryString(value);
+        } else {
+            return toTextClause(field, effectiveOperator, value);
+        }
+    }
+
+    private String toTextClause(String field, String operator, Object value)
+    {
+        switch (operator) {
+            case EQUALS_OPERATOR:
+                // Exact match: a phrase query so the indexed tokens must appear in the exact same order.
+                return field + ":\"" + escapePhrase(value.toString()) + '"';
+            case STARTS_WITH_OPERATOR:
+                // Prefix match: the trailing wildcard is intentional here (the operator means "starts with").
+                return field + ':' + this.solrUtils.toFilterQueryString(value) + WILDCARD;
+            case CONTAINS_OPERATOR:
+            default:
+                // Tokenized match through SolrUtils rather than raw wildcards: wildcards bypass the Solr tokenizer and
+                // lead to surprising results (e.g. multi-word queries not matching). The value is escaped and analyzed
+                // by the field's query analyzer.
+                return field + ':' + this.solrUtils.toFilterQueryString(value);
+        }
+    }
+
+    /**
+     * Translates a date filter constraint into a Solr range query. The live data date filter serializes its value as
+     * an ISO 8601 instant (or, for the {@code between} operator, two instants separated by a {@code /}); Solr expects
+     * UTC instants, so the values are normalized before being injected in a range query.
+     */
+    private String toDateClause(String field, String operator, String value)
+    {
+        String effectiveOperator = StringUtils.isEmpty(operator) ? BETWEEN_OPERATOR : operator;
+        if (BETWEEN_OPERATOR.equals(effectiveOperator)) {
+            String[] bounds = value.split("/", 2);
+            return toRangeClause(field, toSolrDate(bounds[0]), bounds.length > 1 ? toSolrDate(bounds[1]) : WILDCARD);
+        } else if (BEFORE_OPERATOR.equals(effectiveOperator)) {
+            return toRangeClause(field, WILDCARD, toSolrDate(value));
+        } else if (AFTER_OPERATOR.equals(effectiveOperator)) {
+            return toRangeClause(field, toSolrDate(value), WILDCARD);
+        }
+        // Unsupported date operator: ignore the constraint rather than produce an invalid Solr query.
+        return null;
+    }
+
+    private String toRangeClause(String field, String from, String to)
+    {
+        if (from == null || to == null) {
+            return null;
+        }
+        return field + ":[" + from + " TO " + to + ']';
+    }
+
+    private String toSolrDate(String isoDate)
+    {
+        if (WILDCARD.equals(isoDate)) {
+            return WILDCARD;
+        }
+        try {
+            // The live data date filter sends ISO 8601 instants, possibly with a timezone offset; Solr expects UTC.
+            return OffsetDateTime.parse(isoDate).toInstant().toString();
+        } catch (DateTimeParseException e) {
+            // The value is not a parseable instant: drop the bound rather than emit an invalid range.
+            return null;
+        }
+    }
+
+    private String escapePhrase(String value)
+    {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     /**
@@ -319,12 +452,12 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
     {
         Map<String, Object> entry = new LinkedHashMap<>();
 
-        DocumentReference reference = this.solrDocumentReferenceResolver.resolve(document);
+        var reference = this.solrDocumentReferenceResolver.resolve(document);
         // The URL is always provided so that the "link" displayer of the title can build the link.
         entry.put(URL_PROPERTY, this.documentAccessBridge.getDocumentURL(reference, "view", null, null));
-        // The full name is the idProperty of this source, so it is always provided (even when not a requested column)
-        // for the live data widget to be able to identify the rows.
-        entry.put(FULLNAME_PROPERTY, document.getFirstValue(SOLR_FIELDS.get(FULLNAME_PROPERTY)));
+        // The Solr document id is the idProperty of this source, so it is always provided (even when not a requested
+        // column) for the live data widget to be able to uniquely identify the rows.
+        entry.put(ID_PROPERTY, document.getFirstValue(FieldUtils.ID));
 
         List<String> requestedProperties =
             (properties == null || properties.isEmpty()) ? List.of(TITLE_PROPERTY) : properties;

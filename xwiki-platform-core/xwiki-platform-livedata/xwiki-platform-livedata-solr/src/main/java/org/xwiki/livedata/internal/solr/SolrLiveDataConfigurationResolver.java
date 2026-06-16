@@ -24,10 +24,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
@@ -39,10 +39,10 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 
 /**
- * Provides the default live data configuration for the {@code solr} source. The most important value it adds is the
- * {@code meta.entryDescriptor.idProperty} ({@code doc.fullName}): without it the live data widget cannot identify the
- * rows and renders an empty table. It also fills the property descriptors from the {@code solr} property store so that
- * the column types and displayers are known at macro evaluation time.
+ * Provides the default live data configuration for the {@code documentSolrSearch} source. The most important value it
+ * adds is the {@code meta.entryDescriptor.idProperty} ({@code doc.id}): without it the live data widget cannot identify
+ * the rows and renders an empty table. It also fills the property descriptors from the property store so that the
+ * column types and displayers are known at macro evaluation time.
  *
  * @version $Id$
  * @since 18.5.0RC1

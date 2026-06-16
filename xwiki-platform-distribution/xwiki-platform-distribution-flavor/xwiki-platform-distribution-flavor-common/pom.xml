@@ -96,6 +96,13 @@
       <type>xar</type>
       <optional>true</optional>
     </dependency>
+    <!-- The Live Data source backed by a Solr search query. Optional: installed by default but can be removed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-solr</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-ui</artifactId>

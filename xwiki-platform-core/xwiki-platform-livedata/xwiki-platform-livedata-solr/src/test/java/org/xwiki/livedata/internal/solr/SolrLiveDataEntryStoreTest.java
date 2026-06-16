@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
@@ -38,6 +39,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -46,6 +48,8 @@ import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -60,6 +64,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class SolrLiveDataEntryStoreTest
 {
+    private static final String SOLR_LANGUAGE = "solr";
+
     @InjectMockComponents
     private SolrLiveDataEntryStore store;
 
@@ -78,18 +84,45 @@ class SolrLiveDataEntryStoreTest
     @MockComponent
     private SolrUtils solrUtils;
 
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    private SecureQuery mockEmptyQuery(String solrQueryString) throws Exception
+    {
+        SecureQuery solrQuery = mock(SecureQuery.class);
+        when(this.queryManager.createQuery(solrQueryString, SOLR_LANGUAGE)).thenReturn(solrQuery);
+        UserProperties userProperties = mock(UserProperties.class);
+        when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        when(solrQuery.execute()).thenReturn(List.of(response));
+        // A generous configured limit so the (initialized) limit of 15 is accepted.
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
+        return solrQuery;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> captureFilterQueries(SecureQuery solrQuery)
+    {
+        ArgumentCaptor<Object> fqCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(solrQuery).bindValue(eq("fq"), fqCaptor.capture());
+        return (List<String>) fqCaptor.getValue();
+    }
+
     @Test
     void getMapsDocumentsToEntries() throws Exception
     {
         SecureQuery solrQuery = mock(SecureQuery.class);
-        when(this.queryManager.createQuery("links_extended:foo", "solr")).thenReturn(solrQuery);
+        when(this.queryManager.createQuery("links_extended:foo", SOLR_LANGUAGE)).thenReturn(solrQuery);
         UserProperties userProperties = mock(UserProperties.class);
         when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
 
         SolrDocument document = new SolrDocument();
+        // The Solr document id is the idProperty of the source, always read from the "id" field.
+        document.setField("id", "xwiki:Space.Page_en");
         // The title is read from the generic "title_" field (aggregates all locales).
         document.setField("title_", "My Title");
-        // The full name is the idProperty of the source, always read from the "fullname" field.
         document.setField("fullname", "Space.Page");
         SolrDocumentList documents = new SolrDocumentList();
         documents.add(document);
@@ -105,8 +138,8 @@ class SolrLiveDataEntryStoreTest
 
         LiveDataQuery query = new LiveDataQuery();
         query.initialize();
-        query.setProperties(List.of("doc.title"));
-        Source source = new Source("solr");
+        query.setProperties(List.of("doc.title", "doc.fullName"));
+        Source source = new Source("documentSolrSearch");
         source.setParameter("query", "links_extended:foo");
         query.setSource(source);
 
@@ -117,7 +150,9 @@ class SolrLiveDataEntryStoreTest
         Map<String, Object> entry = liveData.getEntries().get(0);
         assertEquals("My Title", entry.get("doc.title"));
         assertEquals("/xwiki/bin/view/Space/Page", entry.get("url"));
-        // The full name is always present since it is the idProperty of the source.
+        // The Solr document id is always present since it is the idProperty of the source.
+        assertEquals("xwiki:Space.Page_en", entry.get("doc.id"));
+        // The full name is present because it was among the requested columns.
         assertEquals("Space.Page", entry.get("doc.fullName"));
 
         verify(solrQuery).checkCurrentUser(true);
@@ -126,18 +161,10 @@ class SolrLiveDataEntryStoreTest
     @Test
     void getTranslatesFiltersAndSort() throws Exception
     {
-        SecureQuery solrQuery = mock(SecureQuery.class);
-        when(this.queryManager.createQuery("*:*", "solr")).thenReturn(solrQuery);
-        // The current user did not opt to display hidden documents, so they must be excluded.
-        UserProperties userProperties = mock(UserProperties.class);
-        when(userProperties.displayHiddenDocuments()).thenReturn(false);
-        when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+        // The current user did not opt to display hidden documents, so they must be excluded (default mock: false).
         // SolrUtils escapes the value (here the space), without introducing wildcards.
         when(this.solrUtils.toFilterQueryString("hello world")).thenReturn("hello\\ world");
-
-        QueryResponse response = mock(QueryResponse.class);
-        when(response.getResults()).thenReturn(new SolrDocumentList());
-        when(solrQuery.execute()).thenReturn(List.of(response));
 
         LiveDataQuery query = new LiveDataQuery();
         query.initialize();
@@ -149,11 +176,8 @@ class SolrLiveDataEntryStoreTest
         this.store.get(query);
 
         // The title property maps to the generic "title_" Solr field and matches via a tokenized query (no wildcard).
-        ArgumentCaptor<Object> fqCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(solrQuery).bindValue(eq("fq"), fqCaptor.capture());
-        @SuppressWarnings("unchecked")
-        List<String> filterQueries = (List<String>) fqCaptor.getValue();
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:hello\\ world)"), filterQueries);
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:hello\\ world)"),
+            captureFilterQueries(solrQuery));
 
         verify(solrQuery).bindValue("sort", "title_sort desc");
         verify(solrQuery).setOffset(30);
@@ -161,10 +185,62 @@ class SolrLiveDataEntryStoreTest
     }
 
     @Test
+    void getTranslatesEqualsOperatorAsPhrase() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.title", "equals", "My Title"));
+
+        this.store.get(query);
+
+        // The "equals" operator produces an exact phrase query (no SolrUtils tokenization).
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:\"My Title\")"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesStartsWithOperatorAsPrefix() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+        when(this.solrUtils.toFilterQueryString("hel")).thenReturn("hel");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.title", "startsWith", "hel"));
+
+        this.store.get(query);
+
+        // The "startsWith" operator appends a trailing wildcard to the escaped value (prefix query).
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:hel*)"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesDateBetweenAsRange() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        // The live data date filter serializes a "between" range as two ISO 8601 instants separated by a slash.
+        query.getFilters().add(
+            new Filter("doc.creationDate", "between", "2023-01-01T00:00:00Z/2023-12-31T23:59:59Z"));
+
+        this.store.get(query);
+
+        assertEquals(
+            List.of("type:(\"DOCUMENT\")", "hidden:(false)",
+                "(creationdate:[2023-01-01T00:00:00Z TO 2023-12-31T23:59:59Z])"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
     void getDefaultsLimitWhenNotSpecified() throws Exception
     {
         SecureQuery solrQuery = mock(SecureQuery.class);
-        when(this.queryManager.createQuery("*:*", "solr")).thenReturn(solrQuery);
+        when(this.queryManager.createQuery("*:*", SOLR_LANGUAGE)).thenReturn(solrQuery);
         UserProperties userProperties = mock(UserProperties.class);
         when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
         QueryResponse response = mock(QueryResponse.class);
@@ -173,12 +249,32 @@ class SolrLiveDataEntryStoreTest
 
         // A query with no offset/limit specified (not initialized to defaults).
         LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("solr"));
+        query.setSource(new Source("documentSolrSearch"));
 
-        this.store.get(query);
+        LiveData liveData = this.store.get(query);
 
+        // An empty Solr result is mapped to an empty live data (count 0, no entries).
+        assertEquals(0, liveData.getCount());
+        assertTrue(liveData.getEntries().isEmpty());
         // A null limit must not degrade to Solr's small default: it falls back to the live data default page size.
         verify(solrQuery).setLimit(15);
         verify(solrQuery).setOffset(0);
+    }
+
+    @Test
+    void getThrowsWhenLimitExceedsConfiguredMaximum() throws Exception
+    {
+        SecureQuery solrQuery = mock(SecureQuery.class);
+        when(this.queryManager.createQuery("*:*", SOLR_LANGUAGE)).thenReturn(solrQuery);
+        UserProperties userProperties = mock(UserProperties.class);
+        when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.setLimit(2000);
+
+        // A limit larger than the configured maximum is rejected to avoid denial of service.
+        assertThrows(LiveDataException.class, () -> this.store.get(query));
     }
 }

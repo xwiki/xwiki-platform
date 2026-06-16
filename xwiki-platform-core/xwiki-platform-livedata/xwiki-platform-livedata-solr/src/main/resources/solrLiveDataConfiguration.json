@@ -1,12 +1,12 @@
 {
   "query": {
     "source": {
-      "id": "solr"
+      "id": "documentSolrSearch"
     }
   },
   "meta": {
     "entryDescriptor": {
-      "idProperty": "doc.fullName"
+      "idProperty": "doc.id"
     }
   }
 }

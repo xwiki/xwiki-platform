@@ -30,7 +30,7 @@
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-solr</artifactId>
   <name>XWiki Platform - Live Data - Solr Connector</name>
-  <description>Adds a Live Data source backed by a Solr search query.</description>
+  <description>A Live Data source backed by a Solr search query.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data - Solr Connector</xwiki.extension.name>
@@ -38,37 +38,43 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- For DocumentAccessBridge, used to build the view URL of the matching documents. -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- For Query/QueryManager/SecureQuery, used to run the Solr query through the "solr" query language. -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- For FieldUtils (Solr field names), the SolrDocument reference resolver and the SolrJ API. -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- For the "display hidden documents" user preference, used to decide whether to list hidden documents. -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- For SecurityConfiguration, used to validate the query limit against the configured maximum. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

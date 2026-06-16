@@ -19,8 +19,8 @@
  */
 package org.xwiki.livedata.internal.solr;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -44,7 +44,7 @@ public class SolrLiveDataSource extends WithParameters implements LiveDataSource
     /**
      * The hint of this component implementation.
      */
-    public static final String ROLE_HINT = "solr";
+    public static final String ROLE_HINT = SolrLiveDataEntryStore.ROLE_HINT;
 
     @Inject
     @Named(ROLE_HINT)

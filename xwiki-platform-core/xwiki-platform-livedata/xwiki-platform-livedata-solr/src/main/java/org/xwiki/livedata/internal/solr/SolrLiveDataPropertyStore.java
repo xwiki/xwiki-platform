@@ -22,9 +22,8 @@ package org.xwiki.livedata.internal.solr;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -56,7 +55,7 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
     /**
      * The hint of this component implementation.
      */
-    public static final String ROLE_HINT = "solr";
+    public static final String ROLE_HINT = SolrLiveDataEntryStore.ROLE_HINT;
 
     private static final String STRING_TYPE = "String";
 
@@ -66,11 +65,21 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
 
     private static final String CONTAINS_OPERATOR = "contains";
 
+    private static final String EQUALS_OPERATOR = "equals";
+
+    private static final String STARTS_WITH_OPERATOR = "startsWith";
+
+    private static final String BEFORE_OPERATOR = "before";
+
+    private static final String AFTER_OPERATOR = "after";
+
+    private static final String BETWEEN_OPERATOR = "between";
+
     private static final String TEXT_FILTER = "text";
 
-    private static final Set<String> DATE_PROPERTIES = Set.of("doc.creationDate", "doc.date");
+    private static final String DATE_FILTER = "date";
 
-    private static final String HIDDEN_PROPERTY = "doc.hidden";
+    private static final String BOOLEAN_FILTER = "boolean";
 
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
@@ -98,17 +107,39 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
             displayer.setParameter("propertyHref", SolrLiveDataEntryStore.URL_PROPERTY);
             descriptor.setDisplayer(displayer);
         }
-        FilterDescriptor filter = new FilterDescriptor(TEXT_FILTER);
-        filter.setDefaultOperator(CONTAINS_OPERATOR);
-        descriptor.setFilter(filter);
+        descriptor.setFilter(getFilter(property));
         return descriptor;
+    }
+
+    private FilterDescriptor getFilter(String property)
+    {
+        FilterDescriptor filter;
+        if (SolrLiveDataEntryStore.DATE_PROPERTIES.contains(property)) {
+            // Date columns are filtered through Solr range queries (see SolrLiveDataEntryStore#toDateClause).
+            filter = new FilterDescriptor(DATE_FILTER);
+            filter.addOperator(BETWEEN_OPERATOR, null);
+            filter.addOperator(BEFORE_OPERATOR, null);
+            filter.addOperator(AFTER_OPERATOR, null);
+            filter.setDefaultOperator(BETWEEN_OPERATOR);
+        } else if (SolrLiveDataEntryStore.HIDDEN_PROPERTY.equals(property)) {
+            filter = new FilterDescriptor(BOOLEAN_FILTER);
+            filter.addOperator(EQUALS_OPERATOR, null);
+            filter.setDefaultOperator(EQUALS_OPERATOR);
+        } else {
+            filter = new FilterDescriptor(TEXT_FILTER);
+            filter.addOperator(CONTAINS_OPERATOR, null);
+            filter.addOperator(EQUALS_OPERATOR, null);
+            filter.addOperator(STARTS_WITH_OPERATOR, null);
+            filter.setDefaultOperator(CONTAINS_OPERATOR);
+        }
+        return filter;
     }
 
     private String getType(String property)
     {
-        if (DATE_PROPERTIES.contains(property)) {
+        if (SolrLiveDataEntryStore.DATE_PROPERTIES.contains(property)) {
             return DATE_TYPE;
-        } else if (HIDDEN_PROPERTY.equals(property)) {
+        } else if (SolrLiveDataEntryStore.HIDDEN_PROPERTY.equals(property)) {
             return BOOLEAN_TYPE;
         }
         return STRING_TYPE;

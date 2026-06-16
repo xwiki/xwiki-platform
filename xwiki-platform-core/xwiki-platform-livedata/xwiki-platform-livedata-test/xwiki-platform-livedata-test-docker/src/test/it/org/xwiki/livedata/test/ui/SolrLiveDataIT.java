@@ -80,7 +80,7 @@ class SolrLiveDataIT
         new SolrTestUtils(setup).waitEmptyQueue();
 
         // The shared token matches both test pages (the title field is tokenized).
-        setup.createPage(testReference, "{{liveData id=\"test\" properties=\"doc.title\" source=\"solr\""
+        setup.createPage(testReference, "{{liveData id=\"test\" properties=\"doc.title\" source=\"documentSolrSearch\""
             + " sourceParameters=\"query=title_:" + TOKEN + "\"/}}", "Solr Live Data");
 
         setup.gotoPage(testReference);
@@ -118,7 +118,7 @@ class SolrLiveDataIT
         setup.setRights(restrictedPage, "", viewer, "view", false);
 
         // The live data page is authored by the superadmin but viewable by everyone.
-        setup.createPage(testReference, "{{liveData id=\"test\" properties=\"doc.title\" source=\"solr\""
+        setup.createPage(testReference, "{{liveData id=\"test\" properties=\"doc.title\" source=\"documentSolrSearch\""
             + " sourceParameters=\"query=title_:" + RIGHTS_TOKEN + "\"/}}", "Solr Live Data");
 
         // Wait for the pages (including the rights change) to be indexed in Solr.

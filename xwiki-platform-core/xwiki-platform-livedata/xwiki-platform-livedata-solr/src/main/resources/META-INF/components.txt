@@ -1,0 +1,4 @@
+org.xwiki.livedata.internal.solr.SolrLiveDataSource
+org.xwiki.livedata.internal.solr.SolrLiveDataEntryStore
+org.xwiki.livedata.internal.solr.SolrLiveDataPropertyStore
+org.xwiki.livedata.internal.solr.SolrLiveDataConfigurationResolver

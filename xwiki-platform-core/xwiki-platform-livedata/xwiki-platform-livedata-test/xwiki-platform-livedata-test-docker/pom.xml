@@ -51,6 +51,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used by SolrLiveDataIT to wait for the documents to be indexed in Solr. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -63,6 +70,14 @@
       <artifactId>xwiki-platform-livedata-livetable</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Note: the Solr connector (xwiki-platform-livedata-solr) is added to the WAR by SolrLiveDataIT via @UITest
+         extraJARs (like the Solr query language), so it must not be declared as a dependency here. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-solr</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

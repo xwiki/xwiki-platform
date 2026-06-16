@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AccessDeniedException;
 
 import com.fasterxml.jackson.core.json.JsonReadFeature;
@@ -94,10 +96,20 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     @Named(ROLE_HINT)
     private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
 
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
     @Override
-    public Optional<Map<String, Object>> get(Object entryId)
+    public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
-        throw new UnsupportedOperationException();
+        LiveDataQuery query = new LiveDataQuery();
+        query.setSource(new Source(ROLE_HINT));
+        String idProperty = this.liveDataConfigurationProvider.get().getMeta().getEntryDescriptor().getIdProperty();
+        query.setProperties(List.of(idProperty));
+        query.setFilters(List.of(new LiveDataQuery.Filter(idProperty, entryId)));
+        query.setLimit(1);
+        return this.get(query).getEntries().stream().findFirst();
     }
 
     @Override
@@ -218,20 +230,23 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
         String entryId = this.liveDataConfigurationProvider.get().getMeta().getEntryDescriptor().getIdProperty();
         String fullName = (String) entry.get(entryId);
+
+        DocumentReference documentReference;
+        boolean create = false;
         if (fullName == null) {
-            throw new LiveDataException(
-                String.format("Entry id [%s] missing. Can't load the document to update.", entryId));
+            documentReference = generateNewEntryReference();
+            create = true;
+        } else {
+            documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
         }
 
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
-
         try {
-            this.modelBridge.updateAll(entry, documentReference, classReference, propertyClassReferences);
+            this.modelBridge.updateAll(entry, documentReference, classReference, propertyClassReferences, 0, create);
         } catch (AccessDeniedException | XWikiException e) {
             throw new LiveDataException(e);
         }
 
-        return Optional.of(fullName);
+        return Optional.of(this.stringEntityReferenceSerializer.serialize(documentReference));
     }
 
     private void checkAllXObjectPropertiesHaveXClass(Map<String, Object> entry,
@@ -273,5 +288,33 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private boolean isDocumentProperty(String property)
     {
         return StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX);
+    }
+
+    private DocumentReference generateNewEntryReference() throws LiveDataException
+    {
+        String namingStrategy = (String) getParameters().get("newRowNamingStrategy");
+
+        switch (namingStrategy) {
+            case "uuid":
+                String location = (String) getParameters().get("newRowLocation");
+                if (StringUtils.isBlank(location)) {
+                    throw new LiveDataException("Missing location for row creation.");
+                }
+                DocumentReference candidate =
+                    this.currentDocumentReferenceResolver.resolve(String.format("%s.%s", location, UUID.randomUUID()));
+                try {
+                    if (!this.modelBridge.exists(candidate)) {
+                        return candidate;
+                    } else {
+                        throw new LiveDataException(String.format("The page [%s] already exists.", candidate));
+                    }
+                } catch (XWikiException e) {
+                    throw new LiveDataException(String.format(
+                        "An error occurred while creating page [%s].", candidate), e);
+                }
+
+            case null, default:
+                throw new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy));
+        }
     }
 }

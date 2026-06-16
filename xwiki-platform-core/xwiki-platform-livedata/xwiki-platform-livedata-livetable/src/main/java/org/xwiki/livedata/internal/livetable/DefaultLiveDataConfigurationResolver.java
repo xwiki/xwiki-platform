@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -87,6 +88,14 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // the given configuration can have a sort entry that specifies only the sort order and not the sort property
         // (e.g. when you want to sort on the default property using a specified sort order).
         setDefaultSort(mergedConfig);
+
+        // We only enable the ability to add an entry if there is a naming strategy explicitly set.
+        Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
+        if (sourceParams.get("newRowNamingStrategy") != null) {
+            LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+            addEntry.setId("addEntry");
+            mergedConfig.getMeta().getActions().add(addEntry);
+        }
 
         // Translate using the context locale.
         return translate(mergedConfig, config);

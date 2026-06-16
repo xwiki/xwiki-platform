@@ -324,7 +324,7 @@ class ModelBridgeTest
         when(this.baseObject.getPropertyNames()).thenReturn(new String[] { "field" });
         when(this.baseObject.get("field")).thenReturn(this.propertyInterface);
 
-        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0, false);
         verify(this.baseClass).fromMap(Collections.singletonMap("field", 55), this.baseObject);
         verify(this.document).setHidden(false);
 
@@ -342,7 +342,7 @@ class ModelBridgeTest
 
         LiveDataException liveDataException = assertThrows(LiveDataException.class,
             () -> this.modelBridge.updateAll((Map<String, Object>) new HashMap<String, Object>(), documentReference,
-                classReference, Map.of(), 0));
+                classReference, Map.of(), 0, false));
 
         assertEquals("We do not support updating new documents.", liveDataException.getMessage());
 
@@ -381,7 +381,7 @@ class ModelBridgeTest
         when(this.localSerializer.serialize(classReference)).thenReturn("MyTest.MyClass");
         when(this.htmlConverter.fromHTML("to convert", "xwiki/2.0")).thenReturn("converted value");
 
-        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0, false);
         verify(this.baseClass).fromMap(Collections.singletonMap("field_known", "converted value"), this.baseObject);
         verify(this.document).setHidden(false);
 
@@ -406,7 +406,7 @@ class ModelBridgeTest
 
         Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
 
-        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0, false);
 
         verify(this.baseClass).fromMap(Map.of("customField", "value"), this.baseObject);
         verify(this.authorization).checkAccess(Right.EDIT, documentReference);
@@ -435,7 +435,7 @@ class ModelBridgeTest
 
         Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
 
-        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0, false);
         verify(this.baseClass)
             .fromMap(Map.of("customField", "converted value"), this.baseObject);
         verify(this.document).setHidden(false);

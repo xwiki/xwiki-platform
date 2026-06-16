@@ -43,12 +43,34 @@
     >
       <LivedataDisplayer :property-id="property.id" :entry="entry" />
     </td>
+
+    <td v-if="logic.isEditMode()">
+      <template v-if="entry._new">
+        <button
+          type="button"
+          class="btn btn-default"
+          :title="$t('livedata.table.action.save')"
+          @click="logic.saveNewEntry()"
+        >
+          <XWikiIcon :icon-descriptor="{ name: 'check' }" />
+        </button>
+        <button
+          type="button"
+          class="btn btn-default"
+          :title="$t('livedata.table.action.cancel')"
+          @click="logic.cancelNewEntry()"
+        >
+          <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
+        </button>
+      </template>
+    </td>
   </tr>
 </template>
 
 <script>
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
+import XWikiIcon from "../../utilities/XWikiIcon.vue";
 
 export default {
   name: "LayoutTableRow",
@@ -56,6 +78,7 @@ export default {
   components: {
     LivedataEntrySelector,
     LivedataDisplayer,
+    XWikiIcon,
   },
 
   inject: ["logic"],
@@ -85,6 +108,21 @@ export default {
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
+  },
+
+  mounted() {
+    // Autofocus the first editable cell of a new row.
+    if (this.entry?._new) {
+      const tryFocus = (attempt = 0) => {
+        const cell = this.$el.querySelector(".editable")?.closest("[tabindex]");
+        if (cell) {
+          cell.focus();
+        } else if (attempt < 20) {
+          requestAnimationFrame(() => tryFocus(attempt + 1));
+        }
+      };
+      tryFocus();
+    }
   },
 };
 </script>

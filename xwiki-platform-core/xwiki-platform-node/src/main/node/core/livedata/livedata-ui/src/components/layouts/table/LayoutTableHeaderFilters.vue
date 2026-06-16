@@ -44,6 +44,7 @@
         :index="0"
       />
     </th>
+    <th v-if="logic.isEditMode()"></th>
   </tr>
 </template>
 

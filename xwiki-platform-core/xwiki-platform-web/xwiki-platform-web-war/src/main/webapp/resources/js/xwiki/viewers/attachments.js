@@ -66,7 +66,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       this.form = $("#attachform").parents("form");
       let fileInput = this.form.find("input[type='file']");
       this.defaultFileDiv = fileInput.parent("div");
-      this.inputSize = fileInput.size();
+      this.inputSize = fileInput.length;
   
       let html5Uploader = this.attachHTML5Uploader(fileInput);
       if (html5Uploader) {
@@ -104,7 +104,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       this.addDiv = document.createElement("div");
       this.addDiv.append(addButton);
       addButton.on('click', this.addField);
-      this.defaultFileDiv.up().insertBefore(this.addDiv, this.defaultFileDiv.next());
+      this.defaultFileDiv.parent().insertBefore(this.addDiv, this.defaultFileDiv.next());
     }
     /** Add a submit listener that prevents submitting the form if no file was specified. */
     blockEmptySubmit() {
@@ -151,7 +151,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */
     onSubmit(event) {
       let hasFiles = false;
-      this.form.getInputs("file").each(function(item) {
+      this.form.find("input[type='file']").each(function(item) {
         if(item.value !== '') {
           hasFiles = true;
         }
@@ -165,7 +165,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       if (event) {
         event.stop();
       }
-      this.form.getInputs("file").each(function(item) {
+      this.form.find("input[type='file']").each(function(item) {
         item.up().remove();
       });
       this.counter = 1;

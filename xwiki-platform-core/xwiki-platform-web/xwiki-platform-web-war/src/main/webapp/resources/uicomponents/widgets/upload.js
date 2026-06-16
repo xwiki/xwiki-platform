@@ -26,7 +26,7 @@
 #set($maxAttachmentSize = "$!escapetool.javascript($xwiki.getSpacePreference('upload_maxsize'))")
 #[[*/
 // Start JavaScript-only code.
-(function(icons, l10nwithParams, maxAttachmentSize) {
+(function(icons, maxAttachmentSize) {
   "use strict";
 define('upload-translations', {
   prefix: 'core.widgets.html5upload.',
@@ -735,4 +735,4 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
   return FileUploader;
 });
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $l10nwithParams, $maxAttachmentSize]));
+}).apply(']]#', $jsontool.serialize([$icons, $maxAttachmentSize]));

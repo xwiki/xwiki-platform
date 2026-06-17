@@ -2177,7 +2177,7 @@ public class XWiki implements EventListener
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
             try {
-                // Indicate the the async context manipulated documents
+                // Indicate the async context manipulated documents
                 getAsyncContext().useEntity(doc.getDocumentReferenceWithLocale());
             } catch (Exception e) {
                 // If the AsyncContext component does not work then we are not in an asynchronous context anyway

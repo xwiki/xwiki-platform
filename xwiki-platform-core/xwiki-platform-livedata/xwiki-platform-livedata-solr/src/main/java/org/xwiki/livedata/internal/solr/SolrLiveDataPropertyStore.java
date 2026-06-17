@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.solr;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.inject.Named;
 
@@ -79,7 +80,32 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
 
     private static final String DATE_FILTER = "date";
 
+    /**
+     * The date format passed to the date filter widget, matching the one of the base {@code date} filter in
+     * {@code liveDataConfiguration.json}.
+     */
+    private static final String DATE_FORMAT = "yyyy/MM/dd HH:mm";
+
     private static final String BOOLEAN_FILTER = "boolean";
+
+    private static final String LINK_DISPLAYER = "link";
+
+    private static final String HTML_DISPLAYER = "html";
+
+    // The "text" displayer id happens to be the same literal as the "text" filter id; reuse the constant to avoid a
+    // duplicated string literal.
+    private static final String TEXT_DISPLAYER = TEXT_FILTER;
+
+    private static final String PROPERTY_HREF = "propertyHref";
+
+    /**
+     * Maps the {@code doc.*} columns rendered as a link to the entry property holding their target URL.
+     */
+    private static final Map<String, String> LINK_HREF_PROPERTIES = Map.of(
+        SolrLiveDataEntryStore.TITLE_PROPERTY, SolrLiveDataEntryStore.URL_PROPERTY,
+        SolrLiveDataEntryStore.FULLNAME_PROPERTY, SolrLiveDataEntryStore.URL_PROPERTY,
+        SolrLiveDataEntryStore.AUTHOR_PROPERTY, SolrLiveDataEntryStore.AUTHOR_URL_PROPERTY,
+        SolrLiveDataEntryStore.CREATOR_PROPERTY, SolrLiveDataEntryStore.CREATOR_URL_PROPERTY);
 
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
@@ -88,6 +114,9 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
         for (String property : SolrLiveDataEntryStore.SOLR_FIELDS.keySet()) {
             properties.add(getDescriptor(property));
         }
+        // The location is a derived column (not backed by a Solr field): it is built from the document reference and
+        // rendered as an HTML breadcrumb of links.
+        properties.add(getLocationDescriptor());
         return properties;
     }
 
@@ -95,20 +124,43 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setId(property);
-        descriptor.setName(property);
+        // The column header name is left unset on purpose: it is localized by the SolrLiveDataConfigurationResolver
+        // from the caller-provided "translationPrefix" source parameter (the live table source contract).
         descriptor.setType(getType(property));
         // A property is sortable when the entry store knows a Solr field to sort it on.
         descriptor.setSortable(SolrLiveDataEntryStore.SOLR_SORT_FIELDS.containsKey(property));
         descriptor.setFilterable(true);
-        if (SolrLiveDataEntryStore.TITLE_PROPERTY.equals(property)) {
-            // Render the title as a link pointing to the document, the URL being provided by the entry's "url"
-            // property.
-            DisplayerDescriptor displayer = new DisplayerDescriptor("link");
-            displayer.setParameter("propertyHref", SolrLiveDataEntryStore.URL_PROPERTY);
-            descriptor.setDisplayer(displayer);
-        }
+        descriptor.setDisplayer(getDisplayer(property));
         descriptor.setFilter(getFilter(property));
         return descriptor;
+    }
+
+    private LiveDataPropertyDescriptor getLocationDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        descriptor.setId(SolrLiveDataEntryStore.LOCATION_PROPERTY);
+        descriptor.setType(STRING_TYPE);
+        // There is no Solr field backing the location, so it can be neither sorted nor filtered on.
+        descriptor.setSortable(false);
+        descriptor.setFilterable(false);
+        descriptor.setDisplayer(new DisplayerDescriptor(HTML_DISPLAYER));
+        return descriptor;
+    }
+
+    private DisplayerDescriptor getDisplayer(String property)
+    {
+        String hrefProperty = LINK_HREF_PROPERTIES.get(property);
+        if (hrefProperty != null) {
+            // Render the value as a link, the target URL being provided by a dedicated entry property.
+            DisplayerDescriptor displayer = new DisplayerDescriptor(LINK_DISPLAYER);
+            displayer.setParameter(PROPERTY_HREF, hrefProperty);
+            return displayer;
+        } else if (SolrLiveDataEntryStore.DATE_PROPERTIES.contains(property)) {
+            // The date value is already formatted server-side, so it is displayed as plain text (not re-parsed by the
+            // client-side "date" displayer).
+            return new DisplayerDescriptor(TEXT_DISPLAYER);
+        }
+        return null;
     }
 
     private FilterDescriptor getFilter(String property)
@@ -121,6 +173,9 @@ public class SolrLiveDataPropertyStore extends WithParameters implements LiveDat
             filter.addOperator(BEFORE_OPERATOR, null);
             filter.addOperator(AFTER_OPERATOR, null);
             filter.setDefaultOperator(BETWEEN_OPERATOR);
+            // The date filter widget needs the date format to (de)serialize the picked dates; we build a full filter
+            // descriptor (custom operators) which would otherwise shadow the base "date" filter and lose its format.
+            filter.setParameter("dateFormat", DATE_FORMAT);
         } else if (SolrLiveDataEntryStore.HIDDEN_PROPERTY.equals(property)) {
             filter = new FilterDescriptor(BOOLEAN_FILTER);
             filter.addOperator(EQUALS_OPERATOR, null);

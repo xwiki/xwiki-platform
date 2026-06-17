@@ -1,7 +1,7 @@
 {
   "query": {
     "source": {
-      "id": "documentSolrSearch"
+      "id": "solr"
     }
   },
   "meta": {

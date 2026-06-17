@@ -71,13 +71,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Note: the Solr connector (xwiki-platform-livedata-solr) is added to the WAR by SolrLiveDataIT via @UITest
-         extraJARs (like the Solr query language), so it must not be declared as a dependency here. -->
+    <!-- The Solr Live Data source connector, used by SolrLiveDataIT. Declared as a runtime dependency so that the
+         docker test framework installs it as a regular extension (via the Extension Manager) in the running XWiki,
+         rather than bundling it in WEB-INF/lib. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-solr</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

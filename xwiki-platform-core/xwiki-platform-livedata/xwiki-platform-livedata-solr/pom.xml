@@ -77,6 +77,24 @@
       <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- For ContextualLocalizationManager, used to localize the column headers from the caller's translation prefix. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- For ConfigurationSource, used to read the wiki date format preference for rendering the date columns. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- For XMLUtils, used to escape the location breadcrumb HTML. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

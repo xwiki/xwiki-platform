@@ -21,13 +21,14 @@ package com.xpn.xwiki.internal.filter.output;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Queue;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -71,6 +72,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     implements UserInstanceOutputFilter
 {
     private static final EntityReference DEFAULT_SPACE = new EntityReference("XWiki", EntityType.SPACE);
+    private static final String MEMBER = "member";
 
     @Inject
     @Named("relative")
@@ -94,7 +96,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
     private String currentWiki;
 
-    private List<String> members;
+    private Collection<String> membersToAdd;
 
     @Override
     public void close() throws IOException
@@ -171,11 +173,6 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         XWikiDocument groupDoc = xcontext.getWiki().getDocument(getGroupDocumentReference(id), xcontext);
         if (groupDoc.isNew()) {
             return groupDoc;
-        }
-
-        if (TRUE.equals(parameters.get(PARAMETER_OVERWRITE))) {
-            xcontext.getWiki().deleteDocument(groupDoc, false, xcontext);
-            return getGroupDocument(id, parameters);
         }
 
         // Don't modify any cached document abusively
@@ -316,20 +313,24 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     public void beginGroupContainer(String name, FilterEventParameters parameters) throws FilterException
     {
         // Init members
-        this.members = new ArrayList<>();
+        this.membersToAdd = new TreeSet<>();
     }
 
     private void addMember(String member, XWikiDocument groupDocument, DocumentReference groupClass,
-            XWikiContext xcontext) throws FilterException
+            Queue<BaseObject> toOverwrite, XWikiContext xcontext) throws FilterException
     {
         BaseObject memberObject;
         try {
-            memberObject = groupDocument.newXObject(groupClass, xcontext);
+            // We take an existing object to overwrite, or we create a new one if there isn't any
+            memberObject = toOverwrite.poll();
+            if (memberObject == null) {
+                memberObject = groupDocument.newXObject(groupClass, xcontext);
+            }
         } catch (XWikiException e) {
             throw new FilterException("Failed to add a group member object", e);
         }
 
-        memberObject.setStringValue("member", member);
+        memberObject.setStringValue(MEMBER, member);
     }
 
     @Override
@@ -364,21 +365,40 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
             xcontext.setWikiId(originalWikiId);
         }
 
-        Set<String> existingMembers = groupDocument.getXObjects(groupClass)
-                .stream()
-                .map(obj -> obj.getStringValue("member"))
-                .collect(Collectors.toSet());
-        if (this.members.isEmpty() && existingMembers.isEmpty()) {
-            // Put an empty member so that the document is "marked" as group
-            addMember("", groupDocument, groupClass, xcontext);
-        } else {
-            this.members.removeAll(existingMembers);
-            for (String member : this.members) {
-                addMember(member, groupDocument, groupClass, xcontext);
+        boolean overwrite = TRUE.equals(parameters.get(PARAMETER_OVERWRITE));
+
+        List<BaseObject> existingObjects = groupDocument.getXObjects(groupClass);
+        Queue<BaseObject> membersToDrop = new ArrayDeque<>();
+
+        // We determine which members to add are already there and which members to remove
+        // The objects of members to remove will be reused to add the new members and then deleted if there are
+        // remaining ones.
+        // Doing this helps limit the number of database operations (deletes) and works around issues related to
+        // inserting objects with the same index than already existing objects (that we are deleting)
+
+        for (BaseObject existingObject : existingObjects) {
+            String existingMember = existingObject.getStringValue(MEMBER);
+            // we remove existing members from the list of members to add
+            boolean keepThisExistingMember = this.membersToAdd.remove(existingMember);
+            if (overwrite && !keepThisExistingMember) {
+                membersToDrop.add(existingObject);
             }
         }
 
-        // Save
+        boolean allExistingMembersAreDropped = existingObjects.size() == membersToDrop.size();
+        if (this.membersToAdd.isEmpty() && allExistingMembersAreDropped) {
+            // Put an empty member in this empty group so that the document is "marked" as group
+            addMember("", groupDocument, groupClass, membersToDrop, xcontext);
+        } else {
+            for (String member : this.membersToAdd) {
+                addMember(member, groupDocument, groupClass, membersToDrop, xcontext);
+            }
+        }
+
+        for (BaseObject memberToDrop : membersToDrop) {
+            groupDocument.removeXObject(memberToDrop);
+        }
+
         try {
             if (groupDocument.isNew() && this.properties.isVersionPreserved()) {
                 maybeSetDates(parameters, groupDocument, GroupFilter.PARAMETER_CREATION_DATE, GroupFilter.PARAMETER_REVISION_DATE);
@@ -393,14 +413,14 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         }
 
         // Reset members
-        this.members = null;
+        this.membersToAdd = null;
     }
 
     private void addMember(String name)
     {
         EntityReference memberReference = this.relativeResolver.resolve(name, EntityType.DOCUMENT, DEFAULT_SPACE);
 
-        this.members.add(this.serializer.serialize(memberReference));
+        this.membersToAdd.add(this.serializer.serialize(memberReference));
     }
 
     @Override

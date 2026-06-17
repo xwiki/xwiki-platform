@@ -3,14 +3,20 @@
 	.jstree-icon { background-repeat:no-repeat; background-color:transparent; }
 	.jstree-anchor,
 	.jstree-animated,
-	.jstree-wholerow { transition:background-color 0.15s, box-shadow 0.15s; }
+	.jstree-wholerow { transition:background-color 0.15s, box-shadow 0.15s; border-radius: @border-radius-small; }
 	// XWiki customization start
 	// .jstree-hovered { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
 	// .jstree-context { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
 	// .jstree-clicked { background:@clicked-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
-	.jstree-hovered { background:@hovered-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
-	.jstree-context { background:@hovered-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
-	.jstree-clicked { background:@clicked-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
+	.jstree-hovered:hover { background:@hovered-bg-color; box-shadow:inset 0 0 1px @hovered-shadow-color; outline: revert;}
+	// We create a focus ring to make keyboard navigation look similar to :focus-visible styles. 
+	// Two rules are needed for cross browser compatibility.
+	.jstree-hovered {
+		outline: 5px auto Highlight;
+		outline: 5px auto -webkit-focus-ring-color;
+	}
+	.jstree-context { background:@hovered-bg-color; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	.jstree-clicked { background:@clicked-bg-color; box-shadow:inset 0 0 1px @clicked-shadow-color; }
 	// XWiki customization end
 	.jstree-no-icons .jstree-anchor > .jstree-themeicon { display:none; }
 	.jstree-disabled {

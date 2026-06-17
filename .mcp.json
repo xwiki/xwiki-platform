@@ -9,15 +9,6 @@
         "https://forum.xwiki.org"
       ]
     },
-    "mcp-atlassian": {
-      "command": "uvx",
-      "args": ["mcp-atlassian"],
-      "env": {
-        "JIRA_URL": "https://jira.xwiki.org",
-        "JIRA_USERNAME": "${JIRA_USER}",
-        "JIRA_API_TOKEN": "${JIRA_TOKEN}"
-      }
-    },
     "sonarqube": {
       "command": "docker",
       "args": [

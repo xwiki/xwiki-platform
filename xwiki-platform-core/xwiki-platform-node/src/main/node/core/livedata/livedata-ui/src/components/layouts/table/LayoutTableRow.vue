@@ -108,7 +108,7 @@ export default {
 }
 
 .layout-table tbody tr:first-child td.cell {
-/* Removes the top border on the first line of the table, it's unecessary since the header itself has a background color */
+  /* Removes the top border on the first line of the table, it's unecessary since the header itself has a background color */
   border-top: 0;
 }
 </style>

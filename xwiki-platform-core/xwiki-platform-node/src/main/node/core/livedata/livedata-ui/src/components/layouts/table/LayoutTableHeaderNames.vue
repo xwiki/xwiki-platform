@@ -352,7 +352,8 @@ export default {
   position: absolute;
   pointer-events: none;
   left: 8px; /*center the handle horizontally, should be changed in case the resize-handle area is increased*/
-  top: calc((1em - 50%) * -1); /* Centers the handle vertically, takes 50% of the height and then move it 50% of the result of the operation */
+  /* Centers the handle vertically, takes 50% of the height and then move it 50% of the result of the operation */
+  top: calc((1em - 50%) * -1);
   background: var(--input-border-focus);
   width: 3px;
   height: 2em;

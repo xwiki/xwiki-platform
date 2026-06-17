@@ -46,7 +46,7 @@ public interface GroupFilter
 
     /**
      * @type {@link java.lang.Boolean}
-     * @since 18.5.0
+     * @since 18.6.0RC1
      */
     String PARAMETER_OVERWRITE = "overwrite";
 

@@ -191,12 +191,12 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     @Override
     public void beginUser(String name, FilterEventParameters parameters) throws FilterException
     {
-        XWikiDocument userDocument;
+        XWikiDocument userDoc;
         try {
-            userDocument = getUserDocument(name);
+            userDoc = getUserDocument(name);
 
             // Safer to clone for thread safety and in case the save fail
-            userDocument = userDocument.clone();
+            userDoc = userDoc.clone();
         } catch (XWikiException e) {
             throw new FilterException("Failed to get an XWikiDocument for user name [" + name + "]", e);
         }
@@ -223,10 +223,37 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
+        createOrUpdateUserObject(xcontext, userDoc, map);
+
+        if (userDoc.isNew()) {
+            // Authors
+            userDoc.setCreatorReference(userDoc.getDocumentReference());
+            userDoc.setAuthorReference(userDoc.getDocumentReference());
+            userDoc.setContentAuthorReference(userDoc.getDocumentReference());
+
+            // Dates
+            maybeSetDates(parameters, userDoc, UserFilter.PARAMETER_CREATION_DATE, UserFilter.PARAMETER_REVISION_DATE);
+
+            // Set false to force the date and authors we want
+            userDoc.setMetaDataDirty(false);
+            userDoc.setContentDirty(false);
+        }
+
+        // Save
+        try {
+            xcontext.getWiki().saveDocument(userDoc, this.properties.getSaveComment(), xcontext);
+        } catch (XWikiException e) {
+            throw new FilterException("Failed to save user document", e);
+        }
+    }
+
+    private static void createOrUpdateUserObject(XWikiContext xcontext, XWikiDocument userDoc, Map<String, Object> map)
+            throws FilterException
+    {
         BaseClass userClass;
         String originalWikiId = xcontext.getWikiId();
         // Make sure we get the group class from the same wiki as the imported user
-        xcontext.setWikiId(userDocument.getDocumentReference().getWikiReference().getName());
+        xcontext.setWikiId(userDoc.getDocumentReference().getWikiReference().getName());
         try {
             userClass = xcontext.getWiki().getUserClass(xcontext);
         } catch (XWikiException e) {
@@ -235,18 +262,18 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
             xcontext.setWikiId(originalWikiId);
         }
 
-        BaseObject userObject = userDocument.getXObject(userClass.getReference());
+        BaseObject userObject = userDoc.getXObject(userClass.getReference());
         if (userObject == null) {
             // Create object
             try {
-                userObject = userDocument.newXObject(userClass.getReference(), xcontext);
+                userObject = userDoc.newXObject(userClass.getReference(), xcontext);
             } catch (XWikiException e) {
                 throw new FilterException("Failed to create user object", e);
             }
 
             // Setup right on user profile
             try {
-                xcontext.getWiki().protectUserPage(userDocument.getFullName(), "edit", userDocument, xcontext);
+                xcontext.getWiki().protectUserPage(userDoc.getFullName(), "edit", userDoc, xcontext);
             } catch (XWikiException e) {
                 throw new FilterException("Failed to initialize user", e);
             }
@@ -254,31 +281,10 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
         // Update user properties
         userClass.fromValueMap(map, userObject);
-
-        if (userDocument.isNew()) {
-            // Authors
-            userDocument.setCreatorReference(userDocument.getDocumentReference());
-            userDocument.setAuthorReference(userDocument.getDocumentReference());
-            userDocument.setContentAuthorReference(userDocument.getDocumentReference());
-
-            // Dates
-            maybeSetDates(parameters, userDocument, UserFilter.PARAMETER_CREATION_DATE, UserFilter.PARAMETER_REVISION_DATE);
-
-            // Set false to force the date and authors we want
-            userDocument.setMetaDataDirty(false);
-            userDocument.setContentDirty(false);
-        }
-
-        // Save
-        try {
-            xcontext.getWiki().saveDocument(userDocument, this.properties.getSaveComment(), xcontext);
-        } catch (XWikiException e) {
-            throw new FilterException("Failed to save user document", e);
-        }
     }
 
     private void maybeSetDates(FilterEventParameters parameters, XWikiDocument doc, String creationField,
-       String revisionField)
+        String revisionField)
     {
         if (this.properties.isVersionPreserved()) {
             if (parameters.containsKey(creationField)) {
@@ -360,8 +366,31 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
             xcontext.setWikiId(originalWikiId);
         }
 
-        boolean overwrite = TRUE.equals(parameters.get(PARAMETER_OVERWRITE));
+        boolean overwrite = TRUE.equals(parameters.get(GroupFilter.PARAMETER_OVERWRITE));
 
+        updateGroupObjects(groupDocument, groupClass, overwrite, xcontext);
+
+        try {
+            if (groupDocument.isNew() && this.properties.isVersionPreserved()) {
+                maybeSetDates(parameters, groupDocument, GroupFilter.PARAMETER_CREATION_DATE,
+                        GroupFilter.PARAMETER_REVISION_DATE);
+
+                // Make sure the dates won't be overwritten when saving
+                groupDocument.setMetaDataDirty(false);
+                groupDocument.setContentDirty(false);
+            }
+            wiki.saveDocument(groupDocument, this.properties.getSaveComment(), xcontext);
+        } catch (XWikiException e) {
+            throw new FilterException("Failed to save group document", e);
+        }
+
+        // Reset members
+        this.membersToAdd = null;
+    }
+
+    private void updateGroupObjects(XWikiDocument groupDocument, DocumentReference groupClass, boolean overwrite,
+            XWikiContext xcontext) throws FilterException
+    {
         List<BaseObject> existingObjects = groupDocument.getXObjects(groupClass);
         Queue<BaseObject> membersToDrop = new ArrayDeque<>();
 
@@ -393,22 +422,6 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         for (BaseObject memberToDrop : membersToDrop) {
             groupDocument.removeXObject(memberToDrop);
         }
-
-        try {
-            if (groupDocument.isNew() && this.properties.isVersionPreserved()) {
-                maybeSetDates(parameters, groupDocument, GroupFilter.PARAMETER_CREATION_DATE, GroupFilter.PARAMETER_REVISION_DATE);
-
-                // Make sure the dates won't be overwritten when saving
-                groupDocument.setMetaDataDirty(false);
-                groupDocument.setContentDirty(false);
-            }
-            wiki.saveDocument(groupDocument, this.properties.getSaveComment(), xcontext);
-        } catch (XWikiException e) {
-            throw new FilterException("Failed to save group document", e);
-        }
-
-        // Reset members
-        this.membersToAdd = null;
     }
 
     private void addMember(String name)

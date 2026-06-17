@@ -46,7 +46,7 @@ import org.xwiki.livedata.WithParameters;
  * (class) properties are not supported yet.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @Component
 @Named(SolrLiveDataPropertyStore.ROLE_HINT)

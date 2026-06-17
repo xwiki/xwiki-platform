@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests of the Live Data macro with the {@code solr} source.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @UITest(extraJARs = {
     // The "solr" query language (used by the Solr live data source) is only reliable when part of the WAR.

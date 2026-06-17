@@ -45,7 +45,7 @@ import org.xwiki.xml.XMLUtils;
  * class focused on querying Solr.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @Component(roles = SolrLiveDataDocumentFormatter.class)
 @Singleton

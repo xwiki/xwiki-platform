@@ -71,7 +71,7 @@ import org.xwiki.user.UserPropertiesResolver;
  * the forward-compatible extension point: new types can be added without changing the {@code solr} source contract.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @Component
 @Named(SolrLiveDataEntryStore.ROLE_HINT)

@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link SolrLiveDataEntryStore}.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @ComponentTest
 class SolrLiveDataEntryStoreTest

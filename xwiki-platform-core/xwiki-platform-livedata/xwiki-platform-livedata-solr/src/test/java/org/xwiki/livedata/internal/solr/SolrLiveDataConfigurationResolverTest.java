@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * caller-provided {@code translationPrefix} source parameter.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @ComponentTest
 class SolrLiveDataConfigurationResolverTest

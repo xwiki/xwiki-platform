@@ -53,7 +53,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * and displayers are known at macro evaluation time.
  *
  * @version $Id$
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 @Component
 @Named(SolrLiveDataEntryStore.ROLE_HINT)

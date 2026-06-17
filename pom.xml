@@ -68,7 +68,7 @@
     <netty.version>4.2.15.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.155.0</metaeffekt.version>
+    <metaeffekt.version>0.156.1</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>

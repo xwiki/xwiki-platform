@@ -106,4 +106,9 @@ export default {
   (see https://stackoverflow.com/a/18488334/657524). */
   height: 100%;
 }
+
+.layout-table tbody tr:first-child td.cell {
+/* Removes the top border on the first line of the table, it's unecessary since the header itself has a background color */
+  border-top: 0;
+}
 </style>

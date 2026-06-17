@@ -150,7 +150,7 @@ catalog:
   vite: 7.3.5
   vite-plugin-css-injected-by-js: 4.0.1
   vite-plugin-dts: 4.5.4
-  vitest: 4.1.6
+  vitest: 4.1.9
   vitest-mock-extended: 4.0.0
   vue: 3.5.38
   vue-eslint-parser: 10.4.0

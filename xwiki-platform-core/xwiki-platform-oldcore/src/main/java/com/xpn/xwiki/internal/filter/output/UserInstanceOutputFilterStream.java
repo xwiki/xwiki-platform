@@ -39,7 +39,6 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.user.GroupFilter;
@@ -89,10 +88,6 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
     @Inject
     private ConverterManager converter;
-
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
 
     private String currentWiki;
 

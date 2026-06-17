@@ -48,7 +48,7 @@ public interface GroupFilter
      * @type {@link java.lang.Boolean}
      * @since 18.5.0
      */
-    String PARAMETER_APPEND = "append";
+    String PARAMETER_OVERWRITE = "overwrite";
 
     // Events
 

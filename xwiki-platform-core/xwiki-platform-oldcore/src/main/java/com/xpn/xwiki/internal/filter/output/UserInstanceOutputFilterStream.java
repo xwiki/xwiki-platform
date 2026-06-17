@@ -173,7 +173,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
             return groupDoc;
         }
 
-         if (!TRUE.equals(parameters.get(PARAMETER_APPEND))) {
+        if (TRUE.equals(parameters.get(PARAMETER_OVERWRITE))) {
             xcontext.getWiki().deleteDocument(groupDoc, false, xcontext);
             return getGroupDocument(id, parameters);
         }

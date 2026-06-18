@@ -341,6 +341,12 @@ importers:
       '@xwiki/platform-macros-service':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/macros/macros-service
+      '@xwiki/platform-markdown-syntax-config':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/markdown
+      '@xwiki/platform-minimal-syntax-config':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/minimal
       '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-api
@@ -350,9 +356,15 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
+      '@xwiki/platform-syntaxes-config':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config
       '@xwiki/platform-uniast-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-api
+      '@xwiki/platform-xwiki-syntax-config':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/xwiki
       inversify:
         specifier: 'catalog:'
         version: 7.11.0(reflect-metadata@0.2.2)

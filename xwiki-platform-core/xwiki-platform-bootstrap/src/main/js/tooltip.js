@@ -109,7 +109,7 @@
     }
 
     try {
-        doc = new DOMParser().parseFromString(unsafeHtml, 'text/html');
+      doc = new DOMParser().parseFromString(unsafeHtml, 'text/html');
     } catch (_) {}
     if (!doc || !doc.documentElement) {
       // IE 8 and below don't support createHTMLDocument

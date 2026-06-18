@@ -18,28 +18,28 @@ import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
 collaboration?: Collaboration;
-depsContainer: Container;
+container: Container;
 }, {
 getContent: () => UniAst | Error;
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: UniAst) => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
 collaboration?: Collaboration;
-depsContainer: Container;
+container: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: UniAst) => any) | undefined;

@@ -232,7 +232,7 @@ type ContextForMacros = {
   /**
    * Request the opening of a UI (e.g. modal) to insert a new block macro
    *
-   * @param prefill - Informations to prefill the modal with (ID, body, ...)
+   * @param prefill - Information to prefill the modal with (ID, body, ...)
    * @param insert - Insert the new macro, replacing the user-selected content (if any)
    *
    * @since 18.5.0RC1

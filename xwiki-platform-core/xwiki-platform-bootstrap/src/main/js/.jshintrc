@@ -11,5 +11,8 @@
   "nonbsp"   : true,
   "strict"   : true,
   "undef"    : true,
-  "unused"   : true
+  "unused"   : true,
+  "globals"  : {
+    "DOMImplementation": false
+  }
 }

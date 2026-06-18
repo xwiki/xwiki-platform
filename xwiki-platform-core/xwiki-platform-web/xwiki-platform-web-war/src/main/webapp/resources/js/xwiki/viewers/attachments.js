@@ -93,18 +93,18 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** By default the form contains one upload field. Add a "remove" button for this one, too. */
     addInitialRemoveButton() {
-      this.defaultFileDiv.appendChild(this.createRemoveButton());
+      this.defaultFileDiv.append(this.createRemoveButton());
     }
     /** Add an "Add another file" button below the file fields. */
     addAddButton() {
-      let addButton = $(document.createElement("input"));
+      let addButton = $("<input/>");
       addButton.attr('type', 'button');
       addButton.attr('value', l10n['core.viewers.attachments.upload.addFileInput']);
       addButton.attr('class', "attachmentActionButton add-file-input");
-      this.addDiv = document.createElement("div");
+      this.addDiv = $("<div></div>");
       this.addDiv.append(addButton);
-      addButton.on('click', this.addField);
-      this.defaultFileDiv.parent().insertBefore(this.addDiv, this.defaultFileDiv.next());
+      addButton.on('click', (e) => this.addField.apply(this, [e]));
+      this.defaultFileDiv.after(this.addDiv);
     }
     /** Add a submit listener that prevents submitting the form if no file was specified. */
     blockEmptySubmit() {
@@ -112,23 +112,21 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** Add a reset listener that resets the number of file fields to 1. */
     resetOnCancel() {
-      this.form[0].on('reset', this.onReset);
-      this.form.find('.cancel')[0].on('click', this.onReset);
+      this.form.first().on('reset', this.onReset);
+      this.form.find('.cancel').on('click', this.onReset);
     }
     /** Creates and inserts a new file input field. */
     addField(event) {
-      let fileInput = document.createElement("input", {
-        type: "file",
-        name: "filepath_" + this.counter,
-        size: this.inputSize,
-        className: "uploadFileInput"
-      });
+      let fileInput = $("<input type='file' class='uploadFileInput'/>");
+      fileInput.attr('name' , "filepath_" + this.counter);
+      fileInput.attr('size' , this.inputSize);
       // For the moment, specifying a different name is not used anymore.
-      var filenameInput = document.createElement("input", {type: "hidden", name : "filename_" + this.counter});
-      var removeButton = this.createRemoveButton();
-      var containerDiv = document.createElement("div", {'class' : 'fileupload-field'});
-      containerDiv.append(filenameInput, fileInput, removeButton);
-      this.addDiv.parentNode.insertBefore(containerDiv, this.addDiv);
+      let filenameInput = $("<input type='hidden'/>");
+      filenameInput.attr('name' , "filename_" + this.counter);
+      let removeButton = this.createRemoveButton();
+      let containerDiv = $("<div class='fileupload-field'></div>");
+      containerDiv.append([filenameInput, fileInput, removeButton]);
+      this.addDiv.after(containerDiv);
       // Remove the focus border from the button
       event.target.blur();
       this.counter++;
@@ -139,12 +137,9 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** Create a remove button that triggers {@link #removeField} when clicked. */
     createRemoveButton() {
-      var removeButton = new Element("input", {
-        type: "button",
-        value: l10n['core.viewers.attachments.upload.removeFileInput'],
-        title: l10n['core.viewers.attachments.upload.removeFileInput.title'],
-        className: "attachmentActionButton remove-file-input"
-      });
+      var removeButton = $("<input type='button' class='attachmentActionButton remove-file-input'/>");
+      removeButton.attr('value', l10n['core.viewers.attachments.upload.removeFileInput']);
+      removeButton.attr('title', l10n['core.viewers.attachments.upload.removeFileInput.title']);
       removeButton.on("click", this.removeField);
       return removeButton;
     }

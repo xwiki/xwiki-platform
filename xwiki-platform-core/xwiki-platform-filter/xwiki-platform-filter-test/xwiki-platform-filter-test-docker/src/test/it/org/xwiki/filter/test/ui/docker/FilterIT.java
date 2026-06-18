@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.test.ui;
+package org.xwiki.filter.test.ui.docker;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +32,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -48,32 +48,34 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * UI tests for the Filter application.
  *
  * @version $Id$
  */
-public class FilterIT extends AbstractTest
+class FilterIT
 {
-    private final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z");
-
-    // Login as superadmin to have delete rights.
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z");
 
     // Generate temporary files under the module's "target" directory so that they don't leak outside the build
-    // workspace (TemporaryFolder is rooted at java.io.tmpdir, which the build redirects to "target").
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    // workspace (@TempDir is rooted at java.io.tmpdir, which the build redirects to "target").
+    @TempDir
+    private File temporaryFolder;
+
+    @BeforeEach
+    void setUp(TestUtils setup)
+    {
+        // Login as superadmin to have delete rights.
+        setup.loginAsSuperAdmin();
+    }
 
     @Test
-    public void applicationRegistration()
+    void applicationRegistration()
     {
         // Navigate to the Filter app by clicking in the Application Panel.
         // This verifies that the Filter application is registered in the Applications Panel.
@@ -87,18 +89,18 @@ public class FilterIT extends AbstractTest
     }
 
     @Test
-    public void testDefaultVersionPreservedValue()
+    void testDefaultVersionPreservedValue(TestUtils setup)
     {
         ApplicationFilterHomePage page = ApplicationFilterHomePage.gotoPage();
 
-        Select outputType = new Select(getDriver().findElement(By.id("filter_output_type")));
+        Select outputType = new Select(setup.getDriver().findElement(By.id("filter_output_type")));
         outputType.selectByValue("xwiki+instance");
         WebElement outputElement = page.getOutputField("versionPreserved");
         assertEquals("true", outputElement.getAttribute("value"));
     }
 
     @Test
-    public void testConvertXMLURL() throws IOException
+    void testConvertXMLURL() throws IOException
     {
         ApplicationFilterHomePage page = ApplicationFilterHomePage.gotoPage();
 
@@ -110,7 +112,7 @@ public class FilterIT extends AbstractTest
 
         // Set output
         page.setOutputFilter("filter+xml");
-        File tmp = this.temporaryFolder.newFile("result.xml");
+        File tmp = new File(this.temporaryFolder, "result.xml");
         page.setTarget("file:" + tmp.getAbsolutePath());
 
         // Start conversion
@@ -121,7 +123,7 @@ public class FilterIT extends AbstractTest
     }
 
     @Test
-    public void testImportDocument() throws Exception
+    void testImportDocument(TestUtils setup) throws Exception
     {
         ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
 
@@ -139,7 +141,7 @@ public class FilterIT extends AbstractTest
 
         LocalDocumentReference localDocumentReference =
             new LocalDocumentReference(List.of("space", "nestedspace2"), "document");
-        Page page = getUtil().rest().get(localDocumentReference,
+        Page page = setup.rest().get(localDocumentReference,
             Map.of("objects", new Object[] {"true"}, "class", new Object[] {"true"}, "attachments",
                 new Object[] {"true"}));
 
@@ -158,7 +160,7 @@ public class FilterIT extends AbstractTest
         ObjectReference objectReference = new ObjectReference("space.nestedspace2.document[0]",
             new DocumentReference(localDocumentReference, new WikiReference("xwiki")));
 
-        org.xwiki.rest.model.jaxb.Object object = getUtil().rest().get(objectReference);
+        org.xwiki.rest.model.jaxb.Object object = setup.rest().get(objectReference);
         List<Property> properties = object.getProperties();
         assertEquals(1, properties.size());
         assertEquals("prop1", properties.get(0).getName());
@@ -166,7 +168,7 @@ public class FilterIT extends AbstractTest
     }
 
     @Test
-    public void testImportDocumentWithoutXClassInfo() throws Exception
+    void testImportDocumentWithoutXClassInfo(TestUtils setup) throws Exception
     {
         ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
 
@@ -184,7 +186,7 @@ public class FilterIT extends AbstractTest
 
         LocalDocumentReference localDocumentReference =
             new LocalDocumentReference(List.of("space", "nestedspace"), "document");
-        Page page = getUtil().rest().get(localDocumentReference,
+        Page page = setup.rest().get(localDocumentReference,
             Map.of("objects", new Object[] {"true"}, "class", new Object[] {"true"}, "attachments",
                 new Object[] {"true"}));
 
@@ -205,7 +207,7 @@ public class FilterIT extends AbstractTest
         ObjectReference objectReference = new ObjectReference("space.nestedspace.document[0]",
             new DocumentReference(localDocumentReference, new WikiReference("xwiki")));
 
-        org.xwiki.rest.model.jaxb.Object object = getUtil().rest().get(objectReference);
+        org.xwiki.rest.model.jaxb.Object object = setup.rest().get(objectReference);
         List<Property> properties = object.getProperties();
         assertEquals(1, properties.size());
         assertEquals("prop1", properties.get(0).getName());

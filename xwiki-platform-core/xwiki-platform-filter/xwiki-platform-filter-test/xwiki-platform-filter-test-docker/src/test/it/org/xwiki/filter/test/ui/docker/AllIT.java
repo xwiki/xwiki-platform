@@ -17,18 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.test.ui;
+package org.xwiki.filter.test.ui.docker;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
+ * All functional Filter tests. Note that XWiki is started/stopped only once during all the tests and thus they must all
+ * work as independent scenarios sharing the same XWiki instance (this reproduces the behavior of the former
+ * {@code PageObjectSuite}-based suite).
  *
  * @version $Id$
- * @since 5.0M2
  */
-@RunWith(PageObjectSuite.class)
-public class AllIT
+@UITest(
+    properties = {
+        // The Filter Stream app's home page (Filter.WebHome) requires Programming Rights, so we need to exclude it
+        // from the Programming Rights checker.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Filter\\.WebHome"
+    }
+)
+class AllIT
 {
+    @Nested
+    class NestedFilterIT extends FilterIT
+    {
+    }
 }

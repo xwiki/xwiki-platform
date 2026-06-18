@@ -20,25 +20,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-test</artifactId>
     <version>18.6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-filter-test-tests</artifactId>
-  <name>XWiki Platform - Filter - Tests - Functional Tests</name>
+  <artifactId>xwiki-platform-filter-test-docker</artifactId>
+  <name>XWiki Platform - Filter - Tests - Functional Tests in Docker</name>
+  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
+  <description>XWiki Platform - Filter - Tests - Functional Tests in Docker</description>
   <packaging>jar</packaging>
-  <description>Tests for the Filter Application</description>
   <properties>
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Filter Stream app's home page requires PR so we need to exclude it from the PR checker ATM -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:Filter\.WebHome</xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
+    <!-- ================================
+         Dependencies for tested features
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-filter-ui</artifactId>
@@ -69,11 +71,12 @@
       <scope>runtime</scope>
     </dependency>
 
-
-    <!-- Test dependencies -->
+    <!-- ================================
+         Test only dependencies
+         ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -91,41 +94,24 @@
     </dependency>
   </dependencies>
   <build>
+    <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <!-- Only run the AllIT suite: it starts XWiki once and runs all the Filter test classes as @Nested classes
+               sharing that single instance. The individual *IT classes are not @UITest-annotated and must not be
+               executed standalone. -->
+          <includes>
+            <include>**/AllIT.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
   <profiles>
-    <profile>
-      <id>package</id>
-      <activation>
-        <property>
-          <name>!skipITs</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
-               https://jira.xwiki.org/browse/XWIKI-7683 -->
-          <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-              <execution>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>package</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
@@ -138,19 +124,16 @@
       </dependencies>
       <build>
         <plugins>
-          <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
-               that have been instrumented with Clover (XWiki oldcore for example) -->
           <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.openclover</groupId>
-                <artifactId>clover</artifactId>
-                <version>${clover.version}</version>
-              </dependency>
-            </dependencies>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
+            </configuration>
           </plugin>
         </plugins>
       </build>

@@ -26,7 +26,7 @@ import type {
 /**
  * Name of the minimal syntax
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 const MINIMAL_SYNTAX_NAME = "_minimal";
@@ -34,7 +34,7 @@ const MINIMAL_SYNTAX_NAME = "_minimal";
 /**
  * Configuration for the `xwiki/2.1` syntax
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 @injectable()

@@ -26,7 +26,7 @@ import type {
 /**
  * Configuration for the `markdown/1.2` syntax
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 @injectable()

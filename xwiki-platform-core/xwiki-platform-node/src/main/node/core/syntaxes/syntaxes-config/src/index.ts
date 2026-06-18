@@ -21,7 +21,7 @@
 /**
  * Component name for registering syntax configurations through dependency injection
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 const SYNTAX_CONFIG_COMPONENT_GROUP_NAME = "SyntaxConfig";
@@ -29,7 +29,7 @@ const SYNTAX_CONFIG_COMPONENT_GROUP_NAME = "SyntaxConfig";
 /**
  * Configuration for a specific syntax
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 type SyntaxConfig = {
@@ -49,7 +49,7 @@ type SyntaxConfig = {
  *
  * All features disabled or absent from the configuration will be considered as unsupported
  *
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 type SyntaxAllowedFeatures = {

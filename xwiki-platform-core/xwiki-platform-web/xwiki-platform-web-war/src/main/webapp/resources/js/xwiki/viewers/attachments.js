@@ -108,7 +108,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** Add a submit listener that prevents submitting the form if no file was specified. */
     blockEmptySubmit() {
-      this.form[0].on('submit', this.onSubmit);
+      this.form.first().on('submit', (e) => this.onSubmit.apply(this, [e]));
     }
     /** Add a reset listener that resets the number of file fields to 1. */
     resetOnCancel() {
@@ -146,13 +146,14 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     /** Form submit listener. It checks that at least one file item contains a filename. If not, cancel the submission. */
     onSubmit(event) {
       let hasFiles = false;
-      this.form.find("input[type='file']").each(function(item) {
+      this.form.find("input[type='file']").each(function(index, item) {
         if(item.value !== '') {
           hasFiles = true;
         }
       });
       if(!hasFiles) {
-        event.stop();
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
     /** Form reset listener. It resets the number of file fields to just one. */

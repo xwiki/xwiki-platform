@@ -21,6 +21,7 @@ package org.xwiki.rest.test.framework;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +45,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.embed.EmbeddableComponentManager;
@@ -74,29 +72,18 @@ import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
-import org.xwiki.test.integration.junit4.ValidateConsoleRule;
-import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 
-public abstract class AbstractHttpIT extends AbstractTest
-{
-    /**
-     * Validate stdout/stderr for problems.
-     */
-    @ClassRule
-    public static final ValidateConsoleRule validateConsole = new ValidateConsoleRule();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public abstract class AbstractHttpIT
+{
     protected static final String INVALID_LIMIT_MINUS_1 =
         "Invalid limit value: -1. The limit must be a positive integer and less than or equal to 1000.";
 
     protected static final String INVALID_LIMIT_1001 =
         "Invalid limit value: 1001. The limit must be a positive integer and less than or equal to 1000.";
-
-    /**
-     * The object used to access the name of the current test.
-     */
-    @Rule
-    public final TestName testName = new TestName();
 
     protected Random random;
 
@@ -108,6 +95,17 @@ public abstract class AbstractHttpIT extends AbstractTest
 
     protected SolrTestUtils solrUtils;
 
+    /**
+     * The {@link TestUtils} instance injected by the Docker test framework, kept as a field so that the helper methods
+     * ported from the legacy framework can keep using {@link #getUtil()}.
+     */
+    protected TestUtils testUtils;
+
+    /**
+     * Used to access the name of the current test (replaces the JUnit 4 {@code TestName} rule).
+     */
+    protected TestInfo testInfo;
+
     static {
         try {
             initializeSystem();
@@ -116,9 +114,17 @@ public abstract class AbstractHttpIT extends AbstractTest
         }
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void setUp(TestUtils setup, TestInfo info) throws Exception
     {
+        this.testUtils = setup;
+        this.testInfo = info;
+
+        // REST operations performed below and by the various helper methods rely on the default credentials being
+        // those of the superadmin user. The former JUnit 4 functional test framework set this up automatically; the
+        // Docker framework does not, so we set it explicitly here (before each test).
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+
         random = new Random();
 
         JAXBContext context = JAXBContext.newInstance("org.xwiki.rest.model.jaxb");
@@ -140,6 +146,14 @@ public abstract class AbstractHttpIT extends AbstractTest
         this.solrUtils = new SolrTestUtils(getUtil());
     }
 
+    /**
+     * @return the {@link TestUtils} instance injected by the Docker test framework
+     */
+    protected TestUtils getUtil()
+    {
+        return this.testUtils;
+    }
+
     public static void initializeSystem() throws Exception
     {
         ComponentManager componentManager = new EmbeddableComponentManager();
@@ -154,7 +168,7 @@ public abstract class AbstractHttpIT extends AbstractTest
         componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultSymbolScheme.class.getName()));
-        loader.initialize(componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
+        loader.initialize(componentManager, AbstractHttpIT.class.getClassLoader(), componentDeclarations);
 
         TestUtils.initializeComponent(componentManager);
     }
@@ -287,7 +301,7 @@ public abstract class AbstractHttpIT extends AbstractTest
     protected String getFormToken(String userName, String password) throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class), userName, password);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
         return getMethod.getResponseHeader("XWiki-Form-Token").getValue();
     }
 
@@ -438,10 +452,10 @@ public abstract class AbstractHttpIT extends AbstractTest
     protected String getWiki() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(wikis.getWikis().size() > 0);
 
         return wikis.getWikis().get(0).getName();
     }
@@ -449,7 +463,7 @@ public abstract class AbstractHttpIT extends AbstractTest
     protected String getContentFromURI(String uri) throws Exception
     {
         GetMethod getMethod = executeGet(uri);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         return getMethod.getResponseBodyAsString();
     }
@@ -460,7 +474,7 @@ public abstract class AbstractHttpIT extends AbstractTest
             for (Link link : linkCollection.getLinks()) {
                 GetMethod getMethod = executeGet(link.getHref());
                 if (getMethod.getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-                    Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+                    assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
                 }
             }
         }
@@ -496,8 +510,8 @@ public abstract class AbstractHttpIT extends AbstractTest
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
 
         int code = putMethod.getStatusCode();
-        Assert.assertTrue(String.format("Failed to set page content, %s", getHttpMethodInfo(putMethod)),
-            code == HttpStatus.SC_ACCEPTED || code == HttpStatus.SC_CREATED);
+        assertTrue(code == HttpStatus.SC_ACCEPTED || code == HttpStatus.SC_CREATED,
+            String.format("Failed to set page content, %s", getHttpMethodInfo(putMethod)));
 
         return code;
     }
@@ -542,7 +556,7 @@ public abstract class AbstractHttpIT extends AbstractTest
 
         return restSpaces;
     }
-    
+
     protected void createPage(List<String> spaces, String pageName, String content) throws Exception
     {
         String uri = buildURI(PageResource.class, getWiki(), toRestSpaces(spaces), pageName);
@@ -552,7 +566,7 @@ public abstract class AbstractHttpIT extends AbstractTest
 
         PutMethod putMethod = executePutXml(uri, page, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
     }
 
     protected boolean createPageIfDoesntExist(List<String> spaces, String pageName, String content) throws Exception
@@ -565,7 +579,7 @@ public abstract class AbstractHttpIT extends AbstractTest
             createPage(spaces, pageName, content);
 
             getMethod = executeGet(uri);
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             return true;
         }
@@ -575,11 +589,15 @@ public abstract class AbstractHttpIT extends AbstractTest
 
     protected String getTestMethodName()
     {
-        return this.testName.getMethodName();
+        return this.testInfo.getTestMethod().map(Method::getName).orElse(null);
     }
 
     protected String getTestClassName()
     {
-        return getClass().getSimpleName();
+        // The tests run as @Nested classes named "Nested<OriginalClassName>" inside AllIT. Strip the "Nested" prefix
+        // so that the space/page names built from the class name (and the assertions that hardcode it) match the
+        // original IT class name, exactly as in the former JUnit 4 suite.
+        String simpleName = getClass().getSimpleName();
+        return simpleName.startsWith("Nested") ? simpleName.substring("Nested".length()) : simpleName;
     }
 }

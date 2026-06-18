@@ -30,9 +30,9 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -56,9 +56,11 @@ import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class WikisResourceIT extends AbstractHttpIT
 {
@@ -72,11 +74,11 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private DocumentReference reference;
 
-    @Before
+    @BeforeEach
     @Override
-    public void setUp() throws Exception
+    public void setUp(TestUtils setup, TestInfo info) throws Exception
     {
-        super.setUp();
+        super.setUp(setup, info);
 
         this.wikiName = getWiki();
         this.spaces = Arrays.asList(getTestClassName());
@@ -90,7 +92,7 @@ public class WikisResourceIT extends AbstractHttpIT
     {
         try {
             GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             SearchResults searchResults =
                 (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
@@ -111,26 +113,26 @@ public class WikisResourceIT extends AbstractHttpIT
     public void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(getHttpMethodInfo(getMethod), wikis.getWikis().size() > 0);
+        assertTrue(wikis.getWikis().size() > 0, getHttpMethodInfo(getMethod));
 
         for (Wiki wiki : wikis.getWikis()) {
             Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             link = getFirstLinkByRelation(wiki, Relations.CLASSES);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             link = getFirstLinkByRelation(wiki, Relations.MODIFICATIONS);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             link = getFirstLinkByRelation(wiki, Relations.SEARCH);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             link = getFirstLinkByRelation(wiki, Relations.QUERY);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             checkLinks(wiki);
         }
@@ -168,8 +170,8 @@ public class WikisResourceIT extends AbstractHttpIT
 
             // Ensure that the terminal page is found by its name.
             int resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
-            Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+            assertEquals(1, resultSize);
+            assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
 
             // Create a non-terminal page with the same "name" but this time as last space.
             String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
@@ -183,7 +185,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
             // Ensure that searching by name finds both terminal and non-terminal page.
             resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(2, resultSize);
+            assertEquals(2, resultSize);
             List<String> foundPages = searchResults.getSearchResults().stream()
                 .map(SearchResult::getPageFullName)
                 .collect(Collectors.toList());
@@ -203,7 +205,7 @@ public class WikisResourceIT extends AbstractHttpIT
                 assertTrue(foundPages.contains(this.fullName));
                 assertTrue(foundPages.contains(nonTerminalFullName));
             } else {
-                Assert.assertEquals(List.of(), foundPages);
+                assertEquals(List.of(), foundPages);
             }
         } finally {
             resetSearchSource(sourceHint);
@@ -212,7 +214,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private void resetSearchSource(String sourceHint) throws Exception
     {
-        Assert.assertEquals(sourceHint, getUtil().executeWikiPlain("""
+        assertEquals(sourceHint, getUtil().executeWikiPlain("""
             {{groovy}}
             System.clearProperty("xconf.xwikiproperties.rest.keywordSearchSource")
             {{/groovy}}
@@ -221,7 +223,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private void setSearchSource(String sourceHint) throws Exception
     {
-        Assert.assertEquals("", getUtil().executeWikiPlain("""
+        assertEquals("", getUtil().executeWikiPlain("""
             {{groovy}}
             System.setProperty("xconf.xwikiproperties.rest.keywordSearchSource", "%s")
             {{/groovy}}
@@ -258,12 +260,12 @@ public class WikisResourceIT extends AbstractHttpIT
             GetMethod getMethod =
                 executeGet(
                     String.format("%s?q=content" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             int resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
+            assertEquals(1, resultSize);
 
             for (SearchResult searchResult : searchResults.getSearchResults()) {
                 checkLinks(searchResult);
@@ -271,12 +273,12 @@ public class WikisResourceIT extends AbstractHttpIT
 
             getMethod = executeGet(
                 String.format("%s?q=" + nestedPageName + "&scope=name", buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
+            assertEquals(1, resultSize);
 
             for (SearchResult searchResult : searchResults.getSearchResults()) {
                 checkLinks(searchResult);
@@ -285,12 +287,12 @@ public class WikisResourceIT extends AbstractHttpIT
             // Search in titles
             getMethod = executeGet(String.format("%s?q=title" + this.pageName + "&scope=title",
                 buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
+            assertEquals(1, resultSize);
 
             for (SearchResult searchResult : searchResults.getSearchResults()) {
                 checkLinks(searchResult);
@@ -299,7 +301,7 @@ public class WikisResourceIT extends AbstractHttpIT
             // Search for space names
             getMethod = executeGet(String.format("%s?q=" + this.pageName + "&scope=spaces",
                 buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -307,7 +309,7 @@ public class WikisResourceIT extends AbstractHttpIT
                 .stream()
                 .map(SearchResult::getSpace)
                 .toList();
-            Assert.assertEquals(List.of(String.join(".", nestedSpace)), searchResultNames);
+            assertEquals(List.of(String.join(".", nestedSpace)), searchResultNames);
 
             for (SearchResult searchResult : searchResults.getSearchResults()) {
                 checkLinks(searchResult);
@@ -323,12 +325,12 @@ public class WikisResourceIT extends AbstractHttpIT
         /* Check search for an object containing XWiki.Admin (i.e., the admin profile) */
         GetMethod getMethod =
             executeGet(String.format("%s?q=XWiki.Admin&scope=objects", buildURI(WikiSearchResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         int resultSize = searchResults.getSearchResults().size();
-        Assert.assertTrue(String.format("Found %s results", resultSize), resultSize == 0);
+        assertTrue(resultSize == 0, String.format("Found %s results", resultSize));
     }
 
     @Test
@@ -338,7 +340,7 @@ public class WikisResourceIT extends AbstractHttpIT
         GetMethod getMethod = executeGet(
             String.format("%s?q=XWiki.XWikiGuest&scope=objects", buildURI(WikiSearchResource.class, getWiki())),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -347,7 +349,7 @@ public class WikisResourceIT extends AbstractHttpIT
          * appear in the results.
          */
         int resultSize = searchResults.getSearchResults().size();
-        Assert.assertTrue(String.format("Found %s results", resultSize), resultSize >= 1);
+        assertTrue(resultSize >= 1, String.format("Found %s results", resultSize));
     }
 
     @Test
@@ -359,11 +361,11 @@ public class WikisResourceIT extends AbstractHttpIT
 
         // Get all pages
         GetMethod getMethod = executeGet(String.format("%s", buildURI(WikiPagesResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(pages.getPageSummaries().size() > 0);
 
         for (PageSummary pageSummary : pages.getPageSummaries()) {
             checkLinks(pageSummary);
@@ -371,27 +373,27 @@ public class WikisResourceIT extends AbstractHttpIT
 
         // Get all pages having a document name that contains "WebHome" (for all spaces)
         getMethod = executeGet(String.format("%s?name=" + this.pageName, buildURI(WikiPagesResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         List<PageSummary> pageSummaries = pages.getPageSummaries();
-        Assert.assertTrue(pageSummaries.size() == 1);
+        assertTrue(pageSummaries.size() == 1);
         PageSummary pageSummary = pageSummaries.get(0);
-        Assert.assertEquals(this.fullName, pageSummary.getFullName());
+        assertEquals(this.fullName, pageSummary.getFullName());
         checkLinks(pageSummary);
 
         // Get all pages having a document name that contains "WebHome" and a space with an "s" in its name.
         getMethod = executeGet(String.format("%s?name=" + this.pageName + "&space=" + this.fullName.charAt(2),
             buildURI(WikiPagesResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         pageSummaries = pages.getPageSummaries();
-        Assert.assertTrue(pageSummaries.size() == 1);
+        assertTrue(pageSummaries.size() == 1);
         pageSummary = pageSummaries.get(0);
-        Assert.assertEquals(this.fullName, pageSummary.getFullName());
+        assertEquals(this.fullName, pageSummary.getFullName());
         checkLinks(pageSummary);
     }
 
@@ -404,11 +406,11 @@ public class WikisResourceIT extends AbstractHttpIT
 
         // Verify there are attachments in the whole wiki
         GetMethod getMethod = executeGet(buildURI(WikiAttachmentsResource.class, getWiki()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Attachments attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertTrue(attachments.getAttachments().size() > 0);
+        assertTrue(attachments.getAttachments().size() > 0);
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -417,11 +419,11 @@ public class WikisResourceIT extends AbstractHttpIT
         // Verify we can search for a specific attachment name in the whole wiki
         getMethod = executeGet(
             String.format("%s?name=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertEquals(getAttachmentsInfo(attachments), 1, attachments.getAttachments().size());
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -431,11 +433,11 @@ public class WikisResourceIT extends AbstractHttpIT
         // Also verify that a space can be looked up independtly of its case ("sandbox" will match the "Sandbox" space)
         getMethod = executeGet(
             String.format("%s?space=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertEquals(getAttachmentsInfo(attachments), 1, attachments.getAttachments().size());
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -444,11 +446,11 @@ public class WikisResourceIT extends AbstractHttpIT
         // Verify we can search for an attachment in a given space (sandbox)
         getMethod = executeGet(String.format("%s?name=" + getTestClassName() + "&space=" + getTestClassName(),
             buildURI(WikiAttachmentsResource.class, getWiki())));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertEquals(getAttachmentsInfo(attachments), 1, attachments.getAttachments().size());
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -466,13 +468,13 @@ public class WikisResourceIT extends AbstractHttpIT
             GetMethod getMethod = executeGet(URIUtil
                 .encodeQuery(String.format("%s?q=where doc.name='" + this.pageName + "' order by doc.space desc&type=hql",
                     buildURI(WikiSearchQueryResource.class, getWiki()))));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             int resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
-            Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+            assertEquals(1, resultSize);
+            assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
         } finally {
             resetAllowedQueryTypes();
         }
@@ -488,12 +490,12 @@ public class WikisResourceIT extends AbstractHttpIT
                     "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
                     buildURI(WikiSearchQueryResource.class, getWiki()))),
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             int resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
+            assertEquals(1, resultSize);
             assertNotNull(searchResults.getSearchResults().get(0).getObject());
         } finally {
             resetAllowedQueryTypes();
@@ -508,12 +510,12 @@ public class WikisResourceIT extends AbstractHttpIT
             GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format(
                 "%s?q=where doc.space='XWiki' and doc.name='XWikiPreferences'&type=hql&className=XWiki.XWikiGlobalRights",
                 buildURI(WikiSearchQueryResource.class, getWiki()))));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             int resultSize = searchResults.getSearchResults().size();
-            Assert.assertEquals(1, resultSize);
+            assertEquals(1, resultSize);
             assertNull(searchResults.getSearchResults().get(0).getObject());
         } finally {
             resetAllowedQueryTypes();
@@ -530,13 +532,13 @@ public class WikisResourceIT extends AbstractHttpIT
 
         GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format("%s?q=\"" + this.pageName + "\"&type=solr",
             buildURI(WikiSearchQueryResource.class, getWiki()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         int resultSize = searchResults.getSearchResults().size();
-        Assert.assertEquals(1, resultSize);
-        Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+        assertEquals(1, resultSize);
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
     }
 
     @Test
@@ -553,7 +555,7 @@ public class WikisResourceIT extends AbstractHttpIT
         // case there is some race condition on server side
         SearchResults searchResults = getUtil().getDriver().waitUntilCondition(d -> search(1, query));
 
-        Assert.assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
     }
 
     @Test
@@ -571,32 +573,32 @@ public class WikisResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 String.format("%s?number=-1", buildURI(WikiAttachmentsResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 String.format("%s?number=1001", buildURI(WikiAttachmentsResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 String.format("%s?number=1", buildURI(WikiAttachmentsResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
+            assertEquals(1, attachments.getAttachments().size());
 
             String firstName = attachments.getAttachments().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(
                 String.format("%s?number=1&start=1", buildURI(WikiAttachmentsResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
+            assertEquals(1, attachments.getAttachments().size());
             // Check that we got a different attachment
-            Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+            assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up attachments
             getUtil().rest().delete(this.reference);
@@ -618,32 +620,32 @@ public class WikisResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 String.format("%s?number=-1", buildURI(WikiPagesResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 String.format("%s?number=1001", buildURI(WikiPagesResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 String.format("%s?number=1", buildURI(WikiPagesResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
+            assertEquals(1, pages.getPageSummaries().size());
 
             String firstName = pages.getPageSummaries().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(
                 String.format("%s?number=1&start=1", buildURI(WikiPagesResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
+            assertEquals(1, pages.getPageSummaries().size());
             // Check that we got a different page
-            Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
+            assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
         } finally {
             // Clean up pages
             getUtil().rest().delete(ref1);
@@ -665,27 +667,27 @@ public class WikisResourceIT extends AbstractHttpIT
 
             // Test: limit=-1 should return error.
             GetMethod getMethod = executeGet("%s?limit=-1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: limit=1001 should return error.
             getMethod = executeGet("%s?limit=1001".formatted(buildURI(WikiChildrenResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with limit=1.
             getMethod = executeGet("%s?limit=1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
-            Assert.assertEquals("ChildSpace1.WebHome", pages.getPageSummaries().get(0).getFullName());
+            assertEquals(1, pages.getPageSummaries().size());
+            assertEquals("ChildSpace1.WebHome", pages.getPageSummaries().get(0).getFullName());
 
             // Test: pagination with limit=1 and offset=1.
             getMethod = executeGet("%s?limit=1&offset=1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
-            Assert.assertEquals("ChildSpace2.WebHome", pages.getPageSummaries().get(0).getFullName());
+            assertEquals(1, pages.getPageSummaries().size());
+            assertEquals("ChildSpace2.WebHome", pages.getPageSummaries().get(0).getFullName());
         } finally {
             // Clean up pages
             getUtil().rest().delete(ref1);
@@ -710,31 +712,31 @@ public class WikisResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 "%s?q=searchcontent&number=-1".formatted(buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1001".formatted(buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1&scope=content".formatted(buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
-            Assert.assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1&start=1&scope=content".formatted(
                     buildURI(WikiSearchResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
-            Assert.assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
         } finally {
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);
@@ -758,31 +760,31 @@ public class WikisResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 "%s?q=querycontent1&number=-1".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 "%s?q=querycontent1&number=1001".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 "%s?q=querycontent&number=1&type=solr".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
-            Assert.assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(
                 "%s?q=querycontent&number=1&start=1&type=solr".formatted(buildURI(WikiSearchQueryResource.class,
                     getWiki())));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
             results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
-            Assert.assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
         } finally {
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);
@@ -795,27 +797,25 @@ public class WikisResourceIT extends AbstractHttpIT
         // By default, only "solr" is allowed; "hql" and "xwql" are forbidden.
         GetMethod getMethod = executeGet(
             "%s?q=somequery&type=hql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-        Assert.assertEquals(400, getMethod.getStatusCode());
-        Assert.assertEquals("Query type [hql] is not allowed. Allowed query types are: [solr].",
-            getMethod.getResponseBodyAsString());
+        assertEquals(400, getMethod.getStatusCode());
+        assertEquals("Query type [hql] is not allowed. Allowed query types are: [solr].", getMethod.getResponseBodyAsString());
 
         getMethod = executeGet(
             "%s?q=somequery&type=xwql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-        Assert.assertEquals(400, getMethod.getStatusCode());
-        Assert.assertEquals("Query type [xwql] is not allowed. Allowed query types are: [solr].",
-            getMethod.getResponseBodyAsString());
+        assertEquals(400, getMethod.getStatusCode());
+        assertEquals("Query type [xwql] is not allowed. Allowed query types are: [solr].", getMethod.getResponseBodyAsString());
 
         // "solr" is allowed by default (no pages needed, just check the status is not 400).
         getMethod = executeGet(
             "%s?q=somequery&type=solr".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
-        Assert.assertNotEquals(400, getMethod.getStatusCode());
+        assertNotEquals(400, getMethod.getStatusCode());
 
         // After allowing "hql" via configuration, it should succeed.
         setAllowedQueryTypes("solr,hql");
         try {
             getMethod = executeGet(URIUtil.encodeQuery(
                 "%s?q=where 1=0&type=hql".formatted(buildURI(WikiSearchQueryResource.class, getWiki()))));
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
         } finally {
             resetAllowedQueryTypes();
         }
@@ -823,7 +823,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     private void setAllowedQueryTypes(String allowedQueryTypes) throws Exception
     {
-        Assert.assertEquals("", getUtil().executeWikiPlain("""
+        assertEquals("", getUtil().executeWikiPlain("""
             {{groovy}}
             System.setProperty("xconf.xwikiproperties.rest.allowedQueryTypes", "%s")
             {{/groovy}}

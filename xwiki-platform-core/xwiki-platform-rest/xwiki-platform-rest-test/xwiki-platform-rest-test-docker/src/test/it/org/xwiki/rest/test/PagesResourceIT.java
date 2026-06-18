@@ -21,8 +21,7 @@ package org.xwiki.rest.test;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
@@ -33,6 +32,10 @@ import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PagesResourceIT extends AbstractHttpIT
 {
@@ -41,30 +44,30 @@ public class PagesResourceIT extends AbstractHttpIT
     public void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(wikis.getWikis().size() > 0);
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
-        Assert.assertNotNull(link);
+        assertNotNull(link);
 
         getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(spaces.getSpaces().size() > 0);
 
         Space space = spaces.getSpaces().get(0);
         link = getFirstLinkByRelation(space, Relations.PAGES);
-        Assert.assertNotNull(link);
+        assertNotNull(link);
 
         getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(pages.getPageSummaries().size() > 0);
 
         checkLinks(pages);
     }
@@ -87,31 +90,31 @@ public class PagesResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 "%s?number=-1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 "%s?number=1001".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 "%s?number=1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
+            assertEquals(1, pages.getPageSummaries().size());
 
             String firstName = pages.getPageSummaries().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(
                 "%s?number=1&start=1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, pages.getPageSummaries().size());
-            Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
+            assertEquals(1, pages.getPageSummaries().size());
+            assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
         } finally {
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);

@@ -27,9 +27,9 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.Page;
@@ -38,9 +38,10 @@ import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class PageTranslationResourceIT extends AbstractHttpIT
 {
@@ -56,11 +57,11 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
     private DocumentReference referenceFR;
 
-    @Before
+    @BeforeEach
     @Override
-    public void setUp() throws Exception
+    public void setUp(TestUtils setup, TestInfo info) throws Exception
     {
-        super.setUp();
+        super.setUp(setup, info);
 
         this.wikiName = getWiki();
         this.space = getTestClassName();
@@ -85,7 +86,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
     {
         GetMethod getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(),
             Arrays.asList("NOTEXISTING"), "NOTEXISTING", Locale.FRENCH).toString());
-        assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
     }
 
     @Test
@@ -104,7 +105,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         // PUT
         PutMethod putMethod = executePutXml(uri, newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
 
         assertEquals("fr titre", modifiedPage.getTitle());
@@ -116,7 +117,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
         // GET
         GetMethod getMethod = executeGet(uri);
-        assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
         modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         assertEquals("fr titre", modifiedPage.getTitle());
@@ -126,7 +127,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         // DELETE
         DeleteMethod deleteMethod = executeDelete(uri, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode(), getHttpMethodInfo(deleteMethod));
 
         assertFalse(getUtil().rest().exists(this.referenceDefault));
         assertFalse(getUtil().rest().exists(this.referenceFR));
@@ -161,31 +162,31 @@ public class PageTranslationResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet("%s?number=-1".formatted(
                 buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet("%s?number=1001".formatted(
                 buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet("%s?number=1".formatted(
                 buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             History history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, history.getHistorySummaries().size());
+            assertEquals(1, history.getHistorySummaries().size());
 
             String firstVersion = history.getHistorySummaries().get(0).getVersion();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet("%s?number=1&start=1".formatted(
                 buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, history.getHistorySummaries().size());
-            Assert.assertNotEquals(firstVersion, history.getHistorySummaries().get(0).getVersion());
+            assertEquals(1, history.getHistorySummaries().size());
+            assertNotEquals(firstVersion, history.getHistorySummaries().get(0).getVersion());
         } finally {
             // Cleanup: Delete the page.
             executeDelete(uri, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),

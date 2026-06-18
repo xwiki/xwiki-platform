@@ -21,13 +21,14 @@ package org.xwiki.rest.test;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RootResourceIT extends AbstractHttpIT
 {
@@ -36,15 +37,15 @@ public class RootResourceIT extends AbstractHttpIT
     public void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(RootResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         Link link = getFirstLinkByRelation(xwiki, Relations.WIKIS);
-        Assert.assertNotNull(link);
+        assertNotNull(link);
 
         link = getFirstLinkByRelation(xwiki, Relations.SYNTAXES);
-        Assert.assertNotNull(link);
+        assertNotNull(link);
 
         // link = xwikiRoot.getFirstLinkByRelation(Relations.WADL);
         // Assert.assertNotNull(link);

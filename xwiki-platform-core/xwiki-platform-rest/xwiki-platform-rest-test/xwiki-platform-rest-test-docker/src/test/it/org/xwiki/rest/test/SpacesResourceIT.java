@@ -28,8 +28,7 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
@@ -47,6 +46,11 @@ import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SpacesResourceIT extends AbstractHttpIT
 {
@@ -58,32 +62,32 @@ public class SpacesResourceIT extends AbstractHttpIT
         createPageIfDoesntExist(Arrays.asList("SpaceA", "SpaceB", "SpaceC"), "MyPage", "some content");
 
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(wikis.getWikis().size() > 0);
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
-        Assert.assertNotNull(link);
+        assertNotNull(link);
 
         getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(spaces.getSpaces().size() > 0);
 
         boolean nestedSpaceFound = false;
 
         for (Space space : spaces.getSpaces()) {
             link = getFirstLinkByRelation(space, Relations.SEARCH);
-            Assert.assertNotNull(link);
+            assertNotNull(link);
 
             checkLinks(space);
 
             if ("xwiki:SpaceA.SpaceB.SpaceC".equals(space.getId())) {
-                Assert.assertEquals("SpaceC", space.getName());
+                assertEquals("SpaceC", space.getName());
                 nestedSpaceFound = true;
             }
 
@@ -91,10 +95,10 @@ public class SpacesResourceIT extends AbstractHttpIT
              * Check that in the returned spaces there are not spaces not visible to user Guest, for example the
              * "Scheduler" space
              */
-            Assert.assertFalse(space.getName().equals("Scheduler"));
+            assertFalse(space.getName().equals("Scheduler"));
         }
 
-        Assert.assertTrue(nestedSpaceFound);
+        assertTrue(nestedSpaceFound);
     }
 
     @Test
@@ -108,20 +112,20 @@ public class SpacesResourceIT extends AbstractHttpIT
 
         GetMethod getMethod = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertEquals(0, searchResults.getSearchResults().size());
+        assertEquals(0, searchResults.getSearchResults().size());
 
         getMethod = executeGet(String.format("%s?q=%s",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName())), getTestMethodName()));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         int resultSize = searchResults.getSearchResults().size();
-        Assert.assertTrue("Found " + resultSize + " result", resultSize == 1);
+        assertTrue(resultSize == 1, "Found " + resultSize + " result");
 
         for (SearchResult searchResult : searchResults.getSearchResults()) {
             checkLinks(searchResult);
@@ -140,11 +144,11 @@ public class SpacesResourceIT extends AbstractHttpIT
         // Matches Sandbox.WebHome@XWikLogo.png
         GetMethod getMethod = executeGet(String.format("%s",
             buildURI(SpaceAttachmentsResource.class, getWiki(), Arrays.asList(getTestClassName()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Attachments attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        Assert.assertEquals(getAttachmentsInfo(attachments), 1, attachments.getAttachments().size());
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -165,28 +169,28 @@ public class SpacesResourceIT extends AbstractHttpIT
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet("%s?number=-1".formatted(buildURI(SpacesResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet("%s?number=1001".formatted(buildURI(SpacesResource.class, getWiki())));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet("%s?number=1".formatted(buildURI(SpacesResource.class, getWiki())));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             Spaces spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, spaces.getSpaces().size());
+            assertEquals(1, spaces.getSpaces().size());
 
             String firstName = spaces.getSpaces().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet("%s?number=1&start=1".formatted(buildURI(SpacesResource.class, getWiki())));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, spaces.getSpaces().size());
-            Assert.assertNotEquals(firstName, spaces.getSpaces().get(0).getName());
+            assertEquals(1, spaces.getSpaces().size());
+            assertNotEquals(firstName, spaces.getSpaces().get(0).getName());
         } finally {
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);
@@ -212,23 +216,23 @@ public class SpacesResourceIT extends AbstractHttpIT
             GetMethod getMethod = executeGet(
                 "%s?q=searchcontent&number=-1".formatted(buildURI(SpaceSearchResource.class, getWiki(),
                     List.of(spaceName))));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1001".formatted(
                     buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1".formatted(
                     buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
+            assertEquals(1, results.getSearchResults().size());
 
             String firstName = results.getSearchResults().get(0).getPageName();
 
@@ -236,10 +240,10 @@ public class SpacesResourceIT extends AbstractHttpIT
             getMethod = executeGet(
                 "%s?q=searchcontent&number=1&start=1".formatted(
                     buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, results.getSearchResults().size());
-            Assert.assertNotEquals(firstName, results.getSearchResults().get(0).getPageName());
+            assertEquals(1, results.getSearchResults().size());
+            assertNotEquals(firstName, results.getSearchResults().get(0).getPageName());
         } finally {
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);
@@ -263,22 +267,22 @@ public class SpacesResourceIT extends AbstractHttpIT
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
                 "%s?number=-1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(), List.of(spaceName))));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(
                 "%s?number=1001".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(),
                     List.of(spaceName))));
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(
                 "%s?number=1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(), List.of(spaceName))));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
+            assertEquals(1, attachments.getAttachments().size());
 
             String firstName = attachments.getAttachments().get(0).getName();
 
@@ -286,10 +290,10 @@ public class SpacesResourceIT extends AbstractHttpIT
             getMethod = executeGet(
                 "%s?number=1&start=1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(),
                     List.of(spaceName))));
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
-            Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+            assertEquals(1, attachments.getAttachments().size());
+            assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up
             getUtil().rest().delete(ref);

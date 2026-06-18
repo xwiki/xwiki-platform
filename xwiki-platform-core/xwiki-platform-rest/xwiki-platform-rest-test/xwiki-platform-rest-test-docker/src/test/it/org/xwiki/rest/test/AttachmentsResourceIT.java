@@ -41,9 +41,9 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -54,6 +54,9 @@ import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttachmentsResourceIT extends AbstractHttpIT
 {
@@ -65,11 +68,11 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
     private DocumentReference reference;
 
-    @Before
+    @BeforeEach
     @Override
-    public void setUp() throws Exception
+    public void setUp(TestUtils setup, TestInfo info) throws Exception
     {
-        super.setUp();
+        super.setUp(setup, info);
 
         this.wikiName = getWiki();
         this.spaces = Arrays.asList(getTestClassName());
@@ -108,10 +111,10 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         // Now get all the attachments.
         String attachmentsUri = buildURIForThisPage(AttachmentsResource.class);
         GetMethod getMethod = executeGet(attachmentsUri);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertEquals(8, attachments.getAttachments().size());
+        assertEquals(8, attachments.getAttachments().size());
 
         // Clean the wiki for further tests: WikisResourceTest use a list of attachments and might fail
         // if we don't clean here.
@@ -131,16 +134,16 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
 
         GetMethod getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
 
         getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
-        Assert.assertEquals(content, getMethod.getResponseBodyAsString());
+        assertEquals(content, getMethod.getResponseBodyAsString());
     }
 
     @Test
@@ -152,10 +155,10 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         String content = "ATTACHMENT CONTENT";
 
         GetMethod getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN);
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_UNAUTHORIZED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
     }
 
     @Test
@@ -167,17 +170,17 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
         PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
 
         GetMethod getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         DeleteMethod deleteMethod = executeDelete(attachmentURI, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode(), getHttpMethodInfo(deleteMethod));
 
         getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
     }
 
     @Test
@@ -190,13 +193,13 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
         PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
 
         DeleteMethod deleteMethod = executeDelete(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_UNAUTHORIZED, deleteMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, deleteMethod.getStatusCode(), getHttpMethodInfo(deleteMethod));
 
         GetMethod getMethod = executeGet(attachmentURI);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
     }
 
     @Test
@@ -218,7 +221,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
             PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-            Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
 
             Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
             pageVersions[i] = attachment.getPageVersion();
@@ -229,7 +232,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         for (int i = 0; i < NUMBER_OF_ATTACHMENTS; i++) {
             String attachmentsUri = buildURIForThisPage(AttachmentsAtPageVersionResource.class, pageVersions[i]);
             GetMethod getMethod = executeGet(attachmentsUri);
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -245,8 +248,8 @@ public class AttachmentsResourceIT extends AbstractHttpIT
                         }
                     }
                 }
-                Assert.assertTrue(String.format("%s is not present in attachments list of the page at version %s",
-                    attachmentNames[j], pageVersions[i]), found);
+                assertTrue(found, String.format("%s is not present in attachments list of the page at version %s",
+                    attachmentNames[j], pageVersions[i]));
             }
 
             /* Check links */
@@ -271,9 +274,9 @@ public class AttachmentsResourceIT extends AbstractHttpIT
             PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
             if (i == 0) {
-                Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+                assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
             } else {
-                Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+                assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
             }
 
             Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
@@ -283,16 +286,16 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
         String attachmentsUri = buildURIForThisPage(AttachmentHistoryResource.class, attachmentName);
         GetMethod getMethod = executeGet(attachmentsUri);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        Assert.assertEquals(NUMBER_OF_VERSIONS, attachments.getAttachments().size());
+        assertEquals(NUMBER_OF_VERSIONS, attachments.getAttachments().size());
 
         for (Attachment attachment : attachments.getAttachments()) {
             getMethod = executeGet(getFirstLinkByRelation(attachment, Relations.ATTACHMENT_DATA).getHref());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
-            Assert.assertEquals(versionToContentMap.get(attachment.getVersion()), getMethod.getResponseBodyAsString());
+            assertEquals(versionToContentMap.get(attachment.getVersion()), getMethod.getResponseBodyAsString());
         }
     }
 
@@ -320,16 +323,16 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         postMethod.setRequestHeader("XWiki-Form-Token", getFormToken(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword()));
         httpClient.executeMethod(postMethod);
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_CREATED, postMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode(), getHttpMethodInfo(postMethod));
 
         this.unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
 
         Header location = postMethod.getResponseHeader("location");
 
         GetMethod getMethod = executeGet(location.getValue());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
-        Assert.assertEquals(content, getMethod.getResponseBodyAsString());
+        assertEquals(content, getMethod.getResponseBodyAsString());
     }
 
     @Test
@@ -346,28 +349,28 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(attachmentsUri + "?number=-1");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(attachmentsUri + "?number=1001");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(attachmentsUri + "?number=1");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
+            assertEquals(1, attachments.getAttachments().size());
 
             String firstName = attachments.getAttachments().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(attachmentsUri + "?number=1&start=1");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
-            Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+            assertEquals(1, attachments.getAttachments().size());
+            assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
             // Clean up
             getUtil().deletePage(this.reference);
@@ -389,9 +392,9 @@ public class AttachmentsResourceIT extends AbstractHttpIT
                         TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
                         TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
                 if (i == 0) {
-                    Assert.assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
+                    assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
                 } else {
-                    Assert.assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+                    assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
                 }
             }
 
@@ -399,28 +402,28 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(historyUri + "?number=-1");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
 
             // Test: number=1001 should return error
             getMethod = executeGet(historyUri + "?number=1001");
-            Assert.assertEquals(400, getMethod.getStatusCode());
-            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getStatusCode());
+            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
 
             // Test: pagination with number=1
             getMethod = executeGet(historyUri + "?number=1");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
+            assertEquals(1, attachments.getAttachments().size());
 
             String firstVersion = attachments.getAttachments().get(0).getVersion();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(historyUri + "?number=1&start=1");
-            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
             attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-            Assert.assertEquals(1, attachments.getAttachments().size());
-            Assert.assertNotEquals(firstVersion, attachments.getAttachments().get(0).getVersion());
+            assertEquals(1, attachments.getAttachments().size());
+            assertNotEquals(firstVersion, attachments.getAttachments().get(0).getVersion());
         } finally {
             // Clean up
             getUtil().deletePage(this.reference);

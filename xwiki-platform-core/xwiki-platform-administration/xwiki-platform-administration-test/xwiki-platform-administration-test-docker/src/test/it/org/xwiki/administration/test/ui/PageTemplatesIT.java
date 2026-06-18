@@ -77,8 +77,20 @@ class PageTemplatesIT
      */
     public static final String TEMPLATE_NAME = "TestTemplate";
 
+    /**
+     * Name of the descendant page created under the template, used to verify that the template hierarchy is recreated
+     * when a page is created from the template (see XWIKI-18303).
+     */
+    private static final String CHILD_TEMPLATE_NAME = "ChildPage";
+
+    /**
+     * Content of the template's descendant page, used to verify that the descendant is actually copied from the
+     * template (and not merely auto-created).
+     */
+    private static final String CHILD_TEMPLATE_CONTENT = "Child Template Content";
+
     @BeforeEach
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
@@ -101,11 +113,11 @@ class PageTemplatesIT
         String templateProviderFullName = setup.serializeReference(templateProviderReference);
         String testSpace = setup.serializeReference(templateProviderReference.getParent());
 
-        // Step 1: Create a Template and a Template Provider and try to create a new page by using the Add Menu and
-        // using the created Template
+        // Step 1: Create a Template (with a descendant page) and a Template Provider and try to create a new page by
+        // using the Add Menu and using the created Template
 
         ViewPage templateProviderView = createTemplateAndTemplateProvider(setup, templateProviderReference,
-            templateContent, "Test Template Title", false);
+            templateContent, "Test Template Title", false, true);
 
         // Create the new document from template
         CreatePagePage createPagePage = templateProviderView.createPage();
@@ -226,6 +238,19 @@ class PageTemplatesIT
 
         // make sure that the template provider is not in the list of templates
         assertFalse(createPagePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // Step 6: Verify that the descendant page of the template has been copied under the new page (XWIKI-18303).
+        // The template instance created in Step 1 is a non-terminal (WebHome) page and the template root is also a
+        // non-terminal page with a descendant, so the hierarchy must be recreated under the instance.
+        SpaceReference templateInstanceSpace =
+            new SpaceReference(templateInstanceName, testReference.getLastSpaceReference());
+        DocumentReference templateInstanceChildReference =
+            new DocumentReference("WebHome", new SpaceReference(CHILD_TEMPLATE_NAME, templateInstanceSpace));
+        ViewPage templateInstanceChildView = setup.gotoPage(templateInstanceChildReference);
+        assertTrue(templateInstanceChildView.exists(),
+            "The descendant page of the template was not copied under the new page.");
+        // Make sure the descendant was copied from the template (and not merely auto-created).
+        assertEquals(CHILD_TEMPLATE_CONTENT, templateInstanceChildView.getContent());
     }
 
     /**
@@ -542,10 +567,38 @@ class PageTemplatesIT
         LocalDocumentReference templateProviderReference, String templateContent, String templateTitle,
         boolean saveAndEdit) throws Exception
     {
+        return createTemplateAndTemplateProvider(setup, templateProviderReference, templateContent, templateTitle,
+            saveAndEdit, false);
+    }
+
+    /**
+     * Helper function to Create both a Template and a Template Provider for the tests in this class. When
+     * {@code withChildTemplate} is {@code true} the template is created as a non-terminal (WebHome) page with a
+     * descendant page so that the template hierarchy can be exercised (see XWIKI-18303).
+     */
+    private ViewPage createTemplateAndTemplateProvider(TestUtils setup,
+        LocalDocumentReference templateProviderReference, String templateContent, String templateTitle,
+        boolean saveAndEdit, boolean withChildTemplate) throws Exception
+    {
         // Create the template page in the same space as the template provider.
-        LocalDocumentReference templateReference =
-            new LocalDocumentReference(TEMPLATE_NAME, templateProviderReference.getParent());
-        setup.rest().savePage(templateReference, templateContent, templateTitle);
+        LocalDocumentReference templateReference;
+        if (withChildTemplate) {
+            // Use a non-terminal (WebHome) template so that it can have a descendant page. We build the spaces with
+            // the generic EntityReference constructor because the template provider reference is local (wiki-less)
+            // and a SpaceReference requires a non-null parent.
+            EntityReference templateSpace =
+                new EntityReference(TEMPLATE_NAME, EntityType.SPACE, templateProviderReference.getParent());
+            templateReference = new LocalDocumentReference("WebHome", templateSpace);
+            setup.rest().savePage(templateReference, templateContent, templateTitle);
+            // Create a descendant page under the template.
+            EntityReference childTemplateSpace =
+                new EntityReference(CHILD_TEMPLATE_NAME, EntityType.SPACE, templateSpace);
+            LocalDocumentReference childTemplateReference = new LocalDocumentReference("WebHome", childTemplateSpace);
+            setup.rest().savePage(childTemplateReference, CHILD_TEMPLATE_CONTENT, "Child Template Title");
+        } else {
+            templateReference = new LocalDocumentReference(TEMPLATE_NAME, templateProviderReference.getParent());
+            setup.rest().savePage(templateReference, templateContent, templateTitle);
+        }
         EntityReference attachmentReference = new EntityReference("file.txt", EntityType.ATTACHMENT, templateReference);
         setup.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
         setup.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);

@@ -46,6 +46,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown

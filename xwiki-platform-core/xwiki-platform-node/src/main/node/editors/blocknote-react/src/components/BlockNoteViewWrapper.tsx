@@ -177,7 +177,7 @@ type BlockNoteViewWrapperProps = {
    *
    * Features not enabled here will be disabled in the future (when possible)
    *
-   * @since 18.5.0RC1
+   * @since 18.6.0RC1
    * @beta
    */
   syntax: SyntaxConfig;

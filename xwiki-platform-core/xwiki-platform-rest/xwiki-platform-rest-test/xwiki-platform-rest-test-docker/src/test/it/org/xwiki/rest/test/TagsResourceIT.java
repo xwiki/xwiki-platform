@@ -53,11 +53,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @version $Id$
  */
-public class TagsResourceIT extends AbstractHttpIT
+class TagsResourceIT extends AbstractHttpIT
 {
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         String tagName = UUID.randomUUID().toString();
 
@@ -132,7 +132,7 @@ public class TagsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTTagsWithTextPlain() throws Exception
+    void testPUTTagsWithTextPlain() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME, "Test");
 
@@ -167,7 +167,7 @@ public class TagsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTTagsFormUrlEncoded() throws Exception
+    void testPUTTagsFormUrlEncoded() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME, "Test");
 
@@ -207,7 +207,7 @@ public class TagsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPagesForTagsMultipleTagsAndPagination() throws Exception
+    void testPagesForTagsMultipleTagsAndPagination() throws Exception
     {
         // Setup: create three pages with different tags
         String tagA = "TagA_" + UUID.randomUUID();

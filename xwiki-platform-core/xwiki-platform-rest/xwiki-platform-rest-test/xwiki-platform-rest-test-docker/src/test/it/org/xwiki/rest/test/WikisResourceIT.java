@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class WikisResourceIT extends AbstractHttpIT
+class WikisResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -76,7 +76,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -110,7 +110,7 @@ public class WikisResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
@@ -139,13 +139,13 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSearchWikisNameDatabase() throws Exception
+    void testSearchWikisNameDatabase() throws Exception
     {
         testSearchWikisName("database");
     }
 
     @Test
-    public void testSearchWikisNameSolr() throws Exception
+    void testSearchWikisNameSolr() throws Exception
     {
         testSearchWikisName("solr");
     }
@@ -231,13 +231,13 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSearchWikisContentNameTitleSpaceDatabase() throws Exception
+    void testSearchWikisContentNameTitleSpaceDatabase() throws Exception
     {
         testSearchWikisContentNameTitleSpace("database");
     }
 
     @Test
-    public void testSearchWikisContentNameTitleSpaceSolr() throws Exception
+    void testSearchWikisContentNameTitleSpaceSolr() throws Exception
     {
         testSearchWikisContentNameTitleSpace("solr");
     }
@@ -320,7 +320,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testObjectSearchNotAuthenticated() throws Exception
+    void testObjectSearchNotAuthenticated() throws Exception
     {
         /* Check search for an object containing XWiki.Admin (i.e., the admin profile) */
         GetMethod getMethod =
@@ -334,7 +334,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testObjectSearchAuthenticated() throws Exception
+    void testObjectSearchAuthenticated() throws Exception
     {
         /* Check search for an object containing XWiki.Admin (i.e., the admin profile) */
         GetMethod getMethod = executeGet(
@@ -353,7 +353,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPages() throws Exception
+    void testPages() throws Exception
     {
         // Create a clean test page.
         getUtil().rest().delete(this.reference);
@@ -398,7 +398,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAttachments() throws Exception
+    void testAttachments() throws Exception
     {
         getUtil().rest().delete(reference);
         getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
@@ -458,7 +458,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testHQLQuerySearch() throws Exception
+    void testHQLQuerySearch() throws Exception
     {
         setAllowedQueryTypes("solr,hql");
         try {
@@ -481,7 +481,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testHQLQuerySearchWithClassnameAuthenticated() throws Exception
+    void testHQLQuerySearchWithClassnameAuthenticated() throws Exception
     {
         setAllowedQueryTypes("solr,hql");
         try {
@@ -503,7 +503,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testHQLQuerySearchWithClassnameNotAuthenticated() throws Exception
+    void testHQLQuerySearchWithClassnameNotAuthenticated() throws Exception
     {
         setAllowedQueryTypes("solr,hql");
         try {
@@ -523,7 +523,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSolrSearch() throws Exception
+    void testSolrSearch() throws Exception
     {
         getUtil().rest().delete(this.reference);
         getUtil().rest().savePage(this.reference);
@@ -542,7 +542,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGlobalSearch() throws Exception
+    void testGlobalSearch() throws Exception
     {
         getUtil().rest().delete(this.reference);
         getUtil().rest().savePage(this.reference);
@@ -559,7 +559,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAttachmentsNumberParameter() throws Exception
+    void testAttachmentsNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 attachments exist
         getUtil().rest().delete(this.reference);
@@ -606,7 +606,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPagesNumberParameter() throws Exception
+    void testPagesNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 pages exist
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "1");
@@ -654,7 +654,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testWikiChildrenLimitParameter() throws Exception
+    void testWikiChildrenLimitParameter() throws Exception
     {
         // Setup: Ensure at least 2 top-level pages exist
         DocumentReference ref1 = new DocumentReference(this.wikiName, List.of("ChildSpace1"), "WebHome");
@@ -696,7 +696,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testWikiSearchNumberParameter() throws Exception
+    void testWikiSearchNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 pages exist for search
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "A");
@@ -744,7 +744,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testWikiSearchQueryNumberParameter() throws Exception
+    void testWikiSearchQueryNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 pages exist for query search
         DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "Q1");
@@ -792,7 +792,7 @@ public class WikisResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testForbiddenQueryType() throws Exception
+    void testForbiddenQueryType() throws Exception
     {
         // By default, only "solr" is allowed; "hql" and "xwql" are forbidden.
         GetMethod getMethod = executeGet(

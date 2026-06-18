@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ObjectsResourceIT extends AbstractHttpIT
+class ObjectsResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -68,7 +68,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -103,7 +103,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         GetMethod getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
@@ -136,14 +136,14 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETNotExistingObject() throws Exception
+    void testGETNotExistingObject() throws Exception
     {
         GetMethod getMethod = executeGet(
             buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, "NOTEXISTING", 0).toString());
         assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
     }
 
-    public Property getProperty(Object object, String propertyName)
+    private Property getProperty(Object object, String propertyName)
     {
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
@@ -155,7 +155,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTObject() throws Exception
+    void testPOSTObject() throws Exception
     {
         final String TAG_VALUE = "TAG";
 
@@ -185,7 +185,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTInvalidObject() throws Exception
+    void testPOSTInvalidObject() throws Exception
     {
         final String TAG_VALUE = "TAG";
 
@@ -202,7 +202,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTObjectNotAuthorized() throws Exception
+    void testPOSTObjectNotAuthorized() throws Exception
     {
         final String TAG_VALUE = "TAG";
 
@@ -219,7 +219,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTObject() throws Exception
+    void testPUTObject() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -247,7 +247,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTObjectUnauthorized() throws Exception
+    void testPUTObjectUnauthorized() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -275,7 +275,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEObject() throws Exception
+    void testDELETEObject() throws Exception
     {
         Object objectToBeDeleted = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
@@ -291,7 +291,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEObjectUnAuthorized() throws Exception
+    void testDELETEObjectUnAuthorized() throws Exception
     {
         Object objectToBeDeleted = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
@@ -305,7 +305,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTProperty() throws Exception
+    void testPUTProperty() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -370,7 +370,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTPropertyWithTextPlain() throws Exception
+    void testPUTPropertyWithTextPlain() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -467,7 +467,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTObjectFormUrlEncoded() throws Exception
+    void testPUTObjectFormUrlEncoded() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -499,7 +499,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTObjectFormUrlEncoded() throws Exception
+    void testPOSTObjectFormUrlEncoded() throws Exception
     {
         final String TAG_VALUE = "TAG";
 
@@ -526,7 +526,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTObjectFormUrlEncodedNoCSRF() throws Exception
+    void testPOSTObjectFormUrlEncodedNoCSRF() throws Exception
     {
         final String tagValue = "TAG";
         NameValuePair[] nameValuePairs = new NameValuePair[2];
@@ -557,7 +557,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
 
 
     @Test
-    public void testPUTPropertyFormUrlEncoded() throws Exception
+    void testPUTPropertyFormUrlEncoded() throws Exception
     {
         final String TAG_VALUE = UUID.randomUUID().toString();
 
@@ -623,7 +623,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETObjectAtPageVersion() throws Exception
+    void testGETObjectAtPageVersion() throws Exception
     {
         Object objectToBePut = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
 
@@ -669,7 +669,7 @@ public class ObjectsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAllObjectsForClassNameResourcePaginationAndErrors() throws Exception
+    void testAllObjectsForClassNameResourcePaginationAndErrors() throws Exception
     {
         // Setup: Create two pages with TagClass objects
         String className = "XWiki.TagClass";

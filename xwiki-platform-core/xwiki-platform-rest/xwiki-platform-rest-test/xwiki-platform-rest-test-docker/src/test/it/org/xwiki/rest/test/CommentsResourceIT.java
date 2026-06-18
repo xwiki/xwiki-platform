@@ -44,7 +44,7 @@ import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CommentsResourceIT extends AbstractHttpIT
+class CommentsResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -56,7 +56,7 @@ public class CommentsResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -73,13 +73,13 @@ public class CommentsResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         /* Everything is done in test methods */
     }
 
     @Test
-    public void testPOSTComment() throws Exception
+    void testPOSTComment() throws Exception
     {
         String commentsUri = buildURI(CommentsResource.class, getWiki(), this.spaces, this.pageName).toString();
 
@@ -106,7 +106,7 @@ public class CommentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTCommentWithTextPlain() throws Exception
+    void testPOSTCommentWithTextPlain() throws Exception
     {
         String commentsUri = buildURI(CommentsResource.class, getWiki(), this.spaces, this.pageName).toString();
 
@@ -130,7 +130,7 @@ public class CommentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTCommentWithTextPlainNoCSRF() throws Exception
+    void testPOSTCommentWithTextPlainNoCSRF() throws Exception
     {
         String commentsUri = buildURI(CommentsResource.class, getWiki(), this.spaces, this.pageName).toString();
 
@@ -155,7 +155,7 @@ public class CommentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETComment() throws Exception
+    void testGETComment() throws Exception
     {
         String commentsUri = buildURI(CommentsResource.class, getWiki(), this.spaces, this.pageName).toString();
 
@@ -170,7 +170,7 @@ public class CommentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETCommentsAtPreviousVersions() throws Exception
+    void testGETCommentsAtPreviousVersions() throws Exception
     {
         String pageHistoryUri = buildURI(PageHistoryResource.class, getWiki(), this.spaces, this.pageName).toString();
 
@@ -193,7 +193,7 @@ public class CommentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTCommentFormUrlEncoded() throws Exception
+    void testPOSTCommentFormUrlEncoded() throws Exception
     {
         String commentsUri = buildURI(CommentsResource.class, getWiki(), this.spaces, this.pageName).toString();
 

@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AttachmentsResourceIT extends AbstractHttpIT
+class AttachmentsResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -70,7 +70,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -87,13 +87,13 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         /* Everything is done in test methods. */
     }
 
     @Test
-    public void testPUTGETAttachments() throws Exception
+    void testPUTGETAttachments() throws Exception
     {
         /* Test normal random UUID method */
         String randomStr = String.format("%s.txt", UUID.randomUUID());
@@ -147,7 +147,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTAttachmentNoRights() throws Exception
+    void testPUTAttachmentNoRights() throws Exception
     {
         String attachmentName = String.format("%s.txt", UUID.randomUUID());
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
@@ -162,7 +162,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEAttachment() throws Exception
+    void testDELETEAttachment() throws Exception
     {
         String attachmentName = String.format("%d.txt", System.currentTimeMillis());
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
@@ -184,7 +184,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEAttachmentNoRights() throws Exception
+    void testDELETEAttachmentNoRights() throws Exception
     {
         String attachmentName = String.format("%d.txt", System.currentTimeMillis());
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
@@ -203,7 +203,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETAttachmentsAtPageVersion() throws Exception
+    void testGETAttachmentsAtPageVersion() throws Exception
     {
         final int NUMBER_OF_ATTACHMENTS = 4;
         String[] attachmentNames = new String[NUMBER_OF_ATTACHMENTS];
@@ -260,7 +260,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETAttachmentVersions() throws Exception
+    void testGETAttachmentVersions() throws Exception
     {
         final int NUMBER_OF_VERSIONS = 4;
         String attachmentName = String.format("%s.txt", UUID.randomUUID());
@@ -300,7 +300,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTAttachment() throws Exception
+    void testPOSTAttachment() throws Exception
     {
         final String attachmentName = String.format("%s.txt", UUID.randomUUID());
         final String content = "ATTACHMENT CONTENT";
@@ -336,7 +336,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAttachmentsResourcePaginationAndErrors() throws Exception
+    void testAttachmentsResourcePaginationAndErrors() throws Exception
     {
         // Setup: Add two attachments
         String attachmentName1 = "att1.txt";
@@ -378,7 +378,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAttachmentHistoryResourcePaginationAndErrors() throws Exception
+    void testAttachmentHistoryResourcePaginationAndErrors() throws Exception
     {
         try {
             // Setup: Create an attachment with multiple versions

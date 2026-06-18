@@ -36,7 +36,7 @@ import org.xwiki.test.docker.junit5.UITest;
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.Execute\\..*"
     }
 )
-public class AllIT
+class AllIT
 {
     @Nested
     class NestedRootResourceIT extends RootResourceIT

@@ -37,11 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class PagesResourceIT extends AbstractHttpIT
+class PagesResourceIT extends AbstractHttpIT
 {
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
@@ -73,7 +73,7 @@ public class PagesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPagesResourcePaginationAndErrors() throws Exception
+    void testPagesResourcePaginationAndErrors() throws Exception
     {
         // Setup: Ensure at least 2 pages exist in a space
         String spaceName = getTestClassName();

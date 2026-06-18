@@ -43,11 +43,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ClassesResourceIT extends AbstractHttpIT
+class ClassesResourceIT extends AbstractHttpIT
 {
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
@@ -64,7 +64,7 @@ public class ClassesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testClassesResourcePaginationAndErrors() throws Exception
+    void testClassesResourcePaginationAndErrors() throws Exception
     {
         // Test: number=-1 should return error
         GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=-1");
@@ -93,7 +93,7 @@ public class ClassesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testClassPropertyValuesResourceBasicAndPagination() throws Exception
+    void testClassPropertyValuesResourceBasicAndPagination() throws Exception
     {
         // Setup: create two pages with TagClass objects and different tag values
         String className = "XWiki.TagClass";

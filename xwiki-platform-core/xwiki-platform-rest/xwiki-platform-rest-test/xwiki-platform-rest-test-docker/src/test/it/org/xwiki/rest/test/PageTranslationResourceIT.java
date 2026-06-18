@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class PageTranslationResourceIT extends AbstractHttpIT
+class PageTranslationResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -59,7 +59,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -77,12 +77,12 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
     }
 
     @Test
-    public void testGETNotExistingPage() throws Exception
+    void testGETNotExistingPage() throws Exception
     {
         GetMethod getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(),
             Arrays.asList("NOTEXISTING"), "NOTEXISTING", Locale.FRENCH).toString());
@@ -90,7 +90,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTGETDELETETranslation() throws Exception
+    void testPUTGETDELETETranslation() throws Exception
     {
         Page newPage = this.objectFactory.createPage();
         newPage.setTitle("fr titre");
@@ -134,7 +134,7 @@ public class PageTranslationResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPageTranslationHistoryResourcePaginationAndErrors() throws Exception
+    void testPageTranslationHistoryResourcePaginationAndErrors() throws Exception
     {
         // Setup: Create a page and a translation with several versions
         Locale language = Locale.FRENCH;

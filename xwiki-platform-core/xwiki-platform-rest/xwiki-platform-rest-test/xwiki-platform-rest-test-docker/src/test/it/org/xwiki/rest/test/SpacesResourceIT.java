@@ -52,11 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SpacesResourceIT extends AbstractHttpIT
+class SpacesResourceIT extends AbstractHttpIT
 {
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         // Create a subspace
         createPageIfDoesntExist(Arrays.asList("SpaceA", "SpaceB", "SpaceC"), "MyPage", "some content");
@@ -102,7 +102,7 @@ public class SpacesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSearch() throws Exception
+    void testSearch() throws Exception
     {
         DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
         getUtil().rest().delete(reference);
@@ -133,7 +133,7 @@ public class SpacesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testAttachments() throws Exception
+    void testAttachments() throws Exception
     {
         DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
         getUtil().rest().delete(reference);
@@ -156,7 +156,7 @@ public class SpacesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSpacesNumberParameter() throws Exception
+    void testSpacesNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 spaces exist
         DocumentReference ref1 = new DocumentReference(getWiki(), getTestClassName() + "A", "WebHome");
@@ -198,7 +198,7 @@ public class SpacesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSpaceSearchNumberParameter() throws Exception
+    void testSpaceSearchNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 pages exist for search
         String spaceName = getTestClassName();
@@ -251,7 +251,7 @@ public class SpacesResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testSpaceAttachmentsNumberParameter() throws Exception
+    void testSpaceAttachmentsNumberParameter() throws Exception
     {
         // Setup: Ensure at least 2 attachments exist in the space
         String spaceName = getTestClassName();

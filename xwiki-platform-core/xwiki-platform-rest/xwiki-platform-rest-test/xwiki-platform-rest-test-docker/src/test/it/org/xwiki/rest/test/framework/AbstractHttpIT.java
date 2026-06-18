@@ -115,7 +115,7 @@ public abstract class AbstractHttpIT
     }
 
     @BeforeEach
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         this.testUtils = setup;
         this.testInfo = info;
@@ -154,7 +154,7 @@ public abstract class AbstractHttpIT
         return this.testUtils;
     }
 
-    public static void initializeSystem() throws Exception
+    private static void initializeSystem() throws Exception
     {
         ComponentManager componentManager = new EmbeddableComponentManager();
 
@@ -215,7 +215,7 @@ public abstract class AbstractHttpIT
         return getUtil().rest().createUri(resourceClass, null).toString();
     }
 
-    public abstract void testRepresentation() throws Exception;
+    protected abstract void testRepresentation() throws Exception;
 
     protected GetMethod executeGet(String uri) throws Exception
     {

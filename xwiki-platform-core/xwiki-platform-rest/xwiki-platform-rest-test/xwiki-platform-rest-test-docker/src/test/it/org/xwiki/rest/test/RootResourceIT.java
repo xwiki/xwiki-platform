@@ -30,11 +30,11 @@ import org.xwiki.rest.test.framework.AbstractHttpIT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RootResourceIT extends AbstractHttpIT
+class RootResourceIT extends AbstractHttpIT
 {
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         GetMethod getMethod = executeGet(getFullUri(RootResource.class));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));

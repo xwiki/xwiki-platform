@@ -71,7 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class PageResourceIT extends AbstractHttpIT
+class PageResourceIT extends AbstractHttpIT
 {
     private String wikiName;
 
@@ -89,7 +89,7 @@ public class PageResourceIT extends AbstractHttpIT
 
     @BeforeEach
     @Override
-    public void setUp(TestUtils setup, TestInfo info) throws Exception
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
     {
         super.setUp(setup, info);
 
@@ -170,7 +170,7 @@ public class PageResourceIT extends AbstractHttpIT
 
     @Override
     @Test
-    public void testRepresentation() throws Exception
+    protected void testRepresentation() throws Exception
     {
         Page page = getFirstPage();
 
@@ -181,7 +181,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void whiteSpaceEncoding() throws Exception
+    void whiteSpaceEncoding() throws Exception
     {
         LocalDocumentReference localDocumentReference = new LocalDocumentReference("Space", "Page with space");
 
@@ -204,7 +204,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETNotExistingPage() throws Exception
+    void testGETNotExistingPage() throws Exception
     {
         GetMethod getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), List.of("NOTEXISTING"), "NOTEXISTING"));
@@ -212,7 +212,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTGETPage() throws Exception
+    void testPUTGETPage() throws Exception
     {
         final String title = String.format("Title (%s)", UUID.randomUUID());
         final String content = String.format("This is a content (%d)", System.currentTimeMillis());
@@ -249,7 +249,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTGETWithObject() throws Exception
+    void testPUTGETWithObject() throws Exception
     {
         String pageURI = buildURI(PageResource.class, getWiki(), List.of("RESTTest"), "PageWithObject");
 
@@ -324,7 +324,7 @@ public class PageResourceIT extends AbstractHttpIT
         assertTrue(modifiedPage.getObjects().getObjectSummaries().isEmpty());
     }
 
-    public Property getProperty(Object object, String propertyName)
+    private Property getProperty(Object object, String propertyName)
     {
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
@@ -336,7 +336,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTPageWithTextPlain() throws Exception
+    void testPUTPageWithTextPlain() throws Exception
     {
         final String CONTENT = String.format("This is a content (%d)", System.currentTimeMillis());
 
@@ -355,7 +355,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTPageUnauthorized() throws Exception
+    void testPUTPageUnauthorized() throws Exception
     {
         Page page = getFirstPage();
         page.setContent("New content");
@@ -368,7 +368,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTNonExistingPage() throws Exception
+    void testPUTNonExistingPage() throws Exception
     {
         final List<String> SPACE_NAME = List.of("Test");
         final String PAGE_NAME = String.format("Test-%d", System.currentTimeMillis());
@@ -400,7 +400,7 @@ public class PageResourceIT extends AbstractHttpIT
      * {@link javax.xml.bind.helpers.DefaultValidationEventHandler} which immediately output the message.
      */
     @Test
-    public void testPUTWithInvalidRepresentation(LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    void testPUTWithInvalidRepresentation(LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         Page page = getFirstPage();
         Link link = getFirstLinkByRelation(page, Relations.SELF);
@@ -415,7 +415,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTGETTranslation() throws Exception
+    void testPUTGETTranslation() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TRANSLATIONS_PAGE_NAME, "Translations");
 
@@ -460,7 +460,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETNotExistingTranslation() throws Exception
+    void testGETNotExistingTranslation() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TRANSLATIONS_PAGE_NAME, "Translations");
 
@@ -474,7 +474,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEPage() throws Exception
+    void testDELETEPage() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, this.pageName, "Test page");
 
@@ -489,7 +489,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testDELETEPageNoRights() throws Exception
+    void testDELETEPageNoRights() throws Exception
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, this.pageName, "Test page");
 
@@ -503,7 +503,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPageHistory() throws Exception
+    void testPageHistory() throws Exception
     {
         GetMethod getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
@@ -544,7 +544,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPageTranslationHistory() throws Exception
+    void testPageTranslationHistory() throws Exception
     {
         String pageHistoryUri = buildURI(PageHistoryResource.class, getWiki(), TestConstants.TEST_SPACE_NAME,
             TestConstants.TRANSLATIONS_PAGE_NAME);
@@ -566,7 +566,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETPageChildren() throws Exception
+    void testGETPageChildren() throws Exception
     {
         GetMethod getMethod =
             executeGet(buildURI(PageChildrenResource.class, getWiki(), this.spaces, this.pageName));
@@ -581,7 +581,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTPageFormUrlEncoded() throws Exception
+    void testPOSTPageFormUrlEncoded() throws Exception
     {
         final String CONTENT = String.format("This is a content (%d)", System.currentTimeMillis());
         final String TITLE = String.format("Title (%s)", UUID.randomUUID());
@@ -606,7 +606,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPOSTPageFormUrlEncodedNoCSRF() throws Exception
+    void testPOSTPageFormUrlEncodedNoCSRF() throws Exception
     {
         final String CONTENT = String.format("This is a content (%d)", System.currentTimeMillis());
         final String TITLE = String.format("Title (%s)", UUID.randomUUID());
@@ -636,7 +636,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPUTPageSyntax() throws Exception
+    void testPUTPageSyntax() throws Exception
     {
         Page originalPage = getFirstPage();
 
@@ -658,7 +658,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPageChildrenResourcePaginationAndErrors() throws Exception
+    void testPageChildrenResourcePaginationAndErrors() throws Exception
     {
         // Setup: Create a parent page and two children
         String spaceName = getTestClassName();
@@ -720,7 +720,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testPageHistoryResourcePaginationAndErrors() throws Exception
+    void testPageHistoryResourcePaginationAndErrors() throws Exception
     {
         // Setup: Create a page and several versions
         try {
@@ -763,7 +763,7 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    public void testGETRenderedContent() throws Exception
+    void testGETRenderedContent() throws Exception
     {
         long time = System.currentTimeMillis();
         final String title = String.format("Title (%s)", UUID.randomUUID());

@@ -42,7 +42,7 @@
      ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -60,6 +60,17 @@
       <artifactId>xwiki-platform-security-requiredrights-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <!-- Required for tests involving subwikis. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>

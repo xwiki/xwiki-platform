@@ -21,33 +21,34 @@ package com.xpn.xwiki.tool.doc;
 
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.component.util.ReflectionUtils;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link AbstractDocumentMojo}.
- * 
+ *
  * @version $Id$
  */
-public class DocumentUpdateMojoTest
+class DocumentUpdateMojoTest
 {
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    private Path tempDir;
 
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any
      * information/is not affected by the process
      */
     @Test
-    public void testXMLDocumentLoading() throws Exception
+    void xmlDocumentLoading() throws Exception
     {
         AttachMojo mojo = new AttachMojo();
 
@@ -57,9 +58,9 @@ public class DocumentUpdateMojoTest
         assertTrue(inputContent.contains("<class>"));
 
         XWikiDocument doc = mojo.loadFromXML(resourceFile);
-        assertEquals(doc.getName(), "Install");
+        assertEquals("Install", doc.getDocumentReference().getName());
 
-        File outputFile = this.tempFolder.newFile("output.xml");
+        File outputFile = this.tempDir.resolve("output.xml").toFile();
         mojo.writeToXML(doc, outputFile);
 
         String outputContent = IOUtils.toString(new FileReader(outputFile));
@@ -69,27 +70,35 @@ public class DocumentUpdateMojoTest
     }
 
     @Test
-    public void execute() throws Exception
+    void execute() throws Exception
     {
         AttachMojo mojo = new AttachMojo();
 
         set(mojo, "author", "XWiki.mflorea");
         set(mojo, "file", new File(this.getClass().getResource("/fileToAttach.txt").toURI()));
         set(mojo, "files", new File[] {new File(this.getClass().getResource("/fileToAttach.js").toURI())});
-        set(mojo, "sourceDocument", new File(this.getClass().getResource("/Test/SampleWikiXMLDocument.input").toURI()));
-        set(mojo, "outputDirectory", this.tempFolder.getRoot());
+        set(mojo, "sourceDocument",
+            new File(this.getClass().getResource("/Test/SampleWikiXMLDocument.input").toURI()));
+        set(mojo, "outputDirectory", this.tempDir.toFile());
 
         mojo.execute();
 
-        File outputFile = new File(tempFolder.getRoot(), "Test/SampleWikiXMLDocument.input");
+        File outputFile = this.tempDir.resolve("Test/SampleWikiXMLDocument.input").toFile();
         String outputContent = IOUtils.toString(new FileReader(outputFile));
-        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.txt</filename>"));
-        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.js</filename>"));
-        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.txt</filename>\n    "
-            + "<mimetype>text/plain</mimetype>"));
+        assertTrue(outputContent.contains("""
+            <attachment>
+                <filename>fileToAttach.txt</filename>"""));
+        assertTrue(outputContent.contains("""
+            <attachment>
+                <filename>fileToAttach.js</filename>"""));
+        assertTrue(outputContent.contains("""
+            <attachment>
+                <filename>fileToAttach.txt</filename>
+                \
+            <mimetype>text/plain</mimetype>"""));
     }
 
-    private void set(AttachMojo mojo, String fieldName, Object value) throws Exception
+    private void set(AttachMojo mojo, String fieldName, Object value)
     {
         ReflectionUtils.setFieldValue(mojo, fieldName, value);
     }

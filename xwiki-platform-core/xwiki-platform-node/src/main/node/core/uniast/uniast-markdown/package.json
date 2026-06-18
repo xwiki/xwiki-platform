@@ -53,7 +53,7 @@
     "unified": "catalog:"
   },
   "peerDependencies": {
-    "inversify": "7.x"
+    "inversify": "7.x || 8.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

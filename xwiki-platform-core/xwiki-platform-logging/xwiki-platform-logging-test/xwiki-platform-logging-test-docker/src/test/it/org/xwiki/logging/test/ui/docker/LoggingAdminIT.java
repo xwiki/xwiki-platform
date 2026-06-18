@@ -21,7 +21,6 @@ package org.xwiki.logging.test.ui.docker;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.logging.test.po.LoggingAdministrationSectionPage;

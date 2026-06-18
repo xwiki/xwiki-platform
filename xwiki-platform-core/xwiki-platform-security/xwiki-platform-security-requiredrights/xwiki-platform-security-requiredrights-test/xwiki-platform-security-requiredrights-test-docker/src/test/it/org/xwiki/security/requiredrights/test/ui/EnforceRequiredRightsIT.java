@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.test.ui;
+package org.xwiki.security.requiredrights.test.ui;
 
 import java.util.List;
 import java.util.Map;
@@ -47,12 +47,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * UI integration tests for the required rights feature.
+ * UI integration tests for the enforcing required rights.
  *
  * @version $Id$
  */
 @UITest
-class RequiredRightsIT
+class EnforceRequiredRightsIT
 {
     @ParameterizedTest
     @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")

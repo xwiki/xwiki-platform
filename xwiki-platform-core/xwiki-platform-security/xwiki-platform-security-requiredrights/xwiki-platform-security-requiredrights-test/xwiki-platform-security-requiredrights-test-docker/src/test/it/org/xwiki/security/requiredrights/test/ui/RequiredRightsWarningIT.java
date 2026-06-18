@@ -35,13 +35,13 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Main test class for the required rights functional tests.
+ * Tests for warnings about required rights when editing a page.
  *
  * @version $Id$
  * @since 15.9RC1
  */
 @UITest
-class RequiredRightsIT
+class RequiredRightsWarningIT
 {
     private static final String VELOCITY_MACRO_REQUIREMENTS_MESSAGE =
         "A [velocity] scripting macro requires script rights "

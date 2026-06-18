@@ -70,14 +70,10 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
     public File createTemporaryFile(TemporaryResourceReference reference, InputStream content) throws IOException
     {
         File temporaryFile = getTemporaryFile(reference);
-        FileOutputStream fos = null;
-        try {
-            // Make sure the parent folders exist.
-            temporaryFile.getParentFile().mkdirs();
-            fos = new FileOutputStream(temporaryFile);
+        // Make sure the parent folders exist.
+        temporaryFile.getParentFile().mkdirs();
+        try (FileOutputStream fos = new FileOutputStream(temporaryFile)) {
             IOUtils.copy(content, fos);
-        } finally {
-            IOUtils.closeQuietly(fos);
         }
 
         return temporaryFile;

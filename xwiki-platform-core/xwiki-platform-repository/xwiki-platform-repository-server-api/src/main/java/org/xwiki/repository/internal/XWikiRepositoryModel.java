@@ -220,6 +220,16 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_SCMDEVCONNECTION = "scmdevconnection";
 
     /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_SCMTAG = "scmtag";
+
+    /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_STAG = "scmtag";
+
+    /**
      * @since 7.3M1
      */
     public static final String PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM = "issueManagementSystem";
@@ -425,6 +435,7 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_STAG, new ExtensionSolrField(PROP_EXTENSION_STAG, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,

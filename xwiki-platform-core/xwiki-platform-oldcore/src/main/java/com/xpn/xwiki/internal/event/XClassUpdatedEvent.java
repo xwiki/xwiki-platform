@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
  * (the version before all the modifications)</li>
  * <li>data: the collection of property updates ({@code Collection<PropertyUpdate>})</li>
  * </ul>
- * @since 18.5.0
+ * @since 18.6.0RC1
  * @version $Id$
  */
 public class XClassUpdatedEvent extends AbstractEntityEvent

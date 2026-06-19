@@ -82,6 +82,7 @@ ExtensionCode.ExtensionSupportPlanClass_paying=Bezahlen
 
 ## Extension sheet
 repository.extension.sheet.name=Name
+repository.extension.sheet.project=Projekt
 repository.extension.sheet.type=Typ
 repository.extension.sheet.category=Kategorie
 repository.extension.sheet.summary=Zusammenfassung

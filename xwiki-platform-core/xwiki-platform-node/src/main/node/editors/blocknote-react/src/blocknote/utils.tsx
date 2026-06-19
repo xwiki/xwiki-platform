@@ -26,7 +26,7 @@ import {
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
 import { RiFileList3Fill } from "react-icons/ri";
-import type { BlockType, InlineContentType } from ".";
+import type { InlineContentType } from ".";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -251,6 +251,9 @@ type ContextForMacros = {
  * @beta
  */
 type MacroInsertionEditorPrefillData = {
+  /** Type of the macro to insert */
+  kind: "block" | "inline";
+
   /** ID of the macro to insert */
   id: string | null;
 
@@ -258,7 +261,7 @@ type MacroInsertionEditorPrefillData = {
   params: UnknownMacroParamsType | null;
 
   /** Body of the macro */
-  body: BlockType[] | null;
+  body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
 };
 
 /**
@@ -270,10 +273,13 @@ type MacroInsertionEditorPrefillData = {
 type MacroBlockInvocation = {
   kind: "block";
   id: string;
-  params: MacroWithUnknownParamsType;
+  params: UnknownMacroParamsType;
   // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
   // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-  body: InlineContentType[] | null;
+  body:
+    | { type: "inlineContents"; content: InlineContentType[] }
+    | { type: "raw"; content: string }
+    | { type: "none" };
 };
 
 /**
@@ -285,10 +291,13 @@ type MacroBlockInvocation = {
 type InlineMacroInvocation = {
   kind: "inline";
   id: string;
-  params: MacroWithUnknownParamsType;
+  params: UnknownMacroParamsType;
   // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
   // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-  body: InlineContentType | null;
+  body:
+    | { type: "inlineContent"; content: InlineContentType }
+    | { type: "raw"; content: string }
+    | { type: "none" };
 };
 
 /**

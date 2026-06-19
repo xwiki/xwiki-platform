@@ -87,4 +87,6 @@ export {
 export type {
   ContextForMacros,
   InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";

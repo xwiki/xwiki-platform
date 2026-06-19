@@ -25,7 +25,7 @@
         ref="editor"
         :editor-props
         :editor-content
-        :container
+        :deps-container="container"
         :macros
         :collaboration
         @instant-change="dirty = true"
@@ -102,9 +102,13 @@ import type {
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
 import type {
+  BlockNoteViewWrapperProps,
   BlockOfType,
   EditorLanguage,
   ImageUpdateResult,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
 } from "@xwiki/platform-editors-blocknote-react";
 import type {
   MacroWithUnknownParamsType,
@@ -277,7 +281,7 @@ onUnmounted(() => {
 });
 
 // This is passed to the BlockNote editor component.
-const macros = {
+const macros: BlockNoteViewWrapperProps["macros"] = {
   list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
     openParamsEditor: async (
@@ -298,6 +302,31 @@ const macros = {
       } catch (error) {
         console.error("Failed to edit the macro", error);
       }
+    },
+
+    openInsertionEditor: async (
+      prefill: MacroInsertionEditorPrefillData,
+      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+    ) => {
+      const macroWizard: BlockNoteMacroWizard = container.get(
+        "BlockNoteMacroWizard",
+      );
+
+      const call = await macroWizard.insert(prefill.kind, prefill.params);
+
+      insert({
+        kind: call.inline ? "inline" : "block",
+        id: call.name,
+        body: call.content
+          ? { type: "raw", content: call.content }
+          : { type: "none" },
+        params: Object.fromEntries(
+          Object.entries(call.parameters).map(([key, value]) => [
+            key,
+            typeof value === "string" ? value : value.value,
+          ]),
+        ),
+      });
     },
   },
 };

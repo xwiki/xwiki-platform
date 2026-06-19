@@ -74,12 +74,15 @@ class RepositoryManagerTest
     @Test
     void importExtensionChecksEditRightBeforeAnySideEffect() throws Exception
     {
-        String extensionId = "my-ext";
+        String extensionIdString = "my-ext";
+        ExtensionId extensionId = new ExtensionId(extensionIdString, new DefaultVersion("1.0"));
 
         ExtensionRepository repository = mock(ExtensionRepository.class);
-        when(repository.resolveVersions(extensionId, 0, -1))
-            .thenReturn(new CollectionIterableResult<>(1, 0, List.of(new DefaultVersion("1.0"))));
-        when(repository.resolve(any(ExtensionId.class))).thenReturn(mock(Extension.class));
+        when(repository.resolveVersions(extensionIdString, 0, -1))
+            .thenReturn(new CollectionIterableResult<>(1, 0, List.of(extensionId.getVersion())));
+        Extension extension = mock(Extension.class);
+        when(extension.getId()).thenReturn(extensionId);
+        when(repository.resolve(extensionId)).thenReturn(extension);
 
         XWikiContext xcontext = mock(XWikiContext.class);
         XWiki xwiki = mock(XWiki.class);
@@ -90,14 +93,14 @@ class RepositoryManagerTest
         XWikiDocument clonedDocument = mock(XWikiDocument.class);
         DocumentReference extensionReference =
             new DocumentReference("xwiki", List.of("Extension", "MyExt"), "WebHome");
-        when(this.extensionStore.getExistingExtensionDocumentById(extensionId)).thenReturn(existingDocument);
+        when(this.extensionStore.getExistingExtensionDocumentById(extensionIdString)).thenReturn(existingDocument);
         when(existingDocument.clone()).thenReturn(clonedDocument);
         when(clonedDocument.getDocumentReference()).thenReturn(extensionReference);
 
         doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.EDIT, extensionReference);
 
         assertThrows(AccessDeniedException.class,
-            () -> this.repositoryManager.importExtension(extensionId, repository, STABLE));
+            () -> this.repositoryManager.importExtension(extensionIdString, repository, STABLE));
 
         // The edit right must be checked on the imported document before performing any side effect on the wiki.
         verify(this.authorization).checkAccess(Right.EDIT, extensionReference);

@@ -59,6 +59,7 @@ import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * Default options for the BlockNote editor
@@ -172,6 +173,16 @@ type BlockNoteViewWrapperProps = {
   };
 
   /**
+   * List of features supported by the underlying syntax
+   *
+   * Features not enabled here will be disabled in the future (when possible)
+   *
+   * @since 18.6.0RC1
+   * @beta
+   */
+  syntax: SyntaxConfig;
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
@@ -195,6 +206,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   linkEditionCtx,
   overrides,
   label,
+  syntax,
   refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const builtMacros: BlockNoteConcreteMacro[] = [];
@@ -268,14 +280,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // joining the session by checking for the absence of an initialContentLoaded key in the document's configuration map
   // (shared across all session participants).
   if (collaboration) {
-    const initialContentLoaded = collaboration.doc
-      .getMap("configuration")
-      .get("initialContentLoaded");
+    const config = collaboration.doc.getMap("configuration");
+    const initialContentLoaded = config.get("initialContentLoaded");
     if (!initialContentLoaded) {
       // This is the first user joining the realtime collaboration session.
-      collaboration.doc
-        .getMap("configuration")
-        .set("initialContentLoaded", true);
+      config.set("initialContentLoaded", true);
       console.debug(
         "Setting initial content for realtime collaboration session.",
         content,
@@ -301,7 +310,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       <SuggestionMenuController
         triggerCharacter={"/"}
         getItems={async (query) =>
-          querySuggestionsMenuItems(editor, query, builtMacros)
+          querySuggestionsMenuItems(editor, query, builtMacros, syntax, lang)
         }
       />
 

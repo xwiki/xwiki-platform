@@ -506,11 +506,11 @@ public class SkinAction extends XWikiAction
             } else {
                 // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
-                String contentDisposition = (attachmentSecurityManager.shouldBeDownloaded(attachment))
-                    ? "attachment" : "inline";
-                String ofilename = Util.encodeURI(filename, context).replaceAll("\\+", "%20");
+                boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
+
                 response.setHeader("Content-Disposition",
-                    String.format("%s; filename*=utf-8''%s", contentDisposition, ofilename));
+                    attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(),
+                        shouldBeDownloaded));
                 try (InputStream input = attachment.getContentInputStream(context)) {
                     IOUtils.copy(input, response.getOutputStream());
                 }

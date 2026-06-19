@@ -795,7 +795,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 12.6]
 #-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
-#-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
+#-# The default is "xwiki" which will produce core names likes "xwiki_events_9", for example.
 # solr.remote.corePrefix=xwiki
 
 #-# [Since 5.1M1]

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.5.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.5.0-SNAPSHOT</version>
+  <version>18.6.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -58,17 +58,17 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>3.3.0</tika.version>
+    <tika.version>3.3.1</tika.version>
     <pdfbox.version>3.0.7</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.9</jetty.server.version>
+    <jetty.server.version>12.1.8</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.13.Final</netty.version>
+    <netty.version>4.2.15.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.155.0</metaeffekt.version>
+    <metaeffekt.version>0.156.1</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -77,17 +77,13 @@
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.5</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
+    <calcite.version>1.42.0</calcite.version>
 
     <!-- The default Tomcat cache size  -->
     <xwiki.tomcat.cacheMaxSize>120176</xwiki.tomcat.cacheMaxSize>
 
-    <!-- Versions of other software we need in our functional tests -->
-    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
-         Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
-         (e.g. 7.2.7).
-    -->
-    <libreoffice.version>25.8.6</libreoffice.version>
+	<!-- Test with latest version of previous branch (what we call LTS) of LibreOffice by default. -->
+    <libreoffice.version>lts</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -118,7 +114,7 @@
     <mysql.version>9.7.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.8</mariadb.version>
+    <mariadb.version>3.5.9</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -429,7 +425,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>tom-select</artifactId>
-        <version>2.5.2</version>
+        <version>2.6.1</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -717,7 +713,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>2.1.8</version>
+        <version>2.1.9</version>
         <exclusions>
           <!--  -->
           <exclusion>
@@ -939,12 +935,12 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
@@ -1187,12 +1183,12 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.34</version>
+        <version>3.5.38</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.2.8</version>
+        <version>11.4.4</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
@@ -1241,6 +1237,8 @@
               <!-- This property makes it simple for some module to exclude the check (for example for functional
                    tests) -->
               <xwiki.surefire.captureconsole.skip>${xwiki.surefire.captureconsole.skip}</xwiki.surefire.captureconsole.skip>
+              <!-- Same as above but for the check that tests don't generate files outside of "target". -->
+              <xwiki.surefire.captureworkingdir.skip>${xwiki.surefire.captureworkingdir.skip}</xwiki.surefire.captureworkingdir.skip>
             </systemPropertyVariables>
           </configuration>
           <dependencies>
@@ -1556,12 +1554,12 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>2.0.0</version>
+          <version>2.0.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.3.1</version>
+          <version>5.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1570,6 +1568,17 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <!-- The "test" execution (inherited from the Commons POM) runs the TemporaryFileCheck verifying that tests
+               don't generate files outside of "target". We skip it (using the same property that skips the equivalent
+               runtime check) until the platform tests that currently violate it have been fixed. -->
+          <execution>
+            <id>test</id>
+            <configuration>
+              <skip>${xwiki.surefire.captureworkingdir.skip}</skip>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- Check license headers -->
       <plugin>
@@ -1841,6 +1850,9 @@
         <!-- Don't check that unit tests don't output anything to the console since for example Clover will output
              messages such as "Updating existing database at '...'." during tests! -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+        <!-- Don't check that tests don't generate files outside "target" since Clover generates a coverage database
+             that can be located outside of it. -->
+        <xwiki.surefire.captureworkingdir.skip>true</xwiki.surefire.captureworkingdir.skip>
       </properties>
       <build>
         <pluginManagement>

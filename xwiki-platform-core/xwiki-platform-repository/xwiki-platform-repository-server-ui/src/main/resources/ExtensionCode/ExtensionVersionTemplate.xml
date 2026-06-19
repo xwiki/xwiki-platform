@@ -197,6 +197,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </id>
+      <index>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>index</name>
+        <number>20</number>
+        <numberType>long</numberType>
+        <prettyName>index</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </index>
       <licenseName>
         <cache>0</cache>
         <customDisplay/>
@@ -445,10 +459,16 @@
       <download/>
     </property>
     <property>
+      <exclusions>[]</exclusions>
+    </property>
+    <property>
       <features/>
     </property>
     <property>
       <id/>
+    </property>
+    <property>
+      <index/>
     </property>
     <property>
       <licenseName/>

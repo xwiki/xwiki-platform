@@ -84,6 +84,7 @@
     'css': $xwiki.getSkinFile('uicomponents/require/css.js'),
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'node-module': $xwiki.getSkinFile('uicomponents/require/node-module.js'),
+    'es-module': $xwiki.getSkinFile('uicomponents/require/es-module.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",

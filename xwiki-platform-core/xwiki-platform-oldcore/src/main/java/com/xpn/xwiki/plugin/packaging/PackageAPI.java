@@ -295,7 +295,7 @@ public class PackageAPI extends Api
 
     public String toXml()
     {
-        return this.pack.toXml(getXWikiContext());
+        return this.pack.toXMLString(getXWikiContext());
     }
 
     /**

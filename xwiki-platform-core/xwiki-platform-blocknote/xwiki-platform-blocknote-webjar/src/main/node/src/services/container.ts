@@ -50,6 +50,9 @@ import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platfor
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
+import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
+import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
 
 const container: Container = new Container();
@@ -101,5 +104,9 @@ DefaultMacroWizard.bind(container);
 DefaultBlockNoteMacroWizard.bind(container);
 
 MinimalApp.bind(container);
+
+new MarkdownSyntaxConfig(container);
+new XWikiSyntaxConfig(container);
+new MinimalSyntaxConfig(container);
 
 export { container };

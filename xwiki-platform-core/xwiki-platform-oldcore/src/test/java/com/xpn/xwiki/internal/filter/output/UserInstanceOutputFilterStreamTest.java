@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
@@ -41,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
+    private static final DocumentReference GROUP1 = new DocumentReference("wiki1", "XWiki", "group1");
+
     // Tests
 
     @Test
@@ -101,15 +105,15 @@ class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTes
 
         // XWiki.group1
 
-        XWikiDocument groupDocument = this.oldcore.getSpyXWiki()
-            .getDocument(new DocumentReference("wiki1", "XWiki", "group1"), this.oldcore.getXWikiContext());
-
+        XWikiDocument groupDocument = this.oldcore.getSpyXWiki().getDocument(GROUP1, this.oldcore.getXWikiContext());
         assertFalse(groupDocument.isNew());
 
         BaseObject groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
         assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
         BaseObject groupMemberObject1 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 1);
         assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
+
+        assertEquals(2, groupDocument.getXObjects(MockitoOldcoreRule.GROUP_CLASS).size());
 
         // XWiki.group2
 
@@ -165,4 +169,47 @@ class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTes
         assertEquals("user1@email.ext", userObject.getStringValue("email"));
         assertEquals(1, userObject.getIntValue("active"));
     }
+
+    @Test
+    void importOverExistingGroupKeepsExistingMembersAndDoesNotAddDuplication() throws FilterException, XWikiException
+    {
+        // Ensure group1 is empty
+        XWiki wiki = this.oldcore.getSpyXWiki();
+        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiDocument groupDocument = wiki.getDocument(GROUP1, context).clone();
+        groupDocument.removeXObjects(MockitoOldcoreRule.GROUP_CLASS);
+        wiki.saveDocument(groupDocument, "Empty group1", context);
+
+        // Add user1
+        groupDocument = wiki.getDocument(GROUP1, context).clone();
+        BaseObject user1Member = groupDocument.newXObject(MockitoOldcoreRule.GROUP_CLASS, context);
+        user1Member.setStringValue("member", "XWiki.user1");
+        wiki.saveDocument(groupDocument, "Add user1 to group1", context);
+
+        // Add user0
+        groupDocument = wiki.getDocument(GROUP1, context).clone();
+        BaseObject user0Member = groupDocument.newXObject(MockitoOldcoreRule.GROUP_CLASS, context);
+        user0Member.setStringValue("member", "XWiki.user0");
+
+        // Catch abusive modifications
+        groupDocument.setCached(true);
+
+        wiki.saveDocument(groupDocument, "Add user0 to group1", context);
+
+        // Import user1 and user2
+        importFromXML("user1");
+
+        XWikiDocument groupDocument1 = this.oldcore.getSpyXWiki().getDocument(GROUP1, this.oldcore.getXWikiContext());
+        assertFalse(groupDocument1.isNew());
+
+        BaseObject groupMemberObject0 = groupDocument1.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
+        assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
+        BaseObject groupMemberObject1 = groupDocument1.getXObject(MockitoOldcoreRule.GROUP_CLASS, 1);
+        assertEquals("XWiki.user0", groupMemberObject1.getStringValue("member"));
+        BaseObject groupMemberObject2 = groupDocument1.getXObject(MockitoOldcoreRule.GROUP_CLASS, 2);
+        assertEquals("XWiki.user2", groupMemberObject2.getStringValue("member"));
+
+        assertEquals(3, groupDocument1.getXObjects(MockitoOldcoreRule.GROUP_CLASS).size());
+    }
+
 }

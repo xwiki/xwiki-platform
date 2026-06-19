@@ -21,11 +21,12 @@ package org.xwiki.validator;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.validator.HTML5Validator}.
@@ -33,18 +34,18 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 6.0RC1
  */
-public class HTML5ValidatorTest
+class HTML5ValidatorTest
 {
     private HTML5Validator validator;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.validator = new HTML5Validator();
     }
 
     @Test
-    public void testValid()
+    void valid()
     {
         this.validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
         List<ValidationError> errors = this.validator.validate();
@@ -52,7 +53,7 @@ public class HTML5ValidatorTest
     }
 
     @Test
-    public void testInvalid()
+    void invalid()
     {
         this.validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         List<ValidationError> errors = this.validator.validate();
@@ -63,20 +64,14 @@ public class HTML5ValidatorTest
     }
 
     @Test
-    public void testWhenException()
+    void whenException()
     {
         this.validator.setDocument(null);
-        boolean exceptionCaught = false;
-        try {
-            this.validator.validate();
-        } catch (RuntimeException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        assertThrows(RuntimeException.class, () -> this.validator.validate());
     }
 
     @Test
-    public void testName()
+    void name()
     {
         assertEquals("HTML5", this.validator.getName());
     }

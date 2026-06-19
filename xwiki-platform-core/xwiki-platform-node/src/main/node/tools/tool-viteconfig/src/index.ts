@@ -96,10 +96,7 @@ function generateWebjarNodeConfig(
       rollupOptions: {
         external: (id) => {
           // Force the inclusion of direct or transitive dependencies to keep bundled.
-          if (
-            toBundle.find((s) => id === s || id.startsWith(`${s}/`)) !==
-            undefined
-          ) {
+          if (toBundle.some((s) => id === s || id.startsWith(`${s}/`))) {
             return false;
           }
 
@@ -144,6 +141,12 @@ function generateConfig(
   entryRoot: string = "./src/",
 ): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
+  const externalDependencies = [
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+  ];
+  const isCssRequest = (value: string | undefined): boolean =>
+    value !== undefined && /\.css($|\?)/.test(value);
 
   const libFileName = (format: string) => `index.${format}.js`;
 
@@ -156,10 +159,19 @@ function generateConfig(
         fileName: libFileName,
       },
       rollupOptions: {
-        external: [
-          ...Object.keys(pkg.dependencies || {}),
-          ...Object.keys(pkg.peerDependencies || {}),
-        ],
+        // Externalize both package roots (e.g. "@scope/pkg") and subpaths
+        // (e.g. "@scope/pkg/subpath") to avoid rebundling transitive runtimes.
+        external: (id) => {
+          // Keep CSS subpath imports internal.
+          if (isCssRequest(id)) {
+            return false;
+          }
+
+          return externalDependencies.some(
+            (dependency) =>
+              id === dependency || id.startsWith(`${dependency}/`),
+          );
+        },
       },
     },
     plugins: [

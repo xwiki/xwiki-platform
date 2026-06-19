@@ -60,6 +60,9 @@ public class IndexTreeScriptService implements ScriptService
     private static final List<String> DOCUMENT_PSEUDO_NODE_TYPES =
         List.of("translations:", "attachments:", "classProperties:", "objects:", "addDocument:", "addAttachment:");
 
+    private static final List<String> ENTITY_NODE_TYPES =
+        List.of("wiki:", "space:", "document:", "attachment:", "object:", "objectProperty:", "classProperty:");
+
     @Inject
     private Logger logger;
 
@@ -94,9 +97,14 @@ public class IndexTreeScriptService implements ScriptService
     @Unstable
     public String normalizeEntityTreeNodeId(String nodeId)
     {
-        String docPseudoNodeType = DOCUMENT_PSEUDO_NODE_TYPES.stream()
-            .filter(type -> Strings.CI.startsWith(nodeId, type)).findFirst().orElse(null);
-        if (docPseudoNodeType != null) {
+        String entityNodeType = findPrefix(nodeId, ENTITY_NODE_TYPES);
+        String docPseudoNodeType = findPrefix(nodeId, DOCUMENT_PSEUDO_NODE_TYPES);
+        if (entityNodeType != null) {
+            EntityReference entityReference = this.entityTreeNodeIdConverter.convert(EntityReference.class, nodeId);
+            if (entityReference != null) {
+                return this.entityTreeNodeIdConverter.convert(String.class, entityReference);
+            }
+        } else if (docPseudoNodeType != null) {
             String documentNodeId = DOCUMENT_NODE_ID_PREFIX + nodeId.substring(docPseudoNodeType.length());
             EntityReference documentReference =
                 this.entityTreeNodeIdConverter.convert(EntityReference.class, documentNodeId);
@@ -106,13 +114,17 @@ public class IndexTreeScriptService implements ScriptService
                 return docPseudoNodeType + normalizedDocumentNodeId.substring(DOCUMENT_NODE_ID_PREFIX.length());
             }
         } else {
-            EntityReference entityReference = this.entityTreeNodeIdConverter.convert(EntityReference.class, nodeId);
-            if (entityReference != null) {
-                return this.entityTreeNodeIdConverter.convert(String.class, entityReference);
-            }
+            // No normalization is needed.
+            return nodeId;
         }
 
+        // Normalization failed, log a warning and return the original node id.
         this.logger.warn("Failed to normalize the given entity tree node id [{}].", nodeId);
         return nodeId;
+    }
+
+    private String findPrefix(String value, List<String> prefixes)
+    {
+        return prefixes.stream().filter(prefix -> Strings.CI.startsWith(value, prefix)).findFirst().orElse(null);
     }
 }

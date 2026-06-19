@@ -51,7 +51,12 @@ userdirectory.configuration.columns.editHint=Click to select the columns
 platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
 platform.userdirectory.configTitle=User Directory Configuration
 platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
-platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.</content>
+platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.
+platform.userdirectory.isCustomizedWarning=You are viewing a customized user directory. You can reset it to default or customize it further.
+platform.userdirectory.canCustomizeInfo=The user directory can be customized to display the columns you wish to see.
+platform.userdirectory.canCustomizeInfoGuest=The user directory can be customized to display the columns you wish to see, but you need to log in first.
+platform.userdirectory.customizeButton=Customize
+platform.userdirectory.resetButton=Reset</content>
   <object>
     <name>XWiki.UserDirectoryTranslations</name>
     <number>0</number>

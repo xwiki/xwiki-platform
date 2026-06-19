@@ -96,9 +96,17 @@ export default {
             // Note that this imply that any filter list descriptor needs to have an empty operator defined.
             if (value === "") {
               this.applyFilter(value, "empty");
-            } else {
-              // Fallback on default operator.
+            } else if (this.isAdvanced) {
+              // In the advanced filtering panel the operator is selected separately, so keep the current operator.
               this.applyFilter(value);
+            } else {
+              // In a column filter, selecting a value always uses the default operator. Passing it explicitly is
+              // required so that switching away from the "empty" operator resets to the default operator instead of
+              // keeping the "empty" operator (which would make the backend ignore the value).
+              this.applyFilter(
+                value,
+                this.logic.getFilterDefaultOperator(this.propertyId),
+              );
             }
           }
         },
@@ -178,24 +186,48 @@ export default {
         label: this.$t("livedata.filter.list.emptyLabel"),
       };
     },
+
+    // Synchronize the selectize widget display with the current filter entry (value and operator). This is needed
+    // because the filter entry can be updated outside of this widget (e.g., from the advanced filtering panel).
+    syncSelectizeValue() {
+      if (!this.$refs.input) {
+        // The input might not be in the DOM yet (e.g., an external filter change while the widget is still loading).
+        return;
+      }
+      const input = this.jQuery(this.$refs.input);
+      let value = this.value;
+      if (this.filterEntry?.operator === "empty") {
+        // Make sure the empty option exists so the widget can display its label even when the operator was switched
+        // to empty after the widget creation (e.g., from the advanced filtering panel).
+        this.$refs.input.selectize?.addOption(this.getDefaultEmptyOption());
+        // The empty string is ignored by default. We change the value to empty string plus a comma value separator to
+        // take it into account.
+        value = ",";
+      }
+      input.val(value).trigger("change");
+    },
   },
 
-  // Update the selectize widget whenever the filter value changes.
+  // Update the selectize widget whenever the filter entry changes.
   watch: {
-    value(newValue) {
-      this.jQuery(this.$refs.input).val(newValue).trigger("change");
+    value() {
+      this.syncSelectizeValue();
+    },
+    // The operator can be changed outside of this widget (e.g., from the advanced filtering panel), so the displayed
+    // value must be kept consistent with the active operator.
+    "filterEntry.operator"() {
+      this.syncSelectizeValue();
     },
     async fullyReady(isReady) {
       if (isReady) {
         // It is important to wait for the next tick to be sure that the input reference is available in the dom, for
         // selectize to be able to enhance it.
         await this.$nextTick();
-        const $ = this.jQuery;
-        $(this.$refs.input).xwikiSelectize(this.selectizeSettings);
+        this.jQuery(this.$refs.input).xwikiSelectize(this.selectizeSettings);
+        // For non-empty operators, selectize picks up the initial value from the HTML input attribute. For the empty
+        // operator, selectize ignores empty string values, so we must sync explicitly after widget creation.
         if (this.filterEntry?.operator === "empty") {
-          // The empty string is ignored by default. We change the value to empty string plus a coma value separator to
-          // take it into account.
-          $(this.$refs.input).val(",").trigger("change");
+          this.syncSelectizeValue();
         }
       }
     },

@@ -31,4 +31,6 @@ export default generateWebjarNodeConfig(import.meta.url, [
   "lodash",
   "vue-tippy",
   "vuedraggable",
+  // Transitive dependency of vuedraggable
+  "sortablejs",
 ]);

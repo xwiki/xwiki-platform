@@ -118,6 +118,39 @@ public class XWikiRepositoryModel
     public static final LocalDocumentReference CONFIGURATION_REFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "RepositoryConfig");
 
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final String PROJECT_CLASSNAME = EXTENSION_SPACENAME + ".ProjectClass";
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECT_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectClass");
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final String PROJECTVERSION_CLASSNAME = EXTENSION_SPACENAME + ".ProjectVersionClass";
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECTVERSION_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectVersionClass");
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECT_TEMPLATEREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectTemplate");
+
     // Tools
 
     /**
@@ -128,6 +161,12 @@ public class XWikiRepositoryModel
     // Properties
 
     public static final String PROP_EXTENSION_ID = "id";
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    public static final String PROP_EXTENSION_PROJECT = "project";
 
     public static final String PROP_EXTENSION_TYPE = "type";
 
@@ -212,6 +251,12 @@ public class XWikiRepositoryModel
      * @since 17.9.0RC1
      */
     public static final String PROP_VERSION_INDEX = "index";
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static final String PROP_VERSION_NOTES = "notes";
 
     /**
      * @since 7.3M1

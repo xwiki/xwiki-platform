@@ -63,7 +63,7 @@ class ClassSheetBinderTest
      * This is called when the component is initialized.
      */
     @BeforeComponent
-    void setUp() throws Exception
+    void setup() throws Exception
     {
         this.sheetBindingsQuery = mock(Query.class);
         // This is called when the component is initialized.

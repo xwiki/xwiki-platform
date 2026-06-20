@@ -149,6 +149,20 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
         return this.userBlogFeed.getText();
     }
 
+    /**
+     * Gets the displayed value of a custom profile field (i.e. one added to extend the user profile), located by the
+     * pretty name shown as its label.
+     *
+     * @param prettyName the pretty name (label) of the custom field as displayed in the profile
+     * @return the displayed value of the custom field
+     * @since 18.5.0RC1
+     */
+    public String getUserCustomProperty(String prettyName)
+    {
+        return getDriver().findElementWithoutWaiting(
+            By.xpath("//dd[preceding-sibling::dt[1]/label[. = '" + prettyName + "']]")).getText();
+    }
+
     public ChangeAvatarPage changeAvatarImage()
     {
         this.changeAvatar.click();

@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.model.reference.EntityReference;
@@ -41,15 +42,15 @@ public class XARDocumentModel extends XarDocumentModel
      * The parameters to be used for reading a document.
      */
     public static final Map<String, EventParameter> DOCUMENT_PARAMETERS = Map.of(
-        ELEMENT_DEFAULTLOCALE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_LOCALE, Locale.class)
+        ELEMENT_DEFAULTLOCALE, new EventParameter(WikiDocumentFilter.PARAMETER_LOCALE, Locale.class)
     );
 
     /**
      * The parameters to be used for reading a document locale.
      */
     public static final Map<String, EventParameter> DOCUMENTLOCALE_PARAMETERS = Map.of(
-        ELEMENT_CREATION_AUTHOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR),
-        ELEMENT_CREATION_DATE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE, Date.class),
+        ELEMENT_CREATION_AUTHOR, new EventParameter(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR),
+        ELEMENT_CREATION_DATE, new EventParameter(WikiDocumentFilter.PARAMETER_CREATION_DATE, Date.class),
         ELEMENT_REVISIONS, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS)
     );
 
@@ -65,38 +66,38 @@ public class XARDocumentModel extends XarDocumentModel
 
     static
     {
-        DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CONTENT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
+        DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CONTENT, new EventParameter(WikiDocumentFilter.PARAMETER_CONTENT));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CONTENT_AUTHOR,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
+            new EventParameter(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CONTENT_DATE,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE, Date.class));
+            new EventParameter(WikiDocumentFilter.PARAMETER_CONTENT_DATE, Date.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CONTENT_HTML,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+            new EventParameter(WikiDocumentFilter.PARAMETER_CONTENT_HTML));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_CUSTOMCLASS,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
+            new EventParameter(WikiDocumentFilter.PARAMETER_CUSTOMCLASS));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_DEFAULTTEMPLATE,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
+            new EventParameter(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_HIDDEN,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, Boolean.class));
+            new EventParameter(WikiDocumentFilter.PARAMETER_HIDDEN, Boolean.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_PARENT,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_PARENT, EntityReference.class));
+            new EventParameter(WikiDocumentFilter.PARAMETER_PARENT, EntityReference.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_REVISION_EFFECTIVEMEDATAAUTHOR,
-                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR));
+                new EventParameter(WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_REVISION_ORIGINALMEDATAAUTHOR,
-                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
+                new EventParameter(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_ENFORCE_REQUIRED_RIGHTS,
-                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS, Boolean.class));
+                new EventParameter(WikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS, Boolean.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_REVISION_COMMENT,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
+            new EventParameter(WikiDocumentFilter.PARAMETER_REVISION_COMMENT));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_REVISION_DATE,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));
+            new EventParameter(WikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_REVISION_MINOR,
-                new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR, Boolean.class));
+                new EventParameter(WikiDocumentFilter.PARAMETER_REVISION_MINOR, Boolean.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_SYNTAX,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.class));
+            new EventParameter(WikiDocumentFilter.PARAMETER_SYNTAX, Syntax.class));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_TITLE,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_TITLE));
+            new EventParameter(WikiDocumentFilter.PARAMETER_TITLE));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_VALIDATIONSCRIPT,
-            new EventParameter(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
+            new EventParameter(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
     };
 }

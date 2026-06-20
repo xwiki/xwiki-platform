@@ -99,22 +99,29 @@ public abstract class AbstractSolr implements Solr, Disposable
     private XWikiSolrCore getRuntimeCore(String coreName)
     {
         try {
-            return getCore(coreName, getSolrMajorVersion(), true);
+            return getCoreInternal(coreName);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private synchronized XWikiSolrCore getCore(String xwikiCoreName, int majorVersion, boolean createAndMigrate)
+    private synchronized XWikiSolrCore getCoreInternal(String xwikiCoreName)
         throws SolrServerException, IOException, SolrException
     {
-        // Resolve the real Solr core name
-        String solrCoreName = toSolrCoreName(xwikiCoreName, majorVersion);
+        // Get the existing client designed for the current Solr version
+        XWikiSolrCore solrCore = getCore(xwikiCoreName, getSolrMajorVersion());
 
-        // Get the existing client
-        SolrClient solrClient = getInternalSolrClient(solrCoreName);
+        // If we cannot create a core, try to find one designed for the previous major version of Solr
+        if (solrCore == null && !canCreateCore()) {
+            solrCore = getCore(xwikiCoreName, getSolrMajorVersion() - 1);
 
-        // Initialize the client
+            if (solrCore == null) {
+                // No core exist for the current Solr version and we cannot create a new one
+                return null;
+            }
+        }
+
+        // Initialize the core
         if (this.componentManager.hasComponent(SolrCoreInitializer.class, xwikiCoreName)) {
             SolrCoreInitializer initializer;
             try {
@@ -123,41 +130,42 @@ public abstract class AbstractSolr implements Solr, Disposable
                 throw new SolrException("Failed to get the SolrCoreInitializer for core name [{}]", e);
             }
 
-            // If no core already exist create a new core
-            if (solrClient == null && createAndMigrate) {
-                solrClient = createSolrClient(solrCoreName, initializer.isCache());
+            // If no core already exist, create a new core
+            if (solrCore == null) {
+                solrCore = createCore(xwikiCoreName, initializer.isCache());
             }
 
-            if (solrClient != null) {
-                // Create the XWikiSolrCore
-                XWikiSolrCore solrCore = new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient);
+            if (solrCore != null) {
+                // Check if the core needs to be migrated from a previous major version of Solr
+                migrateCore(xwikiCoreName, solrCore, initializer);
 
-                if (createAndMigrate) {
-                    // Check if the core needs to be migrated from a previous major version of Solr
-                    migrateCore(xwikiCoreName, solrCore, initializer);
-
-                    // Custom initialization of the core
-                    initializer.initialize(solrCore);
-                }
+                // Custom initialization of the core
+                initializer.initialize(solrCore);
 
                 return solrCore;
             }
-        } else {
-            return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient);
         }
 
-        return null;
+        return solrCore;
     }
 
     protected void migrateCore(String xwikiCoreName, XWikiSolrCore newCore, SolrCoreInitializer initializer)
-        throws SolrException, SolrServerException, IOException
+        throws SolrException, IOException
     {
-        Integer sVersion = getSVersion(newCore);
+        // Get current server version
         int solrMajorVersion = getSolrMajorVersion();
+
+        // There is nothing to migrate if the only core found is designed from the previous version of Solr
+        if (newCore.getSolrMajorVersion() < solrMajorVersion) {
+            return;
+        }
+
+        // Migrate the core, if needed
+        Integer sVersion = getSVersion(newCore);
         if (sVersion == null || sVersion < solrMajorVersion) {
             for (int previousVersion = solrMajorVersion - 1; previousVersion >= 8; --previousVersion) {
-                // Check if a core for this version of Solr exist
-                XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion, false);
+                // Check if a core for previous version of Solr exist
+                XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion);
 
                 if (previousCore != null) {
                     this.logger.debug("A previous core was found for name [{}] ([{}])", xwikiCoreName,
@@ -212,8 +220,6 @@ public abstract class AbstractSolr implements Solr, Disposable
         this.solrSchemaUtils.commit(core);
     }
 
-    protected abstract int getSolrMajorVersion();
-
     protected String getSolrCoreSuffix()
     {
         int majorVersion = getSolrMajorVersion();
@@ -247,14 +253,16 @@ public abstract class AbstractSolr implements Solr, Disposable
     }
 
     /**
-     * @param solrCoreName the real solr core name
-     * @return the core or null if no core exist by this name
-     * @throws SolrException when failing to create the solr client
+     * @since 18.5.0RC1
      */
-    protected abstract SolrClient getInternalSolrClient(String solrCoreName) throws SolrException;
+    protected abstract XWikiSolrCore getCore(String xwikiCoreName, int solrMajorVersion) throws SolrException;
 
     /**
-     * @since 16.2.0RC1
+     * @since 18.5.0RC1
      */
-    protected abstract SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException;
+    protected XWikiSolrCore createCore(String xwikiCoreName, boolean isCache) throws SolrException
+    {
+        // By default, we don't support creating new cores
+        throw new SolrException("Creating new cores is not supported");
+    }
 }

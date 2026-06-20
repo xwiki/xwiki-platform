@@ -29,6 +29,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.browser.XWikiBrowserWebDriverContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.browser.Browser;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
@@ -52,6 +53,10 @@ public final class BrowserTestUtils
     private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME = "selenium/standalone-firefox:%s";
 
     private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME = "selenium/standalone-chrome:%s";
+
+    private static final String SELENIUM_CHROMIUM_DOCKER_IMAGE_NAME = "selenium/standalone-chromium:%s";
+
+    private static final boolean IS_ARM64 = "aarch64".equals(System.getProperty("os.arch"));
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -85,7 +90,10 @@ public final class BrowserTestUtils
      */
     public static DockerImageName getSeleniumDockerImageName(TestConfiguration testConfiguration)
     {
-        return DockerImageName.parse(getImageName(testConfiguration));
+        return IS_ARM64 && Browser.CHROME.equals(testConfiguration.getBrowser())
+            ? DockerImageName.parse(getImageName(testConfiguration, true))
+              .asCompatibleSubstituteFor(getImageName(testConfiguration, false))
+            : DockerImageName.parse(getImageName(testConfiguration, false));
     }
 
     private static void pullImage(DockerClient dockerClient, String imageName)
@@ -113,11 +121,16 @@ public final class BrowserTestUtils
         return (StringUtils.isBlank(testConfiguration.getBrowserTag())) ? LATEST : testConfiguration.getBrowserTag();
     }
 
-    private static String getImageName(TestConfiguration testConfiguration)
+    private static String getImageName(TestConfiguration testConfiguration, boolean useChromium)
     {
-        boolean isChrome = CHROME.equals(testConfiguration.getBrowser());
         String imageTag = getImageTag(testConfiguration);
-        String baseImageName = isChrome ? SELENIUM_CHROME_DOCKER_IMAGE_NAME : SELENIUM_FIREFOX_DOCKER_IMAGE_NAME;
+        String baseImageName;
+        if (useChromium) {
+            baseImageName = SELENIUM_CHROMIUM_DOCKER_IMAGE_NAME;
+        } else {
+            boolean isChrome = CHROME.equals(testConfiguration.getBrowser());
+            baseImageName = isChrome ? SELENIUM_CHROME_DOCKER_IMAGE_NAME : SELENIUM_FIREFOX_DOCKER_IMAGE_NAME;
+        }
         return String.format(baseImageName, imageTag);
     }
 }

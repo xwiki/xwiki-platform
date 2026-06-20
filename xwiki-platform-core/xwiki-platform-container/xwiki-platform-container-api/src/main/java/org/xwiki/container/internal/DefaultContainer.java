@@ -35,6 +35,8 @@ import org.xwiki.container.Session;
  * its own value for these objects. In addition we sometime need to create a new request, response or session even while
  * in the same thread. For this use case we've added the possibility to push/pop different implementations for these
  * Objects.
+ *
+ * @version $Id$
  */
 @Component
 @Singleton

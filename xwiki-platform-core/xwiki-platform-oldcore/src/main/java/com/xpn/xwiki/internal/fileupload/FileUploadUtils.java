@@ -36,7 +36,6 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
-import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -45,7 +44,6 @@ import org.xwiki.internal.attachment.PartAttachmentAccessWrapper;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
-import com.xpn.xwiki.web.UploadAction;
 
 /**
  * File upload related tools.
@@ -100,7 +98,13 @@ public final class FileUploadUtils
         if (!parts.isEmpty()) {
             List<FileItem> items = new ArrayList<>(parts.size());
             for (Part part : parts) {
-                if (Strings.CS.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
+                // Validate any part that is an actual file upload (i.e. that has a submitted file name),
+                // regardless of the field name. For example, the extradoc attachment tab uses the "filepath" field
+                // name, but other consumers of the fileupload plugin (e.g. the WYSIWYG editor falling back on the
+                // legacy upload mechanism) use a different field name such as "upload"; they must still be validated
+                // against the attachment size limit. Plain form fields (xredirect, form_token, filename*, ...) have
+                // no submitted file name and are correctly skipped.
+                if (part.getSubmittedFileName() != null) {
                     attachmentValidator.validateAttachment(new PartAttachmentAccessWrapper(part));
                 }
                 items.add(new PartFileItem(part));

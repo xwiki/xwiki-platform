@@ -83,6 +83,11 @@ import static org.xwiki.rest.internal.resources.KeywordSearchScope.TITLE;
 @Named("database")
 public class DatabaseKeywordSearchSource implements KeywordSearchSource
 {
+    /**
+     * The {@code space} literal, used as an order field name, as a query parameter name and as a search result type.
+     */
+    private static final String SPACE = "space";
+
     @Inject
     protected ContextualAuthorizationManager authorizationManager;
 
@@ -175,8 +180,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             String addColumn = "";
             if (!StringUtils.isBlank(orderField)) {
                 addColumn =
-                    (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField) || "space"
-                        .equals(orderField)) ? "" : ", doc." + orderField;
+                    (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField)
+                        || SPACE.equals(orderField)) ? "" : ", doc." + orderField;
             }
 
             String addSpace = "";
@@ -269,7 +274,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
                 .setLimit(options.number() * 2);
 
             if (options.space() != null) {
-                query.bindValue("space", options.space());
+                query.bindValue(SPACE, options.space());
             }
 
             if (options.searchScopes().contains(NAME)) {
@@ -421,7 +426,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
                 Document spaceDoc = xwikiApi.getDocument(spaceReference);
 
                 SearchResult searchResult = objectFactory.createSearchResult();
-                searchResult.setType("space");
+                searchResult.setType(SPACE);
                 searchResult.setId(spaceId);
                 searchResult.setWiki(wikiName);
                 searchResult.setSpace(spaceId);
@@ -478,8 +483,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
              * select clause.
              */
             String addColumn =
-                (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField) || "space"
-                    .equals(orderField)) ? "" : ", doc." + orderField;
+                (orderField.isEmpty() || "fullName".equals(orderField) || "name".equals(orderField)
+                    || SPACE.equals(orderField)) ? "" : ", doc." + orderField;
 
             if (options.space() != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number");
@@ -529,7 +534,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
                 queryResult =
                     finalQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                        .bindValue("space", options.space()).setLimit(options.number()).execute();
+                        .bindValue(SPACE, options.space()).setLimit(options.number()).execute();
             } else {
                 queryResult =
                     finalQueryManager.createQuery(query, Query.XWQL)

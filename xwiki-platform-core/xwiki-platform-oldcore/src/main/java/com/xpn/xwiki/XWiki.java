@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 import java.io.ByteArrayInputStream;
@@ -59,6 +58,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
@@ -1166,13 +1166,13 @@ public class XWiki implements EventListener
             method.setAccessible(true);
             return method.invoke(obj, args);
         } catch (IllegalAccessException e) {
-            LOGGER.error("Failed to call private method [{}]: [{}]", methodName, e);
+            LOGGER.error("Failed to call private method [{}]", methodName, e);
 
             return null;
         } catch (NoSuchMethodException e) {
             return null;
         } catch (InvocationTargetException e) {
-            LOGGER.error("Private method [{}] failed: [{}]", methodName, e);
+            LOGGER.error("Private method [{}] failed", methodName, e);
 
             return null;
         }
@@ -1196,7 +1196,7 @@ public class XWiki implements EventListener
         } catch (NoSuchFieldException e) {
             return null;
         } catch (IllegalAccessException e) {
-            LOGGER.error("Failed to get private field with name [{}]: [{}]", fieldName, e);
+            LOGGER.error("Failed to get private field with name [{}]", fieldName, e);
 
             return null;
         } finally {
@@ -1703,7 +1703,7 @@ public class XWiki implements EventListener
             }
         } catch (Exception ex) {
             // Probably a SecurityException or the file is not accessible (inside a war)
-            LOGGER.info("Failed to get file modification date: " + ex.getMessage());
+            LOGGER.info("Failed to get file modification date: {}", ex.getMessage());
         }
         return new Date();
     }
@@ -2115,8 +2115,8 @@ public class XWiki implements EventListener
                 // The old version is made available using doc.getOriginalDocument()
                 afterSave(document, context);
             } catch (Exception ex) {
-                LOGGER.error("Failed to send document save notification for document ["
-                    + getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()) + "]", ex);
+                LOGGER.error("Failed to send document save notification for document [{}]",
+                    getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()), ex);
             } finally {
                 document.setOriginalDocument(newOriginal);
             }
@@ -2177,7 +2177,7 @@ public class XWiki implements EventListener
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
             try {
-                // Indicate the the async context manipulated documents
+                // Indicate the async context manipulated documents
                 getAsyncContext().useEntity(doc.getDocumentReferenceWithLocale());
             } catch (Exception e) {
                 // If the AsyncContext component does not work then we are not in an asynchronous context anyway
@@ -2623,7 +2623,7 @@ public class XWiki implements EventListener
         try {
             return getOldRendering().renderTemplate(template, skin, context);
         } catch (Exception ex) {
-            LOGGER.error("Failed to render template [" + template + "] for skin [" + skin + "]", ex);
+            LOGGER.error("Failed to render template [{}] for skin [{}]", template, skin, ex);
             return parseTemplate(template, skin, context);
         }
     }
@@ -2637,7 +2637,7 @@ public class XWiki implements EventListener
         try {
             return getOldRendering().renderTemplate(template, context);
         } catch (Exception ex) {
-            LOGGER.error("Failed to render template [" + template + "]", ex);
+            LOGGER.error("Failed to render template [{}]", template, ex);
             return parseTemplate(template, context);
         }
     }
@@ -4446,7 +4446,7 @@ public class XWiki implements EventListener
 
             XWikiDocument doc = null;
             try {
-                LOGGER.debug("Including Topic " + topic);
+                LOGGER.debug("Including Topic {}", topic);
                 try {
                     @SuppressWarnings("unchecked")
                     Set<String> includedDocs = (Set<String>) context.get("included_docs");
@@ -4456,7 +4456,7 @@ public class XWiki implements EventListener
                     }
 
                     if (includedDocs.contains(prefixedTopic) || currentDocName.equals(prefixedTopic)) {
-                        LOGGER.warn("Error on too many recursive includes for topic " + topic);
+                        LOGGER.warn("Error on too many recursive includes for topic {}", topic);
                         return "Cannot make recursive include";
                     }
                     includedDocs.add(prefixedTopic);
@@ -4473,7 +4473,7 @@ public class XWiki implements EventListener
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
             } catch (XWikiException e) {
-                LOGGER.warn("Exception Including Topic " + topic, e);
+                LOGGER.warn("Exception Including Topic {}", topic, e);
                 return "Topic " + topic + " does not exist";
             }
 
@@ -5423,7 +5423,7 @@ public class XWiki implements EventListener
                     return "wiki/" + wikiDescriptor.getDefaultAlias() + "/";
                 }
             } catch (Exception e) {
-                LOGGER.error("Failed to get URL for provided wiki [" + wikiName + "]", e);
+                LOGGER.error("Failed to get URL for provided wiki [{}]", wikiName, e);
             }
         }
 
@@ -5983,7 +5983,7 @@ public class XWiki implements EventListener
                 try {
                     this.groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
                 } catch (Exception e) {
-                    LOGGER.error("Failed to instantiate custom group service class: " + e.getMessage(), e);
+                    LOGGER.error("Failed to instantiate custom group service class", e);
                     this.groupService = new XWikiGroupServiceImpl();
                 }
                 this.groupService.init(this, context);
@@ -6129,16 +6129,15 @@ public class XWiki implements EventListener
                     }
 
                     if (this.rightService == null) {
-                        LOGGER.warn(String.format(
-                            "Failed to initialize RightService [%s]"
-                                + " by Reflection, using OLD implementation [%s] with 'new'.",
-                            rightsClass, XWikiRightServiceImpl.class.getCanonicalName()), lastException);
+                        LOGGER.warn("Failed to initialize RightService [{}] by Reflection, "
+                            + "using OLD implementation [{}] with 'new'.", rightsClass,
+                            XWikiRightServiceImpl.class.getCanonicalName(), lastException);
 
                         this.rightService = new XWikiRightServiceImpl();
 
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Initialized old RightService implementation "
-                                + this.rightService.getClass().getName() + " using 'new'.");
+                            LOGGER.debug("Initialized old RightService implementation {} using 'new'.",
+                                this.rightService.getClass().getName());
                         }
                     }
                 }
@@ -6185,17 +6184,17 @@ public class XWiki implements EventListener
         if (urlFactoryServiceClass != null) {
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Using custom URLFactory Service Class [" + urlFactoryServiceClass + "]");
+                    LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
                 }
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                     .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
             } catch (Exception e) {
-                LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
+                LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }
         }
         if (factoryService == null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Using default URLFactory Service Class [" + urlFactoryServiceClass + "]");
+                LOGGER.debug("Using default URLFactory Service Class [{}]", urlFactoryServiceClass);
             }
             factoryService = new XWikiURLFactoryServiceImpl(this);
         }
@@ -6528,7 +6527,7 @@ public class XWiki implements EventListener
 
             return sdf.format(date);
         } catch (Exception e) {
-            LOGGER.info("Failed to format date [" + date + "] with pattern [" + xformat + "]: " + e.getMessage());
+            LOGGER.info("Failed to format date [{}] with pattern [{}]: {}", date, xformat, e.getMessage());
             if (format == null) {
                 if (xformat.equals(defaultFormat)) {
                     return date.toString();
@@ -6813,7 +6812,7 @@ public class XWiki implements EventListener
             }
         } catch (Exception e) {
             // This should never happen
-            LOGGER.error("Failed to extract #includeMacros targets from provided content [" + content + "]", e);
+            LOGGER.error("Failed to extract #includeMacros targets from provided content [{}]", content, e);
 
             list = Collections.emptyList();
         }

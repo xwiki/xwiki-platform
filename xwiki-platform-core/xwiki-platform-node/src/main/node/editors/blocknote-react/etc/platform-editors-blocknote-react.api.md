@@ -43,6 +43,7 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
 
 // Warning: (ae-internal-missing-underscore) The name "BlockNoteConcreteMacro" should be prefixed with an underscore because the declaration is marked as @internal
@@ -77,6 +78,7 @@ export type BlockNoteViewWrapperProps = {
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
+    syntax: SyntaxConfig;
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -737,7 +739,7 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 // Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
 //
 // @beta
-export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
+export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[], syntax: SyntaxConfig, lang: EditorLanguage): DefaultReactSuggestionItem[];
 
 // (No @packageDocumentation comment for this package)
 

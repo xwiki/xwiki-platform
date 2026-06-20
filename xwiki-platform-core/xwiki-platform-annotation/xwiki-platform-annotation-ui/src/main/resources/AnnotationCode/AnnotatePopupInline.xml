@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>Inline annotate popup opening when text is selected on a wiki page. A clear and beginner-friendly alternative to the keyboard shortcut to create an annotation.</content>
+  <content>Inline annotate popup that opens when text is selected on a wiki page. An alternative to the keyboard shortcut to create an annotation.</content>
   <object>
     <name>AnnotationCode.AnnotatePopupInline</name>
     <number>0</number>
@@ -130,32 +130,32 @@
 const Constants = Object.freeze({
   /**
    * The CSS class of the annotation bubble
-   * @type {String}
+   * @type {string}
    */
   ANNOTATE_BUBBLE_CLASS: "annotation-bubble",
   /**
    * The name of the icon rendered in the popup
-   * @type {String}
+   * @type {string}
    */
   ANNOTATE_ICON_NAME: "comment",
   /**
    * The translation key for the popup button title (for accessibility)
-   * @type {String}
+   * @type {string}
    */
   ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
   /**
    * The debounce delay added to the selectionstart listener
    * @type {number}
    */
-  DEBOUNCE_SELECT_MS: 700,
+  DEBOUNCE_SELECT_MS: 515,
   /**
    * The CSS class that needs to be added to show the popup
-   * @type {String}
+   * @type {string}
    */
   POPUP_CLASS_OPEN: "opened",
   /**
    * The element id of the popup
-   * @type {String}
+   * @type {string}
    */
   POPUP_ID: "annotation-popup",
   /**
@@ -204,7 +204,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
     wikiContent = null;
     /**
      * Callback that opens the annotation bubble to create an annotation
-     * @type {Function}
+     * @type {() =&gt; void}
      */
     openAnnotationBubble = null;
     /**
@@ -218,22 +218,34 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
      */
     popupButton = null;
     /**
-     * The last focussed element before focus was set programmatically in open method
-     * @type {HTMLElement}
+     * The last focussed element before setting focus programmatically
+     * @type {HTMLElement | null}
      */
     previousFocusElem = null;
+    /**
+     * The first range of the selection
+     * @type {Range | null}
+     */
+    currentRange = null;
 
     /**
      * @param {HTMLElement} wikiContent - The page container
      * @param {Function} openAnnotationBubble - Callback that opens the annotation bubble to create an annotation. Signature: () =&gt; void;
      */
     constructor(wikiContent, openAnnotationBubble) {
+      if (!(wikiContent instanceof HTMLElement)) {
+        throw new TypeError("wikiContent must be an HTMLElement");
+      }
       this.wikiContent = wikiContent;
+
+      if (typeof openAnnotationBubble !== "function") {
+        throw new TypeError("openAnnotationBubble must be a function");
+      }
       this.openAnnotationBubble = openAnnotationBubble;
 
       // Bind handlers to the class instance because event listeners call the function with a different "this"
       this._onSelection = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECT_MS);
-      this._onButtonClick = debounce(this._onButtonClick.bind(this));
+      this._onButtonClick = this._onButtonClick.bind(this);
       this._onEscapeKey = this._onEscapeKey.bind(this);
       this._onClickAway = this._onClickAway.bind(this);
       this._onViewportChange = debounce(this._onViewportChange.bind(this));
@@ -244,30 +256,35 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
     /**
      * Open the popup
-     * @param {Node|null} focusNode - The currently focussed Node
+     * @param {Selection} selection
      */
-    open(focusNode) {
-      // check if an annotate bubble is already open
+    open(selection) {
+      // do not open if an annotate bubble is already open
       if (document.getElementsByClassName(Constants.ANNOTATE_BUBBLE_CLASS).length !== 0) {
         return;
       }
+
+      if (selection.rangeCount &lt;= 0) {
+        return;
+      }
+      this.currentRange = selection.getRangeAt(0).cloneRange()
 
       const pos = this._getPositioning();
       if (!pos) {
         return;
       }
 
+      this.previousFocusElem = selection.focusNode?.parentElement || document.activeElement;
       requestAnimationFrame(() =&gt; {
         this.popup.style.top = pos.top;
         this.popup.style.left = pos.left;
         this.popup.classList.add(Constants.POPUP_CLASS_OPEN);
         this.popup.setAttribute("aria-hidden", "false");
 
-        this.previousFocusElem = focusNode?.parentElement || document.activeElement;
         this.popupButton.focus({ preventScroll: true });
       });
 
-      document.addEventListener("click", this._onClickAway);
+      document.addEventListener("click", this._onClickAway, { passive: true });
       if (window.visualViewport) {
         window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-positioning on resize/zoom
       }
@@ -283,14 +300,17 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
                               !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
                               this.previousFocusElem.getClientRects().length;
 
-      requestAnimationFrame(() =&gt; {
-        if (canRestoreFocus) {
-          this.previousFocusElem.focus({ preventScroll: true });
-        }
-        this.popupButton.blur(); // ensure popupButton is blurred in-time before setting aria-hidden to true
-        this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
-        this.popup.setAttribute("aria-hidden", "true");
-      });
+      if (canRestoreFocus) {
+        this.previousFocusElem.focus({ preventScroll: true });
+      } else {
+        this.popupButton.blur();
+      }
+      this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
+      this.popup.setAttribute("aria-hidden", "true");
+
+      // reset state variables
+      this.previousFocusElem = null;
+      this.currentRange = null;
 
       document.removeEventListener("click", this._onClickAway);
       if (window.visualViewport) {
@@ -342,22 +362,17 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
      */
     _onSelection() {
       const selection = document.getSelection();
-      if (!selection || !selection.anchorNode || !this.wikiContent.contains(selection.anchorNode) || selection.rangeCount &lt;= 0 || !selection.toString().trim()) {
+      if (!selection || !selection.anchorNode || !this.wikiContent.contains(selection.anchorNode) || selection.isCollapsed || !selection.toString().trim()) {
         return;
       }
 
-      this.open(selection.focusNode);
+      this.open(selection);
     }
 
     /**
      * Event handler for popup button click
      */
     _onButtonClick() {
-      if (!this.openAnnotationBubble || typeof this.openAnnotationBubble !== "function") {
-        // FATAL ERROR
-        return;
-      }
-
       this.close();
       this.openAnnotationBubble();
     }
@@ -385,7 +400,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
     /**
      * Event handler for window resize/zoom. Recalculates the positioning of the popup
      */
-    _onViewportChange(event) {
+    _onViewportChange() {
       const pos = this._getPositioning();
       if (!pos) {
         return;
@@ -399,16 +414,15 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
     /**
      * Get popup position that is near the selected text range
-     * @return {{top: String, left: String}} - The absolute top and left position with unit for the popup
+     * @return {{top: String, left: String}| null} - The absolute top and left position with unit for the popup
      */
     _getPositioning() {
-      const selection = document.getSelection();
-      if (!selection || selection.rangeCount &lt;= 0) {
+      if (!this.currentRange) {
         return null;
       }
 
-      // use last rectangle of selection, important for correct positioning in multi-line selections
-      const rects = selection.getRangeAt(0).getClientRects();
+      // use last rectangle of selection (important for correct positioning in multi-line selections)
+      const rects = this.currentRange.getClientRects();
       if (!rects.length) {
         return null;
       }

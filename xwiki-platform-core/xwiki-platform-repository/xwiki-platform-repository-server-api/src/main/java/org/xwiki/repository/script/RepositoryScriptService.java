@@ -20,6 +20,8 @@
 package org.xwiki.repository.script;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,15 +31,21 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionSupportPlans;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
+import org.xwiki.repository.internal.job.XIPExportJob;
+import org.xwiki.repository.job.XIPExportJobRequest;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -71,6 +79,12 @@ public class RepositoryScriptService implements ScriptService
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    /**
+     * Used to execute the XIP export jobs.
+     */
+    @Inject
+    private JobExecutor jobExecutor;
 
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
@@ -207,5 +221,38 @@ public class RepositoryScriptService implements ScriptService
         XWikiDocument projectVersionDocument =
             this.extensionStore.getProjectVersionDocument(projectDocument, version, context);
         return new Object(this.extensionStore.getProjectVersionObject(projectVersionDocument, version), context);
+    }
+
+    /**
+     * Starts a job that will export the given extension (along with its dependencies) as a XIP package that can be used
+     * to install the extension offline on another XWiki instance with the specified version.
+     *
+     * @param extensionId the extension to export (along with its dependencies) as a XIP package
+     * @param xwikiVersion the XWiki version where the extension needs to be installed offline
+     * @return the XIP export job
+     * @since 18.5.0RC1
+     */
+    @Unstable
+    public Job exportExtension(ExtensionId extensionId, String xwikiVersion)
+    {
+        setError(null);
+
+        XIPExportJobRequest request = new XIPExportJobRequest();
+        request.setId("repository", "xip", UUID.randomUUID().toString());
+        request.setExtension(extensionId);
+        request.setXWikiVersion(xwikiVersion);
+        request.setCoreExtensions(
+            List.of(new ExtensionId("org.xwiki.platform:xwiki-platform-distribution-war-dependencies", xwikiVersion)));
+        request.setCheckRights(true);
+        XWikiContext xcontext = contextProvider.get();
+        request.setUserReference(xcontext.getUserReference());
+        request.setAuthorReference(xcontext.getAuthorReference());
+
+        try {
+            return this.jobExecutor.execute(XIPExportJob.JOB_TYPE, request);
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
     }
 }

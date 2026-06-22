@@ -133,8 +133,8 @@ catalogs:
       specifier: 1.0.2
       version: 1.0.2
     globals:
-      specifier: 17.6.0
-      version: 17.6.0
+      specifier: 17.7.0
+      version: 17.7.0
     i18next:
       specifier: 26.3.1
       version: 26.3.1
@@ -416,7 +416,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -455,7 +455,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       jquery:
         specifier: 'catalog:'
         version: 4.0.0
@@ -749,7 +749,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -5646,8 +5646,8 @@ packages:
     resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
     engines: {node: 18 || 20 || >=22}
 
-  globals@17.6.0:
-    resolution: {integrity: sha512-sepffkT8stwnIYbsMBpoCHJuJM5l98FUF2AnE07hfvE0m/qp3R586hw4jF4uadbhvg1ooIdzuu7CsfD2jzCaNA==}
+  globals@17.7.0:
+    resolution: {integrity: sha512-Czmyns5dUsq4seFBR/Kdydhmo8y9kC79hiSkPn0YcGtNnYWnrgt0vjrSjx9tspoDGWm2CMarffRuLjM4xUz8xg==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -10290,7 +10290,7 @@ snapshots:
       minipass: 7.1.3
       path-scurry: 2.0.2
 
-  globals@17.6.0: {}
+  globals@17.7.0: {}
 
   globalthis@1.0.4:
     dependencies:

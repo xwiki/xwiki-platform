@@ -1199,8 +1199,9 @@ public class RepositoryManager
             }
         }
 
-        BaseObject extensionVersionObject = extensionVersionDocument
-            .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
+        BaseObject extensionVersionObject = extensionVersionDocument.getXObject(
+            XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, XWikiRepositoryModel.PROP_VERSION_VERSION, version,
+            false);
 
         if (extensionVersionObject == null && allowProxying
             && this.extensionStore.isVersionProxyingEnabled(extensionDocument)) {
@@ -1225,8 +1226,9 @@ public class RepositoryManager
             try {
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
                 updateExtensionVersion(extension, extensionDocumentClone, 0, xcontext);
-                extensionVersionObject = extensionDocumentClone
-                    .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
+                extensionVersionObject = extensionDocumentClone.getXObject(
+                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, XWikiRepositoryModel.PROP_VERSION_VERSION,
+                    version, false);
             } catch (XWikiException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
@@ -1880,8 +1882,8 @@ public class RepositoryManager
 
             // Migrate the release note if it was stored on the main project page
             BaseObject legacyVersionObject =
-                projectDocument.getXObject(XWikiRepositoryModel.PROJECTVERSION_CLASSREFERENCE, "version",
-                    projectVersion.getId().getVersion().getValue(), false);
+                projectDocument.getXObject(XWikiRepositoryModel.PROJECTVERSION_CLASSREFERENCE,
+                    XWikiRepositoryModel.PROP_VERSION_VERSION, projectVersion.getId().getVersion().getValue(), false);
             if (legacyVersionObject != null) {
                 String releaseNote = this.extensionStore.getValue(legacyVersionObject,
                     XWikiRepositoryModel.PROP_VERSION_NOTES, (String) null);

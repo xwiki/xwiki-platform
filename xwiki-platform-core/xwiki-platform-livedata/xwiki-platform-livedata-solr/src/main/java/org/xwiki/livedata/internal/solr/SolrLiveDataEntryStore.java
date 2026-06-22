@@ -142,6 +142,12 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
     protected static final String ID_PROPERTY = "doc.id";
 
     /**
+     * The live data property holding the (unqualified) name of the matching document, available as a display column
+     * when requested.
+     */
+    protected static final String NAME_PROPERTY = "doc.name";
+
+    /**
      * The live data property holding the full name of the matching document, available as a (local, friendly) display
      * column when requested.
      */
@@ -240,7 +246,7 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
         // The generic "title_" field aggregates the title of all locales (copyField of title_*) and uses the generic
         // tokenizer, so it can be queried/filtered without depending on the document locale.
         fields.put(TITLE_PROPERTY, FieldUtils.TITLE + FieldUtils.USCORE);
-        fields.put("doc.name", FieldUtils.NAME);
+        fields.put(NAME_PROPERTY, FieldUtils.NAME);
         fields.put(FULLNAME_PROPERTY, FieldUtils.FULLNAME);
         fields.put(AUTHOR_PROPERTY, FieldUtils.AUTHOR_DISPLAY);
         fields.put(CREATOR_PROPERTY, FieldUtils.CREATOR_DISPLAY);

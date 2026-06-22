@@ -47,49 +47,49 @@
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For DocumentAccessBridge, used to build the view URL of the matching documents. -->
+    <!-- For the document access bridge. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For Query/QueryManager/SecureQuery, used to run the Solr query through the "solr" query language. -->
+    <!-- To run the query through the "solr" query language. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For FieldUtils (Solr field names), the SolrDocument reference resolver and the SolrJ API. -->
+    <!-- For the Solr field names and the SolrJ API. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For the "display hidden documents" user preference, used to decide whether to list hidden documents. -->
+    <!-- For the user preferences. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For SecurityConfiguration, used to validate the query limit against the configured maximum. -->
+    <!-- For the security configuration. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For ContextualLocalizationManager, used to localize the column headers from the caller's translation prefix. -->
+    <!-- For the localization of the column headers. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- For ConfigurationSource, used to read the wiki date format preference for rendering the date columns. -->
+    <!-- For the configuration sources. -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-configuration-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- For XMLUtils, used to escape the location breadcrumb HTML. -->
+    <!-- For the XML/HTML escaping utilities. -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-xml</artifactId>

@@ -113,6 +113,15 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used to serve the maven test extension repository over HTTP from a container reachable by XWiki, since XWiki
+         can run in a container and then can't access the maven repository on the host filesystem (in particular in the
+         DOOD setup used on the CI). -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-nginx</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

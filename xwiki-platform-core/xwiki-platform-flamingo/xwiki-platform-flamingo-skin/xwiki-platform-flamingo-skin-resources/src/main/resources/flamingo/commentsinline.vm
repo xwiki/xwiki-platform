@@ -143,7 +143,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #foreach($commentID in $thread)
       <li class="reply">
       #displayComment($doc.getObject($xCommentClass, $commentID), $commentDoc)
-      <div id="comment-thread-${commentID}" class="commentthread collapse">
+      <div id="comment-thread-${escapetool.xml($commentID)}" class="commentthread collapse">
         #displayThread($commentID, $commentThreads, $commentDoc)
       </div>
       </li>
@@ -183,7 +183,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #set($threadCount = $commentThreads.get("$!commentID").size())
 ## We always add this button to the DOM, because the user can respond and create a thread without reloading the page.
 ## When there's no thread to show, we hide it with CSS.
-<button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${escapetool.xml($commentID)}" aria-expanded="false" aria-controls="comment-thread-${commentID}">
+<button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${escapetool.xml($commentID)}" aria-expanded="false" aria-controls="comment-thread-${escapetool.xml($commentID)}">
 $services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
 </button>##
 #if($xwiki.hasAccessLevel('comment'))

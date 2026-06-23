@@ -202,12 +202,14 @@ test("Macros can be inserted", async ({ mount, page }) => {
   const editorEl = component.locator(".bn-editor");
 
   const paragraph = editorEl.locator(
-    'div.bn-block-content[data-content-type="paragraph"]',
+    // 'div.bn-block-content[data-content-type="paragraph"]',
+    "p.bn-inline-content",
   );
+
+  await paragraph.waitFor({ state: "attached" });
 
   // Trigger the formatting toolbar
   await paragraph.dblclick();
-  await editorEl.click();
   const macroInsertBtnEl = page.locator('button[data-test="insertMacro"]');
   await macroInsertBtnEl.waitFor({ state: "attached" });
 

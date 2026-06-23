@@ -125,6 +125,9 @@ public class BlockNoteRichTextArea extends BaseElement
      * only when clicked. As a consequence we can't simply move the caret to the end of the content (e.g. with
      * {@code PAGE_DOWN}) and type, because the typed text would have no editable target and would be dropped. We have
      * to click the trailing block first to materialize a real paragraph.
+     * <p>
+     * An alternative way to insert an end-of-content new line is to move the caret to the end of the last line, then
+     * press {@code ENTER}.
      *
      * @param keysToSend the sequence of keys to type in the new paragraph
      * @return this blocknote rich text area instance

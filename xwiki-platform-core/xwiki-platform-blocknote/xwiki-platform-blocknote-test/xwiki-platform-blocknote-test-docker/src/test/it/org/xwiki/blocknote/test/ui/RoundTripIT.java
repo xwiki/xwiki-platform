@@ -206,10 +206,6 @@ class RoundTripIT extends AbstractBlockNoteIT
             * one
             ** two
             *** three
-            * done""", """
-            * one
-            ** two
-            *** three
             * done""");
     }
 
@@ -366,6 +362,33 @@ class RoundTripIT extends AbstractBlockNoteIT
                 after""");
     }
 
+    /**
+     * Insert the provided content in the provided page (testReference), edit the page with blocknote, save it back, and
+     * verify that the content is not altered. If you expect the content to be modified, see
+     * {@link #roundTrip(TestUtils, TestReference, String, String)}.
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param content the initial content of the document
+     * @see #roundTrip(TestUtils, TestReference, String, String)
+     */
+    private void roundTrip(TestUtils setup, TestReference testReference, String content)
+    {
+        roundTrip(setup, testReference, content, content);
+    }
+
+    /**
+     * Insert the provided content (contentBefore) in the provided page (testReference), edit the page with blocknote, 
+     * save it back, and
+     * verify that the content is matching expectations (contentAfter). If you expect the content to be unaltered, 
+     * see {@link #roundTrip(TestUtils, TestReference, String)}
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param contentBefore the initial content
+     * @param contentAfter the expected final content
+     * @see #roundTrip(TestUtils, TestReference, String)
+     */
     private void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
     {
         setup.createPage(testReference, contentBefore, "");

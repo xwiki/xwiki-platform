@@ -147,6 +147,8 @@ interface BlockNoteMacroWizard {
    * @param type - indicates wheither the macro is a block or inline
    * @param parameters - the parameters to prefill the editor with
    * @returns a promise that resolves to the resulting macro call
+   *
+   * @since 18.6.0RC1
    */
   insert(
     type: "block" | "inline",

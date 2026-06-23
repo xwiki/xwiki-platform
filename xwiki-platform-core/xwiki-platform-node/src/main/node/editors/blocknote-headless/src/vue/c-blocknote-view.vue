@@ -265,5 +265,16 @@ onBeforeUnmount(() => {
       padding: 0;
     }
   }
+
+  /* Since BlockNote 0.51 the image element no longer gets a fallback "alt" attribute, so a broken or not-yet-loaded
+    image (e.g. a missing attachment) collapses to a zero size and can no longer be selected or clicked in the editor
+    (to edit or remove it). Give images a minimum size so they stay visible and selectable. Real images are larger
+    than this minimum so they are not affected. */
+  & .bn-visual-media {
+    /* 2em minimum width to keep some space to click on the image even with the resize handles displayed on hover,
+    this is especially useful for very small images, of missing images. */
+    min-width: 2em;
+    min-height: 1em;
+  }
 }
 </style>

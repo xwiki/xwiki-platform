@@ -189,8 +189,17 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
       return parameters;
     }
 
+    if (typeof parameters.call !== "string") {
+      console.error({ macro, parameters, options });
+
+      throw new Error(
+        'Missing or invalid "call" property on macro\'s parameters',
+      );
+    }
+
     const macroInvocation: MacroBlockInvocation | InlineMacroInvocation =
-      JSON.parse(parameters.call as string);
+      JSON.parse(parameters.call);
+
     // Set default values for the configuration options.
     const actualOptions: MacroWizardOptions = {
       inlineParameters: this.getInlineParameters(macro, macroInvocation),

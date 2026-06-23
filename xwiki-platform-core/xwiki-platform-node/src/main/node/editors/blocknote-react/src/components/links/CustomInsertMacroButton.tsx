@@ -67,6 +67,7 @@ export const CustomInsertMacroButton: React.FC<
   }, [openEditor, selectedBlock]);
 
   const insertMacro = useCallback(
+    // eslint-disable-next-line max-statements
     (call: MacroBlockInvocation | InlineMacroInvocation) => {
       switch (call.kind) {
         case "block": {
@@ -94,7 +95,12 @@ export const CustomInsertMacroButton: React.FC<
               assertUnreachable(call.body);
           }
 
-          insertOrUpdateBlockForSlashMenu(editor, block);
+          if (selectedBlock) {
+            editor.replaceBlocks([selectedBlock], [block]);
+          } else {
+            insertOrUpdateBlockForSlashMenu(editor, block);
+          }
+
           break;
         }
 
@@ -130,6 +136,7 @@ export const CustomInsertMacroButton: React.FC<
           editor.insertInlineContent([inlineContent], {
             updateSelection: true,
           });
+
           break;
         }
 

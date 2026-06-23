@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
@@ -314,7 +315,7 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
 
       const call = await macroWizard.insert(prefill.kind, prefill.params);
 
-      insert({
+      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
         kind: call.inline ? "inline" : "block",
         id: call.name,
         body: call.content
@@ -326,6 +327,16 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
             typeof value === "string" ? value : value.value,
           ]),
         ),
+      };
+
+      insert({
+        kind: call.inline ? "inline" : "block",
+        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
+        params: {
+          call: JSON.stringify(invocation),
+          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
+        },
+        body: { type: "none" },
       });
     },
   },

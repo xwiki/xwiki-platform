@@ -152,7 +152,7 @@ catalog:
   unified: 11.0.5
   utility-types: 3.11.0
   vite: 7.3.5
-  vite-plugin-css-injected-by-js: 4.0.1
+  vite-plugin-css-injected-by-js: 5.0.1
   vite-plugin-dts: 4.5.4
   vitest: 4.1.6
   vitest-mock-extended: 4.0.0

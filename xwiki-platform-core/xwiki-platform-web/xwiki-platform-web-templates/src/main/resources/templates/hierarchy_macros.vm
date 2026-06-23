@@ -302,7 +302,7 @@
         ## Get the saved document.
         #set ($document = $xwiki.getDocument($reference).translatedDocument)
       #end
-      #if ($document)
+      #if ($document && "$!document.plainTitle" != '')
         #set ($label = $escapetool.xml($document.plainTitle))
       #end
     #elseif ($reference.type == 'WIKI')

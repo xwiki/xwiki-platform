@@ -817,6 +817,10 @@ public abstract class ListClass extends PropertyClass
             input.setName(prefix + name);
             input.setID(prefix + name);
             input.setDisabled(isDisabled());
+            // This is a text alternative fallback to explain what the input is about. If the input has already been
+            // labelled in another way, this fallback will be ignored by Assistive Techs.
+            input.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+                getTranslatedPrettyName(context)));
             buffer.append(input.toString());
         } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -922,6 +926,10 @@ public abstract class ListClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         List<String> list = getList(context);
         Map<String, ListItem> map = getMap(context);

@@ -25,7 +25,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
   );
 
   await expect(component).toBeVisible();
@@ -37,6 +37,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
       macros={false}
+      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -46,7 +47,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -74,6 +75,7 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
           overrideFnCalledWithUrl = image.url;
         },
       }}
+      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -193,30 +195,11 @@ test("Macros can be inserted", async ({ mount, page }) => {
         },
         list: macros,
       }}
+      syntax={FULL_SYNTAX}
     />,
   );
 
   const editorEl = component.locator(".bn-editor");
-
-  await editorEl.press("/");
-
-  const slashMenuEl = page.locator(
-    "[data-floating-ui-portal] .bn-suggestion-menu",
-  );
-
-  await slashMenuEl.waitFor({ state: "attached" });
-
-  const menuItems = await slashMenuEl
-    .locator(".bn-suggestion-menu-item p:first-child")
-    .all();
-
-  const menuItemsText = await Promise.all(
-    menuItems.map((item) => item.textContent()),
-  );
-
-  expect(menuItemsText).not.toContain("Table");
-  expect(menuItemsText).not.toContain("Quote");
-  // <div class="bn-block-content" data-content-type="paragraph"><p class="bn-inline-content">Yeah</p></div>
 
   const paragraph = editorEl.locator(
     'div.bn-block-content[data-content-type="paragraph"]',

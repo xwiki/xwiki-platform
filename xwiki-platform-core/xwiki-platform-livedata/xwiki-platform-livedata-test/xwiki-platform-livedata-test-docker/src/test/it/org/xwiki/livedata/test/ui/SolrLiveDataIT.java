@@ -149,7 +149,8 @@ class SolrLiveDataIT
         assertEquals(2, tableLayout.countRows());
 
         // The Page (doc.fullName) column filter is case-insensitive on the page name: a lowercase partial term ("ba")
-        // matches "BananaPage" (it is filtered against the tokenized "name" field OR-ed with the "fullname" field).
+        // matches "BananaPage" (it is filtered against the tokenized "name" field -- as a plain analyzed term plus a
+        // substring wildcard -- OR-ed with a substring wildcard on the "fullname" field).
         tableLayout.filterColumn(PAGE_COLUMN, "ba", true);
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(TITLE_COLUMN, BANANA_TITLE);

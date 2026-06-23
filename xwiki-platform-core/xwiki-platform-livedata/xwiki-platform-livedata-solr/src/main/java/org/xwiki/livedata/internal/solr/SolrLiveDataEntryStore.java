@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import jakarta.inject.Inject;
@@ -217,6 +218,27 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
      */
     private static final Map<String, String> USER_URL_PROPERTIES =
         Map.of(AUTHOR_PROPERTY, AUTHOR_URL_PROPERTY, CREATOR_PROPERTY, CREATOR_URL_PROPERTY);
+
+    /**
+     * Maps the {@code doc.*} text properties to the Solr field holding the <em>full, untokenized</em> value, used for
+     * the {@code equals} operator so it is a true full-value match and not a phrase query (which, on a tokenized field,
+     * matches the token sequence anywhere in the value, i.e. still behaves like a "contains"). The {@code title} and
+     * {@code author} variants are {@code lowercase}-typed fields (case-insensitive match); the {@code name} and
+     * {@code fullName} variants are {@code string} fields (case-sensitive). {@code doc.creator} has no full-value
+     * display variant and is intentionally absent (it falls back to an approximate phrase query).
+     */
+    private static final Map<String, String> EXACT_FIELDS = Map.of(
+        TITLE_PROPERTY, FieldUtils.TITLE_SORT,
+        NAME_PROPERTY, FieldUtils.NAME_EXACT,
+        FULLNAME_PROPERTY, FieldUtils.FULLNAME,
+        AUTHOR_PROPERTY, FieldUtils.AUTHOR_DISPLAY_SORT);
+
+    /**
+     * The text filter fields that are <em>not</em> tokenized ({@code string} fields). A plain (analyzed) term never
+     * matches a single typed word against them (it would require the whole value to equal the word), so only a
+     * substring wildcard can match. All the other text fields are tokenized {@code text_general} fields.
+     */
+    private static final Set<String> STRING_FILTER_FIELDS = Set.of(FieldUtils.FULLNAME);
 
     // Live data filter operators (see the live data filter widgets).
     private static final String CONTAINS_OPERATOR = "contains";
@@ -467,38 +489,97 @@ public class SolrLiveDataEntryStore extends WithParameters implements LiveDataEn
         } else if (HIDDEN_PROPERTY.equals(property)) {
             // Boolean field: an exact match on true/false.
             return SOLR_FIELDS.get(property) + ':' + this.solrUtils.toFilterQueryString(value);
+        } else if (EQUALS_OPERATOR.equals(effectiveOperator)) {
+            return toEqualsClause(property, value.toString());
         } else {
-            return toTextClause(getTextFilterFields(property), effectiveOperator, value);
+            return toMatchClause(property, !STARTS_WITH_OPERATOR.equals(effectiveOperator), value.toString());
         }
     }
 
-    private String toTextClause(List<String> fields, String operator, Object value)
+    /**
+     * Translates an {@code equals} text constraint into an exact full-value match. When the property has a full,
+     * untokenized variant ({@link #EXACT_FIELDS}) the phrase query targets that field, so it is a true equality and
+     * not a "contains this phrase" (which is what a phrase query on a tokenized field amounts to). Properties without
+     * such a variant ({@code doc.creator}) fall back to a phrase query on the tokenized field (an approximate match).
+     */
+    private String toEqualsClause(String property, String value)
     {
-        if (EQUALS_OPERATOR.equals(operator)) {
-            // Exact match: a phrase query per field so the indexed tokens must appear in the exact same order.
-            String phrase = escapePhrase(value.toString());
-            return joinFields(fields, field -> field + ":\"" + phrase + '"');
+        String phrase = escapePhrase(value);
+        String exactField = EXACT_FIELDS.get(property);
+        if (exactField != null) {
+            return phraseClause(exactField, phrase);
         }
-        // "contains" surrounds each typed word with wildcards (substring match), "startsWith" only appends a trailing
-        // wildcard (prefix match). Wildcard queries bypass the tokenizer, so we apply them per word (the words are
-        // split on whitespace); on tokenized text fields Solr lowercases the wildcard terms through its multiterm
-        // analyzer, so the match is case-insensitive there. Each word is escaped through SolrUtils.
-        boolean contains = !STARTS_WITH_OPERATOR.equals(operator);
-        List<String> wordClauses = new ArrayList<>();
-        for (String word : value.toString().trim().split("\\s+")) {
+        return joinFields(getTextFilterFields(property), field -> phraseClause(field, phrase));
+    }
+
+    private String phraseClause(String field, String phrase)
+    {
+        return field + ":\"" + phrase + '"';
+    }
+
+    /**
+     * Translates a {@code contains} or {@code startsWith} text constraint into a Solr clause. Each typed word (the
+     * value is split on whitespace) is emitted as a <em>plain</em> term so it is processed by the field analyzer
+     * (tokenizer, lowercasing, synonyms, stop-words) and matches the indexed tokens. Wildcards (which bypass the
+     * analyzer and are comparatively expensive) are added only on the first word (leading wildcard, for
+     * {@code contains} substring matching) and the last word (trailing wildcard, so an in-progress last word still
+     * matches); each wildcard alternative is OR-ed with its plain term so a word can match either way. The words are
+     * then AND-ed.
+     */
+    private String toMatchClause(String property, boolean contains, String value)
+    {
+        List<String> fields = getTextFilterFields(property);
+        List<String> escapedWords = new ArrayList<>();
+        for (String word : value.trim().split("\\s+")) {
             String escaped = this.solrUtils.toFilterQueryString(word);
             if (StringUtils.isNotEmpty(escaped)) {
-                String wildcard = contains ? WILDCARD + escaped + WILDCARD : escaped + WILDCARD;
-                wordClauses.add(joinFields(fields, field -> field + ':' + wildcard));
+                escapedWords.add(escaped);
             }
         }
-        if (wordClauses.isEmpty()) {
+        if (escapedWords.isEmpty()) {
             return null;
         }
-        // The words are AND-ed together. No extra grouping parentheses are added here: each (possibly multi-field) word
-        // clause is already self-contained, the caller (toFilterQuery) wraps the whole constraint, and Lucene gives AND
-        // a higher precedence than the OR that joins the fields and the constraints.
+        List<String> wordClauses = new ArrayList<>();
+        for (int i = 0; i < escapedWords.size(); i++) {
+            // "contains" lets the value start mid-token (leading wildcard on the first word) and end mid-token
+            // (trailing wildcard on the last word); "startsWith" only lets the last word be a prefix.
+            boolean leading = contains && i == 0;
+            boolean trailing = i == escapedWords.size() - 1;
+            wordClauses.add(toWordClause(fields, escapedWords.get(i), leading, trailing));
+        }
+        // The words are AND-ed together. No extra grouping parentheses are added here: each word clause is already
+        // self-contained (a bare clause or a parenthesized OR group), the caller (toFilterQuery) wraps the whole
+        // constraint, and Lucene gives AND a higher precedence than the OR joining the alternatives and constraints.
         return StringUtils.join(wordClauses, AND_JOIN);
+    }
+
+    /**
+     * Builds the clause matching a single typed word across the passed fields. Per field, a tokenized field contributes
+     * a plain (analyzed) term plus, when requested, a wildcard alternative; a non-tokenized {@code string} field
+     * ({@link #STRING_FILTER_FIELDS}) contributes only a substring wildcard (a plain term could not match a single word
+     * there). The alternatives are OR-ed; a single alternative is emitted bare, several inside a parenthesized group so
+     * the OR does not leak into the surrounding AND precedence.
+     */
+    private String toWordClause(List<String> fields, String escaped, boolean leading, boolean trailing)
+    {
+        List<String> alternatives = new ArrayList<>();
+        for (String field : fields) {
+            if (STRING_FILTER_FIELDS.contains(field)) {
+                // Non-tokenized field: only a substring wildcard can match a single word.
+                alternatives.add(field + ':' + WILDCARD + escaped + WILDCARD);
+            } else {
+                // Tokenized field: the plain term goes through the field analyzer (so e.g. punctuation splitting,
+                // lowercasing and synonyms apply), avoiding the false non-matches of a tokenizer-bypassing wildcard.
+                alternatives.add(field + ':' + escaped);
+                if (leading || trailing) {
+                    alternatives.add(field + ':' + (leading ? WILDCARD : "") + escaped + (trailing ? WILDCARD : ""));
+                }
+            }
+        }
+        if (alternatives.size() == 1) {
+            return alternatives.get(0);
+        }
+        return OPEN_GROUP + StringUtils.join(alternatives, OR_JOIN) + CLOSE_GROUP;
     }
 
     /**

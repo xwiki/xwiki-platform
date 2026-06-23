@@ -154,7 +154,8 @@ class SolrLiveDataEntryStoreTest
     {
         SecureQuery solrQuery = mockEmptyQuery("*:*");
         // The current user did not opt to display hidden documents, so they must be excluded (default mock: false).
-        // The "contains" operator is applied per word (split on whitespace), each word surrounded by wildcards.
+        // The "contains" operator is applied per word (split on whitespace): each word is a plain (analyzed) term, with
+        // a wildcard only on the first (leading) and last (trailing) word, OR-ed with the plain term.
         when(this.solrUtils.toFilterQueryString("hello")).thenReturn("hello");
         when(this.solrUtils.toFilterQueryString("world")).thenReturn("world");
 
@@ -167,8 +168,10 @@ class SolrLiveDataEntryStoreTest
 
         this.store.get(query);
 
-        // The title property maps to the generic "title_" field; each word becomes a *word* substring clause, AND-ed.
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:*hello* AND title_:*world*)"),
+        // The title property maps to the generic "title_" field; the first word gets a leading wildcard, the last a
+        // trailing one, each OR-ed with the plain term, and the words are AND-ed.
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)",
+                "((title_:hello OR title_:*hello) AND (title_:world OR title_:world*))"),
             captureFilterQueries(solrQuery));
 
         verify(solrQuery).bindValue("sort", "title_sort desc");
@@ -184,13 +187,13 @@ class SolrLiveDataEntryStoreTest
 
         LiveDataQuery query = new LiveDataQuery();
         query.initialize();
-        // A partial term must match: "Ba" becomes the substring query title_:*Ba* (Solr lowercases wildcard terms on
-        // the tokenized title field, so it matches "Banana").
+        // A partial term must match: a single "contains" word is the plain term OR the substring query title_:*Ba*
+        // (Solr lowercases both on the tokenized title field, so they match "Banana").
         query.getFilters().add(new Filter("doc.title", "contains", "Ba"));
 
         this.store.get(query);
 
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:*Ba*)"),
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "((title_:Ba OR title_:*Ba*))"),
             captureFilterQueries(solrQuery));
     }
 
@@ -202,13 +205,14 @@ class SolrLiveDataEntryStoreTest
 
         LiveDataQuery query = new LiveDataQuery();
         query.initialize();
-        // The full name column is filtered against the tokenized (case-insensitive) "name" field and the "fullname"
-        // string field, OR-ed, so a lowercase partial term still matches the page name.
+        // The full name column is filtered against the tokenized (case-insensitive) "name" field (a plain term plus a
+        // substring wildcard) and the "fullname" string field (substring wildcard only, since a plain term cannot match
+        // a single word there), OR-ed, so a lowercase partial term still matches the page name.
         query.getFilters().add(new Filter("doc.fullName", "contains", "Ba"));
 
         this.store.get(query);
 
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "((name:*Ba* OR fullname:*Ba*))"),
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "((name:Ba OR name:*Ba* OR fullname:*Ba*))"),
             captureFilterQueries(solrQuery));
     }
 
@@ -225,15 +229,16 @@ class SolrLiveDataEntryStoreTest
 
         this.store.get(query);
 
-        // Each word becomes an OR group over the two fields, and the words are AND-ed together.
+        // Each word becomes an OR group over the two fields (a leading wildcard on the first word, a trailing one on the
+        // last, plus the plain "name" term and the "fullname" substring wildcard), and the words are AND-ed together.
         assertEquals(
             List.of("type:(\"DOCUMENT\")", "hidden:(false)",
-                "((name:*ba* OR fullname:*ba*) AND (name:*na* OR fullname:*na*))"),
+                "((name:ba OR name:*ba OR fullname:*ba*) AND (name:na OR name:na* OR fullname:*na*))"),
             captureFilterQueries(solrQuery));
     }
 
     @Test
-    void getTranslatesFullNameEqualsAsPhraseOnNameAndFullName() throws Exception
+    void getTranslatesFullNameEqualsAsPhraseOnFullNameField() throws Exception
     {
         SecureQuery solrQuery = mockEmptyQuery("*:*");
 
@@ -243,8 +248,8 @@ class SolrLiveDataEntryStoreTest
 
         this.store.get(query);
 
-        assertEquals(
-            List.of("type:(\"DOCUMENT\")", "hidden:(false)", "((name:\"Space.Page\" OR fullname:\"Space.Page\"))"),
+        // "equals" on the full name targets the untokenized "fullname" string field, so it is a true full-value match.
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(fullname:\"Space.Page\")"),
             captureFilterQueries(solrQuery));
     }
 
@@ -297,8 +302,10 @@ class SolrLiveDataEntryStoreTest
 
         this.store.get(query);
 
-        // The "equals" operator produces an exact phrase query (no SolrUtils tokenization).
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:\"My Title\")"),
+        // The "equals" operator produces an exact phrase query (no SolrUtils tokenization) against the full-value
+        // "title_sort" variant rather than the tokenized "title_" field, so it is a true full-value (case-insensitive)
+        // match and not a "contains this phrase".
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_sort:\"My Title\")"),
             captureFilterQueries(solrQuery));
     }
 
@@ -314,8 +321,80 @@ class SolrLiveDataEntryStoreTest
 
         this.store.get(query);
 
-        // The "startsWith" operator appends a trailing wildcard to the escaped value (prefix query).
-        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(title_:hel*)"),
+        // The "startsWith" operator appends a trailing wildcard to the last word (prefix query), OR-ed with the plain
+        // term so the analyzer also processes it. No leading wildcard (unlike "contains").
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "((title_:hel OR title_:hel*))"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesNameEqualsAgainstExactField() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.name", "equals", "WebHome"));
+
+        this.store.get(query);
+
+        // "equals" on the name targets the untokenized "name_exact" string field (case-sensitive full-value match).
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(name_exact:\"WebHome\")"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesAuthorEqualsAgainstSortField() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.author", "equals", "John Doe"));
+
+        this.store.get(query);
+
+        // "equals" on the author targets the full-value "author_display_sort" variant (lowercase type, so the match is
+        // case-insensitive) rather than the tokenized "author_display" field.
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(author_display_sort:\"John Doe\")"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesCreatorEqualsAsPhraseFallback() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.creator", "equals", "John Doe"));
+
+        this.store.get(query);
+
+        // The creator has no full-value display variant, so "equals" falls back to a phrase query on the tokenized
+        // "creator_display" field (an approximate match).
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)", "(creator_display:\"John Doe\")"),
+            captureFilterQueries(solrQuery));
+    }
+
+    @Test
+    void getTranslatesMultiWordStartsWithWildcardingOnlyTheLastWord() throws Exception
+    {
+        SecureQuery solrQuery = mockEmptyQuery("*:*");
+        when(this.solrUtils.toFilterQueryString("hello")).thenReturn("hello");
+        when(this.solrUtils.toFilterQueryString("bea")).thenReturn("bea");
+        when(this.solrUtils.toFilterQueryString("wor")).thenReturn("wor");
+
+        LiveDataQuery query = new LiveDataQuery();
+        query.initialize();
+        query.getFilters().add(new Filter("doc.title", "startsWith", "hello bea wor"));
+
+        this.store.get(query);
+
+        // Only the last word gets a (trailing) wildcard; the leading and middle words are plain terms (no wildcard at
+        // all for "startsWith"), processed by the field analyzer.
+        assertEquals(List.of("type:(\"DOCUMENT\")", "hidden:(false)",
+                "(title_:hello AND title_:bea AND (title_:wor OR title_:wor*))"),
             captureFilterQueries(solrQuery));
     }
 

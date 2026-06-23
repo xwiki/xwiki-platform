@@ -19,10 +19,17 @@
  */
 import type { MacroBlock } from "@xwiki/platform-macros-api";
 
+/**
+ * Default placeholder for displaying macros with missing rendering
+ *
+ * Used when the rendered content from the server hasn't been fetched yet
+ */
 export const MACRO_UI_PLACEHOLDER: MacroBlock[] = [
   {
     type: "heading",
-    content: [{ type: "text", content: "YOLO", styles: {} }],
+    content: [
+      { type: "text", content: "Macro placeholder", styles: { italic: true } },
+    ],
     level: 1,
     styles: {},
   },

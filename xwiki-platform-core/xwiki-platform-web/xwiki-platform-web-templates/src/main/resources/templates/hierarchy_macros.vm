@@ -302,8 +302,12 @@
         ## Get the saved document.
         #set ($document = $xwiki.getDocument($reference).translatedDocument)
       #end
-      #if ($document && "$!document.plainTitle" != '')
-        #set ($label = $escapetool.xml($document.plainTitle))
+      #if ($document)
+        ## Fall back to the reference name when the title is empty.
+        #set ($plainTitle = "$!document.plainTitle")
+        #if ($plainTitle != '')
+          #set ($label = $escapetool.xml($plainTitle))
+        #end
       #end
     #elseif ($reference.type == 'WIKI')
       #if ($foreach.index == 0 && !$options.plain)

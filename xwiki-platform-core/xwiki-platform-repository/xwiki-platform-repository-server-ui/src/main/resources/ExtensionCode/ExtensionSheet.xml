@@ -82,6 +82,7 @@
 #end
 
 #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
+#set($projectReference = $doc.getValue('project'))
 {{/velocity}}
 
 {{velocity}}
@@ -109,6 +110,10 @@
       #end
 
       (% class="extensionInfo" %)
+      ##------- Project --------------
+      #if ("$!projectReference" != '')
+        |(% class="label" width='30%' %){{translation key="repository.extension.sheet.project"/}}(%%)|$doc.project
+      #end
       ##------- Type --------------
       #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
       #if ("$!typeDisplay" == '')
@@ -234,14 +239,21 @@
     #end
 
     (% class="extension" %)
-    |{{translation key="repository.extension.sheet.name"/}}|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end~
-    |{{translation key="repository.extension.sheet.type"/}}|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end~
-    |{{translation key="repository.extension.sheet.category"/}}|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end~
-    |{{translation key="repository.extension.sheet.summary"/}}|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~
+    |{{translation key="repository.extension.sheet.name"/}}|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end
+
+    |{{translation key="repository.extension.sheet.type"/}}|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end
+
+    |{{translation key="repository.extension.sheet.category"/}}|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end
+
+    |{{translation key="repository.extension.sheet.summary"/}}|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end
+
     ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
-    |{{translation key="repository.extension.sheet.authors"/}}|#if($proxyExtensionObject)$services.rendering.escape($doc.getValue('authors').toString(), 'xwiki/2.1')#else$doc.display('authors')#end~
-    |{{translation key="repository.extension.sheet.license"/}}|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end~
-    |{{translation key="repository.extension.sheet.source"/}}|$doc.display('source')
+    |{{translation key="repository.extension.sheet.authors"/}}|#if($proxyExtensionObject)$services.rendering.escape($doc.getValue('authors').toString(), 'xwiki/2.1')#else$doc.display('authors')#end
+
+    |{{translation key="repository.extension.sheet.license"/}}|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end
+
+    |{{translation key="repository.extension.sheet.source"/}}|#if($proxyExtensionObject)$doc.display('source', 'view')#else$doc.display('source')#end
+
     |{{translation key="repository.extension.sheet.iconLocation"/}}
 (#set($comment = '##'){{translation key="repository.extension.sheet.iconLocationSyntax"/}} ${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;$escapetool.xml($services.localization.render('repository.extension.sheet.iconLocationLinkText'))&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
     |{{translation key="repository.extension.sheet.showActiveInstalls"/}}|$doc.display('showInstalledCount')
@@ -308,9 +320,14 @@
     ## Only display release notes if there are downloads and release notes
     #if ($doc.getValue('versionPage') == 1 &amp;&amp; $proxyExtensionObject.getValue('proxyLevel') != 'history')
       #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
-      = {{translation key="repository.extension.sheet.versions"/}} =
+      = {{id name="versions"/}}{{translation key="repository.extension.sheet.versions"/}} =
 
-      {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      #if ("$!projectReference" != '')
+        [[See project page&gt;&gt;$services.rendering.escape($services.model.serialize($projectReference), 'xwiki/2.1')||anchor="versions"]]
+      #else
+        #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+        {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      #end
     #elseif ($lastVersionObject)
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))

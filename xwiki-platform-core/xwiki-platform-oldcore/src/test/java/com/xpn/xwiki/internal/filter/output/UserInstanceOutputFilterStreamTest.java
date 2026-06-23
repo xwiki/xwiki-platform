@@ -21,12 +21,12 @@ package com.xpn.xwiki.internal.filter.output;
 
 import java.text.ParseException;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
@@ -35,7 +35,6 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link UserInstanceOutputFilterStream}.

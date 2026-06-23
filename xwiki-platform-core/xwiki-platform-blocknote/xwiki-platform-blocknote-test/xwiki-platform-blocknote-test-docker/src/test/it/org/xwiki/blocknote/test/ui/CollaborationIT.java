@@ -106,8 +106,7 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         // Each user types in their own paragraph.
         secondTextArea.waitUntilTextContains("John:");
-        secondTextArea.click();
-        secondTextArea.sendKeys(Keys.PAGE_DOWN, "Alice:");
+        secondTextArea.appendParagraph("Alice:");
 
         //
         // First Tab

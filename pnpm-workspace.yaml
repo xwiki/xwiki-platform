@@ -44,6 +44,10 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/minimal
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
@@ -67,9 +71,9 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.50.0
-  "@blocknote/mantine": 0.50.0
-  "@blocknote/react": 0.50.0
+  "@blocknote/core": 0.51.4
+  "@blocknote/mantine": 0.51.4
+  "@blocknote/react": 0.51.4
   "@eslint/config-helpers": 0.6.0
   "@eslint/js": 10.0.1
   "@jridgewell/remapping": 2.3.5

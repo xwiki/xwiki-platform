@@ -289,8 +289,8 @@ catalogs:
       specifier: 3.0.0
       version: 3.0.0
     yjs:
-      specifier: 13.6.30
-      version: 13.6.30
+      specifier: 13.6.31
+      version: 13.6.31
 
 importers:
 
@@ -1029,7 +1029,7 @@ importers:
         version: link:../../model/model-reference/model-reference-api
       yjs:
         specifier: 'catalog:'
-        version: 13.6.30
+        version: 13.6.31
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -1099,10 +1099,10 @@ importers:
         version: 0.2.117
       y-websocket:
         specifier: 'catalog:'
-        version: 3.0.0(yjs@13.6.30)
+        version: 3.0.0(yjs@13.6.31)
       yjs:
         specifier: 'catalog:'
-        version: 13.6.30
+        version: 13.6.31
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -7595,6 +7595,10 @@ packages:
     resolution: {integrity: sha512-vv/9h42eCMC81ZHDFswuu/MKzkl/vyq1BhaNGfHyOonwlG4CJbQF4oiBBJPvfdeCt/PlVDWh7Nov9D34YY09uQ==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
 
+  yjs@13.6.31:
+    resolution: {integrity: sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -12341,11 +12345,16 @@ snapshots:
       lib0: 0.2.117
       yjs: 13.6.30
 
-  y-websocket@3.0.0(yjs@13.6.30):
+  y-protocols@1.0.7(yjs@13.6.31):
     dependencies:
       lib0: 0.2.117
-      y-protocols: 1.0.7(yjs@13.6.30)
-      yjs: 13.6.30
+      yjs: 13.6.31
+
+  y-websocket@3.0.0(yjs@13.6.31):
+    dependencies:
+      lib0: 0.2.117
+      y-protocols: 1.0.7(yjs@13.6.31)
+      yjs: 13.6.31
 
   y18n@5.0.8: {}
 
@@ -12366,6 +12375,10 @@ snapshots:
       yargs-parser: 21.1.1
 
   yjs@13.6.30:
+    dependencies:
+      lib0: 0.2.117
+
+  yjs@13.6.31:
     dependencies:
       lib0: 0.2.117
 

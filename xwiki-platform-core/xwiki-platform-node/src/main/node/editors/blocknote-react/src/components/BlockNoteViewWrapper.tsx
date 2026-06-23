@@ -313,29 +313,22 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
-      <BlockNoteToUniAstConverterContext.Provider value={bnToUniAstConverter}>
-        <BlockNoteView
-          editor={editor}
-          theme={theme}
-          // Override some builtin components
-          formattingToolbar={false}
-          linkToolbar={false}
-          filePanel={false}
-          slashMenu={false}
-          onChange={(editor) => onChange?.(editor)}
-        >
-          <SuggestionMenuController
-            triggerCharacter={"/"}
-            getItems={async (query) =>
-              querySuggestionsMenuItems(
-                editor,
-                query,
-                builtMacros,
-                syntax,
-                lang,
-              )
-            }
-          />
+      <BlockNoteView
+        editor={editor}
+        theme={theme}
+        // Override some builtin components
+        formattingToolbar={false}
+        linkToolbar={false}
+        filePanel={false}
+        slashMenu={false}
+        onChange={(editor) => onChange?.(editor)}
+      >
+        <SuggestionMenuController
+          triggerCharacter={"/"}
+          getItems={async (query) =>
+            querySuggestionsMenuItems(editor, query, builtMacros, syntax, lang)
+          }
+        />
 
         {/* TODO: suggestions menu for inline macros */}
 

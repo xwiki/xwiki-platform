@@ -26,11 +26,7 @@ import type { MacroBlock } from "@xwiki/platform-macros-api";
  */
 export const MACRO_UI_PLACEHOLDER: MacroBlock[] = [
   {
-    type: "heading",
-    content: [
-      { type: "text", content: "Macro placeholder", styles: { italic: true } },
-    ],
-    level: 1,
-    styles: {},
+    type: "rawHtml",
+    html: '<p class="1px solid lightgray; padding: 5px;"><em>Placeholder content for macro</p>',
   },
 ];

@@ -115,6 +115,7 @@
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>**/*.sh</include>
+        <include>**/*.bat</include>
       </includes>
       <filtered>true</filtered>
       <fileMode>755</fileMode>

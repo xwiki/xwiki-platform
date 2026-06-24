@@ -19,6 +19,8 @@
  */
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
+import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
+import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
@@ -41,8 +43,6 @@ import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
-import { DefaultUniAstIterator } from "./uniast/DefaultUniAstIterator";
-import { XWikiUniAstProcessor } from "./uniast/XWikiUniAstProcessor";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
@@ -92,8 +92,8 @@ new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
 new LinkSuggestXWikiComponentList(container);
 
-DefaultUniAstIterator.bind(container);
-XWikiUniAstProcessor.bind(container);
+DefaultBlockNoteIterator.bind(container);
+XWikiBlockNoteProcessor.bind(container);
 XWikiMacroBlock.bind(container);
 XWikiInlineMacro.bind(container);
 

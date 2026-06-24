@@ -73,7 +73,7 @@
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
-  #set ($targetSyntax = 'uniast/1.0')
+  #set ($targetSyntax = 'blocknote/1.0')
   #set ($restricted = "$!source.restricted" == 'true')
   #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
   #set ($transformationContext = $services.rendering.createTransformationContext())

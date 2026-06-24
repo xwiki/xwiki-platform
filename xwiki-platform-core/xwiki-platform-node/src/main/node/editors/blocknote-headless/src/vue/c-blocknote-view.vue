@@ -19,9 +19,6 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import messages from "../translations";
-import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
-import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
@@ -35,10 +32,10 @@ import {
   toRaw,
   useTemplateRef,
 } from "vue";
-import { useI18n } from "vue-i18n";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
+  BlockType,
   ContextForMacros,
   EditorType,
   LinkEditionHandlerProps,
@@ -49,7 +46,6 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
-import type { UniAst } from "@xwiki/platform-uniast-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
@@ -71,7 +67,7 @@ type Props = {
     | false;
 
   /** Content to initialize the editor with */
-  editorContent: UniAst | Error;
+  editorContent: BlockType[];
 
   collaboration?: Collaboration;
 
@@ -81,7 +77,7 @@ type Props = {
 
 const {
   editorProps,
-  editorContent: uniAst,
+  editorContent,
   macros,
   collaboration = undefined,
   depsContainer,
@@ -96,13 +92,8 @@ const emit = defineEmits<{
   "instant-change": [];
 
   // Emitted in the same context as "instant-change", but debounced
-  "debounced-change": [content: UniAst];
+  "debounced-change": [content: BlockType[]];
 }>();
-
-defineExpose({
-  // Get the editor's content
-  getContent: (): UniAst | Error => extractEditorContent(),
-});
 
 const remoteURLParser = depsContainer
   .get<RemoteURLParserProvider>("RemoteURLParserProvider")
@@ -112,32 +103,22 @@ const remoteURLSerializer = depsContainer
   .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
   .get()!;
 
-/**
- * Extract the editor's content and convert it to UniAst
- */
-function extractEditorContent(): UniAst | Error {
-  return blockNoteToUniAst.blocksToUniAst(editorRef.value!.document);
+function getContent(): BlockType[] {
+  return editorRef.value!.document;
 }
+
+defineExpose({
+  getContent,
+});
 
 /**
  * Notify the parent component the editor's content changed
  */
 function notifyChanges(): void {
-  const content = extractEditorContent();
-
-  // TODO: error reporting
-  if (content instanceof Error) {
-    throw content;
-  }
-
-  emit("debounced-change", content);
+  emit("debounced-change", getContent());
 }
 
 const notifyChangesDebounced = debounce(notifyChanges, 500);
-
-const { t } = useI18n({
-  messages,
-});
 
 // Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
@@ -183,18 +164,6 @@ const submitEditedLink = ({
   editingLink.value = null;
 };
 
-const blockNoteToUniAst = new BlockNoteToUniAstConverter(
-  depsContainer,
-  macros ? macros.list : [],
-);
-
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(depsContainer);
-
-const content =
-  uniAst instanceof Error
-    ? uniAst
-    : uniAstToBlockNote.uniAstToBlockNote(uniAst);
-
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
 const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
@@ -213,17 +182,13 @@ function handleLinkEditorOutsideClick(e: MouseEvent) {
 }
 
 onMounted(() => {
-  if (content instanceof Error) {
-    throw content;
-  }
-
   if (!blockNoteContainer.value) {
     throw new Error("Missing DOM container for BlockNote!");
   }
 
   mountedBlockNote.value = mountBlockNote(blockNoteContainer.value, {
     ...initializedEditorProps,
-    content,
+    content: editorContent,
   });
 
   window.addEventListener("mousedown", handleLinkEditorOutsideClick);
@@ -243,10 +208,6 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <h1 v-if="content instanceof Error">
-    {{ t("blocknote.document.parsingError", { reason: content }) }}
-  </h1>
-
   <div ref="blocknote-container" />
 
   <div ref="link-modal-container" v-if="editingLink">

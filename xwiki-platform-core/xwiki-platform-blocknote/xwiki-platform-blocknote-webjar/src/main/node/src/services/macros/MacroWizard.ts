@@ -203,7 +203,7 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
     // Set default values for the configuration options.
     const actualOptions: MacroWizardOptions = {
       inlineParameters: this.getInlineParameters(macro, macroInvocation),
-      inlineParametersSyntax: "uniast/1.0",
+      inlineParametersSyntax: "blocknote/1.0",
       showInlineParameters: true,
       sourceDocumentReference: XWiki.currentDocument.documentReference,
       syntax: XWiki.docsyntax,

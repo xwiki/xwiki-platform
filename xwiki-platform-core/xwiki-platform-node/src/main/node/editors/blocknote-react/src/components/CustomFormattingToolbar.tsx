@@ -40,9 +40,13 @@ import {
   TextAlignButton,
   UnnestBlockButton,
   blockTypeSelectItems,
+  useBlockNoteEditor,
   useComponentsContext,
   useDictionary,
+  useEditorState,
 } from "@blocknote/react";
+import { useTranslation } from "react-i18next";
+import { RiSubscript, RiSuperscript } from "react-icons/ri";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ContextForMacros } from "../blocknote/utils";
 import type {
@@ -51,6 +55,48 @@ import type {
 } from "@blocknote/react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { JSX } from "react";
+
+const BooleanStyleButton: React.FC<{
+  style: string;
+  icon: React.ReactNode;
+  label: string;
+}> = ({ style, icon, label }) => {
+  const Components = useComponentsContext()!;
+  const editor = useBlockNoteEditor();
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor.isEditable) {
+        return undefined;
+      }
+      const hasContent = (
+        editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
+      ).some((b) => b.content !== undefined);
+      if (!hasContent) {
+        return undefined;
+      }
+      return { active: style in editor.getActiveStyles() };
+    },
+  });
+
+  if (state === undefined) {
+    return null;
+  }
+  return (
+    <Components.FormattingToolbar.Button
+      className="bn-button"
+      data-test={style}
+      onClick={() => {
+        editor.focus();
+        editor.toggleStyles({ [style]: true } as never);
+      }}
+      isSelected={state.active}
+      label={label}
+      mainTooltip={label}
+      icon={icon}
+    />
+  );
+};
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
@@ -69,6 +115,7 @@ export const CustomFormattingToolbar: React.FC<
 }) => {
   const Components = useComponentsContext()!;
   const dict = useDictionary();
+  const { t } = useTranslation();
 
   const editor = useEditor();
 
@@ -91,7 +138,7 @@ export const CustomFormattingToolbar: React.FC<
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros)
+        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros, t)
       )}
     </Components.FormattingToolbar.Root>
   );
@@ -100,6 +147,7 @@ export const CustomFormattingToolbar: React.FC<
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
   macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
+  t: (key: string) => string,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -124,6 +172,18 @@ const getDefaultFormattingToolbarItems = (
     <BasicTextStyleButton
       basicTextStyle={"strike"}
       key={"strikeStyleButton"}
+    />,
+    <BooleanStyleButton
+      style="subscript"
+      icon={<RiSubscript />}
+      label={t("blocknote.toolbar.subscript")}
+      key={"subscriptStyleButton"}
+    />,
+    <BooleanStyleButton
+      style="superscript"
+      icon={<RiSuperscript />}
+      label={t("blocknote.toolbar.superscript")}
+      key={"superscriptStyleButton"}
     />,
     <TextAlignButton textAlignment={"left"} key={"textAlignLeftButton"} />,
     <TextAlignButton textAlignment={"center"} key={"textAlignCenterButton"} />,

@@ -7,9 +7,6 @@
     and the next footer item (e.g. the document creator). */
   padding: 3px 2em 3px 0;
 }
-.tag-wrapper {
-  padding: 2px 1px;
-}
 .tag-wrapper .separator {
   display: none;
 }

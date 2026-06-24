@@ -125,7 +125,6 @@ class CommentsIT
         commentsTab.openCommentForm();
         commentIndex = commentsTab.postComment(COMMENT_CONTENT, true);
         commentsTab.replyToCommentByID(commentIndex, COMMENT_REPLY);
-        commentsTab.toggleCommentThread(commentIndex);
         int replyIndex = commentsTab.getCommentID(COMMENT_REPLY);
         assertEquals(USER_NAME, commentsTab.getCommentAuthorByID(replyIndex));
        

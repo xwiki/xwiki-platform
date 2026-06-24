@@ -147,7 +147,7 @@ catalog:
   sinon: 22.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3
-  typescript-eslint: 8.59.4
+  typescript-eslint: 8.62.0
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0

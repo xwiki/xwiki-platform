@@ -1052,8 +1052,11 @@ public class RepositoryManager
         Query query =
             this.queryManager.createQuery("select doc.fullName, version.version from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
-                + ") version where doc.space = :space OR doc.space like :space", Query.XWQL);
-        query.bindValue("space", this.localReferenceSerializer.serialize(versionsSpaceReference) + ".%");
+                + ") version where doc.space = :spaceExact OR doc.space like :spaceLike", Query.XWQL);
+        String spaceReference = this.localReferenceSerializer.serialize(versionsSpaceReference);
+        query.bindValue("spaceExact", spaceReference);
+        query.bindValue("spaceLike").like(spaceReference + ".%");
+
         List<Object[]> results = query.execute();
 
         XWiki xwiki = xcontext.getWiki();

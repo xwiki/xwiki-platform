@@ -222,6 +222,10 @@ superscript: StyleSpec<    {
 readonly type: "superscript";
 readonly propSchema: "boolean";
 }>;
+"xwiki:verbatim": StyleSpec<    {
+readonly type: "xwiki:verbatim";
+readonly propSchema: "boolean";
+}>;
 bold: {
 config: {
 type: string;

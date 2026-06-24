@@ -282,6 +282,10 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
         this.popup.setAttribute("aria-hidden", "false");
 
         this.popupButton.focus({ preventScroll: true });
+
+        // Workaround (Firefox 151 and lower): Focussing clears the selection, restore it to be able to copy selected text
+        selection.removeAllRanges();
+        selection.addRange(this.currentRange);
       });
 
       document.addEventListener("click", this._onClickAway, { passive: true });
@@ -414,7 +418,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
     /**
      * Get popup position that is near the selected text range
-     * @return {{top: String, left: String}| null} - The absolute top and left position with unit for the popup
+     * @return {{top: String, left: String} | null} - The absolute top and left position with unit for the popup
      */
     _getPositioning() {
       if (!this.currentRange) {

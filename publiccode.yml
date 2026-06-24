@@ -1,0 +1,80 @@
+publiccodeYmlVersion: 0.5.0
+name: XWiki
+applicationSuite: XWiki
+url: https://github.com/xwiki
+landingURL: https://www.xwiki.org/
+isBasedOn: https://www.xwiki.com/
+softwareVersion: 18.1.0
+releaseDate: 2026-02-23
+logo: https://github.com/xwiki/xwiki-platform/blob/master/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-resources/src/main/resources/flamingo/logo.svg
+platforms:
+  - web
+categories:
+  - knowledge-management
+  - blog
+  - collaboration
+  - enterprise-project-management
+  - online-community
+  - project-collaboration
+  - web-collaboration
+  - other
+organisation:
+  uri: https://xwiki.com
+usedBy:
+  - Schleswik-Holstein
+  - 
+roadmap: https://www.xwiki.org/xwiki/bin/view/Roadmaps/
+developmentStatus: stable
+softwareType: standalone/web
+description:
+  en:
+    localisedName: XWiki
+    shortDescription: "XWiki is a second-generation wiki. This means it's not only a traditional wiki, but also a powerful application development platform in its own right. XWiki can be used both as a classic wiki and as an application platform. An application in XWiki is a set of Pages that adds new functionality to the wiki, such as a blog or a task manager. You can also build your own applications, for instance, you could create a FAQ or an application to manage product sheets, without requiring programming skills. "
+    longDescription: "XWiki is a second-generation wiki. This means it's not only a traditional wiki, but also a powerful application development platform in its own right. While first-generation wikis focus on content collaboration (creating and editing pages together), second-generation wikis take this concept further by enabling users to build structured, collaborative web applications directly from within the wiki. XWiki can be used both as a classic wiki and as an application platform. An application in XWiki is a set of Pages that adds new functionality to the wiki, such as a blog or a task manager. You can also build your own applications, for instance, you could create a FAQ or an application to manage product sheets, without requiring programming skills. 
+    This allows XWiki to be used for a variety of use cases, such as Projects Powered by XWiki."
+    documentation: https://www.xwiki.org/xwiki/bin/view/Documentation/
+    apiDocumentation: https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/API/
+    features:
+      - Wiki
+      - Structured Wiki
+      - Input Forms
+    screenshots:
+      - https://xwiki.com/en/features/
+    videos:
+      - https://www.youtube.com/watch?v=8DePx30dh2g
+legal:
+  license: LGPL-2.1
+maintenance:
+  type: community
+  contacts:
+    - name: XWiki SAS
+      email: contact@xwiki.com
+      affiliation: XWiki SAS
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+    - de
+    - fr
+    - es
+    - zh
+    - pt
+    - nl
+    - pl
+    - cs
+    - sk
+    - sl
+    - hr
+    - bs
+    - hu
+    - ru
+    - uk
+    - fi
+    - el
+    - it
+    - ja
+    - no
+    - ro
+    - sr
+    - sv
+    - tr

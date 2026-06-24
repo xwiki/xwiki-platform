@@ -39,6 +39,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -161,7 +162,7 @@ public class ExtensionStore implements Initializable, Disposable
         cacheConfiguration.setConfigurationId("repository.extensionid.documentreference");
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(10000);
-        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
             this.documentReferenceCache = this.cacheManager.createNewCache(cacheConfiguration);

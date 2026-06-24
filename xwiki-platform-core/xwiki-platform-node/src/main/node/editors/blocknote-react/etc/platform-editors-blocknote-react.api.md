@@ -85,6 +85,18 @@ export type ContextForMacros = {
 //
 // @beta
 export function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
+"xwiki:group": BlockSpec<"xwiki:group", {
+backgroundColor: {
+default: "default";
+};
+textColor: {
+default: "default";
+};
+textAlignment: {
+default: "left";
+values: readonly ["left", "center", "right", "justify"];
+};
+}, "none">;
 bulletListItem: BlockSpec<"bulletListItem", {
 readonly backgroundColor: {
 default: "default";

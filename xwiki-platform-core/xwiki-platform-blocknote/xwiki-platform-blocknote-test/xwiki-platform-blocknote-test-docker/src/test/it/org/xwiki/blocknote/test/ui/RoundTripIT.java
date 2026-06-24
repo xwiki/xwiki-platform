@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
@@ -31,8 +30,9 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Edit and save to check that the wiki syntax is preserved.
@@ -63,7 +63,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 {
     @Test
     @Order(1)
-    void textFormat(TestUtils setup, TestReference testReference) throws Exception
+    void textFormat(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             one **two** //three// __four__ --five-- ,,six,, ^^seven^^ ##eight## nine
@@ -83,7 +83,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(2)
-    void customParameters(TestUtils setup, TestReference testReference) throws Exception
+    void customParameters(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             (% data-bar="foo" %)
@@ -99,7 +99,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(3)
-    void headings(TestUtils setup, TestReference testReference) throws Exception
+    void headings(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             = Heading 1 with **bold** and //italic// =
@@ -137,7 +137,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(4)
-    void emptyLines(TestUtils setup, TestReference testReference) throws Exception
+    void emptyLines(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             first
@@ -160,7 +160,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(5)
-    void verbatim(TestUtils setup, TestReference testReference) throws Exception
+    void verbatim(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             one {{{**two**}}} three
@@ -184,7 +184,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(6)
-    void blockquote(TestUtils setup, TestReference testReference) throws Exception
+    void blockquote(TestUtils setup, TestReference testReference)
     {
         // Minimal test for now because we have the following issues:
         // XWIKI-24011: Fail to edit a quote with multiple child blocks
@@ -200,7 +200,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(7)
-    void unorderedList(TestUtils setup, TestReference testReference) throws Exception
+    void unorderedList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             * one
@@ -211,7 +211,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(8)
-    void orderedList(TestUtils setup, TestReference testReference) throws Exception
+    void orderedList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             (% start="5" %)
@@ -230,7 +230,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(9)
-    void definitionList(TestUtils setup, TestReference testReference) throws Exception
+    void definitionList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             ; name
@@ -248,7 +248,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(10)
-    void table(TestUtils setup, TestReference testReference) throws Exception
+    void table(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             |=|=One|=Two
@@ -266,7 +266,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(11)
-    void link(TestUtils setup, TestReference testReference) throws Exception
+    void link(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference,
             """
@@ -281,7 +281,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(12)
-    void image(TestUtils setup, TestReference testReference) throws Exception
+    void image(TestUtils setup, TestReference testReference)
     {
         // Note that inline images are currently not supported by BlockNote.
         roundTrip(setup, testReference,
@@ -302,7 +302,7 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(13)
-    void div(TestUtils setup, TestReference testReference) throws Exception
+    void div(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             (((
@@ -317,14 +317,14 @@ class RoundTripIT extends AbstractBlockNoteIT
 
     @Test
     @Order(14)
-    void horizontalLine(TestUtils setup, TestReference testReference) throws Exception
+    void horizontalLine(TestUtils setup, TestReference testReference)
     {
         // TODO: See XWIKI-24001: Dividers (horizontal rule) are not saved and content after them is lost
     }
 
     @Test
     @Order(15)
-    void macro(TestUtils setup, TestReference testReference) throws Exception
+    void macro(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             before
@@ -362,20 +362,41 @@ class RoundTripIT extends AbstractBlockNoteIT
                 after""");
     }
 
-    void roundTrip(TestUtils setup, TestReference testReference, String content) throws Exception
+    /**
+     * Insert the provided content in the provided page (testReference), edit the page with blocknote, save it back, and
+     * verify that the content is not altered. If you expect the content to be modified, see
+     * {@link #roundTrip(TestUtils, TestReference, String, String)}.
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param content the initial content of the document
+     * @see #roundTrip(TestUtils, TestReference, String, String)
+     */
+    private void roundTrip(TestUtils setup, TestReference testReference, String content)
     {
         roundTrip(setup, testReference, content, content);
     }
 
-    void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
-        throws Exception
+    /**
+     * Insert the provided content (contentBefore) in the provided page (testReference), edit the page with blocknote, 
+     * save it back, and
+     * verify that the content is matching expectations (contentAfter). If you expect the content to be unaltered, 
+     * see {@link #roundTrip(TestUtils, TestReference, String)}
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param contentBefore the initial content
+     * @param contentAfter the expected final content
+     * @see #roundTrip(TestUtils, TestReference, String)
+     */
+    private void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
     {
         setup.createPage(testReference, contentBefore, "");
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
-        textArea.sendKeys(Keys.PAGE_DOWN, "end");
+        textArea.appendParagraph("end").waitUntilTextContains("end");
 
         page = page.save();
         WikiEditPage wikiEditor = page.editWiki();
@@ -383,11 +404,9 @@ class RoundTripIT extends AbstractBlockNoteIT
 
 
             (% style="color:default;background-color:default;text-align:left" %)
-            end
-
-            (% style="color:default;background-color:default;text-align:left" %)""";
+            end""";
         String content = wikiEditor.getContent();
-        assertTrue(content.endsWith(ending), "The content inserted through the editor is missing.");
+        assertThat("The content inserted through the editor is missing.", content, endsWith(ending));
         assertEquals(contentAfter, Strings.CS.removeEnd(content, ending));
     }
 }

@@ -35,6 +35,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -46,6 +48,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -78,6 +81,9 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
@@ -89,12 +95,24 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // (e.g. when you want to sort on the default property using a specified sort order).
         setDefaultSort(mergedConfig);
 
-        // We only enable the ability to add an entry if there is a naming strategy explicitly set.
+        // We only enable the ability to add an entry if there is a naming strategy explicitly set and the current user
+        // has the rights to create a page.
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
-        if (sourceParams.get("newRowNamingStrategy") != null) {
-            LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
-            addEntry.setId("addEntry");
-            mergedConfig.getMeta().getActions().add(addEntry);
+        String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
+        if (namingStrategy != null
+            && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+            try {
+                LiveTableNewRowNamingStrategy strategy =
+                    this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+                if (strategy.isCreationAllowed(sourceParams)) {
+                    LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                    addEntry.setId("addEntry");
+                    mergedConfig.getMeta().getActions().add(addEntry);
+                }
+            } catch (ComponentLookupException e) {
+                throw new LiveDataException(
+                    String.format("Failed to load the row naming strategy [%s].", namingStrategy), e);
+            }
         }
 
         // Translate using the context locale.

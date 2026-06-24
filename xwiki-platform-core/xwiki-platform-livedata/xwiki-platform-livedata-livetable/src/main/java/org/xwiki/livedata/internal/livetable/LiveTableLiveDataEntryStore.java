@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -36,6 +35,8 @@ import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryStore;
@@ -43,6 +44,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -93,11 +95,14 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private ModelBridge modelBridge;
 
     @Inject
+    private ComponentManager componentManager;
+
+    @Inject
     @Named(ROLE_HINT)
     private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
 
     @Inject
-    @Named("local")
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @Override
@@ -293,28 +298,18 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private DocumentReference generateNewEntryReference() throws LiveDataException
     {
         String namingStrategy = (String) getParameters().get("newRowNamingStrategy");
-
-        switch (namingStrategy) {
-            case "uuid":
-                String location = (String) getParameters().get("newRowLocation");
-                if (StringUtils.isBlank(location)) {
-                    throw new LiveDataException("Missing location for row creation.");
-                }
-                DocumentReference candidate =
-                    this.currentDocumentReferenceResolver.resolve(String.format("%s.%s", location, UUID.randomUUID()));
-                try {
-                    if (!this.modelBridge.exists(candidate)) {
-                        return candidate;
-                    } else {
-                        throw new LiveDataException(String.format("The page [%s] already exists.", candidate));
-                    }
-                } catch (XWikiException e) {
-                    throw new LiveDataException(String.format(
-                        "An error occurred while creating page [%s].", candidate), e);
-                }
-
-            case null, default:
-                throw new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy));
+        if (!this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+            throw new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy));
+        }
+        try {
+            LiveTableNewRowNamingStrategy strategy =
+                this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+            return strategy.generate(getParameters());
+        } catch (ComponentLookupException e) {
+            throw new LiveDataException(
+                String.format("Failed to instantiate the row naming strategy [%s].", namingStrategy), e);
+        } catch (XWikiException e) {
+            throw new LiveDataException("An error occurred while generating the new entry reference.", e);
         }
     }
 }

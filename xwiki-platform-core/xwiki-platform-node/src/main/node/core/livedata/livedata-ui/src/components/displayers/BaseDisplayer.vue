@@ -57,8 +57,8 @@
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"
       ref="displayerRoot"
-      @keydown.enter.exact="onEnter"
-      @keydown.enter.ctrl="onCtrlEnter"
+      @keydown.enter.exact="onEnter(false)"
+      @keydown.enter.ctrl="onEnter(true)"
       v-touch:tap="touchHandler"
     >
       <!--
@@ -295,17 +295,13 @@ export default {
         this.closePopover();
       }
     },
-    async onEnter() {
+    async onEnter(addNewEntry) {
       await this.applyEdit();
       if (this.entry?._new) {
         await this.logic.saveNewEntry();
-      }
-    },
-    async onCtrlEnter() {
-      await this.applyEdit();
-      if (this.entry?._new) {
-        await this.logic.saveNewEntry();
-        this.logic.addEntry();
+        if (addNewEntry) {
+          this.logic.addEntry();
+        }
       }
     },
   },

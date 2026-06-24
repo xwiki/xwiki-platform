@@ -46,6 +46,7 @@
       </a>
     </td>
 
+    <!-- Spacer for the actions column in edit mode -->
     <td v-if="logic.isEditMode()"></td>
   </tr>
 </template>

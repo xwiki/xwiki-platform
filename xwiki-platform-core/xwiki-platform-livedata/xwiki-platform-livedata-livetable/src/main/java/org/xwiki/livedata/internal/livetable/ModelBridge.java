@@ -46,6 +46,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -88,6 +89,10 @@ public class ModelBridge
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     /**
      * Update a property of an xobject located in the specified document. If the property starts with {@code doc.} the
@@ -194,9 +199,12 @@ public class ModelBridge
         if (document.isNew() && !create) {
             throw new LiveDataException(NEW_DOCUMENT_UPDATE_ERROR);
         } else if (create) {
+            if (!document.isNew()) {
+                throw new LiveDataException(
+                    String.format("Cannot create the page [%s] because it already exists.", documentReference));
+            }
             UserReference currentUser = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
             document.getAuthors().setCreator(currentUser);
-            document.newDocument(xcontext);
         }
 
         // Avoid modifying the cache document
@@ -284,7 +292,7 @@ public class ModelBridge
             UserReference userReference = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
             document.setAuthor(userReference);
             String comment = "LiveData update.";
-            DocumentReference documentUserReference = xcontext.getUserReference();
+            DocumentReference documentUserReference = this.documentUserReferenceSerializer.serialize(userReference);
             xcontext.getWiki().checkSavingDocument(documentUserReference, document, comment, true, xcontext);
             xcontext.getWiki().saveDocument(document, comment, true, xcontext);
         }

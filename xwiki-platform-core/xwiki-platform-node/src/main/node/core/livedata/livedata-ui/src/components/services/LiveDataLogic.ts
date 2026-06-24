@@ -600,11 +600,25 @@ export class LiveDataLogic implements Logic {
   }
 
   addEntry() {
-    this.data.data.entries.push({
-      _new: "true",
-      "doc.viewable": "true",
-      "doc.hasedit": "true",
-    });
+    const newEntry: Record<string, string> = { _new: "true" };
+    for (const actionKey of this.getEntryActionKeys()) {
+      newEntry[actionKey] = "true";
+    }
+    this.data.data.entries.push(newEntry);
+  }
+
+  /**
+   * Find the actual property names for the actions available on columns.
+   */
+  private getEntryActionKeys(): Set<string> {
+    return new Set(
+      ["view", "edit"]
+        .map(
+          (id) =>
+            this.data.meta.actions.find((a) => a.id === id)?.allowProperty,
+        )
+        .filter((p): p is string => !!p),
+    );
   }
 
   /**
@@ -1541,21 +1555,28 @@ export class LiveDataLogic implements Logic {
   async saveNewEntry() {
     const newEntryIndex = this.data.data.entries.findIndex((e) => e._new);
     if (newEntryIndex >= 0) {
-      const source = this.data.query.source;
-      const values = Object.fromEntries(
-        Object.entries(this.data.data.entries[newEntryIndex]).filter(
-          ([k]) =>
-            !k.startsWith("_") && k !== "doc.viewable" && k !== "doc.hasedit",
-        ),
-      );
-
+      const entryActionKeys = this.getEntryActionKeys();
       try {
-        await this.liveDataSource.addEntry(source, values);
+        // Submit only data properties, filtering out internal flags and action keys.
+        await this.liveDataSource.addEntry(
+          this.data.query.source,
+          Object.fromEntries(
+            Object.entries(this.data.data.entries[newEntryIndex]).filter(
+              ([k]) => !k.startsWith("_") && !entryActionKeys.has(k),
+            ),
+          ),
+        );
         // We remove the draft once it's successfully saved.
         this.data.data.entries.splice(newEntryIndex, 1);
         await this.updateEntries();
       } catch (e) {
         console.error("Failed to create entry", e);
+        this.translate("livedata.error.addEntryFailed")
+          .then(
+            // @ts-expect-error XWiki.widgets is expected to be globally accessible
+            (value) => new XWiki.widgets.Notification(value, "error"),
+          )
+          .catch(() => {});
         throw e;
       }
     }

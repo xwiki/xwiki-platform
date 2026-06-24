@@ -44,6 +44,7 @@
         :index="0"
       />
     </th>
+    <!-- Spacer for the actions column in edit mode -->
     <th v-if="logic.isEditMode()"></th>
   </tr>
 </template>

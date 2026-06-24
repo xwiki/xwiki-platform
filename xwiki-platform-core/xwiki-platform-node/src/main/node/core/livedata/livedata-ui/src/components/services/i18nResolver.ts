@@ -92,6 +92,7 @@ export async function i18nResolver(
       "footnotes.propertyNotViewable",
       "bottombar.noEntries",
       "error.updateEntriesFailed",
+      "error.addEntryFailed",
       "table.action.header",
       "table.action.save",
       "table.action.cancel",

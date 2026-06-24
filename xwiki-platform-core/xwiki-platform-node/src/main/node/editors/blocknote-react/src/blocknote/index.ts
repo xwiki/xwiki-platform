@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { SubscriptStyle, SuperscriptStyle } from "./styles";
+import { SubscriptStyle, SuperscriptStyle, VerbatimStyle } from "./styles";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
@@ -94,6 +94,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
       ...defaultStyleSpecs,
       subscript: SubscriptStyle,
       superscript: SuperscriptStyle,
+      "xwiki:verbatim": VerbatimStyle,
     },
   });
 

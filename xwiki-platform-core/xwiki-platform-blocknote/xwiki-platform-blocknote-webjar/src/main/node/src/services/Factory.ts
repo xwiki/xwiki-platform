@@ -95,7 +95,7 @@ export class Factory {
    */
   get syntax(): { type: string; version: string } {
     return {
-      type: "uniast",
+      type: "blocknote",
       version: "1.0",
     };
   }

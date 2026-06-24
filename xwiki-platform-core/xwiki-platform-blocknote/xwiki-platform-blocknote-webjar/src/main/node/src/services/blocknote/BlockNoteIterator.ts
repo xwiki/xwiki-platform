@@ -18,49 +18,44 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type {
-  Block,
-  InlineContent,
-  ListItem,
-  TableCell,
-  TableColumn,
-  UniAst,
-} from "@xwiki/platform-uniast-api";
+  BlockType,
+  InlineContentType,
+} from "@xwiki/platform-editors-blocknote-react";
 
-type UniAstNode =
-  | Block
-  | InlineContent
-  | ({ type: "listItem" } & ListItem)
-  | ({ type: "tableColumn" } & TableColumn)
-  | ({ type: "tableCell" } & TableCell);
+type NodeType =
+  | BlockType
+  | { type: "tableCell"; content: InlineContentType[] }
+  | InlineContentType
+  | string;
 
 /**
- * Used to visit UniAst nodes.
+ * Used to visit BlockNote nodes (blocks and inline content).
  *
  * @beta
  */
-interface UniAstVisitor {
+interface BlockNoteVisitor {
   /**
-   * Visit a UniAst node.
+   * Visit a BlockNote node (block or inline content).
    *
    * @param node - the node to visit
    * @returns true if the iterator should not visit the children of this node, false otherwise
    */
-  visit(node: UniAstNode): boolean;
+  visit(node: NodeType): boolean;
 }
 
 /**
- * Used to iterate UniAst nodes.
+ * Used to iterate BlockNote nodes (blocks and inline content).
  *
  * @beta
  */
-interface UniAstIterator {
+interface BlockNoteIterator {
   /**
-   * Iterates the nodes of the given UniAst, calling the provided visitor for each node.
+   * Iterates the nodes of the given BlockNote tree, calling the provided visitor for each node.
    *
-   * @param uniAst - the UniAst to iterate
-   * @param visitor - the visitor to call for each node of the UniAst
+   * @param blockNoteContent - the BlockNote content to iterate, i.e. the top level nodes (blocks) of the BlockNote tree
+   * @param visitor - the visitor to call for each node of the BlockNote tree
    */
-  iterate(uniAst: UniAst, visitor: UniAstVisitor): void;
+  iterate(blockNoteContent: BlockType[], visitor: BlockNoteVisitor): void;
 }
 
-export { type UniAstIterator, type UniAstNode, type UniAstVisitor };
+export type { BlockNoteIterator, BlockNoteVisitor, NodeType };

@@ -92,10 +92,10 @@ import {
   useTemplateRef,
 } from "vue";
 import { resolver } from "xwiki-platform-localization-webjar";
+import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { XWikiMeta } from "../services/meta/XWikiMeta";
-import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -105,6 +105,7 @@ import type {
 import type {
   BlockNoteViewWrapperProps,
   BlockOfType,
+  BlockType,
   EditorLanguage,
   ImageUpdateResult,
   InlineMacroInvocation,
@@ -118,16 +119,18 @@ import type {
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { UniAst } from "@xwiki/platform-uniast-api";
 import type { Ref } from "vue";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
-const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
-  name: "XWiki",
-});
+const blockNoteProcessor: BlockNoteProcessor = container.get(
+  "BlockNoteProcessor",
+  {
+    name: "XWiki",
+  },
+);
 const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
 const modelReferenceParser = container
   .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
@@ -141,7 +144,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "uniast/1.0",
+  inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
   documentReference = XWiki.Model.serialize(
@@ -255,7 +258,7 @@ let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
+  editorContent.value = blockNoteProcessor.load(initialValue);
 
   editorProps.value.label =
     (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
@@ -353,7 +356,7 @@ const editorInstance =
 // Methods
 //
 // eslint-disable-next-line max-statements
-async function updateValue(editorContent?: UniAst | Error): Promise<string> {
+function updateValue(editorContent?: BlockType[]): string {
   if (!dirty.value) {
     // The value is already up-to-date.
     return value.value;
@@ -361,11 +364,11 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
 
   const instantUpdate = !editorContent;
   editorContent = editorContent || editorInstance.value?.getContent();
-  if (!editorContent || editorContent instanceof Error) {
-    throw editorContent || new Error("Could not get the editor content.");
+  if (!editorContent) {
+    throw new Error("Could not get the editor content.");
   }
 
-  const newValue = uniAstProcessor.save(editorContent);
+  const newValue = blockNoteProcessor.save(editorContent);
 
   value.value = newValue;
   dirty.value = false;

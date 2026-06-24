@@ -17,30 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
 /**
- * Processes the UniAst content before it is loaded in the editor and before it is submitted to be saved server-side. In
- * other words, it acts as a pre-processor and post-processor for the UniAst content.
+ * Processes the BlockNote content before it is loaded in the editor and before it is submitted to be saved server-side.
+ * In other words, it acts as a pre-processor and post-processor for the BlockNote content.
  *
  * @beta
+ * @since 18.5.0RC1
  */
-interface UniAstProcessor {
+interface BlockNoteProcessor {
   /**
-   * Prepares the UniAst content for being loaded in the editor.
+   * Prepares the BlockNote content for being loaded in the editor.
    *
-   * @param uniAstJSON - the UniAst content in JSON format
-   * @returns the UniAst content to be loaded in the editor
+   * @param blockNoteJSON - the BlockNote content in JSON format
+   * @returns the BlockNote content to be loaded in the editor
    */
-  load(uniAstJSON: string): UniAst;
+  load(blockNoteJSON: string): BlockType[];
 
   /**
-   * Prepares the UniAst content for being submitted to be saved server-side.
+   * Prepares the BlockNote content for being submitted to be saved server-side.
    *
-   * @param uniAst - the UniAst content to be submitted to be saved server-side
-   * @returns the JSON serialization of the UniAst content to be saved
+   * @param blockNoteContent - the BlockNote content to be submitted to be saved server-side
+   * @returns the JSON serialization of the BlockNote content to be saved
    */
-  save(uniAst: UniAst): string;
+  save(blockNoteContent: BlockType[]): string;
 }
 
-export { type UniAstProcessor };
+export { type BlockNoteProcessor };

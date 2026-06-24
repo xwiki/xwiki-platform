@@ -76,7 +76,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-uniast</artifactId>
+      <artifactId>xwiki-rendering-syntax-blocknote</artifactId>
       <version>${rendering.version}</version>
     </dependency>
     <!-- Test dependencies -->

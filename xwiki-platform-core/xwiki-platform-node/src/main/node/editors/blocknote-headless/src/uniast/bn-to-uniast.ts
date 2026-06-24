@@ -300,6 +300,11 @@ export class BlockNoteToUniAstConverter {
       case "divider":
         return { type: "break" };
 
+      case "xwiki:definitionListItem":
+        throw new Error(
+          "xwiki:definitionListItem blocks cannot be converted to UniAst",
+        );
+
       case "xwiki:group":
         throw new Error("xwiki:group blocks cannot be converted to UniAst");
 

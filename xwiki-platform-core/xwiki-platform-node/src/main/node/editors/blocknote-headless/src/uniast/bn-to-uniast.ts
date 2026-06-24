@@ -300,6 +300,9 @@ export class BlockNoteToUniAstConverter {
       case "divider":
         return { type: "break" };
 
+      case "xwiki:group":
+        throw new Error("xwiki:group blocks cannot be converted to UniAst");
+
       default:
         assertUnreachable(block);
     }

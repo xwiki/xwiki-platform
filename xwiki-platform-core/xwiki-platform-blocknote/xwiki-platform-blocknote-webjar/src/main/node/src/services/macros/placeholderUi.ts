@@ -27,6 +27,6 @@ import type { MacroBlock } from "@xwiki/platform-macros-api";
 export const MACRO_UI_PLACEHOLDER: MacroBlock[] = [
   {
     type: "rawHtml",
-    html: '<p style="border: 2px solid gray; padding: 1rem;"><em>Placeholder content for macro</p>',
+    html: '<p style="border: 2px solid gray; padding: 1rem;"><em>Placeholder content for macro</em></p>',
   },
 ];

@@ -56,4 +56,26 @@ const SuperscriptStyle = createStyleSpec(
   },
 );
 
-export { SubscriptStyle, SuperscriptStyle };
+/**
+ * BlockNote style spec for verbatim (no-wiki-syntax) inline text.
+ * Renders as a `<span>` with the CSS class `xwiki-verbatim`.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+const VerbatimStyle = createStyleSpec(
+  { type: "xwiki:verbatim", propSchema: "boolean" },
+  {
+    render: () => {
+      const span = document.createElement("span");
+      span.className = "xwiki-verbatim";
+      return { dom: span, contentDOM: span };
+    },
+    parse: (element) =>
+      element.tagName === "SPAN" && element.classList.contains("xwiki-verbatim")
+        ? true
+        : undefined,
+  },
+);
+
+export { SubscriptStyle, SuperscriptStyle, VerbatimStyle };

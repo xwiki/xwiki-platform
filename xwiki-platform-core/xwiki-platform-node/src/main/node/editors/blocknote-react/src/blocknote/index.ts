@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { SubscriptStyle, SuperscriptStyle } from "./styles";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
@@ -26,6 +27,7 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
+  defaultStyleSpecs,
 } from "@blocknote/core";
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
@@ -86,6 +88,12 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
             : null,
         ),
       ),
+    },
+
+    styleSpecs: {
+      ...defaultStyleSpecs,
+      subscript: SubscriptStyle,
+      superscript: SuperscriptStyle,
     },
   });
 

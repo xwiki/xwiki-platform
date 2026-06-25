@@ -50,19 +50,55 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   private loadNode(node: NodeType): boolean {
-    console.log("Loading node:", node);
+    if (typeof node === "object" && node.type === "xwiki:macroBlock") {
+      this.loadMacro(node as BlockType);
+      return true;
+    }
     return false;
+  }
+
+  /**
+   * By default, BlockNote supports only primitive values for block properties. To overcome this limitation, we need to
+   * pre-process the macro block properties to convert the call and output objects into strings (JSON serialization).
+   *
+   * @param macroNode - the macro node to pre-process
+   */
+  private loadMacro(macroNode: BlockType): void {
+    const props = macroNode.props as Record<string, unknown>;
+    props.call = JSON.stringify(props.call);
+    if (props.output) {
+      props.output = JSON.stringify(props.output);
+    }
   }
 
   public save(blockNoteContent: BlockType[]): string {
-    this.iterator.iterate(blockNoteContent, {
+    const blockNoteContentCopy = structuredClone(blockNoteContent);
+    this.iterator.iterate(blockNoteContentCopy, {
       visit: (node) => this.saveNode(node),
     });
-    return JSON.stringify(blockNoteContent);
+    return JSON.stringify(blockNoteContentCopy);
   }
 
   private saveNode(node: NodeType): boolean {
-    console.log("Saving node:", node);
+    if (typeof node === "object" && node.type === "xwiki:macroBlock") {
+      this.saveMacro(node as BlockType);
+      return true;
+    }
     return false;
+  }
+
+  /**
+   * Reverses the changes made by the loadMacro method.
+   *
+   * @param macroNode - the macro node to post-process
+   */
+  private saveMacro(macroNode: BlockType): void {
+    const props = macroNode.props as Record<string, unknown>;
+    if (typeof props.call === "string") {
+      props.call = JSON.parse(props.call);
+    }
+    if (typeof props.output === "string") {
+      props.output = JSON.parse(props.output);
+    }
   }
 }

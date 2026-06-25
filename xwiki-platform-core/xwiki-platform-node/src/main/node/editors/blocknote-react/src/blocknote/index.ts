@@ -20,6 +20,7 @@
 
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
+import { XWikiMacroBlock } from "./macroBlock";
 import { SubscriptStyle, SuperscriptStyle, VerbatimStyle } from "./styles";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
@@ -64,6 +65,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
       ...remainingBlockSpecs,
       "xwiki:definitionListItem": DefinitionListItemBlock(),
       "xwiki:group": XWikiGroupBlock(),
+      "xwiki:macroBlock": XWikiMacroBlock(),
 
       // Macros
       ...Object.fromEntries(

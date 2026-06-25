@@ -50,7 +50,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   private loadNode(node: NodeType): boolean {
-    if (typeof node === "object" && node.type === "xwiki:macroBlock") {
+    if (typeof node === "object" && node.type === "xwikiMacroBlock") {
       this.loadMacro(node as BlockType);
       return true;
     }
@@ -80,7 +80,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   private saveNode(node: NodeType): boolean {
-    if (typeof node === "object" && node.type === "xwiki:macroBlock") {
+    if (typeof node === "object" && node.type === "xwikiMacroBlock") {
       this.saveMacro(node as BlockType);
       return true;
     }

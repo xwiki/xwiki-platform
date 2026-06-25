@@ -30,7 +30,7 @@ import { createReactBlockSpec } from "@blocknote/react";
  */
 const XWikiGroupBlock = createReactBlockSpec(
   {
-    type: "xwiki:group",
+    type: "xwikiGroup",
     propSchema: defaultProps,
     content: "none",
   },

@@ -47,7 +47,7 @@ function valueToBlocks(value: unknown): RawBlock[] {
 }
 
 /**
- * Recursively replaces `xwiki:editable` markers in the macro output with the corresponding parameter/content value from
+ * Recursively replaces `xwikiEditable` markers in the macro output with the corresponding parameter/content value from
  * the macro call.
  */
 function substituteEditables(blocks: RawBlock[], call: MacroCall): RawBlock[] {
@@ -55,7 +55,7 @@ function substituteEditables(blocks: RawBlock[], call: MacroCall): RawBlock[] {
   for (const block of blocks) {
     if (typeof block !== "object" || !block) {
       continue;
-    } else if (block.type === "xwiki:editable") {
+    } else if (block.type === "xwikiEditable") {
       const value = block.name ? call.parameters[block.name] : call.content;
       result.push(...valueToBlocks(value));
     } else {
@@ -103,7 +103,7 @@ function toHTML(
  */
 const XWikiMacroBlock = createReactBlockSpec(
   {
-    type: "xwiki:macroBlock",
+    type: "xwikiMacroBlock",
     propSchema: {
       call: { default: "{}" },
       output: { default: "[]" },

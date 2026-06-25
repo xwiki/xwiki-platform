@@ -148,7 +148,7 @@ public class SchedulersClassLoaderManager
 
         try {
             // Get the job object
-            XWikiDocument document = context.getWiki().getDocument(objectReference, context);
+            XWikiDocument document = context.getWiki().getDocument(objectReference, context).clone();
             BaseObject jobObject = document.getXObject(objectReference);
 
             // Reschedule the job with the new classloader.

@@ -70,12 +70,25 @@ class SolrLiveDataIT
     // "platform.index.doc.*" keys are already bundled in the WAR (the document index uses the same prefix).
     private static final String TRANSLATION_PREFIX = "platform.index.";
 
-    // A made-up token, unlikely to collide with other indexed documents, shared by the test page titles.
+    // The page size used by the main scenario. Six documents are created (see below), so they span two pages and the
+    // pagination can be exercised.
+    private static final int PAGE_SIZE = 5;
+
+    // A made-up token, unlikely to collide with other indexed documents, shared by the six test page titles. Their
+    // distinct (alphabetically ordered) fruit names make the row order deterministic once sorted by title.
     private static final String TOKEN = "Zorblax";
 
     private static final String APPLE_TITLE = TOKEN + " Apple";
 
     private static final String BANANA_TITLE = TOKEN + " Banana";
+
+    private static final String CHERRY_TITLE = TOKEN + " Cherry";
+
+    private static final String DRAGONFRUIT_TITLE = TOKEN + " Dragonfruit";
+
+    private static final String ELDERBERRY_TITLE = TOKEN + " Elderberry";
+
+    private static final String FIG_TITLE = TOKEN + " Fig";
 
     // A distinct token for the rights test, so it does not match the documents created by the other test (the Solr
     // query is not scoped to the test space).
@@ -95,21 +108,31 @@ class SolrLiveDataIT
         // Start from a clean test space.
         setup.deletePage(testReference, true);
 
+        // Create six documents sharing the token so that, with a page size of 5, they span two pages (pagination).
+        // The distinct, alphabetically ordered fruit titles make the row order deterministic once sorted by title.
         DocumentReference applePage = new DocumentReference("ApplePage", spaceReference);
         DocumentReference bananaPage = new DocumentReference("BananaPage", spaceReference);
         setup.createPage(applePage, "Apple content", APPLE_TITLE);
         setup.createPage(bananaPage, "Banana content", BANANA_TITLE);
+        setup.createPage(new DocumentReference("CherryPage", spaceReference), "Cherry content", CHERRY_TITLE);
+        setup.createPage(new DocumentReference("DragonfruitPage", spaceReference), "Dragonfruit content",
+            DRAGONFRUIT_TITLE);
+        setup.createPage(new DocumentReference("ElderberryPage", spaceReference), "Elderberry content",
+            ELDERBERRY_TITLE);
+        setup.createPage(new DocumentReference("FigPage", spaceReference), "Fig content", FIG_TITLE);
 
-        // Wait for the two pages to be indexed in Solr before querying them.
+        // Wait for the pages to be indexed in Solr before querying them.
         new SolrTestUtils(setup).waitEmptyQueue();
 
-        // The shared token matches both test pages (the title field is tokenized). The "type" parameter is set
+        // The shared token matches all six test pages (the title field is tokenized). The "type" parameter is set
         // explicitly to its default to exercise the entity-type extension point. Several columns of different kinds
         // (title/full name links, location breadcrumb, author link, formatted date) plus an unsupported column are
-        // requested, and a translation prefix is passed so the headers are localized.
+        // requested, a translation prefix is passed so the headers are localized, and a page size of 5 (the "limit"
+        // macro parameter) is set so the six results span two pages.
         setup.createPage(testReference,
             "{{liveData id=\"test\""
                 + " properties=\"doc.title,doc.location,doc.fullName,doc.author,doc.date," + UNSUPPORTED_COLUMN + "\""
+                + " limit=\"" + PAGE_SIZE + "\""
                 + " source=\"solr\" sourceParameters=\"type=document&query=title_:" + TOKEN + "&translationPrefix="
                 + TRANSLATION_PREFIX + "\"/}}", "Solr Live Data");
 
@@ -117,16 +140,25 @@ class SolrLiveDataIT
         LiveDataElement liveData = new LiveDataElement("test");
         liveData.waitUntilReady();
         TableLayoutElement tableLayout = liveData.getTableLayout();
-        assertEquals(2, tableLayout.countRows());
-        // The title column is rendered as a link to the document (under its localized "Title" header).
+        // Sort by title so that the order of the rows (and thus their distribution across the pages) is deterministic.
+        tableLayout.sortBy(TITLE_COLUMN);
+
+        // Pagination, first page: only the page size (5) rows are rendered, but the total count reflects all six
+        // matches. The Solr source caps the result with setLimit while reporting numFound as the count, independently
+        // of the page size.
+        assertEquals(6, tableLayout.getTotalEntries());
+        assertEquals(PAGE_SIZE, tableLayout.countRows());
+
+        // The title column is rendered as a link to the document (under its localized "Title" header). Apple and
+        // Banana sort first, so they are on this first page.
         tableLayout.assertCellWithLink(TITLE_COLUMN, APPLE_TITLE, setup.getURL(applePage, "view", ""));
         tableLayout.assertCellWithLink(TITLE_COLUMN, BANANA_TITLE, setup.getURL(bananaPage, "view", ""));
         // The other requested columns are rendered under their localized headers (looking the cells up by the
         // translated label both checks the columns are present and proves the headers are localized).
-        assertEquals(2, tableLayout.getAllCells(PAGE_COLUMN).size());
-        assertEquals(2, tableLayout.getAllCells(LAST_AUTHOR_COLUMN).size());
-        assertEquals(2, tableLayout.getAllCells(DATE_COLUMN).size());
-        assertEquals(2, tableLayout.getAllCells(LOCATION_COLUMN).size());
+        assertEquals(PAGE_SIZE, tableLayout.getAllCells(PAGE_COLUMN).size());
+        assertEquals(PAGE_SIZE, tableLayout.getAllCells(LAST_AUTHOR_COLUMN).size());
+        assertEquals(PAGE_SIZE, tableLayout.getAllCells(DATE_COLUMN).size());
+        assertEquals(PAGE_SIZE, tableLayout.getAllCells(LOCATION_COLUMN).size());
 
         // The full name, author and location columns are rendered as links (and not as raw text).
         assertFalse(tableLayout.getAllCells(PAGE_COLUMN).get(0).findElements(By.tagName("a")).isEmpty());
@@ -137,16 +169,26 @@ class SolrLiveDataIT
             "The date column should display a formatted date");
         // The unsupported column is ignored gracefully: its (empty) column still renders and the table is not broken
         // (a missing descriptor used to crash the widget). It falls back to its property id as a header.
-        assertEquals(2, tableLayout.getAllCells(UNSUPPORTED_COLUMN).size());
+        assertEquals(PAGE_SIZE, tableLayout.getAllCells(UNSUPPORTED_COLUMN).size());
 
-        // Filtering on the title column with a partial term narrows the result down to the matching page (the
-        // "contains" operator does a substring match, so "Ap" matches "Apple").
+        // Pagination, second page: the remaining (6th) document is shown, proving the source applies the offset
+        // (setOffset). The total count is unchanged across pages, and the last document in title order is Fig.
+        tableLayout.goToNextPage();
+        assertEquals(6, tableLayout.getTotalEntries());
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(TITLE_COLUMN, FIG_TITLE);
+
+        // Filtering on the title column with a partial term narrows the result down to the single matching page (the
+        // "contains" operator does a substring match, so "Ap" matches "Apple"). Applying a filter also resets the
+        // pagination back to the first page.
         tableLayout.filterColumn(TITLE_COLUMN, "Ap", true);
+        assertEquals(1, tableLayout.getTotalEntries());
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(TITLE_COLUMN, APPLE_TITLE);
-        // Clear the title filter before exercising the other column filters.
+        // Clear the title filter before exercising the other column filters: back to the full (page-limited) result.
         tableLayout.filterColumn(TITLE_COLUMN, "", true);
-        assertEquals(2, tableLayout.countRows());
+        assertEquals(6, tableLayout.getTotalEntries());
+        assertEquals(PAGE_SIZE, tableLayout.countRows());
 
         // The Page (doc.fullName) column filter is case-insensitive on the page name: a lowercase partial term ("ba")
         // matches "BananaPage" (it is filtered against the tokenized "name" field -- as a plain analyzed term plus a
@@ -155,16 +197,15 @@ class SolrLiveDataIT
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(TITLE_COLUMN, BANANA_TITLE);
         tableLayout.filterColumn(PAGE_COLUMN, "", true);
-        assertEquals(2, tableLayout.countRows());
+        assertEquals(PAGE_SIZE, tableLayout.countRows());
 
-        // The Date (doc.date) column filter applies a Solr range query: a range covering "now" keeps both freshly
-        // created pages, while a range entirely in the past excludes them both.
+        // The Date (doc.date) column filter applies a Solr range query: a range covering "now" keeps all six freshly
+        // created pages (capped at the page size), while a range entirely in the past excludes them all.
         tableLayout.filterColumn(DATE_COLUMN, "2000/01/01 00:00 - 2100/01/01 00:00", true);
-        assertEquals(2, tableLayout.countRows());
+        assertEquals(6, tableLayout.getTotalEntries());
+        assertEquals(PAGE_SIZE, tableLayout.countRows());
         tableLayout.filterColumn(DATE_COLUMN, "2000/01/01 00:00 - 2001/01/01 00:00", true);
         assertEquals(0, tableLayout.countRows());
-        tableLayout.filterColumn(DATE_COLUMN, "", true);
-        assertEquals(2, tableLayout.countRows());
     }
 
     @Test

@@ -305,11 +305,14 @@ export class BlockNoteToUniAstConverter {
           "xwikiDefinitionListItem blocks cannot be converted to UniAst",
         );
 
+      case "xwikiGroup":
+        throw new Error("xwikiGroup blocks cannot be converted to UniAst");
+
       case "xwikiMacroBlock":
         throw new Error("xwikiMacroBlock blocks cannot be converted to UniAst");
 
-      case "xwikiGroup":
-        throw new Error("xwikiGroup blocks cannot be converted to UniAst");
+      case "xwikiRaw":
+        throw new Error("xwikiRaw blocks cannot be converted to UniAst");
 
       default:
         assertUnreachable(block);

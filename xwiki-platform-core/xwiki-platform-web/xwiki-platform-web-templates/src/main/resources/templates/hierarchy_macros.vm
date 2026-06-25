@@ -303,7 +303,7 @@
         #set ($document = $xwiki.getDocument($reference).translatedDocument)
       #end
       #if ($document)
-        ## Fall back to the reference name when the title is empty.
+        ## Only use the title as a label when it's not empty (otherwise keep the reference name set above).
         #set ($plainTitle = "$!document.plainTitle")
         #if ($plainTitle != '')
           #set ($label = $escapetool.xml($plainTitle))

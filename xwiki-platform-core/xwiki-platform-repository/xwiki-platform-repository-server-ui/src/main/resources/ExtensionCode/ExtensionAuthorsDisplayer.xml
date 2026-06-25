@@ -197,6 +197,8 @@ function addPage(nb, page, pageTitle) {
    span.value = page;
    var img = document.createElement("img");
    img.src = "$xwiki.getSkinFile('icons/silk/cross.png')";
+   img.alt = "$escapetool.javascript($services.localization.render('repository.extension.sheet.authors.removePage'))";
+   img.title = img.alt;
    img.onclick = function() { removePage(nb, this, spage, spageTitle); };
    li.appendChild(span);
    li.appendChild(img);

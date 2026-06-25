@@ -111,6 +111,14 @@ default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
 }, "none">;
+"xwiki:macroBlock": BlockSpec<"xwiki:macroBlock", {
+readonly call: {
+readonly default: "{}";
+};
+readonly output: {
+readonly default: "[]";
+};
+}, "none">;
 bulletListItem: BlockSpec<"bulletListItem", {
 readonly backgroundColor: {
 default: "default";

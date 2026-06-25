@@ -84,7 +84,7 @@ export type ContextForMacros = {
 //
 // @beta
 export function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
-"xwiki:definitionListItem": BlockSpec<"xwiki:definitionListItem", {
+xwikiDefinitionListItem: BlockSpec<"xwikiDefinitionListItem", {
 readonly term: {
 readonly default: false;
 };
@@ -99,7 +99,7 @@ default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
 }, "inline">;
-"xwiki:group": BlockSpec<"xwiki:group", {
+xwikiGroup: BlockSpec<"xwikiGroup", {
 backgroundColor: {
 default: "default";
 };
@@ -111,7 +111,7 @@ default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
 }, "none">;
-"xwiki:macroBlock": BlockSpec<"xwiki:macroBlock", {
+xwikiMacroBlock: BlockSpec<"xwikiMacroBlock", {
 readonly call: {
 readonly default: "{}";
 };
@@ -257,8 +257,8 @@ superscript: StyleSpec<    {
 readonly type: "superscript";
 readonly propSchema: "boolean";
 }>;
-"xwiki:verbatim": StyleSpec<    {
-readonly type: "xwiki:verbatim";
+xwikiVerbatim: StyleSpec<    {
+readonly type: "xwikiVerbatim";
 readonly propSchema: "boolean";
 }>;
 bold: {

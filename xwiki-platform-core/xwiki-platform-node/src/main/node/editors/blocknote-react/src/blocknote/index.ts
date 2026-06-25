@@ -63,9 +63,9 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...remainingBlockSpecs,
-      "xwiki:definitionListItem": DefinitionListItemBlock(),
-      "xwiki:group": XWikiGroupBlock(),
-      "xwiki:macroBlock": XWikiMacroBlock(),
+      xwikiDefinitionListItem: DefinitionListItemBlock(),
+      xwikiGroup: XWikiGroupBlock(),
+      xwikiMacroBlock: XWikiMacroBlock(),
 
       // Macros
       ...Object.fromEntries(
@@ -100,7 +100,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
       ...defaultStyleSpecs,
       subscript: SubscriptStyle,
       superscript: SuperscriptStyle,
-      "xwiki:verbatim": VerbatimStyle,
+      xwikiVerbatim: VerbatimStyle,
     },
   });
 

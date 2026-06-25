@@ -64,7 +64,7 @@ const SuperscriptStyle = createStyleSpec(
  * @beta
  */
 const VerbatimStyle = createStyleSpec(
-  { type: "xwiki:verbatim", propSchema: "boolean" },
+  { type: "xwikiVerbatim", propSchema: "boolean" },
   {
     render: () => {
       const span = document.createElement("span");

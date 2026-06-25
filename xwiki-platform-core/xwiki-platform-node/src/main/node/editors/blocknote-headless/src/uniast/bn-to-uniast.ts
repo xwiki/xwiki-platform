@@ -300,18 +300,16 @@ export class BlockNoteToUniAstConverter {
       case "divider":
         return { type: "break" };
 
-      case "xwiki:definitionListItem":
+      case "xwikiDefinitionListItem":
         throw new Error(
-          "xwiki:definitionListItem blocks cannot be converted to UniAst",
+          "xwikiDefinitionListItem blocks cannot be converted to UniAst",
         );
 
-      case "xwiki:macroBlock":
-        throw new Error(
-          "xwiki:macroBlock blocks cannot be converted to UniAst",
-        );
+      case "xwikiMacroBlock":
+        throw new Error("xwikiMacroBlock blocks cannot be converted to UniAst");
 
-      case "xwiki:group":
-        throw new Error("xwiki:group blocks cannot be converted to UniAst");
+      case "xwikiGroup":
+        throw new Error("xwikiGroup blocks cannot be converted to UniAst");
 
       default:
         assertUnreachable(block);

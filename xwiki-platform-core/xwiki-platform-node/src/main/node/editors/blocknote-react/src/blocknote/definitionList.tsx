@@ -31,7 +31,7 @@ import { createReactBlockSpec } from "@blocknote/react";
  */
 const DefinitionListItemBlock = createReactBlockSpec(
   {
-    type: "xwiki:definitionListItem",
+    type: "xwikiDefinitionListItem",
     propSchema: {
       ...defaultProps,
       term: { default: false },

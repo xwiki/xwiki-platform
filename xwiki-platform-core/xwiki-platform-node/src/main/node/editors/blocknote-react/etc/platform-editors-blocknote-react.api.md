@@ -119,6 +119,14 @@ readonly output: {
 readonly default: "[]";
 };
 }, "none">;
+xwikiRaw: BlockSpec<"xwikiRaw", {
+readonly syntax: {
+readonly default: "";
+};
+readonly text: {
+readonly default: "";
+};
+}, "none">;
 bulletListItem: BlockSpec<"bulletListItem", {
 readonly backgroundColor: {
 default: "default";

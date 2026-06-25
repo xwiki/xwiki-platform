@@ -42,35 +42,33 @@
 #_sheetInit('ExtensionCode.ExtensionSupportPlanClass', 'repository.supportplan')
 {{html wiki="true" clean="false"}}
 &lt;div class="xform">
-  &lt;dl>
-    &lt;div class="row">
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'name')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'supporter')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-12">
-        #_formProperty($object, 'summary')
-      &lt;/div>
+  &lt;div class="row">
+    &lt;div class="col-md-4 col-sm-6">
+      &lt;dl>#_formProperty($object, 'name')&lt;/dl>
     &lt;/div>
-    &lt;div class="row">
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'url')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'paying')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'active')
-      &lt;/div>
+    &lt;div class="col-md-4 col-sm-6">
+      &lt;dl>#_formProperty($object, 'supporter')&lt;/dl>
     &lt;/div>
-    &lt;div class="row">
-      &lt;div class="col-md-12">
-        #_formProperty($object, 'content')
-      &lt;/div>
+    &lt;div class="col-md-4 col-sm-12">
+      &lt;dl>#_formProperty($object, 'summary')&lt;/dl>
     &lt;/div>
-  &lt;/dl>
+  &lt;/div>
+  &lt;div class="row">
+    &lt;div class="col-md-4 col-sm-6">
+      &lt;dl>#_formProperty($object, 'url')&lt;/dl>
+    &lt;/div>
+    &lt;div class="col-md-4 col-sm-6">
+      &lt;dl>#_formProperty($object, 'paying')&lt;/dl>
+    &lt;/div>
+    &lt;div class="col-md-4 col-sm-6">
+      &lt;dl>#_formProperty($object, 'active')&lt;/dl>
+    &lt;/div>
+  &lt;/div>
+  &lt;div class="row">
+    &lt;div class="col-md-12">
+      &lt;dl>#_formProperty($object, 'content')&lt;/dl>
+    &lt;/div>
+  &lt;/div>
 &lt;/div>
 {{/html}}
 

@@ -89,6 +89,7 @@ repository.extension.sheet.type=Type
 repository.extension.sheet.category=Category
 repository.extension.sheet.summary=Summary
 repository.extension.sheet.authors=Authors
+repository.extension.sheet.authors.removePage=Remove
 repository.extension.sheet.rating=Rating
 repository.extension.sheet.title=Extension sheet
 repository.extension.sheet.imported=Extension imported from repository

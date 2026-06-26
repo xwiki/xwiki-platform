@@ -559,23 +559,23 @@ Get the actual notifications.
  ***********************************************/
 #tmNotifications {
   &amp; &gt; button {
-    background-color: @navbar-default-bg;
-    color: @navbar-default-link-color;
+    background-color: var(--navbar-default-bg);
+    color: var(--navbar-default-link-color);
     border: 0;
-    padding: 10px @navbar-padding-horizontal;
+    padding: 10px 15px;
 
-    @media (min-width: @grid-float-breakpoint) {
-      padding: @navbar-padding-vertical @navbar-padding-horizontal;
+    @media (min-width: 768px) {
+      padding: 15px 15px;
     }
     &amp;:hover,
     &amp;:focus {
       outline: revert;
-      background-color: @navbar-default-link-hover-bg;
-      color: @navbar-default-link-hover-color;
+      background-color: var(--navbar-default-link-hover-bg);
+      color: var(--navbar-default-link-hover-color);
     }
     &amp;:active {
-      background-color: @navbar-default-link-active-bg;
-      color: @navbar-default-link-active-color;
+      background-color: var(--navbar-default-link-active-bg);
+      color: var(--navbar-default-link-active-color);
     }
   }
   
@@ -586,8 +586,8 @@ Get the actual notifications.
 }
 
 .notifications-count {
-  color: @btn-danger-color;
-  background-color: @btn-danger-bg;
+  color: var(--btn-danger-color);
+  background-color: var(--btn-danger-bg);
   position: absolute;
   top: 0;
 }
@@ -621,8 +621,8 @@ Get the actual notifications.
 }
 
 .notifications-toggles .bootstrap-switch .bootstrap-switch-label {
-  background-color: $theme.buttonSecondaryBackgroundColor;
-  color: $theme.buttonSecondaryTextColor;
+  background-color: var(--btn-default-bg);
+  color: var(--btn-default-color);
 }
 
 /***********************************************

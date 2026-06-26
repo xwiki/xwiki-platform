@@ -27,7 +27,6 @@ import type { ContextForMacros } from "../../blocknote/utils";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
 export type CustomMacroEditButtonProps = {
-  // TODO
   macrosList: MacroWithUnknownParamsType[];
   ctxForMacros: ContextForMacros;
 };

@@ -264,7 +264,10 @@ export default {
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
-        if (editBlock.contains(evt.target)) {
+        // The edit block is not rendered while the editor is still loading (e.g. while an edit confirmation modal is
+        // displayed), so there is nothing to switch away from yet and clicks (such as on the modal buttons) must be
+        // ignored.
+        if (!editBlock || editBlock.contains(evt.target)) {
           return;
         }
 

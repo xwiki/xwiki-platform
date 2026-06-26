@@ -46,10 +46,14 @@
 #set($pageList = $doc.getValue($name))
 #if ($isEditMode)
   {{html clean="false"}}
+    ## Force local+global suggestions so that main wiki users are suggested too, like the previous
+    ## custom picker did (which always queried the main wiki when on a subwiki). This overrides the
+    ## #userPicker default of using the wiki's configured user scope ($services.wiki.user.userScope).
     #set ($parameters = {
       'id': "${prefix}${name}",
       'name': "${prefix}${name}",
-      'value': $pageList
+      'value': $pageList,
+      'data-userScope': 'LOCAL_AND_GLOBAL'
     })
     #userPicker(true $parameters)
   {{/html}}

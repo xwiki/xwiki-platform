@@ -20,6 +20,8 @@
 package org.xwiki.test.checker.internal;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -66,6 +68,8 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     private Logger prlogger;
 
     private Pattern excludePattern;
+
+    private final Set<DocumentReference> loggedReferences = ConcurrentHashMap.newKeySet();
 
     @Override
     public void initialize() throws InitializationException
@@ -135,11 +139,15 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
             DocumentReference sref = sdoc.getDocumentReference();
 
             if (this.excludePattern != null && this.excludePattern.matcher(sref.toString()).matches()) {
-                this.prlogger.info("PRChecker: Skipping check for [{}] since it's excluded", sref);
+                if (this.loggedReferences.add(sref)) {
+                    this.prlogger.info("PRChecker: Skipping check for [{}] since it's excluded", sref);
+                }
 
                 return true;
             } else {
-                this.prlogger.info("PRChecker: Block programming right for page [{}]", sref);
+                if (this.loggedReferences.add(sref)) {
+                    this.prlogger.info("PRChecker: Block programming right for page [{}]", sref);
+                }
 
                 return false;
             }

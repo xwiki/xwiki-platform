@@ -40,6 +40,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -78,6 +79,10 @@ class LiveTableLiveDataEntryStoreTest
 
     @MockComponent
     private LiveTableLiveDataResultsRenderer resultsRenderer;
+
+    @MockComponent
+    @Named("uuid")
+    private LiveTableNewRowNamingStrategy namingStrategy;
 
     @MockComponent
     @Named("current")
@@ -142,6 +147,20 @@ class LiveTableLiveDataEntryStoreTest
         assertEquals(1, query.getFilters().size());
         assertEquals("doc.fullName", query.getFilters().get(0).getProperty());
         assertEquals("testEntry", query.getFilters().get(0).getConstraints().get(0).getValue());
+    }
+
+    @Test
+    void saveNewEntry() throws Exception
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
+        when(this.namingStrategy.generate(any())).thenReturn(newReference);
+        when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
+
+        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
+        Map<String, Object> entry = new HashMap<>();
+
+        assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
     }
 
     @Test

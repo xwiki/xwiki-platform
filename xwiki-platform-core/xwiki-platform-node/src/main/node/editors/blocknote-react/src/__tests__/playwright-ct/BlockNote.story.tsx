@@ -17,20 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  InlineMacroInvocation,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroBlockInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+import { depsContainerMock } from "./depsContainer.mock";
+import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import { useMemo } from "react";
+import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+
+export type BlockNoteForTestProps = Omit<
+  BlockNoteViewWrapperProps,
+  "lang" | "label" | "depsContainer"
+> & { syntax?: SyntaxConfig };
+
+export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
+  const depsContainer = useMemo(depsContainerMock, []);
+
+  return (
+    <BlockNoteViewWrapper
+      lang="en"
+      label="Some Label"
+      depsContainer={depsContainer}
+      {...props}
+    />
+  );
+};

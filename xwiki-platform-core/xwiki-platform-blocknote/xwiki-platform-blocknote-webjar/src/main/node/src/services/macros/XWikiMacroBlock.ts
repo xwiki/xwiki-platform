@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { MACRO_UI_PLACEHOLDER } from "./placeholderUi";
 import { eraseParamsTypeForMacroClass } from "@xwiki/platform-macros-api";
 import { Container, injectable } from "inversify";
 import type {
@@ -61,6 +62,6 @@ export class XWikiMacroBlock implements BlockMacro<MacroParams> {
   render({
     output,
   }: GetConcreteMacroParametersType<MacroParams>): MacroBlock[] {
-    return JSON.parse(output || "[]");
+    return output ? JSON.parse(output) : MACRO_UI_PLACEHOLDER;
   }
 }

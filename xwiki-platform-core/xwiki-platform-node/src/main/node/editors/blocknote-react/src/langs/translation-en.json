@@ -5,6 +5,7 @@
   "blocknote.linkToolbar.buttons.open": "Open target",
   "blocknote.linkToolbar.buttons.delete": "Delete link",
   "blocknote.toolbar.unknownBlockType": "Unknown block type",
+  "blocknote.toolbar.buttons.insertMacro": "Insert a macro",
   "blocknote.imageSelector.uploadButton": "Upload",
   "blocknote.imageSelector.placeholder": "Query or image URL...",
   "blocknote.linkEditor.submit": "Submit",

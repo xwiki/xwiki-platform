@@ -19,12 +19,13 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { expect, test } from "@playwright/experimental-ct-react";
-import type { BlockOfType, BlockType } from "../blocknote";
+import type { BlockOfType, BlockType } from "../../blocknote";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
   );
 
   await expect(component).toBeVisible();
@@ -36,6 +37,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
       macros={false}
+      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -45,7 +47,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} />,
+    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -73,6 +75,7 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
           overrideFnCalledWithUrl = image.url;
         },
       }}
+      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -90,10 +93,8 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
   await toolbarEl.waitFor({ state: "attached" });
 
   // Trigger the image edition UI
-  //   > NOTE: this will need to be updated if the button's label changes, or if a translation is used
-  //   > There is no other real identifying DOM attribute for these buttons
   const imgEditBtnEl = page.locator(
-    'button[aria-label="blocknote.imageToolbar.buttons.edit"]',
+    'button[data-test="blocknote.imageToolbar.buttons.edit"]',
   );
   await imgEditBtnEl.waitFor({ state: "attached" });
   await imgEditBtnEl.click();
@@ -161,6 +162,60 @@ test("Disallowed syntax features should be unavailable", async ({
 
   expect(menuItemsText).not.toContain("Table");
   expect(menuItemsText).not.toContain("Quote");
+});
+
+// eslint-disable-next-line max-statements
+test("Macros can be inserted", async ({ mount, page }) => {
+  let macroInsertionModalTriggered = false;
+
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: Math.random().toString(),
+          type: "paragraph",
+          children: [],
+          content: [{ type: "text", text: "Yeah", styles: {} }],
+          props: {
+            backgroundColor: "default",
+            textAlignment: "left",
+            textColor: "default",
+          },
+        },
+      ]}
+      macros={{
+        ctx: {
+          openParamsEditor() {
+            throw new Error("Unreachable");
+          },
+
+          openInsertionEditor() {
+            macroInsertionModalTriggered = true;
+          },
+        },
+        list: macros,
+      }}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+
+  const paragraph = editorEl.locator(
+    // 'div.bn-block-content[data-content-type="paragraph"]',
+    "p.bn-inline-content",
+  );
+
+  await paragraph.waitFor({ state: "attached" });
+
+  // Trigger the formatting toolbar
+  await paragraph.dblclick();
+  const macroInsertBtnEl = page.locator('button[data-test="insertMacro"]');
+  await macroInsertBtnEl.waitFor({ state: "attached" });
+
+  expect(macroInsertionModalTriggered).toBe(false);
+  await macroInsertBtnEl.click();
+  expect(macroInsertionModalTriggered).toBe(true);
 });
 
 function buildParagraphs(blocks: string[]): BlockType[] {
@@ -286,3 +341,18 @@ const FULL_SYNTAX: SyntaxConfig = {
     },
   },
 };
+const macros: MacroWithUnknownParamsType[] = [
+  {
+    renderAs: "block",
+    infos: {
+      id: "sample-macro",
+      name: "Sample Macro",
+      description: "A sample macro",
+      params: {},
+      bodyType: "none",
+      defaultParameters: {},
+      paramsDescription: {},
+    },
+    render: () => [],
+  },
+];

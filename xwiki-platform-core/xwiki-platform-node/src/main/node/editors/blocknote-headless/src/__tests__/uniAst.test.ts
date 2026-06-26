@@ -18,39 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { depsContainerMock } from "./depsContainer.mock";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
-import { BlockType } from "@xwiki/platform-editors-blocknote-react";
-import { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
-import {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
-function init() {
-  const remoteURLParser = mock<RemoteURLParser>();
-  const modelReferenceSerializer = mock<ModelReferenceSerializer>();
-
-  const bnToUniAstConverter = new BlockNoteToUniAstConverter(
-    remoteURLParser,
-    modelReferenceSerializer,
-    [],
-  );
-
-  const remoteURLSerializer = mock<RemoteURLSerializer>();
-
-  const uniAstToBnConverter = new UniAstToBlockNoteConverter(
-    remoteURLSerializer,
-  );
-
-  return { bnToUniAstConverter, uniAstToBnConverter };
-}
-
 describe("Convert BlockNote AST to UniAST", () => {
-  const { bnToUniAstConverter, uniAstToBnConverter } = init();
+  const depsContainer = depsContainerMock();
+
+  const bnToUniAstConverter = new BlockNoteToUniAstConverter(depsContainer, []);
+  const uniAstToBnConverter = new UniAstToBlockNoteConverter(depsContainer);
 
   function testTwoWayConversion(expected: {
     startingFrom: BlockType[];

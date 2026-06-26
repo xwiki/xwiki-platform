@@ -17,20 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  InlineMacroInvocation,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroBlockInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+import { createContext } from "react";
+import type { Container } from "inversify";
+
+const DepsContainerContext = createContext<Container | null>(null);
+
+export { DepsContainerContext };

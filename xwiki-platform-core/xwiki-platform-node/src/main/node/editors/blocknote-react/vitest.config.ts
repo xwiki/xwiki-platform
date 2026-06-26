@@ -17,20 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  InlineMacroInvocation,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroBlockInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+
+import localConfig from "./vite.config";
+import { vitest as defaultConfig } from "@xwiki/platform-dev-config";
+import { UserConfig } from "vite";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(defaultConfig, {
+  ...localConfig,
+  test: {
+    include: ["src/__tests__/vitest/**/*"],
+  },
+} satisfies UserConfig);

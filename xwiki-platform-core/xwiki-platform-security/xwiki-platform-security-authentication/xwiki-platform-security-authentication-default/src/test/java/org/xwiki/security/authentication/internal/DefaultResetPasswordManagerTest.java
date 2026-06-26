@@ -22,8 +22,8 @@ package org.xwiki.security.authentication.internal;
 import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -68,10 +68,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -115,6 +115,10 @@ class DefaultResetPasswordManagerTest
     private UserReferenceSerializer<String> referenceSerializer;
 
     @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceSerializer;
+
+    @MockComponent
     private Provider<AuthenticationMailSender> resetPasswordMailSenderProvider;
 
     @MockComponent
@@ -130,10 +134,15 @@ class DefaultResetPasswordManagerTest
     private AuthenticationMailSender authenticationMailSender;
 
     private DocumentUserReference userReference;
+
     private DocumentReference userDocumentReference;
+
     private UserProperties userProperties;
+
     private XWikiContext context;
+
     private XWiki xWiki;
+
     private XWikiDocument userDocument;
 
     @BeforeEach
@@ -144,6 +153,7 @@ class DefaultResetPasswordManagerTest
         this.userProperties = mock(UserProperties.class);
         when(this.userPropertiesResolver.resolve(this.userReference)).thenReturn(this.userProperties);
         when(this.userReference.getReference()).thenReturn(this.userDocumentReference);
+        when(this.documentReferenceSerializer.serialize(this.userReference)).thenReturn(this.userDocumentReference);
 
         this.context = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.context);
@@ -229,39 +239,62 @@ class DefaultResetPasswordManagerTest
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
     }
 
-    @Test
-    void sendResetPasswordEmailRequest() throws Exception
+    static Stream<Arguments> sendResetPasswordEmailRequestServerURLResolution() throws Exception
+    {
+        URL canonicalURL = new URL("http://xwiki.org");
+        URL expectedResetURL = new URL("http://xwiki.org/xwiki/authenticate/reset?u=user%3AFoobar&v=foobar4242");
+        return Stream.of(
+            // The user's wiki has a canonical URL: it is used directly.
+            arguments("foo", canonicalURL, expectedResetURL),
+            // The user's wiki has no canonical URL (no xwiki.home, no descriptor alias): a null expected URL means
+            // the email must be refused rather than falling back on an untrusted or wrong domain.
+            arguments("subwiki", null, null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendResetPasswordEmailRequestServerURLResolution")
+    void sendResetPasswordEmailRequest(String userWikiId, URL userWikiServerURL, URL expectedResetURL)
+        throws Exception
     {
         when(this.userManager.exists(this.userReference)).thenReturn(true);
+        when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.referenceSerializer.serialize(this.userReference)).thenReturn("user:Foobar");
         when(this.userProperties.getFirstName()).thenReturn("Foo");
         when(this.userProperties.getLastName()).thenReturn("Bar");
-        WikiReference wikiReference = new WikiReference("foo");
-        when(this.context.getWikiReference()).thenReturn(wikiReference);
+        WikiReference userWikiReference = new WikiReference(userWikiId);
+        when(this.userDocumentReference.getWikiReference()).thenReturn(userWikiReference);
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RESET_PASSWORD);
+            new AuthenticationResourceReference(userWikiReference, AuthenticationAction.RESET_PASSWORD);
 
         String verificationCode = "foobar4242";
         resourceReference.addParameter("u", "user:Foobar");
         resourceReference.addParameter("v", verificationCode);
         ExtendedURL firstExtendedURL =
-            new ExtendedURL(Arrays.asList("authenticate", "reset"), resourceReference.getParameters());
+            new ExtendedURL(List.of("authenticate", "reset"), resourceReference.getParameters());
         when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(firstExtendedURL);
         when(this.urlNormalizer.normalize(firstExtendedURL)).thenReturn(
-            new ExtendedURL(Arrays.asList("xwiki", "authenticate", "reset"), resourceReference.getParameters())
-        );
-        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(this.context.getURLFactory()).thenReturn(urlFactory);
-        when(urlFactory.getServerURL(this.context)).thenReturn(new URL("http://xwiki.org"));
+            new ExtendedURL(List.of("xwiki", "authenticate", "reset"), resourceReference.getParameters()));
+        when(this.xWiki.getServerURL(userWikiId, this.context)).thenReturn(userWikiServerURL);
 
         InternetAddress email = new InternetAddress("foobar@xwiki.org");
         when(this.userProperties.getEmail()).thenReturn(email);
 
         DefaultResetPasswordRequestResponse requestResponse =
             new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
-        this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
-        verify(this.authenticationMailSender).sendResetPasswordEmail("Foo Bar", email,
-            new URL("http://xwiki.org/xwiki/authenticate/reset?u=user%3AFoobar&v=foobar4242"));
+
+        if (expectedResetURL != null) {
+            this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
+            verify(this.authenticationMailSender).sendResetPasswordEmail("Foo Bar", email, expectedResetURL);
+        } else {
+            ResetPasswordException exception = assertThrows(ResetPasswordException.class,
+                () -> this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse));
+            assertEquals(("Cannot generate a reset password URL for user [user:Foobar] on wiki [%s]. " +
+                    "The reset password email has not been sent.").formatted(userWikiId),
+                exception.getMessage());
+            // The token leaking email must never be sent when no trusted host can be resolved.
+            verify(this.authenticationMailSender, never()).sendResetPasswordEmail(any(), any(), any());
+        }
     }
 
     @Test

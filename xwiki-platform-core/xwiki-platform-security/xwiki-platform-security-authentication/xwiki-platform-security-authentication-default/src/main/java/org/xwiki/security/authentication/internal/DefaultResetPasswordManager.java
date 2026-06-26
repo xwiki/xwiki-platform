@@ -38,6 +38,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
@@ -109,6 +110,10 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
     @Inject
     private UserReferenceSerializer<String> referenceSerializer;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceSerializer;
 
     @Inject
     private Provider<AuthenticationMailSender> resetPasswordMailSenderProvider;
@@ -206,11 +211,13 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     {
         UserInformation userInformation = this.getUserInformation(requestResponse.getUserReference());
         if (userInformation.canUserResetPassword()) {
-            AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-                this.contextProvider.get().getWikiReference(),
-                AuthenticationAction.RESET_PASSWORD);
-
             UserReference userReference = requestResponse.getUserReference();
+            // Build the reset link for the user's own wiki, which is the safe entry point for that specific user,
+            // rather than for the current request's wiki.
+            WikiReference userWiki = this.documentReferenceSerializer.serialize(userReference).getWikiReference();
+            AuthenticationResourceReference resourceReference =
+                new AuthenticationResourceReference(userWiki, AuthenticationAction.RESET_PASSWORD);
+
             String serializedUserReference = this.referenceSerializer.serialize(userReference);
             // FIXME: this should be provided as part of the User API.
             String formattedName = "";
@@ -235,7 +242,15 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
             try {
                 extendedURL = this.resourceReferenceSerializer.serialize(resourceReference);
                 extendedURL = this.urlNormalizer.normalize(extendedURL);
-                URL serverURL = context.getURLFactory().getServerURL(context);
+                // Resolve the canonical server URL configured for the user's wiki
+                URL serverURL = context.getWiki().getServerURL(userWiki.getName(), context);
+                if (serverURL == null) {
+                    throw new ResetPasswordException(
+                        """
+                            Cannot generate a reset password URL for user [%s] on wiki [%s]. \
+                            The reset password email has not been sent.""".formatted(userReference,
+                            userWiki.getName()));
+                }
                 URL externalVerificationURL = new URL(serverURL, extendedURL.serialize());
 
                 this.resetPasswordMailSenderProvider.get()

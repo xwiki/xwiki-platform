@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authentication.test.ui;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -83,6 +84,13 @@ public class ResetPasswordIT
         this.mail.start();
 
         configureEmail(setup, testConfiguration);
+
+        // Configure the server alias to match the host the browser uses to reach XWiki so that the reset link generated
+        // from the  configuration is valid.
+        // TODO: can be removed on XWIKI-24639 is done.
+        URI baseURI = URI.create(setup.getCurrentExecutor().getBrowserBaseURL());
+        setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0,
+            "server", baseURI.getHost(), "port", String.valueOf(baseURI.getPort()));
     }
 
     @AfterEach
@@ -150,7 +158,7 @@ public class ResetPasswordIT
         MimeMessage receivedEmail = receivedEmails[0];
         assertEquals("Password reset request for " + userName, receivedEmail.getSubject());
         String receivedMailContent = getMessageContent(receivedEmail).get("textPart");
-        String passwordResetLink = getResetLink(setup, receivedMailContent, "xwiki%3AXWiki." + userName);
+        String passwordResetLink = getResetLink(receivedMailContent, "xwiki%3AXWiki." + userName);
         // Use the password reset link
         setup.gotoPage(passwordResetLink);
         // We should now be on the ResetPasswordComplete page
@@ -215,12 +223,11 @@ public class ResetPasswordIT
         return null;
     }
 
-    private String getResetLink(TestUtils setup, String emailContent, String userName)
+    private String getResetLink(String emailContent, String userName)
     {
         String result;
         // Use a regex to extract the password reset link
-        String pattern =
-            String.format("(%s)\\?u=%s\\&v=\\w+", ResetPasswordPage.getResetPasswordURL(), userName);
+        String pattern = String.format("(%s)\\?u=%s&v=\\w+", ResetPasswordPage.getResetPasswordURL(), userName);
         Pattern resetLinkPattern = Pattern.compile(pattern);
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {

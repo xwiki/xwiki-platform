@@ -253,6 +253,16 @@ public interface XWikiURLFactory
 
     /**
      * Generate the base external URL to access this server.
+     * <p>
+     * Implementations are generally allowed to take the current request into account (e.g., the {@code Host} or
+     * {@code X-Forwarded-Host} headers) to keep generated links consistent with however the current visitor reached
+     * the server (reverse proxy, custom domain not registered as a wiki alias, etc.). This means the returned URL can
+     * be influenced by client-controlled data. <strong>Do not use this method to build a URL that will be used
+     * outside of the current request/response cycle</strong> (e.g., sent by email, used in a server-side fetch, or
+     * otherwise handed to a party other than the client that made the current request), as this could allow an
+     * attacker to redirect the generated URL to a server of their choosing. For that use case, prefer
+     * {@link com.xpn.xwiki.XWiki#getServerURL(String, XWikiContext)}, which only relies on trusted server-side
+     * configuration.
      *
      * @param context the XWiki context.
      * @return the URL of the server.

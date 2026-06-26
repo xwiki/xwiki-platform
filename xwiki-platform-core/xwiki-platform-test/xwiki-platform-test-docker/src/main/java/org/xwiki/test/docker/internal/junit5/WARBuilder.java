@@ -141,8 +141,13 @@ public class WARBuilder
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
             maybeAddS3BlobStore(extraArtifacts);
+            // Resolve WEB-INF/lib from the minimal dependencies by default, or from the standard distribution WAR
+            // dependencies when the test requested the standardFlavor mode (so that the bundled core extensions match
+            // a real XWiki instance). Note: ExtensionInstaller must use the same root so that it agrees on what is
+            // bundled (and thus must not be re-provisioned).
             Collection<ArtifactResult> artifactResults =
-                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+                    this.testConfiguration.getWARDependenciesRootArtifactId());
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();

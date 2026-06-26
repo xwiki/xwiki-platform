@@ -83,6 +83,8 @@ public class TestConfiguration
 
     private boolean office;
 
+    private boolean standardFlavor;
+
     private List<ServletEngine> forbiddenServletEngines;
 
     private Properties databaseCommands;
@@ -103,6 +105,8 @@ public class TestConfiguration
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
      */
+    // This is a flat sequence of one merge call per configuration option; splitting it would only hurt readability.
+    @SuppressWarnings("ExecutableStatementCount")
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
         mergeBrowser(testConfiguration.getBrowser());
@@ -125,6 +129,7 @@ public class TestConfiguration
         mergeSSHPorts(testConfiguration.getSSHPorts());
         mergeProfiles(testConfiguration.getProfiles());
         mergeOffice(testConfiguration.isOffice());
+        mergeStandardFlavor(testConfiguration.isStandardFlavor());
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
@@ -276,6 +281,13 @@ public class TestConfiguration
     {
         if (!isOffice() && office) {
             this.office = true;
+        }
+    }
+
+    private void mergeStandardFlavor(boolean standardFlavor)
+    {
+        if (!isStandardFlavor() && standardFlavor) {
+            this.standardFlavor = true;
         }
     }
 
@@ -744,13 +756,17 @@ public class TestConfiguration
      */
     public String getName()
     {
-        return String.format("%s-%s-%s-%s-%s-%s",
+        // Note: the standardFlavor mode is part of the name so that the minimal-WAR and standard-flavor variants get
+        // distinct output directories (and thus distinct build.marker files). Otherwise switching modes for the same
+        // db/servlet/browser combination would reuse a stale WAR.
+        return String.format("%s-%s-%s-%s-%s-%s%s",
             getDatabase().name().toLowerCase(),
             StringUtils.isEmpty(getDatabaseTag()) ? DEFAULT : getDatabaseTag(),
             StringUtils.isEmpty(getJDBCDriverVersion()) ? DEFAULT : getDatabaseTag(),
             getServletEngine().name().toLowerCase(),
             StringUtils.isEmpty(getServletEngineTag()) ? DEFAULT : getServletEngineTag(),
-            getBrowser().name().toLowerCase());
+            getBrowser().name().toLowerCase(),
+            isStandardFlavor() ? "-standardflavor" : "");
     }
 
     /**
@@ -795,6 +811,46 @@ public class TestConfiguration
     public void setOffice(boolean office)
     {
         this.office = office;
+    }
+
+    /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution: the WAR's {@code WEB-INF/lib} is built from the standard distribution WAR
+     *         dependencies (instead of the minimal set) and the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically. See
+     *         {@link org.xwiki.test.docker.junit5.UITest#standardFlavor()}.
+     * @since 18.6.0RC1
+     */
+    public boolean isStandardFlavor()
+    {
+        return this.standardFlavor;
+    }
+
+    /**
+     * @param standardFlavor see {@link #isStandardFlavor()}
+     * @since 18.6.0RC1
+     */
+    public void setStandardFlavor(boolean standardFlavor)
+    {
+        this.standardFlavor = standardFlavor;
+    }
+
+    /**
+     * @return the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom} artifact whose
+     *         dependencies define the JARs to put in the WAR's {@code WEB-INF/lib}: the full standard distribution
+     *         dependencies when {@link #isStandardFlavor()} is true (the {@code legacy} variant when the
+     *         {@code legacy} profile is active), or the minimal set otherwise. Used by both the WAR builder and the
+     *         extension installer so that they agree on what is bundled versus provisioned.
+     * @since 18.6.0RC1
+     */
+    public String getWARDependenciesRootArtifactId()
+    {
+        if (!isStandardFlavor()) {
+            return "xwiki-platform-minimaldependencies";
+        }
+        return getProfiles().contains("legacy")
+            ? "xwiki-platform-distribution-war-legacydependencies"
+            : "xwiki-platform-distribution-war-dependencies";
     }
 
     /**

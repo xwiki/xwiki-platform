@@ -428,11 +428,13 @@ define('editInPlace', [
   'xwiki-meta',
   // We need this in order to easily work with the XWiki document JSON.
   'xwiki-document-api',
+  // We need this to display the edit confirmation modal when the lock needs to be forced.
+  'xwiki-edit-confirmation',
   // We need this for the confirmation modals.
   'bootstrap',
   // We need this in order to catch events triggered by actionButtons.js using Prototype.js
   'xwiki-events-bridge'
-], function($, xcontext, XWikiDocument) {
+], function($, xcontext, XWikiDocument, editConfirmation) {
   var preload = function() {
     paths.css.forEach(loadCSS);
     return initActionButtons();
@@ -550,82 +552,16 @@ define('editInPlace', [
       if (xwikiDocument.lockConfirmation) {
         var confirmation = xwikiDocument.lockConfirmation;
         delete xwikiDocument.lockConfirmation;
-        return maybeForceLock(confirmation).then(xwikiDocument.lock.bind(xwikiDocument, 'edit', true), function() {
-          // Cancel the edit action.
-          return Promise.reject(xwikiDocument);
-        });
+        return editConfirmation.showConfirmationModal(confirmation)
+          .then(xwikiDocument.lock.bind(xwikiDocument, 'edit', true), function() {
+            // Cancel the edit action.
+            return Promise.reject(xwikiDocument);
+          });
       } else {
         new XWiki.widgets.Notification(l10n['edit.inplace.page.lockFailed'], 'error');
         return Promise.reject(xwikiDocument);
       }
     });
-  };
-
-  var maybeForceLock = function(confirmation) {
-    var deferred, promise = new Promise((resolve, reject) =&gt; {
-      deferred = {resolve, reject};
-    });
-    // We need the catch() to prevent the "Uncaught (in promise)" error log in the console.
-    promise.catch(() =&gt; {}).finally(() =&gt; {
-      // This flag is used by the Force Lock modal to know whether the promise is settled when the modal is closing.
-      deferred.settled = true;
-    });
-    // Reuse the confirmation modal once it is created.
-    var modal = $('.force-edit-lock-modal');
-    if (!modal.length) {
-      modal = createForceLockModal();
-    }
-    // Update the deferred that needs to be resolved or rejected.
-    modal.data('deferred', deferred);
-    // Update the confirmation modal.
-    modal.find('.modal-title').text(confirmation.title);
-    modal.find('.modal-body').html(confirmation.message);
-    modal.find('.modal-footer .btn-default').text(confirmation.reject);
-    if (confirmation.confirm) {
-      modal.find('.modal-footer .btn-warning').show().text(confirmation.confirm);
-    } else {
-      modal.find('.modal-footer .btn-warning').hide();
-    }
-    // Show the confirmation modal.
-    modal.modal('show');
-    return promise;
-  };
-
-  var createForceLockModal = function() {
-    var modal = $([
-      '&lt;div class="modal fade force-edit-lock-modal" tabindex="-1" role="dialog"&gt;',
-        '&lt;div class="modal-dialog" role="document"&gt;',
-          '&lt;div class="modal-content"&gt;',
-            '&lt;div class="modal-header"&gt;',
-              '&lt;button type="button" class="close" data-dismiss="modal"&gt;',
-                '&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;',
-              '&lt;/button&gt;',
-              '&lt;h4 class="modal-title"&gt;&lt;/h4&gt;',
-            '&lt;/div&gt;',
-            '&lt;div class="modal-body"&gt;&lt;/div&gt;',
-            '&lt;div class="modal-footer"&gt;',
-              '&lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;&lt;/button&gt;',
-              '&lt;button type="button" class="btn btn-warning"&gt;&lt;/button&gt;',
-            '&lt;/div&gt;',
-          '&lt;/div&gt;',
-        '&lt;/div&gt;',
-      '&lt;/div&gt;'
-    ].join(''));
-    modal.find('.close').attr('aria-label', l10n['edit.inplace.close']);
-    modal.find('.modal-footer .btn-warning').on('click', function() {
-      // The user has confirmed they want to force the lock.
-      modal.data('deferred').resolve();
-      modal.modal('hide');
-    });
-    modal.on('hide.bs.modal', function() {
-      // If the lock promise is not yet settled when the modal is closing then it means the modal was canceled,
-      // i.e. the user doesn't want to force the lock.
-      var deferred = modal.data('deferred');
-      if (!deferred.settled) {
-        deferred.reject();
-      }
-    });
-    return modal.appendTo('body').modal();
   };
 
   var load = function(xwikiDocument) {
@@ -1687,7 +1623,6 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
     #set ($l10nKeys = [
       'edit.inplace.page.renderFailed',
       'edit.inplace.page.lockFailed',
-      'edit.inplace.close',
       'edit.inplace.page.loadFailed',
       'edit.inplace.actionButtons.loadFailed',
       'core.editors.content.titleField.label',

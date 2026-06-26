@@ -53,7 +53,7 @@ function getPropertyReference(propertyName, className) {
   return XWiki.Model.serialize(entityReference);
 }
 
-async function load(mode, documentReference, property, className) {
+async function load(mode, documentReference, property, className, extraParams) {
   const targetUrl = computeTargetURL(documentReference, "get");
   const [xcontext, $] = await loadById("xwiki-meta", "jquery");
   return $.get(targetUrl, {
@@ -64,15 +64,8 @@ async function load(mode, documentReference, property, className) {
     type: property.startsWith("doc.") ? "document" : "object",
     language: xcontext.locale,
     objectPolicy: "updateOrCreate",
-  }).catch((error) => {
-    new XWiki.widgets.Notification(
-      this.$t(
-        "livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage",
-        [mode],
-      ),
-      "error",
-    );
-    throw error;
+    // Extra parameters such as force/force_token when the user confirms an edit confirmation.
+    ...extraParams,
   });
 }
 
@@ -81,10 +74,11 @@ async function load(mode, documentReference, property, className) {
  * @param documentReference - the reference of the document containing the XObject
  * @param className - the class name of the XObject
  * @param property - the XObject property to display
+ * @param extraParams - optional extra request parameters (e.g. force and force_token to force an edit confirmation)
  * @returns the XObject property field html content in edit mode
  */
-function edit(documentReference, className, property) {
-  return load("edit", documentReference, property, className);
+function edit(documentReference, className, property, extraParams) {
+  return load("edit", documentReference, property, className, extraParams);
 }
 
 /**

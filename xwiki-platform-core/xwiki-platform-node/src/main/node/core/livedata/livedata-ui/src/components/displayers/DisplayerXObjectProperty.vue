@@ -52,6 +52,7 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
+import { loadById } from "../../services/require.js";
 import { XWiki } from "../../services/xwiki.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
 
@@ -147,38 +148,86 @@ export default {
     /**
      * Update the content of the editor slot.
      */
-    updateEdit() {
-      this.update(edit)
-        // eslint-disable-next-line promise/always-return
-        .then((html) => {
-          this.isLoading = false;
+    async updateEdit() {
+      const editConfirmationPromise = loadById("xwiki-edit-confirmation");
 
-          this.editField = html;
+      // Loads the edit field. If the server requires an edit confirmation it returns it as JSON with a 423 status
+      // instead of the editor; in that case we display the confirmation modal and, if the user confirms, retry the
+      // request forcing the confirmation so that the editor is returned.
+      const loadEditField = async (extraParams) => {
+        try {
+          return await this.update((documentName, className, property) =>
+            edit(documentName, className, property, extraParams),
+          );
+        } catch (error) {
+          const editConfirmation = await editConfirmationPromise;
+          // Re-throws the error if it's not an edit confirmation (423) response.
+          const confirmation =
+            editConfirmation.parseConfirmationResponse(error);
+          await editConfirmation.showConfirmationModal(confirmation);
+          const xcontext = await loadById("xwiki-meta");
+          return loadEditField({ force: 1, force_token: xcontext.form_token });
+        }
+      };
 
-          // Wait for the rendering to be finished after editField is updated, to have access to  xObjectPropertyEdit
-          // and be able to send the trigger event.
-          // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
-          this.$nextTick().then(() => {
-            const $ = this.jQuery;
-            // eslint-disable-next-line promise/always-return
-            if (this.$refs.xObjectPropertyEdit) {
-              $(document).trigger("xwiki:dom:updated", {
-                elements: [this.$refs.xObjectPropertyEdit],
-              });
-              // Focuses on the first visible field of the loaded form.
-              $(this.$refs.xObjectPropertyEdit)
-                .find(":input")
-                .filter(":visible")
-                .first()
-                .focus();
-            }
-          });
-        })
-        .catch(() => {
-          // Stop the loader and switch to view mode.
-          this.isLoading = false;
-          this.isView = true;
+      try {
+        await this.applyEditField(await loadEditField());
+      } catch (error) {
+        this.handleEditFieldFailure(error, await editConfirmationPromise);
+      }
+    },
+
+    /**
+     * Display the loaded edit field in the editor slot and enhance it (DOM updated event, focus).
+     *
+     * @param html - the edit field HTML returned by the server
+     */
+    async applyEditField(html) {
+      this.isLoading = false;
+      this.editField = html;
+
+      // Wait for the rendering to be finished after editField is updated, to have access to xObjectPropertyEdit
+      // and be able to send the trigger event.
+      await this.$nextTick();
+      const $ = this.jQuery;
+      if (this.$refs.xObjectPropertyEdit) {
+        $(document).trigger("xwiki:dom:updated", {
+          elements: [this.$refs.xObjectPropertyEdit],
         });
+        // Focuses on the first visible field of the loaded form.
+        $(this.$refs.xObjectPropertyEdit)
+          .find(":input")
+          .filter(":visible")
+          .first()
+          .focus();
+      }
+    },
+
+    /**
+     * Handle a failure to load the edit field by switching back to view mode and notifying the user, unless the user
+     * simply dismissed the edit confirmation.
+     *
+     * @param error - the error that occurred while loading the edit field
+     * @param editConfirmation - the edit confirmation module used to detect a dismissal
+     */
+    handleEditFieldFailure(error, editConfirmation) {
+      // Notify the edit bus that the edition is canceled. Switching to edit mode (BaseDisplayer.setEdit) started the
+      // edition on the bus, so it must be canceled here. Otherwise the Live Data keeps considering this property as
+      // being edited, which disables the edit popover of every cell until the page is reloaded.
+      this.logic.getEditBus().cancel(this.entry, this.propertyId);
+      // Stop the loader and switch to view mode.
+      this.isLoading = false;
+      this.isView = true;
+      // Notify the user of genuine failures, but not when they simply dismissed the edit confirmation.
+      if (!editConfirmation.isConfirmationDismissed(error)) {
+        new XWiki.widgets.Notification(
+          this.$t(
+            "livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+            ["edit"],
+          ),
+          "error",
+        );
+      }
     },
   },
 

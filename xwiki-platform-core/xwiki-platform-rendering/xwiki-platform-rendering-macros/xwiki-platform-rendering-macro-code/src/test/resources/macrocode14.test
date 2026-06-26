@@ -23,7 +23,7 @@ onWord [2]
 onNewLine
 endGroup [[class]=[linenos]]
 beginGroup
-beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 onSpecialSymbol [#]
 onSpace
 onWord [Display]
@@ -32,7 +32,7 @@ onWord [daemon]
 onSpace
 onWord [status]
 onNewLine
-endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 onWord [systemctl]
 onSpace
 onWord [status]

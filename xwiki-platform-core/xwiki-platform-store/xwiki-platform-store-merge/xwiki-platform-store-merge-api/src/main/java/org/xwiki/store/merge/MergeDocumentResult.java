@@ -117,7 +117,14 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
         /**
          * Merge of the attachments.
          */
-        ATTACHMENTS
+        ATTACHMENTS,
+
+        /**
+         * Merge of the enforce required rights property.
+         *
+         * @since 16.10.0RC1
+         */
+        ENFORCE_REQUIRED_RIGHTS
     }
 
     /**

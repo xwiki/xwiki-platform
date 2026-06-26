@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-like-api</artifactId>
   <name>XWiki Platform - Like - API</name>
+  <description>API for liking pages</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Needs to be installed on root to be able to use Solr Store -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
     <!-- Name to display by the Extension Manager -->
@@ -92,8 +92,8 @@
     </dependency>
     <!-- Test dependencies. -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

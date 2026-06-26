@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -85,10 +86,31 @@ public class IncludeMacroRefactoring implements MacroRefactoring
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
+        throws MacroRefactoringException
+    {
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            updatedEntities);
+    }
+
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
+        throws MacroRefactoringException
+    {
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            updatedEntities);
+    }
+
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            Map.of(sourceReference, targetReference));
     }
 
     @Override
@@ -96,11 +118,14 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            Map.of(sourceReference.getDocumentReference(), targetReference.getDocumentReference()));
     }
 
+    // FIXME: double check we don't need to use updated documents parameters here.
     private <T extends EntityReference> Optional<MacroBlock> getMacroBlock(MacroBlock macroBlock,
-        DocumentReference currentDocumentReference, T sourceReference, T targetReference, boolean relative)
+        DocumentReference currentDocumentReference, T sourceReference, T targetReference, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
         throws MacroRefactoringException
     {
         Optional<MacroBlock> result;

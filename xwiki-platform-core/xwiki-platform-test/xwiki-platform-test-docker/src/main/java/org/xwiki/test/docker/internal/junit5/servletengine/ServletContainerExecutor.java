@@ -25,11 +25,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -43,14 +44,18 @@ import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.libreoffice.LibreOfficeResolver;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 
+import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 
 /**
@@ -75,6 +80,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String ROOT_USER = "root";
 
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
+
+    private static final String TOMCAT = "tomcat";
+
+    private static final String JETTY = "jetty";
+
+    private final int index;
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -86,17 +99,21 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private GenericContainer<?> servletContainer;
 
     /**
+     * @param index the index of the executor
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      * @param repositoryResolver the resolver to create Maven repositories and sessions
+     * @since 18.3.0RC1
      */
-    public ServletContainerExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+    public ServletContainerExecutor(int index, TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
+        this.index = index;
         this.mavenResolver = mavenResolver;
         this.testConfiguration = testConfiguration;
-        this.jettyStandaloneExecutor = new JettyStandaloneExecutor(testConfiguration, artifactResolver, mavenResolver);
+        this.jettyStandaloneExecutor =
+            new JettyStandaloneExecutor(this.index, testConfiguration, artifactResolver, mavenResolver);
         this.repositoryResolver = repositoryResolver;
     }
 
@@ -120,12 +137,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     /**
      * @param sourceWARDirectory the location where the built WAR is located
+     * @return the executor used to interact with the started XWiki instance
      * @throws Exception if an error occurred during the build or start
+     * @since 18.3.0RC1
      */
-    public void start(File sourceWARDirectory) throws Exception
+    public XWikiExecutor start(File sourceWARDirectory) throws Exception
     {
-        String xwikiIPAddress = "localhost";
-        int xwikiPort = 8080;
+        XWikiExecutor executor = null;
+
+        int httpPort = 8080 + this.index;
 
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
@@ -144,7 +164,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 // http://www.eclipse.org/jetty/documentation/9.4.x/embedding-jetty.html) but we decided against that
                 // as it would mean maintaining 2 Jetty configurations (one for the Jetty standalone packaging and
                 // one for Jetty in embedded mode).
-                this.jettyStandaloneExecutor.start();
+                executor = this.jettyStandaloneExecutor.start();
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
@@ -152,16 +172,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         if (this.servletContainer != null) {
+            String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
+                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb" + this.index;
+            int internalPort = 8080;
 
-            startContainer();
+            startContainer(internalHost, internalPort);
 
-            xwikiIPAddress = this.servletContainer.getHost();
-            xwikiPort =
-                this.servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
+            String xwikiIPAddress = this.servletContainer.getHost();
+            httpPort = this.servletContainer.getMappedPort(httpPort);
+
+            executor = new XWikiExecutor(this.index, internalHost, internalPort, internalHost, internalPort,
+                xwikiIPAddress, httpPort);
         }
 
-        this.testConfiguration.getServletEngine().setIP(xwikiIPAddress);
-        this.testConfiguration.getServletEngine().setPort(xwikiPort);
+        return executor;
     }
 
     private void configureWildFly(File sourceWARDirectory) throws Exception
@@ -179,15 +203,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         List<String> javaOpts = new ArrayList<>();
 
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
-        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
-        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
-        // run on Java 17+.
-        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
-        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
-        // ATM).
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            addJava17AddOpens(javaOpts);
-        }
+        addJava17AddOpens(javaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -201,15 +217,35 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
-        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
-        // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
-        // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
+        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
+        // (ee10 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        int jettyVersion = extractJettyMajorVersionFromDockerTag(this.testConfiguration.getServletEngineTag());
+        if (jettyVersion >= 12) {
+            this.servletContainer.setCommand("--module=ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
+        } else {
+            throw new Exception(String.format("Unsupported version of Jetty: [%n]", jettyVersion));
+        }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
         // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
         // export application).
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
+    }
+
+    private int extractJettyMajorVersionFromDockerTag(String tag)
+    {
+        int result = 12;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 12
+                }
+            }
+        }
+        return result;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
@@ -233,11 +269,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> catalinaOpts = new ArrayList<>();
         catalinaOpts.add("-Xmx1024m");
-        catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
-        catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
-        catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
 
-        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.
         // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
@@ -262,17 +295,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
         // "localhost" as the JVM host to connect to.
         if (this.testConfiguration.isDebug()) {
-            options.add("-Xdebug");
-            options.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
-            options.add("-Xnoagent");
-            options.add("-Djava.compiler=NONE");
+            options.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005");
         }
     }
 
-    private void startContainer() throws Exception
+    private void startContainer(String internalHost, int internalPort) throws Exception
     {
         List<String> networkAliases = new ArrayList<>();
-        networkAliases.add(this.testConfiguration.getServletEngine().getInternalIP());
+        networkAliases.add(internalHost);
         networkAliases.addAll(this.testConfiguration.getServletEngineNetworkAliases());
 
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
@@ -285,7 +315,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         List<Integer> exposedPorts = new ArrayList<>();
-        exposedPorts.add(this.testConfiguration.getServletEngine().getInternalPort());
+        exposedPorts.add(internalPort);
         // In debug mode, we need to map the debug port so that the host can attach the remote debugger to the JVM
         // inside the container.
         if (this.testConfiguration.isDebug()) {
@@ -333,37 +363,79 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
-    private String getDockerImageTag(TestConfiguration testConfiguration)
+    private String getDockerImageTag()
     {
-        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
-        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
+        if (this.testConfiguration.getServletEngineTag() != null) {
+            return this.testConfiguration.getServletEngineTag();
+        } else {
+            String dockerImageName = this.testConfiguration.getServletEngine().name().toLowerCase();
+            try {
+                String javaMaxVersion = this.mavenResolver.getPropertyFromCurrentPOM("xwiki.java.version.support");
+                if (Objects.equals(dockerImageName, TOMCAT)) {
+                    return "jre%s".formatted(javaMaxVersion);
+                } else if (Objects.equals(dockerImageName, JETTY)) {
+                    // At the time of writing, jetty does not provide a "jreXY" tag.
+                    return "jdk%s".formatted(javaMaxVersion);
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Failed to resolve the docker image tag for image [{}]. Cause: [{}]", dockerImageName,
+                    getRootCauseMessage(e));
+            }
+        }
+        return LATEST;
+    }
+
+    private String getDockerImageHash() throws InterruptedException
+    {
+        // Not using try-with-resources since the global docker client should never be closed (triggers an
+        // IllegalStateException)
+        DockerClientFactory.instance().client()
+            .pullImageCmd(this.testConfiguration.getServletEngine().getDockerImageName())
+            .withTag(getDockerImageTag())
+            .start().awaitCompletion();
+        InspectImageResponse inspectImageResponse =
+            DockerClientFactory.instance().client().inspectImageCmd(getBaseImageName()).exec();
+        String imageId = inspectImageResponse.getId();
+        String prefix = "sha256:";
+        if (imageId.startsWith(prefix)) {
+            imageId = imageId.substring(prefix.length());
+        }
+        return imageId;
+    }
+
+    private String getBaseImageName()
+    {
+        return String.format("%s:%s",
+            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag());
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
     {
-        String baseImageName = String.format("%s:%s",
-            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
+        String baseImageName = getBaseImageName();
+        LOGGER.info("Get base image name: {}", baseImageName);
         GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
             // So we compute a name for the image we will build, and we check that the image does not exist yet.
-            String imageName = String.format("xwiki-%s-office:%s",
+            String imageName = String.format("xwiki-%s-%s-office:%s",
                 this.testConfiguration.getServletEngine().name().toLowerCase(),
-                getDockerImageTag(this.testConfiguration));
+                getDockerImageTag(),
+                getDockerImageHash());
 
+            // Resolve the version of LibreOffice to install in the image
+            String officeVersion = 
+                LibreOfficeResolver.resolve(this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version"));
             // We rebuild every time the LibreOffice version changes
-            String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
             String imageVersion = String.format("LO-%S", officeVersion);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
-                .withImageNameFilter(imageName)
+                .withReferenceFilter(imageName)
                 .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
                 .exec();
 
             if (imageSearchResults.isEmpty()) {
-                LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
+                LOGGER.info("(*) Build a dedicated image embedding LibreOffice [{}]...", officeVersion);
+
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
                 container = new XWikiLocalGenericContainer<>(new ImageFromDockerfile(imageName, false)
@@ -380,18 +452,22 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
-                            // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
-                            // JODConverter: https://bit.ly/2w8B82Q
+                            // Install the required tools to download the LibreOffice files
+                            // Also installed dependencies of LibreOffice which are apparently missing from the deb
+                            // packages declarations
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2-dev libxslt1-dev")
+                            // Download the LibreOffice deb packages
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            // Install the LibreOffice deb packages and create a symlink to have a consistent path to
+                            // the LibreOffice installation directory
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "apt-get install --no-install-recommends ./*.deb &&"
+                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);
@@ -400,12 +476,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")
                                 // Put back the user as jetty since it's a best practice to not execute the container as
                                 // root.
-                                .user("jetty");
+                                .user(JETTY);
                         }
 
                         builder.build();
                     }));
             } else {
+                LOGGER.info("(*) An image with LibreOffice [{}] is already available, no need to build one.",
+                    officeVersion);
+
                 container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {

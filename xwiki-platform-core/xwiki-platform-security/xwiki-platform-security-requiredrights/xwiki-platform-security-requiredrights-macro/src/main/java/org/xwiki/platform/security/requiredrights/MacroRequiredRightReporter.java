@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface for reporting required rights and analyzing macro contents recursively.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.10RC1
  */
-@Unstable
 public interface MacroRequiredRightReporter
 {
     /**

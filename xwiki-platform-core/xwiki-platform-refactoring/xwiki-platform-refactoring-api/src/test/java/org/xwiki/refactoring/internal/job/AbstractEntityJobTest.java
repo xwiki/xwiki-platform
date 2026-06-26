@@ -19,12 +19,13 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.when;
 
@@ -34,22 +35,23 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.4M2
  */
-public abstract class AbstractEntityJobTest extends AbstractJobTest
+abstract class AbstractEntityJobTest extends AbstractJobTest
 {
+    @MockComponent
     protected AuthorizationManager authorization;
 
+    @MockComponent
     protected ObservationManager observationManager;
 
+    @MockComponent
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
     @Override
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure()
     {
         super.configure();
-        this.authorization = getMocker().getInstance(AuthorizationManager.class);
-        this.observationManager = getMocker().getInstance(ObservationManager.class);
-
-        EntityReferenceProvider defaultEntityReferenceProvider = getMocker().getInstance(EntityReferenceProvider.class);
-        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 }

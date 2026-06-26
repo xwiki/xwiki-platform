@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.SearchAdmin" locale="">
+<xwikidoc version="1.6" reference="XWiki.SearchAdmin" locale="">
   <web>XWiki</web>
   <name>SearchAdmin</name>
   <language/>
@@ -39,30 +39,16 @@
   <content>{{include reference='XWiki.SearchCode' /}}
 
 {{velocity}}
-#set ($searchEnginePropertyClass = $searchConfigClass.engine)
-#set ($availableSearchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortById' : ''}))
-{{html wiki='true'}}
-&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform'&gt;
+{{html clean="false"}}
+&lt;form id="search_XWiki.SearchConfig" method="post" action="$escapetool.xml($searchConfigDoc.getURL('save'))" class="xform"&gt;
   &lt;div class="hidden"&gt;
-    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" /&gt;
+    &lt;input type="hidden" name="xredirect" value="$escapetool.xml($doc.getURL($xcontext.action, $request.queryString))" /&gt;
   &lt;/div&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;
-      &lt;label&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
-      &lt;span class='xHint'&gt;$services.localization.render('search.admin.configuration.seexwikicfg')&lt;/span&gt;
-    &lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;select name='XWiki.SearchConfigClass_0_engine'&gt;
-      #foreach ($availableSearchExtension in $availableSearchExtensions)
-        &lt;option value="$escapetool.xml($availableSearchExtension.id)" #if($availableSearchExtension.id == $searchEngine)
-        selected='selected'#end &gt;$escapetool.xml($availableSearchExtension.parameters.label)&lt;/option&gt;
-      #end
-      &lt;/select&gt;
-    &lt;/dd&gt;
-  &lt;/dl&gt;
-  &lt;div class='buttonwrapper'&gt;
-    &lt;input value="$services.localization.render('search.admin.configuration.button')" class='button' type='submit'&gt;
+  $services.display.content($searchConfigDoc)
+  &lt;div class="buttonwrapper"&gt;
+    &lt;input class="button" type="submit" name="action_saveandcontinue"
+      value="$escapetool.xml($services.localization.render('search.admin.configuration.button'))" /&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

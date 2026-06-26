@@ -49,7 +49,7 @@ public class WikiPropertyGroup implements Cloneable
     public WikiPropertyGroup(String id)
     {
         this.id = id;
-        this.properties = new HashMap<String, Object>();
+        this.properties = new HashMap<>();
     }
 
     /**

@@ -22,6 +22,8 @@ package org.xwiki.attachment;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgress;
 import org.xwiki.job.event.status.JobStatus;
@@ -40,6 +43,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
@@ -73,11 +77,17 @@ class MoveStatusPagesTest extends PageTest
     @Mock
     private JobScriptService jobScriptService;
 
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
+
     @BeforeEach
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         this.componentManager.registerComponent(ScriptService.class, "job", this.jobScriptService);
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0) + "Icon");
     }
 
     @Test
@@ -85,7 +95,7 @@ class MoveStatusPagesTest extends PageTest
     {
         this.request.put("moveId", "42");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_STATUS_TEMPLATE));
-        assertEquals("attachment.move.status.notFound", render.select(".errormessage").text());
+        assertEquals("exclamationIcon error attachment.move.status.notFound", render.select(".errormessage").text());
         verify(this.jobScriptService).getJobStatus(List.of("refactoring", "moveAttachment", "42"));
     }
 

@@ -19,6 +19,9 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -29,10 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.Job;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
@@ -45,6 +45,8 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 
 /**
@@ -65,18 +67,11 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
      */
     public static final String NAME = "org.xwiki.refactoring.internal.listener.UpdateRightsOnDocumentRenameListener";
 
-    private static final String GROUPS_CLASSNAME = "XWiki.XWikiGroups";
-    private static final String USERS_CLASSNAME = "XWiki.XWikiUsers";
-
     @Inject
     private Logger logger;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
-
-    @Inject
-    @Named("default")
-    private EntityReferenceResolver<String> stringEntityReferenceResolver;
 
     @Inject
     private RequestFactory requestFactory;
@@ -87,39 +82,12 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    private EntityReference groupClassReference;
-    private EntityReference userClassReference;
-
     /**
      * Default constructor.
      */
     public UpdateRightsOnDocumentRenameListener()
     {
         super(NAME, new DocumentRenamedEvent());
-    }
-
-    /**
-     * @return the reference for XWikiGroups class
-     */
-    private EntityReference getGroupClassReference()
-    {
-        if (this.groupClassReference == null) {
-            this.groupClassReference =
-                this.stringEntityReferenceResolver.resolve(GROUPS_CLASSNAME, EntityType.DOCUMENT);
-        }
-        return this.groupClassReference;
-    }
-
-    /**
-     * @return the reference for XWikUsers class
-     */
-    private EntityReference getUserClassReference()
-    {
-        if (this.userClassReference == null) {
-            this.userClassReference =
-                this.stringEntityReferenceResolver.resolve(USERS_CLASSNAME, EntityType.DOCUMENT);
-        }
-        return userClassReference;
     }
 
     @Override
@@ -139,8 +107,10 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
             // first we check if the document being renamed contains a group or a user object to see if there's
             // actually a refactoring to do.
             XWikiDocument document = context.getWiki().getDocument(targetReference, context);
-            boolean definesGroup = document.getXObject(getGroupClassReference()) != null;
-            boolean definesUser = document.getXObject(getUserClassReference()) != null;
+            boolean definesGroup =
+                document.getXObject(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE) != null;
+            boolean definesUser =
+                document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null;
 
             // If the document contains a group object, then we need to rename the rights and groups
             // with the new group reference.
@@ -170,9 +140,26 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
         boolean isUser, XWikiContext context)
         throws WikiManagerException, XWikiException
     {
+        Collection<String> wikiIds;
+
+        String sourceWikiName = sourceReference.getWikiReference().getName();
+        String targetWikiName = targetReference.getWikiReference().getName();
+        if (context.isMainWiki(sourceWikiName) || context.isMainWiki(targetWikiName)) {
+            // If the user/group is from the main wiki then we need to update all wikis.
+            wikiIds = this.wikiDescriptorManager.getAllIds();
+        } else if (sourceWikiName.equals(targetWikiName)) {
+            // If the user/group is being renamed in the same non-main wiki then we only need to update that wiki.
+            wikiIds = List.of(sourceWikiName);
+        } else {
+            // If the user/group is being renamed from one non-main wiki to another non-main wiki then we only need to
+            // update those two wikis. This seems like a very specific use case probably not working as users
+            // from one subwiki cannot be in the group of another subwiki. But let's cover it anyway.
+            wikiIds = List.of(sourceWikiName, targetWikiName);
+        }
+
         String currentWiki = context.getWikiId();
         try {
-            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+            for (String wikiId : wikiIds) {
                 context.setWikiId(wikiId);
                 RightsManager.getInstance().replaceUserOrGroupFromAllRights(sourceReference, targetReference,
                     isUser, context);

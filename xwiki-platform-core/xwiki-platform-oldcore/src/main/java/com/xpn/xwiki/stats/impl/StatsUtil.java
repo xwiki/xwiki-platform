@@ -641,7 +641,7 @@ public final class StatsUtil
      */
     protected static Cookie addCookie(XWikiContext context)
     {
-        Cookie cookie = new Cookie(COOKPROP_VISITID, RandomStringUtils.randomAlphanumeric(32).toUpperCase());
+        Cookie cookie = new Cookie(COOKPROP_VISITID, RandomStringUtils.secure().nextAlphanumeric(32).toUpperCase());
         cookie.setPath("/");
 
         int time = (int) (getCookieExpirationDate().getTime() - (new Date()).getTime()) / 1000;
@@ -748,7 +748,7 @@ public final class StatsUtil
         }
 
         if (!StringUtils.isBlank(users)) {
-            userList = new ArrayList<String>();
+            userList = new ArrayList<>();
 
             int begin = 0;
             boolean escaped = false;

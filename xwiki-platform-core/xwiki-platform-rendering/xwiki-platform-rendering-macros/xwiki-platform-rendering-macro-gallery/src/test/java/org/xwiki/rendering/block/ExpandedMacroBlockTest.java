@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.block;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.MetaData;
@@ -30,54 +30,59 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ExpandedMacroBlock}.
- * 
- * @since 3.1
+ *
  * @version $Id$
+ * @since 3.1
  */
-public class ExpandedMacroBlockTest
+class ExpandedMacroBlockTest
 {
-    private BlockRenderer contentRenderer = mock(BlockRenderer.class);
+    private final BlockRenderer contentRenderer = mock(BlockRenderer.class);
 
-    private ComponentManager componentManager = mock(ComponentManager.class);
+    private final ComponentManager componentManager = mock(ComponentManager.class);
 
     @Test
-    public void constructorCallsSuper()
+    void constructorCallsSuper()
     {
         String id = "gallery";
-        Map<String, String> parameters = Collections.singletonMap("width", "300px");
+        Map<String, String> parameters = Map.of("width", "300px");
         boolean inline = true;
-        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock(id, parameters, contentRenderer, inline);
+        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock(id, parameters, this.contentRenderer, inline);
         assertEquals(id, expandedMacroBlock.getId());
         assertEquals(parameters, expandedMacroBlock.getParameters());
         assertEquals(inline, expandedMacroBlock.isInline());
     }
 
     @Test
-    public void getContentWrapsChildNodesInXDOM()
+    void getContentWrapsChildNodesInXDOM()
     {
         ExpandedMacroBlock expandedMacroBlock =
-            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
+            new ExpandedMacroBlock("gallery", Map.of(), this.contentRenderer, false);
 
         expandedMacroBlock.getContent();
 
         ArgumentCaptor<Block> block = ArgumentCaptor.forClass(Block.class);
         verify(this.contentRenderer).render(block.capture(), any(WikiPrinter.class));
-        assertTrue(block.getValue() instanceof XDOM);
+        assertInstanceOf(XDOM.class, block.getValue());
         assertEquals(0, block.getValue().getChildren().size());
     }
 
     @Test
-    public void getContentUsesChildXDOM()
+    void getContentUsesChildXDOM()
     {
-        XDOM content = new XDOM(Collections.<Block>emptyList());
+        XDOM content = new XDOM(List.of());
         ExpandedMacroBlock expandedMacroBlock =
-            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
+            new ExpandedMacroBlock("gallery", Map.of(), this.contentRenderer, false);
         expandedMacroBlock.addChild(content);
 
         expandedMacroBlock.getContent();
@@ -86,11 +91,11 @@ public class ExpandedMacroBlockTest
     }
 
     @Test
-    public void getContentUsesAnotherBlockRenderer() throws Exception
+    void getContentUsesAnotherBlockRenderer() throws Exception
     {
-        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock("gallery",
-            Collections.<String, String>emptyMap(), this.contentRenderer, false, this.componentManager);
-        XDOM parent = new XDOM(Collections.singletonList(expandedMacroBlock));
+        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock("gallery", Map.of(), this.contentRenderer,
+            false, this.componentManager);
+        XDOM parent = new XDOM(List.of(expandedMacroBlock));
         parent.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.MARKDOWN_1_1);
 
         BlockRenderer markdownRenderer = mock(BlockRenderer.class);

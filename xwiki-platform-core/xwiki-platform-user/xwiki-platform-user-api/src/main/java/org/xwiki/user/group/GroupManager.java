@@ -20,9 +20,11 @@
 package org.xwiki.user.group;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Fast access to group membership.
@@ -36,8 +38,8 @@ public interface GroupManager
     /**
      * Search groups the passed user or group is member of.
      * <p>
-     * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be
-     * returned or the whole hierarchy.
+     * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be returned
+     * or the whole hierarchy.
      * 
      * @param member the group member (user or group)
      * @param wikiTarget the wikis where to search. The following types are supported:
@@ -64,4 +66,29 @@ public interface GroupManager
      * @throws GroupException when failing to get members
      */
     Collection<DocumentReference> getMembers(DocumentReference group, boolean recurse) throws GroupException;
+
+    /**
+     * @param wikiReference the wiki for which to get the groups
+     * @return the groups found in the passed wiki
+     * @throws GroupException when failing to get groups
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    default Set<DocumentReference> getGroups(WikiReference wikiReference) throws GroupException
+    {
+        return Set.of();
+    }
+
+    /**
+     * @param reference the reference of the document to check
+     * @return true of the passed document is a group, false otherwise
+     * @throws GroupException when failing to check if the document is a group
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    default boolean isGroup(DocumentReference reference) throws GroupException
+    {
+        // Not always true, but a reasonable default implementation from API point of view
+        return !getMembers(reference, false).isEmpty();
+    }
 }

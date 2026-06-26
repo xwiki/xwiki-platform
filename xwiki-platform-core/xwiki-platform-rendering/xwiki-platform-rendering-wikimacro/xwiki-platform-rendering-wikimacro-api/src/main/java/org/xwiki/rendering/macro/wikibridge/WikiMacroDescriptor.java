@@ -36,6 +36,7 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
  * @version $Id$
  * @since 2.0M2
  */
+@SuppressWarnings("checkstyle:FinalClass")
 public class WikiMacroDescriptor implements MacroDescriptor
 {
     /**
@@ -247,7 +248,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         // Note: use a linked hash map to preserve the parameter order.
         // TODO: Replace saving the descriptors as a list and use a map instead so that this method becomes performant
         // (as it should be).
-        Map<String, ParameterDescriptor> descriptors = new LinkedHashMap<String, ParameterDescriptor>();
+        Map<String, ParameterDescriptor> descriptors = new LinkedHashMap<>();
 
         for (WikiMacroParameterDescriptor descriptor : this.parameterDescriptors) {
             descriptors.put(descriptor.getId().toLowerCase(), descriptor);

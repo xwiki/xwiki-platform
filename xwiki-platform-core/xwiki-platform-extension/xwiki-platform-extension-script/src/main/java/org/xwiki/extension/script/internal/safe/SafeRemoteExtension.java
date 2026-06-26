@@ -33,7 +33,6 @@ import org.xwiki.script.safe.ScriptSafeProvider;
  * @since 8.3RC1
  */
 public class SafeRemoteExtension<T extends RemoteExtension> extends WrappingRemoteExtension<T>
-    implements RemoteExtension
 {
     /**
      * The provider of instances safe for public scripts.

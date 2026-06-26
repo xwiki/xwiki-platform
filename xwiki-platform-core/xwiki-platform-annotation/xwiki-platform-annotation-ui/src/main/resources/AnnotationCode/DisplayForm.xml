@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="AnnotationCode.DisplayForm" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.DisplayForm" locale="">
   <web>AnnotationCode</web>
   <name>DisplayForm</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>{{include reference="AnnotationCode.Macros" /}}
 
 {{velocity filter="none"}}
@@ -43,4 +44,41 @@
 #displayViewBoxFromReference("$!{request.id}", $annotationReference)
 {{/html}}
 {{/velocity}}</content>
+  <object>
+    <name>AnnotationCode.DisplayForm</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>ccf3eb81-d60d-41a0-9762-2d236f352463</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>script</level>
+    </property>
+  </object>
 </xwikidoc>

@@ -46,18 +46,18 @@ public abstract class AbstractMailConfigClassDocumentConfigurationSource
         new LocalDocumentReference(MAIL_SPACE, "MailConfig");
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
+    protected <T> T getPropertyInternal(String key, T defaultValue)
     {
         T result;
         if (defaultValue != null) {
             try {
                 if (getBaseObject() == null) {
                     // No Mail.GeneralMailConfigClass xobject in the Mail.MailConfig document, use the default value!
-                    result = super.getProperty(key, defaultValue);
+                    result = super.getPropertyInternal(key, defaultValue);
                 } else {
                     // A Mail.GeneralMailConfigClass xobject exists in the Mail.MailConfig document, always use the
                     // value from it.
-                    result = super.getProperty(key, (Class<? extends T>) defaultValue.getClass());
+                    result = super.getPropertyInternal(key, (Class<? extends T>) defaultValue.getClass());
                 }
             } catch (XWikiException e) {
                 this.logger.warn("Failed to access configuration property [{}]. Returning null. Root cause: [{}]", key,
@@ -65,7 +65,7 @@ public abstract class AbstractMailConfigClassDocumentConfigurationSource
                 result = null;
             }
         } else {
-            result = super.getProperty(key);
+            result = super.getPropertyInternal(key);
         }
         return result;
     }

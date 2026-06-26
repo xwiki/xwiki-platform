@@ -33,6 +33,7 @@ import org.xwiki.query.SecureQuery;
 import org.xwiki.query.internal.DefaultQueryParameter;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 
 /**
  * Provides Query Manager-specific Scripting APIs.
@@ -41,10 +42,15 @@ import org.xwiki.script.service.ScriptService;
  * @since 2.4M2
  */
 @Component
-@Named("query")
+@Named(QueryManagerScriptService.ROLEHINT)
 @Singleton
 public class QueryManagerScriptService implements ScriptService
 {
+    /**
+     * The role hint of this component.
+     */
+    public static final String ROLEHINT = "query";
+
     /**
      * Secure query manager that performs checks on rights depending on the query being executed.
      */
@@ -57,6 +63,20 @@ public class QueryManagerScriptService implements ScriptService
      */
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
+
+    /**
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     */
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(QueryManagerScriptService.ROLEHINT + '.' + serviceName);
+    }
 
     /**
      * Shortcut for writing a XWQL query.

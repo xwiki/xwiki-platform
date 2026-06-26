@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -145,8 +146,18 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         attachment.loadArchive(context);
                     }
 
+                    // If the archive has no history yet, seed it with the current attachment so that the initial
+                    // version (typically 1.1) is not lost when the attachment is later updated. Without this seed,
+                    // the second upload increments to 1.2 and creates a fresh archive at 1.2, making 1.1
+                    // unrecoverable. This mirrors the seeding done in AttachmentArchiveSaveRunnable for the
+                    // filesystem store.
+                    XWikiAttachmentArchive archive = attachment.getAttachment_archive();
+                    if (archive != null && archive.getArchiveAsString().isEmpty()) {
+                        archive.addCurrentAttachment(context);
+                    }
+
                     // The archive has been updated in XWikiHibernateStore.saveAttachment()
-                    store.saveArchive(attachment.getAttachment_archive(), context, false);
+                    store.saveArchive(archive, context, false);
 
                     if (parentUpdate) {
                         context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
@@ -237,9 +248,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         try {
             executeRead(inputxcontext, session -> {
                 try {
-                    XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-                    session.load(content, Long.valueOf(content.getId()));
-
+                    XWikiAttachmentContent content = new XWikiAttachmentContent();
+                    session.load(content, Long.valueOf(attachment.getId()));
                     // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
                     content.setContentDirty(false);
 
@@ -404,7 +414,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     private AttachmentVersioningStore getAttachmentVersioningStore(String storeType)
     {
-        if (storeType != null && !storeType.equals(HINT)) {
+        if (storeType != null && !HINT.equals(storeType)) {
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {

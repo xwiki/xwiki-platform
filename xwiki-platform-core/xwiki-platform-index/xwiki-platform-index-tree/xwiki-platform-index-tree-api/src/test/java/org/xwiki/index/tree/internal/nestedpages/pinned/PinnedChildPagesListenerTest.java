@@ -32,11 +32,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.refactoring.internal.job.DeleteJob;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
+import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -60,8 +66,17 @@ class PinnedChildPagesListenerTest
     @MockComponent
     private JobContext jobContext;
 
+    @MockComponent
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @MockComponent
+    private ObservationContext observationContext;
+
     @Mock
-    private DeleteJob deleteJob;
+    private Job currentJob;
+
+    @Mock
+    private MoveRequest moveRequest;
 
     @Mock
     private XWikiDocument document;
@@ -81,6 +96,12 @@ class PinnedChildPagesListenerTest
         when(this.document.getDocumentReference()).thenReturn(this.documentReference);
         when(this.pinnedChildPagesManager.getParent(this.documentReference))
             .thenReturn(this.documentReference.getLastSpaceReference());
+
+        when(this.jobContext.getCurrentJob()).thenReturn(this.currentJob);
+        when(this.currentJob.getRequest()).thenReturn(this.moveRequest);
+
+        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
     }
 
     @Test
@@ -94,12 +115,12 @@ class PinnedChildPagesListenerTest
         when(this.pinnedChildPagesManager.getPinnedChildPages(this.documentReference.getLastSpaceReference()))
             .thenReturn(List.of(foo, this.documentReference, bar));
 
-        // Not inside a delete job (e.g. could be a rename job).
+        // Inside a rename job.
+        when(this.observationContext.isIn(new DocumentRenamingEvent())).thenReturn(true);
         this.pinnedChildPagesListener.onEvent(new DocumentDeletedEvent(), this.document, null);
 
-        when(this.jobContext.getCurrentJob()).thenReturn(this.deleteJob);
-
         // Inside a delete job and there are pinned pages.
+        when(this.observationContext.isIn(new DocumentRenamingEvent())).thenReturn(false);
         this.pinnedChildPagesListener.onEvent(new DocumentDeletedEvent(), this.document, null);
 
         // Trigger the event again to verify that the pinned pages are not updated again.
@@ -127,7 +148,13 @@ class PinnedChildPagesListenerTest
         DocumentReference targetReference = new DocumentReference("wiki", "other", "foo");
         when(this.pinnedChildPagesManager.getParent(targetReference))
             .thenReturn(targetReference.getLastSpaceReference());
+        when(this.currentJob.getType()).thenReturn(RefactoringJobs.MOVE);
+        when(this.moveRequest.getEntityReferences()).thenReturn(List.of(foo));
 
+        this.pinnedChildPagesListener.onEvent(new DocumentRenamedEvent(foo, targetReference), null, null);
+
+        // Moving the page along with its parent should not update the pinned pages.
+        when(this.moveRequest.getEntityReferences()).thenReturn(List.of(foo.getLastSpaceReference()));
         this.pinnedChildPagesListener.onEvent(new DocumentRenamedEvent(foo, targetReference), null, null);
 
         // Renaming the page should update the pinned pages.
@@ -136,7 +163,15 @@ class PinnedChildPagesListenerTest
         targetReference = new DocumentReference("wiki", "space", "otherPage");
         when(this.pinnedChildPagesManager.getParent(targetReference))
             .thenReturn(targetReference.getLastSpaceReference());
+        when(this.currentJob.getType()).thenReturn(RefactoringJobs.RENAME);
+        when(this.moveRequest.getEntityReferences()).thenReturn(List.of(this.documentReference));
 
+        this.pinnedChildPagesListener.onEvent(new DocumentRenamedEvent(this.documentReference, targetReference), null,
+            null);
+
+        // Renaming the page along with its parent should not update the pinned pages.
+        when(this.moveRequest.getEntityReferences())
+            .thenReturn(List.of(this.documentReference.getLastSpaceReference()));
         this.pinnedChildPagesListener.onEvent(new DocumentRenamedEvent(this.documentReference, targetReference), null,
             null);
 

@@ -169,8 +169,8 @@ if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
   echo "No Java found. You need Java installed to use this script."
   exit 0
 fi
-if [ "$JAVA_VERSION" -lt 8 ]; then
-  echo This script requires Java 8 or greater.
+if [ "$JAVA_VERSION" -lt ${xwiki.java.version} ]; then
+  echo This script requires Java ${xwiki.java.version} or greater.
   exit 0
 fi
 

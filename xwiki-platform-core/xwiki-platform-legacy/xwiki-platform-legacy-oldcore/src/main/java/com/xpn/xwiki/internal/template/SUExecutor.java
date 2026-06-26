@@ -126,7 +126,7 @@ public class SUExecutor
         // Use a stack in case a wiki macro calls another wiki macro
         Stack<SUExecutorContext> backup = (Stack<SUExecutorContext>) econtext.getProperty(SUExecutor.class.getName());
         if (backup == null) {
-            backup = new Stack<SUExecutorContext>();
+            backup = new Stack<>();
             econtext.setProperty(SUExecutor.class.getName(), backup);
         }
         backup.push(sucontext);

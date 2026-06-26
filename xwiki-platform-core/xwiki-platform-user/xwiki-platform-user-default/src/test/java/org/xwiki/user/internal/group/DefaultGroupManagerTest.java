@@ -35,13 +35,15 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.internal.MapCache;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.WikiTarget;
-import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -54,11 +56,14 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isContextWiki;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -68,9 +73,9 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList(value = { GroupsCache.class, MembersCache.class })
+@ComponentList(value = { MemberGroupsCache.class, GroupMembersCache.class, WikiGroupCache.class })
 @ReferenceComponentList
-public class DefaultGroupManagerTest
+class DefaultGroupManagerTest
 {
     private static final DocumentReference GLOBAL_USER_1 = new DocumentReference("xwiki", "XWiki", "user1");
 
@@ -78,9 +83,13 @@ public class DefaultGroupManagerTest
 
     private static final DocumentReference GLOBAL_GROUP_2 = new DocumentReference("xwiki", "XWiki", "group2");
 
+    private static final List<String> GLOBAL_GROUPS = List.of("XWiki.group1", "XWiki.group2");
+
     private static final DocumentReference WIKI_GROUP_1 = new DocumentReference("wiki", "XWiki", "group1");
 
     private static final DocumentReference WIKI_GROUP_2 = new DocumentReference("wiki", "XWiki", "group2");
+
+    private static final List<String> WIKI_GROUPS = List.of("XWiki.group1", "XWiki.group2");
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -91,20 +100,27 @@ public class DefaultGroupManagerTest
     @InjectMockComponents
     private DefaultGroupManager manager;
 
-    private XWikiGroupService groupService;
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
-    private MapCache<GroupCacheEntry> cache = new MapCache<>();
+    private WikiGroupCache wikiGroupCache;
+
+    private GroupMembersCache groupMembersCache;
+
+    private XWikiGroupService groupService;
 
     private Set<String> wikis = new LinkedHashSet<>();
 
     @BeforeComponent
     public void beforeComponent() throws CacheException
     {
-        when(this.cacheManager.<GroupCacheEntry>createNewCache(any())).thenReturn(this.cache);
+        when(this.cacheManager.createNewCache(any())).then(invocation -> {
+            return new MapCache<>();
+        });
     }
 
     @BeforeEach
-    public void beforeEach() throws WikiManagerException, ComponentLookupException
+    void beforeEach() throws WikiManagerException, ComponentLookupException
     {
         this.wikis.add(this.oldcore.getXWikiContext().getWikiId());
 
@@ -118,6 +134,23 @@ public class DefaultGroupManagerTest
         when(wikiManager.getCurrentWikiId()).thenAnswer((invocation) -> {
             return oldcore.getXWikiContext().getWikiId();
         });
+
+        this.wikiGroupCache = this.componentManager.getInstance(WikiGroupCache.class);
+        this.groupMembersCache = this.componentManager.getInstance(GroupMembersCache.class);
+
+        mockGroups(GLOBAL_GROUP_1.getWikiReference(), GLOBAL_GROUPS);
+        mockGroups(WIKI_GROUP_1.getWikiReference(), WIKI_GROUPS);
+    }
+
+    private void mockGroups(WikiReference wiki, List<String> groups)
+    {
+        this.wikis.add(wiki.getName());
+        try {
+            when(this.groupService.getAllMatchedGroups(isNull(), eq(false), eq(0), eq(0), isNull(),
+                isContextWiki(wiki.getName()))).thenReturn((List) groups);
+        } catch (XWikiException e) {
+            // Cannot happen
+        }
     }
 
     private void mockGroups(String wiki, DocumentReference user, List<DocumentReference> groups)
@@ -187,7 +220,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenNoGroup() throws GroupException
+    void getGroupsWhenNoGroup() throws GroupException
     {
         assertGetGroupsEmpty(GLOBAL_USER_1, WikiTarget.ENTITY, false);
         assertGetGroupsEmpty(GLOBAL_USER_1, WikiTarget.ENTITY, true);
@@ -198,7 +231,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenOneDirect() throws GroupException
+    void getGroupsWhenOneDirect() throws GroupException
     {
         mockGroups("xwiki", GLOBAL_USER_1, Arrays.asList(GLOBAL_GROUP_1));
 
@@ -215,7 +248,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenOneDirectAndOneRecursive() throws GroupException
+    void getGroupsWhenOneDirectAndOneRecursive() throws GroupException
     {
         mockGroups("xwiki", GLOBAL_USER_1, Arrays.asList(GLOBAL_GROUP_1));
         mockGroups("xwiki", GLOBAL_GROUP_1, Arrays.asList(GLOBAL_GROUP_2));
@@ -237,7 +270,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenOneDirectOnSeveralWikis() throws GroupException
+    void getGroupsWhenOneDirectOnSeveralWikis() throws GroupException
     {
         mockGroups("xwiki", GLOBAL_USER_1, Arrays.asList(GLOBAL_GROUP_1));
         mockGroups("wiki", GLOBAL_USER_1, Arrays.asList(WIKI_GROUP_1));
@@ -259,7 +292,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenOneDirectOnRecursiveOnSeveralWikis() throws GroupException
+    void getGroupsWhenOneDirectOnRecursiveOnSeveralWikis() throws GroupException
     {
         mockGroups("xwiki", GLOBAL_USER_1, Arrays.asList(GLOBAL_GROUP_1));
         mockGroups("wiki", GLOBAL_GROUP_1, Arrays.asList(WIKI_GROUP_2));
@@ -284,7 +317,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getGroupsWhenCrossReference() throws GroupException
+    void getGroupsWhenCrossReference() throws GroupException
     {
         mockGroups("xwiki", GLOBAL_GROUP_1, Arrays.asList(GLOBAL_GROUP_2));
         mockGroups("xwiki", GLOBAL_GROUP_2, Arrays.asList(GLOBAL_GROUP_1));
@@ -296,14 +329,24 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getMembersWhenNoMembers() throws GroupException
+    void getMembersWhenNotGroup() throws GroupException
+    {
+        assertGetMembersEmpty(GLOBAL_USER_1, false);
+        assertGetMembersEmpty(GLOBAL_USER_1, true);
+
+        // Make sure the result is not cached in the member cache
+        assertNull(this.groupMembersCache.getCacheEntry(GLOBAL_USER_1, false));
+     }
+
+    @Test
+    void getMembersWhenNoMembers() throws GroupException
     {
         assertGetMembersEmpty(GLOBAL_GROUP_1, false);
         assertGetMembersEmpty(GLOBAL_GROUP_1, true);
     }
 
     @Test
-    public void getMembersWhenOneDirect() throws GroupException
+    void getMembersWhenOneDirect() throws GroupException
     {
         mockMembers(GLOBAL_GROUP_1, Arrays.asList(GLOBAL_USER_1));
 
@@ -312,7 +355,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getMembersWhenOneDirectAndOneRecursive() throws GroupException
+    void getMembersWhenOneDirectAndOneRecursive() throws GroupException
     {
         mockMembers(GLOBAL_GROUP_1, Arrays.asList(GLOBAL_USER_1));
         mockMembers(GLOBAL_GROUP_2, Arrays.asList(GLOBAL_GROUP_1));
@@ -325,7 +368,7 @@ public class DefaultGroupManagerTest
     }
 
     @Test
-    public void getMembersWhenCrossReference() throws GroupException
+    void getMembersWhenCrossReference() throws GroupException
     {
         mockMembers(GLOBAL_GROUP_1, Arrays.asList(GLOBAL_GROUP_2));
         mockMembers(GLOBAL_GROUP_2, Arrays.asList(GLOBAL_GROUP_1));
@@ -347,5 +390,23 @@ public class DefaultGroupManagerTest
 
         groups = this.manager.getGroups(null, null, true);
         assertTrue(groups.isEmpty());
+    }
+
+    @Test
+    void getWikiGroups() throws GroupException
+    {
+        WikiReference emptyWiki = new WikiReference("empty");
+        Set<DocumentReference> groups = this.manager.getGroups(emptyWiki);
+        assertEquals(0, groups.size());
+
+        assertSame(groups, this.manager.getGroups(emptyWiki));
+
+        this.wikiGroupCache.invalidate(emptyWiki.getName());
+
+        assertNotSame(groups, this.manager.getGroups(emptyWiki));
+
+        mockGroups(WIKI_GROUP_1.getWikiReference(), List.of("XWiki.group1", "XWiki.group2"));
+
+        assertEquals(Set.of(WIKI_GROUP_1, WIKI_GROUP_2), this.manager.getGroups(WIKI_GROUP_1.getWikiReference()));
     }
 }

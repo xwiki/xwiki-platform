@@ -37,7 +37,7 @@ public abstract class AbstractTree extends AbstractTreeNode implements Tree
     @Override
     public List<String> getPath(String nodeId)
     {
-        List<String> path = new ArrayList<String>();
+        List<String> path = new ArrayList<>();
         String rootId = (String) getProperties().get(PROPERTY_ROOT);
         String parentId = nodeId;
         while (!StringUtils.isEmpty(parentId) && !parentId.equals(rootId)) {

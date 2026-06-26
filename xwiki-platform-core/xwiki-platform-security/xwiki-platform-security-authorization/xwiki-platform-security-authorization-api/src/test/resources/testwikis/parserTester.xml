@@ -19,10 +19,12 @@
       <denyUser name="userA" />
       <denyUser name="userB" type="view" />
       <denyUser name="groupB" type="view" />
-      <document name="document1" alt="Document 1">
+      <document name="document1" alt="Document 1" enforceRequiredRights="true">
         <allowUser name="userA" />
         <allowUser name="userB" type="view" />
         <allowUser name="groupA" type="view" />
+        <requiredRight scope="wiki" type="admin"/>
+        <requiredRight type="script"/>
       </document>
       <document name="document2" alt="Document 1" />
     </space>

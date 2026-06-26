@@ -25,9 +25,10 @@
 ##
 ## Most of the time, it is the current document
 #set ($targetDocument = $doc)
-#if ($request.section == 'PageRights')
+#if ($request.section == 'PageRights' || $request.section == 'usersgroups.extensionrights.page')
   ## But when the current page is the "PageRights" section of the page administration, the target doc is actually the
   ## "WebHome" page of the current space.
+  ## Same logic applies for the page-only extension rights section.
   #set ($parentSpace = $doc.documentReference.lastSpaceReference)
   #set ($targetDocument = $xwiki.getDocument($parentSpace))
 #end
@@ -44,11 +45,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   'createwiki', 'creator'])
 #set ($sectionWikiRights = 'wikis.rights')
 #set ($sectionExtensionRights = 'usersgroups.extensionrights')
+#set ($sectionSpaceExtensionRights = 'usersgroups.extensionrights.space')
+#set ($sectionPageExtensionRights = 'usersgroups.extensionrights.page')
 #set ($isStandardRights = false)
 #if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
-#elseif ("$!request.section"==$sectionExtensionRights)
+#elseif ("$!request.section" == $sectionExtensionRights || "$!request.section" == $sectionPageExtensionRights || "$!request.section" == $sectionSpaceExtensionRights)
   #set ($allRights = $services.security.authorization.allRightsNames)
   #set ($rightsLevels = {})
   #set ($allowWins = [])
@@ -96,7 +99,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #set ($clsname = 'XWiki.XWikiRights')
   #end
 #end
-#if ("$!request.section"==$sectionExtensionRights)
+#if ("$!request.section"==$sectionExtensionRights || "$!request.section"==$sectionPageExtensionRights || "$!request.section" == $sectionSpaceExtensionRights)
   #set ($maxlevel = $index - 1)
 #end
 ## Get rights allowed for the current user
@@ -205,18 +208,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #end
               #end
             </tr>
-            <tr id="unregistered">
-              ## Rights for guests, statically displayed outside the livetable
-              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
-              #foreach ($i in [0..$maxlevel])
-                #if ($currentAllowed[$i])
-                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
-                #end
-              #end
-            </tr>
             <tr id="usersandgroupstable-filters">
               ## Users/groups filter
-              <td><label for="name">$services.localization.render('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
+              ## We split the column amount in between the two objects as evenly as possible.
+              ## This way we can make sure both element have enough space to display correctly.
+              #set ($colsp = ($maxlevel+2)/2)
+              <td colspan="$colsp">
+                <label for="name">$services.localization.render('rightsmanager.searchfilter')</label>
+                <input id="name" name="name" type="text"/>
+              </td>
+              <td colspan="$colsp">
                 #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
                   <div id="usersandgroupstable-filters-scope">
@@ -230,9 +231,17 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #else
                   <input type="hidden" name="wiki" value="local"/>
                 #end
-                #set ($colsp = $maxlevel + 1)
+                <input type="hidden" name="clsname" value="$escapetool.xml($clsname)" />
               </td>
-              <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+            </tr>
+            <tr id="unregistered">
+              ## Rights for guests, statically displayed outside the livetable
+              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
+              #foreach ($i in [0..$maxlevel])
+                #if ($currentAllowed[$i])
+                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #end
+              #end
             </tr>
           </thead>
           ## Livetable placeholder, will be filled in from Javascript

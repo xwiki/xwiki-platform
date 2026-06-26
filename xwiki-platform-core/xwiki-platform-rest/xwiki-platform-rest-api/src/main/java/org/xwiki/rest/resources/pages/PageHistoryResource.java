@@ -35,12 +35,14 @@ import org.xwiki.rest.model.jaxb.History;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history")
 public interface PageHistoryResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET History getPageHistory(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("order") @DefaultValue("desc") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;

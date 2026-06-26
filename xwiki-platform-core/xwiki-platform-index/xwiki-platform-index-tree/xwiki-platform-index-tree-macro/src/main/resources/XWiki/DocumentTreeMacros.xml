@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.6" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -68,10 +68,18 @@
     #end
   #end
   ## Handle relative references
-  #makeNodeReferencesAbsolute($docTreeConfig ['root', 'openTo'])
-  ## Sort the child documents by (raw) title when the node label is the document title.
-  #if ($docTreeConfig.showDocumentTitle)
-    #set ($docTreeConfig.orderBy = 'title')
+  #foreach ($key in ['root', 'openTo'])
+    #set ($docTreeConfig[$key] = $services.index.tree.normalizeEntityTreeNodeId($docTreeConfig[$key]))
+  #end
+  ## FIXME: The 'orderBy' property of the tree API is shared by all tree node types, which means we can't indicate a
+  ## different sort field per tree node type (e.g. sort wiki nodes by name and document nodes by last modification
+  ## date). At the same time, this property is currently taken into account only for sorting document tree nodes, so for
+  ## now we set its value to the specified document sort. In the future we may want to convert this into a map, where
+  ## the key is the node type.
+  #set ($docTreeConfig.orderBy = $docTreeConfig.sortDocumentsBy)
+  ## Sort the child documents by (raw) title when the node label is the document title and there's no sort specified.
+  #if ($docTreeConfig.showDocumentTitle &amp;&amp; "$!docTreeConfig.orderBy" == '')
+    #set ($docTreeConfig.orderBy = 'title:asc')
   #end
   ## Determine which hierarchy needs to be used.
   #if ($docTreeConfig.showSpaces)
@@ -88,33 +96,14 @@
   #set ($discard = $tree.properties.putAll($docTreeConfig))
 #end
 
-#set ($documentPseudoNodeTypes = ['translations', 'attachments', 'classProperties', 'objects', 'addDocument',
-  'addAttachment'])
-#macro (makeNodeReferencesAbsolute $map $keys)
-  #foreach ($key in $keys)
-    #set ($nodeId = $map.get($key))
-    #set ($parts = $nodeId.split(':', 2))
-    #if ($parts &amp;&amp; $parts.size() == 2)
-      #set ($nodeType = $parts[0].toLowerCase())
-      #set ($nodeReference = $parts[1])
-      #set ($entityType = $nodeType)
-      #if ($documentPseudoNodeTypes.contains($nodeType))
-        #set ($entityType = 'document')
-      #end
-      #set ($discard = "#evaluate(""${escapetool.h}set (${escapetool.d}entityReference =
-        ${escapetool.d}services.model.resolve$stringtool.capitalize($entityType)(${escapetool.d}nodeReference))"")")
-      #if ($entityReference)
-        #set ($nodeReference = $services.model.serialize($entityReference, 'default'))
-      #end
-      #set ($discard = $map.put($key, "$nodeType:$nodeReference"))
-    #end
-  #end
-#end
-
 #macro (handleDocumentTreeRequest)
   #if ($request.action)
     #if ($services.csrf.isTokenValid($request.form_token))
-      $response.sendError(400, 'The specified action is not supported.')
+      #if ($request.action == 'create' &amp;&amp; $request.type == 'addDocument')
+        #handleNewNodeCreationRequest()
+      #else
+        $response.sendError(400, 'The specified action is not supported.')
+      #end
     #elseif ($isAjaxRequest)
       $response.sendError(403, 'The CSRF token is missing.')
     #else
@@ -138,6 +127,22 @@
       $response.sendError(404)
     #end
   #end
+#end
+
+#macro (handleNewNodeCreationRequest)
+  #set ($cleanId = $stringtool.substring($request.id, $stringtool.length('document:')))
+  #set ($parentReference = $services.model.resolveDocument($cleanId))
+  #set ($requestedName = $request.name)
+  #set ($transformedName = $services.modelvalidation.transformName($requestedName))
+  #set ($spaceReference = $services.model.createSpaceReference($transformedName, $parentReference.lastSpaceReference))
+  #set ($documentReference = $services.model.createDocumentReference('WebHome', $spaceReference))
+  #set ($data = [])
+  #addDocumentNode($documentReference, $data)
+  ## We want to allow opening the node to add another hierarchy.
+  #set ($data[0].children = true)
+  ## We want to display the actual requested name as node name.
+  #set ($data[0].text = $requestedName)
+  #jsonResponse($data)
 #end
 
 #macro (postProcessDocumentTreeData $data)
@@ -164,6 +169,8 @@
   #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
+  #else
+    #validateQueryLimit($limit)
   #end
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($actualNodeId $children)
@@ -183,8 +190,39 @@
   #if ($parts &amp;&amp; $parts.size() == 2)
     #set ($nodeType = $parts[0])
     #set ($nodeReference = $parts[1])
-    #set ($discard = "#evaluate(""${escapetool.h}maybeAdd$stringtool.capitalize($nodeType)Node(
-      ${escapetool.d}nodeReference ${escapetool.d}siblings ${escapetool.d}placeholder)"")")
+    #if ($nodeType == 'farm')
+      #maybeAddFarmNode($nodeReference $siblings)
+    #elseif ($nodeType == 'wiki')
+      #maybeAddWikiNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'space')
+      #maybeAddSpaceNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'document')
+      #maybeAddDocumentNode($nodeReference $siblings $placeholder)
+    #elseif ($nodeType == 'addDocument')
+      #maybeAddAddDocumentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'translations')
+      #maybeAddTranslationsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'translation')
+      #maybeAddTranslationNode($nodeReference $siblings)
+    #elseif ($nodeType == 'attachments')
+      #maybeAddAttachmentsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'attachment')
+      #maybeAddAttachmentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'addAttachment')
+      #maybeAddAddAttachmentNode($nodeReference $siblings)
+    #elseif ($nodeType == 'classProperties')
+      #maybeAddClassPropertiesNode($nodeReference $siblings)
+    #elseif ($nodeType == 'classProperty')
+      #maybeAddClassPropertyNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objects')
+      #maybeAddObjectsNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objectsOfType')
+      #maybeAddObjectsOfTypeNode($nodeReference $siblings)
+    #elseif ($nodeType == 'object')
+      #maybeAddObjectNode($nodeReference $siblings)
+    #elseif ($nodeType == 'objectProperty')
+      #maybeAddObjectPropertyNode($nodeReference $siblings)
+    #end
   #end
 #end
 
@@ -217,6 +255,7 @@
 
 #macro (maybeAddFarmNode $nodeReference $siblings)
   #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': 'farm:*',
     'text': 'Farm',
@@ -225,6 +264,9 @@
     'data': {
       'type': 'farm',
       'validChildren': ['wiki', 'pagination']
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($farmHomeReference)
@@ -254,6 +296,7 @@
   #else
     #set ($label = $wiki.id)
   #end
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': "wiki:$wiki.id",
     'text': $label,
@@ -264,6 +307,9 @@
       'type': 'wiki',
       'validChildren': ['space', 'document', 'pagination'],
       'canDelete': $canDeleteWiki
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($wiki.mainPageReference)
@@ -290,6 +336,7 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
+  #set ($spaceNodeId = "space:$spaceId")
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -297,10 +344,21 @@
     #set ($hasChildren = true)
   #else
     ## We display only the nested spaces. This space might contain only documents.
-    #set ($hasChildren = $tree.getChildCount("space:$spaceId") &gt; 0)
+    #set ($hasChildren = $tree.getChildCount($spaceNodeId) &gt; 0)
+  #end
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($spaceNodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': "space:$spaceId",
+    'id': $spaceNodeId,
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
@@ -317,6 +375,9 @@
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
       'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceReference)
@@ -343,6 +404,7 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($documentId = $services.model.serialize($documentReference, 'default'))
+  #set ($docNodeId = "document:$documentId")
   #set ($label = $documentReference.name)
   #if (!$docTreeConfig.showSpaces &amp;&amp;
       $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -359,9 +421,11 @@
       #set ($label = $plainTitle)
     #end
   #end
-  #set ($hasChildren = $tree.getChildCount("document:$documentId") &gt; 0)
+  #set ($hasChildren = $tree.getChildCount($docNodeId) &gt; 0)
+  #set ($isOpened = false)
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "document:$documentId",
+    'id': $docNodeId,
     'text': $label,
     'icon': 'fa fa-file-o',
     'children': $hasChildren,
@@ -375,6 +439,9 @@
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
       'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+    },
+    'state': {
+       'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference)
@@ -390,14 +457,18 @@
 #end
 
 #macro (addAddDocumentNode $documentReference $siblings)
+  ## FIXME: This URL is wrong, it should use the $documentReference as the parent for creation of the node:
+  ## the reference is already an existing doc, so it shouldn't be the one used for creation.
   #set ($discard = $siblings.add({
     'id': "addDocument:$services.model.serialize($documentReference, 'default')",
-    'text': 'New page...',
+    'text': $services.localization.render('index.documentTree.addDocument'),
     'icon': 'fa fa-plus-circle',
     'children': false,
     'data': {
       'type': 'addDocument',
-      'validChildren': []
+      'validChildren': [],
+      'hasContextMenu': true,
+      'canRename': true
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference, 'create')
@@ -416,9 +487,27 @@
   #end
 #end
 
+#macro (computeIsOpened $docNodeId $result)
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($docNodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
+  #end
+  #setVariable("$result" $isOpened)
+#end
+
 #macro (addTranslationsNode $documentReference $siblings)
-  #set ($discard = $children.add({
-    'id': "translations:${documentReference}",
+  #set ($isOpened = false)
+  #set ($docNodeId = "translations:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
+  #set ($discard = $siblings.add({
+    'id': $docNodeId,
     'text': 'Translations',
     'icon': 'fa fa-language',
     'children': true,
@@ -426,6 +515,9 @@
       'type': 'translations',
       'validChildren': ['translation'],
       'canDelete': $services.security.authorization.hasAccess('delete', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -442,8 +534,11 @@
 
 #macro (addTranslationNode $translationReference $siblings)
   #set ($currentLocale = $services.localization.currentLocale)
+  #set ($isOpened = false)
+  #set ($docNodeId = "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale",
+    'id': $docNodeId,
     'text': $translationReference.locale.getDisplayName($currentLocale),
     'icon': 'fa fa-file-text-o',
     'children': false,
@@ -454,6 +549,9 @@
     },
     'a_attr': {
       'href': $xwiki.getURL($translationReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -470,8 +568,11 @@
 #end
 
 #macro (addAttachmentsNode $documentReference $siblings)
+  #set ($isOpened = false)
+  #set ($docNodeId = "attachments:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "attachments:${documentReference}",
+    'id': $docNodeId,
     'text': 'Attachments',
     'icon': 'fa fa-paperclip',
     'children': true,
@@ -483,6 +584,9 @@
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -502,8 +606,11 @@
   #set ($attachmentId = $services.model.serialize($attachmentReference, 'default'))
   #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $attachmentReference.parent))
   #getAttachmentIcon($attachment $icon)
+  #set ($isOpened = false)
+  #set ($docNodeId = "attachment:$attachmentId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "attachment:$attachmentId",
+    'id': $docNodeId,
     'text': $attachment.filename,
     'icon': $icon,
     'children': false,
@@ -522,6 +629,9 @@
     },
     'a_attr': {
       'href': $attachment.document.getAttachmentURL($attachment.filename)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -600,8 +710,11 @@
 #end
 
 #macro (addClassPropertiesNode $documentReference $siblings)
-  #set ($discard = $children.add({
-    'id': "classProperties:${documentReference}",
+  #set ($isOpened = false)
+  #set ($docNodeId = "classProperties:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
+  #set ($discard = $siblings.add({
+    'id': $docNodeId,
     'text': 'Class Properties',
     'icon': 'fa fa-gears',
     'children': true,
@@ -609,6 +722,9 @@
       'type': 'classProperties',
       'validChildren': ['classProperty'],
       'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -641,8 +757,11 @@
   #if (!$icon)
     #set ($icon = 'gear')
   #end
+  #set ($isOpened = false)
+  #set ($docNodeId = "classProperty:$classPropertyId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "classProperty:$classPropertyId",
+    'id': $docNodeId,
     'text': $property.name,
     'icon': "fa fa-$icon",
     'children': false,
@@ -650,6 +769,9 @@
       'id': $classPropertyId,
       'type': 'classProperty',
       'validChildren': []
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -666,8 +788,11 @@
 #end
 
 #macro (addObjectsNode $documentReference $siblings)
-  #set ($discard = $children.add({
-    'id': "objects:${documentReference}",
+  #set ($isOpened = false)
+  #set ($docNodeId = "objects:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
+  #set ($discard = $siblings.add({
+    'id': $docNodeId,
     'text': 'Objects',
     'icon': 'fa fa-cubes',
     'children': true,
@@ -675,6 +800,9 @@
       'type': 'objects',
       'validChildren': ['objectsOfType'],
       'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -685,8 +813,11 @@
     #set ($documentReference = $services.model.resolveDocument($parts.get(0)))
     #set ($classReference = $services.model.resolveDocument($parts.get(1)))
     #if ($services.security.authorization.hasAccess('view', $documentReference))
-      #set ($discard = $children.add({
-        'id': "objectsOfType:$documentReference/$classReference",
+      #set ($isOpened = false)
+      #set ($docNodeId = "objectsOfType:$documentReference/$classReference")
+      #computeIsOpened($docNodeId $isOpened)
+      #set ($discard = $siblings.add({
+        'id': $docNodeId,
         'text': $services.model.serialize($classReference, 'local'),
         'icon': 'fa fa-cubes',
         'children': true,
@@ -694,6 +825,9 @@
           'type': 'objectsOfType',
           'validChildren': ['object', 'pagination'],
           'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+        },
+        'state': {
+          'opened': $isOpened
         }
       }))
     #end
@@ -720,8 +854,11 @@
 
 #macro (addObjectNode $object $objectReference $siblings)
   #set ($objectId = $services.model.serialize($objectReference, 'default'))
-  #set ($discard = $children.add({
-    'id': "object:$objectId",
+  #set ($isOpened = false)
+  #set ($docNodeId = "object:$objectId")
+  #computeIsOpened($docNodeId $isOpened)
+  #set ($discard = $siblings.add({
+    'id': $docNodeId,
     'text': "[$object.number]",
     'icon': 'fa fa-cube',
     'children': true,
@@ -730,6 +867,9 @@
       'type': 'object',
       'validChildren': ['objectProperty'],
       'canDelete': $services.security.authorization.hasAccess('edit', $objectReference.parent)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -754,8 +894,11 @@
   #end
   #set ($objectPropertyReference = $services.model.createEntityReference($property.name, 'OBJECT_PROPERTY', $objRef))
   #set ($objectPropertyId = $services.model.serialize($objectPropertyReference, 'default'))
+  #set ($isOpened = false)
+  #set ($docNodeId = "objectProperty:$objectPropertyId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "objectProperty:$objectPropertyId",
+    'id': $docNodeId,
     'text': $property.name,
     'icon': "fa fa-$icon",
     'children': false,
@@ -763,6 +906,9 @@
       'id': $objectPropertyId,
       'type': 'objectProperty',
       'validChildren': []
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -1206,6 +1352,8 @@
 #end
 
 #macro (addCommonDocTreeSolrParams $params)
+  ## Enable prefix matching, besides standard language-dependent matching.
+  #set ($discard = $params.add('q=__INPUT__ __INPUT__*'))
   #if ($rootType == 'wiki')
     ## Limit the search to the specified wiki.
     #addWikiLocationSolrParams($rootReference $params)

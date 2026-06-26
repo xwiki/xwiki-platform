@@ -497,7 +497,7 @@ public interface DocumentAccessBridge
      * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
      *         not exist.
      * @throws Exception If the document cannot be accessed.
-     * @deprecated use {@link #getAttachmentContent(org.xwiki.model.reference.AttachmentReference)} instead
+     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
     @Deprecated
     byte[] getAttachmentContent(String documentReference, String attachmentName) throws Exception;
@@ -509,9 +509,7 @@ public interface DocumentAccessBridge
      * @return The content of the attachment as an input stream or null if the attachment doesn't exist
      * @throws Exception If the document cannot be accessed.
      * @since 2.2M1
-     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
-    @Deprecated(since = "14.7RC1")
     InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception;
 
     /**
@@ -549,7 +547,6 @@ public interface DocumentAccessBridge
      * @since 14.10.8
      * @since 15.3RC1
      */
-    @Unstable
     default void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
         throws Exception
     {
@@ -649,8 +646,12 @@ public interface DocumentAccessBridge
     default String getDocumentURL(EntityReference entityReference, String action, String queryString, String anchor,
         boolean isFullURL)
     {
-        return getDocumentURL(entityReference.extractReference(EntityType.DOCUMENT), action, queryString, anchor,
-            isFullURL);
+        EntityReference reference = entityReference.extractReference(EntityType.DOCUMENT);
+        DocumentReference documentReference = null;
+        if (reference != null) {
+            documentReference = new DocumentReference(reference);
+        }
+        return getDocumentURL(documentReference, action, queryString, anchor, isFullURL);
     }
 
     /**
@@ -765,15 +766,6 @@ public interface DocumentAccessBridge
     boolean isDocumentEditable(DocumentReference documentReference);
 
     /**
-     * @return true if the current document's author has programming rights.
-     * @deprecated since 6.1RC1, use
-     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
-     *             instead
-     */
-    @Deprecated
-    boolean hasProgrammingRights();
-
-    /**
      * Utility method to retrieve the current user.
      * 
      * @return the current user full reference.
@@ -883,5 +875,18 @@ public interface DocumentAccessBridge
     default DocumentReference getCurrentAuthorReference()
     {
         return null;
+    }
+
+    /**
+     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
+     * document) based on the current store limitation.
+     *
+     * @return the maximum authorized length for a document full name.
+     * @since 18.3.0RC1
+     */
+    @Unstable
+    default int getLocalReferenceMaxLength()
+    {
+        return 768;
     }
 }

@@ -37,6 +37,7 @@ import org.xwiki.administration.api.ConfigurableObjectEvaluator;
 import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
 import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
 import org.xwiki.localization.macro.internal.TranslationMacro;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -223,11 +224,12 @@ class ConfigurableClassPageTest extends PageTest
         DocumentReference userReference = new DocumentReference(WIKI_NAME, SPACE_NAME, "Admin");
         mySectionDoc.getAuthors().setEffectiveMetadataAuthor(new DocumentUserReference(userReference, true));
         this.xwiki.saveDocument(mySectionDoc, this.context);
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.SCRIPT,
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
             userReference, mySectionDoc.getDocumentReference())).thenReturn(hasScript);
 
         Document htmlPage = renderHTMLPage(CONFIGURABLE_CLASS);
-        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.SCRIPT, userReference, MY_SECTION);
+        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            userReference, MY_SECTION);
 
         String expectedHeading;
         String expectedLink;
@@ -255,8 +257,7 @@ class ConfigurableClassPageTest extends PageTest
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
         this.xwiki.saveDocument(mySectionDoc, this.context);
 
-        when(this.oldcore.getMockRightService()
-            .hasAccessLevel(eq("view"), any(), eq("xwiki:" + MY_SECTION_SERIALIZED), any())).thenReturn(false);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, MY_SECTION)).thenReturn(false);
 
         // Make sure the section document is returned by the query.
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());

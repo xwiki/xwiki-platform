@@ -19,8 +19,8 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -70,25 +70,25 @@ class EventStreamWikiCleanerJobTest
     private ExecutionContextManager executionContextManager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
-        when(executionProvider.get()).thenReturn(execution);
-        executionContextManager = mock(ExecutionContextManager.class);
-        execution.pushContext(new ExecutionContext());
+        when(this.executionProvider.get()).thenReturn(this.execution);
+        this.executionContextManager = mock(ExecutionContextManager.class);
+        this.execution.pushContext(new ExecutionContext());
     }
 
     @Test
     void run() throws Exception
     {
         Query query = mock(Query.class);
-        when(queryManager.createQuery("where event.wiki = :wiki", Query.HQL)).thenReturn(query);
+        when(this.queryManager.createQuery("where event.wiki = :wiki", Query.HQL)).thenReturn(query);
 
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);
         Event event3 = mock(Event.class);
         Event event4 = mock(Event.class);
 
-        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Arrays.asList(event3, event4),
+        when(this.eventStream.searchEvents(query)).thenReturn(List.of(event1, event2), List.of(event3, event4),
             Collections.emptyList());
 
         // Test
@@ -97,10 +97,10 @@ class EventStreamWikiCleanerJobTest
         this.job.runInternal();
 
         // Verify
-        verify(eventStream).deleteEvent(event1);
-        verify(eventStream).deleteEvent(event2);
-        verify(eventStream).deleteEvent(event3);
-        verify(eventStream).deleteEvent(event4);
+        verify(this.eventStream).deleteEvent(event1);
+        verify(this.eventStream).deleteEvent(event2);
+        verify(this.eventStream).deleteEvent(event3);
+        verify(this.eventStream).deleteEvent(event4);
         verify(query, times(3)).bindValue("wiki", "someWiki");
     }
 

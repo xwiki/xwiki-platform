@@ -23,15 +23,12 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Data for a source item.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public interface NewsSourceItem extends Comparable<NewsSourceItem>
 {
     /**

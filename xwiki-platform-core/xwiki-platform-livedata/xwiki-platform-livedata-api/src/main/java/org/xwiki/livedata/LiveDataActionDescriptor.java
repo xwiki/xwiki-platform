@@ -22,8 +22,6 @@ package org.xwiki.livedata;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -34,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 13.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LiveDataActionDescriptor extends BaseDescriptor
+public class LiveDataActionDescriptor extends BaseDescriptor implements InitializableLiveDataElement
 {
     /**
      * The action pretty name.
@@ -187,9 +185,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
         this.urlProperty = urlProperty;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.icon == null) {
@@ -201,7 +197,6 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * @return the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
-    @Unstable
     public LiveDataAsyncActionDescriptor getAsync()
     {
         return this.async;
@@ -211,7 +206,6 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * @param async the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
-    @Unstable
     public void setAsync(LiveDataAsyncActionDescriptor async)
     {
         this.async = async;

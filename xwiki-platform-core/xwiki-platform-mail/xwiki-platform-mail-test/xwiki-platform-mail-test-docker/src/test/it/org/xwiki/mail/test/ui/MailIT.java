@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
@@ -79,9 +79,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
-        // WEB-INF/lib.
-        "org.python:jython-slim:2.7.3",
         // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
         // by XWiki at startup, i.e. before extensions are provisioned for the tests
         "org.xwiki.platform:xwiki-platform-scheduler-api"
@@ -221,9 +218,8 @@ class MailIT
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
-        String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort());
+        // The base URL used in generated emails
+        String requestURLPrefix = setup.getCurrentExecutor().getBrowserBaseURL() + "bin/view";
 
         // Step 5: Send a template email (with an attachment) to a single email address
         sendTemplateMailToEmail(setup, requestURLPrefix);

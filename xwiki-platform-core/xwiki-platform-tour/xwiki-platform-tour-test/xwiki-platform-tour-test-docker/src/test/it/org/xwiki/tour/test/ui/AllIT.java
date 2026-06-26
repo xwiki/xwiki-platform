@@ -19,7 +19,6 @@
  */
 package org.xwiki.tour.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -32,7 +31,6 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("Tour UI")
     class NestedTourApplicationIT extends TourApplicationIT
     {
     }

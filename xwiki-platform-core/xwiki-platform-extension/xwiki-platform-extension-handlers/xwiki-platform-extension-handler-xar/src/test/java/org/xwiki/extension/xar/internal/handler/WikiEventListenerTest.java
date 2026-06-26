@@ -19,12 +19,10 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.bridge.event.WikiCopiedEvent;
-import org.xwiki.environment.Environment;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
@@ -34,7 +32,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtensionRepository;
 import org.xwiki.extension.test.EmptyExtension;
-import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -43,13 +41,21 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ComponentTest
 @AllComponents
-public class WikiEventListenerTest
+@ExtendWith(MockitoRepositoryUtilsExtension.class)
+class WikiEventListenerTest
 {
-    @Rule
-    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private DefaultLocalExtensionRepository localExtensionRepository;
 
@@ -64,26 +70,29 @@ public class WikiEventListenerTest
     private LocalExtension localExtensionDependency1;
 
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
-        this.wikiDescriptorManager =
-            this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
-        this.repositoryUtil.getComponentManager().unregisterComponent(Environment.class, "default");
+        this.wikiDescriptorManager = this.componentManager.registerMockComponent(WikiDescriptorManager.class);
     }
 
-    @Before
-    public void setUp() throws Exception
+    @AfterComponent
+    void addContextualAuthorizationManagerComponent() throws Exception
+    {
+        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(AuthorizationManager.class);
+    }
+
+    @BeforeEach
+    void setUp() throws Exception
     {
         // avoid dependency issue with refactoring listeners
-        this.repositoryUtil.getComponentManager().registerMockComponent(ModelBridge.class);
-        this.repositoryUtil.getComponentManager().registerMockComponent(ReferenceUpdater.class);
+        this.componentManager.registerMockComponent(ModelBridge.class);
+        this.componentManager.registerMockComponent(ReferenceUpdater.class);
 
         this.localExtensionRepository =
-            this.repositoryUtil.getComponentManager().getInstance(LocalExtensionRepository.class);
-        this.installedExtensionRepository =
-            this.repositoryUtil.getComponentManager().getInstance(InstalledExtensionRepository.class);
-
-        this.observation = this.repositoryUtil.getComponentManager().getInstance(ObservationManager.class);
+            (DefaultLocalExtensionRepository) this.componentManager.getInstance(LocalExtensionRepository.class);
+        this.installedExtensionRepository = this.componentManager.getInstance(InstalledExtensionRepository.class);
+        this.observation = this.componentManager.getInstance(ObservationManager.class);
 
         // Extensions
 
@@ -96,27 +105,20 @@ public class WikiEventListenerTest
         this.localExtension1 = this.localExtensionRepository.storeExtension(extension);
     }
 
-    @AfterComponent
-    public void addContextualAuthorizationManagerComponent() throws Exception
-    {
-        this.repositoryUtil.getComponentManager().registerMockComponent(ContextualAuthorizationManager.class);
-        this.repositoryUtil.getComponentManager().registerMockComponent(AuthorizationManager.class);
-    }
-
     @Test
-    public void testCopyOneExtension() throws InstallException
+    void copyOneExtension() throws InstallException
     {
         InstalledExtension extensionDependency1 =
             this.installedExtensionRepository.installExtension(this.localExtensionDependency1, "wiki:source", false);
         InstalledExtension extension1 =
             this.installedExtensionRepository.installExtension(this.localExtension1, "wiki:source", false);
 
-        Assert.assertFalse(extension1.isInstalled("wiki:target"));
-        Assert.assertFalse(extensionDependency1.isInstalled("wiki:target"));
+        assertFalse(extension1.isInstalled("wiki:target"));
+        assertFalse(extensionDependency1.isInstalled("wiki:target"));
 
         this.observation.notify(new WikiCopiedEvent("source", "target"), null, null);
 
-        Assert.assertTrue(extension1.isInstalled("wiki:target"));
-        Assert.assertTrue(extensionDependency1.isInstalled("wiki:target"));
+        assertTrue(extension1.isInstalled("wiki:target"));
+        assertTrue(extensionDependency1.isInstalled("wiki:target"));
     }
 }

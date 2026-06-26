@@ -181,6 +181,9 @@ public class XClassMigratorListener extends AbstractEventListener
         if (!document.isNew()) {
             boolean modified = false;
 
+            // Avoid modifying the cached document
+            document = document.clone();
+
             for (BaseObject xobject : document.getXObjects(classReference)) {
                 if (xobject != null) {
                     BaseProperty<?> property = (BaseProperty<?>) xobject.getField(propertyReference.getName());

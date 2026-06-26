@@ -27,6 +27,7 @@ import javax.servlet.ServletOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.environment.Environment;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -63,6 +64,11 @@ public class TempResourceActionTest
     @MockComponent
     private Environment environment;
 
+    // Use the module's "target" directory as the temporary directory so that no file leaks outside the
+    // build workspace.
+    @TempDir
+    private File temporaryDirectory;
+
     /**
      * The action being tested.
      */
@@ -72,6 +78,7 @@ public class TempResourceActionTest
     public void beforeEach() throws Exception
     {
         this.action = new TempResourceAction();
+        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
     }
 
     /**
@@ -82,7 +89,7 @@ public class TempResourceActionTest
      */
     private void createEmptyFile(String path) throws IOException
     {
-        File emptyFile = new File(this.oldcore.getTemporaryDirectory(), path);
+        File emptyFile = new File(this.temporaryDirectory, path);
         emptyFile.getParentFile().mkdirs();
         emptyFile.createNewFile();
         emptyFile.deleteOnExit();
@@ -96,7 +103,7 @@ public class TempResourceActionTest
      */
     private void createFile(String path, String content) throws IOException
     {
-        File file = new File(this.oldcore.getTemporaryDirectory(), path);
+        File file = new File(this.temporaryDirectory, path);
         file.getParentFile().mkdirs();
         file.deleteOnExit();
         FileUtils.write(file, content);
@@ -130,7 +137,7 @@ public class TempResourceActionTest
     @Test
     public void testGetTemporaryFileMissing() throws Exception
     {
-        assertFalse(new File(this.oldcore.getTemporaryDirectory(), "temp/module/xwiki/Space/Page/file.txt").exists());
+        assertFalse(new File(this.temporaryDirectory, "temp/module/xwiki/Space/Page/file.txt").exists());
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
     }
 

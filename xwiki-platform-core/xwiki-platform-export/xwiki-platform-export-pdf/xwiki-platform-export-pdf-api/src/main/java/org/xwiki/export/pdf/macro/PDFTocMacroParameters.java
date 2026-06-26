@@ -19,7 +19,7 @@
  */
 package org.xwiki.export.pdf.macro;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 import org.xwiki.export.pdf.internal.macro.PDFTocMacro;
 import org.xwiki.properties.annotation.PropertyDescription;

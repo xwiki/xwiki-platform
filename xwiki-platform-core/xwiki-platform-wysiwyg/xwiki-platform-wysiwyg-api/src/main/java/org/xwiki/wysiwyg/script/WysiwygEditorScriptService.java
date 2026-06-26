@@ -35,36 +35,50 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroIdFactory;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
+import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
+import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * The WYSIWYG editor API exposed to server-side scripts like Velocity.
- * 
+ *
  * @version $Id$
  */
 @Component
 @Named("wysiwyg")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class WysiwygEditorScriptService implements ScriptService
 {
     /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
      * from a wiki page (wiki syntax rendering).
-     * 
+     *
      * @see #parseAndRender(String, String)
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
@@ -101,11 +115,27 @@ public class WysiwygEditorScriptService implements ScriptService
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
+    @Inject
+    private MacroDescriptorUIFactory macroDescriptorUIFactory;
+
+    @Inject
+    private MacroManager macroManager;
+
+    @Inject
+    private MacroIdFactory macroIdFactory;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userDocumentReferenceSerializer;
+
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
      * <p>
      * This method should be called before attempting to load the WYSIWYG editor.
-     * 
+     *
      * @param syntaxId the syntax identifier, like {@code xwiki/2.0}
      * @return {@code true} if the specified syntax is currently supported by the editor, {@code false} otherwise
      */
@@ -141,7 +171,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * <p>
      * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG
      * editor. This method is called for instance when a macro is inserted or edited.
-     * 
+     *
      * @param html the HTML fragment to be rendered
      * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
@@ -180,7 +210,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param syntax the storage syntax identifier
      * @param sourceReference the reference of the html (where it's coming from)
      * @param restricted true if the content of this property should be executed in a restricted content, false
-     *            otherwise
+     *     otherwise
      * @return the XHTML result of rendering the given HTML fragment
      * @since 14.10
      * @since 14.4.7
@@ -235,7 +265,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * Velocity context is not isolated so you can put the data needed by the template in the Velocity context before
      * calling this method. The advantage of using this method to obtain the editor input is that the editor doesn't
      * have to make an additional HTTP request for the content template.
-     * 
+     *
      * @param templateReference specifies the document that serves as the template for the editor content
      * @return the result of rendering the specified content template
      */
@@ -261,7 +291,7 @@ public class WysiwygEditorScriptService implements ScriptService
     /**
      * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the
      * WYSIWYG editor.
-     * 
+     *
      * @param source the text to be converted
      * @param syntaxId the syntax identifier
      * @return the annotated XHTML result of the conversion
@@ -270,7 +300,8 @@ public class WysiwygEditorScriptService implements ScriptService
     @Deprecated
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), null);
+        XWikiContext xwikiContext = this.xcontextProvider.get();
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), xwikiContext.getDoc().getDocumentReference());
     }
 
     /**
@@ -296,7 +327,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param syntax the syntax of the source
      * @param sourceReference the reference of the source
      * @param restricted true if the content of this property should be executed in a restricted content, false
-     *            otherwise
+     *     otherwise
      * @return the annotated XHTML result of the conversion
      * @since 14.10
      * @since 14.4.7
@@ -316,20 +347,11 @@ public class WysiwygEditorScriptService implements ScriptService
             // templates using only Velocity for example).
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
-            // If the source reference is not set, do a best effort by using the security doc reference (i.e. the
-            // current document reference since most of the time the content comes from the current document.
-            // However, callers of this method are expected to provide a non-null source reference for more accurate
-            // results. We do this because the main caller of this method is the CKEditor extension and it needs to
-            // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
-            // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
-            // fallback.
-            EntityReference resolvedSourceReference = sourceReference;
-            if (resolvedSourceReference == null) {
-                resolvedSourceReference = securityDocument.getDocumentReference();
-            }
-
-            return this.htmlConverter.toHTML(source, syntax, resolvedSourceReference, restricted);
+            DocumentReference userAuthorReference = getAuthorExecutor(source, sourceReference);
+            return this.authorExecutor.call(
+                () -> this.htmlConverter.toHTML(source, syntax, sourceReference, restricted),
+                userAuthorReference,
+                new DocumentReference(sourceReference));
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -345,9 +367,30 @@ public class WysiwygEditorScriptService implements ScriptService
         }
     }
 
+    private DocumentReference getAuthorExecutor(String source, EntityReference sourceReference) throws XWikiException
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        DocumentReference result = context.getUserReference();
+        if (sourceReference instanceof DocumentReference documentReference) {
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            if (document.getContent().equals(source)) {
+                UserReference contentAuthor = document.getAuthors().getContentAuthor();
+                result = this.userDocumentReferenceSerializer.serialize(contentAuthor);
+            }
+        } else if (sourceReference instanceof ObjectPropertyReference objectPropertyReference) {
+            XWikiDocument document = context.getWiki().getDocument(objectPropertyReference, context);
+            BaseObject object = document.getXObject(objectPropertyReference);
+            if (object != null && source.equals(object.getStringValue(objectPropertyReference.getName()))) {
+                UserReference author = document.getAuthors().getEffectiveMetadataAuthor();
+                result = this.userDocumentReferenceSerializer.serialize(author);
+            }
+        }
+        return result;
+    }
+
     /**
      * Converts the given annotated HTML produced by the WYSIWYG editor to the specified target syntax.
-     * 
+     *
      * @param html the annotated HTML to be converted
      * @param targetSyntaxId the target syntax
      * @return the result of converting the given annotated HTML to the specified target syntax
@@ -411,7 +454,7 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * Sets the document that is going to be used to check for programming rights.
-     * 
+     *
      * @param document the document that is going to be used to check for programming rights
      * @return the previous security document
      */
@@ -422,11 +465,11 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * Builds the annotated XHTML needed to import the specified office attachment in the WYSIWYG editor.
-     * 
+     *
      * @param attachmentReference the office attachment to import
-     * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when importing
-     *            office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
-     *            instead of converting the content of the office file to wiki syntax
+     * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when
+     *     importing office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
+     *     instead of converting the content of the office file to wiki syntax
      * @return the annotated XHTML needed to import the specified attachment into the content of the WYSIWYG editor
      */
     public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
@@ -446,6 +489,45 @@ public class WysiwygEditorScriptService implements ScriptService
             return Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
             throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
+        }
+    }
+
+    /**
+     * Get a macro descriptor UI information to be used for configuring a macro.
+     *
+     * @param macroIdAsString the identifier of a macro
+     * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null} if
+     *     it couldn't be found or initialized.
+     * @since 17.5.0
+     */
+    @Unstable
+    public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)
+    {
+        try {
+            MacroId macroId = this.resolveMacroId(macroIdAsString);
+            if (macroId != null && this.macroManager.exists(macroId, true)) {
+                MacroDescriptor descriptor = this.macroManager.getMacro(macroId).getDescriptor();
+                return this.macroDescriptorUIFactory.buildMacroDescriptorUI(descriptor);
+            }
+        } catch (MacroLookupException e) {
+            this.logger.warn("Failed to lookup macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        return null;
+    }
+
+    /**
+     * @param macroIdAsString a string representing a macro id
+     * @return the resolved macro id or {@code null} if resolving the given string fails
+     */
+    private MacroId resolveMacroId(String macroIdAsString)
+    {
+        try {
+            return this.macroIdFactory.createMacroId(macroIdAsString);
+        } catch (ParseException e) {
+            this.logger.warn("Failed to resolve macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
     }
 }

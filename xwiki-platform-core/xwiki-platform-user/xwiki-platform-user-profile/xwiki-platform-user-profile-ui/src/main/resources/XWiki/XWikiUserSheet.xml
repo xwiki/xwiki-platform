@@ -49,16 +49,19 @@
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
-  #if(!$uix.parameters.containsKey('isActive') || $uix.parameters.get('isActive') != 'false')
-    #if (!$uix.parameters.containsKey('id'))
+  ## We only call this once
+  #set ($uixParameters = $collectiontool.map)
+  #set ($discard = $uixParameters.putAll($uix.parameters))
+  #if(!$uixParameters.containsKey('isActive') || $uixParameters.get('isActive') != 'false')
+    #if (!$uixParameters.containsKey('id'))
       ## when no id is explicitly provided, we use the id of the UIX.
-      #set ($discard = $uix.parameters.put('id', $uix.id))
+      #set ($discard = $uixParameters.put('id', $uix.id))
     #end
-    #if ($uix.parameters.containsKey('icon'))
-      #set ($discard = $uix.parameters.put('glyphicon', $uix.parameters.get('icon')))
+    #if ($uixParameters.containsKey('icon'))
+      #set ($discard = $uixParameters.put('glyphicon', $uixParameters.get('icon')))
     #end
-    #set ($discard = $uix.parameters.put('uix', $uix))
-    #set($discard = $categories.add($uix.parameters))
+    #set ($discard = $uixParameters.put('uix', $uix))
+    #set($discard = $categories.add($uixParameters))
   #end
 #end
 #########################
@@ -121,8 +124,8 @@
 (((
   #foreach($category in $userMenu)
     #foreach($subcategory in $category.get('children'))
-      #set($tabKey = $subcategory.get('id')) 
-      (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
+      #set($tabKey = $services.rendering.escape($subcategory.get('id'), 'xwiki/2.1'))
+      (% id="${tabKey}Pane" class="user-page-pane#if($subcategory.get('id') != $currentCategory) hidden#end" %)
       (((
         {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}
       )))
@@ -442,50 +445,58 @@ return XWiki;
       <code>#template("colorThemeInit.vm")
 #set($tabswidth = "130px")
 /* ----- User menu ----- */
-#user-menu-col{
+#user-menu-col {
   float: left;
   width: 13em;
 }
 
-#avatar p {
-  text-align: center;
+#avatar {
+
+  p {
+    text-align: center;
+  }
+
+  img {
+    border-top: @border-width solid @list-group-border;
+    border-left: @border-width solid @list-group-border;
+    border-right: @border-width solid @list-group-border;
+    border-bottom: 0;
+    border-radius: @border-radius-base @border-radius-base 0 0;
+    margin: 0 auto;
+  }
+
+  .attachment-picker {
+    border-radius: @border-radius-base;
+    padding: @border-width;
+  }
 }
 
-#avatar img {
-  border: 1px solid $theme.borderColor;
-  border-radius: 8px 8px 8px 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  margin: 0 auto;
-  padding: 0.3em;
-  width: 95%;
-}
-
-.profile-menu .category-tab:before{
+.profile-menu .category-tab:before {
   float: left;
   margin: 5px 0 0 5px;
 }
 
-.profile-menu .user-menu-profile:before{
+.profile-menu .user-menu-profile:before {
   content: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
 }
 
-.profile-menu .user-menu-preferences:before{
+.profile-menu .user-menu-preferences:before {
   content: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
-.profile-menu .user-menu-watchlist:before{
+.profile-menu .user-menu-watchlist:before {
   content: url("$xwiki.getSkinFile('icons/silk/star.png')");
 }
 
-.profile-menu .user-menu-network:before{
+.profile-menu .user-menu-network:before {
   content: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
-.profile-menu .user-menu-dashboard:before{
+.profile-menu .user-menu-dashboard:before {
   content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
-.profile-menu .user-menu-wikis:before{
+.profile-menu .user-menu-wikis:before {
   content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
@@ -504,12 +515,12 @@ return XWiki;
   background-position: 7px 50%,top center;
 }
 
-.user-menu-title a:hover{
+.user-menu-title a:hover {
   color: $theme.panelHeaderTextColor !important;
 }
 
 /* ----- Page content ---- */
-#user-page-content{
+#user-page-content {
   margin-left: 14em;
 }
 
@@ -636,37 +647,41 @@ span#avatarUpload {
 
 ## --------------------------------------
 ## Picker style
-.attachment-picker {
+
+#user-menu-col .attachment-picker {
   position: relative;
   margin: auto;
   width: 100%;
 }
 
-.attachment-picker p {
+#user-menu-col .attachment-picker p {
   padding: 0;
   margin: 0;
 }
 
-.attachment-picker .picture {
+#user-menu-col .attachment-picker .picture {
   z-index: -1;
 }
 
-.attachment-picker .buttonwrapper {
+#user-menu-col .attachment-picker .buttonwrapper {
   margin: 0;
 }
 
-.attachment-picker-start {
-  background: url("$xwiki.getSkinFile('icons/silk/picture_edit.png')") no-repeat center center $theme.pageContentBackgroundColor !important;
-  border: 0 none !important;
-  border-bottom-left-radius: 8px;
-  height: 18px;
-  position: absolute;
-  right: 0;
-  text-align: left;
-  text-indent: -9999px;
-  top: 1px;
-  width: 18px !important;
-  z-index: 1;
+#user-menu-col .attachment-picker {
+  .buttonwrapper {
+    .wikilink {
+      display: flex;
+      flex-flow: column;
+    }
+
+    a.button {
+      .btn;
+      .btn-default;
+      border-radius: 0 0 @border-radius-base @border-radius-base;
+      flex-grow: 1;
+      margin: 0;
+    }
+  }
 }
 
 ## --------------------------------------

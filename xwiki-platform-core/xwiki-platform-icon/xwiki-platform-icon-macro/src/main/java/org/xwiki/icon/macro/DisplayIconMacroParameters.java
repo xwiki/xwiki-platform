@@ -24,7 +24,6 @@ import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link DisplayIconMacro} Macro.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.6
  * @since 15.2RC1
  */
-@Unstable
 public class DisplayIconMacroParameters
 {
     private String name;

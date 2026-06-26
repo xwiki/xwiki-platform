@@ -19,9 +19,10 @@
  */
 package org.xwiki.edit.script;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.edit.DocumentEditConfiguration;

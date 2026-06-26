@@ -48,6 +48,7 @@ public class Upgrade1210CustomTest extends UpgradeTest
         LikeButton likeButton = new LikeButton();
         assertEquals(2, likeButton.getLikeNumber());
 
+        getUtil().loginAsAdmin();
         // We expect the user "user1" to have a notification associated
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki.user1", "xwiki", 1);
     }

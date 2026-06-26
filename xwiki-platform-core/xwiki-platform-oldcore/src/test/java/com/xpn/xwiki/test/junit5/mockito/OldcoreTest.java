@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import com.xpn.xwiki.api.XWiki;
 
@@ -42,6 +43,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
+@ExtendWith(XWikiTempDirExtension.class)
 @ExtendWith(MockitoOldCoreExtension.class)
 @Inherited
 public @interface OldcoreTest

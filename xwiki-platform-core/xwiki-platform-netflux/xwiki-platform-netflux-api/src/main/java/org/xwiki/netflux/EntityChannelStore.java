@@ -22,11 +22,9 @@ package org.xwiki.netflux;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * The component used to create and associate channels to XWiki entities.
@@ -55,7 +53,7 @@ public interface EntityChannelStore
         return getChannels(entityReference).stream().filter(Objects::nonNull)
             .filter(channel -> channel.getPath().size() >= pathPrefix.size()
                 && Objects.equals(channel.getPath().subList(0, pathPrefix.size()), pathPrefix))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -80,7 +78,6 @@ public interface EntityChannelStore
      * @since 16.4.1
      * @since 16.6.0RC1
      */
-    @Unstable
     default Optional<EntityChannel> getChannel(String key)
     {
         return Optional.empty();

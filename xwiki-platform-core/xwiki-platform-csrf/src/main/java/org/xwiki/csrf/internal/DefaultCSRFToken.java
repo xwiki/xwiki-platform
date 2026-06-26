@@ -28,7 +28,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
+    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<>();
 
     /** Token for guest user. */
     private String guestToken;
@@ -78,7 +79,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /** Random number generator. */
     private SecureRandom random;
 
-    /** Used to find out the current user name and the current document. */
+    /** Used to find out the current username and the current document. */
     @Inject
     private DocumentAccessBridge docBridge;
 
@@ -110,11 +111,11 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         } catch (NoSuchAlgorithmException e) {
             // use the default implementation then
             this.random = new SecureRandom();
-            this.logger.warn("CSRFToken: Using default implementation of SecureRandom");
+            this.logger.warn("Using default implementation of SecureRandom for CSRF token");
         }
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);
-        this.logger.debug("CSRFToken: Anti-CSRF secret token component has been initialized");
+        this.logger.debug("Anti-CSRF secret token component has been initialized");
     }
 
     /**
@@ -161,15 +162,18 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     @Override
+    // The token is generated and not user-controlled
+    @SuppressWarnings("javasecurity:S5145")
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {
             return true;
         }
         String storedToken = getToken();
-        if (token == null || token.equals("") || !storedToken.equals(token)) {
-            this.logger.warn("CSRFToken: Secret token verification failed, token: \"" + token
-                + "\", stored token: \"" + storedToken + "\"");
+        if (token == null || token.isEmpty() || !storedToken.equals(token)) {
+            this.logger.warn("Secret CSRF token verification failed (token: [{}], stored token: [{}])", token,
+                storedToken);
+
             return false;
         }
         return true;
@@ -238,9 +242,10 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private HttpServletRequest getRequest()
     {
         Request request = this.container.getRequest();
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest();
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest();
         }
+
         throw new RuntimeException("Not supported request type");
     }
 

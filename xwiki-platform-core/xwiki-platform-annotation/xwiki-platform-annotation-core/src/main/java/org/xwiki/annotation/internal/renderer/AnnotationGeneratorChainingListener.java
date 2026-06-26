@@ -74,18 +74,18 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * Map to store the ranges in the plainTextContent and their corresponding events. The ranges will be stored by
      * their end index (inclusive) and ordered from smallest to biggest.
      */
-    private SortedMap<Integer, Event> eventsMapping = new TreeMap<Integer, Event>();
+    private SortedMap<Integer, Event> eventsMapping = new TreeMap<>();
 
     /**
      * Map to store the events whose content has been altered upon append to the plain text representation, along with
      * the altered content objects to allow translation of offsets back to the original offsets.
      */
-    private Map<Event, AlteredContent> alteredEventsContent = new HashMap<Event, AlteredContent>();
+    private Map<Event, AlteredContent> alteredEventsContent = new HashMap<>();
 
     /**
      * The collection of annotations to generate annotation events for, by default the empty list.
      */
-    private Collection<Annotation> annotations = Collections.<Annotation>emptyList();
+    private Collection<Annotation> annotations = Collections.emptyList();
 
     /**
      * Cleaner for the annotation selection text, so that it can be mapped on the content.
@@ -96,8 +96,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * The list of bookmarks where annotation events take place. The map holds a correspondence between the event in the
      * stream of wiki events and the annotation events that take place inside it, at the specified offset.
      */
-    private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
-        new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
+    private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks = new HashMap<>();
 
     private TextExtractor textExtractor;
 
@@ -230,7 +229,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 ann.set(Annotation.PLAIN_TEXT_START_OFFSET_FIELD, contextIndex + alteredSelectionStartIndex);
                 // The end offset should be just after the last annotated character.
                 ann.set(Annotation.PLAIN_TEXT_END_OFFSET_FIELD, contextIndex + alteredSelectionEndIndex + 1);
-                if (startEvt != null & endEvt != null) {
+                if (startEvt != null && endEvt != null) {
                     // store the bookmarks
                     addBookmark((Event) startEvt[0], new AnnotationEvent(AnnotationEventType.START, ann),
                         (Integer) startEvt[1]);
@@ -307,17 +306,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      */
     protected void addBookmark(Event renderingEvent, AnnotationEvent annotationEvent, int offset)
     {
-        SortedMap<Integer, List<AnnotationEvent>> mappings = bookmarks.get(renderingEvent);
-        if (mappings == null) {
-            mappings = new TreeMap<Integer, List<AnnotationEvent>>();
-            bookmarks.put(renderingEvent, mappings);
-        }
-        List<AnnotationEvent> events = mappings.get(offset);
-        if (events == null) {
-            events = new LinkedList<AnnotationEvent>();
-            mappings.put(offset, events);
-        }
-
+        SortedMap<Integer, List<AnnotationEvent>> mappings =
+            this.bookmarks.computeIfAbsent(renderingEvent, k -> new TreeMap<>());
+        List<AnnotationEvent> events = mappings.computeIfAbsent(offset, k -> new LinkedList<>());
         addAnnotationEvent(annotationEvent, events);
     }
 

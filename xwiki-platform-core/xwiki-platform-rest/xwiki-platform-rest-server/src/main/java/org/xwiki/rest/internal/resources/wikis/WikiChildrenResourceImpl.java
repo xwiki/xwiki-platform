@@ -56,8 +56,10 @@ public class WikiChildrenResourceImpl extends AbstractPagesResource implements W
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
 
+        int queryLimit = validateAndGetLimit(limit);
+
         try {
-            return getPages(this.nestedPageHierarchy.getChildren(wikiReference).withOffset(offset).withLimit(limit)
+            return getPages(this.nestedPageHierarchy.getChildren(wikiReference).withOffset(offset).withLimit(queryLimit)
                 .matching(search).getDocumentReferences(), true);
         } catch (QueryException e) {
             throw new XWikiRestException("Failed to retrieve the top level pages.", e);

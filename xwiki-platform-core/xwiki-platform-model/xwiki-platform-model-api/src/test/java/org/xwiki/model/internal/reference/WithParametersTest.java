@@ -20,6 +20,7 @@
 package org.xwiki.model.internal.reference;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(WithPatametersSymbolScheme.class)
+@ComponentList(WithParametersSymbolScheme.class)
 class WithParametersTest
 {
     @InjectMockComponents
@@ -67,5 +68,11 @@ class WithParametersTest
         EntityReference resolved = this.resolver.resolve(serialized, EntityType.DOCUMENT);
 
         assertEquals(documentReference, resolved);
+
+        EntityReference reference = resolver.resolve("wiki:space;param1=value2.page", EntityType.DOCUMENT);
+        assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("page", reference.getName());
+        assertEquals(Map.of("param1", "value2"), reference.extractReference(EntityType.SPACE).getParameters());
     }
 }

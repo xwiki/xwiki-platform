@@ -27,11 +27,14 @@
   };
 
   CKEDITOR.plugins.add('xwiki-upload', {
-    requires: 'uploadfile,uploadimage,xwiki-marker,xwiki-resource',
+    requires: 'uploadfile,uploadimage,notification,xwiki-marker,xwiki-resource',
 
     init: function(editor) {
       preventParallelUploads(editor);
       listenToUploadedAttachments(editor);
+      if (editor.config['xwiki-upload']?.uploadImagesFromPastedHTML !== false) {
+        handleImagesFromPastedHTML(editor);
+      }
     },
 
     afterInit: function(editor) {
@@ -42,21 +45,50 @@
           'data-linktype': 'attachment',
           'data-freestanding': true,
           'data-wikigeneratedlinkcontent': upload.fileName,
-          'data-reference': upload.responseData.resourceReference
+          'data-reference': upload.responseData.serializedResourceReference
         }));
       });
 
       this.overrideUploadWidget(editor, 'uploadimage', false, function(html, upload) {
-        // The image widget looks for these markers.
-        var startMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(
-          upload.responseData.resourceReference) + '-->';
-        var stopMarker = '<!--stopimage-->';
-        // We need to overwrite the HTML because the upload image widget sets the image width and height and we don't
-        // want to save them unless the user resizes the image explicitly.
-        // See CKEDITOR-223: Image larger than the screen inserted with drag & drop gets distorted (explicit image size
-        // is added by default)
-        var image = '<img src="' + upload.url + '"/>';
-        return startMarker + image + stopMarker;
+        // Check if the uploaded image is already wrapped by a image widget.
+        const widget = editor.widgets.getByElement(this.wrapper.getParent());
+        if (widget?.name === 'image' && widget.parts.image.equals(this.parts.img)) {
+          // Update the image widget data.
+          widget.setData({
+            resourceReference: upload.responseData.resourceReference,
+            src: upload.url
+          });
+
+          // We need to add the image back after the upload image widget is removed. We use a placeholder to know where
+          // to insert the image back.
+          const placeholder = editor.document.createElement('span');
+          placeholder.insertBefore(this.wrapper);
+          setTimeout(() => {
+            // The upload image widget has been detached from the DOM but the image element still has some leftover
+            // attributes specific to the upload image widget. We perform the cleanup by destroying the upload image
+            // widget. We set the wrapper to the placeholder knowing that the destroy method is replacing the wrapper
+            // with the widget element (the image) at the end. Note that the image source was updated when we set the
+            // image widget data above.
+            this.wrapper = placeholder;
+            // Don't keep any widget specific attributes when destroying the widget.
+            widget.parts.image.data('cke-widget-keep-attr', 0);
+            editor.widgets.destroy(this);
+          }, 0);
+
+          // Simply remove the upload image widget.
+          return "";
+        } else {
+          // Insert the image widget markers so that the uploaded image is upcasted to an image widget.
+          const startMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(
+            upload.responseData.serializedResourceReference) + '-->';
+          const stopMarker = '<!--stopimage-->';
+          // We need to overwrite the HTML because the upload image widget sets the image width and height and we don't
+          // want to save them unless the user resizes the image explicitly.
+          // See CKEDITOR-223: Image larger than the screen inserted with drag & drop gets distorted (explicit image
+          // size is added by default)
+          const image = '<img src="' + upload.url + '"/>';
+          return startMarker + image + stopMarker;
+        }
       });
 
       // Browses uses 'image.png', or a localized form (e.g., 'graphik.png' in German Firefox) as file name when pasting
@@ -120,9 +152,9 @@
         delete this._upload;
         if (upload) {
           upload.responseData.resourceReference.typed = typedResourceReference;
-          upload.responseData.resourceReference = CKEDITOR.plugins.xwikiResource
+          upload.responseData.serializedResourceReference = CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(upload.responseData.resourceReference);
-          data = filter(data, upload);
+          data = filter.call(this, data, upload);
         }
         originalReplaceWith.call(this, data, mode);
       };
@@ -201,8 +233,282 @@
           'name': 'uploadedFiles',
           'value': JSON.parse(event.data.fileLoader.xhr.responseText).fileName
         });
+        if (editor.config.formId) {
+          input.attr('form', editor.config.formId);
+        }
         input.insertAfter($(editor.element.$));
       }
     });
   };
+
+  function handleImagesFromPastedHTML(editor) {
+    // Maps the URL of a pasted image to the corresponding File (Blob) object. Avoids downloading the same image
+    // multiple times.
+    const imageFileStore = {};
+
+    /**
+     * In order to upload an image we need access to the File object. But we can't get the File object directly from the
+     * image HTML element (even if that image is already displayed to the user). We need to fetch the image using its
+     * source URL. But this is asynchronous (even if the image is already in the browser cache) so we can't do it from
+     * the paste event listener. Instead, we allow the image to be inserted in the content with its "external" URL but
+     * we mark it to be uploaded later on, after the paste event listeners are called.
+     *
+     * @param {CKEDITOR.editor} editor the CKEditor instance for which to mark the pasted images
+     */
+    function markImagesToUploadFromPastedHTML(editor) {
+      // Make sure the attribute we use to mark pasted images is not saved.
+      editor.dataProcessor?.htmlFilter?.addRules({
+        elements: {
+          img: function(image) {
+            delete image.attributes['data-xwiki-pasted-image'];
+          }
+        }
+      }, {priority: 14, applyToAll: true});
+
+      editor.on('paste', function(event) {
+        const data = event.data;
+        // Check if the pasted content was copied from outside the editor, is HTML and contains images.
+        if (data.dataTransfer.getTransferType() === CKEDITOR.DATA_TRANSFER_EXTERNAL && data.type === 'html' &&
+            data.dataValue.includes('<img')) {
+          // The clipboard can contain multiple data types. For instance, when using the "Copy Image" option from the
+          // browser's context menu, the clipboard is filled with both the image HTML markup and the image File object.
+          // CKEditor prefers the HTML markup but we can still access the File object.
+          const pastedImageFiles = getPastedImageFiles(data.dataTransfer);
+          const container = document.createElement('div');
+          container.innerHTML = data.dataValue;
+          let imageCount = 0;
+          container.querySelectorAll('img[src]').forEach(image => {
+            // Ignore the images that don't have the source URL specified (we can't do anything about them) or that are
+            // using the data URI scheme (they are handled separately).
+            if (image.src && !image.src.startsWith('data:')) {
+              // Mark the pasted image in order to upload it afterwards.
+              image.dataset.xwikiPastedImage = true;
+              if (!imageFileStore[image.src] && pastedImageFiles.length) {
+                // Unfortunatelly, there's no explicit mapping between the HTML image elements an the image file objects
+                // (from the clipboard). We assume that:
+                // * the HTML image elements and the image files are in the same order
+                // * the image files are not duplicated if the same image URL is used multiple times in the HTML
+                imageFileStore[image.src] = pastedImageFiles.shift();
+              }
+              imageCount++;
+            }
+          });
+          if (imageCount > 0) {
+            data.dataValue = container.innerHTML;
+          }
+        }
+      });
+    }
+
+    function getPastedImageFiles(dataTransfer) {
+      const imageFiles = [];
+      for (let i = 0; i < dataTransfer.getFilesCount(); i++) {
+        const file = dataTransfer.getFile(i);
+        if (file.type.startsWith('image/')) {
+          imageFiles.push(file);
+        }
+      }
+      return imageFiles;
+    }
+
+    function loadAndUploadImagesFromPastedHTML(editor) {
+      editor.on('afterPaste', function(event) {
+        // By waiting before uploading the images, we allow the user to cancel the upload, in case they want to keep the
+        // images with the "external" URLs. The user can also undo the upload and source replacement.
+        loadPastedImages(editor).then(waitBeforeUploading).then(uploadPastedImages).catch((e) => {
+          console.error('Failed to upload images from pasted HTML: ', e);
+        });
+      });
+    }
+
+    async function loadPastedImages(editor) {
+      let notification;
+      // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_dom_nodeList.html
+      const pastedImages = editor.editable()?.find('img[data-xwiki-pasted-image]');
+      const pastedImagesCount = pastedImages.count();
+      const loadedImages = [];
+      if (pastedImagesCount) {
+        notification = editor.showNotification(
+          editor.localization.get('xwiki-upload.downloadingPastedImages', 0, pastedImagesCount),
+          'progress'
+        );
+        // Make sure we don't handle the same image multiple times, because the user can paste again while the
+        // previously pasted images are being downloaded.
+        pastedImages.toArray().forEach(pastedImage => pastedImage.removeAttribute('data-xwiki-pasted-image'));
+        for (let i = 0; i < pastedImagesCount; i++) {
+          // The user can abort the download by closing the notification.
+          if (!notification.isVisible()) {
+            throw new Error('Downloading pasted images was aborted.');
+          }
+          try {
+            // We download the pasted images sequentially, in order to give more time to the user to decide if they want
+            // to abort the process or not.
+            loadedImages.push(await loadPastedImage(pastedImages.getItem(i)));
+          } catch (e) {
+            // The image failed to be downloaded, usually due to CORS restrictions. Move to the next image.
+          } finally {
+            const loadedCount = i + 1;
+            notification.update({
+              message: editor.localization.get('xwiki-upload.downloadingPastedImages', loadedCount, pastedImagesCount),
+              progress: loadedCount / pastedImagesCount,
+              // Switch the notification type to 'warning' if we were not able to download all the pasted images.
+              type: loadedCount < pastedImagesCount || loadedImages.length === pastedImagesCount ?
+                'progress' : 'warning'
+            });
+          }
+        }
+      }
+
+      return {
+        editor,
+        pastedImages,
+        loadedImages,
+        notification
+      };
+    }
+
+    /**
+     * Fetches the image file based on its source URL, if it's not already in the image file store.
+     *
+     * @param {CKEDITOR.dom.element} pastedImage the image DOM element that was pasted
+     * @returns the pasted image DOM element, after the image was loaded
+     */
+    async function loadPastedImage(pastedImage) {
+      const imageURL = pastedImage.$.src;
+      if (!imageFileStore[imageURL]) {
+        // This is subject to CORS so it may fail if the server is not properly configured.
+        const data = await fetch(imageURL);
+        imageFileStore[imageURL] = await data.blob();
+      }
+      return pastedImage;
+    }
+
+    async function waitBeforeUploading({editor, pastedImages, loadedImages, notification}) {
+      if (loadedImages.length < pastedImages.count() && notification?.isVisible()) {
+        // Update the notification to inform the user that some images failed to be downloaded.
+        const failedCount = pastedImages.count() - loadedImages.length;
+        notification.update({
+          message: editor.localization.get('xwiki-upload.imageDownloadFailed', failedCount, pastedImages.count()),
+          // Reset the progress because we're reusing the notification.
+          progress: undefined,
+          type: 'warning'
+        });
+        // Show the warning message for 3 seconds, before starting to upload the images that were successfully
+        // downloaded.
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+
+      if (loadedImages.length) {
+        // Wait 5 seconds before uploading, to allow the user to cancel the upload.
+        await new Promise((resolve, reject) => {
+          const duration = 5;
+          let secondsLeft = duration;
+          const interval = setInterval(() => {
+            if (!notification.isVisible()) {
+              clearInterval(interval);
+              reject(new Error('Uploading pasted images was aborted.'));
+            } else if (secondsLeft < 0) {
+              clearInterval(interval);
+              resolve();
+            } else {
+              notification.update({
+                message: editor.localization.get('xwiki-upload.starting', secondsLeft),
+                progress: (duration - secondsLeft) / duration
+              });
+              secondsLeft--;
+            }
+          }, 1000);
+        });
+      } else {
+        // Nothing to upload.
+        notification?.hide();
+      }
+
+      return {editor, pastedImages, loadedImages, notification};
+    }
+
+    function uploadPastedImages({editor, loadedImages, notification}) {
+      if (loadedImages.length) {
+        let uploadedCount = 0;
+        let failedCount = 0;
+        updateUploadImageProgress(notification, uploadedCount, failedCount, loadedImages.length);
+        loadedImages.forEach(image => {
+          // We upload the pasted images in parallel.
+          uploadPastedImage(editor, image).then(() => {
+            updateUploadImageProgress(notification, ++uploadedCount, failedCount, loadedImages.length);
+          }, (e) => {
+            failedCount++;
+            console.log('Failed to upload pasted image: ', e);
+          });
+        });
+      }
+    }
+
+    /**
+     * Replaces the image widget instance (associated with the given image DOM element) with an upload image widget
+     * instance that handles the image upload (showing the progress), before being itself replaced with a new image
+     * widget instance that uses the attached image.
+     *
+     * @param {CKEDITOR.editor} editor the CKEditor instance
+     * @param {CKEDITOR.dom.element} image the image DOM element to update after the image is uploaded
+     */
+    async function uploadPastedImage(editor, image) {
+      const imageFile = imageFileStore[image.$.src];
+      const uploadImageWidgetDef = editor.widgets.registered.uploadimage;
+      if (!uploadImageWidgetDef.supportedTypes ||
+          CKEDITOR.fileTools.isTypeSupported(imageFile, uploadImageWidgetDef.supportedTypes)) {
+        // Start uploading the image.
+        const fileName = getFileName(image.$.src);
+        const loader = editor.uploadRepository.create(imageFile, fileName, uploadImageWidgetDef.loaderType);
+        loader.upload(uploadImageWidgetDef.uploadUrl, uploadImageWidgetDef.additionalRequestParameters);
+
+        // Create the upload image widget.
+        CKEDITOR.fileTools.markElement(image, 'uploadimage', loader.id);
+        editor.widgets.initOn(image);
+        if (!uploadImageWidgetDef.skipNotifications) {
+          CKEDITOR.fileTools.bindNotifications(editor, loader);
+        }
+
+        // Wait for the upload to finish (successfully or not).
+        await new Promise((resolve, reject) => {
+          loader.on('uploaded', resolve);
+          loader.on('abort', reject);
+          loader.on('error', reject);
+        });
+      }
+    }
+
+    function getFileName(fileURL) {
+      fileURL = new URL(fileURL, window.location.href);
+      const path = fileURL.pathname.split('/');
+      return path[path.length - 1];
+    }
+
+    function updateUploadImageProgress(notification, uploadedCount, failedCount, totalCount) {
+      notification.update({
+        message: editor.localization.get('xwiki-upload.uploadingPastedImages', uploadedCount, totalCount),
+        progress: uploadedCount / totalCount,
+        // Update the notification type to 'warning' if some images failed to be uploaded.
+        type: failedCount > 0 ? 'warning' : (uploadedCount < totalCount ? 'progress' : 'success')
+      });
+      if (uploadedCount >= totalCount) {
+        // We handled all the pasted images.
+        if (failedCount > 0) {
+          notification.update({
+            message: editor.localization.get('xwiki-upload.imageUploadFailed', failedCount, totalCount),
+            // Reset the progress because we're reusing the notification.
+            progress: undefined,
+            type: 'warning'
+          });
+        }
+        // Keep the notification visible for 3 seconds.
+        setTimeout(() => {
+          notification.hide();
+        }, 3000);
+      }
+    }
+
+    markImagesToUploadFromPastedHTML(editor);
+    loadAndUploadImagesFromPastedHTML(editor);
+  }
 })();

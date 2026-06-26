@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Provider;
 
@@ -309,12 +310,12 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     @Transient
     public List<SpaceReference> getSpaceReferences()
     {
-        List<SpaceReference> references = new ArrayList<SpaceReference>();
+        List<SpaceReference> references = new ArrayList<>();
 
         EntityReference reference = this;
         while (reference != null) {
             if (reference.getType() == EntityType.SPACE) {
-                references.add((SpaceReference) reference);
+                references.add(new SpaceReference(reference));
             }
             reference = reference.getParent();
         }
@@ -377,6 +378,34 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference withoutLocale()
     {
         return getLocale() != null ? new DocumentReference(this, (Locale) null) : this;
+    }
+
+    /**
+     * Retrieve a {@link DocumentReference} from an {@link EntityReference} by extracting it and performing checks.
+     * If the provided entity reference doesn't contain a reference to a document (e.g. it's a wiki reference) then it
+     * returns an empty result.
+     * @param entityReference the reference for which to extract the document reference
+     * @return the extracted {@link DocumentReference} or an empty optional.
+     * @since 16.6.0RC1
+     * @since 16.4.2
+     * @since 15.10.12
+     */
+    public static Optional<DocumentReference> extractDocument(EntityReference entityReference)
+    {
+        Optional<DocumentReference> result = Optional.empty();
+        if (entityReference != null) {
+            if (entityReference instanceof DocumentReference) {
+                result = Optional.of((DocumentReference) entityReference);
+            } else {
+                EntityReference extractedRef = entityReference.extractReference(EntityType.DOCUMENT);
+                if (extractedRef instanceof DocumentReference) {
+                    result = Optional.of((DocumentReference) extractedRef);
+                } else if (extractedRef != null) {
+                    result = Optional.of(new DocumentReference(extractedRef));
+                }
+            }
+        }
+        return result;
     }
 
     @Override

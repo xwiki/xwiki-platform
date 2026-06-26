@@ -71,7 +71,7 @@
 ###############################################################################
 
 ## Menus
-### Missing: platform.wiki.menu.wikiindex=Wiki Index
+platform.wiki.menu.wikiindex=Índex de wikis
 platform.wiki.menu.deletewiki=Suprimir
 ### Missing: platform.wiki.menu.userwikis=Wikis
 
@@ -163,9 +163,6 @@ platform.wiki.create.title=Crear una nova wiki
 ## LegacyWorkspaces macro
 ### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
 ### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
-
-## Browse
-### Missing: platform.wiki.browse=Browse Wikis
 ### Missing: platform.wiki.browse.emptyvalue=N/A
 ### Missing: platform.wiki.browse.wikiprettyname=Name
 ### Missing: platform.wiki.browse.description=Description
@@ -226,7 +223,6 @@ platform.wiki.create.title=Crear una nova wiki
 ### Missing: platform.wiki.create.wizard.step.previous=Previous Step
 ### Missing: platform.wiki.create.wizard.step.next=Next step
 platform.wiki.create.wizard.step.create=Crear
-
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
 ### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
@@ -302,6 +298,10 @@ platform.wiki.sheet.title.createnewalias=Crear nou àlies.
 ### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
+## Browse
+### Missing: platform.wiki.browse=Browse Wikis
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

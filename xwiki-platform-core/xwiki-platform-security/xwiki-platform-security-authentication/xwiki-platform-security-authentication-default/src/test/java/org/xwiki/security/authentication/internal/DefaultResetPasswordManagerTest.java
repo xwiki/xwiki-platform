@@ -151,6 +151,7 @@ class DefaultResetPasswordManagerTest
         this.xWiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(this.xWiki);
         this.userDocument = mock(XWikiDocument.class);
+        when(this.userDocument.clone()).thenReturn(this.userDocument);
         when(this.xWiki.getDocument(this.userDocumentReference, this.context)).thenReturn(this.userDocument);
         this.authenticationMailSender = mock(AuthenticationMailSender.class);
         when(this.resetPasswordMailSenderProvider.get()).thenReturn(this.authenticationMailSender);
@@ -362,7 +363,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(userDocument, saveComment, true, context);
     }
 
@@ -445,7 +446,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(userDocument, saveComment, true, context);
     }
 
@@ -485,7 +486,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(this.userDocument, saveComment, true, context);
     }
 

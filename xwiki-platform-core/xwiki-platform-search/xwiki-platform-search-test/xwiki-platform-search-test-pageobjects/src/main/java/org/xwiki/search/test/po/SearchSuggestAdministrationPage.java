@@ -25,7 +25,7 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.test.ui.po.Select;
 
 /**
- * Represents the actions possible on the Sarch Suggest administration section.
+ * Represents the actions possible on the Search Suggest administration section.
  *
  * @version $Id$
  */

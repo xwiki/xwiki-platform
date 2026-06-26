@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=Skin
 skin.sheet.properties=Skin Properties
+skin.sheet.properties.logo.warning=This logo is usually overridden by the one defined in the color theme. If you want to change the wiki logo, consider editing the current color theme instead.
 skin.sheet.deprecatedProperties=Deprecated properties
 skin.sheet.overriddenTemplates=Overridden templates
 skin.sheet.addTemplate=Add a new overriding template

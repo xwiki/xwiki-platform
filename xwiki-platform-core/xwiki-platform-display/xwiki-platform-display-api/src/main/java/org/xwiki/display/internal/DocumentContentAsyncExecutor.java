@@ -393,6 +393,7 @@ public class DocumentContentAsyncExecutor
         TransformationContext txContext =
             new TransformationContext(this.xdom, this.syntax, this.parameters.isTransformationContextRestricted());
         txContext.setId(this.transformationId);
+        txContext.setTargetSyntax(this.parameters.getTargetSyntax());
         this.transformationManager.performTransformations(this.xdom, txContext);
     }
 }

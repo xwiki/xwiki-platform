@@ -19,16 +19,20 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -37,6 +41,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 /**
  * Document-based implementation of {@link UserManager}.
  *
@@ -44,15 +52,35 @@ import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
  * @since 12.2
  */
 @Component
-@Named("org.xwiki.user.internal.document.DocumentUserReference")
+@Named(DocumentUserManager.HINT)
 @Singleton
 public class DocumentUserManager implements UserManager
 {
+    /**
+     * The role hint of the component.
+     * 
+     * @since 17.4.0RC1
+     */
+    public static final String HINT = "org.xwiki.user.internal.document.DocumentUserReference";
+
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private UserCache userCache;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     @Override
     public boolean exists(UserReference userReference) throws UserException
@@ -93,5 +121,34 @@ public class DocumentUserManager implements UserManager
                 e);
         }
         return result;
+    }
+
+    @Override
+    public boolean hasUsers(WikiReference wiki) throws UserException
+    {
+        return this.userCache.computeIfAbsent(wiki, this::hasUserInternal);
+    }
+
+    private Boolean hasUserInternal(WikiReference wiki) throws UserException
+    {
+        try {
+            Query query = this.queryManager
+                .createQuery("select doc.id from Document doc, doc.object(XWiki.XWikiUsers) as user", Query.XWQL);
+            query.setLimit(1);
+            query.setWiki(wiki.getName());
+
+            return !query.execute().isEmpty();
+        } catch (QueryException e) {
+            throw new UserException("Failed to query users", e);
+        }
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    {
+        DocumentReference userReference = this.documentUserReferenceSerializer.serialize(user);
+        DocumentReference targetReference = this.documentUserReferenceSerializer.serialize(target);
+
+        return this.authorizationManager.hasAccess(right, userReference, targetReference);
     }
 }

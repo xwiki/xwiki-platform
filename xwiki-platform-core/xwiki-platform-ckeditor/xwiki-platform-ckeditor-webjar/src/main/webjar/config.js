@@ -87,7 +87,7 @@ CKEDITOR.editorConfig = function(config) {
     // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,
-    // This is used in CKEditor.FileUploader so we must keep them in sync.
+    // This is used in XWiki.WYSIWYG.FileUploader so we must keep them in sync.
     fileTools_defaultFileName: '__fileCreatedFromDataURI__', // jshint ignore:line
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
@@ -115,6 +115,16 @@ CKEDITOR.editorConfig = function(config) {
           height: true,
           src: true,
           width: true
+        },
+        match: function(image) {
+          if (image.parent?.name?.toLowerCase() === 'figure' ||
+              (image.parent?.name?.toLowerCase() === 'a' && image.parent?.parent?.name?.toLowerCase() === 'figure')) {
+            const figure = image.getAscendant('figure');
+            // This is needed in order for this figure to be upcasted as a captioned image widget.
+            // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_config.html#cfg-image2_captionedClass
+            figure.addClass('image');
+          }
+          return true;
         }
       },
       // Allowed table header and table cell attributes.
@@ -133,10 +143,10 @@ CKEDITOR.editorConfig = function(config) {
         // * lone paragraphs, when inside a list item, table cell, definition list or block quote (in order to simplify
         //   the generated wiki syntax; they will be replaced by their child nodes)
         match: function(element) {
-          var loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
-          var name = element.name.toLowerCase();
-          var allowed = name !== 'div' && name !== 'span' && (
-            name !== 'p' || !element.parent || !element.parent.name ||
+          const loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
+          const name = element.name.toLowerCase();
+          const allowed = name !== 'div' && name !== 'span' && (
+            name !== 'p' || !element.parent?.name ||
             element.parent.children.length > 1 || loneParagraphParents.indexOf(element.parent.name.toLowerCase()) < 0
           );
           if (!allowed && name === 'p') {
@@ -164,6 +174,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-maximize',
       'xwiki-office',
       'xwiki-realtime',
+      'xwiki-rights',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',
@@ -195,114 +206,8 @@ CKEDITOR.editorConfig = function(config) {
       'officeImporter,xwiki-macro',
     // We remove the default sourcearea plugin because we use our own xwiki-sourcearea plugin which supports switching
     // to Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and
-    // translations. We remove the realtime plugin by default because it's unstable.
-    removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea,xwiki-realtime',
-    toolbarGroups: [
-      {name: 'format'},
-      {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-      {name: 'paragraph',   groups: ['list', 'indent', 'align', 'bidi']},
-      {name: 'links'},
-      {name: 'insert'},
-      {name: 'forms'},
-      {name: 'styles',      groups: ['styles', 'blocks']},
-      {name: 'colors'},
-      {name: 'editing',     groups: ['find', 'selection', 'spellchecker']},
-      {name: 'clipboard',   groups: ['clipboard', 'undo']},
-      {name: 'document',    groups: ['mode', 'document', 'doctools']},
-      {name: 'tools'},
-      {name: 'others'},
-      {name: 'about'}
-    ],
-    toolbarMenus: {
-      basicStyles: {
-        toolbar: 'basicstyles,70',
-        groups: [
-          {id: 'basicStyles', items: ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript']},
-          {id: 'removeFormat', items: ['removeFormat']}
-        ]
-      },
-      lists: {
-        toolbar: 'list',
-        groups: [
-          {id: 'lists', items: ['bulletedlist', 'numberedlist']},
-          {id: 'indent', items: ['indent', 'outdent']}
-        ]
-      },
-      insert: {
-        icon: 'insert',
-        toolbar: 'insert',
-        groups: [
-          {id: 'insert', items: ['image', 'table', 'horizontalrule', 'specialchar', 'officeImporter']},
-          {id: 'macros', items: ['infoBox', 'successBox', 'warningBox', 'errorBox', 'toc', 'include', 'code']},
-          {id: 'otherMacros', items: ['xwiki-macro']}
-        ]
-      }
-    },
-    toolbarMenuItems: {
-      bold: {label: 'basicstyles.bold'},
-      italic: {label: 'basicstyles.italic'},
-      strike: {label: 'basicstyles.strike'},
-      underline: {label: 'basicstyles.underline'},
-      subscript: {label: 'basicstyles.subscript'},
-      superscript: {label: 'basicstyles.superscript'},
-
-      removeFormat: {label: 'removeformat.toolbar'},
-
-      indent: {label: 'indent.indent'},
-      outdent: {label: 'indent.outdent'},
-
-      image: {label: 'common.image'},
-      table: {label: 'table.toolbar'},
-      officeImporter: {label: 'xwiki-office.importer.title', icon: 'pastefromword'},
-
-      infoBox: {
-        command: 'xwiki-macro-insert',
-        data: {
-          name: 'info',
-          content: 'Type your information message here.'
-        }
-      },
-      successBox: {
-        command: 'xwiki-macro-insert',
-        data: {
-          name: 'success',
-          content: 'Type your success message here.'
-        }
-      },
-      warningBox: {
-        command: 'xwiki-macro-insert',
-        data: {
-          name: 'warning',
-          content: 'Type your warning message here.'
-        }
-      },
-      errorBox: {
-        command: 'xwiki-macro-insert',
-        data: {
-          name: 'error',
-          content: 'Type your error message here.'
-        }
-      },
-      toc: {
-        command: 'xwiki-macro-insert',
-        data: {name: 'toc'}
-      },
-      include: {
-        command: 'xwiki-macro',
-        data: {
-          name: 'include',
-          parameters: {reference: 'Sandbox.TestPage1'}
-        }
-      },
-      code: {
-        command: 'xwiki-macro',
-        data: {
-          name: 'code',
-          parameters: {language: 'none'}
-        }
-      },
-      'xwiki-macro': {label: 'xwiki-toolbar.otherMacros'}
-    },
+    // translations.
+    removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea',
     versionCheck: false,
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters
@@ -314,7 +219,9 @@ CKEDITOR.editorConfig = function(config) {
       nestedEditableTypes: {
         // The type used when the macro content / parameter supports any wiki syntax (no restrictions).
         'java.util.List<org.xwiki.rendering.block.Block>': {}
-      }
+      },
+      // You can decide here to not see the inline editable parameters in the macro config UI.
+      showInlineEditableParameters: true
     },
     'xwiki-save': {
       leaveConfirmation: true

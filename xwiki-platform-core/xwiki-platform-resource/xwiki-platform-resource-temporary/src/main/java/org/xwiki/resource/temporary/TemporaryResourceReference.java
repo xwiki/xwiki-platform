@@ -121,7 +121,10 @@ public class TemporaryResourceReference extends EntityResourceReference
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(super.hashCode(), 5).append(getModuleId()).append(getOwningEntityReference())
+        return new HashCodeBuilder(23, 5)
+            .appendSuper(super.hashCode())
+            .append(getModuleId())
+            .append(getOwningEntityReference())
             .append(getResourcePath()).toHashCode();
     }
 

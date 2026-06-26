@@ -37,9 +37,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * 
  * @version $Id$
  * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class ZipExplorerPluginAPI extends PluginApi<ZipExplorerPlugin>
 {
     /**

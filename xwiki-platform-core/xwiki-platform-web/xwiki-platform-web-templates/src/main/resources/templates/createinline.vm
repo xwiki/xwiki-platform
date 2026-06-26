@@ -84,8 +84,8 @@
 #set ($disableModalConfirmation = false)
 ## check if the exception is about the non-allowed spaces for template
 #if("$!exception" != '' && $exception.code == 11016)
-  <div class="box errormessage">
-    #set($allowedSpaces = $createAllowedSpaces)
+  #set($allowedSpaces = $createAllowedSpaces)
+  #define ($errorMessageContent)
     #if ($allowedSpaces.size() == 1)
       $escapetool.xml($services.localization.render('core.create.template.allowedspace.inline', [$templateProvider,
         $allowedSpaces.get(0)]))
@@ -93,7 +93,14 @@
       $escapetool.xml($services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider,
         $allowedSpaces.toString()]))
     #end
-  </div>
+  #end
+  #error($errorMessageContent)
+  #set ($disableModalConfirmation = true)
+#end
+## check if the exception is about missing required rights for the template
+#if("$!exception" != '' && $exception.code == 11019)
+  #error($escapetool.xml($services.localization.render('core.create.template.requiredRightsMissing',
+    [$templateProvider])))
   #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document which already exists
@@ -397,7 +404,12 @@
             <span class='label'>$escapetool.xml($services.localization.render('core.create.pageTitle'))</span>
           </dt>
           <dl>
-            #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
+            ## We are creating a top level space.
+            #if ("$!spaceReference" == '' && $isSpace)
+              #set ($targetDocumentReference = $services.model.createDocumentReference('WebHome', $name))
+            #else
+              #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
+            #end
             #hierarchy($targetDocumentReference)
           </dl>
         #end
@@ -451,8 +463,7 @@
 </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-  #getRequiredSkinExtensions($requiredSkinExtensions)
-  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #sendRequiredSkinExtensions()
 #else
   </form>
 #end

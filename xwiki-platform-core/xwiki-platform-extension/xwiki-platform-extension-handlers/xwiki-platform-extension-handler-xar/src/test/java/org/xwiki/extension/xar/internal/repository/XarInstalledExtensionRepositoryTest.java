@@ -19,55 +19,56 @@
  */
 package org.xwiki.extension.xar.internal.repository;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.environment.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.search.SearchException;
-import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+@ComponentTest
 @AllComponents
-public class XarInstalledExtensionRepositoryTest
+@ExtendWith(MockitoRepositoryUtilsExtension.class)
+class XarInstalledExtensionRepositoryTest
 {
-    protected MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
-
-    @Rule
-    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.mocker);
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private XarInstalledExtensionRepository installedExtensionRepository;
 
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
-        this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
-        this.repositoryUtil.getComponentManager().unregisterComponent(Environment.class, "default");
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        this.installedExtensionRepository = this.mocker.getInstance(InstalledExtensionRepository.class, "xar");
+        this.installedExtensionRepository =
+            this.componentManager.getInstance(InstalledExtensionRepository.class, "xar");
     }
 
     // Tests
 
     @Test
-    public void testInit() throws ResolveException, SearchException
+    void init() throws ResolveException, SearchException
     {
         assertEquals(1, this.installedExtensionRepository.countExtensions());
 
@@ -89,11 +90,11 @@ public class XarInstalledExtensionRepositoryTest
             .searchInstalledExtensions("xarinstalledextension", null, 0, -1).getSize());
         assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions(null, null, 0, -1).getSize());
 
-        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+        assertEquals(List.of(xarInstalledExtension), this.installedExtensionRepository
             .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page")));
-        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+        assertEquals(List.of(xarInstalledExtension), this.installedExtensionRepository
             .getXarInstalledExtensions(new DocumentReference("wiki2", "space", "page")));
-        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+        assertEquals(List.of(xarInstalledExtension), this.installedExtensionRepository
             .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ROOT)));
         assertEquals(0, this.installedExtensionRepository
             .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ENGLISH)).size());

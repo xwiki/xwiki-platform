@@ -39,8 +39,7 @@ public class CachedItem
     /**
      * Map containing all extensions used in cached item.
      */
-    public Map<RenderingCacheAware, UsedExtension> extensions = new HashMap<RenderingCacheAware,
-        CachedItem.UsedExtension>();
+    public Map<RenderingCacheAware, UsedExtension> extensions = new HashMap<>();
 
     /**
      * Extension used in cached item.

@@ -44,6 +44,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 /**
  * @version $Id$
@@ -56,6 +57,8 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {
@@ -71,17 +74,23 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
         String spaceId = Utils.getLocalSpaceId(spaces);
 
         History history = new History();
+        int limit = validateAndGetLimit(number);
 
         try {
+            String validOrder = HqlQueryUtils.getValidQueryOrder(order, "desc");
+
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
                 + " doc.space = :space and doc.name = :name and doc.language = :language"
-                + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
+                + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", validOrder, validOrder, validOrder);
             
             List<Object> queryResult = null;
-            queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId).bindValue("name",
-                    pageName).setLimit(number).bindValue("language", language).setOffset(start)
-                        .setWiki(wikiName).execute();
+            queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId)
+                .bindValue("name", pageName)
+                .bindValue("language", language)
+                .setLimit(limit)
+                .setOffset(start)
+                .setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

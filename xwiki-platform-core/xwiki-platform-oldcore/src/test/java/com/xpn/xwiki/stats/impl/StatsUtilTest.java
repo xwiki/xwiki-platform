@@ -20,107 +20,124 @@
 package com.xpn.xwiki.stats.impl;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.Set;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for the {@link StatsUtil} class.
- * 
+ *
  * @version $Id$
  */
-public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class StatsUtilTest
 {
-    private Mock mockXWiki;
+    @InjectMockitoOldcore
+    private MockitoOldcore oldCore;
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
-        this.mockXWiki = mock(XWiki.class);
-
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
-    }
 
     /**
-     * Test for the {@link StatsUtil#getPeriodAsInt(java.util.Date, PeriodType)}.
+     * Test for the {@link StatsUtil#getPeriodAsInt(Date, PeriodType)}.
      */
-    public void testGetPeriodAsInt()
+    @Test
+    void getPeriodAsInt()
     {
         Calendar cal = Calendar.getInstance();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
         String a = sdf.format(cal.getTime());
         String b = StatsUtil.getPeriodAsInt(cal.getTime(), PeriodType.MONTH) + "";
-        assertEquals("Wrong month period format", a, b);
+        assertEquals(a, b, "Wrong month period format");
 
         sdf = new SimpleDateFormat("yyyyMMdd");
         a = sdf.format(cal.getTime());
         b = StatsUtil.getPeriodAsInt(cal.getTime(), PeriodType.DAY) + "";
-        assertEquals("Wrong day period format", a, b);
+        assertEquals(a, b, "Wrong day period format");
     }
 
-    public void testGetFilteredUsers() throws XWikiException
+    @Test
+    void getFilteredUsers() throws XWikiException
     {
-        this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue(null));
-        this.mockXWiki.stubs().method("Param").will(returnValue(null));
+        XWiki wiki = this.oldCore.getSpyXWiki();
+        doReturn(null).when(wiki).getXWikiPreference(any(), any(), any());
+        doReturn(null).when(wiki).Param(any());
 
-        assertEquals(new HashSet<DocumentReference>(), StatsUtil.getRequestFilteredUsers(getContext()));
+        XWikiContext context = this.oldCore.getXWikiContext();
+        assertEquals(Set.of(), StatsUtil.getRequestFilteredUsers(context));
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.XWikiGuest"));
-        this.mockXWiki.stubs().method("getDocument")
-            .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))));
+        doReturn("XWiki.XWikiGuest").when(wiki).Param(any());
+        doReturn(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiGuest")))
+            .when(wiki)
+            .getDocument(any(EntityReference.class), eq(context));
 
         assertEquals(
-            new HashSet<>(Collections.singletonList(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))),
-            StatsUtil.getRequestFilteredUsers(getContext()));
+            Set.of(new DocumentReference("xwiki", "XWiki", "XWikiGuest")),
+            StatsUtil.getRequestFilteredUsers(context));
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.supeRadmin"));
-        this.mockXWiki.stubs().method("getDocument")
-            .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "supeRadmin"))));
+        doReturn("XWiki.supeRadmin").when(wiki).Param(any());
+        doReturn(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "supeRadmin")))
+            .when(wiki)
+            .getDocument(any(EntityReference.class), eq(context));
 
-        assertEquals(new HashSet<>(Collections.singletonList(new DocumentReference("xwiki", "XWiki", "supeRadmin"))),
-            StatsUtil.getRequestFilteredUsers(getContext()));
+        assertEquals(Set.of(new DocumentReference("xwiki", "XWiki", "supeRadmin")),
+            StatsUtil.getRequestFilteredUsers(context));
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("invalid"));
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(
-            new XWikiDocument(new DocumentReference("xwiki", "Space", "invalid"))));
+        doReturn("invalid").when(wiki).Param(any());
+        doReturn(new XWikiDocument(new DocumentReference("xwiki", "Space", "invalid")))
+            .when(wiki)
+            .getDocument(any(EntityReference.class), eq(context));
 
-        assertEquals(new HashSet<DocumentReference>(), StatsUtil.getRequestFilteredUsers(getContext()));
+        assertEquals(Set.of(), StatsUtil.getRequestFilteredUsers(context));
 
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user");
-        final XWikiDocument userDoc = new XWikiDocument(userReference);
+        XWikiDocument userDoc = new XWikiDocument(userReference);
         userDoc.setNew(false);
         userDoc.addXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), new BaseObject());
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user"));
-        this.mockXWiki.stubs().method("getDocument").with(eq(userReference), ANYTHING).will(returnValue(userDoc));
+        doReturn("XWiki.user").when(wiki).Param(any());
+        doReturn(userDoc)
+            .when(wiki)
+            .getDocument(eq(userReference), any());
 
-        assertEquals(new HashSet<>(Collections.singletonList(userReference)),
-            StatsUtil.getRequestFilteredUsers(getContext()));
+        assertEquals(Set.of(userReference), StatsUtil.getRequestFilteredUsers(context));
 
         DocumentReference user2Reference = new DocumentReference("xwiki", "XWiki", "user2");
         final XWikiDocument user2Doc = new XWikiDocument(user2Reference);
         user2Doc.setNew(false);
         user2Doc.addXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), new BaseObject());
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user,XWiki.user2"));
-        this.mockXWiki.stubs().method("getDocument").with(eq(user2Reference), ANYTHING).will(returnValue(user2Doc));
+        doReturn("XWiki.user,XWiki.user2").when(wiki).Param(any());
+        doReturn(user2Doc)
+            .when(wiki)
+            .getDocument(eq(user2Reference), any());
 
-        assertEquals(new HashSet<>(Arrays.asList(userReference, user2Reference)),
-            StatsUtil.getRequestFilteredUsers(getContext()));
+        assertEquals(Set.of(userReference, user2Reference), StatsUtil.getRequestFilteredUsers(context));
 
         DocumentReference user3Reference = new DocumentReference("otherwiki", "XWiki", "user3");
         final XWikiDocument user3Doc = new XWikiDocument(user3Reference);
@@ -134,11 +151,14 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
         member.setStringValue("member", "user3");
         groupDoc.addXObject(new DocumentReference("otherwiki", "XWiki", "XWikiGroups"), member);
 
-        this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user,XWiki.user2,otherwiki:XWiki.group"));
-        this.mockXWiki.stubs().method("getDocument").with(eq(groupReference), ANYTHING).will(returnValue(groupDoc));
-        this.mockXWiki.stubs().method("getDocument").with(eq(user3Reference), ANYTHING).will(returnValue(user3Doc));
+        doReturn("XWiki.user,XWiki.user2,otherwiki:XWiki.group").when(wiki).Param(any());
+        doReturn(groupDoc)
+            .when(wiki)
+            .getDocument(eq(groupReference), eq(context));
+        doReturn(user3Doc)
+            .when(wiki)
+            .getDocument(eq(user3Reference), eq(context));
 
-        assertEquals(new HashSet<>(Arrays.asList(userReference, user2Reference, user3Reference)),
-            StatsUtil.getRequestFilteredUsers(getContext()));
+        assertEquals(Set.of(userReference, user2Reference, user3Reference), StatsUtil.getRequestFilteredUsers(context));
     }
 }

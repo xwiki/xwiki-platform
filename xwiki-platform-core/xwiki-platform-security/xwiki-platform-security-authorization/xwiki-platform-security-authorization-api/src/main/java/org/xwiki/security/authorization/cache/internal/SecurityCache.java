@@ -41,6 +41,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
     /**
      * Add an entry to this cache.
      * @param entry The rule entry to add.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
@@ -48,12 +49,13 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
-    void add(SecurityRuleEntry entry)
+    void add(SecurityRuleEntry entry, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
      * Add an entry to this cache.
      * @param entry The access entry to add.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
@@ -61,12 +63,13 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
-    void add(SecurityAccessEntry entry)
+    void add(SecurityAccessEntry entry, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
      * Add an entry for access to a local wiki entity by a global user.
      * @param entry The access entry to add.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @param wiki The sub-wiki context of this entry
      * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
@@ -77,7 +80,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      *
      * @since 5.0M2
      */
-    void add(SecurityAccessEntry entry, SecurityReference wiki)
+    void add(SecurityAccessEntry entry, SecurityReference wiki, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
@@ -85,6 +88,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      *
      * @param entry The user/group entry to insert.
      * @param groups Local groups references that this user/group is a member.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @exception ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
@@ -92,7 +96,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
-    void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
+    void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
@@ -100,6 +104,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      *
      * @param entry The user entry to insert.
      * @param groups Local group references that this user/group is a member.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @exception ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
@@ -109,8 +114,17 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      *
      * @since 5.0M2
      */
-    void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
+    void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException;
+
+    /**
+     * @return the invalidation counter. This value must be retrieved before loading any data for an entry to the
+     * security cache and then passed when adding the entry to the cache.
+     *
+     * @since 17.2.0RC1
+     * @since 16.10.9
+     */
+    long getInvalidationCounter();
 
     /**
      * Get immediate groups where the user/group is a member (directly in its wiki).
@@ -147,14 +161,14 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
 
     /**
      * Suspend delivery of invalidation events.
-     * 
+     *
      * @since 10.4RC1
      */
     void suspendInvalidation();
 
     /**
      * Resume delivery of invalidation events.
-     * 
+     *
      * @since 10.4RC1
      */
     void resumeInvalidation();

@@ -23,7 +23,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * A tree node group that aggregates multiple, optional, tree nodes.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.4.0RC1
  */
 @Role
-@Unstable
 public interface CompositeTreeNodeGroup extends TreeNodeGroup
 {
     /**

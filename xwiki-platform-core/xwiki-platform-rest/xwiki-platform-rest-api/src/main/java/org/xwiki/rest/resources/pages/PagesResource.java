@@ -35,11 +35,13 @@ import org.xwiki.rest.model.jaxb.Pages;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages")
 public interface PagesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Pages getPages(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("parentId") String parentFilterExpression,
             @QueryParam("order") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames

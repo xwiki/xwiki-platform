@@ -34,6 +34,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
@@ -51,6 +53,7 @@ import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.rest.model.jaxb.Entries;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
 import org.xwiki.livedata.rest.model.jaxb.StringMap;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -102,7 +105,10 @@ class DefaultLiveDataEntriesResourceTest
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
-    
+
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
     /*
      * Cannot be mocked by annotation because it is needed in the @BeforeComponent phase.
      */
@@ -132,6 +138,8 @@ class DefaultLiveDataEntriesResourceTest
         executionContext.setProperty("xwikicontext", this.xcontext);
         when(execution.getContext()).thenReturn(executionContext);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @BeforeEach
@@ -239,6 +247,21 @@ class DefaultLiveDataEntriesResourceTest
 
         verify(this.contextInitializer).initialize("wiki:s2");
         
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1, 1001 })
+    void getEntriesInvalidLimit(int limit)
+    {
+        List<String> properties = emptyList();
+        List<String> matchAll = emptyList();
+        List<String> sort = emptyList();
+        List<Boolean> descending = emptyList();
+
+        WebApplicationException exception =
+            assertThrows(WebApplicationException.class, () -> this.resource.getEntries("sourceId", null, properties,
+                matchAll, sort, descending, 0, limit));
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), exception.getResponse().getStatus());
     }
 
     @Test

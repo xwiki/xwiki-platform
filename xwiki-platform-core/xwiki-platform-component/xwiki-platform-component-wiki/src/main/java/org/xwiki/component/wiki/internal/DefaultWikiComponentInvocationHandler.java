@@ -152,7 +152,7 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
         } else {
             WikiComponentMethodExecutor methodExecutor =
                 componentManager.getInstance(WikiComponentMethodExecutor.class);
-            Map<String, Object> methodContext = new HashMap<String, Object>();
+            Map<String, Object> methodContext = new HashMap<>();
             XDOM xdom = this.wikiComponent.getHandledMethods().get(method.getName());
             methodContext.put(METHOD_CONTEXT_COMPONENT_KEY, proxy);
             this.injectComponentDependencies(methodContext);

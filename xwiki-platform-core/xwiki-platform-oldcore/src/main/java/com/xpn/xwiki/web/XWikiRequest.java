@@ -24,9 +24,14 @@ import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.container.Request;
 import org.xwiki.user.UserReference;
 
+/**
+ * @version $Id$
+ * @deprecated use the {@link org.xwiki.container.Container} API instead
+ */
+@Deprecated(since = "17.0.0RC1")
 public interface XWikiRequest extends HttpServletRequest
 {
     String get(String name);
@@ -44,9 +49,8 @@ public interface XWikiRequest extends HttpServletRequest
      * @since 16.4.1
      * @since 16.6.0RC1
      */
-    @Unstable
     default Optional<UserReference> getEffectiveAuthor()
     {
-        return Optional.empty();
+        return Optional.ofNullable((UserReference) getAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR));
     }
 }

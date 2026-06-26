@@ -167,6 +167,83 @@ public class NavigationPanelAdministrationPage extends ViewPage
         return (NavigationTreeElement) new NavigationTreeElement(this.treeElement).waitForIt();
     }
 
+    private WebElement getPageByTitle(String pageTitle)
+    {
+        return getDriver().findElementWithoutWaiting(this.treeElement,
+            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "'])"));
+    }
+
+    /**
+     * Check if the page with the given title is pinned or not.
+     * @param pageTitle the title of the page for which to check if it's pinned
+     * @return {@code true} if the page is pinned.
+     * @since 17.1.0
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    public boolean isPinned(String pageTitle)
+    {
+        WebElement pageItem = getPageByTitle(pageTitle);
+        return "true".equals(pageItem.getDomAttribute("data-pinned"));
+    }
+
+    private void togglePinnedPageStatus(String pageTitle)
+    {
+        WebElement pageItem = getPageByTitle(pageTitle);
+        pageItem.click();
+        WebElement buttonElement = getDriver().findElementWithoutWaiting(this.treeElement,
+            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "']/following-sibling::div"
+                + "[contains(@class, 'jstree-action')]/button)"));
+        getDriver().createActions().moveToElement(buttonElement).perform();
+        getDriver().waitUntilCondition(driver -> buttonElement.isDisplayed());
+        buttonElement.click();
+    }
+
+    /**
+     * Pin the given page if it's not pinned already.
+     * @param pageTitle the title of the page to pin.
+     * @since 17.1.0
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    public void pinPage(String pageTitle)
+    {
+        if (!isPinned(pageTitle)) {
+            togglePinnedPageStatus(pageTitle);
+        }
+    }
+
+    /**
+     * Unpin the page if it's pinned.
+     * @param pageTitle the title of the page to unpin.
+     * @since 17.1.0
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    public void unpinPage(String pageTitle)
+    {
+        if (isPinned(pageTitle)) {
+            togglePinnedPageStatus(pageTitle);
+        }
+    }
+
+    /**
+     * Drag the given page before the second page argument. Note that performing the drag&amp;drop should also perform a
+     * pin.
+     * @param pageTitleToDrag the title of the page to drag
+     * @param pageTitleToDropBefore the title of the page before which to drag
+     * @since 17.1.0
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    public void dragBefore(String pageTitleToDrag, String pageTitleToDropBefore)
+    {
+        WebElement pageItemToDrag = getPageByTitle(pageTitleToDrag);
+        WebElement pageItemToDropBefore = getPageByTitle(pageTitleToDropBefore);
+
+        getDriver().dragAndDrop(pageItemToDrag, pageItemToDropBefore);
+    }
+
     public void save()
     {
         this.saveButton.click();

@@ -27,9 +27,10 @@ import javax.inject.Inject;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,7 +46,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public abstract class AbstractWikiNotificationRendererComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     @Inject
-    protected AuthorizationManager authorizationManager;
+    protected DocumentAuthorizationManager authorizationManager;
 
     @Override
     public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
@@ -84,7 +85,7 @@ public abstract class AbstractWikiNotificationRendererComponentBuilder implement
     protected void checkRights(DocumentReference documentReference, DocumentReference authorReference)
             throws NotificationException
     {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference())) {
+        if (!this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference, documentReference)) {
             throw new NotificationException(
                     "Registering custom Notification Displayers requires wiki administration rights.");
         }

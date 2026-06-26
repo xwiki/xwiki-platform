@@ -34,7 +34,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
@@ -42,7 +41,6 @@ import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
-import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 /**
  * Convert all event status events to remote events and back to local events.
@@ -54,7 +52,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 @Component
 @Singleton
 @Named("eventstatus")
-public class EventStatusEventConverter extends AbstractEventConverter
+public class EventStatusEventConverter extends AbstractStreamEventConverter
 {
     private static final Set<Class<? extends Event>> EVENTS =
         new HashSet<>(Arrays.asList(EventStatusAddOrUpdatedEvent.class, EventStatusDeletedEvent.class));
@@ -64,9 +62,6 @@ public class EventStatusEventConverter extends AbstractEventConverter
     private static final String PROP_ENTITYID = "entityId";
 
     private static final String PROP_ISREAD = "isRead";
-
-    @Inject
-    private EventStore store;
 
     @Inject
     private Logger logger;
@@ -125,7 +120,7 @@ public class EventStatusEventConverter extends AbstractEventConverter
 
             String eventId = (String) map.get(PROP_EVENTID);
 
-            Optional<org.xwiki.eventstream.Event> event = this.store.getEvent(eventId);
+            Optional<org.xwiki.eventstream.Event> event = getEvent(eventId);
 
             if (event.isPresent()) {
                 return new DefaultEventStatus(event.get(), (String) map.get(PROP_ENTITYID),

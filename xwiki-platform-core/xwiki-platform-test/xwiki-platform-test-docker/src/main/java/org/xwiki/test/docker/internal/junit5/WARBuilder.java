@@ -22,15 +22,12 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,8 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -143,27 +140,33 @@ public class WARBuilder
             List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
+            maybeAddS3BlobStore(extraArtifacts);
+            // Resolve WEB-INF/lib from the minimal dependencies by default, or from the standard distribution WAR
+            // dependencies when the test requested the standardFlavor mode (so that the bundled core extensions match
+            // a real XWiki instance). Note: ExtensionInstaller must use the same root so that it agrees on what is
+            // bundled (and thus must not be re-provisioned).
             Collection<ArtifactResult> artifactResults =
-                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+                    this.testConfiguration.getWARDependenciesRootArtifactId());
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
             for (ArtifactResult artifactResult : artifactResults) {
                 Artifact artifact = artifactResult.getArtifact();
                 // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
-                if (artifact.getExtension().equalsIgnoreCase("war")) {
+                if ("war".equalsIgnoreCase(artifact.getExtension())) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
+                    if ("xwiki-platform-web-war".equals(artifact.getArtifactId())) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
-                    && artifact.getExtension().equals("jar"))
+                } else if ("xwiki-platform-flamingo-skin-resources".equals(artifact.getArtifactId())
+                    && "jar".equals(artifact.getExtension()))
                 {
                     skinDependencies.add(artifact.getFile());
-                } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
+                } else if (JAR.equalsIgnoreCase(artifact.getExtension())) {
                     jarDependencies.add(artifact);
                 }
             }
@@ -186,10 +189,6 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
-            // In order to make XWiki work OOB in Jetty 9, we need to replace jetty-web.xml with an overridden
-            // version. TODO: Remove once we drop support for Jetty 9.
-            handleJetty9(webInfDirectory);
-
             // Mark it as having been built successfully
             touchMarkerFile();
         }
@@ -202,11 +201,7 @@ public class WARBuilder
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
         LOGGER.info("Copying resources to WEB-INF/classes ...");
-        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
-        // in target/classes directly.
-        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
-            ? testConfiguration.getOutputDirectory() : "target";
-        File classesDirectory = new File(outputDirectory, "classes");
+        File classesDirectory = new File(testConfiguration.getMavenBuildDirectory(), "classes");
         if (classesDirectory.exists()) {
             copyDirectory(classesDirectory, webInfClassesDirectory);
         }
@@ -286,6 +281,16 @@ public class WARBuilder
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
+    private void maybeAddS3BlobStore(List<Artifact> extraArtifacts) throws Exception
+    {
+        if (this.testConfiguration.getBlobStore() == BlobStore.S3) {
+            // Explicitly add the S3 Blob Store since it's not part of the minimal dependencies, and we want to be
+            // able to start any test module with the S3 blob store without adding an explicit dependency.
+            extraArtifacts.add(new DefaultArtifact("org.xwiki.commons", "xwiki-commons-store-blob-s3", JAR,
+                this.mavenResolver.getCommonsVersion()));
+        }
+    }
+
     private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
     {
         String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
@@ -299,7 +304,7 @@ public class WARBuilder
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
     {
-        return jdbcDriverVersion != null && !jdbcDriverVersion.equalsIgnoreCase("pom");
+        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception
@@ -333,43 +338,5 @@ public class WARBuilder
     private File getMarkerFile()
     {
         return new File(this.targetWARDirectory, "build.marker");
-    }
-
-    private void handleJetty9(File webInfDirectory) throws Exception
-    {
-        ServletEngine engine = this.testConfiguration.getServletEngine();
-        String tag = this.testConfiguration.getServletEngineTag();
-        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) < 10) {
-            // Override the jetty-web.xml
-            copyJettyWebFile(webInfDirectory);
-        }
-    }
-
-    private void copyJettyWebFile(File webInfDirectory) throws Exception
-    {
-        File outputFile = new File(webInfDirectory, "jetty-web.xml");
-        if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Override jetty-web.xml since Jetty version is < 10");
-        }
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty9-web.xml");
-            IOUtils.copy(is, fos);
-        }
-    }
-
-    private int extractJettyVersionFromDockerTag(String tag)
-    {
-        int result = 10;
-        if (tag != null) {
-            Matcher matcher = MAJOR_VERSION.matcher(tag);
-            if (matcher.find()) {
-                try {
-                    result = Integer.valueOf(matcher.group());
-                } catch (NumberFormatException e) {
-                    // On error consider we're on Jetty 10
-                }
-            }
-        }
-        return result;
     }
 }

@@ -19,15 +19,14 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Named;
+
 import org.apache.solr.common.SolrDocument;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,58 +37,58 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
 /**
  * Unit tests for {@link SolrEntityReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
-public class SolrEntityReferenceResolverTest
+@ComponentTest
+class SolrEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EntityReferenceResolver<SolrDocument>> mocker =
-        new MockitoComponentMockingRule<EntityReferenceResolver<SolrDocument>>(SolrEntityReferenceResolver.class);
+    @InjectMockComponents
+    private SolrEntityReferenceResolver resolver;
+
+    @MockComponent
+    @Named("explicit")
+    private EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver;
 
     private SolrDocument solrDocument;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure()
     {
-        solrDocument = new SolrDocument();
-        solrDocument.setField(FieldUtils.WIKI, "chess");
-        solrDocument.setField(FieldUtils.SPACES, Arrays.asList("Path", "To", "Success"));
-        solrDocument.setField(FieldUtils.NAME, "WebHome");
-        solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, "fr");
+        this.solrDocument = new SolrDocument();
+        this.solrDocument.setField(FieldUtils.WIKI, "chess");
+        this.solrDocument.setField(FieldUtils.SPACES, List.of("Path", "To", "Success"));
+        this.solrDocument.setField(FieldUtils.NAME, "WebHome");
+        this.solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, "fr");
         // The file name field can have multiple values.
-        solrDocument.addField(FieldUtils.FILENAME, "image.png");
-        solrDocument.addField(FieldUtils.FILENAME, "presentation.odp");
+        this.solrDocument.addField(FieldUtils.FILENAME, "image.png");
+        this.solrDocument.addField(FieldUtils.FILENAME, "presentation.odp");
         // The class name field can have multiple values too.
-        solrDocument.addField(FieldUtils.CLASS, "App.Code.PlayerClass");
-        solrDocument.addField(FieldUtils.CLASS, "App.Code.TrainerClass");
-        solrDocument.setField(FieldUtils.NUMBER, 13);
-        solrDocument.setField(FieldUtils.PROPERTY_NAME, "age");
+        this.solrDocument.addField(FieldUtils.CLASS, "App.Code.PlayerClass");
+        this.solrDocument.addField(FieldUtils.CLASS, "App.Code.TrainerClass");
+        this.solrDocument.setField(FieldUtils.NUMBER, 13);
+        this.solrDocument.setField(FieldUtils.PROPERTY_NAME, "age");
 
-        EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver =
-            this.mocker.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit");
-        doAnswer(new Answer<EntityReference>()
-        {
-            @Override
-            public EntityReference answer(InvocationOnMock invocation) throws Throwable
-            {
-                EntityReference reference = invocation.getArgument(0);
-                EntityType type = invocation.getArgument(1);
-                return reference.extractReference(type);
-            }
-        }).when(explicitReferenceEntityReferenceResolver).resolve(any(EntityReference.class), any(EntityType.class));
+        doAnswer(invocation -> {
+            EntityReference reference = invocation.getArgument(0);
+            EntityType type = invocation.getArgument(1);
+            return reference.extractReference(type);
+        }).when(this.explicitReferenceEntityReferenceResolver).resolve(any(EntityReference.class),
+            any(EntityType.class));
     }
 
     @Test
-    public void resolve() throws Exception
+    void resolve()
     {
         WikiReference wikiReference = new WikiReference("chess");
         assertReference(wikiReference);
@@ -98,7 +97,7 @@ public class SolrEntityReferenceResolverTest
             new SpaceReference("Path", wikiReference))));
 
         DocumentReference documentReference =
-            new DocumentReference("chess", Arrays.asList("Path", "To", "Success"), "WebHome", Locale.FRENCH);
+            new DocumentReference("chess", List.of("Path", "To", "Success"), "WebHome", Locale.FRENCH);
         assertReference(documentReference);
 
         assertReference(new AttachmentReference("image.png", documentReference));
@@ -109,9 +108,9 @@ public class SolrEntityReferenceResolverTest
         assertReference(new ObjectPropertyReference("age", objectReference));
     }
 
-    private void assertReference(EntityReference reference) throws Exception
+    private void assertReference(EntityReference reference)
     {
-        solrDocument.setField(FieldUtils.TYPE, reference.getType().name());
-        assertEquals(reference, this.mocker.getComponentUnderTest().resolve(solrDocument, reference.getType()));
+        this.solrDocument.setField(FieldUtils.TYPE, reference.getType().name());
+        assertEquals(reference, this.resolver.resolve(this.solrDocument, reference.getType()));
     }
 }

@@ -23,6 +23,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
@@ -33,7 +34,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
+import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.resizers.Resizers;
 
 /**
  * Image processor implementation based on the Thumbnailator library.
@@ -47,6 +50,21 @@ import net.coobird.thumbnailator.Thumbnails;
 @Named("thumbnailator")
 public class ThumbnailatorImageProcessor extends DefaultImageProcessor
 {
+    @Override
+    public Image readImage(InputStream inputStream) throws IOException
+    {
+        // Use Thumbnailator to read the image to correctly interpret the orientation that is set in Exif metadata.
+        return Thumbnails.of(inputStream)
+            .scale(1)
+            // Ensure that nothing is actually resized and there is thus no quality loss.
+            .resizer(Resizers.NULL)
+            // Set the image type to the default one (ARGB) as Thumbnailator doesn't properly handle indexed PNG
+            // images, see https://github.com/coobird/thumbnailator/issues/41. This cannot be done later after
+            // analyzing the read image, as otherwise the colors would already be wrong.
+            .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
+            .asBufferedImage();
+    }
+
     @Override
     public void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException
     {
@@ -66,6 +84,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
                 return Thumbnails.of((BufferedImage) image).forceSize(width, height)
                     .imageType(getBestImageTypeFor(image)).asBufferedImage();
             } catch (IOException e) {
+                // If the scaling fails with Thumbnailator, we fall back to the default image processor.
+                // TODO: We should probably log a warning
             }
         }
         return super.scaleImage(image, width, height);
@@ -78,6 +98,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
             try {
                 return imageReaders.next().getFormatName();
             } catch (IOException e) {
+                // If an I/O error occurred while reading from input sources, return the passed mime type
+                // TODO: We should probably log a warning
             }
         }
         return mimeType;

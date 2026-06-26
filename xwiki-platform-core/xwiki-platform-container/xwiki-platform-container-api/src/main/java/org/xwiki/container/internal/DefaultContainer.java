@@ -35,6 +35,8 @@ import org.xwiki.container.Session;
  * its own value for these objects. In addition we sometime need to create a new request, response or session even while
  * in the same thread. For this use case we've added the possibility to push/pop different implementations for these
  * Objects.
+ *
+ * @version $Id$
  */
 @Component
 @Singleton
@@ -162,7 +164,7 @@ public class DefaultContainer implements Container
     @Override
     public void setRequest(Request request)
     {
-        Stack<Request> stack = new Stack<Request>();
+        Stack<Request> stack = new Stack<>();
         stack.push(request);
         this.request.set(stack);
     }
@@ -176,7 +178,7 @@ public class DefaultContainer implements Container
     @Override
     public void setResponse(Response response)
     {
-        Stack<Response> stack = new Stack<Response>();
+        Stack<Response> stack = new Stack<>();
         stack.push(response);
         this.response.set(stack);
     }
@@ -190,7 +192,7 @@ public class DefaultContainer implements Container
     @Override
     public void setSession(Session session)
     {
-        Stack<Session> stack = new Stack<Session>();
+        Stack<Session> stack = new Stack<>();
         stack.push(session);
         this.session.set(stack);
     }

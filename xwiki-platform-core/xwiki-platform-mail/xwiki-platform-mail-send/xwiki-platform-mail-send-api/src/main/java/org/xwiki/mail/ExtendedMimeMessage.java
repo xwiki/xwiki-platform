@@ -30,7 +30,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Base64;
-import org.xwiki.stability.Unstable;
 
 /**
  * Extension of the {@link javax.mail.internet.MimeMessage} in order to support processing by this mail API.
@@ -40,7 +39,7 @@ import org.xwiki.stability.Unstable;
  */
 public class ExtendedMimeMessage extends MimeMessage
 {
-    private static final ThreadLocal<SHA1Digest> SHA1_DIGEST = new ThreadLocal<SHA1Digest>();
+    private static final ThreadLocal<SHA1Digest> SHA1_DIGEST = new ThreadLocal<>();
 
     private static final String MESSAGE_ID_HEADER = "Message-ID";
     private static final String TO_HEADER = "To";
@@ -231,7 +230,6 @@ public class ExtendedMimeMessage extends MimeMessage
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public void addExtraData(String key, Object value)
     {
         this.extraDataMap.put(key, value);
@@ -246,7 +244,6 @@ public class ExtendedMimeMessage extends MimeMessage
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public Object getExtraData(String key)
     {
         return this.extraDataMap.get(key);

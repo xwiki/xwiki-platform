@@ -22,8 +22,6 @@ package org.xwiki.repository.test;
 import java.util.Map;
 
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -45,28 +43,19 @@ public class SolrTestUtils
 
     public SolrTestUtils(TestUtils testUtils) throws Exception
     {
-        this(testUtils, (String) null);
-    }
-
-    public SolrTestUtils(TestUtils testUtils, ServletEngine servletEngine) throws Exception
-    {
-        this(testUtils, String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT));
-    }
-
-    public SolrTestUtils(TestUtils testUtils, String url) throws Exception
-    {
         this.testUtils = testUtils;
-        this.url = url;
-        initService();
+        this.url = testUtils.getCurrentExecutor().getHttpClientBaseURL();
+
+        initService();        
     }
 
     private void initService() throws Exception
     {
         if (!this.testUtils.pageExists(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE)) {
-            // Create the utility page.
-            this.testUtils.rest().savePage(SOLRSERVICE_REFERENCE, "{{velocity}}$services.solr.queueSize{{/velocity}}",
-                null);
+            // Create the utility page as superadmin to avoid issues if the current user doesn't have script right
+            // or the permission to edit the page.
+            this.testUtils.rest().savePageAs(TestUtils.SUPER_ADMIN_CREDENTIALS, SOLRSERVICE_REFERENCE,
+                "{{velocity}}$services.solr.queueSize{{/velocity}}", null);
         }
     }
 

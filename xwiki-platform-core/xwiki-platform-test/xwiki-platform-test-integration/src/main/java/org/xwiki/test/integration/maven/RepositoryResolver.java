@@ -53,7 +53,10 @@ public class RepositoryResolver
      * repositories. Note that Maven still connects to the remote repos to read metadata. It's also possible (to be
      * checked) that artifacts will get downloaded if they don't exist locally.
      */
-    private static final RepositoryPolicy REPOSITORY_POLICY = new RepositoryPolicy(true, "never", "warn");
+    private static final RepositoryPolicy REPOSITORY_POLICY_ENABLED = new RepositoryPolicy(true, "never", "warn");
+
+    private static final RepositoryPolicy REPOSITORY_POLICY_DISABLED = new RepositoryPolicy(false,
+        REPOSITORY_POLICY_ENABLED.getUpdatePolicy(), REPOSITORY_POLICY_ENABLED.getChecksumPolicy());
 
     private RemoteRepositoryManager remoteRepositoryManager;
 
@@ -127,6 +130,11 @@ public class RepositoryResolver
         String localRepoLocation = System.getProperty("maven.repo.local",
             String.format("%s/.m2/repository", System.getProperty("user.home")));
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        // Initialize the session with the current JVM system properties. Without this, the session has no system
+        // properties at all, and any POM in the resolved lineage that declares a profile activated by <jdk> (for
+        // example software.amazon.awssdk:aws-sdk-java-pom, imported transitively through xwiki-commons) cannot be
+        // evaluated since "java.version" is missing, which makes the Maven model building fail.
+        session.setSystemProperties(System.getProperties());
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
@@ -141,17 +149,20 @@ public class RepositoryResolver
     {
         RemoteRepository mavenCentral = new RemoteRepository.Builder(
             "central", DEFAULT_REPO_TYPE, "https://repo1.maven.org/maven2/")
-            .setPolicy(REPOSITORY_POLICY)
+            .setReleasePolicy(REPOSITORY_POLICY_ENABLED)
+            .setSnapshotPolicy(REPOSITORY_POLICY_DISABLED)
             .build();
         RemoteRepository mavenXWiki = new RemoteRepository.Builder(
-            "xwiki", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public")
-            .setPolicy(REPOSITORY_POLICY)
+            "xwiki", DEFAULT_REPO_TYPE, "https://nexus-snapshots.xwiki.org/repository/public-proxy")
+            .setReleasePolicy(REPOSITORY_POLICY_ENABLED)
+            .setSnapshotPolicy(REPOSITORY_POLICY_DISABLED)
             .build();
         RemoteRepository mavenXWikiSnapshot = new RemoteRepository.Builder(
             // Note: we make sure to use the same id as the one used my Maven in the hope to have more up to date
             // metadata (in maven-metadata-xwiki-snapshots.xml).
             "xwiki-snapshots", DEFAULT_REPO_TYPE, "https://nexus-snapshots.xwiki.org/repository/snapshots/")
-            .setPolicy(REPOSITORY_POLICY)
+            .setReleasePolicy(REPOSITORY_POLICY_DISABLED)
+            .setSnapshotPolicy(REPOSITORY_POLICY_ENABLED)
             .build();
 
         return Arrays.asList(mavenXWiki, mavenCentral, mavenXWikiSnapshot);

@@ -50,9 +50,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
  * 
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {
     /**
@@ -180,7 +178,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      */
     public List<String> getFileList(Document document, String attachmentName, XWikiContext context)
     {
-        List<String> zipList = new ArrayList<String>();
+        List<String> zipList = new ArrayList<>();
         Attachment attachment = document.getAttachment(attachmentName);
 
         InputStream stream = null;
@@ -228,8 +226,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     public List<ListItem> getFileTreeList(Document document, String attachmentName, XWikiContext context)
     {
         List<String> flatList = getFileList(document, attachmentName, context);
-        Map<String, ListItem> fileTree = new HashMap<String, ListItem>();
-        List<ListItem> res = new ArrayList<ListItem>();
+        Map<String, ListItem> fileTree = new HashMap<>();
+        List<ListItem> res = new ArrayList<>();
         for (String url : flatList) {
             StringBuilder buf = new StringBuilder(url.length());
             String parentBuf = "";

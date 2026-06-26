@@ -42,7 +42,6 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide logging related script oriented APIs.
@@ -94,7 +93,7 @@ public class LoggingScriptService implements ScriptService
     {
         Collection<Logger> registeredLoggers = this.loggerManager.getLoggers();
 
-        Map<String, LogLevel> levels = new HashMap<String, LogLevel>(registeredLoggers.size());
+        Map<String, LogLevel> levels = new HashMap<>(registeredLoggers.size());
 
         for (Logger registeredLogger : registeredLoggers) {
             levels.put(registeredLogger.getName(), getLevel(registeredLogger.getName()));
@@ -174,7 +173,6 @@ public class LoggingScriptService implements ScriptService
      * @since 15.0RC1
      * @since 14.10.1
      */
-    @Unstable
     public Message translate(Message message)
     {
         if (message != null) {
@@ -184,7 +182,10 @@ public class LoggingScriptService implements ScriptService
                 Translation translation = this.localization.getTranslation(message.getTranslationKey());
 
                 if (translation != null) {
-                    return LogUtils.translate(message, (String) translation.getRawSource());
+                    // FIXME: it might not actually be a MessageFormat based translation, introduce a more accurate
+                    // extension point
+                    return LogUtils.translate(message, (String) translation.getRawSource(),
+                        LogUtils.MESSAGE_FORMAT_SYNTAX);
                 }
             }
         }

@@ -23,28 +23,37 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.Right;
@@ -60,8 +69,13 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +143,8 @@ class DefaultWikiMacroTest
 
         this.oldcore.getSpyXWiki().saveDocument(this.wikiMacroDocument, this.oldcore.getXWikiContext());
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.PROGRAM), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(same(Right.PROGRAM), isNull(), any(), any()))
+            .thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.PROGRAM))).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.SCRIPT))).thenReturn(true);
         when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
@@ -141,21 +156,21 @@ class DefaultWikiMacroTest
         this.oldcore.getXWikiContext().put("sdoc", sDocument);
     }
 
-    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception
+    private DefaultWikiMacro registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", true),
                 new WikiMacroParameterDescriptor("param2", "This is param2", true));
-        registerWikiMacro(macroId, macroContent, syntax, parameterDescriptors);
+        return registerWikiMacro(macroId, macroContent, syntax, parameterDescriptors);
     }
 
-    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
+    private DefaultWikiMacro registerWikiMacro(String macroId, String macroContent, Syntax syntax,
         List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
     {
-        registerWikiMacro(macroId, macroContent, syntax, new DefaultContentDescriptor(false), parameterDescriptors);
+        return registerWikiMacro(macroId, macroContent, syntax, new DefaultContentDescriptor(false), parameterDescriptors);
     }
 
-    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
+    private DefaultWikiMacro registerWikiMacro(String macroId, String macroContent, Syntax syntax,
         DefaultContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
         throws Exception
     {
@@ -172,6 +187,8 @@ class DefaultWikiMacroTest
         wikiMacro.initialize(this.wikiMacroObject, descriptor);
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
+
+        return wikiMacro;
     }
 
     private void registerWikiMacro(String macroId, String macroContent) throws Exception
@@ -221,6 +238,63 @@ class DefaultWikiMacroTest
             + "</entry><entry><string>param2</string><string>value2</string></entry></parameters></p><paragraph>"
             + "<word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word>"
             + "</format></paragraph></macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
+    }
+
+    @Test
+    void preparedMacroWithWikiContent() throws Exception
+    {
+        DefaultWikiMacro wikiMacro = registerWikiMacro("wikimacro", "{{wikimacrocontent/}}", Syntax.XWIKI_2_0,
+            new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE), Collections.emptyList());
+
+        MacroBlock wikiMacroCall = new MacroBlock("wikimacro", Map.of(), "content", false);
+        XDOM xdom = new XDOM(List.of(wikiMacroCall), new MetaData(Map.of(MetaData.SYNTAX, Syntax.XWIKI_2_0)));
+
+        wikiMacro.prepare(wikiMacroCall);
+
+        XDOM preparedXDOM = (XDOM) wikiMacroCall.getAttribute(MacroContentParser.ATTRIBUTE_PREPARE_CONTENT_XDOM);
+        assertEquals(List.of(new ParagraphBlock(List.of(new WordBlock("content")))), preparedXDOM.getChildren());
+
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setCurrentMacroBlock(wikiMacroCall);
+        context.setInline(false);
+        context.setXDOM(xdom);
+        List<Block> result = wikiMacro.execute(new WikiMacroParameters(), wikiMacroCall.getContent(), context);
+
+        assertEquals(preparedXDOM.getChildren(), result.get(0).getChildren());
+        assertNotSame(preparedXDOM.getChildren().get(0), result.get(0).getChildren().get(0));
+
+        XDOM falsePreparedXDOM = new XDOM(List.of(new WordBlock("false prepared content")),
+            new MetaData(Map.of(MetaData.SYNTAX, Syntax.XWIKI_2_0)));
+        wikiMacroCall.setAttribute(MacroContentParser.ATTRIBUTE_PREPARE_CONTENT_XDOM, falsePreparedXDOM);
+
+        result = wikiMacro.execute(new WikiMacroParameters(), wikiMacroCall.getContent(), context);
+
+        assertEquals(falsePreparedXDOM.getChildren(), result.get(0).getChildren());
+        assertNotSame(falsePreparedXDOM.getChildren().get(0), result.get(0).getChildren().get(0));
+    }
+
+    @Test
+    void preparedMacroIndex() throws Exception
+    {
+        DefaultWikiMacro wikiMacro = registerWikiMacro("wikimacro", "word", Syntax.XWIKI_2_0,
+            new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE), Collections.emptyList());
+
+        MacroBlock wikiMacroCall = new MacroBlock("wikimacro", Map.of(), "content", false);
+        new XDOM(List.of(wikiMacroCall), new MetaData(Map.of(MetaData.SYNTAX, Syntax.XWIKI_2_0)));
+
+        wikiMacro.prepare(wikiMacroCall);
+
+        Object preparedIndex = wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID);
+        assertNotNull(preparedIndex);
+        assertInstanceOf(String.class, preparedIndex);
+
+        // Enable async
+        FieldUtils.writeField(wikiMacro, "asyncAllowed", true, true);
+        wikiMacroCall.setAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID, null);
+
+        wikiMacro.prepare(wikiMacroCall);
+
+        assertNull(wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID));
     }
 
     /**
@@ -704,5 +778,26 @@ class DefaultWikiMacroTest
         //@formatter:on
 
         assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void wikiMacroParameterWithDefaultValueContext() throws Exception
+    {
+        String defaultValue = "{{velocity}}$xcontext.sdoc{{/velocity}}";
+        List<WikiMacroParameterDescriptor> parameterDescriptors = List.of(new WikiMacroParameterDescriptor("param",
+            "Test parameter", false, defaultValue, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("defaultmacro", "{{wikimacroparameter name=\"param\"/}}", Syntax.XWIKI_2_1,
+            parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(
+            new StringReader("{{defaultmacro /}} {{defaultmacro param=\"Outside: %s\" /}}".formatted(defaultValue)),
+            Syntax.XWIKI_2_1, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("space.macroPage Outside: sspace.sdoc", printer.toString());
+
     }
 }

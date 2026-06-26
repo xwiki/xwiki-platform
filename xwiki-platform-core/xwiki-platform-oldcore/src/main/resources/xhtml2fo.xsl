@@ -1235,7 +1235,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         </fo:block>
     </xsl:template>
 
-    <xsl:template name="process-pre" mode="transform">
+    <xsl:template name="process-pre">
         <xsl:call-template name="process-common-attributes"/>
         <!-- remove leading CR/LF/CRLF char -->
         <xsl:variable name="crlf"><xsl:text>&#xD;&#xA;</xsl:text></xsl:variable>

@@ -102,4 +102,10 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
             return Collections.singletonList(new GroupBlock(placeholderParameters));
         }
     }
+
+    @Override
+    public boolean isExecutionIsolated(WikiMacroParameterMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

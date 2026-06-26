@@ -19,11 +19,10 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,14 +97,15 @@ class DefaultParametrizedNotificationManagerTest
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         when(pref1.getProperties())
             .thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
-        when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
+        when(this.recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class)))
+            .thenReturn(true);
 
         // We consider a grouping algorithm, where each event creates a composite.
         doAnswer(invocationOnMock -> {
@@ -147,7 +147,7 @@ class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 2;
-        parameters.preferences = Arrays.asList(pref1);
+        parameters.preferences = List.of(pref1);
         List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
@@ -200,8 +200,8 @@ class DefaultParametrizedNotificationManagerTest
 
         // Verify
         assertEquals(2, results.size());
-        assertEquals(event1, results.get(0).getEvents().get(0));
-        assertEquals(event5, results.get(1).getEvents().get(0));
+        assertEquals(event1, results.getFirst().getEvents().getFirst());
+        assertEquals(event5, results.get(1).getEvents().getFirst());
     }
 
     @Test
@@ -234,7 +234,7 @@ class DefaultParametrizedNotificationManagerTest
         Event event5 = createMockedEvent();
         Event event6 = createMockedEvent();
 
-        when(recordableEventDescriptorHelper.hasDescriptor(isNull(), any(DocumentReference.class))).thenReturn(true);
+        when(this.recordableEventDescriptorHelper.hasDescriptor(isNull(), any(DocumentReference.class))).thenReturn(true);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
@@ -306,14 +306,14 @@ class DefaultParametrizedNotificationManagerTest
             any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
         when(filter2.filterEvent(eq(event2), any(DocumentReference.class), anyCollection(),
             any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
-        parameters.filters = Arrays.asList(filter1, filter2);
+        parameters.filters = List.of(filter1, filter2);
         when(filter1.compareTo(filter2)).thenReturn(1);
         when(filter2.compareTo(filter1)).thenReturn(-1);
 
         List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         assertEquals(1, results.size());
-        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event1, results.getFirst().getEvents().getFirst());
     }
 
     @Test
@@ -329,7 +329,7 @@ class DefaultParametrizedNotificationManagerTest
             .thenReturn(true);
         when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
 
-        when(recordableEventDescriptorHelper.hasDescriptor(eq("customThing"), eq(userA))).thenReturn(false);
+        when(recordableEventDescriptorHelper.hasDescriptor("customThing", userA)).thenReturn(false);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
@@ -345,7 +345,7 @@ class DefaultParametrizedNotificationManagerTest
         List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         assertEquals(1, results.size());
-        assertEquals(event2, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.getFirst().getEvents().getFirst());
     }
 
     @Test
@@ -381,7 +381,7 @@ class DefaultParametrizedNotificationManagerTest
     {
         Event event = createMockedEvent();
         when(event.getType()).thenReturn("update");
-        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar")));
+        when(event.getTarget()).thenReturn(Set.of("Foo.bar"));
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any())).thenReturn(true);
         when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any())).thenReturn(true);
@@ -397,22 +397,22 @@ class DefaultParametrizedNotificationManagerTest
         // We also check that we tried to look in the groups.
         List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertTrue(results.isEmpty());
-        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+        verify(this.groupManager).getGroups(this.userReference, null, true);
 
         // the current user is targeted explicitely by the event: we get a result.
         // We also check that we don't perform any check in groups in that case
-        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar", "XWiki.UserA")));
+        when(event.getTarget()).thenReturn(Set.of("Foo.bar", "XWiki.UserA"));
         results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertEquals(1, results.size());
-        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+        verify(this.groupManager).getGroups(this.userReference, null, true);
 
         DocumentReference groupReference = mock(DocumentReference.class);
-        when(this.groupManager.getGroups(this.userReference, null, true)).thenReturn(Arrays.asList(groupReference));
+        when(this.groupManager.getGroups(this.userReference, null, true)).thenReturn(List.of(groupReference));
         when(this.serializer.serialize(groupReference)).thenReturn("Foo.bar");
 
         // the current user is targeted by the event, but this time through a group: we get a result.
         // We also check that we did perform a new check in groups
-        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar")));
+        when(event.getTarget()).thenReturn(Set.of("Foo.bar"));
         results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertEquals(1, results.size());
         verify(this.groupManager, times(2)).getGroups(this.userReference, null, true);
@@ -420,7 +420,7 @@ class DefaultParametrizedNotificationManagerTest
         // the current user is targeted explicitely by the event, but also through a group: we should still get a single
         // result
         // We also check that we don't perform any supplementary check in groups in that case
-        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar", "XWiki.UserA")));
+        when(event.getTarget()).thenReturn(Set.of("Foo.bar", "XWiki.UserA"));
         results = this.defaultParametrizedNotificationManager.getEvents(parameters);
         assertEquals(1, results.size());
         verify(this.groupManager, times(2)).getGroups(this.userReference, null, true);

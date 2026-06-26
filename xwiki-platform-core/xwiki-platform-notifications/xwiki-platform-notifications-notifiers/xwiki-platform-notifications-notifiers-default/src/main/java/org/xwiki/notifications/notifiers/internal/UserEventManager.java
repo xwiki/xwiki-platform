@@ -112,7 +112,7 @@ public class UserEventManager implements Initializable
     public boolean isListening(Event event, DocumentReference user, NotificationFormat format)
     {
         try {
-            if (hasAccess(user, event) && isEventAfterUserCreationDate(event, user)
+            if (isEventAfterUserCreationDate(event, user)
                 && (hasCorrespondingNotificationPreference(user, event, format)
                     || isTriggeredByAFollowedUser(user, event, format))) {
                 // Apply the filters that the user has defined in its notification preferences
@@ -121,7 +121,12 @@ public class UserEventManager implements Initializable
                     true, NotificationFilter.FilteringPhase.PRE_FILTERING));
                 filters.sort(null);
 
-                return !isEventFiltered(filters, event, user, format);
+                // The access check is performed last as it can be expensive, in particular with custom
+                // authorization code, and it puts a lot of stress on the security cache which has a limited size.
+                // This is good for cases where most users have access to the entity associated with the event but
+                // few users get notifications for it. It is bad for situations where most users don't have access to
+                // the event, but many of them have a huge number of notification filters.
+                return !isEventFiltered(filters, event, user, format) && hasAccess(user, event);
             }
         } catch (NotificationException e) {
             this.logger.error("Failed to get event filters for user [{}]", user, e);

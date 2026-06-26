@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.UserConfiguration;
@@ -79,12 +78,8 @@ public class DefaultUserConfiguration implements UserConfiguration
     private Properties getPreferencesFor(String userName)
     {
         Properties properties = new Properties();
-        // Note: We miss a CS API to get only keys matching a pattern so we have to iterate over all of them...
-        for (String key : this.xwikiPropertiesSource.getKeys()) {
-            String preferenceKey = StringUtils.substringAfter(key, PREFIX + "preferences." + userName + ".");
-            if (!StringUtils.isEmpty(preferenceKey)) {
-                properties.setProperty(preferenceKey, this.xwikiPropertiesSource.getProperty(key));
-            }
+        for (String key : this.xwikiPropertiesSource.getKeys(PREFIX + "preferences." + userName + ".")) {
+            properties.setProperty(key, this.xwikiPropertiesSource.getProperty(key));
         }
         return properties;
     }

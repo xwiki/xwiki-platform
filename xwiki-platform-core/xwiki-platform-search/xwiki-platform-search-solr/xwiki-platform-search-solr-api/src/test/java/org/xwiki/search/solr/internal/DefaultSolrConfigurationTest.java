@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultSolrConfigurationTest
+class DefaultSolrConfigurationTest
 {
     @MockComponent
     @Named("xwikiproperties")
@@ -49,7 +49,7 @@ public class DefaultSolrConfigurationTest
     private DefaultSolrConfiguration configuration;
 
     @Test
-    public void getServerType()
+    void getServerType()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_TYPE_PROPERTY,
             DefaultSolrConfiguration.SOLR_TYPE_DEFAULT)).thenReturn("toto");
@@ -58,7 +58,7 @@ public class DefaultSolrConfigurationTest
     }
 
     @Test
-    public void getIndexerBatchSize()
+    void getIndexerBatchSize()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_INDEXER_BATCH_SIZE_PROPERTY,
             DefaultSolrConfiguration.SOLR_INDEXER_BATCH_SIZE_DEFAULT)).thenReturn(42);
@@ -67,7 +67,7 @@ public class DefaultSolrConfigurationTest
     }
 
     @Test
-    public void getIndexerBatchMaxLengh()
+    void getIndexerBatchMaxLengh()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY,
             DefaultSolrConfiguration.SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT)).thenReturn(42);
@@ -76,7 +76,7 @@ public class DefaultSolrConfigurationTest
     }
 
     @Test
-    public void getIndexerQueueCapacity()
+    void getIndexerQueueCapacity()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY,
             DefaultSolrConfiguration.SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT)).thenReturn(42);
@@ -86,7 +86,7 @@ public class DefaultSolrConfigurationTest
     }
 
     @Test
-    public void synchronizeAtStartup()
+    void synchronizeAtStartup()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT)).thenReturn(true);
@@ -100,7 +100,7 @@ public class DefaultSolrConfigurationTest
     }
 
     @Test
-    public void synchronizeAtStartupMode()
+    void synchronizeAtStartupMode()
     {
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("farm");
@@ -125,5 +125,14 @@ public class DefaultSolrConfigurationTest
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("");
         assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
+    }
+
+    @Test
+    void getSynchronizationBatchSize()
+    {
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_BATCH_SIZE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT)).thenReturn(42);
+
+        assertEquals(42, this.configuration.getSynchronizationBatchSize());
     }
 }

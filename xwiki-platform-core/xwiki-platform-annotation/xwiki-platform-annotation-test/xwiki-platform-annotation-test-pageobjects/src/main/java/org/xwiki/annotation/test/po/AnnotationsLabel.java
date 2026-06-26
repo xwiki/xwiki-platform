@@ -47,7 +47,7 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        getDriver().findElement(By.id(annotationId)).click();
+        getDriver().findElement(By.className(annotationId)).click();
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
@@ -98,8 +98,10 @@ public class AnnotationsLabel extends BaseElement
 
     public String getAnnotationIdByText(String searchText)
     {
-        getDriver().waitUntilElementIsVisible(By.xpath("//span[contains(.,'" + searchText + "')]"));
-        WebElement annotation = getDriver().findElement(By.xpath("//span[contains(.,'" + searchText + "')]"));
+        String xpathToFindAnnotationByText = "//*[contains(@class, 'annotation-highlight') " 
+            + "and contains(.,'" + searchText + "')]";
+        getDriver().waitUntilElementIsVisible(By.xpath(xpathToFindAnnotationByText));
+        WebElement annotation = getDriver().findElement(By.xpath(xpathToFindAnnotationByText));
         String classId = annotation.getAttribute("class");
         classId = classId.split("\\s+")[1];
         return classId;
@@ -109,9 +111,9 @@ public class AnnotationsLabel extends BaseElement
     {
         hoverOnAnnotationByText(searchText);
         getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='annotationText']/p"));
-        String annotationContent =
-            getDriver().findElement(By.xpath("//*[@class='annotation-bubble']//div[@class='annotationText']/p"))
-                .getText();
+        String annotationContent = getDriver()
+            .findElement(By.xpath("//*[contains(@class, 'annotation-bubble')]//div[@class='annotationText']/p"))
+            .getText();
         WebElement body = getDriver().findElement(By.id("body"));
 
         // It seems that hovering over the small yellow icon sends 2 requests, and one ESC is not enough to make the

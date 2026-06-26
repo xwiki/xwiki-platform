@@ -156,7 +156,6 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
         // Parse the wiki macro content.
         Block block = execute(async, cached);
 
-        ///////////////////////////////////////
         // Rendering
 
         String resultString = null;

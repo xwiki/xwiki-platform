@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.Translations" locale="de">
+<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="de">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>de</language>
@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Name
 extension.repository.summary=Zusammenfassung
 extension.repository.type=Typ
@@ -49,5 +49,96 @@ extension.repository.rating=Bewertung
 extension.repository.installedCount=Installationen
 
 ## Administration UI
-admin.repository=Repository mit Erweiterungen</content>
+admin.repository=Repository mit Erweiterungen
+
+## Support
+repository.support.createsupporter=Registrieren
+
+## Supporters
+repository.supporter.sheet.description=Diese Seite steuert, wie Extension-Supporter-Seiten im Anzeige- und Bearbeitungsmodus angezeigt werden.
+repository.supporter.sheet.noObject=Die aktuelle Seite verfügt nicht über das erwartete Extension-Supporter-Objekt.
+repository.supporter.sheet.createplan=Hinzufügen
+repository.supporter.sheet.plans=Pläne
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Name
+ExtensionCode.ExtensionSupporterClass_summary=Zusammenfassung
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=E-Mail
+ExtensionCode.ExtensionSupporterClass_content=Erläuterungen
+ExtensionCode.ExtensionSupporterClass_active=Aktiv
+
+## Support plans
+repository.supportplan.sheet.description=Diese Seite steuert, wie ExtensionSupport-Plan-Seiten sowohl im Ansichts- als auch im Bearbeitungsmodus angezeigt werden.
+repository.supportplan.sheet.noObject=Die aktuelle Seite verfügt nicht über das erwartete Extension-Support-Plan-Objekt.
+repository.supportplan.sheet.supportedExtensions=Unterstützte Erweiterungen
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+ExtensionCode.ExtensionSupportPlanClass_supporter=Unterstützer
+ExtensionCode.ExtensionSupportPlanClass_summary=Zusammenfassung
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Erläuterungen
+ExtensionCode.ExtensionSupportPlanClass_active=Aktiv
+ExtensionCode.ExtensionSupportPlanClass_paying=Bezahlen
+
+## Extension sheet
+repository.extension.sheet.name=Name
+repository.extension.sheet.project=Projekt
+repository.extension.sheet.type=Typ
+repository.extension.sheet.category=Kategorie
+repository.extension.sheet.summary=Zusammenfassung
+repository.extension.sheet.authors=Autoren
+repository.extension.sheet.rating=Bewertung
+repository.extension.sheet.title=Bogen der Erweiterung
+repository.extension.sheet.imported=Erweiterung aus dem Repository importiert
+repository.extension.sheet.updateExtension=Erweiterung aktualisieren
+repository.extension.sheet.developedBy=Entwickelt von
+repository.extension.sheet.unknown=Unbekannt
+repository.extension.sheet.support=Unterstützung
+repository.extension.sheet.activeInstalls=Aktive Installationen
+repository.extension.sheet.license=Lizenz
+repository.extension.sheet.installable=Kann über den Extension Manager installiert werden
+repository.extension.sheet.documentation=Dokumentation
+repository.extension.sheet.sources=Quellen
+repository.extension.sheet.issues=Probleme
+repository.extension.sheet.download=Download v{0}
+repository.extension.sheet.toc=Inhaltsverzeichnis
+repository.extension.sheet.documentationHelp=Hilfe zur Dokumentation
+repository.extension.sheet.rulesIntro=Hier sind einige Regeln, die bei der Bereitstellung einer Erweiterung zu beachten sind:
+repository.extension.sheet.ruleSummary=Eine kurze Zusammenfassung verwenden. Diese wird in der Extension-Livetable angezeigt und sollte dort im Idealfall nicht mehr als eine Zeile einnehmen.
+repository.extension.sheet.ruleImported=Wenn eine Erweiterung importiert wird, haben alle Elemente aus der Quelle Vorrang vor den Inhalten der Seite. Daher sollte man darauf achten, die pom.xml oder das jeweilige Format, aus dem importiert wird, korrekt einzurichten, oder die automatische Aktualisierung deaktivieren, damit man selbst entscheiden kann, wann importierte Informationen aktualisiert und geändert werden sollen
+repository.extension.sheet.autoSync=Die Erweiterungsdaten automatisch synchronisieren
+repository.extension.sheet.source=Quelle
+repository.extension.sheet.iconLocation=Speicherort des Icons
+repository.extension.sheet.iconLocationSyntax=Syntax:
+repository.extension.sheet.iconLocationLinkText=Name des Icons
+repository.extension.sheet.showActiveInstalls=Aktive Installationen anzeigen
+repository.extension.sheet.supportPlans=Unterstützungspläne
+repository.extension.sheet.description=Beschreibung
+repository.extension.sheet.prerequisites=Voraussetzungen &amp; Installationsanleitung
+repository.extension.sheet.customInstallationOnly=Nur für individuelle Installation
+repository.extension.sheet.standardInstallationInstructions=Standard-Installationsanleitung
+repository.extension.sheet.customInstallationInstructions=Individuelle Installationsanleitung
+repository.extension.sheet.versions=Versionen
+repository.extension.sheet.releaseNotes=Veröffentlichungshinweise (Release Notes)
+repository.extension.sheet.dependencies=Abhängigkeiten
+repository.extension.sheet.dependenciesIntro=Abhängigkeiten für diese Erweiterung ({0}):
+repository.extension.sheet.currentDownloads=Aktuelle Downloads
+repository.extension.sheet.addDownloads=Downloads hinzufügen
+repository.extension.sheet.addDownloadsSaveFirst=Um Download-Informationen für diese Erweiterung hinzuzufügen, muss diese Seite zunächst gespeichert und anschließend erneut bearbeitet werden.
+repository.extension.sheet.addDownloadsWarning=Wenn Änderungen an diesem Formular vorgenommen wurden, muss die Seite unbedingt gespeichert werden, bevor auf die untenstehenden Links geklickt wird, da sonst die eingegebenen Informationen verloren gehen.
+repository.extension.sheet.addDownloadsProcess=Es gibt noch keine benutzerfreundliche Oberfläche, um neue Download-Versionen hinzuzufügen oder bestehende zu bearbeiten, daher läuft das derzeit in zwei Schritten ab:
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+repository.extension.sheet.addDownloadsAttach=Wenn eine neuer Download bereitgestellt wird, {0}füge die neue Version an diese Seite an{1} und kehre dann zu dieser Seite zurück. Achte darauf, die Versionsnummer im Dateinamen anzugeben (z. B. ubercoolmacro-1.0.xar).
+repository.extension.sheet.addDownloadsInfo=Füge Download-Informationen für den neuen Anhang hinzu, indem du ein neues Feld {0}Extension Version{1} ausfüllst. Achte darauf, alle Daten einzugeben, insbesondere die Version und den Link zum Anhang. Um einen Link zum Anhang zu erstellen, kannst du {2} verwenden.
+repository.extension.sheet.currentDependencies=Aktuelle Abhängigkeiten
+repository.extension.sheet.addDependencies=Abhängigkeiten hinzufügen
+repository.extension.sheet.addDependenciesIntro=Du kannst jeder Version auch Abhängigkeiten zuweisen, indem du die folgenden Informationen zu neuen {0}Abhängigkeiten{1} eingibst:
+repository.extension.sheet.addDependenciesVersion=Die Extension-Version ist die Version, der diese Abhängigkeit zugeordnet ist
+repository.extension.sheet.addDependenciesId=Die Abhängigkeits-ID ist die Kennung der abhängigen Erweiterung in dem Repository, in dem sie gespeichert ist
+repository.extension.sheet.addDependenciesConstraint=Die Versionsbeschränkung einer Abhängigkeit ist die versionbezogene Information der Abhängigkeit. Dabei kann es sich um eine Versionsnummer (z. B. 1.0) oder um einen oder mehrere Versionsbereiche gemäß der Maven-Standardsyntax handeln (z. B. [1.0,), was „mindestens 1.0“ bedeutet)
+repository.extension.sheet.wrongObject=Dieser Klassenbogen muss auf ein Dokument angewendet werden, das ein ExtensionCode.ExtensionClass-Objekt enthält
+</content>
 </xwikidoc>

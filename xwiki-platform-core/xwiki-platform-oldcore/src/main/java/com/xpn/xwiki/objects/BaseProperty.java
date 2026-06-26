@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -32,7 +31,6 @@ import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -41,10 +39,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 /**
  * @version $Id$
  */
-// TODO: shouldn't this be abstract? toFormString and toText
-// will never work unless getValue is overriden
-public class BaseProperty<R extends EntityReference> extends BaseElement<R>
-    implements PropertyInterface, Serializable, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface,
+    Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -54,11 +50,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     private BaseCollection object;
 
     private long id;
-
-    /**
-     * Set to true if value is not the same as the database value.
-     */
-    private boolean isValueDirty = true;
 
     @Override
     protected R createReference()
@@ -82,7 +73,17 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setObject(BaseCollection object)
     {
-        this.object = object;
+        if (this.object != object) {
+            this.object = object;
+
+            if (this.object != null) {
+                setOwnerDocument(object.getOwnerDocument());
+
+                if (isDirty()) {
+                    this.object.setDirty(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -125,9 +126,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setId(long id)
     {
-        // I hate this.. needed for hibernate to find the object
-        // when loading the collections..
-        this.id = id;
+        if (id != this.id) {
+            // I hate this.. needed for hibernate to find the object
+            // when loading the collections..
+            this.id = id;
+
+            setDirty(true);
+        }
     }
 
     @Override
@@ -143,25 +148,46 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
         return getClass().getName();
     }
 
+    /**
+     * Should set the class type, but {@link #getClassType()} actually relies on {@link #getClass()} so this should
+     * never be used.
+     * @param type the type supposed to be set.
+     * @deprecated this method does nothing.
+     */
+    @Deprecated(since = "18.2.0RC1")
     public void setClassType(String type)
     {
     }
 
     @Override
+    protected void detachOwner()
+    {
+        super.detachOwner();
+
+        setObject(null);
+    }
+
+    @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXObject(this.object.getReference()));
+        }
+    }
+
+    @Override
     public BaseProperty<R> clone()
     {
-        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+        return (BaseProperty<R>) super.clone();
+    }
 
-        property.ownerDocument = null;
-
-        cloneInternal(property);
-
-        property.isValueDirty = this.isValueDirty;
-        property.ownerDocument = this.ownerDocument;
-
-        property.setObject(getObject());
-
-        return property;
+    @Override
+    public BaseProperty<R> clone(boolean detach)
+    {
+        return (BaseProperty<R>) super.clone(detach);
     }
 
     /**
@@ -173,6 +199,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     {
     }
 
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        cloneInternal((BaseProperty) element);
+    }
+
     public Object getValue()
     {
         return null;
@@ -180,6 +214,35 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
 
     public void setValue(Object value)
     {
+    }
+
+    /**
+     * Chose the value to return if the field is sensitive or not. If {@link #isSensitive(XWikiContext)} return
+     * {@code true} and the {@link PropertyClass} can be identified it returns the output of
+     * {@link PropertyClass#getObfuscatedValue(Object)} using {@link #getValue()} as input. If the {@link PropertyClass}
+     * cannot be identified, it returns {@code null} for safety. Finally, if {@link #isSensitive(XWikiContext)}
+     * returns {@code false} then it simply fallbacks on {@link #getValue()}.
+     *
+     * @return an obfuscated value or {@code null} if {@link #isSensitive(XWikiContext)} returns {@code true},
+     * otherwise the value returned by {@link #getValue()}.
+     * @see PropertyClass#getObfuscatedValue(Object)
+     * @see #isSensitive(XWikiContext)
+     * @see #getValue()
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public Object getObfuscatedValue()
+    {
+        Object value = getValue();
+        if (isSensitive(getXWikiContext())) {
+            PropertyClass propertyClass = getPropertyClass(getXWikiContext());
+            if (propertyClass != null) {
+                return propertyClass.getObfuscatedValue(getValue());
+            } else {
+                return null;
+            }
+        }
+        return value;
     }
 
     @Override
@@ -319,7 +382,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
         MergeConfiguration mergeConfiguration)
     {
@@ -349,10 +411,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @return {@literal true} if the property value doesn't match the value in the database.
      * @since 4.3M2
+     * @deprecated use {@link #isDirty()} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public boolean isValueDirty()
     {
-        return this.isValueDirty;
+        return isDirty();
     }
 
     /**
@@ -362,7 +426,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      */
     protected void setValueDirty(Object newValue)
     {
-        if (!this.isValueDirty && !Objects.equals(newValue, getValue())) {
+        if (!isDirty() && !Objects.equals(newValue, getValue())) {
             setValueDirty(true);
         }
     }
@@ -370,30 +434,21 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @param valueDirty Indicate if the dirty flag should be set or cleared.
      * @since 4.3M2
+     * @deprecated use {@link #setDirty(boolean)} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public void setValueDirty(boolean valueDirty)
     {
-        this.isValueDirty = valueDirty;
-        if (valueDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
-        }
+        setDirty(valueDirty);
     }
 
-    /**
-     * Set the owner document of this base property.
-     *
-     * @param ownerDocument The owner document.
-     * @since 4.3M2
-     */
     @Override
-    public void setOwnerDocument(XWikiDocument ownerDocument)
+    public void setDirty(boolean dirty)
     {
-        if (this.ownerDocument != ownerDocument) {
-            super.setOwnerDocument(ownerDocument);
+        super.setDirty(dirty);
 
-            if (ownerDocument != null && this.isValueDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
+        if (dirty && this.object != null) {
+            this.object.setDirty(true);
         }
     }
 
@@ -404,18 +459,28 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      */
     public PropertyClass getPropertyClass(XWikiContext xcontext)
     {
-        if (getObject() instanceof BaseObject) {
-            XWikiDocument document = getOwnerDocument();
-            if (document != null) {
-                BaseObject xobject = document.getXObject(getReference().getParent());
-                if (xobject != null) {
-                    BaseClass xclass = xobject.getXClass(xcontext);
-
-                    return (PropertyClass) xclass.get(getName());
-                }
+        PropertyClass result = null;
+        if (getObject() instanceof BaseObject baseObject) {
+            BaseClass xclass = baseObject.getSourceXClass();
+            if (xclass == null) {
+                xclass = baseObject.getXClass(xcontext);
+            }
+            if (xclass != null) {
+                result = (PropertyClass) xclass.get(getName());
             }
         }
 
-        return null;
+        return result;
+    }
+
+    @Override
+    public boolean isSensitive(XWikiContext context)
+    {
+        PropertyClass propertyClass = getPropertyClass(context);
+        boolean result = false;
+        if (propertyClass != null) {
+            result = propertyClass.isSensitive(context);
+        }
+        return result;
     }
 }

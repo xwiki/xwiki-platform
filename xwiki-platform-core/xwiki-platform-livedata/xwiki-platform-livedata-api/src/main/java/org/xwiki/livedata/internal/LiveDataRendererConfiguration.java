@@ -89,7 +89,18 @@ public class LiveDataRendererConfiguration
         return this.jsonMerge.merge(advancedConfig, basicConfig);
     }
 
-    private LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
+    /**
+     * Resolve a complete Live Data configuration from a set of parameters.
+     *
+     * @param parameters the Live Data script service parameters
+     * @return the complete Live Data configuration
+     * @throws Exception in case of error when resolving the configuration
+     * @since 18.0.0RC1
+     * @since 17.10.1
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
         liveDataConfig.setId(parameters.getId());

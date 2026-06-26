@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.whatsnew.NewsConfiguration;
 import org.xwiki.whatsnew.NewsException;
 import org.xwiki.whatsnew.NewsSource;
@@ -42,7 +41,6 @@ import org.xwiki.whatsnew.NewsSourceFactory;
 @Component
 @Singleton
 @Named("whatsnew")
-@Unstable
 public class NewsScriptService implements ScriptService
 {
     @Inject

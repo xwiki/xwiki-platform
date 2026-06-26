@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
+<xwikidoc version="1.6" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>XWikiUserNotificationsSheet</name>
   <language/>
@@ -77,7 +77,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -201,7 +200,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -221,7 +220,6 @@
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -252,7 +250,6 @@
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -294,6 +291,7 @@
       #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
       ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
       #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+      #set ($userDoc = $services.rendering.escape($doc.documentReference, 'xwiki/2.1'))
       ######################################################
       ### TITLE
       ######################################################
@@ -306,7 +304,7 @@
       (((
       (% id="Hnotifications.settings.email.title" %)
       === {{translation key="notifications.settings.email.title" /}} ===
-      {{notificationsEmailPreferences user="$doc.documentReference" /}}
+      {{notificationsEmailPreferences user="$userDoc" /}}
       )))
       #end
       ######################################################
@@ -317,7 +315,7 @@
       (((
       (% id="Hnotifications.settings.watch.title" %)
       === {{translation key="notifications.settings.watch.title" /}} ===
-      {{notificationsAutoWatchPreferences user="$doc.documentReference" /}}
+      {{notificationsAutoWatchPreferences user="$userDoc" /}}
       )))
       #end
       ######################################################
@@ -327,7 +325,7 @@
       (((
       (% id="Hnotifications.settings.applications.title" %)
       === {{translation key="notifications.settings.applications.title" /}} ===
-      {{notificationsApplicationsPreferences user="$doc.documentReference" /}}
+      {{notificationsApplicationsPreferences user="$userDoc" /}}
       )))
       ######################################################
       ### FILTERS
@@ -341,13 +339,13 @@
 (((
   (% id="Hnotifications.settings.filters.preferences.system.title" %)
   === {{translation key="notifications.settings.filters.preferences.system.title" /}} ===
-  {{notificationsSystemFiltersPreferences user="$doc.documentReference" /}}
+  {{notificationsSystemFiltersPreferences user="$userDoc" /}}
 )))
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.custom.title" %)
   === {{translation key="notifications.settings.filters.preferences.custom.title" /}} ===
-  {{notificationsCustomFiltersPreferences user="$doc.documentReference" /}}
+  {{notificationsCustomFiltersPreferences user="$userDoc" /}}
 )))
 #end
       {{/velocity}}

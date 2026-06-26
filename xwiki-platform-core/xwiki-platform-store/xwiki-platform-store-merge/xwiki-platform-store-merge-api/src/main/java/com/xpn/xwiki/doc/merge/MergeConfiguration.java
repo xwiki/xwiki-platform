@@ -21,7 +21,6 @@ package com.xpn.xwiki.doc.merge;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 /**
@@ -39,7 +38,6 @@ public class MergeConfiguration
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     public enum ConflictFallbackVersion
     {
         /**
@@ -131,7 +129,6 @@ public class MergeConfiguration
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     public ConflictFallbackVersion getConflictFallbackVersion()
     {
         return conflictFallbackVersion;
@@ -145,7 +142,6 @@ public class MergeConfiguration
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     public void setConflictFallbackVersion(ConflictFallbackVersion conflictFallbackVersion)
     {
         this.conflictFallbackVersion = conflictFallbackVersion;

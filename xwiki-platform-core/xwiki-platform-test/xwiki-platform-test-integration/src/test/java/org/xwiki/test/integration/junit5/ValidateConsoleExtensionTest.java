@@ -57,14 +57,14 @@ import static org.xwiki.test.integration.junit5.ValidateConsoleExtension.SKIP_PR
  * @version $Id$
  * @since 11.4RC1
  */
-public class ValidateConsoleExtensionTest
+class ValidateConsoleExtensionTest
 {
     private static final class ValidateConsoleExtensionTestSetup implements BeforeAllCallback, AfterAllCallback
     {
         private static String skipValue;
 
         @Override
-        public void beforeAll(ExtensionContext extensionContext) throws Exception
+        public void beforeAll(ExtensionContext extensionContext)
         {
             // Ensure that the validator is enabled so that the test can pass and can have the right coverage and
             // mutation score
@@ -73,7 +73,7 @@ public class ValidateConsoleExtensionTest
         }
 
         @Override
-        public void afterAll(ExtensionContext extensionContext) throws Exception
+        public void afterAll(ExtensionContext extensionContext)
         {
             System.setProperty(SKIP_PROPERTY, skipValue);
         }
@@ -83,7 +83,7 @@ public class ValidateConsoleExtensionTest
     // ValidateConsoleExtension code.
     @ExtendWith(ValidateConsoleExtensionTestSetup.class)
     @ExtendWith(ValidateConsoleExtension.class)
-    public static class SampleTestCase
+    static class SampleTestCase
     {
         private static final Logger LOGGER = LoggerFactory.getLogger(SampleTestCase.class);
 
@@ -128,13 +128,12 @@ public class ValidateConsoleExtensionTest
     {
         PrintStream savedOut = System.out;
         PrintStream savedErr = System.err;
-        try {
-            ByteArrayOutputStream outContentStream = new ByteArrayOutputStream();
-            PrintStream psOut = new PrintStream(outContentStream);
+        try (ByteArrayOutputStream outContentStream = new ByteArrayOutputStream();
+             PrintStream psOut = new PrintStream(outContentStream);
+             ByteArrayOutputStream errContentStream = new ByteArrayOutputStream();
+             PrintStream psErr = new PrintStream(errContentStream))
+        {
             System.setOut(psOut);
-
-            ByteArrayOutputStream errContentStream = new ByteArrayOutputStream();
-            PrintStream psErr = new PrintStream(errContentStream);
             System.setErr(psErr);
 
             configureLogback();
@@ -163,21 +162,20 @@ public class ValidateConsoleExtensionTest
     private void assertResult(TestExecutionSummary summary, String errContent)
     {
         assertEquals(1, summary.getFailures().size());
-        assertEquals(""
-            + "The following lines were matching forbidden content:[\n"
-            + "INFO  - Deprecated usage of something\n"
-            + "]", summary.getFailures().get(0).getException().getMessage());
-        assertEquals(""
-            + "WARN  - The following excludes were not matched and could be candidates for removal "
-                + "(beware of configs): [\n"
-            + "caught in beforeAll\n"
-            + "exclude that didn't happen\n"
-            + "]\n"
-            + "WARN  - The following expected were not matched and could be candidates for removal "
-                + "(beware of configs): [\n"
-            + "expected\n"
-            + "expected that didn't happen\n"
-            + "]\n", errContent);
+        assertEquals("The following lines were matching forbidden content:[\nINFO  - Deprecated usage of something\n]",
+            summary.getFailures().getFirst().getException().getMessage());
+        assertEquals("""
+            WARN  - The following excludes were not matched and could be candidates for removal \
+            (beware of configs): [
+            caught in beforeAll
+            exclude that didn't happen
+            ]
+            WARN  - The following expected were not matched and could be candidates for removal \
+            (beware of configs): [
+            expected
+            expected that didn't happen
+            ]
+            """, errContent);
     }
 
     /**

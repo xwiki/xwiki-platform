@@ -32,6 +32,7 @@ import org.apache.ecs.xhtml.select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -46,6 +47,13 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DBTreeListClass extends DBListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "DBTreeList";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "dbtreelist";
@@ -116,7 +124,7 @@ public class DBTreeListClass extends DBListClass
     public Map<String, List<ListItem>> getTreeMap(XWikiContext context)
     {
         List<ListItem> list = getDBList(context);
-        Map<String, List<ListItem>> map = new HashMap<String, List<ListItem>>();
+        Map<String, List<ListItem>> map = new HashMap<>();
         if ((list == null) || (list.size() == 0)) {
             return map;
         }
@@ -148,7 +156,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = getCachedDBTreeList(context);
         if (list == null) {
-            list = new ArrayList<ListItem>();
+            list = new ArrayList<>();
             addToTreeList(list, treemap, map, "", context);
             setCachedDBTreeList(list, context);
         }
@@ -173,7 +181,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = map.get(key);
         if (list == null) {
-            list = new ArrayList<ListItem>();
+            list = new ArrayList<>();
             map.put(key, list);
         }
         list.add(item);
@@ -186,15 +194,15 @@ public class DBTreeListClass extends DBListClass
         List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
         } else if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
         }
         String result = displayFlatView(selectlist, context);
-        if (result.equals("")) {
+        if ("".equals(result)) {
             super.displayView(buffer, name, prefix, object, context);
         } else {
             buffer.append(result);
@@ -210,7 +218,7 @@ public class DBTreeListClass extends DBListClass
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);
-            if (result.equals("")) {
+            if ("".equals(result)) {
                 displayTreeSelectEdit(buffer, name, prefix, object, context);
             } else {
                 displayHidden(buffer, name, prefix, object, context);
@@ -226,10 +234,10 @@ public class DBTreeListClass extends DBListClass
         Map<String, ListItem> map = getMap(context);
         Map<String, List<ListItem>> treemap = getTreeMap(context);
         List<ListItem> fullTreeList = getTreeList(treemap, map, context);
-        List<List<ListItem>> resList = new ArrayList<List<ListItem>>(selectlist.size());
+        List<List<ListItem>> resList = new ArrayList<>(selectlist.size());
 
         for (String item : selectlist) {
-            List<ListItem> itemPath = getItemPath(item, fullTreeList, new ArrayList<ListItem>());
+            List<ListItem> itemPath = getItemPath(item, fullTreeList, new ArrayList<>());
             mergeItems(itemPath, resList);
         }
 
@@ -349,11 +357,11 @@ public class DBTreeListClass extends DBListClass
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
         } else if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList<String>();
+            selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
         }
 
@@ -457,8 +465,8 @@ public class DBTreeListClass extends DBListClass
                 // Build the query in this variable.
                 StringBuffer select = new StringBuffer("select distinct ");
                 // These will hold the components of the from and where parts of the query.
-                ArrayList<String> fromStatements = new ArrayList<String>();
-                ArrayList<String> whereStatements = new ArrayList<String>();
+                ArrayList<String> fromStatements = new ArrayList<>();
+                ArrayList<String> whereStatements = new ArrayList<>();
 
                 // Add the document to the query only if it is needed.
                 if (usesDoc) {
@@ -538,5 +546,11 @@ public class DBTreeListClass extends DBListClass
             LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
         }
         return sql;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

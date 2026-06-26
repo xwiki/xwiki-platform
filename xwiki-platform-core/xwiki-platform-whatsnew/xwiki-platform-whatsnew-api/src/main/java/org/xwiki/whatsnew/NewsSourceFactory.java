@@ -22,7 +22,6 @@ package org.xwiki.whatsnew;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Create a News Source instance. Examples of possible news sources from where to get news about XWiki:
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.1RC1
  */
 @Role
-@Unstable
 public interface NewsSourceFactory
 {
     /**

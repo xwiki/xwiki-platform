@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -56,7 +55,6 @@ public interface WatchedEntitiesManager
      * @throws NotificationException in case of problem to save the changes
      * @since 16.5.0RC1
      */
-    @Unstable
     default boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException
     {
         return false;
@@ -70,7 +68,6 @@ public interface WatchedEntitiesManager
      * @throws NotificationException in case of problem to save the changes
      * @since 16.5.0RC1
      */
-    @Unstable
     default boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException
     {
         return false;
@@ -84,7 +81,6 @@ public interface WatchedEntitiesManager
      * @throws NotificationException in case of problem to save the changes
      * @since 16.5.0RC1
      */
-    @Unstable
     default boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException
     {
         return false;

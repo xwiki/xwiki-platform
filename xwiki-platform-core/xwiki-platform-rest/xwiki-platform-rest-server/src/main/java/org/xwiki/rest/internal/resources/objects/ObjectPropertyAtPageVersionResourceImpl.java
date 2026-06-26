@@ -48,6 +48,8 @@ public class ObjectPropertyAtPageVersionResourceImpl extends XWikiResource imple
         ObjectPropertyAtPageVersionResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Property getObjectProperty(String wikiName, String spaceName, String pageName, String version,
             String className, Integer objectNumber, String propertyName, Boolean withPrettyNames) throws
             XWikiRestException
@@ -73,9 +75,11 @@ public class ObjectPropertyAtPageVersionResourceImpl extends XWikiResource imple
 
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {
-                    String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectAtPageVersionResource.class,
-                        doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                        version, object.getClassName(), object.getNumber()).toString();
+                    String objectUri = Utils
+                        .createURI(uriInfo.getBaseUri(), ObjectAtPageVersionResource.class, doc.getWiki(),
+                            Utils.getSpacesURLElements(doc.getDocumentReference()),
+                            doc.getDocumentReference().getName(), version, object.getClassName(), object.getNumber())
+                        .toString();
                     Link objectLink = objectFactory.createLink();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

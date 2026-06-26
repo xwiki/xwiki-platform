@@ -108,12 +108,12 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             // Note: We need to support databases who treats empty strings as NULL like Oracle. For those checking
             // for equality when the string is empty is not going to work and thus we need to handle the special
             // empty case separately.
-            Locale language = this.document.getLocale();
+            Locale locale = this.document.getLocale();
             Path<String> languageProperty = root.get(LANGUAGE_PROPERTY_NAME);
-            if (language.equals(Locale.ROOT)) {
+            if (locale.equals(Locale.ROOT)) {
                 predicates[1] = builder.or(builder.equal(languageProperty, ""), builder.isNull(languageProperty));
             } else {
-                predicates[1] = builder.equal(languageProperty, language);
+                predicates[1] = builder.equal(languageProperty, locale.toString());
             }
 
             query.where(predicates);

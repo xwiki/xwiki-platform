@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.feed;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -68,7 +68,7 @@ public class SyndEntrySourceApi extends Api
      */
     public boolean source(SyndEntry entry, Object obj)
     {
-        return this.source(entry, obj, new HashMap<String, Object>());
+        return this.source(entry, obj, new HashMap<>());
     }
 
     /**
@@ -92,6 +92,6 @@ public class SyndEntrySourceApi extends Api
      */
     public SyndEntry source(Object obj)
     {
-        return this.source(obj, new HashMap<String, Object>());
+        return this.source(obj, new HashMap<>());
     }
 }

@@ -42,6 +42,7 @@ import org.xwiki.uiextension.script.UIExtensionScriptServiceComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.script.display.DisplayScriptService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,7 +55,8 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList({ UIExtensionClassDocumentInitializer.class, DefaultContextStoreManager.class, TestNoScriptMacro.class })
+@ComponentList({UIExtensionClassDocumentInitializer.class, DefaultContextStoreManager.class, TestNoScriptMacro.class,
+    DisplayScriptService.class})
 @UIExtensionScriptServiceComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
@@ -78,6 +80,8 @@ class SearchAdminPageTest extends PageTest
         this.xwiki.initializeMandatoryDocuments(this.context);
 
         when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), eq(ADMIN_REFERENCE), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(any(), any(), eq(ADMIN_REFERENCE), any())).thenReturn(true);
 
         // Register the component manager as wiki component manager so that the UIX can be registered on the wiki.
         this.componentManager.registerComponent(ComponentManager.class, "wiki", this.componentManager);
@@ -119,9 +123,13 @@ class SearchAdminPageTest extends PageTest
         searchAdminDocument.setContent(searchAdminPageContent);
         this.xwiki.saveDocument(searchAdminDocument, this.context);
 
-        // Load XWiki.SearchCode and XWiki.SearchConfigClass as the SearchAdmin page uses them.
+        // Load the pages required by SearchAdmin page.
         loadPage(new DocumentReference(WIKI_NAME, XWIKI_SPACE, "SearchCode"));
         loadPage(new DocumentReference(WIKI_NAME, XWIKI_SPACE, "SearchConfigClass"));
+        loadPage(new DocumentReference(WIKI_NAME, XWIKI_SPACE, "SearchConfigSheet"));
+
+        // Administration sections are rendered in the context of the admin page which uses the admin action.
+        this.context.setAction("admin");
 
         Document htmlPage = renderHTMLPage(SEARCH_ADMIN_SHEET);
 

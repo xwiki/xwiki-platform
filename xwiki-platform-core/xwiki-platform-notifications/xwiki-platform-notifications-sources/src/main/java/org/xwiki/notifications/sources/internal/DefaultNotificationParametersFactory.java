@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -443,21 +444,14 @@ public class DefaultNotificationParametersFactory
             && notificationParameters.format == NotificationFormat.ALERT) {
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
-        notificationParameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toSet());
 
         enableAllEventTypes(notificationParameters);
 
         String wikis = parameters.get(ParametersKey.WIKIS);
         String pages = parameters.get(ParametersKey.PAGES);
         String spaces = parameters.get(ParametersKey.SPACES);
-        // For legacy reason, we need to consider that by default, in the absence of any watched entity (i.e., wiki, 
-        // space or page), the whole wiki is watched.
-        // Otherwise, only the events matching an explicitly defined filter would be allowed.
+
         String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
-        if (StringUtils.isEmpty(wikis) && StringUtils.isEmpty(spaces) && StringUtils.isEmpty(pages)) {
-            wikis = currentWikiId;
-        }
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
 
         if (StringUtils.isEmpty(currentWiki)) {
@@ -469,6 +463,19 @@ public class DefaultNotificationParametersFactory
         handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
         handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
+
+        // We check if the parameters contain a location, and we remove ScopeNotificationFilter if it doesn't:
+        // this filter would automatically discard all events not matching a given location.
+        // We need to do that only after having handled subwiki without location parameter as this might add a filter
+        // preference.
+        boolean noLocationFilter =
+            notificationParameters.filterPreferences.stream()
+                .noneMatch(pref -> pref instanceof ScopeNotificationFilterPreference);
+        notificationParameters.filters = notificationFilterManager.getAllFilters(true)
+            .stream()
+            .filter(filter -> !excludedFilters.contains(filter.getName())
+                && (!noLocationFilter || !filter.getName().equals(ScopeNotificationFilter.FILTER_NAME)))
+            .collect(Collectors.toSet());
 
         try {
             usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
@@ -487,6 +494,13 @@ public class DefaultNotificationParametersFactory
                 parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
             }
         }
+    }
+
+    private boolean areParametersLocationAllBlank(Map<ParametersKey, String> parameters)
+    {
+        return StringUtils.isBlank(parameters.get(ParametersKey.WIKIS))
+            && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
+            && StringUtils.isBlank(parameters.get(ParametersKey.SPACES));
     }
 
     /**
@@ -515,10 +529,8 @@ public class DefaultNotificationParametersFactory
     private void handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
         Map<ParametersKey, String> parameters, String currentWiki)
     {
-        if (StringUtils.isBlank(parameters.get(ParametersKey.WIKIS))
-            && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
-            && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
-            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+        if (areParametersLocationAllBlank(parameters)
+            && !Strings.CS.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
             handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
         }
     }

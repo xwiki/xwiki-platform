@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.6" reference="XWiki.SuggestSolrMacros" locale="">
   <web>XWiki</web>
   <name>SuggestSolrMacros</name>
   <language/>
@@ -143,11 +143,9 @@
 
 #macro (getSearchSuggestResults $results)
   #createSearchSuggestQuery($request.query $request.input $query)
-  #set ($limit = $numbertool.toNumber($request.nb).intValue())
-  #if (!$limit)
-    #set ($limit = 3)
-  #end
+  #getAndValidateQueryLimitFromRequest('nb', 3, $limit)
   #set ($discard = $query.setLimit($limit))
+  #set ($discard = $query.addFilter('searchExclusions/solr'))
   #set ($macro.results = $query.execute()[0].results)
   #foreach ($result in $macro.results)
     #set ($resultReference = $services.solr.resolve($result))

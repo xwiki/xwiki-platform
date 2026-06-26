@@ -70,7 +70,7 @@
     "actions": [
       {"id": "view", "icon": "eye"},
       {"id": "edit", "icon": "pencil"},
-      {"id": "delete", "icon": "cross", "extraIconClasses": "text-danger"},
+      {"id": "delete", "icon": "trash", "extraIconClasses": "text-danger"},
       {"id": "copy", "icon": "copy"},
       {"id": "rename", "icon": "move"},
       {"id": "rights", "icon": "lock"}

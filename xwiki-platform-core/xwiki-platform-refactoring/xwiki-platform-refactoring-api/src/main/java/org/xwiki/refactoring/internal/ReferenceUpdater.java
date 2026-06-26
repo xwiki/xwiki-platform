@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -32,6 +34,20 @@ import org.xwiki.model.reference.EntityReference;
 @Role
 public interface ReferenceUpdater
 {
+    /**
+     * @param documentReference the reference of the document in which to update the references
+     * @param oldTargetReference the previous reference of the renamed entity
+     * @param newTargetReference the new reference of the renamed entity
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     * and target destination.
+     * @since 16.10.0RC1
+     */
+    default void update(DocumentReference documentReference, EntityReference oldTargetReference,
+        EntityReference newTargetReference, Map<EntityReference, EntityReference> updatedEntities)
+    {
+        update(documentReference, oldTargetReference, newTargetReference);
+    }
+
     /**
      * @param documentReference the reference of the document in which to update the references
      * @param oldTargetReference the previous reference of the renamed entity

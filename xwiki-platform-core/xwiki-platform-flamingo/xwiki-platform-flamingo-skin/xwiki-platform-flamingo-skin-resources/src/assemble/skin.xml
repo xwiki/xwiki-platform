@@ -38,7 +38,7 @@
     </fileSet>
     <!-- Add bootstrap sources -->
     <fileSet>
-      <directory>${project.build.directory}/bootstrap/META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/</directory>
+      <directory>${project.build.directory}/bootstrap/META-INF/resources/webjars/xwiki-platform-bootstrap/${project.version}/less/</directory>
       <outputDirectory>flamingo/less/bootstrap</outputDirectory>
     </fileSet>
     <!-- Add License/Notice files -->

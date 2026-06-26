@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-realtime-wysiwyg-test</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wysiwyg-test-docker</artifactId>
   <name>XWiki Platform - Realtime - WYSIWYG - Test - Functional Tests in Docker</name>
@@ -54,11 +54,12 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
-    <!-- We need this for the WYSIWYG editor administration section where we set the default WYSIWYG editor. -->
     <dependency>
+      <!-- We need this to test the syntax change from the Document Information panel. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- The JavaScript code needs to display localized messages and for this it needs to fetch them through REST so we
@@ -85,6 +86,12 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Needed for the MacroUIFactory to properly get the edit template -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-html</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -95,6 +102,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-realtime-wysiwyg-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -114,8 +127,13 @@
     </dependency>
     <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -118,9 +118,9 @@ public class UploadAction extends XWikiAction
 
             return true;
         }
-        Map<String, String> fileNames = new LinkedHashMap<String, String>();
-        List<String> wrongFileNames = new ArrayList<String>();
-        Map<String, String> failedFiles = new LinkedHashMap<String, String>();
+        Map<String, String> fileNames = new LinkedHashMap<>();
+        List<String> wrongFileNames = new ArrayList<>();
+        Map<String, String> failedFiles = new LinkedHashMap<>();
         for (String fieldName : fileupload.getFileItemNames(context)) {
             try {
                 if (fieldName.startsWith(FILE_FIELD_NAME)) {
@@ -189,8 +189,9 @@ public class UploadAction extends XWikiAction
 
         XWikiAttachment attachment;
         try {
-            InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context);
-            attachment = doc.setAttachment(filename, contentInputStream, context);
+            try (InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context)) {
+                attachment = doc.setAttachment(filename, contentInputStream, context);
+            }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",

@@ -159,7 +159,7 @@ class DefaultNotificationEmailRendererTest
         XWiki wiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(wiki);
 
-        XWikiServletRequestStub xWikiServletRequestStub = mock(XWikiServletRequestStub.class);
+        XWikiServletRequestStub xWikiServletRequestStub = new XWikiServletRequestStub();
         when(context.getRequest()).thenReturn(xWikiServletRequestStub);
 
         ScriptContext scriptContext = mock(ScriptContext.class);

@@ -106,8 +106,9 @@ public class DefaultTagsSelector implements TagsSelector, Initializable
     }
 
     @Override
-    public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments) throws TagException
+    public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
+        throws TagException
     {
-        return this.tagsSelector.getDocumentsWithTag(tag, includeHiddenDocuments);
+        return this.tagsSelector.getDocumentsWithTag(tag, includeHiddenDocuments, caseSensitive);
     }
 }

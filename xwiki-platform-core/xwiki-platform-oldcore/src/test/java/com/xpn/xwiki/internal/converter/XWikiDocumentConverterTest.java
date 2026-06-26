@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -100,7 +99,7 @@ class XWikiDocumentConverterTest
     {
         Document result = documentConverter.convert(Document.class, xWikiDocument);
         assertSame(this.xWikiDocument, result.getDocument());
-        verify(this.contextProvider, times(1)).get();
+        verify(this.contextProvider).get();
     }
 
     @Test

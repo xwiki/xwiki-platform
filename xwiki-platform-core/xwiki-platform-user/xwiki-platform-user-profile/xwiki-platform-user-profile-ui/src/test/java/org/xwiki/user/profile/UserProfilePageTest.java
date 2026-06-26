@@ -34,7 +34,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -79,9 +78,8 @@ class UserProfilePageTest extends PageTest
         // Initialize the XWiki.XWikiUsers class (required in order to be able to display user properties).
         this.xwiki.initializeMandatoryDocuments(this.context);
 
-        AuthorizationManager authorizationManager =
-            this.componentManager.registerMockComponent(AuthorizationManager.class);
-        when(authorizationManager.hasAccess(any(), eq(ADMIN_REFERENCE), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(any(), any(), eq(ADMIN_REFERENCE), any())).thenReturn(true);
 
         // Register the user profile UI extensions at wiki level (requires administration rights).
         this.componentManager.registerComponent(ComponentManager.class, "wiki", this.componentManager);

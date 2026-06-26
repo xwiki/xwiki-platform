@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Скрыть панель 
 platform.appwithinminutes.classEditorMoveFieldLabel=Переместить
 platform.appwithinminutes.classEditorMoveFieldHint=Перетягивайте значения для изменения их порядка
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Значение по умолчанию
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Отображаемое имя
+platform.appwithinminutes.classEditorFieldHintToolTip=Подсказка
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=ОК
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Идентиф�
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Добавить
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Удалить
 appWithinMinutes.templateProviderEditor.hint=Записи приложения - это вики-страницы, которые содержат структурированные данные.
+appWithinMinutes.templateProviderEditor.icon.name=Значок
 appWithinMinutes.templateProviderEditor.icon.hint=Значок, связанный с приложением.
+appWithinMinutes.templateProviderEditor.description.name=Описание
 appWithinMinutes.templateProviderEditor.description.hint=Короткое описание приложения.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Где создавать записи из
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Если расположение не выбрано, записи могут быть созданы с любой страницы.
@@ -150,7 +154,8 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Где соз�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Если расположение не выбрано, записи могут быть созданы в любом месте вики.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Не навязывать расположение записи
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Использовать расположения, указанные выше, только в качестве подсказок, позволяя пользователю выбирать другое расположение при создании записи приложения.
-appWithinMinutes.templateProviderEditor.terminal.hint=Должны ли записи приложения быть терминальными страницами или нет.
+appWithinMinutes.templateProviderEditor.terminal.name=Оконечная страница
+appWithinMinutes.templateProviderEditor.terminal.hint=Должны ли записи приложения быть конечными страницами или нет.
 
 ### Wizard Step 3: Application Presentation
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Поля класса

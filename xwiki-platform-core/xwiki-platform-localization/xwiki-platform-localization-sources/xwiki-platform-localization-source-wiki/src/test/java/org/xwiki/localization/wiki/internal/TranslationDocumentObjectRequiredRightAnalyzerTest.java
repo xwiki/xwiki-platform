@@ -19,7 +19,9 @@
  */
 package org.xwiki.localization.wiki.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -58,6 +60,15 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class TranslationDocumentObjectRequiredRightAnalyzerTest
 {
+    // We cannot use Map.of here as it doesn't allow null values.
+    private static final Map<String, EntityType> SCOPE_MAP = new HashMap<>();
+
+    static {
+        SCOPE_MAP.put("GLOBAL", null);
+        SCOPE_MAP.put("WIKI", EntityType.WIKI);
+        SCOPE_MAP.put("USER", EntityType.DOCUMENT);
+    }
+
     @InjectMockComponents
     private TranslationDocumentObjectRequiredRightAnalyzer analyzer;
 
@@ -123,11 +134,7 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
         assertEquals(1, analysisResult.getRequiredRights().size());
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        if (scope.equals("WIKI")) {
-            assertEquals(EntityType.WIKI, requiredRightResult.getEntityType());
-        } else {
-            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
-        }
+        assertEquals(SCOPE_MAP.get(scope), requiredRightResult.getEntityType());
         assertFalse(requiredRightResult.isManualReviewNeeded());
 
         analysisResult = analysisResults.get(1);
@@ -139,11 +146,7 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
         assertEquals(1, analysisResult.getRequiredRights().size());
         requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        if (scope.equals("WIKI")) {
-            assertEquals(EntityType.WIKI, requiredRightResult.getEntityType());
-        } else {
-            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
-        }
+        assertEquals(SCOPE_MAP.get(scope), requiredRightResult.getEntityType());
         assertFalse(requiredRightResult.isManualReviewNeeded());
     }
 }

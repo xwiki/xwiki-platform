@@ -53,6 +53,7 @@ platform.flamingo.themes.title.preview=Prévisualiser
 platform.flamingo.themes.autorefresh=Actualiser automatiquement
 platform.flamingo.themes.refresh=Actualiser
 platform.flamingo.themes.refreshwarning=L'actualisation peut prendre quelques secondes et la prévisualisation peut ne pas être fidèle à 100%.
+platform.flamingo.themes.preview.iframe.label=Aperçu du thème.
 platform.flamingo.themes.loading=Chargement...
 platform.flamingo.themes.category.logos=Logos
 platform.flamingo.themes.category.base-colors=Couleurs de base
@@ -69,6 +70,7 @@ platform.flamingo.themes.defaultvalue=Par défaut
 platform.flamingo.themes.lessCode.description=Dans ce champ vous pouvez ajouter du code LESS qui sera ajouté à la skin.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
+FlamingoThemesCode.ThemeClass_logo-description_hint=Texte alternatif pour le logo. Il devrait préciser le sens du logo. La valeur localisée définie dans la clé « core.document.header.logo.image.text » est utilisée par défaut.
 
 ###############################################################################
 ## Deprecated

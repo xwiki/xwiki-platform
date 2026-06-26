@@ -30,13 +30,14 @@ import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper
 import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRenderer;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -88,9 +89,10 @@ class IncludedPagesDocumentInformationPageTest extends PageTest
         XWikiDocument includedPagesDoc =
             loadPage(new DocumentReference("xwiki", "Panels", "IncludedPagesDocumentInformation"));
         this.componentManager.registerComponent(ComponentManager.class, "wiki", this.componentManager);
-        AuthorizationManager authorizationManager =
-            this.componentManager.registerMockComponent(AuthorizationManager.class);
-        when(authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
+        // Wiki admin right is required to register the UI extension.
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(Right.ADMIN, EntityType.WIKI,
+            includedPagesDoc.getAuthorReference(), includedPagesDoc.getDocumentReference())).thenReturn(true);
         // The listeners are not registered by default. We trigger it manually so that the UIX is registered and can be
         // found and rendered.
         this.componentManager.<EventListener>getInstance(EventListener.class, EVENT_LISTENER_NAME)

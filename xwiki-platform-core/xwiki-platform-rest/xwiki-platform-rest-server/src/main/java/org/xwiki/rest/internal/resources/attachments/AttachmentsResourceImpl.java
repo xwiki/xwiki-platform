@@ -49,7 +49,6 @@ import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
@@ -65,12 +64,11 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     private static final String NAME = "name";
 
     @Inject
-    private ContextualAuthorizationManager authorization;
-
-    @Inject
     private Container container;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
         Boolean withPrettyNames, String name, String author, String fileTypes) throws XWikiRestException
     {
@@ -80,7 +78,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
         filters.put("fileTypes", fileTypes);
 
         return super.getAttachments(new DocumentReference(wiki, parseSpaceSegments(spaces), page), filters, offset,
-            limit, withPrettyNames);
+            validateAndGetLimit(limit), withPrettyNames);
     }
 
     @Override

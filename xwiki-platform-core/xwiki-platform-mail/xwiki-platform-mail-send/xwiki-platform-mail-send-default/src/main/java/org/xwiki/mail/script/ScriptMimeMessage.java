@@ -75,7 +75,6 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     // of it!
     ScriptMimeMessage(Execution execution, ComponentManager componentManager)
     {
-        super();
         this.execution = execution;
         this.componentManager = componentManager;
     }

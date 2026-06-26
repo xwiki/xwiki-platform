@@ -25,12 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
   <packaging>pom</packaging>
   <description>The dependencies of the WAR as a separate pom to be reusable in other distributions.</description>
+  <properties>
+    <!-- Make sure to not end up with Apache HttpClient 3 in the WAR -->
+    <xwiki.enforcer.enforce-apache-http5.searchTransitive>true</xwiki.enforcer.enforce-apache-http5.searchTransitive>
+  </properties>
   <dependencies>
     <!-- ********************************************************************** -->
     <!-- Depend on the minimal WAR -->
@@ -299,9 +303,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-message</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -562,6 +566,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Modules not designed to be used as installed extensions -->
@@ -667,6 +677,19 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-migrations</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Filesystem store migrations -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-filesystem-migrations</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

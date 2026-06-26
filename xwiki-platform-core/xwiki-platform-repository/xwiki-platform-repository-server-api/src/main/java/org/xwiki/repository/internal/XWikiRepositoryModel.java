@@ -51,6 +51,11 @@ public class XWikiRepositoryModel
      */
     public static final String EXTENSION_SPACENAME = "ExtensionCode";
 
+    /**
+     * @since 17.9.0RC1
+     */
+    public static final String EXTENSIONVERSIONS_SPACENAME = "Versions";
+
     public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionClass";
 
     public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";
@@ -60,6 +65,16 @@ public class XWikiRepositoryModel
     public static final String EXTENSIONDEPENDENCY_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionDependencyClass";
 
     public static final String EXTENSIONPROXY_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionProxyClass";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String EXTENSIONSUPPORTER_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionSupporterClass";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String EXTENSIONSUPPORTPLAN_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionSupportPlanClass";
 
     public static final LocalDocumentReference EXTENSION_CLASSREFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionClass");
@@ -80,6 +95,18 @@ public class XWikiRepositoryModel
     public static final LocalDocumentReference EXTENSIONPROXY_CLASSREFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionProxyClass");
 
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final LocalDocumentReference EXTENSIONSUPPORTER_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionSupporterClass");
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final LocalDocumentReference EXTENSIONSUPPORTPLAN_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionSupportPlanClass");
+
     public static final LocalDocumentReference EXTENSION_TEMPLATEREFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionTemplate");
 
@@ -91,6 +118,39 @@ public class XWikiRepositoryModel
     public static final LocalDocumentReference CONFIGURATION_REFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "RepositoryConfig");
 
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final String PROJECT_CLASSNAME = EXTENSION_SPACENAME + ".ProjectClass";
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECT_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectClass");
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final String PROJECTVERSION_CLASSNAME = EXTENSION_SPACENAME + ".ProjectVersionClass";
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECTVERSION_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectVersionClass");
+
+    /**
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public static final LocalDocumentReference PROJECT_TEMPLATEREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ProjectTemplate");
+
     // Tools
 
     /**
@@ -101,6 +161,12 @@ public class XWikiRepositoryModel
     // Properties
 
     public static final String PROP_EXTENSION_ID = "id";
+
+    /**
+     * @since 15.0RC1
+     * @since 14.10.2
+     */
+    public static final String PROP_EXTENSION_PROJECT = "project";
 
     public static final String PROP_EXTENSION_TYPE = "type";
 
@@ -115,6 +181,11 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_WEBSITE = "website";
 
     public static final String PROP_EXTENSION_AUTHORS = "authors";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_EXTENSION_SUPPORTPLANS = "supportPlans";
 
     /**
      * @since 15.0RC1
@@ -149,6 +220,16 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_SCMDEVCONNECTION = "scmdevconnection";
 
     /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_SCMTAG = "scmtag";
+
+    /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_STAG = "scmtag";
+
+    /**
      * @since 7.3M1
      */
     public static final String PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM = "issueManagementSystem";
@@ -159,6 +240,11 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_ISSUEMANAGEMENT_URL = "issueManagementURL";
 
     public static final String PROP_EXTENSION_PROPERTIES = "properties";
+
+    /**
+     * @since 17.9.0RC1
+     */
+    public static final String PROP_EXTENSION_VERSIONPAGE = "versionPage";
 
     public static final String PROP_VERSION_ID = "id";
 
@@ -172,6 +258,17 @@ public class XWikiRepositoryModel
     public static final String PROP_VERSION_FEATURES = "features";
 
     /**
+     * @since 17.9.0RC1
+     */
+    public static final String PROP_VERSION_INDEX = "index";
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static final String PROP_VERSION_NOTES = "notes";
+
+    /**
      * @since 7.3M1
      */
     public static final String PROP_VERSION_REPOSITORIES = "repositories";
@@ -181,6 +278,12 @@ public class XWikiRepositoryModel
     public static final String PROP_DEPENDENCY_ID = "id";
 
     public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    public static final String PROP_DEPENDENCY_EXCLUSIONS = "exclusions";
 
     /**
      * @since 9.6RC1
@@ -208,11 +311,41 @@ public class XWikiRepositoryModel
 
     public static final String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
 
-    public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
+    public static final String PROP_CONFIGURATION_VALIDTYPES = "validTypes";
 
     public static final String PROP_RATING_TOTALVOTES = "nbvotes";
 
     public static final String PROP_RATING_AVERAGEVOTE = "averagevote";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTER_ACTIVE = "active";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTER_URL = "url";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTPLAN_ACTIVE = "active";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTPLAN_SUPPORTER = "supporter";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTPLAN_URL = "url";
+
+    /**
+     * @since 16.8.0RC1
+     */
+    public static final String PROP_SUPPORTPLAN_PAYING = "paying";
 
     // Consolidation
 
@@ -302,6 +435,7 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_STAG, new ExtensionSolrField(PROP_EXTENSION_STAG, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
@@ -321,6 +455,9 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(RatingExtension.FIELD_AVERAGE_VOTE,
             new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
+
+        // Support plans
+        SOLR_FIELDS.put(RemoteExtension.FIELD_SUPPORT_PLANS, new ExtensionSolrField(PROP_EXTENSION_SUPPORTPLANS, null));
 
         // Recommended
         SOLR_FIELDS.put(RemoteExtension.FIELD_RECOMMENDED,

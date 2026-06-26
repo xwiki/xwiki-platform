@@ -40,15 +40,19 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,18 +89,21 @@ class VelocityRendererTest
     void renderTest() throws Exception
     {
         // Mocks
-        VelocityEngine engine = mock(VelocityEngine.class);
+        VelocityEngine engine = mock();
+        VelocityTemplate template = mock();
         when(this.velocityManager.getVelocityEngine()).thenReturn(engine);
-        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), any(), eq("myCode"))).thenAnswer(
-            invocation -> {
-                // Get the writer
-                Writer writer = (Writer) invocation.getArguments()[1];
-                writer.write("Rendered code");
-                return true;
-            });
+        String renderedOutput = "Rendered ";
+        doAnswer(invocation -> {
+            VelocityContext context = invocation.getArgument(0);
+            // Get the writer
+            Writer writer = (Writer) invocation.getArguments()[1];
+            writer.write(renderedOutput + context.get("icon").toString());
+            return true;
+        }).when(engine).evaluate(any(VelocityContext.class), any(Writer.class), any(), eq(template));
 
         // Test
-        assertEquals("Rendered code", this.velocityRenderer.render("myCode", null));
+        String iconValue = "iconValue";
+        assertEquals(renderedOutput + iconValue, this.velocityRenderer.render(template, iconValue, null));
 
         // Verify
         verify(engine).startedUsingMacroNamespace("IconVelocityRenderer_" + Thread.currentThread().getId());
@@ -113,7 +120,7 @@ class VelocityRendererTest
         // Test
         IconException caughtException = null;
         try {
-            this.velocityRenderer.render("myCode", null);
+            this.velocityRenderer.render(mock(), null, null);
         } catch (IconException e) {
             caughtException = e;
         }
@@ -125,21 +132,25 @@ class VelocityRendererTest
     }
 
     @Test
-    void renderWhenEvaluateReturnsFalse() throws Exception
+    void renderWhenEvaluateThrows() throws Exception
     {
         //  Mocks
         VelocityEngine engine = mock(VelocityEngine.class);
         when(this.velocityManager.getVelocityEngine()).thenReturn(engine);
-        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), any(),
-            eq("myCode"))).thenReturn(false);
+        VelocityTemplate template = mock();
+        XWikiVelocityException testVelocityException = new XWikiVelocityException("Test");
+        doThrow(testVelocityException)
+            .when(engine).evaluate(any(VelocityContext.class), any(Writer.class), any(),
+                eq(template));
 
         // Test
         IconException caughtException = assertThrows(IconException.class,
-            () -> this.velocityRenderer.render("myCode", null));
+            () -> this.velocityRenderer.render(template, "icon", null));
 
         // Verify
-        assertEquals("Failed to render the icon. See the Velocity runtime log.",
+        assertEquals("Failed to render the icon.",
             caughtException.getMessage());
+        assertSame(testVelocityException, caughtException.getCause());
 
         verify(engine).startedUsingMacroNamespace("IconVelocityRenderer_" + Thread.currentThread().getId());
         verify(engine).stoppedUsingMacroNamespace("IconVelocityRenderer_" + Thread.currentThread().getId());
@@ -149,15 +160,15 @@ class VelocityRendererTest
     void renderWithContextDocument() throws Exception
     {
         // Mocks
-        VelocityEngine engine = mock(VelocityEngine.class);
+        VelocityEngine engine = mock();
+        VelocityTemplate template = mock();
         when(this.velocityManager.getVelocityEngine()).thenReturn(engine);
-        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), any(), eq("myCode"))).thenAnswer(
-            invocation -> {
-                // Get the writer
-                Writer writer = (Writer) invocation.getArguments()[1];
-                writer.write("Rendered code");
-                return true;
-            });
+        doAnswer(invocation -> {
+            // Get the writer
+            Writer writer = (Writer) invocation.getArguments()[1];
+            writer.write("Rendered code");
+            return true;
+        }).when(engine).evaluate(any(VelocityContext.class), any(Writer.class), any(), eq(template));
 
         DocumentReference contextReference = new DocumentReference("xwiki", "Space", "IconTheme");
         DocumentReference documentAuthorReference = new DocumentReference("xwiki", "XWiki", "User");
@@ -173,6 +184,6 @@ class VelocityRendererTest
         when(this.documentContextExecutor.call(any(), eq(document)))
             .then(invocation -> invocation.getArgument(0, Callable.class).call());
 
-        assertEquals("Rendered code", this.velocityRenderer.render("myCode", contextReference));
+        assertEquals("Rendered code", this.velocityRenderer.render(template, null, contextReference));
     }
 }

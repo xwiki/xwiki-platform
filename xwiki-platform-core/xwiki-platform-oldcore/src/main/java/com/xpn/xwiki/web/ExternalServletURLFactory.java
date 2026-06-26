@@ -46,7 +46,7 @@ public class ExternalServletURLFactory extends XWikiServletURLFactory
      */
     public ExternalServletURLFactory()
     {
-        super();
+        // Nothing to do.
     }
 
     @Override

@@ -63,7 +63,7 @@ public class PaginationFilterPane extends BaseElement
     /**
      * The index of the last page.
      */
-    @FindBy(xpath = "//span[@class = 'pagination']/*[last()]")
+    @FindBy(xpath = "//ul[@class = 'pagination-list']/*[last()]")
     private WebElement lastPageIndex;
 
     /**
@@ -156,7 +156,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public PaginationFilterPane gotoPage(int index)
     {
-        getDriver().findElement(By.xpath("//span[@class = 'pagination']/a[. = '" + index + "']")).click();
+        getDriver().findElement(By.xpath("//ul[@class = 'pagination-list']/li/a[. = '" + index + "']")).click();
         return new PaginationFilterPane();
     }
 }

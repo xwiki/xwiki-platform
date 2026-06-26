@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
@@ -88,7 +90,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * List of properties (eg XClass properties, XObject properties, etc).
      */
-    protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
+    protected Map<String, Object> fields = new LinkedHashMap<>();
 
     protected List<Object> fieldsToRemove = new ArrayList<>();
 
@@ -224,8 +226,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             }
         }
 
-        this.xClassReference = ref;
-        this.xClassReferenceCache = null;
+        if (!Objects.equals(this.xClassReference, ref)) {
+            this.xClassReference = ref;
+            this.xClassReferenceCache = null;
+
+            setDirty(true);
+        }
     }
 
     /**
@@ -265,7 +271,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         addField(name, property);
         if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setObject(this);
             ((BaseProperty) property).setName(name);
         }
     }
@@ -473,9 +478,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
-            return new HashSet<Object>();
+            return new HashSet<>();
         } else {
-            return new HashSet<Object>((Collection<?>) prop.getValue());
+            return new HashSet<>((Collection<?>) prop.getValue());
         }
     }
 
@@ -537,9 +542,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         this.fields.put(name, element);
 
-        if (element instanceof BaseElement) {
-            ((BaseElement) element).setOwnerDocument(getOwnerDocument());
+        if (element instanceof BaseElement baseElement) {
+            baseElement.setOwnerDocument(getOwnerDocument());
+
+            if (element instanceof BaseProperty baseProperty) {
+                baseProperty.setObject(this);
+            }
         }
+
+        setDirty(true);
     }
 
     public void removeField(String name)
@@ -548,6 +559,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         if (field != null) {
             this.fields.remove(name);
             this.fieldsToRemove.add(field);
+
+            setDirty(true);
         }
     }
 
@@ -632,22 +645,28 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
-    public BaseCollection clone()
+    public BaseCollection<R> clone()
     {
-        BaseCollection collection = (BaseCollection) super.clone();
+        return (BaseCollection<R>) super.clone();
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        BaseCollection<R> collection = (BaseCollection<R>) element;
+
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
-        Map fields = getFields();
-        Map cfields = new HashMap();
-        for (Object objEntry : fields.entrySet()) {
-            Map.Entry entry = (Map.Entry) objEntry;
-            PropertyInterface prop = (PropertyInterface) ((BaseElement) entry.getValue()).clone();
+        Map<String, Object> fields = getFields();
+        Map<String, Object> cfields = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> objEntry : fields.entrySet()) {
+            PropertyInterface prop = (PropertyInterface) ((BaseElement) objEntry.getValue()).clone(true);
             prop.setObject(collection);
-            cfields.put(entry.getKey(), prop);
+            cfields.put(objEntry.getKey(), prop);
         }
         collection.setFields(cfields);
-
-        return collection;
     }
 
     public void merge(BaseObject object)
@@ -656,14 +675,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         while (itfields.hasNext()) {
             String name = (String) itfields.next();
             if (safeget(name) == null) {
-                safeput(name, (PropertyInterface) ((BaseElement) object.safeget(name)).clone());
+                safeput(name, (PropertyInterface) ((BaseElement) object.safeget(name)).clone(true));
             }
         }
     }
 
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseCollection oldCollection = (BaseCollection) oldObject;
         // Iterate over the new properties first, to handle changed and added objects
         for (Object key : this.getFields().keySet()) {
@@ -673,15 +693,23 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
+            boolean isSensitive = false;
+            if (newProperty != null) {
+                isSensitive = newProperty.isSensitive(context);
+            }
+            if (!isSensitive && oldProperty != null) {
+                isSensitive = oldProperty.isSensitive(context);
+            }
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
+                if ((newProperty != null) && (!"".equals(newProperty.toText()))) {
                     if (pclass != null) {
                         String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
                             : pclass.displayView(propertyName, this, context);
                         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
+                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                            isSensitive));
                     }
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -694,12 +722,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         : pclass.displayView(propertyName, oldCollection, context);
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldPropertyValue, newPropertyValue));
+                            propertyName, propertyType, oldPropertyValue, newPropertyValue,
+                            isSensitive));
                 } else {
                     // Cannot get property definition, so use the plain value
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
+                            propertyName, propertyType, oldProperty.toText(), newProperty.toText(),
+                            isSensitive));
                 }
             }
         }
@@ -712,20 +742,28 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
-
+            boolean isSensitive = false;
+            if (newProperty != null) {
+                isSensitive = newProperty.isSensitive(context);
+            }
+            if (!isSensitive && oldProperty != null) {
+                isSensitive = oldProperty.isSensitive(context);
+            }
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
+                if ((oldProperty != null) && (!"".equals(oldProperty.toText()))) {
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
                             : pclass.displayView(propertyName, oldCollection, context);
                         difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                            isSensitive));
                     } else {
                         // Cannot get property definition, so use the plain value
                         difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
+                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                            isSensitive));
                     }
                 }
             }
@@ -801,7 +839,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         for (String name : this.fields.keySet()) {
             BaseProperty property = (BaseProperty) get(name);
             map.put(name, property.getCustomMappingValue());
@@ -925,7 +963,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         if (clean) {
             // Delete fields that don't exist anymore
-            List<String> fieldsToDelete = new ArrayList<String>(this.fields.size());
+            List<String> fieldsToDelete = new ArrayList<>(this.fields.size());
             for (String key : this.fields.keySet()) {
                 if (newCollection.safeget(key) == null) {
                     fieldsToDelete.add(key);
@@ -980,5 +1018,25 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setDirty(dirty);
+
+        this.fields.values().forEach(field -> {
+            if (field instanceof BaseCollection<?> baseCollection) {
+                baseCollection.setDirty(dirty, deep);
+            } else if (field instanceof BaseElement<?> baseElement) {
+                baseElement.setDirty(dirty);
+            }
+        });
     }
 }

@@ -66,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -74,7 +75,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AttachmentsResourceImpl}.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -114,7 +115,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -152,10 +153,12 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(textAttachment.getFilename()).thenReturn("plain.txt");
         when(textAttachment.getMimeType(this.xcontext)).thenReturn("text/plain");
 
-        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", videoAttachment},
-            new Object[] {"Path.To", "Page", "1.3", textAttachment},
-            new Object[] {"Path.To", "Page", "1.3", imageAttachment});
+        List<Object> results = Arrays.asList(new Object[] { "Path.To", "Page", "1.3", videoAttachment },
+            new Object[] { "Path.To", "Page", "1.3", textAttachment },
+            new Object[] { "Path.To", "Page", "1.3", imageAttachment });
         when(query.execute()).thenReturn(results);
+
+        when(this.authorization.hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
         when(this.defaultSpaceReferenceResover.resolve(eq("Path.To"), any()))
@@ -193,7 +196,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -224,7 +227,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -251,7 +254,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("pom.xml", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("pom.xml", null, "<project/>", "application/xml");
+        mockRequest("pom.xml", null, "<project/>");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -269,7 +272,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         assertEquals("<project/>", IOUtils.toString(xwikiAttachment.getContentInputStream(this.xcontext)));
     }
 
-    private void mockRequest(String originalFileName, String overwritingFileName, String content, String mediaType)
+    private void mockRequest(String originalFileName, String overwritingFileName, String content)
         throws Exception
     {
         HttpServletRequest request = mock();
@@ -305,9 +308,8 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             this.xwiki.saveDocument(document, this.xcontext);
         }
 
-        when(this.oldCore.getMockRightService()
-            .hasAccessLevel("view", this.xcontext.getUser(), serializedDocumentReference, this.xcontext)).thenReturn(
-            hasView);
+        when(this.oldCore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, documentReference))
+            .thenReturn(hasView);
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(hasEdit);
 
         return this.xwiki.getDocument(documentReference, this.xcontext);

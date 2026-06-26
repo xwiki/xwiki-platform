@@ -50,13 +50,14 @@ import static org.junit.jupiter.api.Assertions.fail;
             + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
             + "com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
+    resolveExtraJARs = true,
     extraJARs = {
         // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.cfg and plugins are loaded
         // by XWiki at startup, i.e. before extensions are provisioned for the tests
         "org.xwiki.platform:xwiki-platform-scheduler-api",
         // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
         // WEB-INF/lib.
-        "org.python:jython-slim:2.7.3"
+        "org.python:jython-slim"
 })
 class SchedulerIT
 {

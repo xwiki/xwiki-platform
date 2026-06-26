@@ -25,12 +25,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.internal.web.PageTemplateRequiredRightsChecker;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -39,12 +45,16 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -53,6 +63,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,12 +78,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.2M1
  */
-@ComponentList
+@ComponentList(PageTemplateRequiredRightsChecker.class)
 @ReferenceComponentList
 @OldcoreTest
 class CreateActionTest
 {
     private static final String CSRF_TOKEN_VALUE = "token4234343";
+
+    private static final Logger log = LoggerFactory.getLogger(CreateActionTest.class);
 
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
@@ -85,6 +98,9 @@ class CreateActionTest
     @MockComponent
     private CSRFToken csrfToken;
 
+    @MockComponent
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
     XWikiContext context;
 
     XWikiRequest mockRequest;
@@ -94,7 +110,7 @@ class CreateActionTest
     Query mockTemplateProvidersQuery;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.context = this.oldcore.getXWikiContext();
 
@@ -499,6 +515,7 @@ class CreateActionTest
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
@@ -854,13 +871,12 @@ class CreateActionTest
             new DocumentReference("xwiki", Arrays.asList("XWiki"), "TemplateProviderClass");
 
         // Mock to return at least 1 existing template provider
-        when(mockTemplateProvidersQuery.execute()).thenReturn(new ArrayList<Object>(Arrays.asList(fullName)));
+        when(this.mockTemplateProvidersQuery.execute()).thenReturn(new ArrayList<Object>(Arrays.asList(fullName)));
 
         // Mock the template document as existing.
         XWikiDocument templateProviderDocument = mock(XWikiDocument.class);
+        when(templateProviderDocument.clone()).thenReturn(templateProviderDocument);
         when(templateProviderDocument.getDocumentReference()).thenReturn(resolvedDocumentReference);
-        oldcore.getDocuments().put(new DocumentReference(resolvedDocumentReference, Locale.ROOT),
-            templateProviderDocument);
         // Mock the provider object (template + spaces properties)
         BaseObject templateProviderObject = mock(BaseObject.class);
         when(templateProviderObject.getListValue("creationRestrictions")).thenReturn(allowedSpaces);
@@ -878,27 +894,28 @@ class CreateActionTest
             when(templateProviderObject.getStringValue("action")).thenReturn(action);
         }
         when(templateProviderDocument.getXObject(templateProviderClassReference)).thenReturn(templateProviderObject);
+        this.oldcore.getDocuments().put(new DocumentReference(resolvedDocumentReference, Locale.ROOT),
+            templateProviderDocument);
 
         // Mock the template document as existing
         String templateDocumentName =
             resolvedDocumentReference.getName().substring(0, resolvedDocumentReference.getName().indexOf("Provider"));
         DocumentReference templateDocumentReference =
             new DocumentReference(templateDocumentName, new SpaceReference(resolvedDocumentReference.getParent()));
-        mockTemplateDocumentExisting(templateDocumentFullName, templateDocumentReference);
+        mockTemplateDocumentExisting(templateDocumentReference);
     }
 
     /**
-     * @param templateDocumentFullName
      * @param templateDocumentReference
      * @throws XWikiException
      */
-    private void mockTemplateDocumentExisting(String templateDocumentFullName,
-        DocumentReference templateDocumentReference) throws XWikiException
+    private void mockTemplateDocumentExisting(DocumentReference templateDocumentReference) throws XWikiException
     {
         XWikiDocument templateDocument = mock(XWikiDocument.class);
+        when(templateDocument.clone()).thenReturn(templateDocument);
         when(templateDocument.getDocumentReference()).thenReturn(templateDocumentReference);
         when(templateDocument.getDefaultEditMode(context)).thenReturn("edit");
-        oldcore.getDocuments().put(new DocumentReference(templateDocumentReference, Locale.ROOT), templateDocument);
+        this.oldcore.getDocuments().put(new DocumentReference(templateDocumentReference, Locale.ROOT), templateDocument);
     }
 
     @Test
@@ -1281,7 +1298,6 @@ class CreateActionTest
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&template=XWiki.MyTemplate
-        String templateDocumentFullName = "XWiki.MyTemplate";
         DocumentReference templateDocumentReference =
             new DocumentReference("MyTemplate", Arrays.asList("XWiki"), "xwiki");
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
@@ -1289,7 +1305,7 @@ class CreateActionTest
         when(mockRequest.getParameter("template")).thenReturn("XWiki.MyTemplate");
 
         // Mock the passed template document as existing.
-        mockTemplateDocumentExisting(templateDocumentFullName, templateDocumentReference);
+        mockTemplateDocumentExisting(templateDocumentReference);
 
         // Run the action
         String result = action.render(context);
@@ -1652,5 +1668,119 @@ class CreateActionTest
         verify(document).setCreatorReference(userReference);
         verify(document).setAuthorReference(userReference);
         verify(this.context.getWiki()).saveDocument(document, this.context);
+    }
+
+    @Test
+    void templateProviderDeniedWhenDocumentRightMissing() throws Exception
+    {
+        DocumentReference currentDocument = new DocumentReference("xwiki", List.of("Main"), "WebHome");
+        XWikiDocument document = mock();
+        when(document.getDocumentReference()).thenReturn(currentDocument);
+        when(document.isNew()).thenReturn(false);
+        when(document.getLocalReferenceMaxLength()).thenReturn(255);
+        this.context.setDoc(document);
+
+        when(this.mockRequest.getParameter("spaceReference")).thenReturn("Sandbox.Child");
+        when(this.mockRequest.getParameter("name")).thenReturn("Target");
+
+        String providerFullName = "XWiki.RestrictedTemplateProvider";
+        when(this.mockRequest.getParameter("templateprovider")).thenReturn(providerFullName);
+
+        DocumentReference templateProviderDocumentReference =
+            new DocumentReference("xwiki", List.of("XWiki"), "RestrictedTemplateProvider");
+        mockExistingTemplateProviders(providerFullName, templateProviderDocumentReference, Collections.emptyList());
+
+        DocumentReference expectedTarget =
+            new DocumentReference("xwiki", List.of("Sandbox", "Child", "Target"), "WebHome");
+
+        DocumentReference userReference = new DocumentReference(providerFullName, "Users", "Alice");
+        this.context.setUserReference(userReference);
+
+        mockRequiredRights(templateProviderDocumentReference, Right.SCRIPT, EntityType.DOCUMENT, true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.SCRIPT, userReference, expectedTarget))
+            .thenReturn(false);
+
+        // Deny access to the space of the current document, too.
+        SpaceReference currentSpace = currentDocument.getLastSpaceReference();
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.SCRIPT, userReference, currentSpace))
+            .thenReturn(false);
+
+        assertEquals("create", this.action.render(this.context));
+
+        XWikiException exception = (XWikiException) this.oldcore.getScriptContext().getAttribute("createException");
+        assertNotNull(exception);
+        assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_REQUIRED_RIGHTS_MISSING, exception.getCode());
+
+        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.SCRIPT, userReference, expectedTarget);
+
+        // Verify that when listing all template providers, the restriction is checked on the space of the current
+        // document.
+        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.SCRIPT, userReference, currentSpace);
+        // Verify that the template provider isn't listed as available.
+        List<?> availableTemplateProviders =
+            (List<?>) this.oldcore.getScriptContext().getAttribute("availableTemplateProviders");
+        assertEquals(List.of(), availableTemplateProviders);
+    }
+
+    @Test
+    void templateProviderAllowedWhenDocumentRightGranted() throws Exception
+    {
+        DocumentReference currentDocument = new DocumentReference("xwiki", List.of("Main"), "WebHome");
+        XWikiDocument document = mock();
+        when(document.getDocumentReference()).thenReturn(currentDocument);
+        when(document.isNew()).thenReturn(false);
+        when(document.getLocalReferenceMaxLength()).thenReturn(255);
+        this.context.setDoc(document);
+
+        when(this.mockRequest.getParameter("spaceReference")).thenReturn("Sandbox");
+        when(this.mockRequest.getParameter("name")).thenReturn("Child");
+
+        String providerFullName = "XWiki.RestrictedTemplateProvider";
+        when(this.mockRequest.getParameter("templateprovider")).thenReturn(providerFullName);
+
+        DocumentReference templateProviderDocumentReference =
+            new DocumentReference("xwiki", List.of("XWiki"), "RestrictedTemplateProvider");
+        mockExistingTemplateProviders(providerFullName, templateProviderDocumentReference, Collections.emptyList());
+
+        SpaceReference expectedTarget = new SpaceReference("xwiki", List.of("Sandbox", "Child"));
+
+        DocumentReference userReference = new DocumentReference(providerFullName, "Users", "Alice");
+        this.context.setUserReference(userReference);
+
+        mockRequiredRights(templateProviderDocumentReference, Right.ADMIN, EntityType.SPACE, true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, userReference, expectedTarget))
+            .thenReturn(true);
+        // Also grant admin right on the space of the current document so the template provider is listed.
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, userReference,
+            currentDocument.getLastSpaceReference()))
+            .thenReturn(true);
+
+        assertNull(this.action.render(this.context));
+
+        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.ADMIN, userReference, expectedTarget);
+        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.ADMIN, userReference,
+            currentDocument.getLastSpaceReference());
+
+        // Verify that the template provider is listed.
+        List<?> availableTemplateProviders =
+            (List<?>) this.oldcore.getScriptContext().getAttribute("availableTemplateProviders");
+        assertEquals(1, availableTemplateProviders.size());
+        assertInstanceOf(Document.class, availableTemplateProviders.get(0));
+        assertEquals(templateProviderDocumentReference,
+            ((Document) availableTemplateProviders.get(0)).getDocumentReference());
+    }
+
+    private void mockRequiredRights(DocumentReference providerReference, Right right, EntityType scope, boolean enforce)
+        throws Exception
+    {
+        String templateDocumentName =
+            providerReference.getName().substring(0, providerReference.getName().indexOf("Provider"));
+        DocumentReference templateDocumentReference =
+            new DocumentReference(templateDocumentName, providerReference.getLastSpaceReference());
+
+        DocumentRequiredRight requiredRight = new DocumentRequiredRight(right, scope);
+        DocumentRequiredRights documentRequiredRights = new DocumentRequiredRights(enforce, Set.of(requiredRight));
+        when(this.documentRequiredRightsManager.getRequiredRights(templateDocumentReference))
+            .thenReturn(Optional.of(documentRequiredRights));
     }
 }

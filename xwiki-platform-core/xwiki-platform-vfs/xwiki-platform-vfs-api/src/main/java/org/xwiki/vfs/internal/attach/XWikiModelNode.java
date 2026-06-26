@@ -24,8 +24,8 @@ import java.net.URI;
 
 import javax.inject.Provider;
 
-import org.apache.commons.httpclient.util.URIUtil;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.http.URIUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -133,7 +133,7 @@ public class XWikiModelNode
             try {
                 XWikiDocument document = getXWikiContext().getWiki().getDocument(
                     getDocumentReference(), getXWikiContext());
-                String decodedName = URIUtil.decode(this.name);
+                String decodedName = URIUtils.decode(this.name);
                 this.attachment = document.getAttachment(decodedName);
             } catch (Exception e) {
                 throw new IOException(String.format("Failed to get Attachment for [%s]", this.uri), e);

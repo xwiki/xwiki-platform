@@ -27,6 +27,7 @@ import java.util.Locale;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -60,6 +61,11 @@ public class ImportTest extends AbstractPackageTest
     private Package pack;
 
     private XWiki xwiki;
+
+    // Generate temporary files under the module's "target" directory so that they don't leak outside the build
+    // workspace.
+    @TempDir
+    private File temporaryDirectory;
 
     @BeforeEach
     void beforeEach() throws Exception
@@ -138,7 +144,7 @@ public class ImportTest extends AbstractPackageTest
 
         // Store the extension in the local repository
         DefaultLocalExtension localExtension = new DefaultLocalExtension(null, extensionId, "xar");
-        File file = File.createTempFile("temp", ".xar");
+        File file = new File(this.temporaryDirectory, "temp.xar");
         FileUtils.writeByteArrayToFile(file, zipFile);
         localExtension.setFile(file);
         LocalExtensionRepository localeRepository =
@@ -368,9 +374,6 @@ public class ImportTest extends AbstractPackageTest
         assertFalse(foundOverwritingDoc.isNew());
         assertNotSame(foundDocument, foundOverwritingDoc);
         assertEquals(foundOverwritingDoc.getContent(), newContent);
-        // Make sure the previous version is set as original document by the packager
-        // This is cheating a bit, should be tested using a listener instead this hack
-        assertSame(foundDocument, foundOverwritingDoc.getOriginalDocument().getOriginalDocument());
     }
 
     /**

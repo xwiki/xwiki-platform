@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
@@ -51,7 +51,7 @@ class ActionFilterTest
     private final ActionFilter filter = new ActionFilter();
 
     @BeforeComponent
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         Utils.setComponentManager(componentManager);
         componentManager.registerMockComponent(ConfigurationSource.class, "xwikicfg");

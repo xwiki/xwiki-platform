@@ -22,6 +22,9 @@ package org.xwiki.livedata;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -33,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataPaginationConfiguration
+public class LiveDataPaginationConfiguration implements InitializableLiveDataElement
 {
     private Integer maxShownPages;
 
@@ -157,9 +160,7 @@ public class LiveDataPaginationConfiguration
         this.showPageSizeDropdown = showPageSizeDropdown;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.maxShownPages == null) {
@@ -174,5 +175,47 @@ public class LiveDataPaginationConfiguration
         if (this.showNextPrevious == null) {
             this.showNextPrevious = true;
         }
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataPaginationConfiguration that = (LiveDataPaginationConfiguration) o;
+
+        return new EqualsBuilder()
+            .append(this.maxShownPages, that.maxShownPages)
+            .append(this.pageSizes, that.pageSizes)
+            .append(this.showEntryRange, that.showEntryRange)
+            .append(this.showNextPrevious, that.showNextPrevious)
+            .append(this.showFirstLast, that.showFirstLast)
+            .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.maxShownPages)
+            .append(this.pageSizes)
+            .append(this.showEntryRange)
+            .append(this.showNextPrevious)
+            .append(this.showFirstLast)
+            .append(this.showPageSizeDropdown)
+            .toHashCode();
     }
 }

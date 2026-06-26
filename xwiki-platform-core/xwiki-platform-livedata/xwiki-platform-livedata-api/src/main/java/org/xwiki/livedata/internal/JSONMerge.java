@@ -41,6 +41,9 @@ public class JSONMerge
 
     /**
      * Deep merge the given objects.
+     * Note that the right element always have priority over the left element in case of conflict when merging. Also
+     * the merge of object nodes happens only if both objects have an {@code id} key containing the same value. If
+     * it's not the case the object will be treated as simple elements without performing deep analysis.
      * 
      * @param objects the objects to merge
      * @param <T> the type of objects to merge

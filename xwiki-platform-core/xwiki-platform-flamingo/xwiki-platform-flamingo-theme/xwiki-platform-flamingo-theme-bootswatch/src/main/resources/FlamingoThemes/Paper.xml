@@ -155,6 +155,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </breadcrumb-color>
+      <breadcrumb-link-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>breadcrumb-link-color</name>
+        <number>60</number>
+        <picker>0</picker>
+        <prettyName>breadcrumb-link-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </breadcrumb-link-color>
       <breadcrumb-separator>
         <customDisplay/>
         <disabled>0</disabled>
@@ -807,6 +820,9 @@
     </property>
     <property>
       <breadcrumb-color/>
+    </property>
+    <property>
+      <breadcrumb-link-color/>
     </property>
     <property>
       <breadcrumb-separator/>

@@ -19,17 +19,17 @@
  */
 package org.xwiki.rendering;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.test.MockWikiModel;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -38,26 +38,17 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
+    @Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
         // Attachment Reference Resolver Mock
-        final AttachmentReferenceResolver<String> mockResolver = mockery.mock(AttachmentReferenceResolver.class);
-        mockery.checking(new Expectations() {{
-            allowing(mockResolver).resolve("Space.ExistingPage@my.png");
-            will(returnValue(
-                new AttachmentReference("my.png", new DocumentReference("wiki", "Space", "ExistingPage"))));
-        }});
-        DefaultComponentDescriptor<AttachmentReferenceResolver<String>> descriptorARS =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver<String>>();
-        descriptorARS.setRoleType(AttachmentReferenceResolver.TYPE_STRING);
-        descriptorARS.setRoleHint("current");
-        componentManager.registerComponent(descriptorARS, mockResolver);
+        AttachmentReferenceResolver<String> ar = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, AttachmentReferenceResolver.class, String.class), "current");
+        when(ar.resolve("Space.ExistingPage@my.png")).thenReturn(
+            new AttachmentReference("my.png", new DocumentReference("wiki", "Space", "ExistingPage")));
 
         // WikiModel Mock
         componentManager.registerComponent(MockWikiModel.getComponentDescriptor());

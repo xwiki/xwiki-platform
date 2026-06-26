@@ -29,11 +29,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -49,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +74,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     private ExplicitlyAllowedValuesDBListQueryBuilder builder;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     @Named("secure")
@@ -82,6 +85,10 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
 
     @MockComponent
     private VelocityManager velocityManager;
+
+    @MockComponent
+    @Named("viewableAllowedDBListPropertyValue")
+    private QueryFilter viewableValueFilter;
 
     @Mock
     private VelocityEngine velocityEngine;
@@ -96,9 +103,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         when(ownerDocument.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
 
         BaseClass xclass = new BaseClass();
-        xclass.setDocumentReference(ownerDocument.getDocumentReference());
+        xclass.setOwnerDocument(ownerDocument);
 
-        this.dbListClass.setOwnerDocument(ownerDocument);
         this.dbListClass.setObject(xclass);
         this.dbListClass.setName("category");
         this.dbListClass.setSql(SQL);
@@ -109,8 +115,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithScriptRight() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE))
-            .thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(true);
 
         String evaluatedStatement = "test";
         when(this.velocityEngine.evaluate(any(), any(), any(), eq(SQL))).thenAnswer(new Answer<Boolean>()
@@ -136,6 +142,9 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         when(this.secureQueryManager.createQuery(evaluatedStatement, Query.HQL)).thenReturn(query);
 
         assertSame(query, this.builder.build(this.dbListClass));
+
+        // SQL does not contain "doc.fullName", so the viewable value filter should not be applied.
+        verify(query, never()).addFilter(this.viewableValueFilter);
     }
 
     @Test
@@ -147,5 +156,24 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         assertSame(query, this.builder.build(this.dbListClass));
 
         verify(query).setWiki("math");
+        // SQL does not contain "doc.fullName", so the viewable value filter should not be applied.
+        verify(query, never()).addFilter(this.viewableValueFilter);
+    }
+
+    @Test
+    public void buildWithDocFullNameAppliesViewableFilter() throws Exception
+    {
+        String sqlWithFullName = "select distinct doc.fullName as unfilterableRightCheck, doc.web from XWikiDocument "
+            + "doc where doc.name = 'WebHome' order by doc.web";
+        this.dbListClass.setSql(sqlWithFullName);
+
+        Query query = mock(Query.class);
+        when(this.secureQueryManager.createQuery(sqlWithFullName, Query.HQL)).thenReturn(query);
+
+        assertSame(query, this.builder.build(this.dbListClass));
+
+        verify(query).setWiki("math");
+        // SQL contains "doc.fullName as unfilterableRightCheck", so the viewable value filter must be applied.
+        verify(query).addFilter(this.viewableValueFilter);
     }
 }

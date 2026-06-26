@@ -42,11 +42,9 @@ solr.admin.submit=Aplikovať
 solr.admin.error.notallowed=Nemáte oprávnenie na vykonávanie akcie.
 solr.admin.error.norights=Aby ste mohli pokračovať potrebujete administrátorské práva.
 ### Missing: solr.admin.success.action={0} successfully triggered.
-
 solr.admin.status.title=Stav
 solr.admin.status.queueSize.label=Veľkosť fronty
 solr.admin.status.queueSize.hint=Počet dokumentov, ktoré čakajkú na indexovanie, re-indexovanie alebo vymazanie z indexu.
-
 solr.admin.indexing.title=Indexovanie
 solr.admin.indexing.action.label=Akcia
 solr.admin.indexing.action.hint=Akcia sa vykoná na indexe.
@@ -58,47 +56,40 @@ solr.admin.indexing.wiki.hint=Má vplyv na všetky dokumenty Wiki.
 ### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Vlastný dotaz
 solr.admin.indexing.query.hint=Voliteľný dotaz na obmedzenie počet dokumentov, ktoré budú ovplyvnené v indexe.
-
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-
-solr.sortBy=Zoradiť podľa\:
-### Missing: solr.sortBy.score=Relevance
-solr.sortBy.title_sort=Názov
-### Missing: solr.sortBy.date=Last modification date
-solr.sortBy.author_display_sort=Posledný autor
-solr.sortBy.filename_sort=Názov súboru
-solr.sortBy.attsize_sort=Veľkoť súboru
-solr.sortBy.attdate_sort=Dátum
-solr.sortBy.attauthor_display_sort=Nahral
-### Missing: solr.sortOrder.asc=Ascending
-### Missing: solr.sortOrder.desc=Descending
-
-solr.options=Ukázať\:
-solr.options.highlight=Zvýraznenie
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
-### Missing: solr.options.facet=Facets
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
+### Missing: solr.options.highlight.title=
+### Missing: search.solr.options.showFacet=Show filters
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
-
 solr.result.language=Jazyk
 ### Missing: solr.result.locatedIn=Located in
 solr.result.author=Editoval {0} ({1})
 solr.result.mediaType=Súbor typu {0}
 solr.result.uploadedBy=Nahral {0} - {1} ({2})
 ### Missing: solr.result.highlightAll=Highlight all matches
-
-### Missing: solr.facets.title=Refine your search
-### Missing: solr.facets.hint=Select a category and activate filters on the current results
+### Missing: solr.facets.title=
+### Missing: solr.facets.hint=
 solr.facets.resetAll=Vynulovať všetky
 solr.facets.expandAll=Rozbaliť všetko
 solr.facets.collapseAll=Zbaliť všetko
 solr.facets.emptyValue=Prázdna hodnota
 solr.facets.moreValues={0} viac
-
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.attachment=Príloha
 solr.filterBy.type.object=Objekt
 solr.filterBy.type.object_property=Vlastnosť objektu
-
 solr.filterBy.fileType.image=Obrázok
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Ikona
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Binárne dáta
-
 solr.facet.date.today=Dnes
 solr.facet.date.last7Days=Posledných 7 dní
 solr.facet.date.last30Days=Posledných 30 dní
@@ -131,7 +121,6 @@ solr.facet.date.between=Od {0} do {1}
 solr.facet.date.after=Po {0}
 solr.facet.date.before=Pred {0}
 solr.facet.date.any=Akýkoľvek dátum
-
 ### Missing: solr.facet.size.tiny=Tiny
 ### Missing: solr.facet.size.small=Small
 ### Missing: solr.facet.size.medium=Medium
@@ -140,7 +129,6 @@ solr.facet.size.between=Medzi {0} a {1}
 solr.facet.size.lessThan=Menej ako {0}
 solr.facet.size.moreThan=Viac ako {0}
 solr.facet.size.any=Akákoľvek veľkosť
-
 ### Missing: solr.field.type=Result type
 solr.field.locale=jazyk
 ### Missing: solr.field.locale.emptyValue=No language
@@ -158,8 +146,8 @@ solr.field.creator=Vytvoril
 solr.field.creator_display=Vytvoril
 solr.field.date=Posledná modifikácia
 solr.field.creationdate=Dátum vytvorenia
-### Missing: solr.field.doccontent=Rendered document content
-### Missing: solr.field.doccontentraw=Raw document content
+### Missing: solr.field.doccontent=
+### Missing: solr.field.doccontentraw=
 solr.field.class=Typ objektu
 solr.field.class.definedBy=Definuje {0} » {1}
 solr.field.propertyname=Pekný názov
@@ -173,7 +161,6 @@ solr.field.attauthor=Nahral
 solr.field.attauthor_display=Nahral
 solr.field.attdate=Dátum pridania
 solr.field.attsize=Veľkosť súboru
-
 ### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
 ### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
 
@@ -185,7 +172,20 @@ solr.result.location=Nachádza sa v {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Priestor
+solr.sortBy=Zoradiť podľa\:
+### Missing: solr.sortBy.score=Relevance
+solr.sortBy.title_sort=Názov
+### Missing: solr.sortBy.date=
+solr.sortBy.author_display_sort=Posledný autor
+solr.sortBy.filename_sort=Názov súboru
+solr.sortBy.attsize_sort=Veľkoť súboru
+solr.sortBy.attdate_sort=Dátum
+solr.sortBy.attauthor_display_sort=Nahral
+solr.options=Ukázať\:
+solr.options.highlight=Zvýraznenie
+### Missing: solr.options.facet=
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -165,13 +165,18 @@ public class ExtensionIndexJobScheduler implements Disposable
         ExtensionIndexStatus scheduledStatus = !id.equals(this.scheduledRequest.getId())
             ? (ExtensionIndexStatus) this.jobStore.getJobStatus(this.scheduledRequest.getId()) : null;
 
-        if (namespaceStatus != null
+        if (hasAStartDate(namespaceStatus)
             && (scheduledStatus == null || namespaceStatus.getStartDate().after(scheduledStatus.getStartDate())
                 || !((ExtensionIndexRequest) scheduledStatus.getRequest()).getNamespaces().contains(namespace))) {
             return namespaceStatus;
         }
 
         return scheduledStatus;
+    }
+
+    private boolean hasAStartDate(ExtensionIndexStatus status)
+    {
+        return status != null && status.getStartDate() != null;
     }
 
     /**

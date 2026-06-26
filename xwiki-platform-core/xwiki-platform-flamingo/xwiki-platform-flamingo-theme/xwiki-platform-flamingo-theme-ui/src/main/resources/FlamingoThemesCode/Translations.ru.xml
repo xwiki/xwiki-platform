@@ -73,6 +73,7 @@ platform.flamingo.themes.defaultvalue=По-умолчанию
 platform.flamingo.themes.lessCode.description=В этом поле вы можете напрямую написать LESS-код, который будет добавлен в скин.
 platform.flamingo.themes.local=Локальные
 platform.flamingo.themes.global=Глобальные
+FlamingoThemesCode.ThemeClass_logo-description_hint=Альтернативный текст для логотипа. Он должен описывать значение логотипа. По умолчанию используется локализованное значение, связанное с ключом «core.document.header.logo.image.text».
 
 ###############################################################################
 ## Deprecated

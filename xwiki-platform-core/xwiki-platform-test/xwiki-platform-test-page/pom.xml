@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-page</artifactId>
   <name>XWiki Platform - Test - Page Tests Framework</name>
   <packaging>jar</packaging>
   <description>Allow writing unit tests for wiki pages</description>
   <properties>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -68,12 +67,22 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-message</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -104,8 +113,22 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 </project>

@@ -39,7 +39,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.test.LogLevel;
@@ -58,7 +58,9 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -99,7 +101,7 @@ class JsSkinExtensionPluginTest
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     private SkinExtensionAsync skinExtensionAsync;
@@ -148,7 +150,8 @@ class JsSkinExtensionPluginTest
 
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
         when(document.getAuthorReference()).thenReturn(userReference);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(true);
 
         this.skinExtensionPlugin.use(resource, parameters, context);
         String className = JsSkinExtensionPlugin.class.getCanonicalName();
@@ -162,7 +165,8 @@ class JsSkinExtensionPluginTest
         expectedParameters.put(resource, parameters);
 
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference);
         verify(this.skinExtensionAsync).use("jsx", resource, parameters);
 
         String resource2 = "MySpace.MyOtherJSXPage";
@@ -179,7 +183,8 @@ class JsSkinExtensionPluginTest
 
         DocumentReference userReference2 = new DocumentReference("xwiki", "XWiki", "Bar");
         when(document2.getAuthorReference()).thenReturn(userReference2);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2)).thenReturn(false);
 
         this.skinExtensionPlugin.use(resource2, parameters2, context);
         resources = (Set<String>) context.get(className);
@@ -187,14 +192,16 @@ class JsSkinExtensionPluginTest
         parametersMap =
             (Map<String, Map<String, Object>>) context.get(className + "_parameters");
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2);
         verify(this.skinExtensionAsync, never()).use("jsx", resource2, parameters2);
 
         assertEquals(1, this.logCapture.size());
         assertEquals("Extensions present in [MySpace.MyOtherJSXPage] ignored because of lack of script right "
             + "from the author.", this.logCapture.getMessage(0));
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2)).thenReturn(true);
         this.skinExtensionPlugin.use(resource2, parameters2, context);
 
         Set<String> expectedSet = new HashSet<>();
@@ -207,7 +214,8 @@ class JsSkinExtensionPluginTest
         parametersMap =
             (Map<String, Map<String, Object>>) context.get(className + "_parameters");
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager, times(2)).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.authorizationManager, times(2))
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2, documentReference2);
         verify(this.skinExtensionAsync).use("jsx", resource2, null);
 
         parameters2 = Collections.singletonMap("buzValue", 42);
@@ -266,15 +274,18 @@ class JsSkinExtensionPluginTest
         when(currentDoc.getDocumentReference()).thenReturn(documentReference);
         when(currentDoc.getAuthorReference()).thenReturn(userReference);
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(false);
         assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference);
 
         assertEquals(1, this.logCapture.size());
         assertEquals("Extensions present in [xwiki:MySpace.SomePage] ignored because of lack of script right "
             + "from the author.", this.logCapture.getMessage(0));
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(true);
         assertTrue(this.skinExtensionPlugin.hasPageExtensions(context));
     }
 }

@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletSession;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -181,6 +182,7 @@ public class RequestInitializer
     {
         xcontext.setRequest(stubRequest);
         this.container.setRequest(new ServletRequest(stubRequest));
+        this.container.setSession(new ServletSession(stubRequest));
 
         // Update to create the URL factory
         XWikiURLFactory urlFactory = xcontext.getURLFactory();

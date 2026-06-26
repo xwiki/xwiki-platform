@@ -19,10 +19,10 @@
  */
 package org.xwiki.test.ui.po;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
@@ -112,18 +112,20 @@ public class DrawerMenu extends BaseElement
 
     private void waitForDrawer(boolean visible)
     {
+        // We always want the transition to be ended in the wait condition.
+        ExpectedCondition<Boolean> transitionEnded = ExpectedConditions.not(
+            ExpectedConditions.attributeContains(this.drawerContainer, "class", "drawer-transitioning")
+        );
         if (visible) {
-            getDriver().waitUntilCondition(ExpectedConditions.visibilityOf(this.drawerContainer));
-            // Wait for the x position of the drawer container to be stable.
-            MutableInt x = new MutableInt(this.drawerContainer.getLocation().getX());
-            getDriver().waitUntilCondition(driver -> {
-                int newX = this.drawerContainer.getLocation().getX();
-                boolean isStable = newX == x.intValue();
-                x.setValue(newX);
-                return isStable;
-            });
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                ExpectedConditions.visibilityOf(this.drawerContainer),
+                transitionEnded
+            ));
         } else {
-            getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(this.drawerContainer));
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                ExpectedConditions.invisibilityOf(this.drawerContainer),
+                transitionEnded
+            ));
         }
     }
 }

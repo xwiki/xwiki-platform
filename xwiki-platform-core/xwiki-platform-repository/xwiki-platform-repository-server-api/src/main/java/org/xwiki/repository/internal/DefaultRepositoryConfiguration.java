@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
@@ -60,6 +61,9 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
     @Named("current")
     private DocumentReferenceResolver<EntityReference> resolver;
 
+    @Inject
+    private ConfigurationSource configurationsSource;
+
     /**
      * @return the XWiki object containing the configuration
      * @throws XWikiException when failing to get the object
@@ -88,7 +92,7 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
     {
         BaseObject obj = getConfigurationObject();
 
-        return obj != null ? obj.getListValue(XWikiRepositoryModel.PROP_CONFIGURATION_VALIDTYPEs) : Collections
+        return obj != null ? obj.getListValue(XWikiRepositoryModel.PROP_CONFIGURATION_VALIDTYPES) : Collections
             .<String> emptyList();
     }
 
@@ -100,4 +104,9 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
         return types.isEmpty() || types.contains(StringUtils.defaultString(type));
     }
 
+    @Override
+    public boolean isAllowedCustomRepository() throws XWikiException
+    {
+        return this.configurationsSource.getProperty("repository.rest.allowCustomRepository", false);
+    }
 }

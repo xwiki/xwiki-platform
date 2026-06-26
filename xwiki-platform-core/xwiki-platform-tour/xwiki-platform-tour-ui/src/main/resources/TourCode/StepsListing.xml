@@ -85,9 +85,9 @@
                #set($reflex      = $step.getValue('reflex'))
                #set($stepID      = $step.getNumber())
                &lt;tr&gt;
-                  &lt;td&gt;$!mathtool.add($order, 1)&lt;/td&gt;
-                  &lt;td&gt;$!element&lt;/td&gt;
-                  &lt;td&gt;$services.localization.render($!title)&lt;/td&gt;
+                  &lt;td&gt;$escapetool.xml($!order)&lt;/td&gt;
+                  &lt;td&gt;$escapetool.xml($!element)&lt;/td&gt;
+                  &lt;td&gt;$services.localization.render($escapetool.xml($!title))&lt;/td&gt;
                   &lt;td&gt;
                   #if($backdrop == 0)
                      $services.localization.render('tour.steps.no')
@@ -96,12 +96,12 @@
                   #end
                   &lt;/td&gt;
                   &lt;td&gt;
-                     $!placement
+                     $escapetool.xml($!placement)
                   &lt;/td&gt;
                   &lt;td&gt;
-                     $!targetPage &lt;br&gt;
-                     $!action &lt;br&gt;
-                     $!queryString
+                    $escapetool.xml($!targetPage) &lt;br&gt;
+                    $escapetool.xml($!action) &lt;br&gt;
+                    $escapetool.xml($!queryString)
                   &lt;/td&gt;
                   &lt;td&gt;
                   #if($reflex == 1)

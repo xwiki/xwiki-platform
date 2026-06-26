@@ -75,7 +75,7 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference spaceReference) throws SolrIndexerException
     {
-        List<EntityReference> result = new ArrayList<EntityReference>();
+        List<EntityReference> result = new ArrayList<>();
         EntityReference wikiReference = spaceReference.extractReference(EntityType.WIKI);
         String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
 

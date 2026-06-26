@@ -25,10 +25,10 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.event.status.JobStatus;
@@ -38,7 +38,11 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -49,67 +53,69 @@ import org.xwiki.wiki.template.WikiTemplateManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.security.authorization.Right.ADMIN;
 
-public class WikiTemplateManagerScriptTest
+/**
+ * Test of {@link WikiTemplateManagerScript}.
+ *
+ * @version $Id$
+ */
+@ComponentTest
+class WikiTemplateManagerScriptTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiTemplateManagerScript> mocker =
-            new MockitoComponentMockingRule(WikiTemplateManagerScript.class);
+    @InjectMockComponents
+    private WikiTemplateManagerScript wikiTemplateManagerScript;
 
+    @MockComponent
     private WikiTemplateManager wikiTemplateManager;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private AuthorizationManager authorizationManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Mock
     private XWikiContext xcontext;
 
+    @MockComponent
     private Execution execution;
 
-    private DocumentReference currentUserRef;
+    private static final DocumentReference CURRENT_USER_REF = new DocumentReference("mainWiki", "XWiki", "User");
 
+    @Mock
     private XWikiDocument currentDoc;
 
     private ExecutionContext executionContext;
 
-    @Before
-    public void setUp() throws Exception
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeEach
+    void setUp()
     {
-        wikiTemplateManager = mocker.getInstance(WikiTemplateManager.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
-                EntityReferenceSerializer.class, String.class));
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        execution = mocker.getInstance(Execution.class);
-        executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
-
-        currentUserRef = new DocumentReference("mainWiki", "XWiki", "User");
-        when(xcontext.getUserReference()).thenReturn(currentUserRef);
-
-        currentDoc = mock(XWikiDocument.class);
-        when(xcontext.getDoc()).thenReturn(currentDoc);
-
-        when(xcontext.getMainXWiki()).thenReturn("mainWiki");
-
-        when(entityReferenceSerializer.serialize(currentUserRef)).thenReturn("mainWiki:XWiki.User");
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.executionContext = new ExecutionContext();
+        when(this.execution.getContext()).thenReturn(this.executionContext);
+        when(this.xcontext.getUserReference()).thenReturn(CURRENT_USER_REF);
+        when(this.xcontext.getDoc()).thenReturn(this.currentDoc);
+        when(this.xcontext.getMainXWiki()).thenReturn("mainWiki");
+        when(this.entityReferenceSerializer.serialize(CURRENT_USER_REF)).thenReturn("mainWiki:XWiki.User");
     }
 
     /**
@@ -118,12 +124,12 @@ public class WikiTemplateManagerScriptTest
     private Exception currentScriptHasNotProgrammingRight() throws AccessDeniedException
     {
         DocumentReference authorDocRef = new DocumentReference("mainWiki", "XWiki", "Admin");
-        when(currentDoc.getAuthorReference()).thenReturn(authorDocRef);
+        when(this.currentDoc.getAuthorReference()).thenReturn(authorDocRef);
         DocumentReference currentDocRef = new DocumentReference("subwiki", "Test", "test");
-        when(currentDoc.getDocumentReference()).thenReturn(currentDocRef);
+        when(this.currentDoc.getDocumentReference()).thenReturn(currentDocRef);
 
         Exception exception = new AccessDeniedException(Right.PROGRAM, authorDocRef, currentDocRef);
-        doThrow(exception).when(authorizationManager).checkAccess(Right.PROGRAM, authorDocRef, currentDocRef);
+        doThrow(exception).when(this.authorizationManager).checkAccess(Right.PROGRAM, authorDocRef, currentDocRef);
 
         return exception;
     }
@@ -134,8 +140,8 @@ public class WikiTemplateManagerScriptTest
     private Exception currentUserHasNotAdminRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("wikiId");
-        Exception exception = new AccessDeniedException(Right.ADMIN, currentUserRef, wiki);
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef), eq(wiki));
+        Exception exception = new AccessDeniedException(ADMIN, CURRENT_USER_REF, wiki);
+        doThrow(exception).when(this.authorizationManager).checkAccess(ADMIN, CURRENT_USER_REF, wiki);
 
         return exception;
     }
@@ -146,240 +152,241 @@ public class WikiTemplateManagerScriptTest
     private Exception currentUserHasNotCreateWikiRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("mainWiki");
-        Exception exception = new AccessDeniedException(Right.CREATE_WIKI, currentUserRef, wiki);
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(currentUserRef), eq(wiki));
+        Exception exception = new AccessDeniedException(Right.CREATE_WIKI, CURRENT_USER_REF, wiki);
+        doThrow(exception).when(this.authorizationManager).checkAccess(Right.CREATE_WIKI, CURRENT_USER_REF, wiki);
 
         return exception;
     }
 
     @Test
-    public void getTemplates() throws Exception
+    void getTemplates() throws Exception
     {
-        Collection<WikiDescriptor> templates = new ArrayList<WikiDescriptor>();
+        Collection<WikiDescriptor> templates = new ArrayList<>();
         WikiDescriptor descriptor = new WikiDescriptor("templateId", "templateAlias");
         templates.add(descriptor);
 
-        when(wikiTemplateManager.getTemplates()).thenReturn(templates);
+        when(this.wikiTemplateManager.getTemplates()).thenReturn(templates);
 
-        Collection<WikiDescriptor> results = mocker.getComponentUnderTest().getTemplates();
+        Collection<WikiDescriptor> results = this.wikiTemplateManagerScript.getTemplates();
         assertEquals(templates, results);
     }
 
     @Test
-    public void getTemplatesError() throws Exception
+    void getTemplatesError() throws Exception
     {
         Exception exception = new WikiTemplateManagerException("Error in getTemplates");
-        when(wikiTemplateManager.getTemplates()).thenThrow(exception);
+        when(this.wikiTemplateManager.getTemplates()).thenThrow(exception);
 
-        Collection<WikiDescriptor> results = mocker.getComponentUnderTest().getTemplates();
+        Collection<WikiDescriptor> results = this.wikiTemplateManagerScript.getTemplates();
         assertTrue(results.isEmpty());
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Error while getting all the wiki templates.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Error while getting all the wiki templates.", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void setTemplateWhenCurrentUserIsOwner() throws Exception
+    void setTemplateWhenCurrentUserIsOwner() throws Exception
     {
         WikiDescriptor wikiDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
         wikiDescriptor.setOwnerId("mainWiki:XWiki.User");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
 
         // Test 1
-        boolean result = mocker.getComponentUnderTest().setTemplate("wikiId", true);
+        boolean result = this.wikiTemplateManagerScript.setTemplate("wikiId", true);
         assertTrue(result);
-        verify(wikiTemplateManager).setTemplate("wikiId", true);
+        verify(this.wikiTemplateManager).setTemplate("wikiId", true);
 
         // Test 2
-        result = mocker.getComponentUnderTest().setTemplate("wikiId", false);
+        result = this.wikiTemplateManagerScript.setTemplate("wikiId", false);
         assertTrue(result);
-        verify(wikiTemplateManager).setTemplate("wikiId", false);
+        verify(this.wikiTemplateManager).setTemplate("wikiId", false);
     }
 
     @Test
-    public void setTemplateWithoutPR() throws Exception
+    void setTemplateWithoutPR() throws Exception
     {
         Exception exception = currentScriptHasNotProgrammingRight();
 
-        boolean result = mocker.getComponentUnderTest().setTemplate("wikiId", true);
+        boolean result = this.wikiTemplateManagerScript.setTemplate("wikiId", true);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Access denied for [mainWiki:XWiki.User] to change the template value" +
-                " of the wiki [wikiId]. The user has not the right to perform this operation or the script has not " +
-                "the programming right.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("""
+                Access denied for [mainWiki:XWiki.User] to change the template value of the wiki [wikiId]. \
+                The user has not the right to perform this operation or the script has not the programming right.""",
+            this.logCapture.getMessage(0));
     }
 
     @Test
-    public void setTemplateWithoutAdminRight() throws Exception
+    void setTemplateWithoutAdminRight() throws Exception
     {
         Exception exception = currentUserHasNotAdminRight();
 
         WikiDescriptor wikiDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
 
-        boolean result = mocker.getComponentUnderTest().setTemplate("wikiId", true);
+        boolean result = this.wikiTemplateManagerScript.setTemplate("wikiId", true);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Access denied for [mainWiki:XWiki.User] to change the template value" +
-                " of the wiki [wikiId]. The user has not the right to perform this operation or the script has not " +
-                "the programming right.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("""
+                Access denied for [mainWiki:XWiki.User] to change the template value of the wiki [wikiId]. The user \
+                has not the right to perform this operation or the script has not the programming right.""",
+            this.logCapture.getMessage(0));
     }
 
     @Test
-    public void setTemplateErrorWithDescriptorManager() throws Exception
+    void setTemplateErrorWithDescriptorManager() throws Exception
     {
         Exception exception = new WikiManagerException("error in getById");
-        when(wikiDescriptorManager.getById("wikiId")).thenThrow(exception);
+        when(this.wikiDescriptorManager.getById("wikiId")).thenThrow(exception);
 
-        boolean result = mocker.getComponentUnderTest().setTemplate("wikiId", true);
+        boolean result = this.wikiTemplateManagerScript.setTemplate("wikiId", true);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Failed to get the descriptor of the wiki [wikiId].", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Failed to get the descriptor of the wiki [wikiId].", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void setTemplateErrorWithTemplateManager() throws Exception
+    void setTemplateErrorWithTemplateManager() throws Exception
     {
         WikiDescriptor wikiDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
 
         Exception exception = new WikiTemplateManagerException("error in setTemplate");
-        doThrow(exception).when(wikiTemplateManager).setTemplate("wikiId", true);
+        doThrow(exception).when(this.wikiTemplateManager).setTemplate("wikiId", true);
 
-        boolean result = mocker.getComponentUnderTest().setTemplate("wikiId", true);
+        boolean result = this.wikiTemplateManagerScript.setTemplate("wikiId", true);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Failed to set the template value [true] for the wiki [wikiId].",
-                exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Failed to set the template value [true] for the wiki [wikiId].", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void isTemplate() throws Exception
+    void isTemplate() throws Exception
     {
-        when(wikiTemplateManager.isTemplate("wikiTemplate")).thenReturn(true);
-        when(wikiTemplateManager.isTemplate("subwiki")).thenReturn(false);
+        when(this.wikiTemplateManager.isTemplate("wikiTemplate")).thenReturn(true);
+        when(this.wikiTemplateManager.isTemplate("subwiki")).thenReturn(false);
 
-        assertTrue(mocker.getComponentUnderTest().isTemplate("wikiTemplate"));
-        assertFalse(mocker.getComponentUnderTest().isTemplate("subwiki"));
+        assertTrue(this.wikiTemplateManagerScript.isTemplate("wikiTemplate"));
+        assertFalse(this.wikiTemplateManagerScript.isTemplate("subwiki"));
     }
 
     @Test
-    public void isTemplateError() throws Exception
+    void isTemplateError() throws Exception
     {
         Exception exception = new WikiTemplateManagerException("error in isTemplate");
 
-        when(wikiTemplateManager.isTemplate("wikiTemplate")).thenThrow(exception);
+        when(this.wikiTemplateManager.isTemplate("wikiTemplate")).thenThrow(exception);
 
-        assertNull(mocker.getComponentUnderTest().isTemplate("wikiTemplate"));
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Failed to get if the wiki [wikiTemplate] is a template or not.",
-                exception);
+        assertNull(this.wikiTemplateManagerScript.isTemplate("wikiTemplate"));
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Failed to get if the wiki [wikiTemplate] is a template or not.", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void createWikiFromTemplate() throws Exception
+    void createWikiFromTemplate() throws Exception
     {
         // Test
-        boolean result = mocker.getComponentUnderTest().createWikiFromTemplate("newWikiId", "newWikiAlias",
+        boolean result = this.wikiTemplateManagerScript.createWikiFromTemplate("newWikiId", "newWikiAlias",
                 "templateId", "ownerId", true);
 
         // Verify
         assertTrue(result);
-        verify(wikiTemplateManager).createWikiFromTemplate("newWikiId", "newWikiAlias", "templateId", "ownerId", true);
+        verify(this.wikiTemplateManager).createWikiFromTemplate("newWikiId", "newWikiAlias", "templateId", "ownerId",
+            true);
     }
 
     @Test
-    public void createWikiFromTemplateWithoutPR() throws Exception
+    void createWikiFromTemplateWithoutPR() throws Exception
     {
         Exception exception = currentScriptHasNotProgrammingRight();
 
         // Test
-        boolean result = mocker.getComponentUnderTest().createWikiFromTemplate("newWikiId", "newWikiAlias",
+        boolean result = this.wikiTemplateManagerScript.createWikiFromTemplate("newWikiId", "newWikiAlias",
                 "templateId", "ownerId", true);
 
         // Verify
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error(
-                "Error, you or this script does not have the right to create a wiki from a template.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Error, you or this script does not have the right to create a wiki from a template.",
+            this.logCapture.getMessage(0));
     }
 
     @Test
-    public void createWikiFromTemplateWithoutCreateRight() throws Exception
+    void createWikiFromTemplateWithoutCreateRight() throws Exception
     {
         Exception exception = currentUserHasNotCreateWikiRight();
 
         // Test
-        boolean result = mocker.getComponentUnderTest().createWikiFromTemplate("newWikiId", "newWikiAlias",
+        boolean result = this.wikiTemplateManagerScript.createWikiFromTemplate("newWikiId", "newWikiAlias",
                 "templateId", "ownerId", true);
 
         // Verify
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error(
-                "Error, you or this script does not have the right to create a wiki from a template.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Error, you or this script does not have the right to create a wiki from a template.",
+            this.logCapture.getMessage(0));
     }
 
     @Test
-    public void createWikiFromTemplateError() throws Exception
+    void createWikiFromTemplateError() throws Exception
     {
         Exception exception = new WikiTemplateManagerException("error in createWikiFromTemplate.");
 
-        when(wikiTemplateManager.createWikiFromTemplate("newWikiId", "newWikiAlias", "templateId",
+        when(this.wikiTemplateManager.createWikiFromTemplate("newWikiId", "newWikiAlias", "templateId",
                 "ownerId", true)).thenThrow(exception);
 
         // Test
-        boolean result = mocker.getComponentUnderTest().createWikiFromTemplate("newWikiId", "newWikiAlias",
+        boolean result = this.wikiTemplateManagerScript.createWikiFromTemplate("newWikiId", "newWikiAlias",
                 "templateId", "ownerId", true);
 
         // Verify
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Failed to create the wiki from the template.", exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Failed to create the wiki from the template.", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void getLastException() throws Exception
+    void getLastException()
     {
         Exception exception = new Exception("test");
-        executionContext.setProperty(WikiTemplateManagerScript.CONTEXT_LASTEXCEPTION, exception);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastException());
+        this.executionContext.setProperty(WikiTemplateManagerScript.CONTEXT_LASTEXCEPTION, exception);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastException());
     }
 
     @Test
-    public void getWikiProvisioningJobStatus() throws Exception
+    void getWikiProvisioningJobStatus() throws Exception
     {
         WikiProvisioningJob job = mock(WikiProvisioningJob.class);
-        when(wikiTemplateManager.getWikiProvisioningJob(anyList())).thenReturn(job);
+        when(this.wikiTemplateManager.getWikiProvisioningJob(anyList())).thenReturn(job);
         JobStatus status = mock(JobStatus.class);
         when(job.getStatus()).thenReturn(status);
 
-        List<String> jobId = new ArrayList<String>();
-        JobStatus result = mocker.getComponentUnderTest().getWikiProvisioningJobStatus(jobId);
+        List<String> jobId = new ArrayList<>();
+        JobStatus result = this.wikiTemplateManagerScript.getWikiProvisioningJobStatus(jobId);
 
         assertEquals(status, result);
     }
 
     @Test
-    public void getWikiProvisioningJobStatusWithBadId() throws Exception
+    void getWikiProvisioningJobStatusWithBadId()
     {
-        List<String> jobId = new ArrayList<String>();
-        JobStatus result = mocker.getComponentUnderTest().getWikiProvisioningJobStatus(jobId);
+        List<String> jobId = new ArrayList<>();
+        JobStatus result = this.wikiTemplateManagerScript.getWikiProvisioningJobStatus(jobId);
 
-        assertEquals(null, result);
+        assertNull(result);
     }
 
     @Test
-    public void getWikiProvisioningJobStatusWithException() throws Exception
+    void getWikiProvisioningJobStatusWithException() throws Exception
     {
         Exception exception = new WikiTemplateManagerException("test");
-        when(wikiTemplateManager.getWikiProvisioningJob(anyList())).thenThrow(exception);
+        when(this.wikiTemplateManager.getWikiProvisioningJob(anyList())).thenThrow(exception);
 
-        List<String> jobId = new ArrayList<String>();
-        JobStatus result = mocker.getComponentUnderTest().getWikiProvisioningJobStatus(jobId);
+        List<String> jobId = new ArrayList<>();
+        JobStatus result = this.wikiTemplateManagerScript.getWikiProvisioningJobStatus(jobId);
 
-        assertEquals(null, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verify(mocker.getMockedLogger()).error("Failed to get tge wiki provisioning job.", exception);
+        assertNull(result);
+        assertEquals(exception, this.wikiTemplateManagerScript.getLastError());
+        assertEquals("Failed to get tge wiki provisioning job.", this.logCapture.getMessage(0));
 
     }
 

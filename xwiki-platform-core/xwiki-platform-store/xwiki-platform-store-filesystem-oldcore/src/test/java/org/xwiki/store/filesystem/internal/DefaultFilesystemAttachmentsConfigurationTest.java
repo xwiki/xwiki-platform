@@ -20,12 +20,12 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -34,7 +34,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,12 +47,16 @@ class DefaultFilesystemAttachmentsConfigurationTest
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
+    // Use a directory under the module's "target" directory so that it doesn't leak outside the build workspace.
+    @TempDir
+    private Path temporaryDirectory;
+
     @Test
     void cleanOnStartup()
     {
         when(configurationSource.getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE)).thenReturn(true);
         assertTrue(configuration.cleanOnStartup());
-        verify(configurationSource, times(1)).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
+        verify(configurationSource).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
     }
 
     @Test
@@ -61,8 +64,8 @@ class DefaultFilesystemAttachmentsConfigurationTest
     {
         assertNull(configuration.getDirectory());
 
-        Path tempDir = Files.createTempDirectory("testxwiki");
-        when(configurationSource.getProperty("store.file.directory")).thenReturn(tempDir.toString());
-        assertEquals(tempDir.toFile(), configuration.getDirectory());
+        when(configurationSource.getProperty("store.file.directory"))
+            .thenReturn(this.temporaryDirectory.toString());
+        assertEquals(this.temporaryDirectory.toFile(), configuration.getDirectory());
     }
 }

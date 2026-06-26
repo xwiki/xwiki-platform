@@ -44,21 +44,24 @@ help.tipsPanel.improveXWikiTip=您知道您可以改善XWiki吗？花5分钟时�
 help.tipsPanel.breadcrumbsTip=您可以单击面包屑元素旁边的箭头，以快速导航到同级和子级页面。
 help.tipsPanel.advancedHiddenShortcutTip=使用x+x+x+a组合键可切换[[高级模式&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]]，x+x+x+h可切换[[隐藏页面&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]]的显示。
 help.tipsPanel.linkAutocompleteWYSIWYGTip=在WYSIWYG模式中进行编辑时，输入##[##，然后开始输入字母以获取有关创建链接的建议。
+help.tipsPanel.WYSIWYGEditorTip=在所见即所得模式下编辑时，{0}Alt + 0{1} 快捷键（在 macOS 上为 {0}⌥0{1}）将打开一个帮助模式，其中包含有关使用键盘导航编辑器的信息。
 help.macroList.title=可用的宏
 help.macroList.id=Id
 help.macroList.name=名称
+help.macroList.categories=类别
 help.macroList.description=描述
 help.macroList.visibility=可见性
 
 ###############################################################################
 ## Deprecated
 ## Note: each element should be removed when the last branch using it is no longer supported
-###############################################################################
+############################################################################### 
 
 #@deprecatedstart
 
 ## until 14.6RC1
 help.macroList.category=分类
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

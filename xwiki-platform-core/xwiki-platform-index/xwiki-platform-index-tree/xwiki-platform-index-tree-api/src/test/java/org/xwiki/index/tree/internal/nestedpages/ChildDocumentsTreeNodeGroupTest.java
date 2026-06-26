@@ -39,6 +39,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.index.tree.internal.macro.DocumentSort;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -123,6 +124,9 @@ class ChildDocumentsTreeNodeGroupTest
     @Named("test")
     private TreeFilter filter;
 
+    @MockComponent
+    private Converter<DocumentSort> documentSortConverter;
+
     @Mock
     private Query query;
 
@@ -167,7 +171,7 @@ class ChildDocumentsTreeNodeGroupTest
 
         when(this.query.addFilter(any(QueryFilter.class))).thenReturn(this.query);
 
-        when(this.queryManager.getNamedQuery("nestedPagesOrderedByName")).thenReturn(this.nestedPagesOrderedByName);
+        when(this.queryManager.getNamedQuery("nestedPagesOrderedByNameAsc")).thenReturn(this.nestedPagesOrderedByName);
         when(this.nestedPagesOrderedByName.addFilter(any(QueryFilter.class))).thenReturn(this.nestedPagesOrderedByName);
 
         when(this.contextComponentManagerProvider.get()).thenReturn(componentManager);
@@ -180,8 +184,9 @@ class ChildDocumentsTreeNodeGroupTest
             this.childDocumentsTreeNodeGroup.getChildDocuments(terminalDocumentReference, 0, 10));
 
         this.childDocumentsTreeNodeGroup.getProperties().put("showTerminalDocuments", false);
-        Query queryNonTerminalPagesByName = mock(Query.class, "nonTerminalPagesOrderedByTitle");
-        String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
+        Query queryNonTerminalPagesByName = mock(Query.class, "nonTerminalPagesOrderedByNameAsc");
+        String statement = "select space.reference, 0 as terminal from XWikiSpace space"
+            + " order by lower(space.name) asc, space.name asc";
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(queryNonTerminalPagesByName);
         when(queryNonTerminalPagesByName.addFilter(this.documentReferenceResolverFilter))
             .thenReturn(queryNonTerminalPagesByName);
@@ -197,9 +202,11 @@ class ChildDocumentsTreeNodeGroupTest
         verify(queryNonTerminalPagesByName).addFilter(this.childPageFilter);
         verify(queryNonTerminalPagesByName).bindValue("parent", "Path.To.Page");
 
-        this.childDocumentsTreeNodeGroup.getProperties().put("orderBy", "title");
-        Query queryNonTerminalPagesByTitle = mock(Query.class, "nonTerminalPagesOrderedByTitle");
-        when(this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle"))
+        this.childDocumentsTreeNodeGroup.getProperties().put("orderBy", "title:desc");
+        when(this.documentSortConverter.convert(DocumentSort.class, "title:desc"))
+            .thenReturn(new DocumentSort("title", false));
+        Query queryNonTerminalPagesByTitle = mock(Query.class, "nonTerminalPagesOrderedByTitleDesc");
+        when(this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitleDesc"))
             .thenReturn(queryNonTerminalPagesByTitle);
         childReference = new DocumentReference("wiki", List.of("Path.To.Page"), "Bob");
         when(queryNonTerminalPagesByTitle.addFilter(this.documentReferenceResolverFilter))
@@ -373,7 +380,8 @@ class ChildDocumentsTreeNodeGroupTest
         when(userProperties.displayHiddenDocuments()).thenReturn(false);
         when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
 
-        String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
+        String statement = "select space.reference, 0 as terminal from XWikiSpace space"
+            + " order by lower(space.name) asc, space.name asc";
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(this.query);
         when(query.execute()).thenReturn(Collections.singletonList(new DocumentReference("foo", "C", "WebHome")));
 
@@ -397,10 +405,12 @@ class ChildDocumentsTreeNodeGroupTest
         when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
 
         this.childDocumentsTreeNodeGroup.getProperties().put("orderBy", "title");
+        when(this.documentSortConverter.convert(DocumentSort.class, "title"))
+            .thenReturn(new DocumentSort("title", true));
         this.childDocumentsTreeNodeGroup.getProperties().put("exclusions",
             new HashSet<>(List.of("document:bar:A.WebHome", "document:foo:B.WebHome")));
 
-        when(this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle")).thenReturn(this.query);
+        when(this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitleAsc")).thenReturn(this.query);
         when(this.localizationContext.getCurrentLocale()).thenReturn(Locale.FRENCH);
         when(query.execute()).thenReturn(Collections.singletonList(new DocumentReference("foo", "C", "WebHome")));
 

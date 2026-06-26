@@ -200,7 +200,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         // 1: Add local extensions
         this.progress.startStep(this);
         if (getRequest().isLocalExtensionsEnabled()) {
-            addLocalExtensions(indexedExtensions);
+            //addLocalExtensions(indexedExtensions);
         }
 
         // 2: Gather all extensions from searchable repositories
@@ -604,9 +604,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         this.progress.pushLevelProgress(repositories);
         for (ExtensionRepository repository : repositories) {
             this.progress.startStep(repositories);
-            if (repository instanceof Searchable) {
+            if (repository instanceof Searchable searchableRepository) {
                 try {
-                    updated |= addRemoteExtensions((Searchable) repository, indexedExtensions);
+                    updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
                     this.logger.warn("Failed to get remote extension from repository [{}]: {}",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
@@ -664,12 +664,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 }
 
                 // Update recommended and rating
-                if (extension instanceof RemoteExtension) {
+                if (extension instanceof RemoteExtension remoteExtension) {
                     SortedSet<Version> versions = indexedExtensions.get(extension.getId().getId());
                     if (versions != null) {
                         for (Version version : versions) {
                             this.indexStore.update(new ExtensionId(extension.getId().getId(), version),
-                                (RemoteExtension) extension);
+                                remoteExtension);
 
                             updated = true;
                         }

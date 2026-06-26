@@ -31,6 +31,7 @@ import org.xwiki.test.ui.po.EditablePropertyPane;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 import org.xwiki.xclass.test.po.DataTypesPage;
 
@@ -123,6 +124,10 @@ class ClassSheetIT
         classSheetPage = classSheetPage.clickCreateTemplateButton().clickAddObjectToTemplateLink();
         ViewPage templatePage = classSheetPage.clickTemplateLink();
         assertEquals(className + " Template", templatePage.getDocumentTitle());
+        // Check that the object is present in the template.
+        ObjectEditPage objectEditPage = templatePage.editObjects();
+        assertTrue(objectEditPage.hasObject(spaceName + "." + classDocName));
+        objectEditPage.clickCancel();
         // The default edit button should take us to the In-line edit mode.
         templatePage.edit();
         InlinePage editPage = new InlinePage();
@@ -157,7 +162,7 @@ class ClassSheetIT
         assertEquals("Tester", descriptionProperty.getDisplayValue());
 
         assertEquals(pageName, viewPage.getDocumentTitle());
-        assertEquals("YOUR FAVORITE COLOR\npink\nYOUR CURRENT AGE\n27\nDESCRIPTION\nTester", viewPage.getContent());
+        assertEquals("Your favorite color\npink\nYour current age\n27\nDescription\nTester", viewPage.getContent());
         viewPage.clickBreadcrumbLink(classTitle);
 
         // Assert the created document is listed.

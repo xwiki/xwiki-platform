@@ -76,6 +76,7 @@ TourCode.StepClass_placement=Platzierung
 TourCode.StepClass_targetPage=Zielseite
 TourCode.StepClass_action=Zielaktion
 TourCode.StepClass_queryString=Abfrage (Query string)
+TourCode.StepClass_reflex=Reflex
 tour.steps=Schritte
 tour.steps.new_step=Neuer Schritt
 tour.steps.add_step=Schritt hinzufügen

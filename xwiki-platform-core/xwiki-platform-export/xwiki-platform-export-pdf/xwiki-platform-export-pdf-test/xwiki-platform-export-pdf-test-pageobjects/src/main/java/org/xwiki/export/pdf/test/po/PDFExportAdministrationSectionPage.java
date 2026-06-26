@@ -64,6 +64,9 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_chromeRemoteDebuggingPort")
     private WebElement chromeRemoteDebuggingPortInput;
 
+    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_pageReadyTimeout")
+    private WebElement pageReadyTimeoutInput;
+
     @FindBy(linkText = "Reset")
     private WebElement resetButton;
 
@@ -215,6 +218,25 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     public boolean isChromeRemoteDebuggingPortValid()
     {
         return isValid(this.chromeRemoteDebuggingPortInput);
+    }
+
+    /**
+     * @return the page ready timeout
+     */
+    public String getPageReadyTimeout()
+    {
+        return this.pageReadyTimeoutInput.getAttribute("value");
+    }
+
+    /**
+     * Sets the page ready timeout.
+     * 
+     * @param value the new page ready timeout value
+     */
+    public void setPageReadyTimeout(String value)
+    {
+        this.pageReadyTimeoutInput.clear();
+        this.pageReadyTimeoutInput.sendKeys(value);
     }
 
     /**

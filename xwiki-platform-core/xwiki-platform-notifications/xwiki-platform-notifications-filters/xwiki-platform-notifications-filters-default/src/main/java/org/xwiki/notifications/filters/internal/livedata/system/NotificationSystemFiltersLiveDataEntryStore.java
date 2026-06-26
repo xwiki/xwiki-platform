@@ -123,14 +123,14 @@ public class NotificationSystemFiltersLiveDataEntryStore extends AbstractNotific
 
         Collection<NotificationFilter> notificationFilters;
         try {
-            if (targetInformation.isWikiTarget) {
-                WikiReference wikiReference = new WikiReference(targetInformation.ownerReference);
+            if (targetInformation.isWikiTarget()) {
+                WikiReference wikiReference = new WikiReference(targetInformation.getOwnerReference());
                 notificationFilters = this.notificationFilterManager.getAllFilters(wikiReference);
                 filtersActivations =
                     this.filterPreferencesModelBridge.getToggleableFilterActivations(
                         new DocumentReference(NOTIFICATION_ADMINISTRATION_REF, wikiReference));
             } else {
-                DocumentReference userDoc = new DocumentReference(targetInformation.ownerReference);
+                DocumentReference userDoc = new DocumentReference(targetInformation.getOwnerReference());
                 notificationFilters = this.notificationFilterManager.getAllFilters(userDoc, false);
                 filtersActivations = this.filterPreferencesModelBridge.getToggleableFilterActivations(userDoc);
             }

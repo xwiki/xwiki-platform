@@ -19,11 +19,6 @@
  */
 package org.xwiki.netflux.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -40,6 +35,13 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link EffectiveAuthorSetterListener}.
@@ -92,8 +94,8 @@ class EffectiveAuthorSetterListenerTest
         EntityChange entityChangeFive = new EntityChange(new DocumentReference("test", "Other", "Page"),
             otherUserReference, ScriptLevel.PROGRAMMING);
 
-        when(this.request.getProperties("netfluxChannel"))
-            .thenReturn(Arrays.asList("", "one", null, "two", "three", "four", "five"));
+        when(this.request.getParameterValues("netfluxChannel"))
+            .thenReturn(new String[] {"", "one", null, "two", "three", "four", "five"});
         when(this.scriptAuthorTracker.getScriptAuthor("two")).thenReturn(Optional.of(entityChangeTwo));
         when(this.scriptAuthorTracker.getScriptAuthor("three")).thenReturn(Optional.of(entityChangeThree));
         when(this.scriptAuthorTracker.getScriptAuthor("four")).thenReturn(Optional.of(entityChangeFour));
@@ -101,6 +103,14 @@ class EffectiveAuthorSetterListenerTest
 
         this.listener.onEvent(new ActionExecutingEvent(), null, null);
 
-        verify(this.request).setProperty("com.xpn.xwiki.web.XWikiRequest#effectiveAuthor", this.effectiveAuthor);
+        verify(this.request).setAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, this.effectiveAuthor);
+    }
+
+    @Test
+    void onActionExecutingEventWithoutNetfluxChannel()
+    {
+        this.listener.onEvent(new ActionExecutingEvent(), null, null);
+
+        verify(this.request, never()).setAttribute(eq(Request.ATTRIBUTE_EFFECTIVE_AUTHOR), any(UserReference.class));
     }
 }

@@ -40,18 +40,6 @@ public class RealtimeCKEditor extends CKEditor
     }
 
     @Override
-    public RealtimeCKEditor waitToLoad()
-    {
-        // Wait for the "instanceReady" event to be fired.
-        super.waitToLoad();
-
-        // Also wait for the realtime connection to be established.
-        getToolBar();
-
-        return this;
-    }
-
-    @Override
     public RealtimeRichTextAreaElement getRichTextArea()
     {
         return getRichTextArea(true);
@@ -60,12 +48,6 @@ public class RealtimeCKEditor extends CKEditor
     @Override
     public RealtimeRichTextAreaElement getRichTextArea(boolean wait)
     {
-        return new RealtimeRichTextAreaElement(getContentContainer(), wait);
-    }
-
-    @Override
-    public RealtimeCKEditorToolBar getToolBar()
-    {
-        return new RealtimeCKEditorToolBar(this);
+        return new RealtimeRichTextAreaElement(this, wait);
     }
 }

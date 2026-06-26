@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Style" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.Style" locale="">
   <web>AnnotationCode</web>
   <name>Style</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>
 </content>
   <attachment>
@@ -92,25 +93,23 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>level</name>
         <number>1</number>
-        <picker>0</picker>
-        <prettyName>level</prettyName>
+        <prettyName>Level</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators> ,|</separators>
         <size>1</size>
-        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>edit|programming</values>
+        <values>edit|script|wiki_admin|programming</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
     <property>
-      <level>programming</level>
+      <level>wiki_admin</level>
     </property>
   </object>
   <object>
@@ -129,8 +128,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -144,10 +146,13 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -157,6 +162,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -192,6 +199,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -254,26 +263,52 @@
 }
 
 /* Annotations displayed in the text */
-.annotation-highlight {
-  background-color: #FE9; ## $theme.highlightColor;
-}
-## In velocity comment: settings for using the larger images from silk
-.annotation-marker {
-  ##background: transparent #imgURL('note') no-repeat left top;
-  background: transparent #attImgURL('notesmall') no-repeat left top;
-  display: inline-block;
-  ##height: 16px;
-  height: 10px;
-  overflow: hidden;
-  text-indent: -9999px;
-  ##width: 16px;
-  width: 10px;
-  vertical-align: baseline;
-  ##margin: -19px -14px 3px -2px;
-  margin: -15px -7px 5px -3px;
-  z-index: 1;
+.annotation-highlight, .selection-highlight {
   position: relative;
+  background-color: var(--mark-bg);
+  /* Remove the default mark padding added in bootstrap. 
+     The highlights can happen in the middle of words, and it would look odd. */
+  padding: 0;
   cursor: pointer;
+
+  &amp;.updated {
+    background-color: var(--mark-updated-bg);
+  }
+
+  &amp;.altered {
+    background-color: var(--mark-altered-bg);
+  }
+  
+  &amp;.hovered,
+  &amp;.hovered .annotation-highlight, &amp;.hovered .selection-highlight {
+    /* We want to increase the accent on the element when hovered. 
+       The btn warning background color does that without reducing contrast with the default text color too much. 
+       We use this class set dynamically in JS instead of pseudo classes because we want highlights to span multiple
+       marks across text blocks. */
+    /* We repeat the selector because of nested annotation marks. */
+    background-color: var(--mark-highlighted-bg);
+  }
+  
+  .annotation-toggle {
+    /* We don't want the annotation toggle to disturb the text layout. */
+    position: absolute;
+    margin: 0;
+    z-index: 1;
+    /* But we still need to center it relative to its parent. */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity .5s ease;
+  }
+
+  .annotation-toggle.sr-only {
+    opacity: 0;
+  }
+}
+
+mark.annotation:not(.annotation-highlight) {
+  padding: 0;
+  background-color: unset;
+  color: unset;
 }
 
 /* Annotation boxes */
@@ -282,10 +317,10 @@
   border: 1px dotted $theme.borderColor;
   width: 560px;
   position: absolute;
-  z-index: 2;
   border-radius: 0 10px 10px 10px;
   box-shadow: 0 2px 4px -1px $theme.linkColor;
-  margin-left: 20px;
+  margin: 0 10px;
+  z-index: 2;
 }
 
 .annotation-bubble:before, .annotation-bubble:after {
@@ -305,6 +340,28 @@
   top: 0;
   left: -10px;
   border-right-color: $theme.backgroundSecondaryColor;
+}
+
+.annotation-bubble.annotation-bubble-position-left {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 0;
+  
+  &amp;:before, &amp;:after {
+    border-right: none;
+    left: unset;
+    border-left: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  &amp;:before {
+    right: -11px;
+    border-left-color: $theme.borderColor;
+  }
+
+  &amp;:after {
+    right: -10px;
+    border-left-color: $theme.backgroundSecondaryColor;
+  }
 }
 
 .annotation-box {
@@ -369,17 +426,14 @@
 #allAnnotations .annotation {
   margin: 0 0 8px;
 }
-#allAnnotations .annotation .annotationText, #Commentspane .annotation .annotationText {
-  padding: 0 36px 0 14px;
-  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+.annotationText {
+  padding: 0 36px 0 0;
   text-align: justify;
 }
-#allAnnotations .UPDATED .annotationText, #xwikicontent .UPDATED {
-  ##background-image: #imgURL('note_error');
+#allAnnotations .UPDATED .annotationText {
   background-image: #attImgURL('notesmallorange');
 }
-#allAnnotations .ALTERED annotationText, #xwikicontent .ALTERED {
-  ##background-image: #imgURL('note_delete');
+#allAnnotations .ALTERED annotationText {
   background-image: #attImgURL('notesmallred');
 }
 
@@ -387,6 +441,28 @@
 .annotationHeader{
   padding: 2px 0px 6px;
 }
+
+.annotatedText {
+  font-style: italic;
+  font-size: 1.2em;
+  border-left: none;
+  padding: 10px 0 0 0;
+  margin: 0;
+  /* We hide the overflow so that the decorative quote doesn't go over the rest of the UI. */
+  overflow: hidden;
+
+  &amp;:before {
+    content: "“";
+    font-size: 4em;
+    line-height: .1em;
+    margin-right: .1em;
+    vertical-align: -.45em;
+    font-family: var(--font-family-serif);
+    font-weight: var(--font-weight-semibold);
+    font-style: normal;
+  }
+}
+
 #allAnnotations .annotationHeader:hover {
   background-color: $theme.highlightColor;
 }
@@ -427,6 +503,9 @@ dt.annotationLabel label {
 .annotationContent blockquote {
   padding-left: 12px;
 }</code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>Annotations style</name>

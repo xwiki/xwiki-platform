@@ -85,7 +85,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
     /**
      * The currently available locales for each running wiki.
      */
-    private Map<String, Set<Locale>> localesCache = new ConcurrentHashMap<String, Set<Locale>>();
+    private Map<String, Set<Locale>> localesCache = new ConcurrentHashMap<>();
 
     /**
      * Logging framework.
@@ -136,7 +136,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
         List<Locale> availableLocales = xcontext.getWiki().getAvailableLocales(xcontext);
 
         // Update the cache
-        this.localesCache.put(wiki, new HashSet<Locale>(availableLocales));
+        this.localesCache.put(wiki, new HashSet<>(availableLocales));
 
         try {
             // oldLocales may be null in case the XWikiPreferences has been modified as part of a mandatory document
@@ -193,7 +193,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
      */
     private Set<Locale> getParentLocales(Locale locale)
     {
-        Set<Locale> parentLocales = new HashSet<Locale>(LocaleUtils.localeLookupList(locale, Locale.ROOT));
+        Set<Locale> parentLocales = new HashSet<>(LocaleUtils.localeLookupList(locale, Locale.ROOT));
 
         parentLocales.remove(locale);
 

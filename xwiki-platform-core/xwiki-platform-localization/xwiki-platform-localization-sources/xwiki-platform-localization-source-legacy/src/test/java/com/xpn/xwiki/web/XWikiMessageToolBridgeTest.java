@@ -266,6 +266,7 @@ class XWikiMessageToolBridgeTest
         XWikiDocument defaultWikiTranslation = this.oldcore.getSpyXWiki()
             .getDocument(this.defaultWikiTranslationReference, this.oldcore.getXWikiContext());
         defaultWikiTranslation.setDefaultLocale(Locale.FRENCH);
+        this.oldcore.getSpyXWiki().saveDocument(defaultWikiTranslation, this.oldcore.getXWikiContext());
 
         addWikiTranslation("language", "Overwritten language", Locale.ROOT);
 

@@ -52,15 +52,16 @@ tour.homepageTour.pageContent.title=Contingut de la pàgina
 tour.homepageTour.pageContent.contentA=Aquí és on es mostra el contingut de la pàgina.
 tour.homepageTour.pageContent.contentB=Editeu aquest pàgina per afegir taules, llistes, macros i estructurar per organitzar el coneixement.
 tour.homepageTour.pageMenu.title=Menú pàgina
-tour.homepageTour.pageMenu.contentA=Aquest menú conté les accions relacionades amb les pàgines. Amb els permisos adequats podeu editar, crear, gestionar o esborrar pàgines.
-### Missing: tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like Export, Print and Share.
+tour.homepageTour.pageMenu.contentA=Aquest menú conté accions relacionades amb la pàgina. Amb els drets adequats, podeu editar, crear, seguir pàgines i molt més.
+tour.homepageTour.pageMenu.contentB=El botó {0} revela més accions com Administrar, Copia/Mou/Reanomena/Suprimeix, Exporta, Imprimeix, Anota i Comparteix.
 ### Missing: tour.homepageTour.pageTabs.title=Page Tabs
 ### Missing: tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
 ### Missing: tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
 ### Missing: tour.homepageTour.header.title=Header
-### Missing: tour.homepageTour.header.contentA=You can Search for content, Watch for page changes or access your User Profile.
+tour.homepageTour.header.contentA=Pots cercar contingut, veure les teves notificacions o accedir al teu perfil d'usuari.
 ### Missing: tour.homepageTour.header.contentB=The {0} button opens a Drawer which contains wiki related actions like Administration and Indexes.
 ### Missing: tour.homepageTour.tourComplete.title=Tour Complete
 ### Missing: tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
-### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+### Missing: tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.
+</content>
 </xwikidoc>

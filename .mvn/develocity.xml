@@ -24,11 +24,13 @@
   xmlns="https://www.gradle.com/develocity-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://www.gradle.com/develocity-maven https://www.gradle.com/schema/develocity-maven.xsd">
   <server>
-    <url>https://ge.xwiki.org</url>
+    <url>https://community.develocity.cloud</url>
   </server>
+  <projectId>xwiki</projectId>
   <buildScan>
-    <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on ge.xwiki.org
-     due to local changes from users and so that it doesn't pollute the ge.xwiki.org data.
+    <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on
+     community.develocity.cloud due to local changes from users and so that it doesn't pollute the
+     community.develocity.cloud data.
      To force publishing a build scan: -Dscan -->
     <publishing>
       <onlyIf><![CDATA[env['CI'] != null && authenticated]]></onlyIf>
@@ -45,7 +47,7 @@
        more to save the goal outputs since they're not going to be re-used.
     -->
     <local>
-      <enabled><![CDATA[env['CI'] == null]]></enabled>
+      <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
       <!-- Notes:
@@ -53,15 +55,9 @@
       -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
-      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['DEVELOCITY_ACCESS_KEY'])]]></storeEnabled>
-      <server>
-        <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
-             anymore in the Maven settings.xml file -->
-        <id>develocityCache</id>
-        <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
-             to make caching more beneficial vs rebuilding) -->
-        <url>https://eu-build-cache-ge.xwiki.org/cache/</url>
-      </server>
+      <storeEnabled>#{env['CI'] != null}</storeEnabled>
+      <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
+           anymore in the Maven settings.xml file -->
     </remote>
   </buildCache>
 </develocity>

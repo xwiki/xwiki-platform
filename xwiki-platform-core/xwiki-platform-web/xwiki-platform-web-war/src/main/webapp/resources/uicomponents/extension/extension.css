@@ -33,11 +33,84 @@
 }
 
 .extension-item:hover .extension-header {
-  background-color: $theme.highlightColor;
+  background-color: var(--nav-link-hover-bg);
 }
 .extension-header .buttonwrapper {
   margin: 0 0 0 5px;
 }
+
+/*Supported By*/
+
+.supported-by {
+  color: var(--text-color);
+}
+
+.supported-by h3,
+.supported-by h4{
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.supporter-listing {
+  position: relative;
+  left: -6px;
+}
+
+.support-multi-plan {
+  position: relative;
+  padding: 4px 0px;
+}
+
+.supporter-name {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  padding: 0px 6px;
+}
+
+.support-multi-name {
+  cursor: pointer;
+}
+
+.support-multi-name:hover {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 56px;
+}
+
+.plan-name.infomessage {
+  border-radius: 96px;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  padding: 4px 6px;
+}
+
+.plan-name.infomessage a {
+  text-decoration: none;
+}
+
+.support-dialog {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  padding: 12px 16px;
+  position: absolute;
+  display: none;
+  top: 24px;
+  left: 0;
+  z-index: 1;
+}
+
+.support-dialog.open {
+  display: block;
+}
+
+.support-flex {
+  display: flex;
+  gap: 8px;
+}
+
+/*--end supported by*/
 
 .extension-actions {
   clear: right;
@@ -68,7 +141,7 @@ h2.extension-title .extension-status {
 }
 
 .extension-authors {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: .9em;
 }
 
@@ -77,11 +150,11 @@ h2.extension-title .extension-status {
 /* We have to duplicate the selectors to force the style to be applied to extension dependencies, which are nested inside extension display. */
 .extension-item .extension-item-core .extension-status,
 .extension-item .extension-item-installed-dependency .extension-status {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 .extension-item-installed .extension-status,
 .extension-item .extension-item-installed .extension-status {
-  color: $theme.notificationSuccessColor;
+  color: var(--brand-success);
 }
 .extension-item-remote-core .extension-status,
 .extension-item-remote-installed .extension-status,
@@ -89,13 +162,13 @@ h2.extension-title .extension-status {
 .extension-item .extension-item-remote-core .extension-status,
 .extension-item .extension-item-remote-installed .extension-status,
 .extension-item .extension-item-remote-installed-dependency .extension-status {
-  color: $theme.notificationWarningColor;
+  color: var(--brand-warning);
 }
 .extension-item-installed-invalid .extension-status, .extension-item-remote-installed-invalid .extension-status,
 .extension-item .extension-item-installed-invalid .extension-status, .extension-item .extension-item-remote-installed-invalid .extension-status,
 /* This applies only to dependencies. */
 .extension-item-remote-core-incompatible .extension-status, .extension-item-remote-installed-incompatible .extension-status {
-  color: $theme.notificationErrorColor;
+  color: var(--brand-danger);
 }
 
 .extension-summary {
@@ -107,11 +180,11 @@ h2.extension-title .extension-status {
 
 .extension-recommended {
   margin-top: .5em;
-  color: $theme.notificationSuccessColor
+  color: var(--brand-success);
 }
 
 .extension-body {
-  border: 1px dotted $theme.borderColor;;
+  border: 1px dotted var(--xwiki-border-color);
   padding: 0 .8em .8em 1.8em !important;
   margin: 0 1em 1em;
 }
@@ -138,7 +211,7 @@ dl.extension-body-section,
 }
 dl.extension-body-section > dt,
 .extension-body-section > dl > dt {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-weight: normal;
 }
 dl.extension-body-section > dd + dt,
@@ -164,12 +237,12 @@ ul.dependencies {
   padding: 0;
 }
 ul.dependencies li:hover {
-  background-color: $theme.highlightColor;
+  background-color: var(--nav-link-hover-bg);
 }
 .dependency-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
-  border-right: 7px solid $theme.pageContentBackgroundColor;
+  border-right: 7px solid var(--xwiki-page-content-bg);
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
@@ -204,19 +277,19 @@ ul.dependencies li:hover {
 
 .extension-item-core,
 .extension-item-installed-dependency {
-  border-right-color: $theme.textSecondaryColor;
+  border-right-color: var(--text-muted);
 }
 .extension-item-installed {
-  border-right-color: $theme.notificationSuccessColor;
+  border-right-color: var(--brand-success);
 }
 .extension-item-remote-installed,
 .extension-item-remote-installed-dependency,
 .extension-item-remote-core {
-  border-right-color: $theme.notificationWarningColor;
+  border-right-color: var(--brand-warning);
 }
 .extension-item-installed-invalid, .extension-item-remote-installed-invalid,
 .extension-item-remote-core-incompatible, .extension-item-remote-installed-incompatible {
-  border-right-color: $theme.notificationErrorColor;
+  border-right-color: var(--brand-danger);
 }
 
 .extension-diff-title {
@@ -226,7 +299,7 @@ ul.dependencies li:hover {
   margin-bottom: .6em;
 }
 .extension-diff-options .label {
-  color: $theme.textColor;
+  color: var(--text-color);
   font-size: 0.85em;
   font-weight: 700;
   margin-right: 0.3em;
@@ -238,11 +311,8 @@ ul.dependencies li:hover {
 }
 
 .extension-search-bar {
-  background-color: $theme.panelCollapsedBackgroundColor;
-  border: 1px solid $theme.borderColor;
-  border-bottom: 0;
-  color: $theme.panelCollapsedTextColor;
-  font-size: .8em;
+  background-color: var(--breadcrumb-bg);
+  border-radius: var(--border-radius-base);
   padding: .3em 1.2em .3em .3em;
   position: relative;
 }
@@ -251,7 +321,7 @@ ul.dependencies li:hover {
   float: left;
 }
 #extensionSearchInput {
-  background: url("$xwiki.getSkinFile('icons/xwiki/search.png')") no-repeat scroll left center $theme.pageContentBackgroundColor;
+  background: url("$xwiki.getSkinFile('icons/xwiki/search.png')") no-repeat scroll left center var(--xwiki-page-content-bg);
   padding-left: 18px;
 }
 
@@ -302,7 +372,7 @@ ul.dependencies li:hover {
 }
 
 ul.innerMenu {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: 1em;
   font-size: 0.8em;
   padding: 0 0 .1em;
@@ -310,13 +380,12 @@ ul.innerMenu {
 }
 .innerMenu li {
   display: inline-block;
-  sborder: 1px solid red;
   vertical-align: top;
   margin-left: -1px;
 }
 .innerMenu li a {
   border-radius: 7px 7px 0 0 / 5px 5px 0 0;
-  border-top: 3px solid $theme.borderColor;
+  border-top: 3px solid var(--xwiki-border-color);
   display: inline-block;
   margin: 2px 2em 0 0;
   padding: 6px .5em .2em;
@@ -325,20 +394,20 @@ ul.innerMenu {
 }
 .innerMenu li a:hover {
   border-radius: 8px 8px 0 0;
-  border-top: 5px solid $theme.borderColor;
+  border-top: 5px solid var(--xwiki-border-color);
   margin-top: 0px;
 }
 .innerMenu li a.current {
-  background-color: $theme.panelCollapsedBackgroundColor;
+  background-color: var(--nav-link-hover-bg);
   border: 0 none;
-  border-top: 5px solid $theme.panelCollapsedBackgroundColor;
+  border-top: 5px solid var(--nav-link-hover-bg);
   margin-top: 0;
   border-radius: 0 0 8px 8px;
   box-shadow: 3px;
 }
 .innerMenu li a.current:after {
   border-style: solid;
-  border-color: transparent transparent  $theme.borderColor;
+  border-color: transparent;
   border-width: 0 5px 5px 0;
   width: 0;
   display: block;
@@ -349,7 +418,6 @@ ul.innerMenu {
   right: -5px;
 }
 .innerMenu li a.current {
-  color: $theme.panelCollapsedTextColor;
   text-decoration: none;
 }
 
@@ -370,7 +438,7 @@ ul.innerMenu {
   text-transform: uppercase;
 }
 .xHint {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: smaller;
   margin: 0.3em 0;
 }
@@ -394,10 +462,10 @@ ul.document-tree {
   position: relative;
 }
 .document-tree .node:hover {
-  background-color: $theme.highlightColor;
+  background-color: var(--nav-link-hover-bg);
 }
 .document-tree .node .locale {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-style: italic;
   padding-left: .2em;
 }
@@ -471,7 +539,7 @@ ul.collapsible.document-tree {
   vertical-align: middle;
 }
 .selectable.document-tree .selectedCount {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: .8em;
   /* Bold is inherited from wiki and space nodes so we need to overwrite it. */
   font-weight: normal;

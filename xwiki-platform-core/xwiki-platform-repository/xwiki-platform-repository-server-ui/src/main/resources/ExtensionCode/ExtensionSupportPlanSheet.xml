@@ -1,0 +1,104 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="ExtensionCode.ExtensionSupportPlanSheet" locale="">
+  <web>ExtensionCode</web>
+  <name>ExtensionSupportPlanSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="ExtensionCode.Macros"/}}
+
+{{velocity}}
+#_sheetInit('ExtensionCode.ExtensionSupportPlanClass', 'repository.supportplan')
+{{html wiki="true" clean="false"}}
+&lt;div class="xform"&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'name')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'supporter')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'summary')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'url')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'paying')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'active')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'content')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+
+=={{translation key="repository.supportplan.sheet.supportedExtensions"/}}==
+
+{{liveData
+  id="supportedExtensions"
+  source="liveTable"
+  properties="name,summary,category,authors,doc.creationDate,doc.date,supportPlans"
+  sourceParameters="translationPrefix=extension.repository.&amp;className=ExtensionCode.ExtensionClass&amp;supportPlans=${escapetool.url($doc.fullName)}"
+  sort="name:asc"
+}}
+{
+  "meta": {
+    "propertyDescriptors": [
+      {
+        "id": "name",
+        "displayer": {
+          "id": "link",
+          "propertyHref": "doc.url"
+        }
+      },
+      {
+        "id": "supportPlans",
+        "type": "hidden",
+        "visible": false
+      }
+    ]
+  }
+}
+{{/liveData}}
+{{/velocity}}</content>
+</xwikidoc>

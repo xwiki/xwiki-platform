@@ -49,9 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
-}, properties = {
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class AttachmentGalleryPickerMacroIT
 {
@@ -83,7 +80,7 @@ class AttachmentGalleryPickerMacroIT
         attachmentsPane.waitForUploadToFinish("textcontent.txt");
 
         // Waits for the uploaded files to be indexed before continuing.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Reload the page to see the file after the uploads and solr indexing.
         setup.getDriver().navigate().refresh();

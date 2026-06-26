@@ -48,8 +48,15 @@ import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 @UITest(properties = {
     // "$xcontext.context" (used in the test) requires PR
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*PanelIT"
-        + ".verifyTipsContentIsExecutedWithTheRightAuthor.WebHome"
-})
+        + ".verifyTipsContentIsExecutedWithTheRightAuthor.WebHome",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+},
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class TipsPanelIT
 {
     private final static String TIPS_UIXP = "org.xwiki.platform.help.tipsPanel";

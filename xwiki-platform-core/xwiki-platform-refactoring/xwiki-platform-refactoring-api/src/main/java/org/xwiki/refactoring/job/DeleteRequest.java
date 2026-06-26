@@ -88,7 +88,7 @@ public class DeleteRequest extends EntityRequest
      */
     public boolean shouldSkipRecycleBin()
     {
-        return getProperty(SHOULD_SKIP_RECYCLE_BIN, true);
+        return getProperty(SHOULD_SKIP_RECYCLE_BIN, false);
     }
 
     /**

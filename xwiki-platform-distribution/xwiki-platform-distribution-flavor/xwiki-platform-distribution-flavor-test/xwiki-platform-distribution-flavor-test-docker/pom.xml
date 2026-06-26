@@ -37,16 +37,26 @@
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
+  <!--
+    This module hosts Docker-based functional tests that need the assembled standard distribution (shipped defaults,
+    cross-feature/distribution behaviour) rather than a single feature's UI. The tests use
+    "@UITest(standardFlavor = true)", which makes the test instance equivalent to an XWiki installed from the standard
+    flavor distribution:
+    - The generated WAR's WEB-INF/lib core extensions are resolved from xwiki-platform-distribution-war-dependencies
+      (the same set used by the standard distribution WAR, xwiki-platform-distribution-war) instead of from the
+      minimal set (xwiki-platform-minimaldependencies).
+    - The standard flavor (xwiki-platform-distribution-flavor-mainwiki) is installed automatically by the Docker test
+      framework, so it does NOT need to be declared as a dependency here.
+
+    Remaining (intentional) differences from the standard production WAR, which are inherent to the test setup and
+    not yet addressed:
+    - The XWiki configuration files (xwiki.cfg, xwiki.properties, hibernate.cfg.xml) are generated for the test
+      database/environment instead of shipping the production defaults.
+    - A few test-only JARs are added to WEB-INF/lib by the Docker test framework (e.g. xwiki-platform-test-checker,
+      xwiki-platform-component-script, and the Clover JAR when the clover profile is active).
+  -->
   <dependencies>
-    <!-- Runtime dependencies. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>xar</type>
-    </dependency>
-    <!--Test only dependencies. -->
+    <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>

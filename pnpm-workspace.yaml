@@ -101,7 +101,7 @@ catalog:
   "@vue/tsconfig": 0.9.1
   axe-core: 4.11.4
   bootstrap-icons: 1.13.1
-  cross-env: 7.0.3
+  cross-env: 10.1.0
   dompurify: 3.4.9
   eslint: 10.4.0
   eslint-import-resolver-typescript: 4.4.4

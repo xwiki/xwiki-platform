@@ -47,7 +47,7 @@
 (function(l10n, icons) {
   "use strict";
 
-define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
+define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], function($, xcontext, editConfirmation) {
   $.fn.editableProperty = function() {
     return this.each(init);
   };
@@ -113,31 +113,50 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var edit = function(editableProperty) {
     // Disable the edit action while we load the editor.
     var editIcon = editableProperty.find('.editableProperty-edit').addClass('disabled');
-    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
+    return loadEditor(editableProperty).catch(error => {
+      // Don't report an error notification when the user simply dismissed the edit confirmation.
+      if (!editConfirmation.isConfirmationDismissed(error)) {
+        new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
+      }
+      return Promise.reject(error);
+    }).finally(() => {
+      // Re-enable the edit action (even if hidden).
+      editIcon.removeClass('disabled');
+    });
+  };
+
+  // Loads the property editor. If the server requires an edit confirmation it returns it as JSON with a 423 status
+  // instead of the editor; in that case we display the confirmation modal and, if the user confirms, retry the request
+  // forcing the confirmation so that the editor is returned.
+  var loadEditor = function(editableProperty, extraParams) {
+    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), Object.assign({
       xpage: 'display',
       mode: 'edit',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
       objectPolicy: editableProperty.data('objectPolicy'),
       language: xcontext.locale
-    })).then(html => {
-      // Replace the edit action with the save and cancel actions.
-      editIcon.hide();
-      editableProperty.find('.editableProperty-save, .editableProperty-cancel').show();
-      // Update the editor.
-      var editor = editableProperty.next('.editableProperty-viewer').hide().next('.editableProperty-editor');
-      editor.html(html).show();
-      // Allow others to enhance the editor.
-      $(document).trigger('xwiki:dom:updated', {'elements': editor.toArray()});
-      // Focus the first visible input.
-      editor.find(':input').filter(':visible').focus();
-    }).catch(() => {
-      new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
-      return Promise.reject();
-    }).finally(() => {
-      // Re-enable the edit action (even if hidden).
-      editIcon.removeClass('disabled');
+    }, extraParams))).then(html => {
+      injectEditor(editableProperty, html);
+    }).catch(async error => {
+      // Re-throws the error if it's not an edit confirmation (423) response.
+      const confirmation = editConfirmation.parseConfirmationResponse(error);
+      await editConfirmation.showConfirmationModal(confirmation);
+      return loadEditor(editableProperty, {force: 1, force_token: xcontext.form_token});
     });
+  };
+
+  var injectEditor = function(editableProperty, html) {
+    // Replace the edit action with the save and cancel actions.
+    editableProperty.find('.editableProperty-edit').hide();
+    editableProperty.find('.editableProperty-save, .editableProperty-cancel').show();
+    // Update the editor.
+    var editor = editableProperty.next('.editableProperty-viewer').hide().next('.editableProperty-editor');
+    editor.html(html).show();
+    // Allow others to enhance the editor.
+    $(document).trigger('xwiki:dom:updated', {'elements': editor.toArray()});
+    // Focus the first visible input.
+    editor.find(':input').filter(':visible').focus();
   };
 
   var cancel = function(editableProperty) {

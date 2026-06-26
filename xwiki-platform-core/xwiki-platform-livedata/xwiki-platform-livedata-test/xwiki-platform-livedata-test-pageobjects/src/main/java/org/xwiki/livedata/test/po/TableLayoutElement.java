@@ -776,6 +776,55 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Starts editing the nth cell of a column by clicking the inline edit button on the cell's popover, without waiting
+     * for the editor to appear. This is useful when clicking the edit button may trigger an edit confirmation modal
+     * before the editor is shown.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to edit (the first line is number 1)
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public void clickEditCell(String columnLabel, int rowNumber)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        By editButton = By.cssSelector(".displayer-action-list span[title='Edit']");
+        // Hover on the property and click on the edit button on the displayed popover (see internalEdit for the
+        // rationale behind the two moves). We first move the mouse away from the cell so that moving back onto it
+        // reliably triggers the popover, in particular when re-editing a cell right after closing an edit
+        // confirmation modal (the mouse might still be over the cell from the previous attempt).
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(getRoot())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
+        // The popover holding the edit button is displayed asynchronously after hovering, so wait for it before
+        // clicking instead of failing immediately when it is not there yet.
+        getDriver().waitUntilElementIsVisible(element, editButton);
+        element.findElement(editButton).click();
+    }
+
+    /**
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @return {@code true} if the inline editor for the given XObject property cell is currently displayed
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public boolean isCellEditing(String columnLabel, int rowNumber, String fieldName)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        return !element.findElements(By.cssSelector(String.format("[name$='_%s']", fieldName))).isEmpty();
+    }
+
+    /**
      * Returns a single {@link WebElement} found by passing {@code by} to {@link WebElement#findElement(By)} on the
      * {@link WebElement} of the requested row.
      *

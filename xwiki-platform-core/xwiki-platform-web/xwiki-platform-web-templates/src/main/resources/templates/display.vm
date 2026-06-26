@@ -38,16 +38,34 @@
     #end
     #if ($knownPropertyTypes.contains($propertyType))
       #initRequiredSkinExtensions()
-      #if ($propertyType == 'object')
-        #if ($request.getParameter('objectPolicy') == 'updateOrCreate')
-          #createObjectAndPropertyIfMissing($propertyReference)
-        #end
-        #displayObjectProperty($propertyReference $displayMode)
-      #else
-        #displayDocumentProperty($propertyReference $displayMode)
+      ## Run the edit confirmation checkers before displaying the editor so that any caller of this template is subject
+      ## to the same checks (e.g. required rights). Editing a single property in-place doesn't acquire a document lock,
+      ## so we skip the document lock checker.
+      #set ($editConfirmation = $NULL)
+      #if ($displayMode == 'edit')
+        #template('edit_macros.vm')
+        #getEditConfirmation(['documentLock'])
       #end
-      #getRequiredSkinExtensions($requiredSkinExtensions)
-      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+      #if ($editConfirmation)
+        ## An edit confirmation is required: return it as JSON with a 423 (Locked) status instead of the editor. The
+        ## client displays it in a modal and, once the user confirms, re-requests with force=1 to get the editor.
+        #set ($discard = $response.setStatus(423))
+        ## Send required skin extension resources so that the client can display the edit confirmation modal.
+        #getRequiredSkinExtensions($requiredSkinExtensions)
+        #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+        #jsonResponse($editConfirmation)
+      #else
+        #if ($propertyType == 'object')
+          #if ($request.getParameter('objectPolicy') == 'updateOrCreate')
+            #createObjectAndPropertyIfMissing($propertyReference)
+          #end
+          #displayObjectProperty($propertyReference $displayMode)
+        #else
+          #displayDocumentProperty($propertyReference $displayMode)
+        #end
+        #getRequiredSkinExtensions($requiredSkinExtensions)
+        #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+      #end
     #else
       ## Bad request.
       #set ($discard = $response.sendError(400, 'Unknown property type.'))

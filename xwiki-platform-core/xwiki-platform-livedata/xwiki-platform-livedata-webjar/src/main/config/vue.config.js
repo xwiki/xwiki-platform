@@ -52,7 +52,9 @@ module.exports = {
       "moment": "moment",
       "moment-jdateformatparser": "moment-jdateformatparser",
       "xwiki-selectize": "xwiki-selectize",
-      "xwiki-livedata-xObjectPropertyHelper": "xwiki-livedata-xObjectPropertyHelper"
+      "xwiki-livedata-xObjectPropertyHelper": "xwiki-livedata-xObjectPropertyHelper",
+      "xwiki-edit-confirmation": "xwiki-edit-confirmation",
+      "xwiki-meta": "xwiki-meta"
     })
   },
   css: {

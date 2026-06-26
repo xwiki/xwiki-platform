@@ -22,22 +22,65 @@ import DisplayerXObjectProperty from "../../../displayers/DisplayerXObjectProper
 import {initWrapper} from "./displayerTestsHelper";
 import $ from 'jquery';
 import flushPromises from "flush-promises";
+import xObjectPropertyHelper from "xwiki-livedata-xObjectPropertyHelper";
+import editConfirmation from "xwiki-edit-confirmation";
 
 global.$ = global.jQuery = $;
 
+const EDIT_FORM = '<form id="editForm"><input type="text" id="editField" /></form>';
+
+// The edit form is loaded through this helper; mock it so that the tests don't need a server.
 jest.mock("xwiki-livedata-xObjectPropertyHelper", function () {
   return {
-    setLocalization() {
-    },
-    edit() {
-      return new Promise(resolve => {
-        resolve('<form id="editForm"><input type="text" id="editField" /></form>');
-      })
+    edit: jest.fn()
+  };
+});
+
+// The edit confirmation modal is loaded as a RequireJS module; mock it so that the tests don't need the real modules.
+jest.mock("xwiki-edit-confirmation", function () {
+  return {
+    parseConfirmationResponse: jest.fn(error => {
+      // Re-throws the error if it's not an edit confirmation (423) response.
+      if (error && error.status === 423) {
+        return error.responseJSON;
+      }
+      throw error;
+    }),
+    showConfirmationModal: jest.fn(() => Promise.resolve()),
+    isConfirmationDismissed: jest.fn(() => false)
+  };
+});
+
+jest.mock("xwiki-meta", function () {
+  return {
+    locale: 'en',
+    // eslint-disable-next-line camelcase
+    form_token: 'token'
+  };
+});
+
+const editModeLogic = {
+  getEntryId() {
+    return 'testProperty'
+  },
+  data: {
+    query: {
+      source: {
+        className: 'XWiki.TestClass'
+      }
     }
   }
-})
+};
 
 describe('DisplayerXObjectProperty.vue', () => {
+  beforeEach(() => {
+    xObjectPropertyHelper.edit.mockReset();
+    xObjectPropertyHelper.edit.mockResolvedValue(EDIT_FORM);
+    editConfirmation.parseConfirmationResponse.mockClear();
+    editConfirmation.showConfirmationModal.mockClear();
+    editConfirmation.isConfirmationDismissed.mockClear();
+  })
+
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(DisplayerXObjectProperty, {
       props: {
@@ -57,34 +100,50 @@ describe('DisplayerXObjectProperty.vue', () => {
           color: '<strong>some content</strong>'
         }
       },
-      logic: {
-        getEntryId() {
-          return 'testProperty'
-        }, data: {
-          query: {
-            source: {
-              className: 'XWiki.TestClass'
-            }
-          }
-        }
-      }
+      logic: editModeLogic
     })
 
-    // The :visible filter does not work in the context of jest. To mitigate that issue we spy on jquery filter
-    // method and return the expected result (the #editField input).
-    const jQuerySpy = jest.spyOn($.fn, "filter", );
-    jQuerySpy.mockImplementation(() => {
-      return $(wrapper.element).find('#editField')
-    })
-
-    // Switch to edit mode and manually call updateEdit, instead of using the actions because accessing the actions
-    // of the popover is not currently possible.
+    // Switch to edit mode, the isView watcher then calls updateEdit which loads the edit form.
     await wrapper.setData({isView: false})
-    wrapper.vm.updateEdit()
     await flushPromises();
 
     // Checks that the edition form is properly retrieved and displayed.
     expect(wrapper.find('#editForm').exists()).toBe(true);
-    expect(wrapper.find('#editField').element).toHaveFocus();
+  })
+
+  it('Shows the edit confirmation modal and forces the edit once confirmed', async () => {
+    // The first edit request requires a confirmation (the server returns a 423 with the confirmation as JSON), the
+    // second one (forced) returns the editor.
+    const confirmationError = Object.assign(new Error('confirmation required'), {
+      status: 423,
+      responseJSON: {
+        title: 'Warning',
+        message: '<p>Required rights warning.</p>',
+        reject: 'Cancel',
+        confirm: 'Force'
+      }
+    });
+    xObjectPropertyHelper.edit.mockReset();
+    xObjectPropertyHelper.edit
+      .mockRejectedValueOnce(confirmationError)
+      .mockResolvedValueOnce(EDIT_FORM);
+
+    const wrapper = initWrapper(DisplayerXObjectProperty, {
+      props: {
+        entry: {
+          color: '<strong>some content</strong>'
+        }
+      },
+      logic: editModeLogic
+    })
+
+    await wrapper.setData({isView: false})
+    await flushPromises();
+
+    // The confirmation modal was shown and, once confirmed, the editor was forced and displayed.
+    expect(editConfirmation.showConfirmationModal).toHaveBeenCalledTimes(1);
+    // One of the edit requests was retried with the force parameters once the confirmation was confirmed.
+    expect(xObjectPropertyHelper.edit.mock.calls.some(call => call[3] && call[3].force === 1)).toBe(true);
+    expect(wrapper.find('#editForm').exists()).toBe(true);
   })
 })

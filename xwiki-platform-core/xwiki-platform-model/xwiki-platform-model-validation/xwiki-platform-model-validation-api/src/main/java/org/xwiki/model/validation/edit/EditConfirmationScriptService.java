@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.validation.edit;
 
+import java.util.Collection;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -58,6 +61,23 @@ public class EditConfirmationScriptService implements ScriptService
     public EditConfirmationCheckerResults check()
     {
         return this.editConfirmationCheckersManager.check();
+    }
+
+    /**
+     * Performs a check like {@link #check()} but skips the {@link EditConfirmationChecker} components whose component
+     * hints are in the given collection. This is useful, for instance, to skip the document lock check when editing a
+     * single property in-place since this doesn't acquire a document lock.
+     *
+     * @param skipHints the component hints of the checkers to skip
+     * @return a {@link EditConfirmationCheckerResults} object containing the results of the check
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public EditConfirmationCheckerResults check(Collection<String> skipHints)
+    {
+        return this.editConfirmationCheckersManager.check(Set.copyOf(skipHints));
     }
 
     /**

@@ -69,7 +69,7 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
         editor.updateBlock(macroBlock.id, { props: newProps }),
       );
     };
-  }, [selection, macrosList]);
+  }, [selection, macrosList, ctxForMacros, editor]);
 
   return (
     openMacroEditor && (

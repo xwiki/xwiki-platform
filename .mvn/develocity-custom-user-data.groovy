@@ -21,7 +21,7 @@ import com.gradle.develocity.agent.maven.adapters.BuildScanApiAdapter
 
 /**
  * Captures the Maven active profiles and add them as tags to the Build Scan. The goal is to make it simpler to
- * filter builds on <a href="ge.xwiki.org">https://ge.xwiki.org</a> by filtering on Maven profiles.
+ * filter builds on <a href="https://community.develocity.cloud/scans?search.rootProjectNames=XWiki*">https://community.develocity.cloud</a> by filtering on Maven profiles.
  */
 
 buildScan.executeOnce('tag-profiles') { BuildScanApiAdapter buildScanApi ->

@@ -104,32 +104,32 @@ public class XClassMigratorListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof XClassUpdatedEvent ev) {
-            if (data instanceof Collection<?> updatedProperties) {
-                List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
-                for (Object p : updatedProperties) {
-                    if (p instanceof PropertyUpdate(PropertyInterface oldProp, PropertyInterface newProp)) {
-                        if ((oldProp instanceof PropertyClass || oldProp == null)
-                                    && (newProp instanceof PropertyClass || newProp == null)
-                        ) {
-                            maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
-                        }
-                    } else {
-                        logger.error("Unexpected entry of type [{}], this should not happen",
-                                p == null ? null : p.getClass());
-                        return;
-                    }
-                }
-
-                updateProperties(ev.getReference(), propertiesToUpdate);
-            } else {
-                logger.error("Unexpected data of type [{}], this should not happen",
-                        data == null ? null : data.getClass());
-            }
+        if (event instanceof XClassUpdatedEvent ev && data instanceof Collection<?> updatedProperties) {
+            onEvent(ev, updatedProperties);
         } else {
-            logger.error("Unexpected event of type [{}], this should not happen",
-                    event == null ? null : event.getClass());
+            logger.error("Unexpected event of type [{}] or unexpected data of type [{}], this should not happen",
+                    event == null ? null : event.getClass(), data == null ? null : data.getClass());
         }
+    }
+
+    private void onEvent(XClassUpdatedEvent ev, Collection<?> updatedProperties)
+    {
+        List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
+        for (Object p : updatedProperties) {
+            if (p instanceof PropertyUpdate(PropertyInterface oldProp, PropertyInterface newProp)) {
+                if ((oldProp instanceof PropertyClass || oldProp == null)
+                            && (newProp instanceof PropertyClass || newProp == null)
+                ) {
+                    maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
+                }
+            } else {
+                logger.error("Unexpected entry of type [{}], this should not happen",
+                        p == null ? null : p.getClass());
+                return;
+            }
+        }
+
+        updateProperties(ev.getReference(), propertiesToUpdate);
     }
 
     private void maybeAddPropertyToUpdate(PropertyClass newPropertyClass, PropertyClass previousPropertyClass,

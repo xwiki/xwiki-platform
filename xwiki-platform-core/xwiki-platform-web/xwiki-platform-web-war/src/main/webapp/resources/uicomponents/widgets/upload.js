@@ -409,6 +409,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         return;
       }
 
+      if (event?.target?.responseText) {
+        this.statusUI.UPLOAD_RESPONSE.update(event.target.responseText);
+      }
+
       if (this.options.enableProgressInfo) {
         this.statusUI.PROGRESS_PERCENTAGE.update('100%');
         this.statusUI.PROGRESS_REMAINING.update('00:00:00');

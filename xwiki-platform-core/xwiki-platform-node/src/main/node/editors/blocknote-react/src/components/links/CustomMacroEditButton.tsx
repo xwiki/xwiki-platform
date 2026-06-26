@@ -75,7 +75,7 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
     openMacroEditor && (
       <Components.FormattingToolbar.Button
         className={"bn-button"}
-        data-test="createLink"
+        data-test="insertMacroButton"
         label={t("blocknote.linkToolbar.macros.edit.label")}
         mainTooltip={t("blocknote.linkToolbar.macros.edit.tooltip")}
         icon={<RiPencilFill />}

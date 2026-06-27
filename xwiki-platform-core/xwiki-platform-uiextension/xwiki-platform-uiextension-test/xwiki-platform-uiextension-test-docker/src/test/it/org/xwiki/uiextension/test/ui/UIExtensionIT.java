@@ -19,16 +19,17 @@
  */
 package org.xwiki.uiextension.test.ui;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.TestUtils.RestTestUtils;
 import org.xwiki.test.ui.po.DocExtraPane;
 import org.xwiki.test.ui.po.ViewPage;
@@ -36,35 +37,42 @@ import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 
 import com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * UI tests for the UI Extension feature.
  *
  * @version $Id$
- * @since 4.2M3
+ * @since 18.6.0RC1
  */
-public class UIExtensionTest extends AbstractTest
+@UITest
+class UIExtensionIT
 {
     private static final String HELLOWORLD_UIX_PAGE = "HelloWorld";
 
     private static final String HELLOWIKIWORLD_UIX_PAGE = "HelloWikiWorld";
 
-    // Login as superadmin to have delete rights.
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Login as superadmin to have delete rights.
+        setup.loginAsSuperAdmin();
+
         // Delete pages that we create in the test
-        getUtil().rest().delete(new LocalDocumentReference(getTestClassName(), HELLOWORLD_UIX_PAGE));
-        getUtil().rest().delete(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
+        SpaceReference space = testReference.getLastSpaceReference();
+        setup.rest().delete(new DocumentReference(HELLOWORLD_UIX_PAGE, space));
+        setup.rest().delete(new DocumentReference(HELLOWIKIWORLD_UIX_PAGE, space));
     }
 
     @Test
-    public void testUIExtension() throws Exception
+    @Order(1)
+    void testUIExtension(TestUtils setup, TestReference testReference) throws Exception
     {
+        SpaceReference space = testReference.getLastSpaceReference();
+
         // Test Java UI extensions
-        getUtil().rest().savePage(new LocalDocumentReference(getTestClassName(), HELLOWORLD_UIX_PAGE),
+        setup.rest().savePage(new DocumentReference(HELLOWORLD_UIX_PAGE, space),
             "{{velocity}}\n"
             + "\n"
             + "{{html}}\n"
@@ -80,8 +88,7 @@ public class UIExtensionTest extends AbstractTest
 
         // Test Wiki UI extension
 
-        Page extensionsPage =
-            getUtil().rest().page(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
+        Page extensionsPage = setup.rest().page(new DocumentReference(HELLOWIKIWORLD_UIX_PAGE, space));
         Objects objects = new Objects();
         extensionsPage.setObjects(objects);
         Object object = RestTestUtils.object(WikiUIExtensionConstants.CLASS_REFERENCE_STRING);
@@ -98,10 +105,11 @@ public class UIExtensionTest extends AbstractTest
         object.withProperties(RestTestUtils.property("content", "HelloWikiWorld1"));
         object.withProperties(RestTestUtils.property("parameters", "HelloWorldKey=zz1_$xcontext.user"));
         objects.withObjectSummaries(object);
-        getUtil().rest().save(extensionsPage);
+        setup.rest().save(extensionsPage);
 
-        ViewPage page = getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
-        Assert.assertEquals("HelloWorld\n"
+        setup.gotoPage(new DocumentReference(HELLOWORLD_UIX_PAGE, space));
+        ViewPage page = new ViewPage();
+        assertEquals("HelloWorld\n"
             + "HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"
             + "{HelloWorldKey=HelloWorldValue}\n"
@@ -110,9 +118,12 @@ public class UIExtensionTest extends AbstractTest
     }
 
     @Test
-    public void testDocExtraUIExtension() throws Exception
+    @Order(2)
+    void testDocExtraUIExtension(TestUtils setup, TestReference testReference) throws Exception
     {
-        Page extensionPage = getUtil().rest().page(new LocalDocumentReference(getTestClassName(), "DocExtra"));
+        SpaceReference space = testReference.getLastSpaceReference();
+
+        Page extensionPage = setup.rest().page(new DocumentReference("DocExtra", space));
         extensionPage.setContent(
             "{{velocity}}$xwiki.jsx.use($doc.getDocumentReference(), {'parameter': 'My Custom Value'}){{/velocity}}");
 
@@ -151,12 +162,13 @@ public class UIExtensionTest extends AbstractTest
             RestTestUtils.property("extensionPointId", "org.xwiki.plaftorm.template.docextra"));
         extensionsObject.withProperties(RestTestUtils.property("content", """
             {{velocity output="false"}}
-            ## Load the OnDemandJS extension to verify that the UI extension can load JSX.
-            $xwiki.jsx.use('%s.OnDemandJS')
+            ## Load the OnDemandJS extension to verify that the UI extension can load JSX. The OnDemandJS page is a
+            ## sibling of the current page so it can be referenced by its name only.
+            $xwiki.jsx.use('OnDemandJS')
             {{/velocity}}
-            
+
             Doc extra content
-            """.formatted(getTestClassName())));
+            """));
         // Construct parameters
         String parameters = """
             show=true
@@ -169,11 +181,10 @@ public class UIExtensionTest extends AbstractTest
         extensionsObject.withProperties(RestTestUtils.property("parameters", parameters));
         objects.withObjectSummaries(extensionsObject);
 
-        getUtil().rest().save(extensionPage);
+        setup.rest().save(extensionPage);
 
         // Create a second page with a pure on-demand JavaScript extension that adds a different content to the page.
-        Page onDemandJSPage =
-            getUtil().rest().page(new LocalDocumentReference(getTestClassName(), "OnDemandJS"));
+        Page onDemandJSPage = setup.rest().page(new DocumentReference("OnDemandJS", space));
         Objects onDemandJSObjects = new Objects();
         onDemandJSPage.setObjects(onDemandJSObjects);
         Object onDemandJSObject = RestTestUtils.object(JsSkinExtensionPlugin.JSX_CLASS_NAME);
@@ -185,20 +196,21 @@ public class UIExtensionTest extends AbstractTest
         onDemandJSObject.withProperties(RestTestUtils.property("parse", "0"));
         onDemandJSObject.withProperties(RestTestUtils.property("use", "onDemand"));
         onDemandJSObjects.withObjectSummaries(onDemandJSObject);
-        getUtil().rest().save(onDemandJSPage);
+        setup.rest().save(onDemandJSPage);
 
-        ViewPage page = getUtil().gotoPage(getTestClassName(), "DocExtra");
+        setup.gotoPage(new DocumentReference("DocExtra", space));
+        ViewPage page = new ViewPage();
         // Verify that the JavaScript extension is loaded.
         String expectedPageContent = "Parameter value: My Custom Value";
-        Assert.assertEquals(expectedPageContent, page.getContent().trim());
-        Assert.assertTrue(page.hasDocExtraPane("DocExtra"));
+        assertEquals(expectedPageContent, page.getContent().trim());
+        assertTrue(page.hasDocExtraPane("DocExtra"));
         DocExtraPane docExtra = page.openDocExtraPane("DocExtra");
-        Assert.assertEquals("Doc extra content", docExtra.getText());
+        assertEquals("Doc extra content", docExtra.getText());
         // Verify that the page content is not modified by the "on this page" JavaScript extension but is modified by
         // the JavaScript extension loaded by the DocExtra UI extension.
         String expectedContent = expectedPageContent + "OnDemandJS";
         // Wait for the expected content to be added by the JavaScript extension loaded by the DocExtra UI extension.
         page.waitUntilContent(expectedContent);
-        Assert.assertEquals(expectedContent, page.getContent().trim());
+        assertEquals(expectedContent, page.getContent().trim());
     }
 }

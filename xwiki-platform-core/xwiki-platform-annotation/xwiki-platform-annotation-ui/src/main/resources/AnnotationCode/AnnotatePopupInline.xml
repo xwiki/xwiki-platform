@@ -438,7 +438,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       const anchor = isRTL ? rect.left : rect.right; // support for RTL languages
       return {
         top: (rect.top + window.scrollY - pSize.height - Constants.POPUP_TOP_OFFSET) + "px",
-        left: anchor + window.scrollX - (pSize.width / 2) + "px"
+        left: (anchor + window.scrollX - (pSize.width / 2)) + "px"
       };
     }
   }

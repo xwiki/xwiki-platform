@@ -77,6 +77,13 @@ public class DocumentMergeImporter
     public void importDocument(String comment, XWikiDocument previousDocument, XWikiDocument currentDocument,
         XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception
     {
+        if (configuration.isForceOverwrite()) {
+            // Reinstall: skip the 3-way merge and write the new version as-is, so that the fresh download
+            // is not silently discarded by a merge that sees no delta between previous and next.
+            saveDocument(nextDocument, comment, configuration);
+            return;
+        }
+
         XarEntryType type = this.typeResolver.getDefault();
         XWikiDocumentMerger merger = this.defaultMerger;
 

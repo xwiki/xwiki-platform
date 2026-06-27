@@ -21,26 +21,33 @@ package org.xwiki.resource.test.ui;
 
 import java.net.URL;
 
-import org.junit.Test;
-import org.xwiki.test.ui.AbstractTest;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the Resource Module (for Use Cases that cannot be easily tested in integration or unit tests).
+ * <p>
+ * This class is not annotated with {@code @UITest} on purpose: it is run as a {@link org.junit.jupiter.api.Nested}
+ * class of {@link AllIT}, which starts XWiki once and shares it across all the test classes.
  *
  * @version $Id$
- * @since 7.2M1
+ * @since 18.6.0RC1
  */
-public class ResourceTest extends AbstractTest
+class ResourceIT
 {
     @Test
-    public void accessResources() throws Exception
+    void accessResources(TestUtils setup) throws Exception
     {
+        // Log in so that editing is allowed on the minimal test wiki. The assertions below verify URL routing and are
+        // independent of the logged-in user.
+        setup.loginAsSuperAdmin();
+
         // Verify that accessing /view/A/B goes to A.B.WebHome (Nested Documents URL shortcut feature)
-        getUtil().gotoPage(getUtil().getURL("view", new String[] {"A", "B"}, null));
+        setup.gotoPage(setup.getURL("view", new String[] {"A", "B"}, null));
         // Edit the page and verify the URL
         // The wiki is empty and there's no WYSIWYG so clicking edit will go to the wiki editor
         new ViewPage().edit();
@@ -48,13 +55,13 @@ public class ResourceTest extends AbstractTest
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B/WebHome"));
 
         // Verify that accessing /edit/A/B edits A.B (Nested Documents URL shortcut feature is only for view mode)
-        getUtil().gotoPage(getUtil().getURL("edit", new String[] {"A", "B"}, null));
+        setup.gotoPage(setup.getURL("edit", new String[] {"A", "B"}, null));
         ep = new EditPage();
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));
 
         // Verify that the spaceRedirect=false query string parameter and value can be used to disable the automatic
         // space redirect
-        getUtil().gotoPage(getUtil().getURL("view", new String[] {"A", "B"}, "spaceRedirect=false"));
+        setup.gotoPage(setup.getURL("view", new String[] {"A", "B"}, "spaceRedirect=false"));
         new ViewPage().edit();
         ep = new EditPage();
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));

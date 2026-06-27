@@ -332,7 +332,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       this.popup.setAttribute("aria-hidden", "true");
 
       this.popupButton = document.createElement("button");
-      this.popupButton.classList.add("btn", "btn-default", "btn-xs");
+      this.popupButton.classList.add("btn-default", "btn-xs"); // "btn" class not added due to extra margin not needed here
       this.popupButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY];
       this.popupButton.setAttribute("aria-label", l10n[Constants.ANNOTATE_TRANSLATION_KEY]);
 

@@ -80,7 +80,7 @@ public class PropUpdateAction extends XWikiAction
             }
 
             if (newName.indexOf(" ") != -1) {
-                newName = newName.replaceAll(" ", "");
+                newName = newName.replace(" ", "");
                 newProperty.setName(newName);
             }
             bclass2.addField(newName, newProperty);

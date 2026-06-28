@@ -5779,7 +5779,7 @@ public class XWiki implements EventListener
         }
         if (!path.startsWith(segment)) {
             // Some clients also encode -, although it's allowed in the path
-            segment = segment.replaceAll("-", "%2D");
+            segment = segment.replace("-", "%2D");
         }
         if (!path.startsWith(segment)) {
             // Can't find the context path in the URL (shouldn't happen), just skip to the next path segment

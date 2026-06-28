@@ -144,10 +144,15 @@ const Constants = Object.freeze({
    */
   ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
   /**
-   * The debounce delay added to the selectionstart listener
+   * The debounce delay added to the selectionchange listener
    * @type {number}
    */
   DEBOUNCE_SELECT_MS: 515,
+  /**
+   * The debounce delay added to the resize listener
+   * @type {number}
+   */
+  DEBOUNCE_VIEWPORT_MS: 75,
   /**
    * The CSS class that needs to be added to show the popup
    * @type {string}
@@ -183,7 +188,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
    * @param {number} delay - Delay time
    * @returns {Function} - Debounced version of func (result of the function is NOT returned)
    */
-  function debounce(func, delay = 75) {
+  function debounce(func, delay) {
     let timerId = null;
     return function(...args) {
       if (timerId) {
@@ -244,11 +249,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       this.openAnnotationBubble = openAnnotationBubble;
 
       // Bind handlers to the class instance because event listeners call the function with a different "this"
-      this._onSelection = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECT_MS);
+      this._onSelectionDebounced = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECT_MS);
       this._onButtonClick = this._onButtonClick.bind(this);
       this._onEscapeKey = this._onEscapeKey.bind(this);
       this._onClickAway = this._onClickAway.bind(this);
-      this._onViewportChange = debounce(this._onViewportChange.bind(this));
+      this._onViewportChangeDebounced = debounce(this._onViewportChange.bind(this), Constants.DEBOUNCE_VIEWPORT_MS);
 
       this._create();
       this._registerListeners();
@@ -259,15 +264,15 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
      * @param {Selection} selection
      */
     open(selection) {
-      // do not open if an annotate bubble is already open
-      if (document.getElementsByClassName(Constants.ANNOTATE_BUBBLE_CLASS).length !== 0) {
+      // do not open if an annotate bubble is already open (opened by the Annotation class)
+      if (document.querySelector("." + Constants.ANNOTATE_BUBBLE_CLASS)) {
         return;
       }
 
       if (selection.rangeCount &lt;= 0) {
         return;
       }
-      this.currentRange = selection.getRangeAt(0).cloneRange()
+      this.currentRange = selection.getRangeAt(0).cloneRange(); // clone range because the selection can change when focus is moved
 
       this.previousFocusElem = selection.focusNode?.parentElement || document.activeElement;
       const pos = this._getPositioning();
@@ -283,13 +288,13 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
         this.popupButton.focus({ preventScroll: true }); // also allows pressing Enter to click the button
 
-        // Workaround (Firefox 151 and lower): Focussing clears the selection, restore it to be able to copy selected text
+        // Firefox 151 and lower: Shifting focus clears the selection. Restore the selection so users can still copy the originally selected text.
         selection.addRange(this.currentRange);
       });
 
       document.addEventListener("click", this._onClickAway, { passive: true });
       if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", this._onViewportChange, { passive: true }); // re-positioning on resize/zoom
+        window.visualViewport.addEventListener("resize", this._onViewportChangeDebounced, { passive: true }); // re-positioning on resize/zoom
       }
     }
 
@@ -297,6 +302,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
      * Close the popup
      */
     close() {
+      // restore focus if the previously focused element is still in the document and focusable; otherwise blur the popup button
       const canRestoreFocus = this.previousFocusElem &amp;&amp;
                               document.contains(this.previousFocusElem) &amp;&amp;
                               typeof this.previousFocusElem.focus === "function" &amp;&amp;
@@ -317,7 +323,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
       document.removeEventListener("click", this._onClickAway);
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", this._onViewportChange);
+        window.visualViewport.removeEventListener("resize", this._onViewportChangeDebounced);
       }
     }
 
@@ -344,16 +350,19 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
      * Register event listeners
      */
     _registerListeners() {
-      // open popup on text selection, disable in edit mode
-      document.addEventListener("selectionchange", this._onSelection, { passive: true });
+      document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
+
+      // remove selectionchange handler in edit mode (annotations are disabled while editing)
       this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; {
-        document.removeEventListener("selectionchange", this._onSelection);
-      });
-      this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; {
-        document.addEventListener("selectionchange", this._onSelection, { passive: true });
+        document.removeEventListener("selectionchange", this._onSelectionDebounced);
       });
 
-      // prevent losing focus (the selection) when clicking on the popup edges
+      // re-enable selectionchange handler when annotations are allowed again
+      this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; {
+        document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
+      });
+
+      // prevent losing focus (the selection) when clicking on the popup
       this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); });
 
       this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
@@ -417,7 +426,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
     /**
      * Get popup position that is near the selected text range
-     * @return {{top: String, left: String} | null} - The absolute top and left position with unit for the popup
+     * @return {{top: String, left: String} | null} - CSS unit strings for top and left position for the popup
      */
     _getPositioning() {
       if (!this.currentRange) {
@@ -431,12 +440,12 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
       const rect = rects[rects.length - 1];
 
-      const pSize = this.popup.getBoundingClientRect();
-      if(!this.previousFocusElem) {
+      if (!this.previousFocusElem) {
         return null;
       }
       const isRTL = window.getComputedStyle(this.previousFocusElem).direction === "rtl";
       const afterLastWordAnchor = isRTL ? rect.left : rect.right;
+      const pSize = this.popup.getBoundingClientRect();
       return {
         top: (rect.top + window.scrollY - pSize.height - Constants.POPUP_TOP_OFFSET) + "px",
         left: (afterLastWordAnchor + window.scrollX - (pSize.width / 2)) + "px"

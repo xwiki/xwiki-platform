@@ -270,8 +270,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       this.currentRange = selection.getRangeAt(0).cloneRange()
 
       this.previousFocusElem = selection.focusNode?.parentElement || document.activeElement;
-      const isRTL = window.getComputedStyle(this.previousFocusElem).direction === "rtl";
-      const pos = this._getPositioning(isRTL);
+      const pos = this._getPositioning();
       if (!pos) {
         return;
       }
@@ -419,10 +418,9 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 
     /**
      * Get popup position that is near the selected text range
-     * @param {boolean} isRTL
      * @return {{top: String, left: String} | null} - The absolute top and left position with unit for the popup
      */
-    _getPositioning(isRTL = false) {
+    _getPositioning() {
       if (!this.currentRange) {
         return null;
       }
@@ -435,10 +433,14 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       const rect = rects[rects.length - 1];
 
       const pSize = this.popup.getBoundingClientRect();
-      const anchor = isRTL ? rect.left : rect.right; // support for RTL languages
+      if(!this.previousFocusElem) {
+        return null;
+      }
+      const isRTL = window.getComputedStyle(this.previousFocusElem).direction === "rtl";
+      const afterLastWordAnchor = isRTL ? rect.left : rect.right;
       return {
         top: (rect.top + window.scrollY - pSize.height - Constants.POPUP_TOP_OFFSET) + "px",
-        left: (anchor + window.scrollX - (pSize.width / 2)) + "px"
+        left: (afterLastWordAnchor + window.scrollX - (pSize.width / 2)) + "px"
       };
     }
   }
@@ -447,7 +449,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
 });</code>
     </property>
     <property>
-      <name>Annotate Popup -- Main JavaScript</name>
+      <name>Annotate Popup -- Main Script</name>
     </property>
     <property>
       <parse>0</parse>

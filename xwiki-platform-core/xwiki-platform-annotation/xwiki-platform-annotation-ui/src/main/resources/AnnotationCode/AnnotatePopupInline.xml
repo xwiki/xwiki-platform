@@ -303,11 +303,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
                               !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
                               this.previousFocusElem.getClientRects().length;
 
+      this.popupButton.blur();
       if (canRestoreFocus) {
         this.previousFocusElem.focus({ preventScroll: true });
-      } else {
-        this.popupButton.blur();
       }
+
       this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
       this.popup.setAttribute("aria-hidden", "true");
 

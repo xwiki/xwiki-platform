@@ -286,7 +286,7 @@ public class UploadAction extends XWikiAction
             filename = fname;
         }
         // Sometimes spaces are replaced with '+' by the browser.
-        filename = filename.replaceAll("\\+", " ");
+        filename = filename.replace("+", " ");
 
         if (StringUtils.isBlank(filename)) {
             // The file field was left empty, ignore this

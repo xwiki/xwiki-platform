@@ -284,7 +284,6 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
         this.popupButton.focus({ preventScroll: true }); // also allows pressing Enter to click the button
 
         // Workaround (Firefox 151 and lower): Focussing clears the selection, restore it to be able to copy selected text
-        selection.removeAllRanges();
         selection.addRange(this.currentRange);
       });
 

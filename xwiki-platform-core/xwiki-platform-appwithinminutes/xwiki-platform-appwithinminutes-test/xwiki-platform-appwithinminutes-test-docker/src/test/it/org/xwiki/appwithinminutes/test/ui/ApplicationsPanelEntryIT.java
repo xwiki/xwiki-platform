@@ -17,74 +17,70 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomeEditPage;
 import org.xwiki.panels.test.po.ApplicationsPanel;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.AdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the applications panel entry. This test needs its own class because it needs to be in a separated space in the
  * wiki. In the other test classes we create one application per method, in the same space, which leads to duplicate
  * entries in the panel.
- * 
+ *
  * @version $Id$
  * @since 4.3RC1
  */
-public class ApplicationsPanelEntryTest extends AbstractTest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
+class ApplicationsPanelEntryIT
 {
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
-
-    /**
-     * The page being tested.
-     */
-    private ApplicationHomeEditPage editPage;
-
-    /**
-     * The query string parameters passed to the edit action.
-     */
-    private final Map<String, String> editQueryStringParameters = new HashMap<String, String>();
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(TestUtils setup, TestReference testReference)
     {
-        getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
-        editQueryStringParameters.put("editor", "inline");
-        editQueryStringParameters.put("template", "AppWithinMinutes.LiveTableTemplate");
-        editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_class", "XWiki.XWikiUsers");
-        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
-        editPage = new ApplicationHomeEditPage();
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
     }
 
     @Test
-    public void testApplicationPanelEntry()
+    @Order(1)
+    void applicationPanelEntry(TestUtils setup, TestReference testReference)
     {
+        setup.gotoPage(testReference, "edit", "editor", "inline",
+            "template", "AppWithinMinutes.LiveTableTemplate",
+            "AppWithinMinutes.LiveTableClass_0_class", "XWiki.XWikiUsers");
+        ApplicationHomeEditPage editPage = new ApplicationHomeEditPage();
+
         String appTitle = "Applications Panel Entry Test";
 
-        // Test the title and the icon remain the same between edits
+        // Test the title and the icon remain the same between edits.
         editPage.setTitle(appTitle);
         editPage.setIcon("icon:bell");
         editPage.clickSaveAndView();
 
-        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit");
+        setup.gotoPage(testReference, "edit");
+        editPage = new ApplicationHomeEditPage();
         assertEquals(appTitle, editPage.getTitle());
         assertEquals("icon:bell", editPage.getIcon());
 
         ApplicationsPanel panel = ApplicationsPanel.gotoPage();
         ViewPage page = panel.clickApplication(appTitle);
         // Verify we're on the right page!
-        assertEquals(getTestClassName(), page.getMetaDataValue("space"));
-        assertEquals(getTestMethodName(), page.getMetaDataValue("page"));
+        assertEquals(setup.serializeLocalReference(testReference.getLastSpaceReference()),
+            page.getMetaDataValue("space"));
+        assertEquals(testReference.getName(), page.getMetaDataValue("page"));
     }
 }

@@ -41,10 +41,10 @@
 #end
 
 #macro (displayDocumentSummary $document $titleKey)
-  #set($title = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}")))
-  #set($hint = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}.hint")))
+  #set ($title = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}")))
+  #set ($hint = $escapetool.xml($services.localization.render("job.question.OverwriteQuestion.$!{titleKey}.hint")))
   <div class="col-sm-6">
-    <label>$title</label>
+    <strong>$title</strong>
     <div class="xHint">$hint</div>
     <a href="$document.getURL()">$services.icon.renderHTML('file-white')&nbsp;$escapetool.xml($document.plainTitle)</a>
     <div>

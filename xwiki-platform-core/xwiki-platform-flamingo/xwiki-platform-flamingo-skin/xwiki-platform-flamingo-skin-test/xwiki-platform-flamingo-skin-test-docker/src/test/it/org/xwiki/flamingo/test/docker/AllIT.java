@@ -33,7 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    class NestedEditIT extends EditIT
+    class NestedEditIT extends WikiEditIT
     {
     }
 

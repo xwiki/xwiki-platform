@@ -516,7 +516,7 @@
     &lt;/a&gt;
     #set ($attachmentHistoryURL = $xwiki.getURL($searchResultReference, 'viewattachrev', $NULL))
     #set ($historyHint = $services.localization.render('core.viewers.attachments.showHistory'))
-    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version"&gt;
+    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version force-no-underline"&gt;
       $escapetool.xml($searchResult.attversion)
     &lt;/a&gt;
   &lt;/h2&gt;

@@ -201,7 +201,6 @@ body {
        Those are already different enough from their neighboring text. */
       & a.btn,
       & a.button,
-      & a.search-result-version,
       & .buttonwrapper a {
         .not-inline-link();
       }
@@ -217,14 +216,15 @@ body {
 
     // Helper classes for easier content customization. Note that those only work for this preference.
     // This class can either be used on a common parent or the links themselves.
+    // See https://forum.xwiki.org/t/proposal-use-the-important-css-syntax-for-the-force-underline/18256
     #xwikicontent .force-no-underline a,
     #xwikicontent a.force-no-underline {
-      text-decoration: none;
+      text-decoration: none !important;
     }
 
     .force-underline a,
     a.force-underline {
-      text-decoration: underline;
+      text-decoration: underline !important;
     }
   }
   /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering.*/

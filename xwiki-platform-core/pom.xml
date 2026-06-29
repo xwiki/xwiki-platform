@@ -138,33 +138,9 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>No retro compatibiliity impact, only indicate how to display the macro parameter.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</old>
-                  <new>method void org.xwiki.localization.macro.TranslationMacroParameters::setParameters(java.lang.String[])</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature("parameters")</annotation>
-                </item>
-              </differences>
-            </revapi.differences>
+            
 
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class com.xpn.xwiki.web.InlineAction</old>
-                  <new>class com.xpn.xwiki.web.InlineAction</new>
-                  <superClass>com.xpn.xwiki.web.EditAction</superClass>
-                  <justification>Not a breakage in our case (no final methods), also nobody should inherit from InlineAction.</justification>
-                  <criticality>allowed</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

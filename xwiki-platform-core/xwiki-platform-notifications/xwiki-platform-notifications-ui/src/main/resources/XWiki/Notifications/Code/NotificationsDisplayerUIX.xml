@@ -639,10 +639,10 @@ Get the actual notifications.
 }</code>
     </property>
     <property>
-      <contentType>LESS</contentType>
+      <contentType>CSS</contentType>
     </property>
     <property>
-      <name>LESS</name>
+      <name>CSS</name>
     </property>
     <property>
       <parse>0</parse>

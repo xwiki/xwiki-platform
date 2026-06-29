@@ -17,7 +17,7 @@
   padding-right: 0;
 }
 
-.breadcrumb-container {
+.location-picker .breadcrumb-container {
   /* Sets up a flex display for breadcrumbs and location actions. */
   display: flex;
   flex-wrap: nowrap;
@@ -26,7 +26,9 @@
 }
 
 .location-picker > dd > .breadcrumb-container > .location-actions {
+  /* Lay the action buttons out in a row. */
   display: flex;
+  /* Keep the buttons pinned to the top so they align with the first breadcrumb line when it wraps. */
   align-items: flex-start;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;

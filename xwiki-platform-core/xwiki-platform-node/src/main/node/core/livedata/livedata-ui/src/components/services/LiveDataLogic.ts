@@ -36,10 +36,9 @@ import type {
   PropertyDescriptor,
   QueryConstraint,
   SortEntry,
-  TranslationQuery,
-  Translations,
   Values,
 } from "@xwiki/platform-livedata-api";
+import type { Query, Translations } from "@xwiki/platform-localization-api";
 import type { Reactive, Ref } from "vue";
 import type { ComposerTranslation } from "vue-i18n";
 
@@ -70,7 +69,7 @@ export class LiveDataLogic implements Logic {
     private readonly liveDataSource: LiveDataSource,
     data: string,
     private readonly contentTrusted: boolean,
-    resolveTranslations: (query: TranslationQuery) => Promise<Translations>,
+    resolveTranslations: (query: Query) => Promise<Translations>,
   ) {
     this.data = reactive(JSON.parse(data));
     // Reactive properties must be initialized before Vue is instantiated.
@@ -90,7 +89,7 @@ export class LiveDataLogic implements Logic {
   }
 
   private async initI18n(
-    resolveTranslations: (query: TranslationQuery) => Promise<Translations>,
+    resolveTranslations: (query: Query) => Promise<Translations>,
   ): Promise<boolean> {
     try {
       await i18nResolver(resolveTranslations);

@@ -74,7 +74,7 @@ public class StyleFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         String mode = cleaningParams.get("filterStyles");
-        if (null != mode && mode.equals("strict")) {
+        if ("strict".equals(mode)) {
             filter(document.getDocumentElement(), this.attributeMappingsStrict);
         }
     }

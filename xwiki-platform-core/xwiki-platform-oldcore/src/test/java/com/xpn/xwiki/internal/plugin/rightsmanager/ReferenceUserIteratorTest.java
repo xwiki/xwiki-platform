@@ -20,22 +20,18 @@
 package com.xpn.xwiki.internal.plugin.rightsmanager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -43,8 +39,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -54,11 +51,8 @@ import static org.mockito.Mockito.*;
  * @since 6.4.2
  * @since 7.0M2
  */
-public class ReferenceUserIteratorTest
+class ReferenceUserIteratorTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
-
     private XWiki xwiki;
 
     private XWikiContext xwikiContext;
@@ -68,9 +62,9 @@ public class ReferenceUserIteratorTest
     private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void getMembersWhenNoExecutionContext() throws Exception
+    void getMembersWhenNoExecutionContext()
     {
-        Execution execution = this.componentManager.registerMockComponent(Execution.class);
+        Execution execution = mock(Execution.class);
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
             new ReferenceUserIterator(userReference, null, execution).next();
@@ -81,9 +75,9 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenNoXWikiContext() throws Exception
+    void getMembersWhenNoXWikiContext()
     {
-        Execution execution = this.componentManager.registerMockComponent(Execution.class);
+        Execution execution = mock(Execution.class);
         when(execution.getContext()).thenReturn(new ExecutionContext());
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
@@ -95,7 +89,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenReferenceIsNull() throws Exception
+    void getMembersWhenReferenceIsNull()
     {
         setUpBaseMocks();
 
@@ -106,7 +100,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSuperadmin() throws Exception
+    void getMembersWhenSuperadmin()
     {
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "superadmin");
@@ -119,7 +113,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGuest() throws Exception
+    void getMembersWhenGuest()
     {
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "XWikiGuest");
@@ -132,7 +126,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleUser() throws Exception
+    void getMembersWhenSingleUser() throws Exception
     {
         Iterator<DocumentReference> iterator = setUpSingleUser();
 
@@ -142,7 +136,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleUserWithoutCallingHasNextFirst() throws Exception
+    void getMembersWhenSingleUserWithoutCallingHasNextFirst() throws Exception
     {
         Iterator<DocumentReference> iterator = setUpSingleUser();
 
@@ -151,7 +145,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenCallingNextWithNoMoreReference() throws Exception
+    void getMembersWhenCallingNextWithNoMoreReference() throws Exception
     {
         Iterator<DocumentReference> iterator = setUpSingleUser();
 
@@ -174,7 +168,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleReferenceButDocumentDoesntExist() throws Exception
+    void getMembersWhenSingleReferenceButDocumentDoesntExist() throws Exception
     {
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "invalid");
@@ -188,7 +182,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleUserButBothUserAndGroupReference() throws Exception
+    void getMembersWhenSingleUserButBothUserAndGroupReference() throws Exception
     {
         setUpBaseMocks();
         DocumentReference reference = new DocumentReference("wiki", "XWiki", "page");
@@ -226,7 +220,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleUserButDocumentFailsToLoad() throws Exception
+    void getMembersWhenSingleUserButDocumentFailsToLoad() throws Exception
     {
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
@@ -243,7 +237,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupWithTwoUsers() throws Exception
+    void getMembersWhenGroupWithTwoUsers() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
@@ -261,7 +255,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenTwoUsers() throws Exception
+    void getMembersWhenTwoUsers() throws Exception
     {
         setUpBaseMocks();
         DocumentReference userReference1 = new DocumentReference("userwiki", "XWiki", "user1");
@@ -269,7 +263,7 @@ public class ReferenceUserIteratorTest
         DocumentReference userReference2 = new DocumentReference("userwiki", "XWiki", "user2");
         setUpUserPageMocks(userReference2);
 
-        Iterator<DocumentReference> iterator = new ReferenceUserIterator(Arrays.asList(userReference1, userReference2),
+        Iterator<DocumentReference> iterator = new ReferenceUserIterator(List.of(userReference1, userReference2),
             null, this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
@@ -280,7 +274,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupWithOneUser() throws Exception
+    void getMembersWhenGroupWithOneUser() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
@@ -295,7 +289,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupWithOneBlankUser() throws Exception
+    void getMembersWhenGroupWithOneBlankUser() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
@@ -316,7 +310,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupWithNullMember() throws Exception
+    void getMembersWhenGroupWithNullMember() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
@@ -335,7 +329,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupIsLooping() throws Exception
+    void getMembersWhenGroupIsLooping() throws Exception
     {
         setUpBaseMocks();
 
@@ -391,7 +385,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenGroupHasReferenceToItself() throws Exception
+    void getMembersWhenGroupHasReferenceToItself() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
@@ -413,7 +407,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenSingleReferenceNotAUser() throws Exception
+    void getMembersWhenSingleReferenceNotAUser() throws Exception
     {
         setUpBaseMocks();
         XWikiDocument document = mock(XWikiDocument.class);
@@ -429,7 +423,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenNestedGroup() throws Exception
+    void getMembersWhenNestedGroup() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference1 = new DocumentReference("groupwiki", "XWiki", "grouppage1");
@@ -456,7 +450,7 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
-    public void getMembersWhenNestedGroupAndUserAndGroupExcludes() throws Exception
+    void getMembersWhenNestedGroupAndUserAndGroupExcludes() throws Exception
     {
         setUpBaseMocks();
         DocumentReference groupReference1 = new DocumentReference("groupwiki", "XWiki", "grouppage1");
@@ -468,8 +462,8 @@ public class ReferenceUserIteratorTest
         setUpGroupPageMocks(groupReference1, userReference1, userReference2, groupReference2);
         setUpGroupPageMocks(groupReference2, userReference3, userReference4);
 
-        Iterator<DocumentReference> iterator = new ReferenceUserIterator(Collections.singletonList(groupReference1),
-            Arrays.asList(userReference2, groupReference2), this.resolver, this.execution);
+        Iterator<DocumentReference> iterator = new ReferenceUserIterator(List.of(groupReference1),
+            List.of(userReference2, groupReference2), this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference1, iterator.next());
@@ -515,10 +509,10 @@ public class ReferenceUserIteratorTest
         when(this.xwiki.getDocument(userReference, this.xwikiContext)).thenReturn(document);
     }
 
-    private void setUpBaseMocks() throws Exception
+    private void setUpBaseMocks()
     {
-        this.resolver = this.componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-        this.execution = this.componentManager.registerMockComponent(Execution.class);
+        this.resolver = mock(DocumentReferenceResolver.class);
+        this.execution = mock(Execution.class);
         this.xwikiContext = mock(XWikiContext.class);
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);

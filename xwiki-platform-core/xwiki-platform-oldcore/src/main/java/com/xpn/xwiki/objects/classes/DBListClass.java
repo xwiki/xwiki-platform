@@ -36,6 +36,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,6 +49,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "DBList";
+
     /**
      * Serialization identifier.
      */
@@ -410,6 +418,12 @@ public class DBListClass extends ListClass
         super.flushCache();
     }
 
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
+
     // return first or second column from user query
     public String returnCol(String hqlQuery, boolean first)
     {
@@ -533,7 +547,7 @@ public class DBListClass extends ListClass
                 String hibquery = this.getSql();
                 String secondCol = "-", firstCol = "-";
 
-                if (hibquery != null && !hibquery.equals("")) {
+                if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);
                     secondCol = returnCol(hibquery, false);
 
@@ -586,7 +600,7 @@ public class DBListClass extends ListClass
             displaySelectEdit(buffer, name, prefix, object, context);
         }
 
-        if (!getDisplayType().equals("input")) {
+        if (!"input".equals(getDisplayType())) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);

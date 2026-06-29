@@ -30,30 +30,39 @@ import type { TableCell } from "@blocknote/core";
 import type {
   BlockType,
   EditorInlineContentSchema,
-  EditorLink,
   EditorStyleSchema,
-  EditorStyledText,
   InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
+import type {
+  RemoteURLSerializer,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
   Image,
   InlineContent,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
   TableCell as TableCellUniast,
   UniAst,
 } from "@xwiki/platform-uniast-api";
+import type { Container } from "inversify";
 
 /**
  * Converts the Universal AS to the internal format of Blocknote.
  *
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
-// TODO: convert to an actual inversify component
 export class UniAstToBlockNoteConverter {
-  constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
+  private readonly remoteURLSerializer: RemoteURLSerializer;
+
+  constructor(depsContainer: Container) {
+    this.remoteURLSerializer = depsContainer
+      .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+      .get()!;
+  }
 
   uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error {
     return tryFallibleOrError(() =>
@@ -61,7 +70,18 @@ export class UniAstToBlockNoteConverter {
     );
   }
 
-  // eslint-disable-next-line max-statements
+  macroBlockInvocationToBlockNote(
+    call: MacroBlockInvocation,
+  ): BlockType | Error {
+    return tryFallibleOrError(() => this.convertMacroBlock(call));
+  }
+
+  inlineMacroInvocationToBlockNote(
+    call: InlineMacroInvocation,
+  ): InlineContentType | Error {
+    return tryFallibleOrError(() => this.convertInlineMacro(call));
+  }
+
   private convertBlock(block: Block): BlockType | BlockType[] {
     switch (block.type) {
       case "paragraph":
@@ -90,14 +110,27 @@ export class UniAstToBlockNoteConverter {
           },
         };
 
-      case "quote":
+      case "quote": {
+        // Quotes must start with actual text (a paragraph)
+        if (block.content.length < 1 || block.content[0].type !== "paragraph") {
+          throw new Error("Expected a paragraph to begin quote block");
+        }
+
         return {
           type: "quote",
           id: genId(),
-          children: [],
-          content: this.convertCustomBlockContent(block.content),
+          // First paragraph is the base content of the quote
+          content: block.content[0].content.map((item) =>
+            this.convertInlineContent(item),
+          ),
+          // Rest is the following children
+          children: block.content
+            .slice(1)
+            .map((block) => this.convertBlock(block))
+            .flat(),
           props: this.convertBlockStyles(block.styles),
         };
+      }
 
       case "code":
         return {
@@ -154,52 +187,57 @@ export class UniAstToBlockNoteConverter {
         return this.convertImage(block);
 
       case "break":
-        throw new Error("TODO: handle block of type " + block.type);
-
-      case "macroBlock": {
-        let content: InlineContentType[] | null = null;
-
-        const { body } = block.call;
-
-        switch (body.type) {
-          case "none":
-            content = null;
-            break;
-
-          case "raw":
-            content = [buildMacroRawContent(body.content)];
-            break;
-
-          case "inlineContent":
-            throw new Error(
-              "Unexpectedly found inlineContent as body for block macro (expected a list of inline contents)",
-            );
-
-          case "inlineContents":
-            content = body.inlineContents.map((inline) =>
-              this.convertInlineContent(inline),
-            );
-            break;
-        }
-
-        const out: BlockType = {
-          // @ts-expect-error: AST is dynamically typed
-          type: `${MACRO_NAME_PREFIX}${block.call.id}`,
+        return {
+          type: "divider",
           id: genId(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          props: block.call.params as any,
+          children: [],
+          content: undefined,
+          props: {},
         };
 
-        if (content) {
-          out.content = content;
-        }
-
-        return out;
+      case "macroBlock": {
+        return this.convertMacroBlock(block.call);
       }
 
       default:
         assertUnreachable(block);
     }
+  }
+
+  private convertMacroBlock(call: MacroBlockInvocation): BlockType {
+    let content: InlineContentType[] | null = null;
+
+    const { body } = call;
+
+    switch (body.type) {
+      case "none":
+        content = null;
+        break;
+
+      case "raw":
+        content = [buildMacroRawContent(body.content)];
+        break;
+
+      case "inlineContents":
+        content = body.inlineContents.map((inline) =>
+          this.convertInlineContent(inline),
+        );
+        break;
+    }
+
+    const out: BlockType = {
+      // @ts-expect-error: AST is dynamically typed
+      type: `${MACRO_NAME_PREFIX}${call.id}`,
+      id: genId(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      props: call.params as any,
+    };
+
+    if (content) {
+      out.content = content;
+    }
+
+    return out;
   }
 
   private convertCell(
@@ -214,16 +252,6 @@ export class UniAstToBlockNoteConverter {
         rowspan: cell.rowSpan,
       },
     };
-  }
-
-  private convertCustomBlockContent(
-    content: Block[],
-  ): Array<EditorStyledText | EditorLink> {
-    if (content.length > 1 || content[0].type !== "paragraph") {
-      throw new Error("Expected a single paragraph inside custom block");
-    }
-
-    return content[0].content.map((item) => this.convertInlineContent(item));
   }
 
   private convertBlockStyles(styles: BlockStyles) {
@@ -328,7 +356,6 @@ export class UniAstToBlockNoteConverter {
     };
   }
 
-  // eslint-disable-next-line max-statements
   private convertInlineContent(
     inlineContent: InlineContent,
   ): InlineContentType {
@@ -391,44 +418,45 @@ export class UniAstToBlockNoteConverter {
         throw new Error("Inline images are currently unsupported in blocknote");
 
       case "inlineMacro": {
-        let content: InlineContent | null = null;
-
-        const { body } = inlineContent.call;
-
-        switch (body.type) {
-          case "none":
-            content = null;
-            break;
-
-          case "raw":
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            content = buildMacroRawContent(body.content) as any;
-            break;
-
-          case "inlineContent":
-            content = body.inlineContent;
-            break;
-
-          case "inlineContents":
-            throw new Error(
-              "Unexpectedly found inlineContents as body for inline macro (expected one single inline content at most)",
-            );
-        }
-
-        const out: InlineContentType = {
-          // @ts-expect-error: macros are dynamically added to the AST
-          type: `${MACRO_NAME_PREFIX}${inlineContent.call.id}`,
-          props: inlineContent.call.params,
-        };
-
-        if (content) {
-          // @ts-expect-error: AST is dynamically typed
-          out.content = content;
-        }
-
-        return out;
+        return this.convertInlineMacro(inlineContent.call);
       }
     }
+  }
+
+  private convertInlineMacro(call: InlineMacroInvocation): InlineContentType {
+    let content: InlineContentType | null = null;
+
+    const { body } = call;
+
+    switch (body.type) {
+      case "none":
+        content = null;
+        break;
+
+      case "raw":
+        content = buildMacroRawContent(body.content);
+        break;
+
+      case "inlineContent":
+        content = this.convertInlineContent(body.inlineContent);
+        break;
+    }
+
+    const out: InlineContentType = {
+      type: `${MACRO_NAME_PREFIX}${call.id}`,
+      props: call.params,
+
+      // NOTE: macros are dynamically added to the AST
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    if (content) {
+      // NOTE: AST is dynamically typed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (out as any).content = content satisfies InlineContentType;
+    }
+
+    return out;
   }
 }
 

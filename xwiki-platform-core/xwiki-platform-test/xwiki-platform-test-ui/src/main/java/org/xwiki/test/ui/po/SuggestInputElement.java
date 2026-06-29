@@ -22,9 +22,12 @@ package org.xwiki.test.ui.po;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Represents the actions possible on the suggest input widget.
@@ -65,7 +68,7 @@ public class SuggestInputElement extends BaseElement
         public String getIcon()
         {
             WebElement icon = this.suggestion.findElement(By.className("xwiki-selectize-option-icon"));
-            return "img".equals(icon.getTagName()) ? icon.getAttribute("src") : icon.getAttribute("class");
+            return "img".equals(icon.getTagName()) ? icon.getAttribute("src") : icon.getAttribute(ATTRIBUTE_CLASS);
         }
 
         /**
@@ -124,18 +127,44 @@ public class SuggestInputElement extends BaseElement
 
     private WebElement container;
 
+    /**
+     * Whether to wait for remove suggestions to be fetched when the dropdown is opened. This is used by
+     * {@link #waitForSuggestions()} when the caller doesn't specify whether the suggestions are loaded from a remote
+     * source or not.
+     */
+    private boolean shouldWaitForRemoteSuggestions;
+
+    /**
+     * Checks if the suggest input widget is available on the given element.
+     * 
+     * @param executor the JavaScript executor used to check if the suggest input widget is available
+     * @param targetElement the element on which to check if the suggest input widget is available
+     * @return {@code true} if the suggest input widget is available on the given element, {@code false} otherwise
+     * @since 18.2.0RC1
+     */
+    public static boolean isAvailable(JavascriptExecutor executor, WebElement targetElement)
+    {
+        return Boolean.TRUE.equals(executor.executeScript("return !!arguments[0].selectize", targetElement));
+    }
+
     public SuggestInputElement(WebElement originalInput)
     {
         this.originalInput = originalInput;
 
         // Wait for the original input element to be enhanced.
-        getDriver().waitUntilCondition(driver -> this.originalInput.getAttribute("class").contains("selectized"));
+        getDriver().waitUntilCondition(driver -> StringUtils
+            .defaultString(this.originalInput.getAttribute(ATTRIBUTE_CLASS)).contains("tomselected"));
 
         this.container = getDriver().findElementWithoutWaiting(this.originalInput,
-            By.xpath("following-sibling::*[contains(@class, 'selectize-control')][1]"));
+            By.xpath("following-sibling::*[contains(@class, 'ts-wrapper')][1]"));
 
         // Wait for the selection to be initialized.
-        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading"));
+        getDriver().waitUntilCondition(driver -> !isLoading());
+    }
+
+    private boolean isLoading()
+    {
+        return StringUtils.defaultString(this.container.getAttribute(ATTRIBUTE_CLASS)).contains("loading");
     }
 
     /**
@@ -143,7 +172,7 @@ public class SuggestInputElement extends BaseElement
      */
     private WebElement getTextInput()
     {
-        return getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".selectize-input > input"));
+        return getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".ts-control > input"));
     }
 
     /**
@@ -153,12 +182,8 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement click()
     {
-        // If we simply click on the container we risk highlighting one of the selected suggestions (because the default
-        // click is performed in the center of the element) and this hides the text input when multiple selection is on.
-        // Safest is to click on the top left corner of the suggest input, before the first selected suggestion.
-        // And selenium only move to the center of the element, so we have to compute the offset for the top-left corner
-        // and we click on (2,2) to avoid missing it.
-        getDriver().moveToTopLeftCornerOfTargetWithOffset(this.container, 2, 2, null).click().build().perform();
+        getDriver().executeScript("arguments[0].selectize.focus()", this.originalInput);
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -169,9 +194,14 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement clear()
     {
-        // We cannot call WebElement#clear method because it does not fire the right keyboard events,
-        // so better to rely on a key combination to remove the content.
-        getTextInput().sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE));
+        WebElement textInput = getTextInput();
+        if (!textInput.isDisplayed()) {
+            // The text input is not visible when the widget is not focused and single selection is enabled. We need to
+            // focus the widget first.
+            click();
+        }
+        textInput.clear();
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -182,7 +212,14 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement clearSelectedSuggestions()
     {
-        getSelectedSuggestions().forEach(SuggestionElement::delete);
+        // When single selection is enabled we can't focus the selected item to delete it. The only way to clear the
+        // selection is to clear the text input and then send the backspace key to delete the selected item. We apply
+        // the same strategy when multiple selection is enabled, in order to use the same code and also because it
+        // avoids the need to click on each of the selected items, which might fail if there is some overlaid element
+        // (like the balloon context toolbar shown when hovering a live data cell, with the action to edit the cell).
+        clear();
+        sendKeys(Keys.BACK_SPACE.toString().repeat(getSelectedSuggestions().size()));
+        this.shouldWaitForRemoteSuggestions = false;
         return this;
     }
 
@@ -193,8 +230,47 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement sendKeys(CharSequence... keysToSend)
     {
-        getTextInput().sendKeys(keysToSend);
+        if (keysToSend != null) {
+            maybeInsertReloadMarker();
+            getTextInput().sendKeys(keysToSend);
+            this.shouldWaitForRemoteSuggestions = true;
+        }
         return this;
+    }
+
+    private void maybeInsertReloadMarker()
+    {
+        getDriver().executeScript("""
+            const reloadMarker = document.createElement('div');
+            reloadMarker.hidden = true;
+            reloadMarker.classList.add('xwiki-selectize-dropdown-reload-marker');
+            const dropdownContent = document.querySelector('.ts-dropdown.active .ts-dropdown-content');
+            dropdownContent?.append(reloadMarker);
+            """);
+    }
+
+    /**
+     * Unfortunately, there is no way to know whether the current suggestions correspond to the current input value or
+     * not. TomSelect caches queries and it doesn't set the loading state when suggestions are loaded from the cache.
+     * Moreover, it caches the suggestion rendering as well, so suggestions that are shared between different queries
+     * are not re-rendered. As a consequence, if two different queries have the same results, the content of the
+     * suggestions dropdown is identical. The workaround is to detect when the content of the dropdown is cleared and
+     * reloaded (even if the new content is the same).
+     * 
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     */
+    private void waitForDropdownReload(boolean remote)
+    {
+        if (remote) {
+            // Wait for remote suggestions to be fetched.
+            getDriver().waitUntilCondition(driver -> isLoading());
+        } else {
+            // Wait for cached suggestions.
+            getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(
+                By.cssSelector(".ts-dropdown.active .xwiki-selectize-dropdown-reload-marker"), 0));
+        }
+        this.shouldWaitForRemoteSuggestions = false;
     }
 
     /**
@@ -204,8 +280,23 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestions()
     {
-        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
-            && !driver.findElements(By.cssSelector(".selectize-dropdown.active")).isEmpty());
+        return waitForSuggestions(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until the suggestions have been loaded.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.2.0RC1
+     */
+    public SuggestInputElement waitForSuggestions(boolean remote)
+    {
+        waitForDropdownReload(remote);
+        // Wait for suggestions to be displayed.
+        getDriver().waitUntilCondition(
+            driver -> !isLoading() && !driver.findElements(By.cssSelector(".ts-dropdown.active")).isEmpty());
         return this;
     }
 
@@ -219,8 +310,22 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForNonTypedSuggestions()
     {
-        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
-            && !driver.findElements(By.cssSelector(".selectize-dropdown.active .xwiki-selectize-option")).isEmpty());
+        return waitForNonTypedSuggestions(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until suggestions beyond the option to choose the typed text are displayed.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.2.0RC1
+     */
+    public SuggestInputElement waitForNonTypedSuggestions(boolean remote)
+    {
+        waitForDropdownReload(remote);
+        getDriver().waitUntilCondition(driver -> !isLoading()
+            && !driver.findElements(By.cssSelector(".ts-dropdown.active .xwiki-selectize-option")).isEmpty());
         return this;
     }
 
@@ -232,7 +337,7 @@ public class SuggestInputElement extends BaseElement
     public SuggestInputElement waitForSuggestionsClearance()
     {
         getDriver().waitUntilCondition(driver -> getDriver()
-            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty());
+            .findElementsWithoutWaiting(this.container, By.cssSelector(".ts-wrapper.dropdown-active")).isEmpty());
         return this;
     }
 
@@ -241,9 +346,8 @@ public class SuggestInputElement extends BaseElement
      */
     public List<SuggestionElement> getSuggestions()
     {
-        return getDriver()
-            .findElementsWithoutWaiting(By.cssSelector(".selectize-dropdown.active .xwiki-selectize-option")).stream()
-            .map(SuggestionElement::new).toList();
+        return getDriver().findElementsWithoutWaiting(By.cssSelector(".ts-dropdown.active .xwiki-selectize-option"))
+            .stream().map(SuggestionElement::new).toList();
     }
 
     /**
@@ -253,10 +357,8 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByIndex(int index)
     {
-        getDriver().findElement(
-            By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
-                + "//*[contains(@class, 'xwiki-selectize-option')][" + (index + 1) + "]"))
-            .click();
+        getDriver().findElement(By.xpath("//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
+            + "//*[contains(@class, 'xwiki-selectize-option')][" + (index + 1) + "]")).click();
 
         return this;
     }
@@ -268,12 +370,29 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByValue(String value)
     {
-        getDriver().findElement(
-            By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
-                + "//*[contains(@class, 'xwiki-selectize-option') and @data-value = '" + value + "']"))
-            .click();
+        getDriver().findElement(optionByValue(value, null)).click();
 
         return this;
+    }
+
+    @SuppressWarnings("null")
+    private By optionByValue(String value, Boolean selected)
+    {
+        return By.xpath(String.format(
+            "//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
+                + "//*[contains(@class, 'xwiki-selectize-option')%s and @data-value = '%s']",
+            getSelectedConstraint(selected), StringUtils.defaultString(value)));
+    }
+
+    private String getSelectedConstraint(Boolean selected)
+    {
+        if (selected == null) {
+            return "";
+        } else if (selected) {
+            return " and contains(@class, 'active')";
+        } else {
+            return " and not(contains(@class, 'active'))";
+        }
     }
 
     /**
@@ -283,12 +402,19 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
-        getDriver().findElement(
-            By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
-                + "//*[contains(@class, 'xwiki-selectize-option-label') and . = '" + text + "']"))
-            .click();
+        getDriver().findElement(optionByLabel(text, null)).click();
 
         return this;
+    }
+
+    @SuppressWarnings("null")
+    private By optionByLabel(String value, Boolean selected)
+    {
+        return By.xpath(String.format(
+            "//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
+                + "//*[contains(@class, 'xwiki-selectize-option')%s]"
+                + "/*[contains(@class, 'xwiki-selectize-option-label') and . = '%s']",
+            getSelectedConstraint(selected), StringUtils.defaultString(value)));
     }
 
     /**
@@ -298,7 +424,23 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectTypedText()
     {
-        getDriver().findElement(By.cssSelector(".selectize-dropdown.active .create")).click();
+        WebElement textInput = getTextInput();
+        String typedText = StringUtils.defaultString(textInput.getAttribute(ATTRIBUTE_VALUE));
+        getDriver().waitUntilElementsAreVisible(new By[] {
+            // Option to create a new item with the typed text as value.
+            By.xpath("//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
+                + "//*[contains(@class, 'create') and contains(@class, 'active')]/em[. = '" + typedText + "']"),
+            // Existing option with the same value as the typed text.
+            optionByValue(typedText, true),
+            // Existing option with the same label as the typed text.
+            optionByLabel(typedText, true)}, false);
+
+        // Pick the selected option.
+        textInput.sendKeys(Keys.ENTER);
+
+        // The typed text is kept when we select an existing option with that value, which is not what we want most of
+        // the time.
+        textInput.clear();
 
         return this;
     }
@@ -310,9 +452,10 @@ public class SuggestInputElement extends BaseElement
     {
         if ("select".equals(this.originalInput.getTagName())) {
             return new Select(this.originalInput).getAllSelectedOptions().stream()
-                .map(option -> option.getAttribute("value")).toList();
+                .map(option -> option.getAttribute(ATTRIBUTE_VALUE)).toList();
         } else {
-            return Arrays.asList(this.originalInput.getAttribute("value").split(","));
+            return Arrays
+                .asList(StringUtils.defaultString(this.originalInput.getAttribute(ATTRIBUTE_VALUE)).split(","));
         }
     }
 
@@ -344,7 +487,6 @@ public class SuggestInputElement extends BaseElement
      */
     public boolean isDropDownOpened()
     {
-        return !getDriver()
-            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty();
+        return StringUtils.defaultString(this.container.getAttribute(ATTRIBUTE_CLASS)).contains("dropdown-active");
     }
 }

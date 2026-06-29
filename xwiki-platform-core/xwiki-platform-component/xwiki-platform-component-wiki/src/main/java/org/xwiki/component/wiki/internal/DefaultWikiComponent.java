@@ -250,7 +250,7 @@ public class DefaultWikiComponent implements WikiComponent
     @Override
     public int getRoleHintPriority()
     {
-        return this.roleTypePriority;
+        return this.roleHintPriority;
     }
 
     /**

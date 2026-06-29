@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { mount } from "@vue/test-utils";
 import LivedataTopbar from "./LivedataTopbar.vue";
+import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -35,7 +35,7 @@ import { describe, expect, it } from "vitest";
  * }
  * ```
  *
- * @returns {*} a wrapper for the LivedataBottombar component
+ * @returns a wrapper for the LivedataBottombar component
  */
 function initWrapper() {
   return mount(LivedataTopbar, {

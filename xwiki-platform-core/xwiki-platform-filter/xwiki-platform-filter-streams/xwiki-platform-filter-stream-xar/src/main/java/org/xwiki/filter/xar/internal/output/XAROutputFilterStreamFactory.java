@@ -30,11 +30,12 @@ import org.xwiki.filter.xar.output.XAROutputProperties;
 
 /**
  * Generate XAR package from FilterStream events.
- * 
+ *
  * @version $Id$
  * @since 6.2M1
  */
 @Component(hints = {
+    XARFilterUtils.ROLEHINT_17,
     XARFilterUtils.ROLEHINT_16,
     XARFilterUtils.ROLEHINT_15,
     XARFilterUtils.ROLEHINT_14,

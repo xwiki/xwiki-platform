@@ -144,6 +144,7 @@
           <element name="attachments" type="xwiki:Attachments" minOccurs="0" maxOccurs="1"></element>
           <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
           <element name="right" type="xwiki:Right" minOccurs="0" maxOccurs="unbounded"></element>
+          <element name="renderedContent" type="string" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>

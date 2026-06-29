@@ -106,8 +106,8 @@ public abstract class AbstractQueryFilter implements QueryFilter
             if (gidx > -1) {
                 fragment = fragment.substring(0, gidx);
             }
-            fragment = fragment.replaceAll(" desc", "");
-            fragment = fragment.replaceAll(" asc", "");
+            fragment = fragment.replace(" desc", "");
+            fragment = fragment.replace(" asc", "");
 
             for (String column : fragment.split(COLUMN_SEPARATOR)) {
                 columns.add(column.trim());

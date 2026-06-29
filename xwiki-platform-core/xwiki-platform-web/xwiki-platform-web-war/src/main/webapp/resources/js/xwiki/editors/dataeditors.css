@@ -218,12 +218,6 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   color: $theme.textColor;
 }
 
-.syncProperties {
-  font-weight: 900;
-  display: inline-block;
-  padding: 2px 0 2px 0;
-  color: $theme.notificationErrorColor;
-}
 /* XProperty tools */
 .disabletool label {
   font-weight: 900;
@@ -378,15 +372,15 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   text-align: left;
 }
 
-.suggest-classes.selectize-control {
+.suggest-classes.ts-wrapper {
   /* Display on the same line as the Add button */
   display: inline-block;
   /* Align with the Add button */
   vertical-align: middle;
 }
 
-.suggest-classes > .selectize-dropdown > .selectize-dropdown-content,
-.suggest-classes.selectize-dropdown > .selectize-dropdown-content {
+.suggest-classes > .ts-dropdown > .ts-dropdown-content,
+.suggest-classes.ts-dropdown > .ts-dropdown-content {
   /* Increase the max height because the drop down includes all the classes. */
   max-height: 400px;
 }

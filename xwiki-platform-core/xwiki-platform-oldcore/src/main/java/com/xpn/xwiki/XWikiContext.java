@@ -849,6 +849,16 @@ public class XWikiContext extends Hashtable<Object, Object>
         put("mainxwiki", str);
     }
 
+    /**
+     * @return the reference of the main wiki, or null if none is set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public WikiReference getMainWikiReference()
+    {
+        return new WikiReference(getMainXWiki());
+    }
+
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {

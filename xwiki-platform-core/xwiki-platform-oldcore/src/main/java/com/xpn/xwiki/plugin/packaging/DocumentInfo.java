@@ -132,7 +132,7 @@ public class DocumentInfo
                 XWikiDocument doc1 = context.getWiki().getDocument(this.doc.getFullName(), context);
                 boolean isNew = doc1.isNew();
                 if (!isNew) {
-                    if ((this.doc.getLanguage() != null) && (!this.doc.getLanguage().equals(""))) {
+                    if ((this.doc.getLanguage() != null) && (!"".equals(this.doc.getLanguage()))) {
                         isNew = !doc1.getTranslationList(context).contains(this.doc.getLanguage());
                     }
                 }

@@ -53,8 +53,7 @@ import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.template.TemplateManager;
 
-import static java.util.Map.entry;
-import static java.util.Map.ofEntries;
+import static com.google.common.collect.ImmutableMap.of;
 import static java.util.stream.Collectors.joining;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.apache.commons.text.StringEscapeUtils.escapeXml11;
@@ -120,15 +119,15 @@ public class SolrToLiveDataEntryMapper
      */
     public Map<String, Object> mapDocToEntries(SolrDocument doc)
     {
-        return ofEntries(
-            entry(NAME, buildExtensionName(doc)),
+        return of(
+            NAME, buildExtensionName(doc),
             // Even if not displayed, the extension id must be returned as it is used as the id.
-            entry(EXTENSION_ID, buildExtensionId(doc)),
-            entry(MAX_CVSS, buildMaxCVSS(doc)),
-            entry(CVE_ID, buildCVEList(doc)),
-            entry(FIX_VERSION, buildFixVersion(doc)),
-            entry(ADVICE, buildAdvice(doc)),
-            entry(WIKIS, buildWikis(doc))
+            EXTENSION_ID, buildExtensionId(doc),
+            MAX_CVSS, buildMaxCVSS(doc),
+            CVE_ID, buildCVEList(doc),
+            FIX_VERSION, buildFixVersion(doc),
+            ADVICE, buildAdvice(doc),
+            WIKIS, buildWikis(doc)
         );
     }
 

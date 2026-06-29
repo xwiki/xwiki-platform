@@ -19,10 +19,9 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
+import org.xwiki.security.authorization.AbstractLegacyWikiTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.security.internal.XWikiConstants;
@@ -30,15 +29,18 @@ import org.xwiki.security.internal.XWikiConstants;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
  * 
  * @version $Id$
  */
-public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
+class XWikiRightServiceTest extends AbstractLegacyWikiTest
 {
     @Test
-    public void testUserFromAnotherWiki1() throws Exception
+    void userFromAnotherWiki1() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki1.xml", true);
 
@@ -53,7 +55,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testUserFromAnotherWiki2() throws Exception
+    void userFromAnotherWiki2() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml", true);
 
@@ -78,7 +80,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testGroupFromAnotherWiki1() throws Exception
+    void groupFromAnotherWiki1() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("groupFromAnotherWiki1.xml", true);
 
@@ -105,7 +107,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testWikiOwnerFromAnotherWiki() throws Exception
+    void wikiOwnerFromAnotherWiki() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki2.xml", true);
 
@@ -135,11 +137,9 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
     /**
      * Test that programming rights are checked on the context user when no context document is set.
-     * 
-     * @throws com.xpn.xwiki.XWikiException on error
      */
     @Test
-    public void testProgrammingRightsWhenNoContextDocumentIsSet() throws Exception
+    void programmingRightsWhenNoContextDocumentIsSet() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("programmingRights.xml", true);
 
@@ -153,23 +153,23 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         // XWiki.Programmer should have PR, as per the global rights.
         testWiki.setUser("XWiki.programmer");
-        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+        assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
         // Guests should not have PR
         testWiki.setUser(XWikiConstants.GUEST_USER_FULLNAME);
-        Assert.assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
+        assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
+        assertFalse(getCachingImpl().hasProgrammingRights(ctx));
 
         // superadmin should always have PR
         testWiki.setUser(XWikiConstants.XWIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
-        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+        assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
     }
 
     @Test
-    public void testProgrammingRightsWhenCustomSecureDocIsSet() throws Exception
+    void programmingRightsWhenCustomSecureDocIsSet() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("programmingRights.xml", true);
 
@@ -185,23 +185,23 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         // XWiki.Programmer should have PR, as per the global rights.
         sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", "programmer"));
-        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+        assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
         // Guests should not have PR
         sdoc.setContentAuthorReference(null);
-        Assert.assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
+        assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
+        assertFalse(getCachingImpl().hasProgrammingRights(ctx));
 
         // superadmin should always have PR
         sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", "superadmin"));
-        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
-        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+        assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
     }
 
     @Test
-    public void testGuestRightsOnEmptyWiki() throws Exception
+    void guestRightsOnEmptyWiki() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("empty.xml", true);
 
@@ -234,7 +234,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testGlobalUserInLocalGroup() throws Exception
+    void globalUserInLocalGroup() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("glocalUserInLocalGroup.xml", true);
 
@@ -247,7 +247,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testGlobalGroupInLocalGroup() throws Exception
+    void globalGroupInLocalGroup() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("glocalGroupInLocalGroup.xml", true);
 
@@ -263,7 +263,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
     }
 
     @Test
-    public void testRelativeDocumentReference() throws Exception
+    void relativeDocumentReference() throws Exception
     {
         LegacyTestWiki testWiki = newTestWiki("denieddocument.xml", true);
 

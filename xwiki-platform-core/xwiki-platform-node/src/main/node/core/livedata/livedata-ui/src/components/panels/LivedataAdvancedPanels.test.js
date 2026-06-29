@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -34,8 +34,9 @@ describe("LivedataAdvancedPanels.vue", () => {
               },
             ],
           },
-        }, stubs: {
-          "test": {
+        },
+        stubs: {
+          test: {
             template: "<span>Hello World from {{ panel.id }}!</span>",
             props: { panel: Object },
           },
@@ -44,6 +45,7 @@ describe("LivedataAdvancedPanels.vue", () => {
     });
 
     expect(wrapper.html()).toBe(
-      "<div class=\"livedata-advanced-panels\"><span>Hello World from test!</span></div>");
+      '<div class="livedata-advanced-panels"><span>Hello World from test!</span></div>',
+    );
   });
 });

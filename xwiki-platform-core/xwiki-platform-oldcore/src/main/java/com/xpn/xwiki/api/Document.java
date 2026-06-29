@@ -29,12 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -1490,7 +1489,7 @@ public class Document extends Api
         documentProperties.setWithWikiAttachmentsContent(false);
         documentProperties.setWithJRCSRevisions(false);
         documentProperties.setWithRevisions(false);
-        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+        documentProperties.setSensitiveFieldsExcluded(true);
 
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();
@@ -3201,7 +3200,7 @@ public class Document extends Api
                 i = fname.lastIndexOf("/");
             }
             filename = fname.substring(i + 1);
-            filename = filename.replaceAll("\\+", " ");
+            filename = filename.replace("+", " ");
 
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());

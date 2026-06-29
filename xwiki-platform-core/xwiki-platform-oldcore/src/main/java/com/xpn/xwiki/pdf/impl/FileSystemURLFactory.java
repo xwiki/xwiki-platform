@@ -172,7 +172,9 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             }
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
-                IOUtils.copy(attachment.getContentInputStream(context), fos);
+                try (InputStream content = attachment.getContentInputStream(context)) {
+                    IOUtils.copy(content, fos);
+                }
             }
             usedFiles.put(key, file);
         }

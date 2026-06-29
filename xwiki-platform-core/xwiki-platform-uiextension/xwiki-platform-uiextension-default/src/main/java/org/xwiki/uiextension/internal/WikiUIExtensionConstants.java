@@ -30,7 +30,8 @@ import com.xpn.xwiki.XWiki;
  * @version $Id$
  * @since 4.2M3
  */
-
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface WikiUIExtensionConstants
 {
     /**

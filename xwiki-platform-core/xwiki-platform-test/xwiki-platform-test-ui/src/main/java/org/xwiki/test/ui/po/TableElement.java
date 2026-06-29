@@ -46,7 +46,7 @@ public class TableElement extends BaseElement
     public TableElement(WebElement table)
     {
         super();
-        if (!table.getTagName().toLowerCase().equals("table")) {
+        if (!"table".equalsIgnoreCase(table.getTagName())) {
             throw new WebDriverException("You can only create a TableElement using a <table> web element,"
                                          + "you passed a <" + table.getTagName() + "> element");
         }

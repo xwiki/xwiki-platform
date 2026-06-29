@@ -21,12 +21,6 @@
 #set ($paths = {
   'js': {
     'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)
-  },
-  'css': {
-    'selectize': [
-      $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
-      $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true)
-    ]
   }
 })
 #set ($l10n = {
@@ -137,14 +131,6 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     // Initialize the page picker.
     var self = this;
     require(['jquery', 'xwiki-suggestPages'], function($) {
-      // Load the required CSS.
-      paths.css.selectize.forEach(function(url) {
-        $('<link/>').attr({
-          type: 'text/css',
-          rel: 'stylesheet',
-          href: url
-        }).appendTo('head');
-      });
       var enableActionButtons = function(enable) {
         var actionButtons = $(self.viewButton).add(self.editButton).find('input');
         if (enable === false) {

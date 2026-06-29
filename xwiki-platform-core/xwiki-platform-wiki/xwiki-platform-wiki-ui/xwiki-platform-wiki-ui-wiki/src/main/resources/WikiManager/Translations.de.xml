@@ -78,7 +78,7 @@ platform.wiki.currentwiki.invitationCancelFailure=Fehler: Diese Einladung kann n
 platform.wiki.currentwiki.candidateReviewFailure=Fehler: Diese Einladung kann nicht zurückgezogen werden.
 
 # LABELS
-platform.wiki.currentwiki.prop.wikiprettyname.label=Name
+platform.wiki.currentwiki.prop.wikiprettyname.label=Anzeigename
 platform.wiki.currentwiki.prop.description.label=Beschreibung
 platform.wiki.currentwiki.prop.owner.label=Besitzer
 platform.wiki.currentwiki.prop.membershipType.label=Art der Mitgliedschaft

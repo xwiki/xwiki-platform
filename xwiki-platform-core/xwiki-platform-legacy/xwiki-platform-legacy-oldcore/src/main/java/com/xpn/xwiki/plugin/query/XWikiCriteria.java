@@ -53,7 +53,7 @@ public class XWikiCriteria
         for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
             String key = it.next();
             String objname = key.substring(0, key.indexOf('_'));
-            if ((!objname.equals("") && (!objname.equals("doc"))))
+            if ((!"".equals(objname) && (!"doc".equals(objname))))
                 set.add(objname);
         }
         return set;

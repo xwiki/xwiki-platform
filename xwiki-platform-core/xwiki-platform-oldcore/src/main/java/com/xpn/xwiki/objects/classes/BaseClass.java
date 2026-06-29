@@ -873,7 +873,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        textAreaClass.setRestricted(restricted);
+        if (textAreaClass.isRestricted() != restricted) {
+            textAreaClass.setRestricted(restricted);
+            result = true;
+        }
 
         return result;
     }
@@ -1448,7 +1451,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 

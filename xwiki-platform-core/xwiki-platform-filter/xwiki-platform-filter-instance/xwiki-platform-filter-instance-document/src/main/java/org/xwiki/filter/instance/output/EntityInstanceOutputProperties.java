@@ -102,7 +102,7 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
      * @return Indicate if the version related information coming from the events should be kept
      */
     @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions related informations coming from the events should be kept")
+    @PropertyDescription("Indicate if the versions related data coming from the events should be kept")
     public boolean isVersionPreserved()
     {
         return this.versionPreserved;

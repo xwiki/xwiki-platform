@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -44,26 +44,32 @@ import { describe, expect, it } from "vitest";
  * }
  * ```
  *
- * @param mountConfiguration mount parameters merged over the default configuration
- * @returns {{options: string}|{}|*} an initialized LivedataFootnotes Vue component
+ * @param mountConfiguration - mount parameters merged over the default configuration
+ * @returns an initialized LivedataFootnotes Vue component
  */
 function initWrapper(mountConfiguration = {}) {
-  return mount(LivedataFootnotes, _.merge({
-    global: {
-      provide: {
-        logic: {
-          footnotes: {
-            list() {
-              return [];
+  return mount(
+    LivedataFootnotes,
+    _.merge(
+      {
+        global: {
+          provide: {
+            logic: {
+              footnotes: {
+                list() {
+                  return [];
+                },
+              },
             },
+          },
+          mocks: {
+            $t: (key) => key,
           },
         },
       },
-      mocks: {
-        $t: (key) => key,
-      },
-    },
-  }, mountConfiguration));
+      mountConfiguration,
+    ),
+  );
 }
 
 describe("LivedataFootnotes.vue", () => {
@@ -88,7 +94,11 @@ describe("LivedataFootnotes.vue", () => {
       },
     });
     expect(wrapper.classes()).contain("footnotes");
-    expect(wrapper.find(".box").classes()).toEqual(["box", "infomessage", "footnote"]);
+    expect(wrapper.find(".box").classes()).toEqual([
+      "box",
+      "infomessage",
+      "footnote",
+    ]);
     expect(wrapper.find(".box").text()).toBe("(1) a.b.c");
   });
 });

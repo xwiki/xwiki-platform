@@ -23,6 +23,7 @@ import flushPromises from "flush-promises";
 import $ from "jquery";
 import _ from "lodash-es";
 import { describe, expect, it, vi } from "vitest";
+import { reactive } from "vue";
 
 vi.mock("../../services/require.js", () => {
   return {
@@ -58,8 +59,8 @@ vi.mock("../../services/require.js", () => {
  * }
  * ```
  *
- * @param mountConfiguration mount parameters merged over the default configuration
- * @returns {{options: string}|{}|*} an initialized FilterList Vue component
+ * @param mountConfiguration - mount parameters merged over the default configuration
+ * @returns an initialized FilterList Vue component
  */
 function initWrapper(mountConfiguration = {}) {
   // Define an empty xwikiSelectize to prevent the component mount to fail.
@@ -107,6 +108,70 @@ describe("FilterList.vue", () => {
     await flushPromises();
     expect(wrapper.find("span").html()).toBe(
       '<span><input class="filter-list livedata-filter" aria-label="livedata.filter.list.label"></span>',
+    );
+  });
+
+  it("Displays the empty option when the operator is switched to empty externally", async () => {
+    // Reactive filter group so that mutating the operator (as the advanced filtering panel does) triggers the
+    // component reactivity.
+    const filterGroup = reactive({
+      constraints: [{ value: "U1", operator: "contains" }],
+    });
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getQueryFilterGroup() {
+              return filterGroup;
+            },
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // The column filter initially displays the selected value.
+    expect(wrapper.vm.$refs.input.value).toBe("U1");
+
+    // Simulate selecting the "empty" operator in the advanced filtering panel.
+    filterGroup.constraints[0].operator = "empty";
+    await wrapper.vm.$nextTick();
+
+    // Verify the value is the empty operator (the comma is the convention used to display the empty
+    // option).
+    expect(wrapper.vm.$refs.input.value).toBe(",");
+  });
+
+  it("Applies the default operator when switching from the empty filter to a value", async () => {
+    const filter = vi.fn();
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getFilterDefaultOperator() {
+              return "equals";
+            },
+            filter,
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // Simulate a selectize widget with one selected (non-empty) value.
+    wrapper.vm.$refs.input.selectize = { items: ["U1"] };
+    // Simulate the user selecting a non-empty value while the empty operator is active.
+    wrapper.vm.selectizeSettings.onChange("U1");
+
+    // Make sure the filter is called with the right value.
+    expect(filter).toHaveBeenCalledWith(
+      "user1",
+      0,
+      { value: "U1" },
+      {
+        filterOperator: "equals",
+        skipFetch: false,
+      },
     );
   });
 

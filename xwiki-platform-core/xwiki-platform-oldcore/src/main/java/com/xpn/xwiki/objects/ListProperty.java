@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.collection.spi.PersistentCollection;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -31,6 +32,13 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "List";
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -166,6 +174,12 @@ public class ListProperty extends BaseProperty implements Cloneable
     public ListProperty clone()
     {
         return (ListProperty) super.clone();
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

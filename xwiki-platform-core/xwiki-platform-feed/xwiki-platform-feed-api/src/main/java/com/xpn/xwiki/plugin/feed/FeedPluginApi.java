@@ -598,7 +598,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     private static boolean keyHasNoValue(Map<String, Object> map, String key)
     {
         Object value = map.get(key);
-        return value == null || value.equals("");
+        return value == null || "".equals(value);
     }
 
     private Map<String, Object> fillWebFeedMetadata(Map<String, Object> metadata)

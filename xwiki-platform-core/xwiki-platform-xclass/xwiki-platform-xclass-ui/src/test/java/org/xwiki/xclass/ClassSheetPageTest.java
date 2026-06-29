@@ -80,7 +80,6 @@ import static org.mockito.Mockito.when;
 @DefaultRenderingConfigurationComponentList
 @ComponentList({
     TemplateMacro.class,
-    TranslationMacro.class,
     WarningMessageMacro.class,
     InfoMessageMacro.class,
     TemplateScriptService.class,

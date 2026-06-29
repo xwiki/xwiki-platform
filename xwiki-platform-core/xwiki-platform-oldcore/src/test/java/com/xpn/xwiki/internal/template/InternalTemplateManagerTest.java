@@ -49,9 +49,13 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class InternalTemplateManagerTest
 {
-    private static final String FS_TEMPLATE_PATH = "/templates/template";
+    private static final String FS_TEMPLATE_PREFIX = "/templates/";
 
-    private static final String FS_TEMPLATE_ID = TemplateSkinResource.createId(FS_TEMPLATE_PATH);
+    private static final String FS_TEMPLATE_SUFFIX = "template";
+
+    private static final String FS_TEMPLATE_FULLPATH = FS_TEMPLATE_PREFIX + FS_TEMPLATE_SUFFIX;
+
+    private static final String FS_TEMPLATE_ID = TemplateSkinResource.createId(FS_TEMPLATE_FULLPATH);
 
     @MockComponent
     private CacheManager cacheManager;
@@ -94,13 +98,14 @@ class InternalTemplateManagerTest
     @Test
     void getFilesystemTemplateWhenTemplateExist() throws MalformedURLException
     {
-        when(this.environment.getResource(FS_TEMPLATE_PATH)).thenReturn(new URL("file://templates/template"));
+        when(this.environment.getResource(FS_TEMPLATE_PREFIX, FS_TEMPLATE_SUFFIX))
+            .thenReturn(new URL("file://templates/template"));
 
         Template template = this.templates.getTemplate("template");
 
         assertNotNull(template);
         assertEquals(FS_TEMPLATE_ID, template.getId());
-        assertEquals(FS_TEMPLATE_PATH, template.getPath());
+        assertEquals(FS_TEMPLATE_FULLPATH, template.getPath());
 
         verify(this.cache, times(2)).get(FS_TEMPLATE_ID);
         verify(this.cache, never()).remove(any());

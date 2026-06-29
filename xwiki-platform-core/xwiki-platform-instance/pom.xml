@@ -25,36 +25,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-instance</artifactId>
   <name>XWiki Platform - Instance</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <description>API related to the XWiki instance (e.g. compute a unique id for the instance)</description>
-  <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Instance API</xwiki.extension.name>
-    <!-- Skipping revapi since xwiki-platform-legacy-instance wraps this module and runs checks on it -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
-    </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-instance-api</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-instance-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -19,9 +19,10 @@
  */
 package org.xwiki.resource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Unit tests for {@link org.xwiki.resource.ResourceType}.
@@ -29,10 +30,10 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class ResourceTypeTest
+class ResourceTypeTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         ResourceType type1 = new ResourceType("test");
         ResourceType type2 = new ResourceType("test");

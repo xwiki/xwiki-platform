@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -47,7 +48,9 @@ public class HistoryDropdown extends BaseElement
      */
     public HistoryDropdown open()
     {
-        getToggle().click();
+        WebElement toggle = getToggle();
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(toggle));
+        toggle.click();
         getDriver().waitUntilElementIsVisible(DROPDOWN_MENU);
         return this;
     }

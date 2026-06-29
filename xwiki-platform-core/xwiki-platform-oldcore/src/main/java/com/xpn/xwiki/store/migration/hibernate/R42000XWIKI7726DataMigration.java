@@ -131,14 +131,15 @@ public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
             Connection connection) throws SQLException
         {
             String command = "ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s(%d)";
+            String currentColumnType;
             try (ResultSet result = prepareStatement.executeQuery()) {
                 if (!result.next()) {
                     return;
                 }
-                String currentColumnType = result.getString(1);
-                try (Statement statement = connection.createStatement()) {
-                    statement.execute(String.format(command, tableName, columnName, currentColumnType, 1 << 30));
-                }
+                currentColumnType = result.getString(1);
+            }
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(String.format(command, tableName, columnName, currentColumnType, 1 << 30));
             }
         }
     }

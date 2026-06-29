@@ -19,29 +19,48 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-public class ReferencesTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+public class ReferencesTest
 {
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @Test
-    public void testLookup() throws ComponentLookupException, Exception
+    void testLookup()
     {
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "default/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.class, "explicit/reference");
-        getComponentManager().getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "explicit/reference");
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(DocumentReferenceResolver.class, "default/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(DocumentReferenceResolver.class, "explicit/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "explicit/reference"));
 
-        getComponentManager().getInstance(EntityReferenceResolver.class, "default/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "default/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.class, "explicit/reference");
-        getComponentManager().getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit/reference");
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceResolver.class, "default/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "default/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceResolver.class, "explicit/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit/reference"));
 
-        getComponentManager().getInstance(EntityReferenceSerializer.class, "local/reference");
-        getComponentManager().getInstance(EntityReferenceSerializer.TYPE_REFERENCE, "local/reference");
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceSerializer.class, "local/reference"));
+        assertDoesNotThrow(
+            () -> this.componentManager.getInstance(EntityReferenceSerializer.TYPE_REFERENCE, "local/reference"));
     }
 }

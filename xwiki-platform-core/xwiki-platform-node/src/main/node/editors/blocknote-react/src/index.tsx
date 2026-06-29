@@ -18,11 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { App } from "./App";
-import { MACRO_NAME_PREFIX } from "./blocknote/utils";
 import { createRoot } from "react-dom/client";
-import type { ContextForMacros } from "./blocknote/utils";
 import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
-import type { LinkEditionContext } from "./misc/linkSuggest";
 
 /**
  * Mount a BlockNote editor inside a DOM container
@@ -57,12 +54,10 @@ function mountBlockNote(
   };
 }
 
-export { MACRO_NAME_PREFIX, mountBlockNote };
-
-export type { BlockNoteViewWrapperProps, ContextForMacros, LinkEditionContext };
+export { mountBlockNote };
+export type { BlockNoteViewWrapperProps };
 
 export type {
-  BlockNoteConcreteMacro,
   BlockOfType,
   BlockType,
   EditorBlockSchema,
@@ -76,25 +71,22 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
-export {
-  createBlockNoteSchema,
-  createDictionary,
-  querySuggestionsMenuItems,
-} from "./blocknote";
-
-export type {
-  createCustomBlockSpec,
-  createCustomInlineContentSpec,
-} from "./blocknote/utils";
-
-export {
-  buildMacroRawContent,
-  extractMacroRawContent,
-} from "./blocknote/utils";
-
 export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
 
 export type {
   ImageEditionOverrideFn,
   ImageUpdateResult,
 } from "./components/images/CustomImageToolbar";
+
+export {
+  MACRO_NAME_PREFIX,
+  buildMacroRawContent,
+  extractMacroRawContent,
+} from "./blocknote/utils";
+
+export type {
+  ContextForMacros,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
+} from "./blocknote/utils";

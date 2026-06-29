@@ -42,12 +42,8 @@ import {
   ref,
   useTemplateRef,
 } from "vue";
-import type {
-  LiveDataSource,
-  Logic,
-  TranslationQuery,
-  Translations,
-} from "@xwiki/platform-livedata-api";
+import type { LiveDataSource, Logic } from "@xwiki/platform-livedata-api";
+import type { Query, Translations } from "@xwiki/platform-localization-api";
 import type { I18n } from "vue-i18n";
 
 const element = useTemplateRef("rootElement");
@@ -59,7 +55,7 @@ const { liveDataSource, data, contentTrusted, resolveTranslations } =
     contentTrusted: boolean;
     locale: string;
     i18n: I18n;
-    resolveTranslations: (query: TranslationQuery) => Promise<Translations>;
+    resolveTranslations: (query: Query) => Promise<Translations>;
   }>();
 
 const logic = new LiveDataLogic(
@@ -69,8 +65,6 @@ const logic = new LiveDataLogic(
   resolveTranslations,
 );
 
-// eslint is unable to resolved jquery's type, but TypeScript does.
-// eslint-disable-next-line no-undef
 const jQuery: JQueryStatic = inject("jQuery")!;
 
 provide<Logic>("logic", logic);

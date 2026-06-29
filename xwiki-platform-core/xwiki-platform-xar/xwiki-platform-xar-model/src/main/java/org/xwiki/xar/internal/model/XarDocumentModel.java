@@ -69,11 +69,18 @@ public class XarDocumentModel
     public static final String VERSION_16 = "1.6";
 
     /**
+     * Introduce the concept of type in object property.
+     *
+     * @since 18.2.0RC1
+     */
+    public static final String VERSION_17 = "1.7";
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_16;
+    public static final String VERSION_CURRENT = VERSION_17;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 

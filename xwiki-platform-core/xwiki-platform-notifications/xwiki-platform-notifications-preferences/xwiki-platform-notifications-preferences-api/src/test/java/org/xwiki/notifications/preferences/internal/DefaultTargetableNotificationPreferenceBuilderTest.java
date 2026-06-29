@@ -19,8 +19,8 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultTargetableNotificationPreferenceBuilderTest
+class DefaultTargetableNotificationPreferenceBuilderTest
 {
     @InjectMockComponents
     private DefaultTargetableNotificationPreferenceBuilder builder;
@@ -51,14 +51,14 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
      * Only format, properties and target are taken into account in the equals/hashcode.
      */
     @Test
-    public void build()
+    void build()
     {
 
         TargetableNotificationPreference preference1 = this.builder.prepare()
             .setCategory(NotificationPreferenceCategory.DEFAULT)
             .setEnabled(true)
             .setFormat(NotificationFormat.ALERT)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
             .setStartDate(new Date(42))
             .setProviderHint("MyHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page"))
@@ -68,7 +68,7 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .setCategory(NotificationPreferenceCategory.DEFAULT)
             .setEnabled(true)
             .setFormat(NotificationFormat.ALERT)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
             .setStartDate(new Date(42))
             .setProviderHint("MyHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page"))
@@ -82,7 +82,7 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .setCategory(NotificationPreferenceCategory.SYSTEM)
             .setEnabled(false)
             .setFormat(NotificationFormat.ALERT)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
             .setStartDate(new Date(88))
             .setProviderHint("AnotherHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page"))
@@ -96,7 +96,7 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .setCategory(NotificationPreferenceCategory.DEFAULT)
             .setEnabled(true)
             .setFormat(NotificationFormat.EMAIL)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
             .setStartDate(new Date(42))
             .setProviderHint("MyHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page"))
@@ -110,7 +110,7 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .setCategory(NotificationPreferenceCategory.DEFAULT)
             .setEnabled(true)
             .setFormat(NotificationFormat.ALERT)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "bar"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "bar"))
             .setStartDate(new Date(42))
             .setProviderHint("MyHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page"))
@@ -124,7 +124,7 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .setCategory(NotificationPreferenceCategory.DEFAULT)
             .setEnabled(true)
             .setFormat(NotificationFormat.ALERT)
-            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setProperties(Map.of(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
             .setStartDate(new Date(42))
             .setProviderHint("MyHint")
             .setTarget(new DocumentReference("xwiki", "Space", "Page2"))

@@ -385,7 +385,7 @@ public class Package
         add(doc, DefaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
-            if (!((language == null) || (language.equals("")) || (language.equals(doc.getDefaultLanguage())))) {
+            if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
                 add(doc.getTranslatedDocument(language, context), DefaultAction, context);
             }
         }
@@ -397,7 +397,7 @@ public class Package
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        if ((language == null) || (language.equals(""))) {
+        if ((language == null) || (language.isEmpty())) {
             add(doc, DefaultAction, context);
         } else {
             add(doc.getTranslatedDocument(language, context), DefaultAction, context);
@@ -526,7 +526,7 @@ public class Package
                             "Failed to parse document [{}] from XML during import, thus it will not be installed. "
                                 + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
-                        addToErrors(entry.getName().replaceAll("/", "."), context);
+                        addToErrors(entry.getName().replace("/", "."), context);
 
                         continue;
                     }
@@ -1051,12 +1051,14 @@ public class Package
     }
 
     /**
-     * You should prefer {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter)}. If an error occurs, a stacktrace is dump
-     * to logs, and an empty String is returned.
+     * Serialize the package descriptor to an XML string. If an error occurs, a stacktrace is dumped to logs, and an
+     * empty String is returned.
      *
-     * @return a package.xml file for the this package
+     * @param context the current XWiki context
+     * @return a package.xml file for this package as a String
+     * @since 18.5.0RC1
      */
-    public String toXml(XWikiContext context)
+    public String toXMLString(XWikiContext context)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -1183,7 +1185,7 @@ public class Package
 
         // Add language
         String language = doc.getLanguage();
-        if ((language != null) && (!language.equals(""))) {
+        if ((language != null) && (!language.isEmpty())) {
             fileName.append(".");
             fileName.append(language);
         }

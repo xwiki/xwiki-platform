@@ -330,6 +330,18 @@ public class ConfigurationFilesGenerator
                     this.testConfiguration.getDatabase()));
         }
 
+        // In standardFlavor mode the WAR bundles the full standard distribution JARs and installs the standard
+        // flavor, so register the same extra Hibernate mappings the standard distribution registers (see
+        // xwiki.db.common.extraMappings / xwiki.db.default.extraMappings in xwiki-platform-distribution/pom.xml).
+        // Without this the standard UI (e.g. the notifications watch menu) queries entities such as
+        // DefaultNotificationFilterPreference that would otherwise be unmapped. In minimal mode these JARs are
+        // absent from WEB-INF/lib, so the mappings must NOT be registered.
+        if (this.testConfiguration.isStandardFlavor()) {
+            props.setProperty("xwikiDbHbmCommonExtraMappings",
+                "instance.hbm.xml,notification-filter-preferences.hbm.xml");
+            props.setProperty("xwikiDbHbmDefaultExtraMappings", "mailsender.hbm.xml");
+        }
+
         return props;
     }
 

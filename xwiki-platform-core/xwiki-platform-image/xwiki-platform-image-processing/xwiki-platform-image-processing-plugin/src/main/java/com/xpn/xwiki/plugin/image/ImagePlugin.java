@@ -22,12 +22,13 @@ package com.xpn.xwiki.plugin.image;
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -313,7 +314,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
     {
-        Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
+        Image image;
+        try (InputStream stream = attachment.getContentInputStream(context)) {
+            image = this.imageProcessor.readImage(stream);
+        }
 
         // Compute the new image dimension.
         int currentWidth = image.getWidth(null);
@@ -430,7 +434,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getWidth(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getWidth(null);
+        try (InputStream imageInputStream = attachment.getContentInputStream(context)) {
+            return this.imageProcessor.readImage(imageInputStream).getWidth(null);
+        }
     }
 
     /**
@@ -442,6 +448,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getHeight(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getHeight(null);
+        try (InputStream imageInputStream = attachment.getContentInputStream(context)) {
+            return this.imageProcessor.readImage(imageInputStream).getHeight(null);
+        }
     }
 }

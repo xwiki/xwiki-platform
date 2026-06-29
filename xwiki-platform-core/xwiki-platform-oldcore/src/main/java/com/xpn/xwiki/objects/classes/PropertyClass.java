@@ -85,12 +85,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     private static final String TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX = "template:";
 
+    private static final String PARAGRAPH_START = "<p>";
+
+    private static final String PARAGRAPH_END = "</p>";
+
     private static final String NAME = "name";
     private static final String VALUE = "value";
     private static final String CUSTOM_DISPLAY = "customDisplay";
     private static final String PRETTY_NAME = "prettyName";
     private static final String HINT = "hint";
-    private static final String NUMBER = "number";
+    private static final String NUMBER_FIELD = "number";
     private static final String TOOLTIP = "tooltip";
     private static final String CLASS_SUFFIX = "Class";
     private static final String UNMODIFIABLE = "unmodifiable";
@@ -433,38 +437,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
-                if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
-                    final String rawContent = getCustomDisplay();
-                    XWikiDocument classDocument = getObject().getOwnerDocument();
-                    final String classSyntax = classDocument.getSyntax().toIdString();
-                    // Using author reference since the document content is not relevant in this case.
-                    DocumentReference authorReference = classDocument.getAuthorReference();
-                    if (authorReference == null && classDocument.isNew()) {
-                        // If the class document has not been saved yet (e.g. we could be previewing a class property in
-                        // the class editor) then use the context user as author (e.g. the user that is in the process
-                        // of creating the class).
-                        authorReference = context.getUserReference();
-                    }
-
-                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
-                    // document author).
-                    content = renderContentInContext(rawContent, classSyntax, authorReference,
-                        classDocument.getDocumentReference(), classDocument.isRestricted(), context);
-                } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
-                    XWikiDocument displayerDoc = context.getWiki().getDocument(
-                        StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
-                    final String rawContent = displayerDoc.getContent();
-                    final String displayerDocSyntax = displayerDoc.getSyntax().toIdString();
-                    DocumentReference authorReference = displayerDoc.getContentAuthorReference();
-
-                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. displayer
-                    // document content author).
-                    content = renderContentInContext(rawContent, displayerDocSyntax, authorReference,
-                        displayerDoc.getDocumentReference(), context);
-                } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
-                    content = context.getWiki().evaluateTemplate(
-                        StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
-                }
+                content = getCustomDisplayContent(customDisplayer, context);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
@@ -476,8 +449,88 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     /**
+     * Render the custom display content for the given custom displayer.
+     *
+     * @param customDisplayer the custom displayer to use (see {@link #getCachedDefaultCustomDisplayer(XWikiContext)})
+     * @param context the current context
+     * @return the rendered custom display content
+     * @throws Exception in case of problem when rendering the custom display
+     */
+    private String getCustomDisplayContent(String customDisplayer, final XWikiContext context)
+        throws Exception
+    {
+        String content = "";
+        if (CLASS_DISPLAYER_IDENTIFIER.equals(customDisplayer)) {
+            final String rawContent = getCustomDisplay();
+            XWikiDocument classDocument = getObject().getOwnerDocument();
+            final String classSyntax = classDocument.getSyntax().toIdString();
+            // Using author reference since the document content is not relevant in this case.
+            DocumentReference authorReference = classDocument.getAuthorReference();
+            if (authorReference == null && classDocument.isNew()) {
+                // If the class document has not been saved yet (e.g. we could be previewing a class property in
+                // the class editor) then use the context user as author (e.g. the user that is in the process
+                // of creating the class).
+                authorReference = context.getUserReference();
+            }
+
+            // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
+            // document author).
+            content = renderContentInContext(rawContent, classSyntax, authorReference,
+                classDocument.getDocumentReference(), classDocument.isRestricted(), context);
+        } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
+            XWikiDocument displayerDoc = context.getWiki().getDocument(
+                StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
+            final String rawContent = displayerDoc.getContent();
+            final String displayerDocSyntax = displayerDoc.getSyntax().toIdString();
+            DocumentReference authorReference = displayerDoc.getContentAuthorReference();
+
+            // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. displayer
+            // document content author).
+            content = renderContentInContext(rawContent, displayerDocSyntax, authorReference,
+                displayerDoc.getDocumentReference(), context);
+        } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
+            content = context.getWiki().evaluateTemplate(
+                StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
+        }
+
+        // Custom displayers are rendered as standalone block content, which wraps an inline value in a paragraph.
+        // Remove that wrapping paragraph so the value is displayed inline, like the default displayView()/displayEdit()
+        // output. Only a single top level paragraph is removed; block level displayers (e.g. multi-valued ones
+        // producing several top level blocks) are left untouched.
+        return removeTopLevelParagraph(content);
+    }
+
+    /**
+     * Remove the wrapping top level paragraph introduced when a custom display is rendered as standalone block content,
+     * so that a property is rendered inline (like the default {@link #displayView} / {@link #displayEdit} output). The
+     * paragraph is only removed when the whole content consists of a single top level paragraph; more complex
+     * displayers (e.g. multi-valued ones producing several top level blocks) are left untouched.
+     *
+     * @param content the rendered content (in the current output syntax) to convert to inline
+     * @return the inline version of the passed content, or the passed content unchanged when it doesn't consist of a
+     *         single top level paragraph
+     */
+    private String removeTopLevelParagraph(String content)
+    {
+        if (StringUtils.isBlank(content)) {
+            return content;
+        }
+        // The content is a single top level paragraph only when there's exactly one "<p>" and one "</p>". This leaves
+        // more complex (e.g. multi-valued or block level) displayers untouched.
+        if (content.indexOf(PARAGRAPH_START) == content.lastIndexOf(PARAGRAPH_START)
+            && content.indexOf(PARAGRAPH_END) == content.lastIndexOf(PARAGRAPH_END)) {
+            String strippedContent = content.strip();
+            if (strippedContent.startsWith(PARAGRAPH_START) && strippedContent.endsWith(PARAGRAPH_END)) {
+                return strippedContent.substring(PARAGRAPH_START.length(),
+                    strippedContent.length() - PARAGRAPH_END.length());
+            }
+        }
+        return content;
+    }
+
+    /**
      * Render content in the current document's context with the rights of the given user.
-     * 
+     *
      * @since 8.3M2
      * @deprecated since 10.11RC1, use
      *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
@@ -675,13 +728,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public int getNumber()
     {
-        return getIntValue(NUMBER);
+        return getIntValue(NUMBER_FIELD);
     }
 
     @Override
     public void setNumber(int number)
     {
-        setIntValue(NUMBER, number);
+        setIntValue(NUMBER_FIELD, number);
     }
 
     /**
@@ -693,7 +746,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
      *
      * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
+     * @deprecated Use {@link #getPropertyType()} instead.
      */
+    @Deprecated(since = "18.2.0RC1")
     public String getClassType()
     {
         // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
@@ -847,7 +902,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         return fromString(strings[0]);
     }
-
+    
     @Override
     public BaseProperty fromValue(Object value)
     {
@@ -907,7 +962,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public boolean validateProperty(BaseProperty property, XWikiContext context)
     {
         String regexp = getValidationRegExp();
-        if ((regexp == null) || (regexp.trim().equals(""))) {
+        if ((regexp == null) || (regexp.trim().isEmpty())) {
             return true;
         }
 
@@ -1069,5 +1124,18 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         XWikiContext context, MergeResult mergeResult)
     {
         currentProperty.merge(previousProperty, newProperty, configuration, context, mergeResult);
+    }
+
+    /**
+     * Compute and return an obfuscated value. By default, this method always returns {@code null} as it's the better
+     * obfuscation possible. Now inherited classes can override this to use their own obfuscation mechanism.
+     * @param value the value to be obfuscated.
+     * @return the obfuscated value, which can be {@code null}.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public Object getObfuscatedValue(Object value)
+    {
+        return null;
     }
 }

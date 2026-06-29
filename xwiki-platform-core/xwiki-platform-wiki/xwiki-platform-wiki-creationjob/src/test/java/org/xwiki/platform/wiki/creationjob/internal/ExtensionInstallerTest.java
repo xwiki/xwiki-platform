@@ -19,12 +19,9 @@
  */
 package org.xwiki.platform.wiki.creationjob.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
@@ -33,11 +30,15 @@ import org.xwiki.job.Job;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -46,58 +47,49 @@ import static org.mockito.Mockito.verify;
 /**
  * @version $Id$
  */
-public class ExtensionInstallerTest
+@ComponentTest
+class ExtensionInstallerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExtensionInstaller> mocker =
-            new MockitoComponentMockingRule<>(ExtensionInstaller.class);
-    
+    @InjectMockComponents
+    private ExtensionInstaller extensionInstaller;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @Test
-    public void installExtension() throws Exception
+    void installExtension() throws Exception
     {
         // Mocks
         InstallJob installJob = mock(InstallJob.class);
-        mocker.registerComponent(Job.class, InstallJob.JOBTYPE, installJob);
+        this.componentManager.registerComponent(Job.class, InstallJob.JOBTYPE, installJob);
         final InstallRequest[] installRequest = {null};
-        
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                installRequest[0] = (InstallRequest) invocation.getArguments()[0];
-                return null;
-            }
+
+        doAnswer(invocation -> {
+            installRequest[0] = (InstallRequest) invocation.getArguments()[0];
+            return null;
         }).when(installJob).initialize(any(Request.class));
-        
+
         // Test
-        mocker.getComponentUnderTest().installExtension("wikiId", new ExtensionId("extensionId", "version"));
-        
+        this.extensionInstaller.installExtension("wikiId", new ExtensionId("extensionId", "version"));
+
         // Verify
         assertNotNull(installRequest[0]);
-        assertEquals(Arrays.asList("wiki:wikiId"), installRequest[0].getNamespaces());
-        assertEquals(Arrays.asList("wikicreation", "install", "wikiId"), installRequest[0].getId());
-        assertEquals(Arrays.asList(new ExtensionId("extensionId", "version")), installRequest[0].getExtensions());
+        assertEquals(List.of("wiki:wikiId"), installRequest[0].getNamespaces());
+        assertEquals(List.of("wikicreation", "install", "wikiId"), installRequest[0].getId());
+        assertEquals(List.of(new ExtensionId("extensionId", "version")), installRequest[0].getExtensions());
         assertEquals(new DocumentReference("xwiki", "XWiki", "superadmin"),
-                installRequest[0].getProperty("user.reference"));
+            installRequest[0].getProperty("user.reference"));
         verify(installJob).run();
     }
 
     @Test
-    public void installExtensionWithException() throws Exception
+    void installExtensionWithException() throws Exception
     {
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().installExtension("wikiId", new ExtensionId("extensionId", "version"));
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-        
-        // Verify
-        assertNotNull(caughtException);
+        // Test and verify
+        WikiCreationException caughtException = assertThrows(WikiCreationException.class,
+            () -> this.extensionInstaller.installExtension("wikiId", new ExtensionId("extensionId", "version")));
         assertEquals("Failed to install the extension [extensionId/version] on the wiki [wikiId].",
-                caughtException.getMessage());
-        assertTrue(caughtException.getCause() instanceof ComponentLookupException);
+            caughtException.getMessage());
+        assertInstanceOf(ComponentLookupException.class, caughtException.getCause());
     }
 }

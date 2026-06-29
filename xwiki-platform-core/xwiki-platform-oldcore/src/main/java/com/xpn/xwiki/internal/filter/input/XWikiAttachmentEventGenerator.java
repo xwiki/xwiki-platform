@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
@@ -268,7 +269,18 @@ public class XWikiAttachmentEventGenerator
             size = attachment.getLongSize();
         }
 
-        attachmentFilter.onWikiAttachment(attachment.getFilename(), content, size, attachmentParameters);
+        try {
+            attachmentFilter.onWikiAttachment(attachment.getFilename(), content, size, attachmentParameters);
+        } finally {
+            if (content != null) {
+                try {
+                    content.close();
+                } catch (IOException e) {
+                    this.logger.warn("Failed to close the content stream of the attachment [{}]: {}",
+                        attachment.getReference(), ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
     }
 
     private void writeRevisions(XWikiAttachment attachment, XWikiAttachmentFilter attachmentFilter,

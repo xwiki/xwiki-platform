@@ -20,7 +20,6 @@
 package org.xwiki.mail.integration;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -112,7 +111,7 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
+class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + ScriptingIntegrationTest.class.getSimpleName();
 
@@ -127,7 +126,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeComponent
-    public void registerConfiguration() throws Exception
+    void registerConfiguration() throws Exception
     {
         this.greenMail.start();
 
@@ -159,7 +158,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @BeforeEach
-    public void initialize() throws Exception
+    void initialize() throws Exception
     {
         this.scriptService = this.componentManager.getInstance(ScriptService.class, "mail.sender");
 
@@ -183,7 +182,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @AfterEach
-    public void cleanUp() throws Exception
+    void cleanUp() throws Exception
     {
         logCapture.ignoreAllMessages();
 
@@ -197,7 +196,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendTextMail() throws Exception
+    void sendTextMail() throws Exception
     {
         ScriptMimeMessage message1 = this.scriptService.createMessage("john@doe.com", "subject");
         message1.addPart("text/plain", "some text here");
@@ -207,7 +206,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
         message3.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        List<ScriptMimeMessage> messagesList = Arrays.asList(message1, message2, message3);
+        List<ScriptMimeMessage> messagesList = List.of(message1, message2, message3);
         ScriptMailResult result = this.scriptService.sendAsynchronously(messagesList, "memory");
 
         // Verify that there are no errors
@@ -241,7 +240,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendHTMLAndCalendarInvitationMail() throws Exception
+    void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
@@ -279,7 +278,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
             Collections.singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
-        ScriptMailResult result = this.scriptService.send(Arrays.asList(message));
+        ScriptMailResult result = this.scriptService.send(List.of(message));
 
         // Verify that there are no errors and that 1 mail was sent
         assertNull(this.scriptService.getLastError());

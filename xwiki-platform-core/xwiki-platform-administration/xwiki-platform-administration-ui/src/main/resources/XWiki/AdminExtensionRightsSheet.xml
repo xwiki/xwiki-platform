@@ -41,7 +41,7 @@
 {{html}}
   &lt;form method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" class="xform"&gt;
     ############################################################################################
-    ## RIGHTS
+    ## EXTENSION RIGHTS
     ############################################################################################
     &lt;fieldset&gt;
       #template('rightsUI.vm')
@@ -302,7 +302,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <scope>WIKI+ALL_SPACES</scope>
+      <scope>WIKI</scope>
     </property>
     <property>
       <sectionOrder>375</sectionOrder>

@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { shallowMount } from "@vue/test-utils";
-import _ from "lodash-es";
 import LayoutTable from "./LayoutTable.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
-import { nextTick } from "vue";
+import { shallowMount } from "@vue/test-utils";
+import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 /**
  * Vue Component initializer for LayoutTable component. Since this component creates a deep
@@ -49,37 +49,43 @@ import { describe, expect, it } from "vitest";
  * ```
  * The default option object is merged with the `option` parameter.
  *
- * @param options an optional option object use to customize the initialized component
- * @param afterEntryFetchWrapper wrapper for the afterEntryFetch event. The callback is stored in
+ * @param options - an optional option object use to customize the initialized component
+ * @param afterEntryFetchWrapper - wrapper for the afterEntryFetch event. The callback is stored in
  *   the callback field of the object passed in parameter
- * @returns {*} a shallow wrapper for the LayoutTable component
+ * @returns a shallow wrapper for the LayoutTable component
  */
 function initWrapper({ options, afterEntryFetchWrapper }) {
-  return shallowMount(LayoutTable, _.merge({
-    global: {
-      provide: {
-        logic: {
-          canAddEntry: () => false,
-          getEntryId: (e) => e.id,
-          onEvent: (eventName, callback) => {
-            if (afterEntryFetchWrapper) {
-              afterEntryFetchWrapper.callback = callback;
-            }
-          },
-          getPropertyDescriptors: () => [],
-          data: {
-            data: {
-              entries: [],
+  return shallowMount(
+    LayoutTable,
+    _.merge(
+      {
+        global: {
+          provide: {
+            logic: {
+              canAddEntry: () => false,
+              getEntryId: (e) => e.id,
+              onEvent: (eventName, callback) => {
+                if (afterEntryFetchWrapper) {
+                  afterEntryFetchWrapper.callback = callback;
+                }
+              },
+              getPropertyDescriptors: () => [],
+              data: {
+                data: {
+                  entries: [],
+                },
+              },
             },
           },
+          mocks: {
+            $t: (key) => key,
+          },
+          renderStubDefaultSlot: true,
         },
       },
-      mocks: {
-        $t: (key) => key,
-      },
-      renderStubDefaultSlot: true,
-    },
-  }, options));
+      options,
+    ),
+  );
 }
 
 describe("LayoutTable.vue", () => {
@@ -92,7 +98,9 @@ describe("LayoutTable.vue", () => {
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
     await nextTick();
-    expect(wrapper.find(".noentries-table").text()).toBe("livedata.bottombar.noEntries");
+    expect(wrapper.find(".noentries-table").text()).toBe(
+      "livedata.bottombar.noEntries",
+    );
   });
 
   it("Provides a non-zero property count as CSS variable", async () => {
@@ -107,7 +115,11 @@ describe("LayoutTable.vue", () => {
         },
       },
     });
-    expect(wrapper.find(".layout-table").element.style.getPropertyValue("--livedata-property-count")).toBe("1");
+    expect(
+      wrapper
+        .find(".layout-table")
+        .element.style.getPropertyValue("--livedata-property-count"),
+    ).toBe("1");
   });
 
   it("Renders with some entries", async () => {
@@ -119,9 +131,7 @@ describe("LayoutTable.vue", () => {
             logic: {
               data: {
                 data: {
-                  entries: [
-                    { id: 1 },
-                  ],
+                  entries: [{ id: 1 }],
                 },
               },
             },

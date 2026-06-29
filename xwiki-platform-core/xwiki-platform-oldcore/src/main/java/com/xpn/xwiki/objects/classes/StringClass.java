@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.XMLUtils;
 
@@ -40,6 +41,13 @@ import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 public class StringClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "String";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "string";
@@ -52,7 +60,7 @@ public class StringClass extends PropertyClass
 
     public StringClass(PropertyMetaClass wclass)
     {
-        this(XCLASSNAME, "String", wclass);
+        this(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public StringClass()
@@ -94,6 +102,12 @@ public class StringClass extends PropertyClass
         BaseProperty property = new StringProperty();
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

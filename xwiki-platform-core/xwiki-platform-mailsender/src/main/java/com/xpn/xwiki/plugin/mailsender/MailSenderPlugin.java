@@ -276,9 +276,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         String name = attachment.getFilename();
         byte[] stream = attachment.getContent();
         File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp", this.environment.getTemporaryDirectory()));
-        FileOutputStream fos = new FileOutputStream(temp);
-        fos.write(stream);
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(temp)) {
+            fos.write(stream);
+        }
         DataSource source = new FileDataSource(temp);
         MimeBodyPart part = new MimeBodyPart();
         String mimeType = MimeTypesUtil.getMimeTypeFromFilename(name);
@@ -420,9 +420,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     value += line;
                     line = input.readLine();
                 }
-                if (header.equals(SUBJECT)) {
+                if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
-                } else if (header.equals(FROM)) {
+                } else if (FROM.equals(header)) {
                     toMail.setFrom(value);
                 } else {
                     toMail.setHeader(header, value);

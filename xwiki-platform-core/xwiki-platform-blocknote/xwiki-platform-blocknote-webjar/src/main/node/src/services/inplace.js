@@ -18,16 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // The Inplace edit mode is looking for a RequireJS module named "xwiki-<editorId>-inline".
-// eslint-disable-next-line no-undef
 define("xwiki-blocknote-inline", [
   "jquery",
   "xwiki-blocknote",
+  "css!xwiki-wysiwyg",
   "css!xwiki-blocknote",
 ], function ($, BlockNote) {
   $(document).on("xwiki:actions:edit", function (event, config) {
     if (
-      config &&
-      config.contentType === "org.xwiki.rendering.syntax.SyntaxContent" &&
+      config?.contentType === "org.xwiki.rendering.syntax.SyntaxContent" &&
       config.editMode === "wysiwyg"
     ) {
       createEditor(event.target, config);
@@ -40,10 +39,9 @@ define("xwiki-blocknote-inline", [
       name: config.editorName,
       value: config.document.renderedContent,
       form: config.formId,
-      inputSyntax: `${BlockNote.syntax.type}/${BlockNote.syntax.version}`,
       outputSyntax: config.document.syntax,
       startupFocus: config.startupFocus,
-      // eslint-disable-next-line no-undef
+
       sourceDocumentReference: XWiki.Model.serialize(
         config.document.documentReference,
       ),
@@ -63,7 +61,7 @@ define("xwiki-blocknote-inline", [
       );
       BlockNote.destroy(container);
       container.classList.remove("xwiki-blocknote-wrapper");
-      container.removeAttribute("data-config");
+      delete container.dataset.config;
     });
 
     config.deferred.resolve(config.document);

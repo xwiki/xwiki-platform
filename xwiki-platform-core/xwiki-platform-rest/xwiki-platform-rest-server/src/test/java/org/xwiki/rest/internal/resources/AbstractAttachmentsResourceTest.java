@@ -77,7 +77,7 @@ public abstract class AbstractAttachmentsResourceTest
     protected UriInfo uriInfo;
 
     @BeforeEach
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         when(this.uriInfo.getBaseUri()).thenReturn(new URI("https://test/"));
 

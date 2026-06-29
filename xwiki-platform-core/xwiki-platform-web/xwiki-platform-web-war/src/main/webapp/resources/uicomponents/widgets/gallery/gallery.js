@@ -34,7 +34,7 @@
 // Start JavaScript-only code.
 (function(l10n) {
   "use strict";
-var XWiki = (function (XWiki) {
+globalThis.XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Gallery = Class.create({
   initialize : function(container) {

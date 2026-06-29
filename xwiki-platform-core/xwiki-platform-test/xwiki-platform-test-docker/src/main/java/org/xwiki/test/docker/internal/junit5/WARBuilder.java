@@ -40,7 +40,6 @@ import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGen
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -142,27 +141,32 @@ public class WARBuilder
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
             maybeAddS3BlobStore(extraArtifacts);
+            // Resolve WEB-INF/lib from the minimal dependencies by default, or from the standard distribution WAR
+            // dependencies when the test requested the standardFlavor mode (so that the bundled core extensions match
+            // a real XWiki instance). Note: ExtensionInstaller must use the same root so that it agrees on what is
+            // bundled (and thus must not be re-provisioned).
             Collection<ArtifactResult> artifactResults =
-                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+                    this.testConfiguration.getWARDependenciesRootArtifactId());
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
             for (ArtifactResult artifactResult : artifactResults) {
                 Artifact artifact = artifactResult.getArtifact();
                 // Note: we ignore XAR dependencies since they'll be provisioned as Extensions in ExtensionInstaller
-                if (artifact.getExtension().equalsIgnoreCase("war")) {
+                if ("war".equalsIgnoreCase(artifact.getExtension())) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
+                    if ("xwiki-platform-web-war".equals(artifact.getArtifactId())) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
-                    && artifact.getExtension().equals("jar"))
+                } else if ("xwiki-platform-flamingo-skin-resources".equals(artifact.getArtifactId())
+                    && "jar".equals(artifact.getExtension()))
                 {
                     skinDependencies.add(artifact.getFile());
-                } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
+                } else if (JAR.equalsIgnoreCase(artifact.getExtension())) {
                     jarDependencies.add(artifact);
                 }
             }
@@ -197,11 +201,7 @@ public class WARBuilder
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
         LOGGER.info("Copying resources to WEB-INF/classes ...");
-        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
-        // in target/classes directly.
-        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
-            ? testConfiguration.getOutputDirectory() : "target";
-        File classesDirectory = new File(outputDirectory, "classes");
+        File classesDirectory = new File(testConfiguration.getMavenBuildDirectory(), "classes");
         if (classesDirectory.exists()) {
             copyDirectory(classesDirectory, webInfClassesDirectory);
         }
@@ -304,7 +304,7 @@ public class WARBuilder
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
     {
-        return jdbcDriverVersion != null && !jdbcDriverVersion.equalsIgnoreCase("pom");
+        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception

@@ -31,6 +31,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  * @since 4.2M3
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface WikiComponentConstants
 {
     /**

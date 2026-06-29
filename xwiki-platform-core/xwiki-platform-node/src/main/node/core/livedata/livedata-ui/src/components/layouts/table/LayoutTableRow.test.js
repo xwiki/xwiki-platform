@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import LayoutTableRow from "./LayoutTableRow.vue";
 import { shallowMount } from "@vue/test-utils";
 import _ from "lodash-es";
-import LayoutTableRow from "./LayoutTableRow.vue";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -28,32 +28,38 @@ import { describe, expect, it } from "vitest";
  *
  * The default option object is merged with the `option` parameter.
  *
- * @param options an optional option object use to customize the initialized component
- * @returns {*} a shallow wrapper for the LayoutTableRow component
+ * @param options - an optional option object use to customize the initialized component
+ * @returns a shallow wrapper for the LayoutTableRow component
  */
 function initWrapper(options = {}) {
-  return shallowMount(LayoutTableRow, _.merge({
-    global: {
-      provide: {
-        logic: {
-          getEntryId: (e) => e.id,
-          isSelectionEnabled: () => false,
-          isPropertyVisible: () => false,
-          getPropertyDescriptors: () => {
-            return [];
-          },
-          data: {
-            query: {
-              properties: [],
+  return shallowMount(
+    LayoutTableRow,
+    _.merge(
+      {
+        global: {
+          provide: {
+            logic: {
+              getEntryId: (e) => e.id,
+              isSelectionEnabled: () => false,
+              isPropertyVisible: () => false,
+              getPropertyDescriptors: () => {
+                return [];
+              },
+              data: {
+                query: {
+                  properties: [],
+                },
+              },
             },
+          },
+          mocks: {
+            $t: (key) => key,
           },
         },
       },
-      mocks: {
-        $t: (key) => key,
-      },
-    },
-  }, options));
+      options,
+    ),
+  );
 }
 
 describe("LayoutTableRow.vue", () => {

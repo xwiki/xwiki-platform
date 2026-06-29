@@ -25,15 +25,17 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
 
@@ -44,63 +46,63 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class WikiDescriptorMigratorTest
+@ComponentTest
+class WikiDescriptorMigratorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiDescriptorMigrator> mocker =
-            new MockitoComponentMockingRule(WikiDescriptorMigrator.class, HibernateDataMigration.class,
-                    "R54300WikiDescriptorMigration");
+    @InjectMockComponents(role = HibernateDataMigration.class)
+    private WikiDescriptorMigrator wikiDescriptorMigrator;
 
+    @MockComponent
     private QueryManager queryManager;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @MockComponent
+    private Logger logger;
 
     private XWikiContext context;
 
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        context = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(context);
-        xwiki = mock(XWiki.class);
-        when(context.getWiki()).thenReturn(xwiki);
-
-        queryManager = mocker.getInstance(QueryManager.class);
-        documentReferenceResolver= mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        this.context = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.context);
+        this.xwiki = mock(XWiki.class);
+        when(this.context.getWiki()).thenReturn(this.xwiki);
     }
 
     @Test
-    public void hibernateMigrate() throws Exception
+    void hibernateMigrate() throws Exception
     {
         List<String> documentList = new ArrayList<>();
         documentList.add("XWiki.XWikiServerSubwiki1");
 
         Query query = mock(Query.class);
-        when(queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
         when(query.<String>execute()).thenReturn(documentList);
 
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwiki1");
-        when(documentReferenceResolver.resolve(documentList.get(0))).thenReturn(documentReference);
+        when(this.documentReferenceResolver.resolve(documentList.getFirst())).thenReturn(documentReference);
 
         XWikiDocument document = mock(XWikiDocument.class);
-        when(xwiki.getDocument(documentReference, context)).thenReturn(document);
+        when(this.xwiki.getDocument(documentReference, this.context)).thenReturn(document);
 
         List<BaseObject> objects = new ArrayList<>();
         objects.add(null);
@@ -112,72 +114,69 @@ public class WikiDescriptorMigratorTest
         when(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME)).thenReturn("");
 
         // Test
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.wikiDescriptorMigrator.hibernateMigrate();
 
         // Verify
         verify(object).setStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, "Subwiki1");
-        verify(xwiki).saveDocument(document, "[UPGRADE] Set a default pretty name.", context);
-
+        verify(this.xwiki).saveDocument(document, "[UPGRADE] Set a default pretty name.", this.context);
     }
 
     @Test
-    public void hibernateMigrateWhenQueryException() throws Exception
+    void hibernateMigrateWhenQueryException() throws Exception
     {
-        List<String> documentList = new ArrayList<>();
-        documentList.add("XWiki.XWikiServerSubwiki1");
-
         Exception exception = new QueryException("error in queryManager.createQuery()", null, null);
-        when(queryManager.createQuery(any(), eq(Query.HQL))).thenThrow(exception);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenThrow(exception);
 
         // Test
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.wikiDescriptorMigrator.hibernateMigrate();
 
         // Verify
-        verify(mocker.getMockedLogger()).error("Failed to perform a query on the main wiki.", exception);
+        verify(this.logger).error("Failed to perform a query on the main wiki.", exception);
     }
 
     @Test
-    public void hibernateMigrateWhenXWikiException() throws Exception
+    void hibernateMigrateWhenXWikiException() throws Exception
     {
         List<String> documentList = new ArrayList<>();
         documentList.add("XWiki.XWikiServerSubwiki1");
 
         Query query = mock(Query.class);
-        when(queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
         when(query.<String>execute()).thenReturn(documentList);
 
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwiki1");
-        when(documentReferenceResolver.resolve(documentList.get(0))).thenReturn(documentReference);
+        when(this.documentReferenceResolver.resolve(documentList.getFirst())).thenReturn(documentReference);
 
         Exception exception = new XWikiException(0, 0, "error in xwiki.getDocument()");
-        when(xwiki.getDocument(documentReference, context)).thenThrow(exception);
+        when(this.xwiki.getDocument(documentReference, this.context)).thenThrow(exception);
 
         // Test
-        mocker.getComponentUnderTest().hibernateMigrate();
+        this.wikiDescriptorMigrator.hibernateMigrate();
 
         // Verify
-        verify(mocker.getMockedLogger()).warn("Failed to get or save the wiki descriptor document [{}]. You" +
-                " will not see the corresponding wiki in the Wiki Index unless you give it a Pretty Name manually. {}",
-                documentList.get(0), ExceptionUtils.getRootCauseMessage(exception));
+        verify(this.logger).warn(
+            "Failed to get or save the wiki descriptor document [{}]. You"
+                + " will not see the corresponding wiki in the Wiki Index unless you give it a Pretty Name manually. {}",
+            documentList.getFirst(), ExceptionUtils.getRootCauseMessage(exception));
     }
 
     @Test
-    public void shouldExecuteTrue() throws Exception
+    void shouldExecuteTrue()
     {
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         // Test
-        assertTrue(mocker.getComponentUnderTest().shouldExecute(null));
+        assertTrue(this.wikiDescriptorMigrator.shouldExecute(null));
     }
 
     @Test
-    public void shouldExecuteFalse() throws Exception
+    void shouldExecuteFalse()
     {
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         // Test
-        assertFalse(mocker.getComponentUnderTest().shouldExecute(null));
+        assertFalse(this.wikiDescriptorMigrator.shouldExecute(null));
     }
 }

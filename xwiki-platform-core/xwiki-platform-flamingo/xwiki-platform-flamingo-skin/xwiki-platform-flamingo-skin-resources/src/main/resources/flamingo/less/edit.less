@@ -102,19 +102,20 @@
     color: inherit;
     font-size: inherit;
     background-color: transparent;
+    /* Remove the border (this also avoids text flickering due to border snapping) */
+    border: 0;
+    box-shadow: none;
+    outline: 0;
     /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
     height: ~"calc(@{font-size-document-title} * @{headings-line-height} - -2 * (1px - -@{document-title-input-padding-vertical}))";
     line-height: @headings-line-height;
-    padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
+    padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2));
     width: 100%;
 
-    &:valid {
-      border: 1px solid transparent;
-      box-shadow: none;
-
-      &:focus {
-        outline: 0;
-      }
+    /* The wiki can be configured to have mandatory titles. */
+    &:invalid {
+      /* We use outline instead of border for validation in order to avoid issues with border snapping and text flickering, */
+      outline: 1px solid @state-danger-text;
     }
   }
 }

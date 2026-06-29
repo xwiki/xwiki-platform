@@ -270,6 +270,15 @@
      The highlights can happen in the middle of words, and it would look odd. */
   padding: 0;
   cursor: pointer;
+
+  &amp;.updated {
+    background-color: var(--mark-updated-bg);
+  }
+
+  &amp;.altered {
+    background-color: var(--mark-altered-bg);
+  }
+  
   &amp;.hovered,
   &amp;.hovered .annotation-highlight, &amp;.hovered .selection-highlight {
     /* We want to increase the accent on the element when hovered. 
@@ -417,17 +426,14 @@ mark.annotation:not(.annotation-highlight) {
 #allAnnotations .annotation {
   margin: 0 0 8px;
 }
-#allAnnotations .annotation .annotationText, #Commentspane .annotation .annotationText {
-  padding: 0 36px 0 14px;
-  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+.annotationText {
+  padding: 0 36px 0 0;
   text-align: justify;
 }
-#allAnnotations .UPDATED .annotationText, #xwikicontent .UPDATED {
-  ##background-image: #imgURL('note_error');
+#allAnnotations .UPDATED .annotationText {
   background-image: #attImgURL('notesmallorange');
 }
-#allAnnotations .ALTERED annotationText, #xwikicontent .ALTERED {
-  ##background-image: #imgURL('note_delete');
+#allAnnotations .ALTERED annotationText {
   background-image: #attImgURL('notesmallred');
 }
 
@@ -435,6 +441,28 @@ mark.annotation:not(.annotation-highlight) {
 .annotationHeader{
   padding: 2px 0px 6px;
 }
+
+.annotatedText {
+  font-style: italic;
+  font-size: 1.2em;
+  border-left: none;
+  padding: 10px 0 0 0;
+  margin: 0;
+  /* We hide the overflow so that the decorative quote doesn't go over the rest of the UI. */
+  overflow: hidden;
+
+  &amp;:before {
+    content: "“";
+    font-size: 4em;
+    line-height: .1em;
+    margin-right: .1em;
+    vertical-align: -.45em;
+    font-family: var(--font-family-serif);
+    font-weight: var(--font-weight-semibold);
+    font-style: normal;
+  }
+}
+
 #allAnnotations .annotationHeader:hover {
   background-color: $theme.highlightColor;
 }

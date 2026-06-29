@@ -22,9 +22,9 @@ import { loadById } from "../services/require.js";
 
 /**
  * Resolve the url of the document reference in the given mode.
- * @param documentReference the document reference
- * @param mode the mode
- * @returns {*} the computed relative url
+ * @param documentReference - the document reference
+ * @param mode - the mode
+ * @returns the computed relative url
  */
 function computeTargetURL(documentReference, mode) {
   return new XWiki.Document(
@@ -78,10 +78,10 @@ async function load(mode, documentReference, property, className) {
 
 /**
  * Load an XObject property field in edit mode.
- * @param documentReference the reference of the document containing the XObject
- * @param className the class name of the XObject
- * @param property the XObject property to display
- * @returns {*} the XObject property field html content in edit mode
+ * @param documentReference - the reference of the document containing the XObject
+ * @param className - the class name of the XObject
+ * @param property - the XObject property to display
+ * @returns the XObject property field html content in edit mode
  */
 function edit(documentReference, className, property) {
   return load("edit", documentReference, property, className);
@@ -89,10 +89,10 @@ function edit(documentReference, className, property) {
 
 /**
  * Load an XObject property field in view mode.
- * @param documentReference the reference of the document containing the XObject
- * @param className the class name of the XObject
- * @param property the XObject property to display
- * @returns {*} the XObject property field html content in view mode
+ * @param documentReference - the reference of the document containing the XObject
+ * @param className - the class name of the XObject
+ * @param property - the XObject property to display
+ * @returns the XObject property field html content in view mode
  */
 function view(documentReference, className, property) {
   return load("view", documentReference, property, className);

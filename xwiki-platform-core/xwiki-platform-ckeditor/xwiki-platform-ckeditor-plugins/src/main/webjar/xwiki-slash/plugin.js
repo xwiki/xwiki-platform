@@ -71,11 +71,11 @@
       this.groups = {};
 
       // Initialize the quick action search asynchronously.
-      this.searchReady = new Promise(function(resolve, reject) {
-        require(['fuse'], function(Fuse) {
+      this.searchReady = new Promise((resolve, reject) => {
+        require(['es-module!fuse'], ({'default': Fuse}) => {
           resolve(new Fuse(this.actions, this.config.search));
-        }.bind(this), reject);
-      }.bind(this));
+        }, reject);
+      });
     }
 
     /**
@@ -544,7 +544,14 @@
     getHtmlToInsert: function(item) {
       // Schedule the command execution after the AutoComplete panel is closed.
       this.maybeScheduleCommand(item);
-      return item.outputHTML || '';
+      if (item.outputHTML) {
+        return item.outputHTML;
+      } else if (this.outputTemplate) {
+        const encodedItem = encodeItem(item);
+        return this.outputTemplate.output(encodedItem);
+      } else {
+        return '';
+      }
     },
 
     /**
@@ -871,10 +878,7 @@
           command: {
             name: 'xwiki-macro',
             data: {
-              name: 'code',
-              parameters: {
-                language: 'none'
-              },
+              name: 'code'
             }
           }
         },

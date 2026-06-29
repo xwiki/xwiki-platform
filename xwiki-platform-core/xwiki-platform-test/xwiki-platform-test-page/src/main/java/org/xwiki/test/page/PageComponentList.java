@@ -44,6 +44,7 @@ import org.xwiki.internal.velocity.XWikiVelocityManager;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
+import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -61,6 +62,7 @@ import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRendererFactory;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.macro.message.MacroIconPrettyNameProvider;
+import org.xwiki.rendering.internal.macro.script.DefaultScriptMacroTools;
 import org.xwiki.rendering.internal.macro.velocity.DefaultVelocityMacroConfiguration;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFilter;
@@ -263,6 +265,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLocalizationManager.class,
     DefaultTranslationBundleContext.class,
     XWikiLocalizationContext.class,
+    TranslationMacro.class,
+    DefaultScriptMacroTools.class,
 
     // Property Class Providers (needed when the page has xobjects)
     StaticListMetaClass.class,

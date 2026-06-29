@@ -29,8 +29,7 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A Mock for the Cache<?> interface that ensure the same function than a cache without any
@@ -145,7 +144,7 @@ public class TestCache<T> implements Cache<T>
     @Override
     public void removeCacheEntryListener(CacheEntryListener<T> tCacheEntryListener)
     {
-        assertThat(tCacheEntryListener, equalTo(listener));
+        assertEquals(listener, tCacheEntryListener);
         listener = null;
     }
 

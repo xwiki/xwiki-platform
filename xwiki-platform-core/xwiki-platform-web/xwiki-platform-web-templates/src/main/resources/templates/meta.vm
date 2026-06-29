@@ -23,10 +23,6 @@
 <meta name="keywords" content="$escapetool.xml($keywords.replaceAll('[|,]', ' ').trim())" />
 <meta name="rating" content="General" />
 <meta name="author" content="$escapetool.xml($!xwiki.getUserName($doc.getAuthor(), false))" />
-## Add HTML tags inside the page's head element, provided by UI Extensions implementing the "org.xwiki.platform.html.head" Extension Point
-#foreach($uix in $services.uix.getExtensions("org.xwiki.platform.html.head", {'sortByParameter' : 'order'}))
-    $services.rendering.render($uix.execute(), 'xhtml/1.0')
-#end
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are
 ## protected. In addition it makes the login redirect to the feeds page in some cases.
 #if($doc.fullName != "XWiki.XWikiLogin")

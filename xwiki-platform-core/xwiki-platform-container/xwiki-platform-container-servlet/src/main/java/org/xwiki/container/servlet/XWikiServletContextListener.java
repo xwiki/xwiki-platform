@@ -300,7 +300,7 @@ public class XWikiServletContextListener implements ServletContextListener
         for (Class<?> innerClass : uriComplianceClass.getDeclaredClasses()) {
             // We cannot manipulate the class directly because it would probably be the wrong one, so we use reflection
             @SuppressWarnings("java:S1872")
-            boolean isViolationClass = innerClass.getName().equals("org.eclipse.jetty.http.UriCompliance$Violation");
+            boolean isViolationClass = "org.eclipse.jetty.http.UriCompliance$Violation".equals(innerClass.getName());
             if (isViolationClass) {
                 return innerClass;
             }

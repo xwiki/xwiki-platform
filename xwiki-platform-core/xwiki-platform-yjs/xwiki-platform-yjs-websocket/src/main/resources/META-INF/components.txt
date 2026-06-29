@@ -1,2 +1,7 @@
-org.xwiki.yjs.websocket.internal.Room
-org.xwiki.yjs.websocket.internal.YjsRealtimeEndpoint
+org.xwiki.yjs.websocket.internal.event.EffectiveAuthorSetterListener
+org.xwiki.yjs.websocket.internal.event.RoomListener
+org.xwiki.yjs.websocket.internal.DefaultPingPongManager
+org.xwiki.yjs.websocket.internal.DefaultRoomManager
+org.xwiki.yjs.websocket.internal.DefaultYjsEndpointConfiguration
+org.xwiki.yjs.websocket.internal.RoomScriptAuthorTracker
+org.xwiki.yjs.websocket.internal.YjsEndpoint

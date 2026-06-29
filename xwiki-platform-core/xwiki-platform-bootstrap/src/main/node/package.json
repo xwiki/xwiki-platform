@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "xwiki-bootstrap",
+  "version": "3.4.1.1-xwiki",
+  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "cross-env MINIFY=false vite build && cross-env MINIFY=true vite build",
+    "lint": "eslint .",
+    "test:unit": "playwright install chromium && playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@playwright/test": "catalog:",
+    "cross-env": "catalog:",
+    "eslint": "catalog:",
+    "globals": "catalog:",
+    "jquery": "catalog:",
+    "qunit": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:"
+  }
+}

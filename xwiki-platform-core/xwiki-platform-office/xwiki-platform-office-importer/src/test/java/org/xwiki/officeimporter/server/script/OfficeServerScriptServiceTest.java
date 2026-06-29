@@ -53,7 +53,7 @@ import static org.xwiki.security.authorization.Right.PROGRAM;
 @ComponentTest
 class OfficeServerScriptServiceTest
 {
-    private final static String ERROR_PRIVILEGES = "Inadequate privileges.";
+    private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
 
     private static final String ERROR_FORBIDDEN = "Office server administration is forbidden for sub-wikis.";
 
@@ -76,12 +76,12 @@ class OfficeServerScriptServiceTest
     private ExecutionContext executionContext;
 
     @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
     void setUp()
     {
-        when (this.execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(this.executionContext);
     }
 
     @Test
@@ -126,7 +126,7 @@ class OfficeServerScriptServiceTest
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while starting");
 
-        assertEquals("Error while starting", logCapture.getMessage(0));
+        assertEquals("Error while starting", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -171,6 +171,6 @@ class OfficeServerScriptServiceTest
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while stopping");
 
-        assertEquals("Error while stopping", logCapture.getMessage(0));
+        assertEquals("Error while stopping", this.logCapture.getMessage(0));
     }
 }

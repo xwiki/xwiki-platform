@@ -138,8 +138,7 @@ public class WikiReader
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
-        ZipArchiveEntry entry = zis.getNextEntry();
-        while (entry != null) {
+        for (ZipArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
             if (entry.isDirectory() || entry.getName().startsWith("META-INF")) {
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
@@ -149,7 +148,6 @@ public class WikiReader
             } else {
                 readDocument(filter, proxyFilter, zis, entry);
             }
-            entry = zis.getNextEntry();
         }
     }
 

@@ -80,4 +80,9 @@ public class AllIT
     class NestedEditingIT extends EditingIT
     {
     }
+
+    @Nested
+    class NestedIconThemeIT extends IconThemeIT
+    {
+    }
 }

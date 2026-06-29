@@ -575,9 +575,9 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       <code>#annotation-popup {
   position: absolute;
   background-color: var(--xwiki-page-content-bg);
-  padding: 4px;
-  border-radius: 4px;
-  box-shadow: 0 1.65px 3px var(--btn-default-border);
+  padding: 2px;
+  border-radius: 5px;
+  box-shadow: 0 1.5px 2.5px var(--btn-default-border);
   visibility: hidden;
   opacity: 0;
   transition: opacity .2s ease-in;

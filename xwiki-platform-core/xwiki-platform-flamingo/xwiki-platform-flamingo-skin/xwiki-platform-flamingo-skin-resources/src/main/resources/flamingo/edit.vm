@@ -162,9 +162,9 @@
       #set ($docLink = "<a href=""$doc.getURL()"">$escapetool.xml($doc.plainTitle)</a>")
       <h1 class="sr-only">
         #if ($request.section)
-          $services.localization.render('core.editors.section.title', [$docLink])
+          $services.localization.render('core.editors.section.title.text', [$docLink])
         #else
-          $services.localization.render('core.editors.content.title', [$docLink])
+          $services.localization.render('core.editors.content.title.text', [$docLink])
         #end
       </h1>
       <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">

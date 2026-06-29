@@ -342,7 +342,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                 (built) => built.dropdownTransformItem,
               )}
               macros={macros}
-              imageEditionOverrideFn={overrides?.imageEdition}
             />
           )}
         />

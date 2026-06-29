@@ -45,7 +45,6 @@ import {
 } from "@blocknote/react";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ContextForMacros } from "../blocknote/utils";
-import type { LinkEditionContext } from "../misc/linkSuggest";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
@@ -92,10 +91,7 @@ export const CustomFormattingToolbar: React.FC<
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(
-          formattingToolbarProps.blockTypeSelectItems,
-          macros,
-        )
+        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros)
       )}
     </Components.FormattingToolbar.Root>
   );

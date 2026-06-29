@@ -78,7 +78,6 @@ public class EmailClass extends StringClass
      **/
     public EmailClass()
     {
-        super();
         setValidationRegExp(DEFAULT_EMAIL_VALIDATION_REGEXP);
     }
 
@@ -112,8 +111,13 @@ public class EmailClass extends StringClass
     {
         EmailAddressObfuscator emailAddressObfuscator = Utils.getComponent(EmailAddressObfuscator.class);
         try {
-            InternetAddress address = InternetAddress.parse(String.valueOf(value))[0];
-            return emailAddressObfuscator.obfuscate(address);
+            // InternetAddress.parse returns an empty array (rather than throwing) when the value is blank, so we
+            // can't blindly access index 0.
+            InternetAddress[] addresses = InternetAddress.parse(String.valueOf(value));
+            if (addresses.length == 0) {
+                return "";
+            }
+            return emailAddressObfuscator.obfuscate(addresses[0]);
         } catch (AddressException e) {
             LOGGER.debug("Invalid email address value when trying to obfuscate [{}] falling back on null.", value);
             return null;

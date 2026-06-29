@@ -70,4 +70,14 @@ public class AllIT
     class NestedDateTimeIT extends DateTimeIT
     {
     }
+
+    @Nested
+    class NestedUserEditIT extends UserEditIT
+    {
+    }
+
+    @Nested
+    class NestedEditingIT extends EditingIT
+    {
+    }
 }

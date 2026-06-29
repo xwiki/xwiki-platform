@@ -351,7 +351,7 @@ class MacroDescriptorUIFactoryTest
 
         MacroUINodeParameter nodeContent = new MacroUINodeParameter("$content");
         nodeContent.setName("rendering.macroContentTranslated");
-        nodeContent.setDescription("rendering.macro.myMacrocontent.descriptionTranslated");
+        nodeContent.setDescription("rendering.macro.myMacro.content.descriptionTranslated");
         nodeContent.setMandatory(false);
         nodeContent.setDisplayType("java.util.List<org.xwiki.rendering.block.Block>");
         nodeContent.setEditTemplate("<textarea name=\"$content\" rows=\"7\"></textarea>");

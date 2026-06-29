@@ -17,7 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, injectable } from "inversify";
+import { Container, inject, injectable } from "inversify";
+import type { XWikiMeta } from "../meta/XWikiMeta";
 import type {
   AuthenticationManager,
   UserDetails,
@@ -25,6 +26,8 @@ import type {
 
 @injectable("Singleton")
 export class XWikiAuthenticationManager implements AuthenticationManager {
+  private userDetails?: Promise<UserDetails>;
+
   public static bind(container: Container): void {
     container
       .bind("AuthenticationManager")
@@ -32,6 +35,8 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
       .inSingletonScope()
       .whenNamed("XWiki");
   }
+
+  constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
 
   public async start(): Promise<void> {
     // TODO
@@ -49,17 +54,55 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
   }
 
   public async isAuthenticated(): Promise<boolean> {
-    // TODO
-    throw new Error("Method not implemented.");
+    return !!this.getUserId();
   }
 
   public async getUserDetails(): Promise<UserDetails> {
-    // TODO
-    throw new Error("Method not implemented.");
+    this.userDetails ??= this.fetchUserDetails();
+    return this.userDetails;
+  }
+
+  private async fetchUserDetails(): Promise<UserDetails> {
+    const currentUserDetailsURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/user`;
+    const response = await fetch(currentUserDetailsURL, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.warn(
+        `Failed to fetch user details: ${response.status} ${response.statusText}`,
+      );
+      return this.getDefaultUserDetails();
+    }
+
+    const userDetails = await response.json();
+    return {
+      name: userDetails.id,
+      username: userDetails.displayName,
+      avatar: userDetails.avatarUrl,
+      profile: userDetails.xwikiRelativeUrl,
+    };
+  }
+
+  private getDefaultUserDetails(): UserDetails {
+    return {
+      name: this.getUserId() ?? "xwiki:XWiki.XWikiGuest",
+      username: this.xwikiMeta.userReference?.name ?? "XWikiGuest",
+      avatar: `${XWiki.contextPath}/bin/skin/resources/icons/xwiki/noavatar.png`,
+    };
   }
 
   public async logout(): Promise<void> {
     // TODO
     throw new Error("Method not implemented.");
+  }
+
+  public getUserId(): string | undefined {
+    return this.xwikiMeta.userReference
+      ? XWiki.Model.serialize(this.xwikiMeta.userReference)
+      : undefined;
   }
 }

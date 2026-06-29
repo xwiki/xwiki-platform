@@ -27,17 +27,14 @@ import {
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
-  linkEditionCtx: LinkEditionContext;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
-  linkEditionCtx,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
@@ -64,7 +61,6 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
           variant="form-popover"
         >
           <LinkEditor
-            linkEditionCtx={linkEditionCtx}
             current={{
               url: linkToolbarProps.url,
               title: linkToolbarProps.text,

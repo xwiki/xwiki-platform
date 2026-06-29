@@ -20,6 +20,7 @@
 package org.xwiki.rest;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -89,9 +90,9 @@ class XWikiResourceTest
             assertEquals("Malformed URL: the spaces section is invalid.", e.getMessage());
         }
 
-        assertEquals(Arrays.asList("one"), this.xwikiResource.parseSpaceSegments("one/"));
+        assertEquals(List.of("one"), this.xwikiResource.parseSpaceSegments("one/"));
         assertEquals(Arrays.asList("one", "two"), this.xwikiResource.parseSpaceSegments("one/spaces/two"));
-        assertEquals(Arrays.asList("spaces"), this.xwikiResource.parseSpaceSegments("spaces"));
+        assertEquals(List.of("spaces"), this.xwikiResource.parseSpaceSegments("spaces"));
 
         assertEquals(Arrays.asList("on e", "tw/o"), this.xwikiResource.parseSpaceSegments("on%20e/spaces/tw%2Fo"));
 

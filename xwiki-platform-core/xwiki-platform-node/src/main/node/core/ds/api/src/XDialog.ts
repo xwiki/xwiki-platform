@@ -19,13 +19,13 @@
  */
 
 /**
- * @since 18.0.0RC1
+ * @since 18.2.0RC1
  * @beta
  */
 type DialogProps = {
-  width?: "auto";
+  title: string;
+  width?: string | number | undefined;
   modelValue?: boolean;
-  logo?: string;
 };
 
 export type { DialogProps };

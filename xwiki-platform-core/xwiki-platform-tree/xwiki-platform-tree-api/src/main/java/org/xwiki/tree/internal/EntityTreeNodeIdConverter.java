@@ -76,13 +76,14 @@ public class EntityTreeNodeIdConverter extends AbstractConverter<EntityReference
     protected EntityReference convertToType(Type targetType, Object value)
     {
         String[] parts = StringUtils.split(String.valueOf(value), ":", 2);
-        if (parts == null || parts.length != 2) {
+        if (parts == null || parts.length == 0) {
             return null;
         }
+        String reference = parts.length > 1 ? parts[1] : "";
 
         try {
             EntityType entityType = EntityType.valueOf(camelCaseToUnderscore(parts[0]).toUpperCase());
-            return this.currentEntityReferenceResolver.resolve(parts[1], entityType);
+            return this.currentEntityReferenceResolver.resolve(reference, entityType);
         } catch (IllegalArgumentException e) {
             return null;
         }

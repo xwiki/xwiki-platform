@@ -239,7 +239,7 @@
       field: editor.name,
       // This is used to generate the WYSIWYG editor URL so we need to take into account if we are in view mode
       // (i.e. in-place editing) or in edit mode (standalone editing).
-      href: window.XWiki?.contextaction === 'view' ? '&force=1' : '&editor=wysiwyg&force=1',
+      href: window.XWiki?.contextaction === 'view' ? '' : '&editor=wysiwyg',
       name: 'WYSIWYG',
       compatible: ['wysiwyg', 'wiki']
     };

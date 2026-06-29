@@ -20,8 +20,6 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -33,8 +31,6 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-
 /**
  * Common abstract class for the skins that manipulate resources.
  *
@@ -44,6 +40,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 public abstract class AbstractResourceSkin extends AbstractSkin
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractResourceSkin.class);
+
+    protected static final String PROPERTIES_FILE_NAME = "skin.properties";
 
     private Configuration properties;
 
@@ -55,15 +53,15 @@ public abstract class AbstractResourceSkin extends AbstractSkin
      * @param configuration the skin internal configuration, used to access the default parent skin id
      * @param logger a logger used to log warning in case of error when parsin a skin's syntax
      */
-    public AbstractResourceSkin(String id, InternalSkinManager skinManager,
-        InternalSkinConfiguration configuration, Logger logger)
+    public AbstractResourceSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+        Logger logger)
     {
         super(id, skinManager, configuration, logger);
     }
 
     abstract AbstractResource<InputSource> createResource(String resourcePath, String resourceName);
 
-    abstract URL getResourceURL(String resourcePath);
+    abstract URL getResourceURL(String prefixPath, String resourcePath);
 
     @Override
     public String getOutputSyntaxString()
@@ -95,18 +93,12 @@ public abstract class AbstractResourceSkin extends AbstractSkin
     @Override
     public Resource<?> getLocalResource(String resourceName)
     {
-        String resourcePath = getSkinResourcePath(resourceName);
-
-        if (resourcePath != null && getResourceURL(resourcePath) != null) {
-            return createResource(resourcePath, resourceName);
+        String skinFolder = getSkinFolder();
+        if (getResourceURL(skinFolder, resourceName) != null) {
+            return createResource(skinFolder + resourceName, resourceName);
         }
 
         return null;
-    }
-
-    protected String getPropertiesPath()
-    {
-        return getSkinFolder() + "skin.properties";
     }
 
     protected String getSkinFolder()
@@ -117,13 +109,12 @@ public abstract class AbstractResourceSkin extends AbstractSkin
     protected Configuration getProperties()
     {
         if (this.properties == null) {
-            URL url = getResourceURL(getPropertiesPath());
+            URL url = getResourceURL(getSkinFolder(), PROPERTIES_FILE_NAME);
             if (url != null) {
                 try {
                     this.properties = new Configurations().properties(url);
                 } catch (ConfigurationException e) {
-                    LOGGER.error("Failed to load skin [{}] properties file ([])", this.id, url,
-                        getRootCauseMessage(e));
+                    LOGGER.error("Failed to load skin [{}] properties file ({})", this.id, url, e);
 
                     this.properties = new BaseConfiguration();
                 }
@@ -135,21 +126,5 @@ public abstract class AbstractResourceSkin extends AbstractSkin
         }
 
         return this.properties;
-    }
-
-    private String getSkinResourcePath(String resource)
-    {
-        String skinFolder = getSkinFolder();
-        String resourcePath = skinFolder + resource;
-
-        // Prevent access to resources from other directories
-        Path normalizedResource = Paths.get(resourcePath).normalize();
-        // Protect against directory attacks.
-        if (!normalizedResource.startsWith(skinFolder)) {
-            LOGGER.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
-            return null;
-        }
-
-        return resourcePath;
     }
 }

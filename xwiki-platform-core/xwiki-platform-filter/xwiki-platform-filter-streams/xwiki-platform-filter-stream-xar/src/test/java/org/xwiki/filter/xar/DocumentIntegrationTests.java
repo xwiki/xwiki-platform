@@ -31,6 +31,6 @@ import org.xwiki.test.annotation.AllComponents;
  */
 @AllComponents
 @Scope(value = "document"/*, pattern = "new1.test"*/)
-public class DocumentIntegrationTests extends FilterTest
+class DocumentIntegrationTests extends FilterTest
 {
 }

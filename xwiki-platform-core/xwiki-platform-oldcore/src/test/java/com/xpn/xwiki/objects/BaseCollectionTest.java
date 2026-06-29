@@ -19,23 +19,23 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.junit.Assert;
-
 import org.dom4j.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for the {@link BaseCollection} class.
- * 
+ *
  * @version $Id$
  */
-public class BaseCollectionTest extends AbstractBridgedComponentTestCase
+class BaseCollectionTest
 {
     @Test
-    public void testGetXClassWithNullReference() throws Exception
+    void getXClassWithNullReference()
     {
         BaseCollection collection = new BaseCollection()
         {
@@ -46,6 +46,6 @@ public class BaseCollectionTest extends AbstractBridgedComponentTestCase
             }
         };
 
-        Assert.assertNull(collection.getXClass(getContext()));
+        assertNull(collection.getXClass(new XWikiContext()));
     }
 }

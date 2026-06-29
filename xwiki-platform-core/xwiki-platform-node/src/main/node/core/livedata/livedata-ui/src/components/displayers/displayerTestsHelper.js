@@ -92,6 +92,12 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
     show: () => {},
   });
 
+  // Mocks $t
+  global.$.fn.$t = stub();
+  global.$.fn.$t.resolves({
+    show: () => {},
+  });
+
   // Mock $.data
   global.$.fn.data = stub(global.$.fn, "data");
   global.$.fn.data.resolves({

@@ -19,9 +19,15 @@
  */
 package org.xwiki.rest.internal;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,6 +41,22 @@ import com.xpn.xwiki.web.XWikiContextInitializationFilter;
  */
 public class XWikiRESTContextInitializationFilter extends XWikiContextInitializationFilter
 {
+    @Inject
+    private WikiDescriptorManager wikis;
+
+    private WikiDescriptorManager getWikiDescriptorManager(ServletContext context)
+        throws WikiManagerException, ComponentLookupException
+    {
+        if (this.wikis == null) {
+            ComponentManager componentManager =
+                (ComponentManager) context.getAttribute(org.xwiki.component.manager.ComponentManager.class.getName());
+
+            this.wikis = componentManager.getInstance(WikiDescriptorManager.class);
+        }
+
+        return this.wikis;
+    }
+
     @Override
     protected void authenticate(XWikiContext context, HttpServletRequest request) throws XWikiException
     {
@@ -44,7 +66,13 @@ public class XWikiRESTContextInitializationFilter extends XWikiContextInitializa
         if (path != null) {
             String wiki = extractWiki(path);
             if (wiki != null) {
-                context.setWikiId(wiki);
+                try {
+                    if (getWikiDescriptorManager(request.getServletContext()).getById(wiki) != null) {
+                        context.setWikiId(wiki);
+                    }
+                } catch (Exception e) {
+                    throw new XWikiException("Failed to check if the wiki [" + wiki + "] exists", e);
+                }
             }
         }
 
@@ -55,7 +83,7 @@ public class XWikiRESTContextInitializationFilter extends XWikiContextInitializa
     {
         String[] elements = StringUtils.split(path, '/');
 
-        if (elements.length >= 2 && elements[0].equals("wikis")) {
+        if (elements.length >= 2 && "wikis".equals(elements[0])) {
             return elements[1];
         }
 

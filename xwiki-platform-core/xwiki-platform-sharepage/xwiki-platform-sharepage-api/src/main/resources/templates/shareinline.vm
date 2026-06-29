@@ -21,6 +21,8 @@
 #if ($isGuest)
 ##  $response.setStatus(401)
   #error ($services.localization.render('core.viewers.share.error.mustLogin'))
+#elseif ("$!{request.send}" != '' && !$services.csrf.isTokenValid($request.form_token))
+  #error ($services.localization.render('core.viewers.share.error.invalidCSRF'))
 #elseif ("$!{request.send}" != '')
   #set ($message = "$!{request.message.trim()}")
   #set ($sender = $xwiki.getUserName($xcontext.user, false))

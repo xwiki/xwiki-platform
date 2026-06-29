@@ -206,4 +206,24 @@ public class AllIT
     class NestedWebJarsIT extends WebJarsIT
     {
     }
+
+    @Nested
+    class NestedSkinActionIT extends SkinActionIT
+    {
+    }
+
+    @Nested
+    class NestedHTMLExportIT extends HTMLExportIT
+    {
+    }
+
+    @Nested
+    class NestedBreadcrumbsIT extends BreadcrumbsIT
+    {
+    }
+
+    @Nested
+    class NestedCreatePageNestedDocumentsIT extends CreatePageNestedDocumentsIT
+    {
+    }
 }

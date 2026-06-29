@@ -25,6 +25,8 @@ import {
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import { RiFileList3Fill } from "react-icons/ri";
+import type { InlineContentType } from ".";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -40,6 +42,7 @@ import type {
   StyleSchema,
 } from "@blocknote/core";
 import type {
+  BlockTypeSelectItem,
   ReactCustomBlockImplementation,
   ReactInlineContentImplementation,
 } from "@blocknote/react";
@@ -71,7 +74,9 @@ function createCustomBlockSpec<
   customToolbar,
 }: {
   config: BlockConfig<Name, Props, InlineType>;
-  implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
+  implementation: ReactCustomBlockImplementation<
+    BlockConfig<Name, Props, InlineType>
+  >;
   slashMenu:
     | false
     | {
@@ -177,19 +182,25 @@ const MACRO_NAME_PREFIX = "Macro_";
 
 /**
  * Description of a macro adapted by `adaptMacroForBlockNote`
- *
- * @since 18.0.0RC1
- * @internal
  */
 type BlockNoteConcreteMacro = {
   /** Type-erased macro */
   macro: MacroWithUnknownParamsType;
 
+  /** Dropdown item for changing the selection to the current macro */
+  dropdownTransformItem: BlockTypeSelectItem | null;
+
   /** Rendering part */
   bnRendering: // Block macro
   | {
         type: "block";
-        block: ReturnType<typeof createCustomBlockSpec>;
+        block:
+          | ReturnType<
+              typeof createCustomBlockSpec<string, PropSchema, "inline">
+            >
+          | ReturnType<
+              typeof createCustomBlockSpec<string, PropSchema, "none">
+            >;
       }
     // Inline macro
     | {
@@ -206,7 +217,7 @@ type BlockNoteConcreteMacro = {
  */
 type ContextForMacros = {
   /**
-   * Request the opening of an UI to edit the macro's parameters (e.g. a modal)
+   * Request the opening of a UI to edit the macro's parameters (e.g. a modal)
    *
    * @param macro - Description of the macro being edited
    * @param params - Current parameters of the macro
@@ -217,6 +228,76 @@ type ContextForMacros = {
     params: UnknownMacroParamsType,
     update: (newProps: UnknownMacroParamsType) => void,
   ): void;
+
+  /**
+   * Request the opening of a UI (e.g. modal) to insert a new block macro
+   *
+   * @param prefill - Information to prefill the modal with (ID, body, ...)
+   * @param insert - Insert the new macro, replacing the user-selected content (if any)
+   *
+   * @since 18.5.0RC1
+   * @beta
+   */
+  openInsertionEditor(
+    prefill: MacroInsertionEditorPrefillData,
+    insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+  ): void;
+};
+
+/**
+ * Informations to fill the insertion modal UI with
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroInsertionEditorPrefillData = {
+  /** Type of the macro to insert */
+  kind: "block" | "inline";
+
+  /** ID of the macro to insert */
+  id: string | null;
+
+  /** Parameters of the macro */
+  params: UnknownMacroParamsType | null;
+
+  /** Body of the macro */
+  body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
+};
+
+/**
+ * Information about a macro block invocation
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroBlockInvocation = {
+  kind: "block";
+  id: string;
+  params: UnknownMacroParamsType;
+  // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body:
+    | { type: "inlineContents"; content: InlineContentType[] }
+    | { type: "raw"; content: string }
+    | { type: "none" };
+};
+
+/**
+ * Information about an inline macro invocation
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type InlineMacroInvocation = {
+  kind: "inline";
+  id: string;
+  params: UnknownMacroParamsType;
+  // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body:
+    | { type: "inlineContent"; content: InlineContentType }
+    | { type: "raw"; content: string }
+    | { type: "none" };
 };
 
 /**
@@ -231,6 +312,7 @@ type ContextForMacros = {
  * @since 18.0.0RC1
  * @beta
  */
+// eslint-disable-next-line max-statements
 function adaptMacroForBlockNote(
   macro: MacroWithUnknownParamsType,
   ctx: ContextForMacros,
@@ -288,7 +370,7 @@ function adaptMacroForBlockNote(
    * @returns The rendered macro, as a JSX element
    */
   function renderMacro(
-    contentRef: (node: HTMLElement | null) => void,
+    contentRef: ((node: HTMLElement | null) => void) | null,
     props: Props<PropSchema>,
     content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
     // TODO: should also allow to replace the macro's body
@@ -316,7 +398,11 @@ function adaptMacroForBlockNote(
 
     if (renderedJsx instanceof Error) {
       // TODO: how to display properly an error?
-      return <strong>Failed to render macro: {renderedJsx.message}</strong>;
+      return (
+        <strong onDoubleClick={openParamsEditor}>
+          Failed to render macro: {renderedJsx.message}
+        </strong>
+      );
     }
 
     return macro.renderAs === "block" ? (
@@ -328,38 +414,63 @@ function adaptMacroForBlockNote(
 
   // Block and inline macros are defined pretty differently, so a bit of logic was computed ahead of time
   // to share it between the two definitions here.
+  const slashMenu = getSlashMenu((getDefaultValue) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: () => getDefaultValue() as any,
+  }));
+
   const bnRendering: BlockNoteConcreteMacro["bnRendering"] =
     macro.renderAs === "block"
       ? {
           type: "block",
-          block: createCustomBlockSpec({
-            config: {
-              type: blockNoteName,
-              // NOTE: Nesting is not supported
-              // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-              content: macro.infos.bodyType === "wysiwyg" ? "inline" : "none",
-              propSchema,
-            },
-            implementation: {
-              render: ({ contentRef, block, editor }) =>
-                renderMacro(
-                  contentRef,
-                  block.props,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  block.content as any,
-                  (newProps) => {
-                    editor.updateBlock(block.id, { props: newProps });
+          block:
+            macro.infos.bodyType === "wysiwyg"
+              ? createCustomBlockSpec({
+                  config: {
+                    type: blockNoteName,
+                    // NOTE: Nesting is not supported
+                    // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+                    content: "inline" as const,
+                    propSchema,
                   },
-                ),
-            },
-            slashMenu: getSlashMenu((getDefaultValue) => ({
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              default: () => getDefaultValue() as any,
-            })),
-            // TODO: allow macros to define their own toolbar, using a set of provided UI components (buttons, ...)
-            // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-708
-            customToolbar: null,
-          }),
+                  implementation: {
+                    render: ({ contentRef, block, editor }) =>
+                      renderMacro(
+                        contentRef,
+                        block.props,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        block.content as any,
+                        (newProps) => {
+                          editor.updateBlock(block.id, { props: newProps });
+                        },
+                      ),
+                  },
+                  slashMenu,
+                  // TODO: allow macros to define their own toolbar, using a set of provided UI components (buttons, ...)
+                  // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-708
+                  customToolbar: null,
+                })
+              : createCustomBlockSpec({
+                  config: {
+                    type: blockNoteName,
+                    content: "none" as const,
+                    propSchema,
+                  },
+                  implementation: {
+                    render: ({ block, editor }) =>
+                      renderMacro(
+                        null,
+                        block.props,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        block.content as any,
+                        (newProps) => {
+                          editor.updateBlock(block.id, { props: newProps });
+                        },
+                      ),
+                  },
+                  slashMenu,
+                  customToolbar: null,
+                }),
         }
       : {
           type: "inline",
@@ -398,7 +509,20 @@ function adaptMacroForBlockNote(
           }),
         };
 
-  return { macro, bnRendering };
+  const dropdownTransformItem =
+    macro.renderAs === "block"
+      ? ({
+          type: blockNoteName,
+          icon: (props) => <RiFileList3Fill {...props} />,
+          name: macro.infos.name,
+          props:
+            macro.infos.defaultParameters !== false
+              ? macro.infos.defaultParameters
+              : {},
+        } satisfies BlockTypeSelectItem)
+      : null;
+
+  return { macro, bnRendering, dropdownTransformItem };
 }
 
 /**
@@ -458,4 +582,10 @@ export {
   extractMacroRawContent,
 };
 
-export type { BlockNoteConcreteMacro, ContextForMacros };
+export type {
+  BlockNoteConcreteMacro,
+  ContextForMacros,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
+};

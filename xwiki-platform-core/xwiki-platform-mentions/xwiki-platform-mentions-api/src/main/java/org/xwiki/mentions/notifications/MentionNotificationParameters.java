@@ -47,13 +47,13 @@ public class MentionNotificationParameters implements Serializable
 {
     private static final long serialVersionUID = -8847694983380889549L;
 
+    private final Map<String, Set<MentionNotificationParameter>> mutableNewMentions;
+
     private final Map<String, Set<MentionNotificationParameter>> newMentions;
 
-    private final Map<String, Set<MentionNotificationParameter>> unmodifiableNewMentions;
+    private final Map<String, Set<MentionNotificationParameter>> mutableMentions;
 
     private final Map<String, Set<MentionNotificationParameter>> mentions;
-
-    private final Map<String, Set<MentionNotificationParameter>> unmodifiableMentions;
 
     private final String authorReference;
 
@@ -76,10 +76,10 @@ public class MentionNotificationParameters implements Serializable
         this.entityReference = entityReference;
         this.location = location;
         this.version = version;
-        this.newMentions = new HashMap<>();
-        this.mentions = new HashMap<>();
-        this.unmodifiableNewMentions = Collections.unmodifiableMap(this.newMentions);
-        this.unmodifiableMentions = Collections.unmodifiableMap(this.mentions);
+        this.mutableNewMentions = new HashMap<>();
+        this.mutableMentions = new HashMap<>();
+        this.newMentions = Collections.unmodifiableMap(this.mutableNewMentions);
+        this.mentions = Collections.unmodifiableMap(this.mutableMentions);
     }
 
     /**
@@ -116,7 +116,7 @@ public class MentionNotificationParameters implements Serializable
     public MentionNotificationParameters addMention(String type,
         MentionNotificationParameter mentionedActorReference)
     {
-        addToMap(type, mentionedActorReference, this.mentions);
+        addToMap(type, mentionedActorReference, this.mutableMentions);
         return this;
     }
 
@@ -130,7 +130,7 @@ public class MentionNotificationParameters implements Serializable
     public MentionNotificationParameters addNewMention(String type,
         MentionNotificationParameter mentionedActorReference)
     {
-        addToMap(type, mentionedActorReference, this.newMentions);
+        addToMap(type, mentionedActorReference, this.mutableNewMentions);
         return this;
     }
 
@@ -143,7 +143,7 @@ public class MentionNotificationParameters implements Serializable
      */
     public Map<String, Set<MentionNotificationParameter>> getNewMentions()
     {
-        return this.unmodifiableNewMentions;
+        return this.newMentions;
     }
 
     /**
@@ -155,7 +155,7 @@ public class MentionNotificationParameters implements Serializable
      */
     public Map<String, Set<MentionNotificationParameter>> getMentions()
     {
-        return this.unmodifiableMentions;
+        return this.mentions;
     }
 
     /**
@@ -197,8 +197,8 @@ public class MentionNotificationParameters implements Serializable
         MentionNotificationParameters that = (MentionNotificationParameters) o;
 
         return new EqualsBuilder()
-            .append(this.newMentions, that.newMentions)
-            .append(this.mentions, that.mentions)
+            .append(this.mutableNewMentions, that.mutableNewMentions)
+            .append(this.mutableMentions, that.mutableMentions)
             .append(this.authorReference, that.authorReference)
             .append(this.entityReference, that.entityReference)
             .append(this.location, that.location)
@@ -210,8 +210,8 @@ public class MentionNotificationParameters implements Serializable
     public int hashCode()
     {
         return new HashCodeBuilder(17, 37)
-            .append(this.newMentions)
-            .append(this.mentions)
+            .append(this.mutableNewMentions)
+            .append(this.mutableMentions)
             .append(this.authorReference)
             .append(this.entityReference)
             .append(this.location)
@@ -227,8 +227,8 @@ public class MentionNotificationParameters implements Serializable
             .append("entityReference", this.getEntityReference())
             .append("version", this.getVersion())
             .append("location", this.getLocation())
-            .append("mentions", this.mentions)
-            .append("newMentions", this.newMentions)
+            .append("mentions", this.mutableMentions)
+            .append("newMentions", this.mutableNewMentions)
             .build();
     }
 }

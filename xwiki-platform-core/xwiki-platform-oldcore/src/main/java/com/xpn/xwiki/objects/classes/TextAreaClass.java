@@ -399,7 +399,7 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        return contentType != null && !contentType.equals(PURETEXT_LOWERCASE) && !contentType.equals("velocitycode");
+        return contentType != null && !PURETEXT_LOWERCASE.equals(contentType) && !"velocitycode".equals(contentType);
     }
 
     /**
@@ -447,7 +447,7 @@ public class TextAreaClass extends StringClass
         parameters.put(ROWS, getRows());
         parameters.put("disabled", isDisabled());
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
-        parameters.put("sourceDocumentReference", object.getDocumentReference());
+        parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());
         Syntax syntax = null;
         String contentType = getContentType();
 

@@ -37,8 +37,14 @@ import type {
   EditorStyledText,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
+import type {
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
@@ -48,24 +54,30 @@ import type {
   TableCell,
   UniAst,
 } from "@xwiki/platform-uniast-api";
+import type { Container } from "inversify";
 
 /**
  * Convert the internal format of Blocknote to the Universal AST.
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
-// TODO: convert to an actual inversify component
 export class BlockNoteToUniAstConverter {
   private readonly macros: Record<string, MacroWithUnknownParamsType>;
+  private readonly remoteURLParser: RemoteURLParser;
+  private readonly modelReferenceSerializer: ModelReferenceSerializer;
 
-  constructor(
-    private readonly remoteURLParser: RemoteURLParser,
-    private readonly modelReferenceSerializer: ModelReferenceSerializer,
-    macros: MacroWithUnknownParamsType[],
-  ) {
+  constructor(depsContainer: Container, macros: MacroWithUnknownParamsType[]) {
     this.macros = Object.fromEntries(
       macros.map((macro) => [macro.infos.id, macro]),
     );
+
+    this.remoteURLParser = depsContainer
+      .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+      .get()!;
+
+    this.modelReferenceSerializer = depsContainer
+      .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+      .get()!;
   }
 
   blocksToUniAst(blocks: BlockType[]): UniAst | Error {
@@ -157,6 +169,7 @@ export class BlockNoteToUniAstConverter {
       return {
         type: "macroBlock",
         call: {
+          kind: "block",
           id,
           // Conversion is required as the AST is dynamically typed
           params: block.props as Record<string, boolean | number | string>,
@@ -285,9 +298,7 @@ export class BlockNoteToUniAstConverter {
       }
 
       case "divider":
-        // TODO: support dividers
-        // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-756
-        throw new Error("TODO: add support for BlockNote dividers to UniAst");
+        return { type: "break" };
 
       default:
         assertUnreachable(block);
@@ -406,6 +417,7 @@ export class BlockNoteToUniAstConverter {
       return {
         type: "inlineMacro",
         call: {
+          kind: "inline",
           id,
           // Conversion is required because the AST is dynamically typed
           params: (
@@ -422,9 +434,8 @@ export class BlockNoteToUniAstConverter {
                     content: extractMacroRawContent([inlineContent]),
                   }
                 : {
-                    type: "inlineContents",
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    inlineContents: [inlineContent as any],
+                    type: "inlineContent",
+                    inlineContent: this.convertInlineContent(inlineContent),
                   },
         },
       };

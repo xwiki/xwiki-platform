@@ -41,10 +41,7 @@ import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
@@ -76,6 +73,9 @@ import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -711,7 +711,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Tree");
-        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ", Keys.ARROW_LEFT);
 
         // Verify that the image uploaded from the second tab is visible in the first tab.
         firstTextArea.verifyContent(content -> {
@@ -734,7 +734,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
+        firstTextArea.sendKeys("est");
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickDone();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",

@@ -1030,6 +1030,7 @@ describe("MarkdownToUniAstConverter", () => {
               {
                 type: "inlineMacro",
                 call: {
+                  kind: "inline",
                   id: "someInlineMacro",
                   params: {},
                   body: { type: "none" },
@@ -1080,6 +1081,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {},
               body: { type: "none" },
@@ -1088,6 +1090,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {},
               body: { type: "none" },
@@ -1096,6 +1099,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {},
               body: { type: "none" },
@@ -1104,6 +1108,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {},
               body: { type: "none" },
@@ -1112,6 +1117,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "1",
@@ -1122,6 +1128,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "1",
@@ -1132,6 +1139,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "1",
@@ -1142,6 +1150,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "1",
@@ -1152,6 +1161,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "1",
@@ -1163,6 +1173,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1: "param1Value",
@@ -1208,6 +1219,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
               body: { type: "raw", content: "Hello **world**" },
@@ -1216,6 +1228,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
               body: { type: "raw", content: "Hello **world**" },
@@ -1224,6 +1237,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
               body: { type: "raw", content: "Hello **world**" },
@@ -1232,6 +1246,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
               body: { type: "raw", content: "Hello **world**" },
@@ -1240,6 +1255,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "1",
@@ -1250,6 +1266,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "1",
@@ -1260,6 +1277,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "1",
@@ -1270,6 +1288,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "1",
@@ -1280,6 +1299,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "1",
@@ -1291,6 +1311,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             type: "macroBlock",
             call: {
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1: "param1Value",
@@ -1328,6 +1349,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             call: {
               body: { type: "none" },
+              kind: "block",
               id: "someBlockMacro",
               params: {
                 param1:
@@ -1339,6 +1361,7 @@ describe("MarkdownToUniAstConverter", () => {
           {
             call: {
               body: { type: "raw", content: "Hello **world**" },
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {
                 param1:
@@ -1353,6 +1376,7 @@ describe("MarkdownToUniAstConverter", () => {
                 type: "raw",
                 content: "{{someBlockMacro /}}",
               },
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
             },
@@ -1365,6 +1389,7 @@ describe("MarkdownToUniAstConverter", () => {
                 content:
                   "{{someBlockMacroWithContent}}{{/someBlockMacroWithContent}}",
               },
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
             },
@@ -1376,6 +1401,7 @@ describe("MarkdownToUniAstConverter", () => {
                 type: "raw",
                 content: "`{{/someBlockMacroWithContent}}`",
               },
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
             },
@@ -1387,6 +1413,7 @@ describe("MarkdownToUniAstConverter", () => {
                 type: "raw",
                 content: "```{{/someBlockMacroWithContent}}```",
               },
+              kind: "block",
               id: "someBlockMacroWithContent",
               params: {},
             },
@@ -1397,31 +1424,83 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse nested blocks", async () => {
+  test("parse nested lists", async () => {
+    const input = ["1. A", "   1. B", "   2. C", "2. D", "3. E"].join("\n");
+
     await testTwoWayConversion({
-      startingFrom: "> A\n> > B",
-      convertsBackTo: "> A\n> > B",
+      startingFrom: input,
+      convertsBackTo: input,
       withUniAst: {
         blocks: [
           {
-            content: [
+            items: [
               {
-                content: [
-                  {
-                    content: "A",
-                    styles: {},
-                    type: "text",
-                  },
-                ],
-                styles: {},
-                type: "paragraph",
-              },
-              {
+                checked: undefined,
                 content: [
                   {
                     content: [
                       {
-                        content: "B",
+                        content: "A",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                  {
+                    items: [
+                      {
+                        checked: undefined,
+                        content: [
+                          {
+                            content: [
+                              {
+                                content: "B",
+                                styles: {},
+                                type: "text",
+                              },
+                            ],
+                            styles: {},
+                            type: "paragraph",
+                          },
+                        ],
+                        number: 1,
+                        styles: {},
+                      },
+                      {
+                        checked: undefined,
+                        content: [
+                          {
+                            content: [
+                              {
+                                content: "C",
+                                styles: {},
+                                type: "text",
+                              },
+                            ],
+                            styles: {},
+                            type: "paragraph",
+                          },
+                        ],
+                        number: 2,
+                        styles: {},
+                      },
+                    ],
+                    styles: {},
+                    type: "list",
+                  },
+                ],
+                number: 1,
+                styles: {},
+              },
+              {
+                checked: undefined,
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "D",
                         styles: {},
                         type: "text",
                       },
@@ -1430,12 +1509,30 @@ describe("MarkdownToUniAstConverter", () => {
                     type: "paragraph",
                   },
                 ],
+                number: 2,
                 styles: {},
-                type: "quote",
+              },
+              {
+                checked: undefined,
+                content: [
+                  {
+                    content: [
+                      {
+                        content: "E",
+                        styles: {},
+                        type: "text",
+                      },
+                    ],
+                    styles: {},
+                    type: "paragraph",
+                  },
+                ],
+                number: 3,
+                styles: {},
               },
             ],
             styles: {},
-            type: "quote",
+            type: "list",
           },
         ],
       },

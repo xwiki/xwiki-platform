@@ -19,9 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.delete;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -75,7 +74,7 @@ class DocumentsDeletingListenerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeComponent
-    void setUp(MockitoComponentManager mockitoComponentManager) throws Exception
+    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         this.repository = mock(XarInstalledExtensionRepository.class);
         mockitoComponentManager.registerComponent(InstalledExtensionRepository.class, "xar", this.repository);
@@ -107,13 +106,13 @@ class DocumentsDeletingListenerTest
         XarInstalledExtension ext2 = mock(XarInstalledExtension.class);
         when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
         when(ext2.getId()).thenReturn(new ExtensionId("ext2"));
-        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1, ext2));
+        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(List.of(ext1, ext2));
         when(this.repository.isAllowed(doc1, Right.DELETE)).thenReturn(false);
-        when(this.repository.getXarInstalledExtensions(doc2)).thenReturn(Collections.emptyList());
+        when(this.repository.getXarInstalledExtensions(doc2)).thenReturn(List.of());
         when(this.repository.isAllowed(doc2, Right.DELETE)).thenReturn(true);
-        when(this.repository.getXarInstalledExtensions(doc3)).thenReturn(Arrays.asList(ext2));
+        when(this.repository.getXarInstalledExtensions(doc3)).thenReturn(List.of(ext2));
         when(this.repository.isAllowed(doc3, Right.DELETE)).thenReturn(false);
-        when(this.repository.getXarInstalledExtensions(doc4)).thenReturn(Arrays.asList(ext1));
+        when(this.repository.getXarInstalledExtensions(doc4)).thenReturn(List.of(ext1));
         when(this.repository.isAllowed(doc4, Right.DELETE)).thenReturn(true);
 
         doAnswer(invocationOnMock -> {
@@ -152,12 +151,13 @@ class DocumentsDeletingListenerTest
 
         // Check
         verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
-        assertEquals(1, logCapture.size());
-        assertEquals("The question has been asked, however no answer has been received.", logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("The question has been asked, however no answer has been received.",
+            this.logCapture.getMessage(0));
     }
 
     @Test
-    public void onEventWhenNonInteractive()
+    void onEventWhenNonInteractive()
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -171,11 +171,11 @@ class DocumentsDeletingListenerTest
         this.listener.onEvent(event, job, null);
 
         // Verify
-        assertEquals(1, logCapture.size());
+        assertEquals(1, this.logCapture.size());
         assertEquals("XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.",
-            logCapture.getMessage(0));
+            this.logCapture.getMessage(0));
         verifyNoInteractions(status);
-        verifyNoInteractions(repository);
+        verifyNoInteractions(this.repository);
     }
 
     @Test
@@ -194,7 +194,7 @@ class DocumentsDeletingListenerTest
 
         XarInstalledExtension ext1 = mock(XarInstalledExtension.class);
         when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
-        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1));
+        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(List.of(ext1));
 
         InterruptedException e = new InterruptedException();
         doThrow(e).when(status).ask(any(), anyLong(), any());
@@ -206,7 +206,7 @@ class DocumentsDeletingListenerTest
         // Check
         verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("Question has been interrupted."));
-        assertEquals(1, logCapture.size());
-        assertEquals("Confirm question has been interrupted.", logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Confirm question has been interrupted.", this.logCapture.getMessage(0));
     }
 }

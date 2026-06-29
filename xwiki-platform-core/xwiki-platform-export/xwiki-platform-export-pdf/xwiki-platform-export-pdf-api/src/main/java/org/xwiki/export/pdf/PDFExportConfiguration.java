@@ -128,7 +128,7 @@ public interface PDFExportConfiguration
     default boolean isXWikiURISpecified()
     {
         try {
-            return !getXWikiURI().toString().equals(DEFAULT_XWIKI_URI);
+            return !DEFAULT_XWIKI_URI.equals(getXWikiURI().toString());
         } catch (URISyntaxException e) {
             // If the XWiki URI cannot be parsed then most likely it is specified (basically we expect the default XWiki
             // URI to be valid).

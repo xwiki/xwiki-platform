@@ -5,7 +5,7 @@
 ```ts
 
 import { BlockNoteViewWrapperProps } from '@xwiki/platform-editors-blocknote-react';
-import { CollaborationInitializer } from '@xwiki/platform-collaboration-api';
+import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
@@ -18,28 +18,28 @@ import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
-container: Container;
+collaboration?: Collaboration;
+depsContainer: Container;
 }, {
 getContent: () => UniAst | Error;
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: UniAst) => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
-container: Container;
+collaboration?: Collaboration;
+depsContainer: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: UniAst) => any) | undefined;

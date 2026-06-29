@@ -120,14 +120,14 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
     {
         java.lang.Object newValue = null;
         PropertyClass propertyClass = (PropertyClass) object.getXClass(xcontext).get(propertyName);
-        if (propertyClass.getClassType().equals("Boolean")) {
+        if ("Boolean".equals(propertyClass.getClassType())) {
             // Note: if not defined, then set it to true
             if (object.getIntValue(propertyName) == 1) {
                 newValue = 0;
             } else  {
                 newValue = 1;
             }
-        } else if (propertyClass.getClassType().equals("StaticList")) {
+        } else if ("StaticList".equals(propertyClass.getClassType())) {
             newValue = computeNewStaticListValue((StaticListClass) propertyClass, object, propertyName, xcontext);
         }
         return newValue;

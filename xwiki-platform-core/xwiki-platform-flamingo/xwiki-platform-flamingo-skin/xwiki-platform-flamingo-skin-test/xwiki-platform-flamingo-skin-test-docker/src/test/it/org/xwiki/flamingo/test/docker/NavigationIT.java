@@ -226,11 +226,14 @@ public class NavigationIT
      */
     @Order(4)
     @Test
-    public void simpleBinUrlDoesNotThrowException(TestUtils testUtils)
+    void simpleBinUrlDoesNotThrowException(TestUtils testUtils)
     {
+        // Create the main page so we can assert its title later.
+        testUtils.createPage("Main", "WebHome", "", "Home Page");
+
         testUtils.gotoPage(testUtils.getBaseBinURL());
         ViewPage viewPage = new ViewPage();
-        assertEquals("XWiki - Main - Main", viewPage.getPageTitle());
+        assertEquals("XWiki - Main - Home Page", viewPage.getPageTitle());
     }
 
     @Order(5)

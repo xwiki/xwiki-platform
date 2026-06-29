@@ -91,9 +91,9 @@ public class ExportAction extends XWikiAction
 
             if (!validateExportRequest(request)) {
                 return "docdoesnotexist";
-            } else if (format == null || format.equals("xar")) {
+            } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
-            } else if (format.equals("html")) {
+            } else if ("html".equals(format)) {
                 defaultPage = exportHTML(context);
             } else {
                 defaultPage = export(format, context);
@@ -216,7 +216,7 @@ public class ExportAction extends XWikiAction
         // a directory hierarchy but a file name
         EntityReferenceSerializer<String> serializer =
             Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
-        String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+        String filename = serializer.serialize(doc.getDocumentReference()).replace("/", "_");
         // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
         filename = StringUtils.abbreviateMiddle(filename, "__", 255);
         context.getResponse().addHeader("Content-disposition",

@@ -150,6 +150,14 @@ XWiki.Selection = Class.create({
     }
     this.container = container;
   },
+  
+  // This method should only be used internally.
+  // Filter a string to remove all occurrences of the annotation text alternative.
+  // This allows to get the same result from the content picked on the page whether annotations are shown or not.
+  filterText : function(text) {
+    return text.replaceAll(
+      "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))",'');
+  },
 
   computeSelection : function () {
     // reset the selection state
@@ -171,8 +179,7 @@ XWiki.Selection = Class.create({
       return;
     }
     this.selectionText = this.range.toString();
-    this.selectionText = this.selectionText.replaceAll(
-        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))",'')
+    this.selectionText = this.filterText(this.selectionText);
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
     }
@@ -396,8 +403,10 @@ XWiki.Selection = Class.create({
 
   computeContextFF : function() {
     var left = this.getLeftDocument(this.range.startContainer) + this.range.startContainer.textContent.substring(0, this.range.startOffset);
+    left = this.filterText(left);
     var subLeft = '';
     var right = this.range.endContainer.textContent.substring(this.range.endOffset, this.range.endContainer.textContent.length) + this.getRightDocument(this.range.endContainer);
+    right = this.filterText(right);
     var subRight = '';
     var offset = 0;
     var context = this.range.toString();
@@ -1052,6 +1061,7 @@ XWiki.Annotation = Class.create({
     var wrapper = document.createElement('mark');
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
+    wrapper.addClassName(ann.state.toLowerCase());
     var parentNode = markedNode.parentElement;
     parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);
@@ -1915,7 +1925,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
   $(function() {
     // Load the annotations only in view mode, if the document content is displayed
     // (the document content is not displayed when viewer=history for instance).
-    if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
+    if (XWiki.contextaction != 'view' || !$('#xwikicontent')[0]) {
       return;
     }
 

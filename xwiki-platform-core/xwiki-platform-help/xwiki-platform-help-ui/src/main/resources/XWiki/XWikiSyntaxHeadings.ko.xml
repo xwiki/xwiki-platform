@@ -65,7 +65,7 @@
 (% style="color:blue" %)
 = heading =
 )))
-|Headings with XWiki Syntax|1.1.1 Heading with *bold*|(((=== Heading with **bold** ===)))
+|Headings with XWiki Syntax|1.1 Heading with *bold*|(((== Heading with **bold** ==)))
 
 === 2.0 Headings ===
 
@@ -89,5 +89,5 @@
 (% style="color:blue" %)
 = heading =
 )))
-|Headings with XWiki Syntax|{{{=== Heading with **bold** ===}}}|(((=== Heading with **bold** ===)))</content>
+|Headings with XWiki Syntax|{{{== Heading with **bold** ==}}}|(((== Heading with **bold** ==)))</content>
 </xwikidoc>

@@ -46,7 +46,7 @@ public class DocumentRestoringEvent extends AbstractDocumentRestoreEvent
      */
     public DocumentRestoringEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

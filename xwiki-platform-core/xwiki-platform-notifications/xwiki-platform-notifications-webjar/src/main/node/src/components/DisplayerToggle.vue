@@ -64,6 +64,7 @@ import {
   BaseDisplayer,
   XWikiIcon,
   displayerMixin,
+  loadById,
 } from "@xwiki/platform-livedata-ui";
 
 export default {
@@ -82,28 +83,56 @@ export default {
     return {
       // When this value changes to true following the ready from XWikiIcon, the toggle is initialized.
       iconReady: false,
-      innerChecked: this.entry[`${this.propertyId}_checked`],
-      innerDisabled: this.entry[`${this.propertyId}_disabled`],
-      innerData: {
-        ...this.entry[`${this.propertyId}_data`],
-      },
     };
   },
+  computed: {
+    innerChecked: {
+      get() {
+        return this.entry[`${this.propertyId}_checked`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_checked`] = val;
+      },
+    },
+    innerDisabled: {
+      get() {
+        return this.entry[`${this.propertyId}_disabled`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_disabled`] = val;
+      },
+    },
+    innerData: {
+      get() {
+        return this.entry[`${this.propertyId}_data`];
+      },
+      set(val) {
+        this.entry[`${this.propertyId}_data`] = val;
+      },
+    },
+  },
   watch: {
+    innerChecked(checked) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("state", checked, true);
+    },
+    innerDisabled(disabled) {
+      this.jQuery(this.$refs.input).bootstrapSwitch("disabled", disabled);
+    },
     iconReady: function (val) {
       if (val) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
-        this.$nextTick(() => {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require(["xwiki-bootstrap-switch"], () => {
-            this.jQuery(this.$refs.input).bootstrapSwitch({
-              size: "mini",
-              state: component.innerChecked,
-              disabled: component.innerDisabled,
-              labelText: this.$refs.icon.$el.outerHTML,
-              /*
+        this.$nextTick(async () => {
+          await loadById("xwiki-bootstrap-switch");
+
+          const jQuery = this.jQuery;
+          jQuery(this.$refs.input).bootstrapSwitch({
+            size: "mini",
+            state: component.innerChecked,
+            disabled: component.innerDisabled,
+            labelText: this.$refs.icon.$el.outerHTML,
+            /*
                Send a xwiki:livedata:toggle event with the following event data:
                - the data of the toggle
                - the new state of the toggle
@@ -111,35 +140,26 @@ export default {
                - a callback. When the callback is called, the toggle component is updated with the provided data, state,
                   and disabled status.
               */
-              onSwitchChange(event, state) {
-                const toggleData = component.innerData;
-                const disabledVal = component.innerDisabled;
-                component.logic.triggerEvent("toggle", {
-                  data: toggleData,
-                  checked: state,
-                  disabled: disabledVal,
-                  callback: function ({
-                    data = toggleData,
-                    checked = state,
-                    disabled = disabledVal,
-                  }) {
-                    component.innerData = data;
-                    component.innerChecked = checked;
-                    component.innerDisabled = disabled;
-                    // The last parameter is skip, preventing to call onSwitchChange again.
-                    this.jQuery(component.$refs.input).bootstrapSwitch(
-                      "state",
-                      checked,
-                      true,
-                    );
-                    this.jQuery(component.$refs.input).bootstrapSwitch(
-                      "disabled",
-                      disabled,
-                    );
-                  },
-                });
-              },
-            });
+            onSwitchChange(event, state) {
+              const toggleData = component.innerData;
+              const disabledVal = component.innerDisabled;
+              component.logic.triggerEvent("toggle", {
+                data: toggleData,
+                checked: state,
+                disabled: disabledVal,
+                callback: function ({
+                  data = toggleData,
+                  checked = state,
+                  disabled = disabledVal,
+                }) {
+                  // Writing to computed setters updates `entry` directly —
+                  // the innerChecked/innerDisabled watchers then sync bootstrapSwitch.
+                  component.innerData = data;
+                  component.innerChecked = checked;
+                  component.innerDisabled = disabled;
+                },
+              });
+            },
           });
         });
       }

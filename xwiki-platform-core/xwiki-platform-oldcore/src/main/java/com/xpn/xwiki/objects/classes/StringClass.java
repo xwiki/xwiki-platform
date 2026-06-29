@@ -60,7 +60,7 @@ public class StringClass extends PropertyClass
 
     public StringClass(PropertyMetaClass wclass)
     {
-        this(XCLASSNAME, "String", wclass);
+        this(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public StringClass()

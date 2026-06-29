@@ -82,26 +82,26 @@ public class AdminAction extends XWikiAction
                 doc.setDefaultTemplate(defaultTemplate);
             }
             String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage != null) && !defaultLanguage.equals("")) {
+            if ((defaultLanguage != null) && !defaultLanguage.isEmpty()) {
                 doc.setDefaultLanguage(defaultLanguage);
             }
-            if (doc.getDefaultLanguage().equals("")) {
+            if ("".equals(doc.getDefaultLanguage())) {
                 doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
             }
 
             String language = context.getWiki().getLanguagePreference(context);
             String languagefromrequest = context.getRequest().getParameter("language");
             String languagetoedit =
-                ((languagefromrequest == null) || (languagefromrequest.equals(""))) ? language : languagefromrequest;
+                ((languagefromrequest == null) || (languagefromrequest.isEmpty())) ? language : languagefromrequest;
 
-            if ((languagetoedit == null) || (languagetoedit.equals("default"))) {
+            if ((languagetoedit == null) || ("default".equals(languagetoedit))) {
                 languagetoedit = "";
             }
             if (doc.isNew() || (doc.getDefaultLanguage().equals(languagetoedit))) {
                 languagetoedit = "";
             }
 
-            if (languagetoedit.equals("")) {
+            if (languagetoedit.isEmpty()) {
                 // In this case the created document is going to be the default document
                 tdoc = doc;
                 context.put("tdoc", doc);

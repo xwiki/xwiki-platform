@@ -36,8 +36,6 @@ import type { Query } from "./query";
 import type { QueryConstraint } from "./queryConstraint";
 import type { SortEntry } from "./sortEntry";
 import type { Source } from "./source";
-import type { TranslationQuery } from "./translationQuery";
-import type { Translations } from "./translations";
 import type { Values } from "./values";
 
 export type {
@@ -59,7 +57,5 @@ export type {
   QueryConstraint,
   SortEntry,
   Source,
-  TranslationQuery,
-  Translations,
   Values,
 };

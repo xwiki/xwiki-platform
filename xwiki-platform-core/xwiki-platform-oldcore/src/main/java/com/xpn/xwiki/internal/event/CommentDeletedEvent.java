@@ -49,7 +49,7 @@ public class CommentDeletedEvent extends AbstractCommentEvent
      */
     public CommentDeletedEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

@@ -133,7 +133,7 @@ public class TableLayoutElement extends BaseElement
             URIBuilder uriBuilder = new URIBuilder(initialUri);
             List<String> pathSegments = uriBuilder.getPathSegments();
             URI uri;
-            if (pathSegments.get(pathSegments.size() - 1).equals("")) {
+            if ("".equals(pathSegments.getLast())) {
                 pathSegments.remove(pathSegments.size() - 1);
                 try {
                     uri = uriBuilder.setPathSegments(pathSegments).build();
@@ -175,7 +175,7 @@ public class TableLayoutElement extends BaseElement
         @Override
         protected boolean matchesSafely(WebElement item)
         {
-            return item.getText().equals(this.value);
+            return this.value.equals(item.getText());
         }
 
         @Override
@@ -535,12 +535,19 @@ public class TableLayoutElement extends BaseElement
     {
         SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
         // Wait for the suggestions on selectize fields only if this is explicitly asked.
-        suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+        suggestInputElement.click().waitForSuggestions().clearSelectedSuggestions().sendKeys(content);
         if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
             suggestInputElement.waitForSuggestions().selectByVisibleText(content);
         } else {
             suggestInputElement.selectTypedText();
         }
+        // Sometimes, when the suggest input is focused, we need to click twice to perform an action (e.g. sort on a
+        // given column, open the "More actions" dropdown menu). The first click moves the focus to the new target (i.e.
+        // document.activeElement is updated) but the action is not performed until the second click. We couldn't
+        // reproduce this outside tests, and it doesn't reproduce for any suggest input filter in tests either, so we
+        // don't know if this is a Tom Select bug or some issue in Selenium / WebDriver, or a mix of both. The
+        // workaround is to blur the suggest input after selecting a value.
+        getDriver().executeScript("document.activeElement?.blur()");
     }
 
     private static void filterBooleanColumn(String content, WebElement filterElement)
@@ -551,7 +558,8 @@ public class TableLayoutElement extends BaseElement
             suggestInputElement.clearSelectedSuggestions().hideSuggestions();
         } else {
             suggestInputElement.clear().sendKeys(content);
-            suggestInputElement.waitForNonTypedSuggestions();
+            // The boolean filter doesn't need a remote source, so we don't need to wait for suggestions to be fetched.
+            suggestInputElement.waitForNonTypedSuggestions(false);
             suggestInputElement.selectByVisibleText(content);
         }
     }
@@ -903,7 +911,7 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement getDropDownButton()
     {
-        return getRoot().findElement(By.cssSelector("a.dropdown-toggle"));
+        return getRoot().findElement(By.cssSelector("button.dropdown-toggle"));
     }
 
     /**
@@ -976,7 +984,7 @@ public class TableLayoutElement extends BaseElement
         List<WebElement> elements = getRoot().findElements(By.cssSelector("thead tr th .property-name"));
         int index = -1;
         for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).getText().equals(columnLabel)) {
+            if (columnLabel.equals(elements.get(i).getText())) {
                 index = i + 1;
                 break;
             }

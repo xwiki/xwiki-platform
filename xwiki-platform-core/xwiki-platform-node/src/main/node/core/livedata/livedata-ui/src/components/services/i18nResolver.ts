@@ -18,18 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type {
-  TranslationQuery,
-  Translations,
-} from "@xwiki/platform-livedata-api";
+import type { Query, Translations } from "@xwiki/platform-localization-api";
 
 /**
- * @param i18n - the i18n instance to initialize
- * @param locale - the locale to load
+ * @param resolveTranslations - takes a translation query and returns resolved translations
  * @returns continues once the translation values are fetched remotely
  */
 export async function i18nResolver(
-  resolveTranslations: (query: TranslationQuery) => Promise<Translations>,
+  resolveTranslations: (query: Query) => Promise<Translations>,
 ): Promise<Translations> {
   return await resolveTranslations({
     prefix: "livedata.",
@@ -62,6 +58,8 @@ export async function i18nResolver(
       "action.columnName.sortable.hint",
       "action.columnName.default.hint",
       "action.resizeColumn.hint",
+      "panel.heading.actions.collapse.hint",
+      "panel.heading.actions.close.hint",
       "panel.filter.title",
       "panel.filter.noneFilterable",
       "panel.filter.addConstraint",

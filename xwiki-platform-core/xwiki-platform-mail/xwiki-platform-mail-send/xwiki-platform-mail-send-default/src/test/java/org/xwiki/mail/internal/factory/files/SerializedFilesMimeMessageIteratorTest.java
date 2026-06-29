@@ -32,45 +32,43 @@ import java.util.UUID;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.files.SerializedFilesMimeMessageIterator}.
+ * Unit tests for {@link SerializedFilesMimeMessageIterator}.
  *
  * @version $Id$
  * @since 6.4M3
  */
-public class SerializedFilesMimeMessageIteratorTest
+class SerializedFilesMimeMessageIteratorTest
 {
     private static final String TEMPORARY_DIRECTORY = "target/"
         + SerializedFilesMimeMessageIteratorTest.class.getSimpleName();
 
-    @Rule
-    public LogRule logRule = new LogRule()
-    {
-        {
-            record(LogLevel.ERROR);
-            recordLoggingForType(SerializedFilesMimeMessageIterator.class);
-        }
-    };
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     private String batchId;
 
     private File batchDirectory;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.batchId = UUID.randomUUID().toString();
 
@@ -79,20 +77,18 @@ public class SerializedFilesMimeMessageIteratorTest
         this.batchDirectory.mkdirs();
     }
 
-    @After
-    public void tearDown() throws Exception
+    @AfterEach
+    void tearDown() throws Exception
     {
-        // Delete created messages and directories
-        FileUtils.deleteDirectory(
-            new File(TEMPORARY_DIRECTORY, this.batchId));
+        FileUtils.deleteDirectory(new File(TEMPORARY_DIRECTORY, this.batchId));
     }
 
     /**
-     * Error that can happen if the file has been locally deleted between the time the time the user executes a
-     * resend and the time the Mail Sender Thread reaches that file for processing (i.e. deserializing it).
+     * Error that can happen if the file has been locally deleted between the time the user executes a resend and the
+     * time the Mail Sender Thread reaches that file for processing (i.e. deserializing it).
      */
     @Test
-    public void createMessageWhenFileNoLongerExists() throws Exception
+    void createMessageWhenFileNoLongerExists() throws Exception
     {
         Environment environment = mock(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
@@ -105,7 +101,7 @@ public class SerializedFilesMimeMessageIteratorTest
         createSerializedMessage(mailID);
 
         SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(this.batchId,
-            Collections.<String, Object>emptyMap(), componentManager);
+            Collections.emptyMap(), componentManager);
 
         // Remove the file before next() is called to generate the error
         File messageFile = new File(this.batchDirectory, URLEncoder.encode(mailID, "UTF-8"));
@@ -117,11 +113,11 @@ public class SerializedFilesMimeMessageIteratorTest
         // 1) the returned message is null since there was an error
         // 2) that the log contains the error
         assertNull(message);
-        assertEquals("Failed to create Mime Message", this.logRule.getMessage(0));
+        assertEquals("Failed to create Mime Message", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void createMessage() throws Exception
+    void createMessage() throws Exception
     {
         String mailID1 = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
         String mailID2 = "<1128820400.1.1419205781342.JavaMail.contact@xwiki.org>";
@@ -132,7 +128,7 @@ public class SerializedFilesMimeMessageIteratorTest
         createSerializedMessage(mailID3);
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("parameters", Collections.EMPTY_MAP);
+        parameters.put("parameters", Collections.emptyMap());
 
         Environment environment = mock(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
@@ -172,13 +168,13 @@ public class SerializedFilesMimeMessageIteratorTest
         messageFile.createNewFile();
         String newLine = System.getProperty("line.separator");
 
-        FileWriter fileWriter = new FileWriter(messageFile, true);
-        // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
-        fileWriter.append("Message-ID: " + messageId + newLine);
-        fileWriter.append("MIME-Version: 1.0" + newLine);
-        fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
-        fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
-        fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
-        fileWriter.close();
+        try (FileWriter fileWriter = new FileWriter(messageFile, true)) {
+            // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
+            fileWriter.append("Message-ID: ").append(messageId).append(newLine);
+            fileWriter.append("MIME-Version: 1.0").append(newLine);
+            fileWriter.append("Content-Type: text/plain; charset=us-ascii").append(newLine);
+            fileWriter.append("Content-Transfer-Encoding: 7bit").append(newLine);
+            fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
+        }
     }
 }

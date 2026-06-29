@@ -105,14 +105,15 @@ class DefaultIconSetLoaderTest
     @Test
     void loadIconSet() throws Exception
     {
-        Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"));
+        try (Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"))) {
 
-        // Test
-        IconSet result = this.iconSetLoader.loadIconSet(content, "FontAwesome");
+            // Test
+            IconSet result = this.iconSetLoader.loadIconSet(content, "FontAwesome");
 
-        // Verify
-        verifies(result);
-        assertEquals("FontAwesome", result.getName());
+            // Verify
+            verifies(result);
+            assertEquals("FontAwesome", result.getName());
+        }
     }
 
     @Test

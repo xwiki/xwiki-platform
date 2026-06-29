@@ -19,9 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class ScopeNotificationFilterPreferencesGetterTest
+class ScopeNotificationFilterPreferencesGetterTest
 {
     @InjectMockComponents
     private ScopeNotificationFilterPreferencesGetter getter;
@@ -79,25 +78,23 @@ public class ScopeNotificationFilterPreferencesGetterTest
         when(pref6.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
         // pref3 has not the right matching format, it is discarded. Others at least contains it.
-        when(pref3.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.EMAIL));
-        when(pref4.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
-        when(pref5.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.ALERT));
-        when(pref6.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
+        when(pref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
+        when(pref4.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(pref5.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
+        when(pref6.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         // pref4 does not contain the right event type, it will be discarded.
         // pref5 does not contain any specific event type, so it should match all since onlyGivenType is false.
-        when(pref4.getEventTypes()).thenReturn(Collections.singleton("otherEventType"));
-        when(pref5.getEventTypes()).thenReturn(Collections.emptySet());
-        when(pref6.getEventTypes()).thenReturn(new HashSet<>(Arrays.asList("like", "mentions", "comment")));
+        when(pref4.getEventTypes()).thenReturn(Set.of("otherEventType"));
+        when(pref5.getEventTypes()).thenReturn(Set.of());
+        when(pref6.getEventTypes()).thenReturn(Set.of("like", "mentions", "comment"));
 
         ScopeNotificationFilterPreferencesHierarchy expected = new ScopeNotificationFilterPreferencesHierarchy(
-            Arrays.asList(
+            List.of(
                 new ScopeNotificationFilterPreference(pref5, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref6, this.entityReferenceResolver)
-        ));
-        assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
+            ));
+        assertEquals(expected, this.getter.getScopeFilterPreferences(List.of(
             pref1, pref2, pref3, pref4, pref5, pref6
         ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
@@ -132,26 +129,25 @@ public class ScopeNotificationFilterPreferencesGetterTest
         when(pref6.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
         // All formats will be accepted
-        when(pref3.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.EMAIL));
-        when(pref4.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
-        when(pref5.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.ALERT));
+        when(pref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
+        when(pref4.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(pref5.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         when(pref6.getNotificationFormats()).thenReturn(null);
 
         // pref4 does not contain the right event type, it will be discarded.
         // pref5 does not contain any specific event type, so it should match all since onlyGivenType is false.
-        when(pref3.getEventTypes()).thenReturn(Collections.singleton("mentions"));
-        when(pref4.getEventTypes()).thenReturn(Collections.singleton("otherEventType"));
-        when(pref5.getEventTypes()).thenReturn(Collections.emptySet());
-        when(pref6.getEventTypes()).thenReturn(new HashSet<>(Arrays.asList("like", "mentions", "comment")));
+        when(pref3.getEventTypes()).thenReturn(Set.of("mentions"));
+        when(pref4.getEventTypes()).thenReturn(Set.of("otherEventType"));
+        when(pref5.getEventTypes()).thenReturn(Set.of());
+        when(pref6.getEventTypes()).thenReturn(Set.of("like", "mentions", "comment"));
 
         ScopeNotificationFilterPreferencesHierarchy expected = new ScopeNotificationFilterPreferencesHierarchy(
-            Arrays.asList(
+            List.of(
                 new ScopeNotificationFilterPreference(pref3, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref5, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref6, this.entityReferenceResolver)
             ));
-        assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
+        assertEquals(expected, this.getter.getScopeFilterPreferences(List.of(
             pref1, pref2, pref3, pref4, pref5, pref6
         ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
@@ -186,26 +182,25 @@ public class ScopeNotificationFilterPreferencesGetterTest
         when(pref6.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
         // All formats will be accepted
-        when(pref3.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.EMAIL));
-        when(pref4.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
-        when(pref5.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.ALERT));
+        when(pref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
+        when(pref4.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(pref5.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         when(pref6.getNotificationFormats()).thenReturn(null);
 
         // eventType is null and onlyGivenType is false so any event type will be accepted.
-        when(pref3.getEventTypes()).thenReturn(Collections.singleton("mentions"));
-        when(pref4.getEventTypes()).thenReturn(Collections.singleton("otherEventType"));
-        when(pref5.getEventTypes()).thenReturn(Collections.emptySet());
-        when(pref6.getEventTypes()).thenReturn(new HashSet<>(Arrays.asList("like", "mentions", "comment")));
+        when(pref3.getEventTypes()).thenReturn(Set.of("mentions"));
+        when(pref4.getEventTypes()).thenReturn(Set.of("otherEventType"));
+        when(pref5.getEventTypes()).thenReturn(Set.of());
+        when(pref6.getEventTypes()).thenReturn(Set.of("like", "mentions", "comment"));
 
         ScopeNotificationFilterPreferencesHierarchy expected = new ScopeNotificationFilterPreferencesHierarchy(
-            Arrays.asList(
+            List.of(
                 new ScopeNotificationFilterPreference(pref3, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref4, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref5, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref6, this.entityReferenceResolver)
             ));
-        assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
+        assertEquals(expected, this.getter.getScopeFilterPreferences(List.of(
             pref1, pref2, pref3, pref4, pref5, pref6
         ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
@@ -240,25 +235,24 @@ public class ScopeNotificationFilterPreferencesGetterTest
         when(pref6.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
         // All formats will be accepted
-        when(pref3.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.EMAIL));
-        when(pref4.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
-        when(pref5.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.ALERT));
+        when(pref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
+        when(pref4.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(pref5.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         when(pref6.getNotificationFormats()).thenReturn(null);
 
         // pref4 does not contain the right event type, it will be discarded.
         // pref5 does not contain any specific event type, and onlyGivenType is true so it doesn't match.
-        when(pref3.getEventTypes()).thenReturn(Collections.singleton("mentions"));
-        when(pref4.getEventTypes()).thenReturn(Collections.singleton("otherEventType"));
-        when(pref5.getEventTypes()).thenReturn(Collections.emptySet());
-        when(pref6.getEventTypes()).thenReturn(new HashSet<>(Arrays.asList("like", "mentions", "comment")));
+        when(pref3.getEventTypes()).thenReturn(Set.of("mentions"));
+        when(pref4.getEventTypes()).thenReturn(Set.of("otherEventType"));
+        when(pref5.getEventTypes()).thenReturn(Set.of());
+        when(pref6.getEventTypes()).thenReturn(Set.of("like", "mentions", "comment"));
 
         ScopeNotificationFilterPreferencesHierarchy expected = new ScopeNotificationFilterPreferencesHierarchy(
-            Arrays.asList(
+            List.of(
                 new ScopeNotificationFilterPreference(pref3, this.entityReferenceResolver),
                 new ScopeNotificationFilterPreference(pref6, this.entityReferenceResolver)
             ));
-        assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
+        assertEquals(expected, this.getter.getScopeFilterPreferences(List.of(
             pref1, pref2, pref3, pref4, pref5, pref6
         ), requestedEventType, requestedFormat, onlyGivenType, false));
     }
@@ -293,23 +287,22 @@ public class ScopeNotificationFilterPreferencesGetterTest
         when(pref6.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
         // All formats will be accepted
-        when(pref3.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.EMAIL));
-        when(pref4.getNotificationFormats())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFormat.ALERT, NotificationFormat.EMAIL)));
-        when(pref5.getNotificationFormats()).thenReturn(Collections.singleton(NotificationFormat.ALERT));
+        when(pref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
+        when(pref4.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(pref5.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         when(pref6.getNotificationFormats()).thenReturn(null);
 
         // eventType is null and onlyGivenType is true so only pref5 matches.
-        when(pref3.getEventTypes()).thenReturn(Collections.singleton("mentions"));
-        when(pref4.getEventTypes()).thenReturn(Collections.singleton("otherEventType"));
-        when(pref5.getEventTypes()).thenReturn(Collections.emptySet());
-        when(pref6.getEventTypes()).thenReturn(new HashSet<>(Arrays.asList("like", "mentions", "comment")));
+        when(pref3.getEventTypes()).thenReturn(Set.of("mentions"));
+        when(pref4.getEventTypes()).thenReturn(Set.of("otherEventType"));
+        when(pref5.getEventTypes()).thenReturn(Set.of());
+        when(pref6.getEventTypes()).thenReturn(Set.of("like", "mentions", "comment"));
 
         ScopeNotificationFilterPreferencesHierarchy expected = new ScopeNotificationFilterPreferencesHierarchy(
-            Collections.singletonList(
+            List.of(
                 new ScopeNotificationFilterPreference(pref5, this.entityReferenceResolver)
             ));
-        assertEquals(expected, this.getter.getScopeFilterPreferences(Arrays.asList(
+        assertEquals(expected, this.getter.getScopeFilterPreferences(List.of(
             pref1, pref2, pref3, pref4, pref5, pref6
         ), requestedEventType, requestedFormat, onlyGivenType, false));
     }

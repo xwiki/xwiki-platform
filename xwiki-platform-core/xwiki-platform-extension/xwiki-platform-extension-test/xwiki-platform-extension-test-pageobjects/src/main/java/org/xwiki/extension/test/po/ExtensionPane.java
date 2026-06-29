@@ -211,6 +211,18 @@ public class ExtensionPane extends BaseElement
         return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "hideDetails", "Hide details")));
     }
 
+    private ExtensionPane clickAndWaitForPlanConfirmation(WebElement button)
+    {
+        return clickAndWaitForPlanConfirmation(button, getDriver().getTimeout());
+    }
+
+    private ExtensionPane clickAndWaitForPlanConfirmation(WebElement button, int timeout)
+    {
+        return clickAndWaitUntilElementIsVisible(button,
+            "[descendant::button[@name = 'extensionAction' and @value = 'continue' and not(@disabled)]]",
+            timeout);
+    }
+
     /**
      * Clicks on the given button and waits for a confirmation or for the job/action to be done.
      * 
@@ -231,7 +243,7 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button, int timeout)
     {
-        // Wait until the the continue button is present or the extension is not loading and both the extension body and
+        // Wait until the continue button is present or the extension is not loading and both the extension body and
         // the progress section are present and not loading.
         return clickAndWaitUntilElementIsVisible(button,
             "[descendant::button[@name = 'extensionAction' and @value = 'continue' and not(@disabled)] or ("
@@ -247,7 +259,7 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane install()
     {
-        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getInstallButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getInstallButton());
     }
 
     /**
@@ -290,7 +302,7 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane uninstall()
     {
-        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getUninstallButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getUninstallButton());
     }
 
     /**
@@ -308,7 +320,19 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane upgrade()
     {
-        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getUpgradeButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getUpgradeButton());
+    }
+
+    /**
+     * Clicks on the upgrade button and waits for the upgrade plan to be computed.
+     *
+     * @param timeout the maximum number of seconds to wait for the end
+     * @return the extension pane displaying the upgrade plan
+     * @since 18.4.0RC1
+     */
+    public ExtensionPane upgrade(int timeout)
+    {
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getUpgradeButton(), timeout);
     }
 
     /**
@@ -326,7 +350,19 @@ public class ExtensionPane extends BaseElement
      */
     public ExtensionPane downgrade()
     {
-        return maybeOpenActionDropDownMenu().clickAndWaitForConfirmationOrJobDone(getDowngradeButton());
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getDowngradeButton());
+    }
+
+    /**
+     * Clicks on the downgrade button and waits for the downgrade plan to be computed.
+     *
+     * @param timeout the maximum number of seconds to wait for the end
+     * @return the extension pane displaying the downgrade plan
+     * @since 18.4.0RC1
+     */
+    public ExtensionPane downgrade(int timeout)
+    {
+        return maybeOpenActionDropDownMenu().clickAndWaitForPlanConfirmation(getDowngradeButton(), timeout);
     }
 
     /**

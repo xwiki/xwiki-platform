@@ -22,16 +22,13 @@ import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
 import { useCallback } from "react";
 import type { BlockOfType } from "../../blocknote";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;
-  linkEditionCtx: LinkEditionContext;
 };
 
 export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
-  linkEditionCtx,
 }) => {
   const editor = useEditor();
 
@@ -48,7 +45,6 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
     // So we put some container to make it stand out from the editor's content
     <Paper shadow="md" p="sm">
       <ImageSelector
-        linkEditionCtx={linkEditionCtx}
         currentSelection={image.props.url}
         onSelected={updateImage}
       />

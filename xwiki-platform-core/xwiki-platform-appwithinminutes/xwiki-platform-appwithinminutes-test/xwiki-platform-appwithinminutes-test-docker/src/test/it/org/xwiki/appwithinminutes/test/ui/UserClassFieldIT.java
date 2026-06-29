@@ -140,8 +140,9 @@ class UserClassFieldIT
         assertTrue(userPicker.clear().sendKeys("a").waitForNonTypedSuggestions().getSuggestions().size() > 2);
 
         // An empty text input brings a default list of suggestions. There should be at least 3 users (the 2 users we
-        // created plus the default administrator).
-        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForNonTypedSuggestions().getSuggestions().size() > 2);
+        // created plus the default administrator). Note that the default list of suggestions has already been fetched
+        // so we don't need to wait for the remote source.
+        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForNonTypedSuggestions(false).getSuggestions().size() > 2);
 
         // We should be able to close the list of suggestions using the escape key.
         assertTrue(

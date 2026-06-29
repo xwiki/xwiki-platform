@@ -547,7 +547,7 @@ public class DBListClass extends ListClass
                 String hibquery = this.getSql();
                 String secondCol = "-", firstCol = "-";
 
-                if (hibquery != null && !hibquery.equals("")) {
+                if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);
                     secondCol = returnCol(hibquery, false);
 
@@ -600,7 +600,7 @@ public class DBListClass extends ListClass
             displaySelectEdit(buffer, name, prefix, object, context);
         }
 
-        if (!getDisplayType().equals("input")) {
+        if (!"input".equals(getDisplayType())) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);

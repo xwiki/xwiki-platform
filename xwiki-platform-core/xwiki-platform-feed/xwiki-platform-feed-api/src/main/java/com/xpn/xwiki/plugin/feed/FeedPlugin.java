@@ -528,7 +528,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             SyndEntry entry = entries.get(i);
             if (oneDocPerEntry) {
                 String hashCode = "" + entry.getLink().hashCode();
-                String pagename = feedname + "_" + hashCode.replaceAll("-", "") + "_" + entry.getTitle();
+                String pagename = feedname + "_" + hashCode.replace("-", "") + "_" + entry.getTitle();
                 doc =
                     context.getWiki().getDocument(
                         prefix + "_" + context.getWiki().clearName(pagename, true, true, context), context);
@@ -726,7 +726,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (fullContent) {
             String url = entry.getLink();
-            if ((url != null) && (!url.trim().equals(""))) {
+            if ((url != null) && (!url.trim().isEmpty())) {
                 try {
                     String sfullContent = context.getWiki().getURLContent(url, context);
                     obj.setLargeStringValue("fullContent",

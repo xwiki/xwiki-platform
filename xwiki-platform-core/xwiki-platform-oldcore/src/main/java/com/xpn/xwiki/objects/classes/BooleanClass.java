@@ -59,7 +59,7 @@ public class BooleanClass extends PropertyClass
     
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Boolean", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public BooleanClass()
@@ -76,7 +76,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayType()
     {
         String dtype = getStringValue("displayType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "yesno";
         }
         return dtype;
@@ -85,7 +85,7 @@ public class BooleanClass extends PropertyClass
     public String getDisplayFormType()
     {
         String dtype = getStringValue("displayFormType");
-        if ((dtype == null) || (dtype.equals(""))) {
+        if ((dtype == null) || (dtype.isEmpty())) {
             return "radio";
         }
         return dtype;
@@ -174,13 +174,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if (getDisplayType().equals("checkbox")) {
+        if ("checkbox".equals(getDisplayType())) {
             displayFormType = "checkbox";
         }
 
-        if (displayFormType.equals("checkbox")) {
+        if ("checkbox".equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if (displayFormType.equals("select")) {
+        } else if ("select".equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -195,6 +195,10 @@ public class BooleanClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);

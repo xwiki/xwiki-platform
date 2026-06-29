@@ -250,7 +250,7 @@ public class MacroDescriptorUIFactory
                     .setDisplayType(contentDescriptor.getType().getTypeName())
                     .setEditTemplate(CONTENT_TEMPLATE.trim())
                     .setName(getParameterTranslation("rendering.macroContent", "Content"))
-                    .setDescription(getParameterTranslation(macroTranslationKey + "content.description",
+                    .setDescription(getParameterTranslation(macroTranslationKey + ".content.description",
                         contentDescriptor.getDescription()))
                     .setMandatory(contentDescriptor.isMandatory())
                     .setOrder(contentDescriptor.getOrder());

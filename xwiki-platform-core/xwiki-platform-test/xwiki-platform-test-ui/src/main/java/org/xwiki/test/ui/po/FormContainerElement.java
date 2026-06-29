@@ -130,7 +130,7 @@ public class FormContainerElement extends BaseElement
     {
         getDriver().scrollTo(fieldElement);
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
-            setCheckBox(fieldElement, value.equals("true"));
+            setCheckBox(fieldElement, "true".equals(value));
         } else if ("select".equals(fieldElement.getTagName())) {
             // if a select uses selectized then we should use a SuggestInputElement.
             if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("tomselected")) {
@@ -207,7 +207,7 @@ public class FormContainerElement extends BaseElement
 
         public SelectElement(WebElement select)
         {
-            if (!select.getTagName().toLowerCase().equals("select")) {
+            if (!"select".equalsIgnoreCase(select.getTagName())) {
                 throw new WebDriverException("Can only create a select element from a webelement of tag name select.");
             }
             this.select = select;

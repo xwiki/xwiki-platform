@@ -31,7 +31,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
@@ -92,6 +95,10 @@ class EditMacrosPageTest extends PageTest
     @MockComponent(classToMock = IconManagerScriptService.class)
     @Named("icon")
     private ScriptService iconManagerScriptService;
+
+    @MockComponent(classToMock = CSRFTokenScriptService.class)
+    @Named("csrf")
+    private ScriptService csrfScriptService;
 
     @Mock
     private HttpSession httpSession;
@@ -183,7 +190,7 @@ class EditMacrosPageTest extends PageTest
     }
 
     @Test
-    void oneWarningEditForced() throws Exception
+    void oneWarningEditForcedInSession() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
         document.setContent("{{template name=\"edit_macros.vm\" output='false'/}}\n"
@@ -205,6 +212,37 @@ class EditMacrosPageTest extends PageTest
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         assertNull(scriptContext.getAttribute("editConfirmation"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void oneWarningEditForcedInRequest(boolean validToken) throws Exception
+    {
+        XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
+        document.setContent("{{template name=\"edit_macros.vm\" output='false'/}}\n"
+            + "{{velocity}}#getEditConfirmation(){{/velocity}}"
+        );
+        document.setSyntax(Syntax.XWIKI_2_1);
+        this.context.setDoc(document);
+        this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker1",
+            (EditConfirmationChecker) () -> Optional.of(
+                new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false, true)));
+
+        String forceToken = "forceToken";
+        this.request.put("force_token", forceToken);
+        when(((CSRFTokenScriptService) this.csrfScriptService).isTokenValid(forceToken)).thenReturn(validToken);
+
+        this.request.put("force", "true");
+        document.getRenderedContent(this.context);
+
+        ScriptContext scriptContext =
+            this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
+        if (validToken) {
+            assertNull(scriptContext.getAttribute("editConfirmation"));
+        } else {
+            Map<?, ?> editConfirmation = (Map<?, ?>) scriptContext.getAttribute("editConfirmation");
+            assertEquals("warning", editConfirmation.get("title"));
+        }
     }
 
     @Test

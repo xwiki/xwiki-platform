@@ -85,7 +85,7 @@ public class RegisterAction extends XWikiAction
         }
 
         String register = request.getParameter(REGISTER);
-        if (register != null && register.equals("1")) {
+        if ("1".equals(register)) {
             // CSRF prevention
             if (!csrfTokenCheck(context)) {
                 return false;

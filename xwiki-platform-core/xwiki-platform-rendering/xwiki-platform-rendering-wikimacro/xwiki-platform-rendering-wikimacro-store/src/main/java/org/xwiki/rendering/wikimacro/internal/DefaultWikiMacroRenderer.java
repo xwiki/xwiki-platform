@@ -207,7 +207,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private static final Pattern HTML_PLACEHOLDER_PATTERN =
         Pattern.compile("<(span|div) data-wikimacro-id=(?:[\"'])([^\"']+)(?:[\"'])"
-            + "(?: name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
+            + "(?: data-wikimacro-parameter-name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
 
     @Inject
     private AsyncContext asyncContext;

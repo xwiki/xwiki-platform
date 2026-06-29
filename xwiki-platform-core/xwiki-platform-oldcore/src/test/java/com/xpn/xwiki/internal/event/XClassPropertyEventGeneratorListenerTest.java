@@ -19,8 +19,10 @@
  */
 package com.xpn.xwiki.internal.event;
 
+import com.xpn.xwiki.objects.PropertyInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -37,8 +39,13 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import java.util.Collection;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -83,13 +90,26 @@ class XClassPropertyEventGeneratorListenerTest
     {
         this.xclass.addTextField("property", "Property", 30);
 
-        final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
+        PropertyInterface newProp = this.xclass.getField("property");
+        final Event propertyEvent = new XClassPropertyAddedEvent(newProp.getReference());
 
         this.listener.onEvent(new DocumentCreatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
-        verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        // We verify in order because it makes it easier to debug the test, but I suppose triggering XClassUpdatedEvent
+        // before the PropertyAddedEvent would be fine.
+        // Although a behavior change could theoretically be a subtle API breakage I suppose.
+        InOrder inOrder = inOrder(this.observationManager);
+
+        // Make sure the listener generated a property added event
+        inOrder.verify(this.observationManager).notify(eq(propertyEvent), same(this.document), same(this.oldcore.getXWikiContext()));
+
+        // Make sure the listener generated a class updated event
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
+        Collection<XClassUpdatedEvent.PropertyUpdate> propertyUpdates = List.of(
+                new XClassUpdatedEvent.PropertyUpdate(null, newProp)
+        );
+        inOrder.verify(this.observationManager).notify(eq(classEvent), same(this.document), eq(propertyUpdates));
     }
 
     @Test
@@ -97,13 +117,24 @@ class XClassPropertyEventGeneratorListenerTest
     {
         this.xclassOrigin.addTextField("property", "Property", 30);
 
-        final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
+        PropertyInterface oldProp = this.xclassOrigin.getField("property");
+        final Event event = new XClassPropertyDeletedEvent(oldProp.getReference());
 
         this.listener.onEvent(new DocumentDeletedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
-        verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        // See the previous comment about verifying in order
+        InOrder inOrder = inOrder(this.observationManager);
+
+        // Make sure the listener generated a property deleted event
+        inOrder.verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+
+        // Make sure the listener generated a class updated event
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
+        Collection<XClassUpdatedEvent.PropertyUpdate> propertyUpdates = List.of(
+                new XClassUpdatedEvent.PropertyUpdate(oldProp, null)
+        );
+        inOrder.verify(this.observationManager).notify(eq(classEvent), same(this.document), eq(propertyUpdates));
     }
 
     @Test
@@ -111,13 +142,24 @@ class XClassPropertyEventGeneratorListenerTest
     {
         this.xclass.addTextField("property", "Property", 30);
 
-        final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
+        PropertyInterface newProp = this.xclass.getField("property");
+        final Event event = new XClassPropertyAddedEvent(newProp.getReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
-        verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        // See the previous comment about verifying in order
+        InOrder inOrder = inOrder(this.observationManager);
+
+        // Make sure the listener generated a property deleted event
+        inOrder.verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+
+        // Make sure the listener generated a class updated event
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
+        Collection<XClassUpdatedEvent.PropertyUpdate> propertyUpdates = List.of(
+                new XClassUpdatedEvent.PropertyUpdate(null, newProp)
+        );
+        inOrder.verify(this.observationManager).notify(eq(classEvent), same(this.document), eq(propertyUpdates));
     }
 
     @Test
@@ -125,27 +167,50 @@ class XClassPropertyEventGeneratorListenerTest
     {
         this.xclassOrigin.addTextField("property", "Property", 30);
 
-        final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
+        PropertyInterface oldProp = this.xclassOrigin.getField("property");
+        final Event event = new XClassPropertyDeletedEvent(oldProp.getReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
-        verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        // See the previous comment about verifying in order
+        InOrder inOrder = inOrder(this.observationManager);
+
+        // Make sure the listener generated a property deleted event
+        inOrder.verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+
+        // Make sure the listener generated a class updated event
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
+        Collection<XClassUpdatedEvent.PropertyUpdate> propertyUpdates = List.of(
+                new XClassUpdatedEvent.PropertyUpdate(oldProp, null)
+        );
+        inOrder.verify(this.observationManager).notify(eq(classEvent), same(this.document), eq(propertyUpdates));
     }
 
     @Test
     void modifiedDocumentXClassPropertyModified()
     {
         this.xclassOrigin.addTextField("property", "Property", 30);
+        PropertyInterface oldProp = this.xclassOrigin.getField("property");
         this.xclass.addTextField("property", "New Property", 30);
+        PropertyInterface newProp = this.xclass.getField("property");
 
         final Event event = new XClassPropertyUpdatedEvent(this.xclassOrigin.getField("property").getReference());
 
         this.listener.onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
             this.document, this.oldcore.getXWikiContext());
 
-        // Make sure the listener generated a xobject added event
-        verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+        // See the previous comment about verifying in order
+        InOrder inOrder = inOrder(this.observationManager);
+
+        // Make sure the listener generated a property updated event
+        inOrder.verify(this.observationManager).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
+
+        // Make sure the listener generated a class updated event
+        final Event classEvent = new XClassUpdatedEvent(this.document.getDocumentReference());
+        Collection<XClassUpdatedEvent.PropertyUpdate> propertyUpdates = List.of(
+                new XClassUpdatedEvent.PropertyUpdate(oldProp, newProp)
+        );
+        inOrder.verify(this.observationManager).notify(eq(classEvent), same(this.document), eq(propertyUpdates));
     }
 }

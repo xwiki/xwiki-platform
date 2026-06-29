@@ -815,7 +815,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   white-space: nowrap;
 }
 
-/* Override the default style for links in content. */
+/* Overwrites: the default style for links in content in general.less. */
 body.preference-underlining-only-inline-links #xwikicontent .search-facet-body .itemName,
 body.preference-underlining-only-inline-links #xwikicontent .search-facet-body .more {
   text-decoration: none;

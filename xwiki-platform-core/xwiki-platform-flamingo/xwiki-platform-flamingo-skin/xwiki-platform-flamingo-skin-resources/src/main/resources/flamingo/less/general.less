@@ -190,7 +190,7 @@ body {
       & .jstree-xwiki, // Do not underline links in jstrees
       & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
       & .breadcrumb, // The breadcrumb contains enough presentation to distinguish it from neighboring text.
-      & nav, & *[role="navigation"] // Navigation nodes are meant to contain anchors. This meaning is most of the time conveyed through the style
+      & nav, & *[role="navigation"] // Navigation nodes are meant to contain anchors. This meaning is most of the time conveyed through the style.
       {
         & a {
           .not-inline-link();
@@ -229,7 +229,8 @@ body {
       text-decoration: underline !important;
     }
   }
-  /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering.*/
+
+  /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering. */
   &.preference-underlining-no:not(:hover):not(:focus) {
     a {
       text-decoration: none;

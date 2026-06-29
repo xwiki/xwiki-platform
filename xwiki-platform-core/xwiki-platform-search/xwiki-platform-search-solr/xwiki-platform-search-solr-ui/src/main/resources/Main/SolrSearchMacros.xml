@@ -553,7 +553,10 @@
     #set ($titleURL = $xwiki.getURL($searchResultReference, 'view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
-    &lt;a href="$titleURL"&gt;$services.icon.renderHTML('file-white') $escapetool.xml($searchResult.title_)&lt;/a&gt;
+    &lt;a href="$titleURL"&gt;
+      $services.icon.renderHTML('file-white')
+      $escapetool.xml($searchResult.title_)
+    &lt;/a&gt;
     #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;

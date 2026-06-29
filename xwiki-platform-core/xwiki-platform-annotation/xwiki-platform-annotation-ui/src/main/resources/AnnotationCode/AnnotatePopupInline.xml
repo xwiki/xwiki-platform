@@ -181,7 +181,7 @@ define("xwiki-annotate-popup/translation-keys", {
   keys: [Constants.ANNOTATE_TRANSLATION_KEY]
 });
 
-define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys"], function(icons, l10n) {
+define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys", "jquery"], function(icons, l10n, $) {
   /**
    * Debounces a function
    * @param {Function} func
@@ -352,13 +352,12 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
     _registerListeners() {
       document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
 
-      // remove selectionchange handler in edit mode (annotations are disabled while editing)
-      this.wikiContent.addEventListener("xwiki:actions:edit", () =&gt; {
+      // remove selectionchange handler in edit mode (annotations are disabled while editing), add it back in view mode
+      // NOTE: need to use a jQuery handler here to catch the custom jQuery event
+      $(document).on("xwiki:actions:edit", () =&gt; {
         document.removeEventListener("selectionchange", this._onSelectionDebounced);
       });
-
-      // re-enable selectionchange handler when annotations are allowed again
-      this.wikiContent.addEventListener("xwiki:actions:view", () =&gt; {
+      $(document).on("xwiki:actions:view", () =&gt; {
         document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
       });
 

@@ -33,9 +33,10 @@ import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
+import org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
@@ -106,7 +107,7 @@ class GadgetObjectRequiredRightAnalyzerTest
     @Test
     void checkTitleWithVelocity() throws RequiredRightsException
     {
-        String title = "$services.localization.render('gadget')";
+        String title = "$evil";
         when(this.object.getStringValue("title")).thenReturn(title);
 
         List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(this.object);
@@ -123,6 +124,17 @@ class GadgetObjectRequiredRightAnalyzerTest
     }
 
     @Test
+    void checkTitleWithTranslation() throws RequiredRightsException
+    {
+        String title = "$services.localization.render('gadget')";
+        when(this.object.getStringValue("title")).thenReturn(title);
+
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(this.object);
+
+        assertEquals(List.of(), analysisResults);
+    }
+
+    @Test
     void checkContentWithXDOMAnalyzer() throws RequiredRightsException, MissingParserException, ParseException
     {
         String content = "{{velocity}}$services.localization.render('gadget'){{/velocity}}";
@@ -130,6 +142,27 @@ class GadgetObjectRequiredRightAnalyzerTest
         MacroBlock macroBlock = new MacroBlock("gadget", new HashMap<>(), content, false);
         XDOM xdom = new XDOM(List.of(macroBlock));
         when(this.contentParser.parse(content, Syntax.XWIKI_2_1, this.documentReference)).thenReturn(xdom);
+
+        RequiredRightAnalysisResult wikiResult = mock();
+        when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of(wikiResult));
+
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(this.object);
+
+        verify(this.xdomRequiredRightAnalyzer).analyze(xdom);
+        assertEquals(this.object.getReference(),
+            xdom.getMetaData().getMetaData().get(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA));
+
+        assertEquals(1, analysisResults.size());
+        assertEquals(wikiResult, analysisResults.get(0));
+    }
+
+    @Test
+    void checkTitleWithXDOMAnalyzer() throws Exception
+    {
+        String title = "{{velocity}}Title code{{/velocity}}";
+        when(this.object.getStringValue("title")).thenReturn(title);
+        XDOM xdom = new XDOM(List.of(new WordBlock("title")));
+        when(this.contentParser.parse(title, Syntax.XWIKI_2_1, this.documentReference)).thenReturn(xdom);
 
         RequiredRightAnalysisResult wikiResult = mock();
         when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of(wikiResult));

@@ -189,8 +189,10 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
   ckeditorPromise.then(ckeditor =&gt; {
     function getUserMentionsConfig(editor) {
       return {
-        feed: function (opts, callback) {
-          search(opts.query, callback);
+        dataCallback: function (options, callback) {
+          // Remove the marker prefix and replace non-breaking space.
+          const text = options.query.substring(1).replaceAll('\u00A0', ' ');
+          search(text, callback);
         },
         marker: '@',
         minChars: 0,
@@ -232,13 +234,8 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     });
 
     function maybeEnableUserMentions(editor) {
-      return waitForEditorReady(editor).then((editor) =&gt; {
-        // Check if the Mentions plugin is enabled for the given editor instance.
-        // TODO: Add support for disabling the user mentions for a particular editor instance (without disabling all
-        // types of mentions).
-        if (editor.plugins.mentions) {
-          editor.plugins.mentions.instances.push(new ckeditor.plugins.mentions(editor, getUserMentionsConfig(editor)));
-        }
+      return waitForEditorReady(editor).then(editor =&gt; {
+        new CKEDITOR.plugins.AdvancedAutoComplete(editor, getUserMentionsConfig(editor));
         return editor;
       });
     }
@@ -373,13 +370,19 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     </property>
     <property>
       <code>.xwiki-mention {
-  background-color: $services.mentions.mentionsColor;
+  --mentions-color: $services.mentions.mentionsColor;
+  --mentions-self-color: $services.mentions.selfMentionsForeground;
+  --mentions-self-bg: $services.mentions.selfMentionsColor;
+  background-color: var(--mentions-color);
   border-radius: 10px;
-  padding: 2px 5px 2px 5px;
+  padding: 1px 5px 1px 5px;
+  border: 1px solid var(--dropdown-divider-bg);
 }
 
 .xwiki-mention.user.self {
-  background-color: $services.mentions.selfMentionsColor;
+  background-color: var(--mentions-self-bg);
+  color: var(--mentions-self-color);
+  border: 0;
 }
 
 .xwiki-mention.removed {

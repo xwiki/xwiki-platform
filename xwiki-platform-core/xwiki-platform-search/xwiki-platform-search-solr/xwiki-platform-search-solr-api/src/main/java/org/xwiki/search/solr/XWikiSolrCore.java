@@ -20,7 +20,6 @@
 package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.xwiki.stability.Unstable;
 
 /**
  * The main entry point to manipulate a Solr core in XWiki.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.2.0RC1
  */
-@Unstable
 public interface XWikiSolrCore
 {
     /**
@@ -45,4 +43,14 @@ public interface XWikiSolrCore
      * @return the Solr client which can be used to directly communicate with the Solr native API
      */
     SolrClient getClient();
+
+    /**
+     * @return the major version of Solr this core is designed for (which can be different for the version of the Solr
+     *         server it's currently running on)
+     * @since 18.5.0RC1
+     */
+    default int getSolrMajorVersion()
+    {
+        return -1;
+    }
 }

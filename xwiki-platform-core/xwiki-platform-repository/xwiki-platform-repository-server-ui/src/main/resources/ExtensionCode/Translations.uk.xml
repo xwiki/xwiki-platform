@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=Активний
 ## Support plans
 repository.supportplan.sheet.description=Ця сторінка керує тим, як сторінки ExtensionSupportPlan відображаються як у режимі перегляду, так і в режимі редагування.
 repository.supportplan.sheet.noObject=На поточній сторінці відсутній очікуваний об'єкт ExtensionSupportPlan.
+repository.supportplan.sheet.supportedExtensions=Підтримувані розширення
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Назва
 ExtensionCode.ExtensionSupportPlanClass_supporter=Підтримка

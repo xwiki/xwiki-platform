@@ -40,6 +40,7 @@ import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -120,6 +121,9 @@ class DocumentTest
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @MockComponent
+    private GeneralMailConfiguration generalMailConfiguration;
+
+    @MockComponent
     private SkinManager skinManager;
 
     @MockComponent
@@ -174,7 +178,7 @@ class DocumentTest
     }
 
     @Test
-    void getObject()
+    void getObject() throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
@@ -362,8 +366,11 @@ class DocumentTest
         xdoc.setCreatorReference(new DocumentReference("wiki1", "XWiki", "initialcreator"));
 
         xdoc.getXClass().addTextField("key", "Key", 30);
-        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
+        xdoc.setContentDirty(false);
+        // perform a fake save to ensure the xclass is set when creating the new xobject.
+        this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
+        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
         xdoc.setContentDirty(false);
         this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
@@ -672,6 +679,7 @@ class DocumentTest
         Skin skin = mock();
         when(this.skinManager.getCurrentSkin(anyBoolean())).thenReturn(skin);
         when(skin.getOutputSyntax()).thenReturn(Syntax.HTML_5_0);
+        when(generalMailConfiguration.shouldObfuscate()).thenReturn(true);
 
         XWikiDocument classDocument =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("Wiki", "XWiki", "TestClass"),
@@ -703,7 +711,7 @@ class DocumentTest
         assertEquals(
             """
                 <?xml version='1.1' encoding='UTF-8'?>
-                <xwikidoc version="1.6" reference="Space.Page" locale="">
+                <xwikidoc version="1.7" reference="Space.Page" locale="">
                   <web>Space</web>
                   <name>Page</name>
                   <language/>
@@ -767,7 +775,7 @@ class DocumentTest
                         <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
                       </secret>
                     </class>
-                    <property>
+                    <property type="String">
                       <name>John</name>
                     </property>
                   </object>

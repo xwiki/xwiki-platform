@@ -1080,17 +1080,20 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </smtp_server>
     <smtp_server_password>
+      <algorithm/>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>smtp_server_password</name>
       <number>23</number>
       <picker>0</picker>
       <prettyName>Server password (optional)</prettyName>
       <size>30</size>
+      <storageType>Clear</storageType>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
     </smtp_server_password>
     <smtp_server_username>
       <customDisplay/>
@@ -2585,17 +2588,20 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </smtp_server>
       <smtp_server_password>
+        <algorithm/>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>smtp_server_password</name>
         <number>23</number>
         <picker>0</picker>
         <prettyName>Server password (optional)</prettyName>
         <size>30</size>
+        <storageType>Clear</storageType>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
       </smtp_server_password>
       <smtp_server_username>
         <customDisplay/>

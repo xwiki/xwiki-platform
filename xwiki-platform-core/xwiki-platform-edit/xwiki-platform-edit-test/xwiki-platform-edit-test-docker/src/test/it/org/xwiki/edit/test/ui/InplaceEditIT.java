@@ -26,21 +26,25 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -54,7 +58,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.10.6
  * @since 13.2RC1
  */
-@UITest
+@UITest(
+    extraJARs = {
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
+    },
+    resolveExtraJARs = true
+)
 class InplaceEditIT
 {
     @BeforeAll
@@ -70,15 +82,9 @@ class InplaceEditIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        // We might have an alert in case one test failed during an edition, in which case we just want to get rid of
-        // the alert to move to next page.
-        try {
-            setup.gotoPage(testReference);
-        } catch (UnhandledAlertException e) {
-            setup.getDriver().switchTo().alert().accept();
-        }
+        setup.maybeLeaveEditMode();
     }
 
     @Test
@@ -100,6 +106,8 @@ class InplaceEditIT
         viewPage.setDocumentTitle("updated title");
         viewPage.cancel();
         assertEquals("test title", viewPage.getDocumentTitle());
+        // The "Edit" text comes from the section edit link.
+        assertEquals("before\nSection\nEdit\nafter", viewPage.getContent());
         assertTrue(viewPage.getPageURL().endsWith("/editInplace/#"), viewPage.getPageURL());
 
         // Save + Cancel
@@ -349,11 +357,16 @@ class InplaceEditIT
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
 
+        // Wait until the children macro has loaded the tree content.
+        richTextArea.waitUntilTextContains("No pages found");
+
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
 
     @Test
+    @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
+        + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24488 .")
     @Order(7)
     void selectionRestoreOnSwitchToSource(TestUtils setup, TestReference testReference)
     {
@@ -365,6 +378,9 @@ class InplaceEditIT
         CKEditor ckeditor = new CKEditor("content");
         RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
         richTextArea.clear();
+
+        // Hide the expected error message because it can interfere with the test.
+        viewPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
 
         // Insert some long text (vertically).
         for (int i = 1; i < 50; i++) {
@@ -385,7 +401,8 @@ class InplaceEditIT
         assertEquals("4", sourceTextArea.getDomProperty("selectionEnd"));
 
         // Verify that the top left corner of the Source text area is visible (inside the viewport).
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 0));
+        // The toolbar is overlapping the text area so we need to add some offset.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 10));
 
         // Select something from the middle of the edited content.
         for (int i = 0; i < 46; i++) {
@@ -438,8 +455,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 1));
+        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
 
         viewPage.cancel();
     }
@@ -462,13 +479,18 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert the Velocity macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys(Keys.ENTER, "/velocity");
+        richTextArea.sendKeys("/velocity");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/velocity", "Velocity");
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
+        // check the behaviour of boolean parameters of macro.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        assertTrue(macroEditModal.getMacroParameterInput("wiki").isSelected());
+        macroEditModal.setMacroContent("#set($discard = $NULL)");
+        macroEditModal.setMacroParameterCheckbox("wiki", false);
+        macroEditModal.clickSubmit();
         richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());
@@ -498,5 +520,44 @@ class InplaceEditIT
         setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRequiredRightsWarning(false));
 
         viewPage.cancel();
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        String content = wikiEditPage.getContent();
+        assertEquals("{{velocity wiki=\"false\"}}\n"
+            + "#set($discard = $NULL)\n"
+            + "{{/velocity}}", content);
+        wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(9)
+    void editInplaceWithRequiredRightsEditWarning(TestUtils setup, TestReference testReference)
+    {
+        // Create a page as superadmin with a Velocity macro.
+        setup.loginAsSuperAdmin();
+        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}\nVelocity content\n{{/velocity}}", "");
+        assertEquals("Velocity content", viewPage.getContent());
+
+        // Login as alice and we should get a warning that editing the page may break things due to missing rights.
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.edit();
+
+        ForceEditLockModal forceEditLockModal = new ForceEditLockModal();
+        setup.getDriver().waitUntilCondition(driver -> forceEditLockModal.isDisplayed());
+        assertEquals("Warning", forceEditLockModal.getTitle());
+        assertThat(forceEditLockModal.getMessage(),
+            containsString(
+                "Editing this page may result in breakage because you are missing the following rights"));
+        forceEditLockModal.clickOk();
+
+        inplaceEditablePage.waitForInplaceEditor();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.sendKeys(Keys.END, Keys.ENTER, "Edited content");
+        inplaceEditablePage.saveAndView();
+
+        // We should have an error message that the Velocity macro failed to execute.
+        assertThat(inplaceEditablePage.getContent(), containsString(
+            "Failed to execute the [velocity] macro."));
     }
 }

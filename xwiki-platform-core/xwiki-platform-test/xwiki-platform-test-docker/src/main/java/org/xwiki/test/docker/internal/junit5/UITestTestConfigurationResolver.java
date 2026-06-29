@@ -31,8 +31,10 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
+import org.xwiki.test.docker.junit5.SolrMode;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -68,6 +70,14 @@ public class UITestTestConfigurationResolver
 
     private static final String BROWSERTAG_PROPERTY = "xwiki.test.ui.browserTag";
 
+    private static final String BLOBSTORE_PROPERTY = "xwiki.test.ui.blobStore";
+
+    private static final String BLOBSTORETAG_PROPERTY = "xwiki.test.ui.blobStoreTag";
+
+    private static final String SOLRMODE_PROPERTY = "xwiki.test.ui.remoteSolr";
+
+    private static final String REMOTESOLRTAG_PROPERTY = "xwiki.test.ui.remoteSolrTag";
+
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
@@ -80,6 +90,8 @@ public class UITestTestConfigurationResolver
 
     private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
 
+    private static final String STANDARDFLAVOR_PROPERTY = "xwiki.test.ui.standardFlavor";
+
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
@@ -90,9 +102,13 @@ public class UITestTestConfigurationResolver
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
      */
+    // It does not make much sense to split the resolution of the different properties, and it would actually hurt
+    // readability
+    @SuppressWarnings("ExecutableStatementCount")
     public TestConfiguration resolve(UITest uiTestAnnotation)
     {
         TestConfiguration configuration = new TestConfiguration();
+
         configuration.setBrowser(resolveBrowser(uiTestAnnotation.browser()));
         configuration.setDatabase(resolveDatabase(uiTestAnnotation.database()));
         configuration.setServletEngine(resolveServletEngine(uiTestAnnotation.servletEngine()));
@@ -113,13 +129,20 @@ public class UITestTestConfigurationResolver
         configuration.setSSHPorts(resolveSSHPorts(uiTestAnnotation.sshPorts()));
         configuration.setProfiles(resolveCommaSeparatedValues(uiTestAnnotation.profiles(), PROFILES_PROPERTY));
         configuration.setOffice(resolveOffice(uiTestAnnotation.office()));
+        configuration.setStandardFlavor(resolveStandardFlavor(uiTestAnnotation.standardFlavor()));
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
-        configuration.setSavePermanentDirectoryData(resolveSavePermanentDirectoryData(
-            uiTestAnnotation.savePermanentDirectoryData()));
+        configuration.setSavePermanentDirectoryData(
+            resolveSavePermanentDirectoryData(uiTestAnnotation.savePermanentDirectoryData()));
         configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(
             uiTestAnnotation.servletEngineNetworkAliases(), SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY));
+        configuration.setBlobStore(resolveBlobStore(uiTestAnnotation.blobStore()));
+        configuration.setBlobStoreTag(resolveBlobStoreTag(uiTestAnnotation.blobStoreTag()));
+        configuration.setSolrMode(resolveSolrMode(uiTestAnnotation.solrMode()));
+        configuration.setRemoteSolrTag(resolveRemoteSolrTag(uiTestAnnotation.remoteSolrTag()));
+        configuration.setXWikiInstances(uiTestAnnotation.xwikiInstances());
+
         return configuration;
     }
 
@@ -251,6 +274,11 @@ public class UITestTestConfigurationResolver
         return resolve(wcagStopOnError, WCAG_STOP_ON_ERROR_PROPERTY);
     }
 
+    private boolean resolveStandardFlavor(boolean standardFlavor)
+    {
+        return resolve(standardFlavor, STANDARDFLAVOR_PROPERTY);
+    }
+
     private boolean resolveOffice(boolean office)
     {
         return resolve(office, OFFICE_PROPERTY);
@@ -354,5 +382,25 @@ public class UITestTestConfigurationResolver
     private boolean resolveSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         return resolve(savePermanentDirectoryData, SAVEPERMANENTDIRECTORY_PROPERTY);
+    }
+
+    private BlobStore resolveBlobStore(BlobStore blobStore)
+    {
+        return resolve(BlobStore.class, blobStore, BLOBSTORE_PROPERTY);
+    }
+
+    private String resolveBlobStoreTag(String blobStoreTag)
+    {
+        return resolve(blobStoreTag, BLOBSTORETAG_PROPERTY);
+    }
+
+    private SolrMode resolveSolrMode(SolrMode solrMode)
+    {
+        return resolve(SolrMode.class, solrMode, SOLRMODE_PROPERTY);
+    }
+
+    private String resolveRemoteSolrTag(String resolveRemoTag)
+    {
+        return resolve(resolveRemoTag, REMOTESOLRTAG_PROPERTY);
     }
 }

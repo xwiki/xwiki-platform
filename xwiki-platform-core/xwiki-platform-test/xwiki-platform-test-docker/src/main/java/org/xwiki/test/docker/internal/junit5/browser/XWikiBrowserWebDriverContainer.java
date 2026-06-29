@@ -45,22 +45,6 @@ public class XWikiBrowserWebDriverContainer<T extends BrowserWebDriverContainer<
     private RemoteWebDriver driver;
 
     /**
-     * Use the default docker image name for selenium.
-     */
-    public XWikiBrowserWebDriverContainer()
-    {
-        super();
-    }
-
-    /**
-     * @param dockerImageName the selenium image name to use
-     */
-    public XWikiBrowserWebDriverContainer(String dockerImageName)
-    {
-        super(dockerImageName);
-    }
-
-    /**
      * @param dockerImageName the selenium image name to use
      */
     public XWikiBrowserWebDriverContainer(DockerImageName dockerImageName)

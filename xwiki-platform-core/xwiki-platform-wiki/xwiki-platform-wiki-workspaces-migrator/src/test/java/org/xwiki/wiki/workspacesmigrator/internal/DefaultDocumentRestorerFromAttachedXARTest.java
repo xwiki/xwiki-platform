@@ -26,11 +26,13 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -39,7 +41,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,13 +49,17 @@ import static org.mockito.Mockito.when;
  *
  * @since 5.3RC1
  */
-public class DefaultDocumentRestorerFromAttachedXARTest
+@ComponentTest
+class DefaultDocumentRestorerFromAttachedXARTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultDocumentRestorerFromAttachedXAR> mocker =
-            new MockitoComponentMockingRule(DefaultDocumentRestorerFromAttachedXAR.class);
+    @InjectMockComponents
+    private DefaultDocumentRestorerFromAttachedXAR documentRestorer;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    private Logger logger;
 
     private XWikiContext xcontext;
 
@@ -66,104 +71,109 @@ public class DefaultDocumentRestorerFromAttachedXARTest
 
     private List<DocumentReference> docsToRestore;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
         // Inputs
-        docToRestore1 = mock(XWikiDocument.class);
+        this.docToRestore1 = mock(XWikiDocument.class);
         DocumentReference docToRestoreRef1 = new DocumentReference("workspace", "XWiki", "AdminRegistrationSheet");
-        when(xwiki.getDocument(eq(docToRestoreRef1), any(XWikiContext.class))).thenReturn(docToRestore1);
-        docToRestore2 = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(eq(docToRestoreRef1), any(XWikiContext.class))).thenReturn(this.docToRestore1);
+        this.docToRestore2 = mock(XWikiDocument.class);
         DocumentReference docToRestoreRef2 = new DocumentReference("workspace", "XWiki", "RegistrationHelp");
-        when(xwiki.getDocument(eq(docToRestoreRef2), any(XWikiContext.class))).thenReturn(docToRestore2);
-        docsToRestore = new ArrayList<DocumentReference>();
-        docsToRestore.add(docToRestoreRef1);
-        docsToRestore.add(docToRestoreRef2);
+        when(this.xwiki.getDocument(eq(docToRestoreRef2), any(XWikiContext.class))).thenReturn(this.docToRestore2);
+        this.docsToRestore = new ArrayList<>();
+        this.docsToRestore.add(docToRestoreRef1);
+        this.docsToRestore.add(docToRestoreRef2);
     }
 
     @Test
-    public void restoreDocumentFromAttachedXAR() throws Exception
+    void restoreDocumentFromAttachedXAR() throws Exception
     {
         // Mocks
         XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", "WorkspaceManager", "Install")),
-                any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(this.xwiki.getDocument(eq(new DocumentReference("mainWiki", "WorkspaceManager", "Install")),
+            any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
         XWikiAttachment xeXar = mock(XWikiAttachment.class);
         when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(xeXar);
         when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
-                getClass().getResourceAsStream("/test-restore-documents.xar"));
+            getClass().getResourceAsStream("/test-restore-documents.xar"));
 
         // Run
-        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+        this.documentRestorer.restoreDocumentFromAttachedXAR(
+            new DocumentReference("mainWiki", "WorkspaceManager", "Install"), "workspace-template.xar",
+            this.docsToRestore);
 
         // Verify the document to restore has been restored from the xar
-        verify(docToRestore1).fromXML(any(InputStream.class));
-        verify(xwiki, times(1)).saveDocument(docToRestore1, xcontext);
-        verify(docToRestore2).fromXML(any(InputStream.class));
-        verify(xwiki, times(1)).saveDocument(docToRestore2, xcontext);
+        verify(this.docToRestore1).fromXML(any(InputStream.class));
+        verify(this.xwiki).saveDocument(this.docToRestore1, this.xcontext);
+        verify(this.docToRestore2).fromXML(any(InputStream.class));
+        verify(this.xwiki).saveDocument(this.docToRestore2, this.xcontext);
     }
 
     @Test
-    public void errorWhenNoDocument() throws Exception
+    void errorWhenNoDocument() throws Exception
     {
         // Mocks
         XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
         DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
-        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(this.xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class)))
+            .thenReturn(workspaceInstallDoc);
         when(workspaceInstallDoc.isNew()).thenReturn(true);
 
         // Run
-        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+        this.documentRestorer.restoreDocumentFromAttachedXAR(
+            new DocumentReference("mainWiki", "WorkspaceManager", "Install"), "workspace-template.xar",
+            this.docsToRestore);
 
         // Verify
-        verify(mocker.getMockedLogger()).warn("[{}] does not exist", workspaceInstallDocRef);
+        verify(this.logger).warn("[{}] does not exist", workspaceInstallDocRef);
     }
 
     @Test
-    public void errorWhenNoAttachment() throws Exception
+    void errorWhenNoAttachment() throws Exception
     {
         // Mocks
         XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
         DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
-        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(this.xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class)))
+            .thenReturn(workspaceInstallDoc);
         when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(null);
 
         // Run
-        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+        this.documentRestorer.restoreDocumentFromAttachedXAR(
+            new DocumentReference("mainWiki", "WorkspaceManager", "Install"), "workspace-template.xar",
+            this.docsToRestore);
 
         // Verify
-        verify(mocker.getMockedLogger()).warn("[{}] has no attachment named [{}].", workspaceInstallDocRef,
-                "workspace-template.xar");
+        verify(this.logger).warn("[{}] has no attachment named [{}].", workspaceInstallDocRef,
+            "workspace-template.xar");
     }
 
     @Test
-    public void errorZipInvalid() throws Exception
+    void errorZipInvalid() throws Exception
     {
         // Mocks
         XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
         DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
-        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(this.xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class)))
+            .thenReturn(workspaceInstallDoc);
         XWikiAttachment xeXar = mock(XWikiAttachment.class);
         when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(xeXar);
         when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
-                getClass().getResourceAsStream("/invalid-xar.xar"));
+            getClass().getResourceAsStream("/invalid-xar.xar"));
 
         // Run
-        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+        this.documentRestorer.restoreDocumentFromAttachedXAR(
+            new DocumentReference("mainWiki", "WorkspaceManager", "Install"), "workspace-template.xar",
+            this.docsToRestore);
 
         // Verify
-        verify(mocker.getMockedLogger()).error(eq("Error during the decompression of [{}]."),
-                eq("workspace-template.xar"), any(IOException.class));
+        verify(this.logger).error(eq("Error during the decompression of [{}]."), eq("workspace-template.xar"),
+            any(IOException.class));
     }
-
 }

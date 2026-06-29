@@ -144,7 +144,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("smtp_server", "SMTP Server", 30);
         xclass.addTextField("smtp_port", "SMTP Port", 5);
         xclass.addTextField("smtp_server_username", "Server username (optional)", 30);
-        xclass.addTextField("smtp_server_password", "Server password (optional)", 30);
+        xclass.addPasswordField("smtp_server_password", "Server password (optional)", 30, PasswordMetaClass.CLEAR);
         xclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6, ContentType.PURE_TEXT);
         xclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10, ContentType.PURE_TEXT);
         xclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10,

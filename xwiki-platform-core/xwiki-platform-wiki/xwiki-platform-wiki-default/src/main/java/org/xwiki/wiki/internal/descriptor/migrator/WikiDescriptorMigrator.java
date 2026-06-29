@@ -27,6 +27,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -132,7 +133,7 @@ public class WikiDescriptorMigrator extends AbstractHibernateDataMigration
                 String value = obj.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME);
                 if (StringUtils.isBlank(value)) {
                     obj.setStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME,
-                        StringUtils.capitalize(StringUtils.removeStart(documentReference.getName(), "XWikiServer")));
+                        StringUtils.capitalize(Strings.CS.removeStart(documentReference.getName(), "XWikiServer")));
                 }
             }
             xwiki.saveDocument(document, "[UPGRADE] Set a default pretty name.", context);

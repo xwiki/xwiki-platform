@@ -28,9 +28,12 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
@@ -62,25 +65,38 @@ public class PropertyConverter
      */
     public BaseProperty<?> convertProperty(BaseProperty<?> storedProperty, PropertyClass modifiedPropertyClass)
     {
-        Object newValue = convertPropertyValue(storedProperty.getValue(), modifiedPropertyClass);
+        Object newValue;
+        // If the property was a password and the new property class is not a PasswordClass, then we get rid of the
+        // value to not leak it.
+        if (storedProperty instanceof PasswordProperty && !(modifiedPropertyClass instanceof PasswordClass)) {
+            newValue = "";
+        } else {
+            newValue = convertPropertyValue(storedProperty.getValue(), modifiedPropertyClass);
+        }
         BaseProperty<?> newProperty = null;
         if (newValue != null) {
             newProperty = modifiedPropertyClass.newProperty();
             if (newProperty != null) {
+                String errorLog = "Incompatible data migration when changing field [{}] of class [{}]";
                 try {
                     // Try to set the converted value.
                     newProperty.setValue(newValue);
                 } catch (Exception e) {
                     // Looks like the conversion didn't succeed. Let's try to compute the value from string.
                     // This should return null if the new value cannot be parsed from string.
-                    newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
+                    try {
+                        newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
+                    } catch (XWikiException ex) {
+                        this.logger.warn(errorLog,
+                            modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(), ex);
+                    }
                 }
                 if (newProperty != null) {
                     newProperty.setId(storedProperty.getId());
                     newProperty.setName(storedProperty.getName());
                 } else {
                     // The stored value couldn't be converted to the new property type.
-                    this.logger.warn("Incompatible data migration when changing field [{}] of class [{}]",
+                    this.logger.warn(errorLog,
                         modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName());
                 }
             }

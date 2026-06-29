@@ -34,7 +34,7 @@ import org.xwiki.test.ui.po.BasePage;
  */
 public class ChangePasswordPage extends BasePage
 {
-    private static final String ERROR_MESSAGE_SELECTOR = "span.box.errormessage";
+    private static final String ERROR_MESSAGE_SELECTOR = "div.box.errormessage";
 
     private static final String VALIDATION_ERROR_MESSAGE_SELECTOR = "span.LV_validation_message.LV_invalid";
 

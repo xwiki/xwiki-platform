@@ -80,15 +80,15 @@ public enum MailState
         // using filtering continue to work properly.
 
         MailState result;
-        if (state.equalsIgnoreCase(PREPARE_SUCCESS.toString()) || state.equalsIgnoreCase("READY")) {
+        if (PREPARE_SUCCESS.toString().equalsIgnoreCase(state) || "READY".equalsIgnoreCase(state)) {
             result = PREPARE_SUCCESS;
-        } else if (state.equalsIgnoreCase(PREPARE_ERROR.toString())) {
+        } else if (PREPARE_ERROR.toString().equalsIgnoreCase(state)) {
             result = PREPARE_ERROR;
-        } else if (state.equalsIgnoreCase(SEND_SUCCESS.toString()) || state.equalsIgnoreCase("SENT")) {
+        } else if (SEND_SUCCESS.toString().equalsIgnoreCase(state) || "SENT".equalsIgnoreCase(state)) {
             result = SEND_SUCCESS;
-        } else if (state.equalsIgnoreCase(SEND_ERROR.toString()) || state.equalsIgnoreCase("FAILED")) {
+        } else if (SEND_ERROR.toString().equalsIgnoreCase(state) || "FAILED".equalsIgnoreCase(state)) {
             result = SEND_ERROR;
-        } else if (state.equalsIgnoreCase(SEND_FATAL_ERROR.toString())) {
+        } else if (SEND_FATAL_ERROR.toString().equalsIgnoreCase(state)) {
             result = SEND_FATAL_ERROR;
         } else {
             throw new IllegalArgumentException(String.format("Invalid mail state [%s]", state));

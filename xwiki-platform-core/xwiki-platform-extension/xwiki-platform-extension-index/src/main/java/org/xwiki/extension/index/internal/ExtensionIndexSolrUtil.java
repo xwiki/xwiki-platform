@@ -163,7 +163,7 @@ public class ExtensionIndexSolrUtil
      */
     private String fromStoredNamespace(String storedNamespace)
     {
-        if (storedNamespace == null || storedNamespace.equals(ROOT_NAMESPACE)) {
+        if (storedNamespace == null || ROOT_NAMESPACE.equals(storedNamespace)) {
             return null;
         }
 

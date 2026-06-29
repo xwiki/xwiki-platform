@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
@@ -77,7 +78,7 @@ public aspect DateClassCompatibiityAspect
     }
 
     @Deprecated
-    public void DateClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
+    public void DateClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map) throws XWikiException
     {
         String[] data = map.get("");
         if ((data != null) && (data.length == 1)) {

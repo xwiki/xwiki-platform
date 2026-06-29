@@ -65,14 +65,14 @@ class TableIT extends AbstractCKEditorIT
         edit(setup, testReference);
 
         // Insert a table.
-        editor.getToolBar().insertTable().submit();
+        editor.getToolBar().insertTable().setHeader("None").submit();
 
         // The caret should be in the first table cell. Insert two paragraphs. It's important to have two paragraphs,
         // otherwise the bug doesn't reproduce.
         textArea.sendKeys("one", Keys.ENTER, "two");
 
         // Insert a row after the current one.
-        textArea.sendKeys("/table_row_after");
+        textArea.sendKeys(" /table_row_after");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/table_row_after", "Insert Row After");
         // We click instead of pressing Enter to be sure the fake selection is not lost.

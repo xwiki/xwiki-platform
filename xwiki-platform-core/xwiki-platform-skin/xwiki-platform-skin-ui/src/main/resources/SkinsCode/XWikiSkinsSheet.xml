@@ -78,17 +78,34 @@
   #set ($deprecatedProperties = [])
   #set ($className = 'XWiki.XWikiSkins')
   #set ($class = $doc.getObject($className).xWikiClass)
+  {{html wiki='true'}}
+  &lt;dl&gt;
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; {{html}}&lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;$escapetool.xml($prop.prettyName)&lt;/label&gt;{{/html}}
-    : #if($prop.name == 'logo')## Avoid line break
-      {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
-    #else$doc.display($prop.name)#end
+    &lt;dt&gt;
+      &lt;label for="${className}_$escapetool.xml($services.rendering.escape($doc.getObject($className).getNumber(), 'xwiki/2.1'))_$escapetool.xml($services.rendering.escape($prop.name, 'xwiki/2.1'))"&gt;
+        $escapetool.xml($services.rendering.escape($prop.prettyName, 'xwiki/2.1'))
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      #if($prop.name == 'logo')
+        
+        {{warning}}
+          {{translation key="skin.sheet.properties.logo.warning" /}}
+        {{/warning}}
+        
+        {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}} 
+      #else 
+        $doc.display($prop.name)
+      #end
+    &lt;/dd&gt;
     
     #else
       #set($discard = $deprecatedProperties.add($prop))
     #end
   #end
+  &lt;/dl&gt;
+  {{/html}}
   (% id="overrideSection" %)
   (((
     == {{translation key="skin.sheet.overriddenTemplates" /}} ==
@@ -106,7 +123,7 @@
     {{html}}
     &lt;div id="addOverride"&gt;
       &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $escapetool.xml($services.localization.render("skin.sheet.addTemplate"))&lt;/label&gt;
-      &lt;input placeholder="file.vm" id="newPath" name="newPath" value="file.vm" size="20" class="withTip" type="text" /&gt;
+      &lt;input placeholder="file.vm" id="newPath" name="newPath" placeholder="file.vm" size="20" type="text" /&gt;
       &lt;button class="btn btn-primary" id="newPathAdd"&gt;$escapetool.xml($services.localization.render("skin.sheet.add"))&lt;/button&gt;
     &lt;/div&gt;
     {{/html}}
@@ -357,10 +374,19 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // Then we hide the object via jQuery
       properties.hide();
       // So now we can make it slide (not possible if it were not hidden by jQuery first)
-      properties.slideDown();
+      properties.slideDown(400, function () {
+        $(this).addClass('property-slided');
+      });
     } else {
       // The other time, we just use the toggle function
-      properties.slideToggle();
+      properties.slideToggle({
+        'start': function() {
+          $(this).removeClass('property-slided');
+        },
+        'complete': function() {
+          $(this).addClass('property-slided');
+        }
+      });
     }
   }
 

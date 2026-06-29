@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -211,7 +212,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
         return StringUtils.isNotBlank(pref.getPageOnly())
-            && StringUtils.startsWith(pref.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX)
+            && Strings.CS.startsWith(pref.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX)
             && pref.getEventTypes().isEmpty();
     }
 
@@ -310,7 +311,7 @@ public class ScopeNotificationFilterExpressionGenerator
     {
         // This optimization can only works on preferences stored by the user, that's why we add the final condition
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-            && StringUtils.startsWith(nfp.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX);
+            && Strings.CS.startsWith(nfp.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX);
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

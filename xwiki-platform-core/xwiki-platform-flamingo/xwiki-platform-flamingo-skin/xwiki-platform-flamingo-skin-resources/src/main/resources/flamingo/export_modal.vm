@@ -51,6 +51,7 @@
     #exportTreeModal()
   #end
 #end
+#set ($_exportModalAvailable = true)
 ##
 #macro (getExportFormats)
   ## Hide by default the output produced by rendering each export format UIX.

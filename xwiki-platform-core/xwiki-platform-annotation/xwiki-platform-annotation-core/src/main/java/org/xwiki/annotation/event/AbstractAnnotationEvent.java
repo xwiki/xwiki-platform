@@ -49,7 +49,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
      */
     public AbstractAnnotationEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

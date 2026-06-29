@@ -29,12 +29,15 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
-import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * All functional tests for Quick Actions.
@@ -71,12 +74,12 @@ class QuickActionsIT extends AbstractCKEditorIT
     private WYSIWYGEditPage editPage;
 
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void beforeAll(TestUtils setup) throws Exception
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
 
         // The mentions quick action is implemented with a global JSX provided by the mentions macro page, which has to
         // be saved with programming rights, otherwise the global JSX is not registered. Programming rights are
@@ -131,7 +134,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         textArea = editor.getRichTextArea();
 
         // Switch back to paragraph
-        textArea.sendKeys("/parag");
+        textArea.sendKeys(" /parag");
         qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/parag", "Paragraph");
         textArea.sendKeys(Keys.ENTER);
@@ -278,7 +281,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        assertSourceEquals("|" + TEST_TEXT + "| \n| | \n| | \n\n ");
+        assertSourceEquals("|=" + TEST_TEXT + "|= \n| | \n| | \n\n ");
     }
 
     @Test
@@ -456,20 +459,27 @@ class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(20)
-    void include()
+    void include(TestUtils testUtils) throws Exception
     {
+        testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
+            "Test include");
         textArea.sendKeys("/inc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/inc", "Include Page");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        // Empty form
-        new MacroDialogEditModal().waitUntilReady().clickSubmit();
+        MacroDialogEditModal macroDialogEditModal = new MacroDialogEditModal().waitUntilReady();
+        SuggestInputElement reference =
+            new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
+        reference.sendKeys("TestInclude")
+            .waitForNonTypedSuggestions()
+            .selectByIndex(0);
+        macroDialogEditModal.clickSubmit();
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{include/}}");
+        assertSourceEquals("{{include reference=\"QuickActionsIT.TestInclude\"/}}");
     }
 
     @Test
@@ -487,7 +497,7 @@ class QuickActionsIT extends AbstractCKEditorIT
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{code language=\"none\"}}{{/code}}");
+        assertSourceEquals("{{code}}{{/code}}");
     }
 
     @Test
@@ -571,6 +581,11 @@ class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys("before after");
         // Place the caret between the typed words.
         textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT, Keys.RIGHT));
+        // there's a missing space so the quickactions shouldn't be displayed.
+        textArea.sendKeys("/inf");
+        assertFalse(AutocompleteDropdown.isDisplayed());
+        // Remove the 4 characters we just typed
+        textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE,  Keys.BACK_SPACE, Keys.BACK_SPACE);
         textArea.sendKeys(" /inf");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/inf", "Info Box");

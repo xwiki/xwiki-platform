@@ -22,9 +22,11 @@ package com.xpn.xwiki.render;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -63,6 +65,12 @@ public class ScriptXWikiServletRequest extends WrappingXWikiRequest
         this.authorization = authorization;
     }
 
+    @Override
+    public jakarta.servlet.http.HttpServletRequest getJakarta()
+    {
+        return new JakartaToJavaxHttpServletRequest<>(this);
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -75,6 +83,24 @@ public class ScriptXWikiServletRequest extends WrappingXWikiRequest
     {
         if (this.authorization.hasAccess(Right.PROGRAM)) {
             return super.getServletContext();
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Only allowed to author with programming right because it allows access to the underlying request that doesn't
+     * enforce any security checks.
+     *
+     * @see javax.servlet.ServletRequestWrapper#getRequest()
+     */
+    @Override
+    public ServletRequest getRequest()
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            return super.getRequest();
         }
 
         return null;

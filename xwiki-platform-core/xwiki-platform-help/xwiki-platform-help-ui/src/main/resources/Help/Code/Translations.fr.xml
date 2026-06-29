@@ -192,7 +192,7 @@ help.videos.videoCard5.topic2=Apprenez à utiliser votre application
 help.videos.videoCard6.title=Ajout / Suppression d'extensions
 help.videos.videoCard6.topic1=Découvrez comment gérer vos extensions avec le Gestionnaire d'extensions
 help.videos.videoCard6.topic2=Découvrez l'interface d'Administration XWiki
-### Missing: help.videos.hint=This video showcases XWiki features with a subtitled screencast without audio indications. The following documentation links provide a text alternative to this video.
+help.videos.hint=Cette vidéo présente les fonctionnalités de XWiki avec une capture d'écrans vidéo sous-titrée, sans bande son. Le lien suivant, pointant vers la documentation, fournit une alternative textuelle à cette vidéo.
 help.videos.watch=Voir
 
 ## Example Macro

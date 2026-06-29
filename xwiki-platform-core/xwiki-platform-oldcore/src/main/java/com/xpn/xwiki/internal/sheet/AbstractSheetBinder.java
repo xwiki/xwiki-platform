@@ -26,7 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
@@ -119,7 +119,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
         if (sheetBindingObjects == null) {
             return Collections.emptyList();
         }
-        List<DocumentReference> sheets = new ArrayList<DocumentReference>();
+        List<DocumentReference> sheets = new ArrayList<>();
         for (BaseObject sheetBindingObject : sheetBindingObjects) {
             // The list of XWiki objects can contain null values due to a design flaw in the old XWiki core.
             if (sheetBindingObject != null) {
@@ -138,7 +138,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
         this.sheetBindingsQuery.setWiki(expectedSheetRef.getWikiReference().getName());
         try {
             List<Object[]> sheetBindings = this.sheetBindingsQuery.execute();
-            List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
+            List<DocumentReference> documentReferences = new ArrayList<>();
             for (Object[] sheetBinding : sheetBindings) {
                 DocumentReference docRef =
                     this.documentReferenceResolver.resolve((String) sheetBinding[0], expectedSheetRef);
@@ -178,7 +178,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 // The list of XWiki objects can contain null values due to a design flaw in the old XWiki core.
                 if (sheetBindingObject != null) {
                     String boundSheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
-                    if (StringUtils.equals(boundSheetStringRef, sheetReferenceString)) {
+                    if (Strings.CS.equals(boundSheetStringRef, sheetReferenceString)) {
                         return false;
                     }
                 }

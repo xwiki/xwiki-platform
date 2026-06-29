@@ -38,6 +38,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityContext;
 
 /**
@@ -72,13 +73,15 @@ public class VelocityRenderer
     private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
     /**
-     * Render a velocity code without messing with the document context and namespace.
-     * @param code code to render
+     * Render a velocity template without messing with the document context and namespace.
+     * @param template the velocity template to render
+     * @param iconValue the icon value to render
      * @param contextDocumentReference the reference of the context document
      * @return the rendered code
      * @throws IconException if problem occurs
      */
-    public String render(String code, DocumentReference contextDocumentReference) throws IconException
+    public String render(VelocityTemplate template, String iconValue, DocumentReference contextDocumentReference)
+        throws IconException
     {
         // The macro namespace to use by the velocity engine, see afterwards.
         String namespace = "IconVelocityRenderer_" + Thread.currentThread().getId();
@@ -87,8 +90,6 @@ public class VelocityRenderer
         StringWriter output = new StringWriter();
 
         VelocityEngine engine = null;
-
-        boolean result;
 
         try {
             // Get the velocity engine
@@ -119,18 +120,25 @@ public class VelocityRenderer
             VelocityContext context = new XWikiVelocityContext(this.velocityManager.getVelocityContext(),
                 this.loggerConfiguration.isDeprecatedLogEnabled());
 
+            if (iconValue != null) {
+                context.put("icon", iconValue);
+            }
+
             // Render the code
             VelocityEngine finalEngine = engine;
-            Callable<Boolean> callable = () -> finalEngine.evaluate(context, output, NAMESPACE, code);
+            Callable<Void> callable = () -> {
+                finalEngine.evaluate(context, output, NAMESPACE, template);
+                return null;
+            };
             if (contextDocumentReference != null) {
                 // Wrap the callable in a document context and author executor to ensure that the document is in
                 // context and the Velocity code is executed with the author's rights.
-                Callable<Boolean> innerCallable = callable;
+                Callable<Void> innerCallable = callable;
                 callable = () -> this.documentContextExecutor.call(
                     () -> this.authorExecutor.call(innerCallable, authorReference, contextDocumentReference),
                     sourceDocument);
             }
-            result = callable.call();
+            callable.call();
         } catch (Exception e) {
             throw new IconException("Failed to render the icon.", e);
         } finally {
@@ -140,11 +148,6 @@ public class VelocityRenderer
             }
         }
 
-        if (result) {
-            return output.toString();
-        } else {
-            // I don't know how to check the velocity runtime log
-            throw new IconException("Failed to render the icon. See the Velocity runtime log.");
-        }
+        return output.toString();
     }
 }

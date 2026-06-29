@@ -87,7 +87,7 @@ public class EntityReferenceTreeNode
     void addChild(EntityReference childReference)
     {
         if (this.children == null) {
-            this.children = new TreeMap<String, Map<EntityType, EntityReferenceTreeNode>>(this.comparator);
+            this.children = new TreeMap<>(this.comparator);
         }
 
         List<EntityReference> childReferenceList = childReference.getReversedReferenceChain();
@@ -119,7 +119,7 @@ public class EntityReferenceTreeNode
     void addLocale(EntityReference childReference)
     {
         if (this.locales == null) {
-            this.locales = new TreeMap<Locale, EntityReference>(LocaleComparator.INSTANCE);
+            this.locales = new TreeMap<>(LocaleComparator.INSTANCE);
         }
 
         this.locales.put((Locale) childReference.getParameter(DocumentReference.LOCALE), childReference);

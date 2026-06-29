@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
 
@@ -167,7 +168,7 @@ public class SavedRequestRestorerFilter implements Filter
                 return super.getParameterMap();
             } else {
                 // First put the saved (old) request data in the map, so that the new data overrides it.
-                Map<String, String[]> map = new HashMap<String, String[]>(this.savedRequest.getParameterMap());
+                Map<String, String[]> map = new HashMap<>(this.savedRequest.getParameterMap());
                 map.putAll(super.getParameterMap());
                 return Collections.unmodifiableMap(map);
             }
@@ -252,7 +253,7 @@ public class SavedRequestRestorerFilter implements Filter
                 SavedRequest savedRequest = savedRequests.get(savedRequestId);
                 // Only reuse this request if the new request is for the same resource (URL)
                 if (savedRequest != null
-                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
+                    && Strings.CS.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
                     // Remove the saved request from the session
                     savedRequests.remove(savedRequestId);
                     // Return the SavedRequest

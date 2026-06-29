@@ -62,6 +62,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Named("document")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 {
     /**
@@ -109,22 +110,20 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             return false;
         }
 
-        Locale locale = getLocale(documentReference);
-
-        solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
+        Locale realLocale = getRealLocale(documentReference);
 
         // Rendered title.
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, realLocale), plainTitle);
 
         // Raw Content
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, realLocale),
             translatedDocument.getContent());
 
         // Rendered content
         WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
         this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, realLocale),
             plainContentPrinter.toString());
 
         solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
@@ -149,7 +148,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         setLinks(solrDocument, translatedDocument, xcontext);
 
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
-        setExtras(documentReference, solrDocument, locale);
+        setExtras(documentReference, solrDocument, realLocale);
 
         // Extract more metadata
         this.extractorUtils.extract(documentReference, translatedDocument, solrDocument);

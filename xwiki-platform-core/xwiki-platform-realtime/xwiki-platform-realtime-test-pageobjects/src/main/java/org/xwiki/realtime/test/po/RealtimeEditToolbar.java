@@ -41,7 +41,10 @@ public class RealtimeEditToolbar extends BaseElement
 
     private static final By SAVE_STATUS = By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-save-status");
 
-    private static final String VALUE = "value";
+    private static final By SUMMARIZE_AND_DONE_ACTION =
+        By.cssSelector(".realtime-edit-toolbar-left .realtime-action-summarize");
+
+    private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
 
     /**
      * Waits until the user is connected to the realtime editing session.
@@ -51,7 +54,8 @@ public class RealtimeEditToolbar extends BaseElement
     public RealtimeEditToolbar waitUntilConnected()
     {
         getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(
-            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), VALUE, "clean"));
+            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), ATTRIBUTE_VALUE,
+            "clean"));
         return this;
     }
 
@@ -115,20 +119,31 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public void clickDone()
     {
-        getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-done")).click();
+        getDriver().findElement(DONE_ACTION).click();
     }
 
     /**
      * Click on the "Summarize and done" button to open the modal for summarizing the changes.
+     * 
      * @return the modal to summarize.
      */
     public SummaryModal clickSummarizeAndDone()
     {
         openDoneDropdown();
-        getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-summarize")).click();
-        SummaryModal summaryModal = new SummaryModal();
-        getDriver().waitUntilCondition(it -> summaryModal.isDisplayed());
-        return summaryModal;
+        getDriver().findElement(SUMMARIZE_AND_DONE_ACTION).click();
+        return new SummaryModal();
+    }
+
+    /**
+     * @return {@code true} if the "Summarize &amp; Done" action is available, {@code false} otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean hasSummarizeAndDoneAction()
+    {
+        return !getDriver().findElementsWithoutWaiting(SUMMARIZE_AND_DONE_ACTION).isEmpty();
     }
 
     /**
@@ -142,10 +157,10 @@ public class RealtimeEditToolbar extends BaseElement
     /**
      * @return the list of coeditors listed directly on the toolbar
      */
-    public List<Coeditor> getVisibleCoeditors()
+    public List<CoeditorElement> getVisibleCoeditors()
     {
         return getDriver().findElements(By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user"))
-            .stream().map(Coeditor::new).toList();
+            .stream().map(CoeditorElement::new).toList();
     }
 
     /**
@@ -154,12 +169,13 @@ public class RealtimeEditToolbar extends BaseElement
      * @param coeditorId the coeditor identifier
      * @return this instance
      */
-    public Coeditor waitForCoeditor(String coeditorId)
+    public CoeditorElement waitForCoeditor(String coeditorId)
     {
         By coeditorSelector = By.cssSelector(".realtime-edit-toolbar .realtime-user[data-id='" + coeditorId + "']");
         // The coeditor can be either displayed directly on the toolbar or hidden in the dropdown.
-        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(coeditorSelector));
-        return new Coeditor(getDriver().findElement(coeditorSelector));
+        WebElement coeditorElement =
+            getDriver().waitUntilCondition(driver -> getDriver().findElementWithoutScrolling(coeditorSelector));
+        return new CoeditorElement(coeditorElement);
     }
 
     /**
@@ -168,7 +184,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public boolean isEditingAlone()
     {
-        List<Coeditor> visibleCoeditors = getVisibleCoeditors();
+        List<CoeditorElement> visibleCoeditors = getVisibleCoeditors();
         return visibleCoeditors.size() == 1 && visibleCoeditors.get(0).getId().equals(getUserId());
     }
 
@@ -185,7 +201,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public SaveStatus getSaveStatus()
     {
-        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(VALUE));
+        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(ATTRIBUTE_VALUE));
     }
 
     /**
@@ -200,8 +216,8 @@ public class RealtimeEditToolbar extends BaseElement
         // we need to wait at most 100 seconds (adding an error margin of 20 seconds).
         int timeout = (int) (status == SaveStatus.SAVED ? 100
             : getDriver().manage().timeouts().getImplicitWaitTimeout().toSeconds());
-        getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, status.getValue()),
-            timeout);
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, status.getValue()), timeout);
         return this;
     }
 
@@ -222,8 +238,48 @@ public class RealtimeEditToolbar extends BaseElement
     {
         getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
         if (wait) {
-            getDriver()
-                .waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, SaveStatus.SAVED.getValue()));
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                // Wait for the content to be saved.
+                ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, SaveStatus.SAVED.getValue()),
+                // Wait for the edit form to be re-enabled.
+                ExpectedConditions.elementToBeClickable(DONE_ACTION)));
         }
+    }
+
+    /**
+     * Wait for the warning that informs the user that they, or some other user, are editing the same page outside the
+     * realtime collaboration session, which may lead to merge conflicts on save.
+     *
+     * @return this instance
+     * @since 17.8.0
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public RealtimeEditToolbar waitForConcurrentEditingWarning()
+    {
+        String toggleSelector = "button.realtime-warning[data-toggle=\"popover\"]";
+        String popoverSelector = toggleSelector + " + .popover";
+
+        // Wait for the popover to be fully displayed, because it uses a fade-in animation.
+        getDriver().waitUntilElementIsVisible(By.cssSelector(popoverSelector + ".fade.in"));
+
+        // Hide the popover because it can cover other UI elements.
+        WebElement toggle = getDriver().findElementWithoutWaiting(By.cssSelector(toggleSelector));
+        // We have to click twice because the popover was displayed without focusing the toggle.
+        toggle.click();
+        toggle.click();
+
+        // Wait for the popover to be fully hidden, because it uses a fade-out animation.
+        getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(By.cssSelector(popoverSelector), 0));
+
+        return this;
+    }
+
+    /**
+     * @return the dropdown listing recent versions of the edited document, and the "Summarize Changes" action
+     */
+    public HistoryDropdown getHistoryDropdown()
+    {
+        return new HistoryDropdown();
     }
 }

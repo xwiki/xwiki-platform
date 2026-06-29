@@ -19,8 +19,6 @@
  */
 package org.xwiki.observation.remote.internal.converter;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,8 +26,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.EventConverterManager;
@@ -44,57 +40,24 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
  */
 @Component
 @Singleton
-public class DefaultEventConverterManager implements EventConverterManager, Initializable
+public class DefaultEventConverterManager implements EventConverterManager
 {
-    /**
-     * The local events converters.
-     */
     @Inject
-    private List<LocalEventConverter> localEventConverters;
-
-    /**
-     * The remote events converters.
-     */
-    @Inject
-    private List<RemoteEventConverter> remoteEventConverters;
+    private EventConverters eventConverters;
 
     @Inject
     private Logger logger;
 
     @Override
-    public void initialize() throws InitializationException
-    {
-        // sort local events converters by priority
-        Collections.sort(this.localEventConverters, new Comparator<LocalEventConverter>()
-        {
-            @Override
-            public int compare(LocalEventConverter eventConverter1, LocalEventConverter eventConverter2)
-            {
-                return eventConverter1.getPriority() - eventConverter2.getPriority();
-            }
-        });
-
-        // sort remote events converters by priority
-        Collections.sort(this.remoteEventConverters, new Comparator<RemoteEventConverter>()
-        {
-            @Override
-            public int compare(RemoteEventConverter eventConverter1, RemoteEventConverter eventConverter2)
-            {
-                return eventConverter1.getPriority() - eventConverter2.getPriority();
-            }
-        });
-    }
-
-    @Override
     public List<LocalEventConverter> getLocalEventConverters()
     {
-        return this.localEventConverters;
+        return this.eventConverters.getLocalEventConverters();
     }
 
     @Override
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
-        return this.remoteEventConverters;
+        return this.eventConverters.getRemoteEventConverters();
     }
 
     @Override
@@ -102,7 +65,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
     {
         RemoteEventData remoteEvent = new RemoteEventData();
 
-        for (LocalEventConverter eventConverter : this.localEventConverters) {
+        for (LocalEventConverter eventConverter : getLocalEventConverters()) {
             try {
                 if (eventConverter.toRemote(localEvent, remoteEvent)) {
                     break;
@@ -124,7 +87,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
     {
         LocalEventData localEvent = new LocalEventData();
 
-        for (RemoteEventConverter eventConverter : this.remoteEventConverters) {
+        for (RemoteEventConverter eventConverter : getRemoteEventConverters()) {
             try {
                 if (eventConverter.fromRemote(remoteEvent, localEvent)) {
                     break;

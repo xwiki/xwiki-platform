@@ -196,21 +196,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
      */
     protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
     {
-        Locale locale = null;
-
-        try {
-            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
-                locale = documentReference.getLocale();
-            } else {
-                XWikiContext xcontext = this.xcontextProvider.get();
-                locale = xcontext.getWiki().getDocument(documentReference, xcontext).getRealLocale();
-            }
-        } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",
-                documentReference), e);
-        }
-
-        return locale;
+        return documentReference.getLocale() != null ? documentReference.getLocale() : Locale.ROOT;
     }
 
     @Override

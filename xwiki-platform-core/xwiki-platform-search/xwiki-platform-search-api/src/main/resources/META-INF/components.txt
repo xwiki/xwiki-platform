@@ -1,1 +1,3 @@
+org.xwiki.search.internal.DefaultSearchConfiguration
+org.xwiki.search.internal.SearchConfigurationSource
 org.xwiki.search.internal.SearchSuggestSourceObjectEvaluator

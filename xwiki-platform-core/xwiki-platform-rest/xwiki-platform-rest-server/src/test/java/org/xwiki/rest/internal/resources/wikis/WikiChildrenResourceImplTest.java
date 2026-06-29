@@ -19,11 +19,6 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.net.URI;
 import java.util.List;
 
@@ -44,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -56,6 +52,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiChildrenResourceImpl}.
@@ -80,6 +81,9 @@ class WikiChildrenResourceImplTest
 
     @MockComponent
     protected ModelFactory modelFactory;
+
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
 
     @Mock
     private ChildrenQuery childrenQuery;
@@ -109,6 +113,8 @@ class WikiChildrenResourceImplTest
         when(this.uriInfo.getBaseUri()).thenReturn(this.baseURI);
 
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test

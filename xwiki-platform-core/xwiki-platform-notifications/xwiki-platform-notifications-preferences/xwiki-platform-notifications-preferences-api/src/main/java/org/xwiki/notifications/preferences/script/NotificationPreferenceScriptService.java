@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,6 +71,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Named("notification.preferences")
 @Singleton
+// Fan-out reached because of the usage of DocumentUserReference which should be removed in the future
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class NotificationPreferenceScriptService implements ScriptService
 {
     @Inject
@@ -388,7 +391,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     {
         for (NotificationPreference preference : allPreferences) {
             Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
+            if (prefEventType != null && Strings.CS.equals((String) prefEventType, eventType)
                 && preference.getFormat() == format) {
                 return preference.isNotificationEnabled();
             }

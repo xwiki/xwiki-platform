@@ -19,7 +19,6 @@
  */
 package org.xwiki.panels.test.ui.docker;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,37 +32,31 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("Panels Administration Tests")
     class NestedPanelsAdministrationIT extends PanelsAdministrationIT
     {
     }
 
     @Nested
-    @DisplayName("Navigation Panel Tests")
     class NestedNavigationPanelIT extends NavigationPanelIT
     {
     }
 
     @Nested
-    @DisplayName("Navigation Panel Administration Tests")
     class NestedNavigationPanelAdministrationIT extends NavigationPanelAdministrationIT
     {
     }
 
     @Nested
-    @DisplayName("Panels Tests")
     class NestedPanelIT extends PanelIT
     {
     }
 
     @Nested
-    @DisplayName("Application Panels Administration Tests")
     class NestedApplicationsPanelAdministrationIT extends ApplicationsPanelAdministrationIT
     {
     }
 
     @Nested
-    @DisplayName("New Page Panel Tests")
     class NestedNewPagePanelIT extends NewPagePanelIT
     {
     }

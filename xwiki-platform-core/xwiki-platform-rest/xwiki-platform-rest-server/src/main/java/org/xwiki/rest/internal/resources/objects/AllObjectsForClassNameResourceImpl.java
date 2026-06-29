@@ -55,6 +55,7 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
             Boolean withPrettyNames) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
+        int limit = validateAndGetLimit(number);
 
         try {
             Objects objects = new Objects();
@@ -69,8 +70,9 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
             List<Object> queryResult = null;
             queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("className", className).setLimit(number)
-                            .setOffset(start).execute();
+                this.queryManager.createQuery(query, Query.XWQL).bindValue("className", className)
+                    .setLimit(limit)
+                    .setOffset(start).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

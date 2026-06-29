@@ -725,11 +725,9 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   &amp;.menu-horizontal {
     /* Stylization: Navbars */
     .clearfix;
-    background-color: @navbar-default-bg;
-    border-color: @navbar-default-border;
-    /* Custom styling */
-    .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
-    min-height: @navbar-height;
+    background-color: @menu-default-bg;
+    border-color: @menu-default-border;
+    min-height: @menu-height;
     padding-left: 25px;
     .xDropdown.open {
       &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
@@ -743,7 +741,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       padding-left: 0;
       list-style-type: none;
       margin: 0;
-      min-height: 50px;
+      min-height: @menu-height;
       display: flex;
       align-items: stretch;
       &amp; &gt; li {
@@ -757,22 +755,21 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }
-        line-height: @line-height-computed;
-        color: @navbar-default-link-color;
+        color: @menu-default-link-color;
         &amp;:hover, &amp;:focus-within {
-          color: @navbar-default-link-hover-color;
-          background-color: @navbar-default-link-hover-bg;
-          background-color: @navbar-default-link-active-bg;
-          color: @navbar-default-link-active-color;
+          color: @menu-default-link-hover-color;
+          background-color: @menu-default-link-hover-bg;
+          background-color: @menu-default-link-active-bg;
+          color: @menu-default-link-active-color;
           /* When hovering, have the same color for text and link usage */
           &amp; &gt; span &gt; a {
-            background-color: @navbar-default-link-active-bg;
-            color: @navbar-default-link-active-color;
+            background-color: @menu-default-link-active-bg;
+            color: @menu-default-link-active-color;
           }
         }
         /* Links inside menu */
         a {
-          color: @navbar-default-link-color;
+          color: @menu-default-link-color;
           &amp;:hover, &amp;:focus-within {
             text-decoration: none;
           }
@@ -780,7 +777,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         /* Containers, images inside menu */
         div, img {
           /* Limit the height to the nav height minus the padding and minus border */
-          max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
+          max-height: @menu-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
           &amp;.xDropdown-header{
             /* No border on the dropdown header */
@@ -791,15 +788,15 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
           &amp;:hover, &amp;:focus-within {
             /* Change background color of the caret when hovering on the navbar. */
-            background-color: @navbar-default-bg;
+            background-color: @menu-default-bg;
           }
         }
         /* Separator vertical inside menu */
         &amp;:empty {
-          height: @navbar-height;
+          height: @menu-height;
           margin: 0 ((@line-height-computed / 2) - 1);
           padding: 0;
-          border-right: 1px solid @navbar-default-border;
+          border-right: 1px solid @menu-default-border;
         }
       }
       /* Stylization: Dropdowns */
@@ -819,6 +816,8 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         background-color: @dropdown-bg;
         border: 1px solid @dropdown-border;
         border-radius: @border-radius-base;
+        /* On this element, the box-shadow is very useful since it appears in front of other elements. 
+          We don't want to remove it despite the Flamingo theme now using flat designs almost everywhere. */
         .box-shadow(0 6px 12px rgba(0,0,0,.175));
         background-clip: padding-box;
         margin-top: 0;
@@ -854,7 +853,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
             line-height: @line-height-base;
             color: @dropdown-link-color;
             /* Empty dropdowns should have height in order to display the arrow */
-            min-height: 2 * @font-size-base;
+            min-height: 1lh;
             &amp;:hover, &amp;:focus-within {
               text-decoration: none;
               color: @dropdown-link-hover-color;
@@ -916,7 +915,7 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         margin: 0 0 0 -25px; /* Remove padding added in normal view */
         &gt; li {
           &amp;:empty {
-            .nav-divider(@navbar-default-border);
+            .nav-divider(@menu-default-border);
           }
         }
         ul {
@@ -930,25 +929,25 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
           box-shadow: none;
           li {
             /* Text inside menu */
-            color: @navbar-default-link-color;
+            color: @menu-default-link-color;
             /* Links inside menu */
             a {
-              color: @navbar-default-link-color;
+              color: @menu-default-link-color;
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
-              color: @navbar-default-link-color;
+              color: @menu-default-link-color;
               &amp;.open {
                 background-color: transparent;
                 color: inherit;
               }
               /* When in dropdown we also have a link */
               &gt; span &gt; a {
-                color: @navbar-default-link-color;
+                color: @menu-default-link-color;
               }
             }
             &amp;:empty {
-              .nav-divider(@navbar-default-border);
+              .nav-divider(@menu-default-border);
             }
           }
         }
@@ -978,15 +977,16 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
 
 .menu-horizontal-toggle {
   .clearfix;
-  background-color: @navbar-default-bg;
-  border-color: @navbar-default-border;
-  .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
-  min-height: @navbar-height;
+  background-color: @menu-default-bg;
+  border-color: @menu-default-border;
+  min-height: @menu-height;
   &amp; .navbar-toggle {
     float: left;
     padding-left: 15px;
+    padding-top: 0;
+    padding-bottom: 0;
     &amp; .icon-bar {
-      background-color: @navbar-default-link-color;
+      background-color: @menu-default-link-color;
       transition: .3s ease all;
       &amp;:nth-of-type(2) {
         opacity: 0;

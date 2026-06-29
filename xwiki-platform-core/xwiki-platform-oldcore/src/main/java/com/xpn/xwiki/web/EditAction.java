@@ -200,19 +200,19 @@ public class EditAction extends XWikiAction
 
 
         String language = context.getWiki().getLanguagePreference(context);
-        if (doc.isNew() && doc.getDefaultLanguage().equals("")) {
+        if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
             doc.setDefaultLanguage(language);
         }
 
         String languageToEdit = StringUtils.isEmpty(editForm.getLanguage()) ? language : editForm.getLanguage();
 
         // If no specific language is set or if it is "default" then we edit the current doc.
-        if (languageToEdit == null || languageToEdit.equals("default")) {
+        if (languageToEdit == null || "default".equals(languageToEdit)) {
             languageToEdit = "";
         }
         // If the document is new or if the language to edit is the default language then we edit the default
         // translation.
-        if (doc.isNew() || doc.getDefaultLanguage().equals(languageToEdit)) {
+        if (doc.isNew() || languageToEdit.equals(doc.getDefaultLanguage())) {
             languageToEdit = "";
         }
         // If the doc does not exist in the language to edit and the language was not explicitly set in the URL then
@@ -223,7 +223,7 @@ public class EditAction extends XWikiAction
 
         // Initialize the translated document.
         XWikiDocument tdoc;
-        if (languageToEdit.equals("")) {
+        if (languageToEdit.isEmpty()) {
             // Edit the default document translation (default language).
             tdoc = doc;
             if (doc.isNew()) {

@@ -21,17 +21,19 @@ package org.xwiki.lesscss.internal.resources;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.WikiLESSResourceReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * A reference to a LESS resource containing in an XObject property in the wiki.
  *
- * @since 6.4M2
  * @version $Id$
+ * @since 6.4M2
  */
-public class LESSObjectPropertyResourceReference implements LESSResourceReference
+public class LESSObjectPropertyResourceReference implements WikiLESSResourceReference
 {
     private ObjectPropertyReference objectPropertyReference;
 
@@ -39,19 +41,24 @@ public class LESSObjectPropertyResourceReference implements LESSResourceReferenc
 
     private DocumentAccessBridge bridge;
 
+    private final UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer;
+
     /**
      * Constructor.
+     *
      * @param objectPropertyReference reference to the property of an XObject storing some LESS code
      * @param entityReferenceSerializer object reference serializer
      * @param bridge bridge to access to documents
+     * @param userReferenceDocumentReferenceSerializer a document reference serializer
      */
-    public LESSObjectPropertyResourceReference(ObjectPropertyReference objectPropertyReference, 
-            EntityReferenceSerializer<String> entityReferenceSerializer,
-            DocumentAccessBridge bridge)
+    public LESSObjectPropertyResourceReference(ObjectPropertyReference objectPropertyReference,
+        EntityReferenceSerializer<String> entityReferenceSerializer, DocumentAccessBridge bridge,
+        UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer)
     {
         this.objectPropertyReference = objectPropertyReference;
         this.entityReferenceSerializer = entityReferenceSerializer;
         this.bridge = bridge;
+        this.userReferenceDocumentReferenceSerializer = userReferenceDocumentReferenceSerializer;
     }
 
     @Override
@@ -59,7 +66,7 @@ public class LESSObjectPropertyResourceReference implements LESSResourceReferenc
     {
         if (o instanceof LESSObjectPropertyResourceReference) {
             LESSObjectPropertyResourceReference lessObjectPropertyResourceReference =
-                    (LESSObjectPropertyResourceReference) o;
+                (LESSObjectPropertyResourceReference) o;
             return objectPropertyReference.equals(lessObjectPropertyResourceReference.objectPropertyReference);
         }
 
@@ -82,5 +89,25 @@ public class LESSObjectPropertyResourceReference implements LESSResourceReferenc
     public String serialize()
     {
         return String.format("LessXObjectProperty[%s]", entityReferenceSerializer.serialize(objectPropertyReference));
+    }
+
+    @Override
+    public DocumentReference getDocumentReference()
+    {
+        return this.bridge.getCurrentDocumentReference();
+    }
+
+    @Override
+    public DocumentReference getAuthorReference() throws LESSCompilerException
+    {
+        var documentReference = this.getDocumentReference();
+        try {
+            var documentInstance = this.bridge.getDocumentInstance(documentReference);
+            var originalMetadataAuthor = documentInstance.getAuthors().getEffectiveMetadataAuthor();
+            return this.userReferenceDocumentReferenceSerializer.serialize(originalMetadataAuthor);
+        } catch (Exception e) {
+            throw new LESSCompilerException(
+                "Failed to get the document from document reference [" + documentReference + "]", e);
+        }
     }
 }

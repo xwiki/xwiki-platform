@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=活动
 ## Support plans
 repository.supportplan.sheet.description=此页面控制 ExtensionSupportPlan 页面在查看和编辑模式下的显示方式。
 repository.supportplan.sheet.noObject=当前页面没有预期的 ExtensionSupportPlan 对象。
+repository.supportplan.sheet.supportedExtensions=支持的扩展
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
 ExtensionCode.ExtensionSupportPlanClass_supporter=支持者

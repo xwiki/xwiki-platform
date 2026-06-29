@@ -136,7 +136,7 @@ public class LocalUidStringEntityReferenceSerializerTest
     }
 
     /**
-     * Tests resolving and re-serializing an class property reference.
+     * Tests resolving and re-serializing a class property reference.
      */
     @Test
     public void serializeClassPropertyReference()

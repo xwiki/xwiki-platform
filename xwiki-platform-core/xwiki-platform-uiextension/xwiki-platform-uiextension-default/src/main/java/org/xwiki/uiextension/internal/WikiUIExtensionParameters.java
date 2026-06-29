@@ -147,7 +147,7 @@ public class WikiUIExtensionParameters
     /**
      * Parse the parameters provided by the extension.
      * The parameters are provided in a LargeString property of the extension object. In the future it would be better
-     * to have a Map<String, String> XClass property.
+     * to have a Map&lt;String, String&gt; XClass property.
      *
      * @param rawParameters the string to parse
      * @return a map of parameters

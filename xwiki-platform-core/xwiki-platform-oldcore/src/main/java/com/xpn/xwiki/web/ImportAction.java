@@ -25,6 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.tika.mime.MediaType;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
@@ -84,6 +85,10 @@ public class ImportAction extends XWikiAction
             if ("getPackageInfos".equals(action)) {
                 getPackageInfos(doc.getAttachment(name), response, context);
             } else if ("import".equals(action)) {
+                // CSRF prevention
+                if (!csrfTokenCheck(context)) {
+                    return null;
+                }
                 result = importPackage(doc.getAttachment(name), request, context);
             }
         } catch (Exception e) {
@@ -167,7 +172,7 @@ public class ImportAction extends XWikiAction
         String historyStrategy = request.getParameter("historyStrategy");
 
         // Get the backup switch value
-        boolean importAsBackup = StringUtils.equals(request.getParameter("importAsBackup"), "true");
+        boolean importAsBackup = Strings.CS.equals(request.getParameter("importAsBackup"), "true");
 
         // Configure pages to import
         EntityReferenceSet entities;

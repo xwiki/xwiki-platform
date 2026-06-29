@@ -36,7 +36,8 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test XClass editing.
@@ -104,6 +105,8 @@ class EditClassIT
 
         setup.addObject(editObjectsTestObject, className,
             "prop1", "testing value 1", "prop2", "testing value 2");
+        setup.addObject(editObjectsTestObject, className,
+            "prop1", "testing value 1 - obj2", "prop2", "testing value 2 - obj2");
 
         ViewPage vp = setup.gotoPage(editObjectsTestObject);
 
@@ -118,17 +121,33 @@ class EditClassIT
         assertEquals("this is the content: /testing value 2/testing value 1", vp.getContent());
 
         ObjectEditPage oep = vp.editObjects();
-        List<ObjectEditPane> objectsOfClass = oep.getObjectsOfClass(className);
-        assertEquals(1, objectsOfClass.size());
-        objectsOfClass.get(0).displayObject();
-        assertNotNull(setup.getDriver().findElement(By.className("deprecatedProperties")));
-        assertNotNull(setup.getDriver().findElement(By.cssSelector(".deprecatedProperties label")));
-        assertEquals("prop1:", setup.getDriver().findElement(By.cssSelector(".deprecatedProperties label")).getText());
+        assertTrue(oep.hasDeprecatedProperties());
+
+        List<ObjectEditPane> objectsOfClass = oep.getObjectsOfClass(className, false);
+        assertEquals(2, objectsOfClass.size());
+        ObjectEditPane objectEditPane = objectsOfClass.get(0);
+        objectEditPane.displayObject();
+        assertEquals("testing value 1", objectEditPane.getDeprecatedPropertyValue("prop1"));
+        objectEditPane.clickRemoveDeprecatedProperties();
+        assertTrue(objectEditPane.isObjectDisplayed());
+
+        objectEditPane = objectsOfClass.get(1);
+        objectEditPane.displayObject();
+        assertEquals("testing value 1 - obj2", objectEditPane.getDeprecatedPropertyValue("prop1"));
 
         // Remove deprecated properties
         oep.removeAllDeprecatedProperties();
+
+        assertTrue(objectsOfClass.get(0).isObjectDisplayed());
+        assertFalse(objectsOfClass.get(0).hasDeprecatedProperties());
+
+        assertTrue(objectsOfClass.get(1).isObjectDisplayed());
+        assertFalse(objectsOfClass.get(1).hasDeprecatedProperties());
+
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: /testing value 2/", vp.getContent());
+        oep = vp.editObjects();
+        assertFalse(oep.hasDeprecatedProperties());
     }
 
     @Test
@@ -138,7 +157,59 @@ class EditClassIT
         DocumentReference editObjectsTestClass = getTestClassDocumentReference(reference);
         ClassEditPage cep = setup.editClass(editObjectsTestClass);
         cep.addPropertyWithoutWaiting("a<b c", "String");
-        cep.waitForNotificationErrorMessage("Failed: Property names must follow these naming rules:");
+        String errorMessage =
+        setup.getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-error')]")).getText();
+        assertEquals("Failed:Property names must follow these naming rules:\n"
+            + "Names can contain letters, numbers, and the following characters: \"., -, _, :\"\n"
+            + "Names must not start with a number or punctuation character.\n"
+            + "Names must not start with the letters xml (or XML, or Xml, etc).\n"
+            + "Names cannot contain spaces.", errorMessage);
+        /*cep.waitForNotificationErrorMessage("Failed:Property names must follow these naming rules:<br/>"
+            + "Names can contain letters, numbers, and the following characters: \"., -, _, :\"<br/>"
+            + "Names must not start with a number or punctuation character.<br/>"
+            + "Names must not start with the letters xml (or XML, or Xml, etc).<br/>"
+            + "Names cannot contain spaces.");*/
+    }
+
+    /**
+     * Test adding and removing a property without leaving the class editor UI.
+     */
+    @Test
+    @Order(4)
+    void addAndDeleteProperty(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.rest().savePage(reference, "Some content", "");
+        ClassEditPage classEditPage = setup.editClass(reference);
+        classEditPage.addProperty("age", "Number");
+        classEditPage.addProperty("color", "String");
+        classEditPage.deleteProperty("color");
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertTrue(classEditPage.hasProperty("age"));
+        assertFalse(classEditPage.hasProperty("color"));
+    }
+
+    @Test
+    @Order(5)
+    void reorderProperty(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.rest().savePage(reference, "Some content", "");
+        ClassEditPage classEditPage = setup.editClass(reference);
+        classEditPage.addProperty("testA", "Number");
+        classEditPage.addProperty("testB", "Number");
+        classEditPage.addProperty("testC", "Number");
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
+
+        classEditPage.movePropertyBefore("testC", "testB");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
     }
 
     private DocumentReference getTestClassDocumentReference(TestReference reference)

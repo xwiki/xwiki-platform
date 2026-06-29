@@ -125,7 +125,7 @@
   <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
   <filter>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <filter-class>com.xpn.xwiki.web.XWikiContextInitializationFilter</filter-class>
+    <filter-class>org.xwiki.rest.internal.XWikiRESTContextInitializationFilter</filter-class>
     <!-- A parameter used to identify the request as a an XML-RPC/REST call -->
     <init-param>
       <param-name>mode</param-name>
@@ -413,11 +413,6 @@
   <welcome-file-list>
     <welcome-file>redirect</welcome-file>
   </welcome-file-list>
-
-  <error-page>
-    <error-code>404</error-code>
-    <location>/bin/view/Main/DocumentDoesNotExist</location>
-  </error-page>
 
   <!-- Uncomment if you wish to use a DataSource to define the Database connection
   <resource-ref>

@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -265,7 +266,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> enabledProperties = new ArrayList<PropertyClass>(allProperties.size());
+        List<PropertyClass> enabledProperties = new ArrayList<>(allProperties.size());
 
         for (PropertyClass property : allProperties) {
             if (property != null && !property.isDisabled()) {
@@ -293,7 +294,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledProperties = new ArrayList<PropertyClass>();
+        List<PropertyClass> disabledProperties = new ArrayList<>();
 
         for (PropertyClass property : allProperties) {
             if (property != null && property.isDisabled()) {
@@ -322,7 +323,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
+        List<PropertyClass> disabledObjectProperties = new ArrayList<>(disabledProperties.size());
 
         for (PropertyClass property : disabledProperties) {
             try {
@@ -354,7 +355,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<BaseProperty> deprecatedObjectProperties = new ArrayList<BaseProperty>();
+        List<BaseProperty> deprecatedObjectProperties = new ArrayList<>();
 
         for (BaseProperty property : objectProperties) {
             if (safeget(property.getName()) == null) {
@@ -404,7 +405,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object) throws XWikiException
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -872,7 +873,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        textAreaClass.setRestricted(restricted);
+        if (textAreaClass.isRestricted() != restricted) {
+            textAreaClass.setRestricted(restricted);
+            result = true;
+        }
 
         return result;
     }
@@ -1269,7 +1273,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
@@ -1447,7 +1451,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 
@@ -1490,7 +1494,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseClass oldClass = (BaseClass) oldObject;
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();
@@ -1591,37 +1595,37 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         BaseClass newBaseClass = (BaseClass) newElement;
 
-        if (!StringUtils.equals(getCustomClass(), newBaseClass.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), newBaseClass.getCustomClass())) {
             setCustomClass(newBaseClass.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
+        if (!Strings.CS.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
             setCustomMapping(newBaseClass.getCustomMapping());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
+        if (!Strings.CS.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
             setDefaultWeb(newBaseClass.getDefaultWeb());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
+        if (!Strings.CS.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
             setDefaultViewSheet(newBaseClass.getDefaultViewSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
+        if (!Strings.CS.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
             setDefaultEditSheet(newBaseClass.getDefaultEditSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), newBaseClass.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), newBaseClass.getValidationScript())) {
             setValidationScript(newBaseClass.getValidationScript());
             modified = true;
         }
 
-        if (!StringUtils.equals(getNameField(), newBaseClass.getNameField())) {
+        if (!Strings.CS.equals(getNameField(), newBaseClass.getNameField())) {
             setNameField(newBaseClass.getNameField());
             modified = true;
         }

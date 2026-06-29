@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Named;
 
@@ -43,6 +44,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,7 +68,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DatabaseDocumentIteratorTest
 {
-    private static final String ORDER_CLAUSE = " order by doc.space, doc.name, doc.language nulls first";
+    private static final String ORDER_CLAUSE = " order by doc.id asc";
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
@@ -92,11 +94,19 @@ class DatabaseDocumentIteratorTest
     @InjectMockComponents
     private DatabaseDocumentIterator databaseIterator;
 
+
+    private ImmutablePair<DocumentReference, DocumentIteratorEntry> entry(DocumentReference reference, long docId,
+        String version)
+    {
+        return new ImmutablePair<DocumentReference, DocumentIteratorEntry>(reference,
+            new DocumentIteratorEntry(reference.getWikiReference(), docId, version));
+    }
+
     @BeforeEach
     void configure() throws Exception
     {
         // We explicitly leave the list of wikis unsorted.
-        when(this.wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("chess", "tennis"));
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("chess", "tennis"));
     }
 
     @Test
@@ -114,69 +124,71 @@ class DatabaseDocumentIteratorTest
         int batchSize = 83;
         when(this.configuration.getSynchronizationBatchSize()).thenReturn(batchSize);
         Query emptyQuery = mock(Query.class);
-        when(emptyQuery.execute()).thenReturn(Collections.emptyList());
+        when(emptyQuery.execute()).thenReturn(List.of());
 
         Query chessQuery = mock(Query.class);
         when(chessQuery.setOffset(0)).thenReturn(chessQuery);
         when(chessQuery.setOffset(batchSize)).thenReturn(emptyQuery);
-        when(chessQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Blog.Code", "WebHome", "", "3.2" },
-            new Object[] { "Main", "Welcome", "en", "1.1" }, new Object[] { "XWiki.Syntax", "Links", "fr", "2.5" }));
+        when(chessQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Blog.Code", "WebHome", "", "3.2", 1L },
+            new Object[] { "Main", "Welcome", "en", "1.1", 2L }, new Object[] { "XWiki.Syntax", "Links", "fr", "2.5", 3L }));
 
         DocumentReference chessBlogCodeWebHome =
-            createDocumentReference("chess", Arrays.asList("Blog", "Code"), "WebHome", null);
+            createDocumentReference("chess", List.of("Blog", "Code"), "WebHome", null);
         DocumentReference chessMainWelcome =
-            createDocumentReference("chess", Arrays.asList("Main"), "Welcome", Locale.ENGLISH);
+            createDocumentReference("chess", List.of("Main"), "Welcome", Locale.ENGLISH);
         DocumentReference chessXWikiSyntaxLinks =
-            createDocumentReference("chess", Arrays.asList("XWiki", "Syntax"), "Links", Locale.FRENCH);
+            createDocumentReference("chess", List.of("XWiki", "Syntax"), "Links", Locale.FRENCH);
 
         Query tennisQuery = mock(Query.class);
         when(tennisQuery.setOffset(0)).thenReturn(tennisQuery);
         when(tennisQuery.setOffset(batchSize)).thenReturn(emptyQuery);
-        when(tennisQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Main", "Welcome", "en", "2.1" },
-            new Object[] { "XWiki.Syntax", "Links", "fr", "1.3" }));
+        when(tennisQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Main", "Welcome", "en", "2.1", 1L },
+            new Object[] { "XWiki.Syntax", "Links", "fr", "1.3", 2L }));
 
         DocumentReference tennisMainWelcome =
-            createDocumentReference("tennis", Arrays.asList("Main"), "Welcome", Locale.ENGLISH);
+            createDocumentReference("tennis", List.of("Main"), "Welcome", Locale.ENGLISH);
         DocumentReference tennisXWikiSyntaxLinks =
-            createDocumentReference("tennis", Arrays.asList("XWiki", "Syntax"), "Links", Locale.FRENCH);
+            createDocumentReference("tennis", List.of("XWiki", "Syntax"), "Links", Locale.FRENCH);
 
         Query query = mock(Query.class);
         when(query.setLimit(anyInt())).thenReturn(query);
-        when(query.getNamedParameters()).thenReturn(Collections.emptyMap());
+        when(query.getNamedParameters()).thenReturn(Map.of());
         when(query.setWiki("chess")).thenReturn(chessQuery);
         when(query.setWiki("tennis")).thenReturn(tennisQuery);
 
         Query chessCountQuery = mock(Query.class);
-        when(chessCountQuery.execute()).thenReturn(Collections.singletonList(3L));
+        when(chessCountQuery.execute()).thenReturn(List.of(3L));
 
         Query tennisCountQuery = mock(Query.class);
-        when(tennisCountQuery.execute()).thenReturn(Collections.singletonList(2L));
+        when(tennisCountQuery.execute()).thenReturn(List.of(2L));
 
         Query countQuery = mock(Query.class);
         when(countQuery.addFilter(this.countQueryFilter)).thenReturn(countQuery);
         when(countQuery.setWiki("chess")).thenReturn(chessCountQuery);
         when(countQuery.setWiki("tennis")).thenReturn(tennisCountQuery);
 
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager.createQuery(
+            "select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc" + ORDER_CLAUSE,
+            Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery("", Query.HQL)).thenReturn(countQuery);
 
-        DocumentIterator<String> iterator = this.databaseIterator;
+        DocumentIterator<DocumentIteratorEntry> iterator = this.databaseIterator;
 
         assertEquals(5L, iterator.size());
 
-        List<Pair<DocumentReference, String>> actualResults = new ArrayList<>();
+        List<Pair<DocumentReference, DocumentIteratorEntry>> actualResults = new ArrayList<>();
         while (iterator.hasNext()) {
             actualResults.add(iterator.next());
         }
 
-        List<Pair<DocumentReference, String>> expectedResults = new ArrayList<>();
-        expectedResults.add(new ImmutablePair<>(chessBlogCodeWebHome, "3.2"));
-        expectedResults.add(new ImmutablePair<>(chessMainWelcome, "1.1"));
-        expectedResults.add(new ImmutablePair<>(chessXWikiSyntaxLinks, "2.5"));
-        expectedResults.add(new ImmutablePair<>(tennisMainWelcome, "2.1"));
-        expectedResults.add(new ImmutablePair<>(tennisXWikiSyntaxLinks, "1.3"));
+        assertThrows(NoSuchElementException.class, iterator::next);
+
+        List<Pair<DocumentReference, DocumentIteratorEntry>> expectedResults = new ArrayList<>();
+        expectedResults.add(entry(chessBlogCodeWebHome, 1, "3.2"));
+        expectedResults.add(entry(chessMainWelcome, 2, "1.1"));
+        expectedResults.add(entry(chessXWikiSyntaxLinks, 3, "2.5"));
+        expectedResults.add(entry(tennisMainWelcome, 1, "2.1"));
+        expectedResults.add(entry(tennisXWikiSyntaxLinks, 2, "1.3"));
 
         assertEquals(expectedResults, actualResults);
     }
@@ -186,19 +198,19 @@ class DatabaseDocumentIteratorTest
     {
         int batchSize = 23;
         when(this.configuration.getSynchronizationBatchSize()).thenReturn(batchSize);
-        DocumentReference rootReference = createDocumentReference("gang", Arrays.asList("A", "B"), "C", null);
+        DocumentReference rootReference = createDocumentReference("gang", List.of("A", "B"), "C", null);
 
         Query emptyQuery = mock(Query.class);
-        when(emptyQuery.execute()).thenReturn(Collections.emptyList());
+        when(emptyQuery.execute()).thenReturn(List.of());
 
         Query query = mock(Query.class);
         when(query.setLimit(anyInt())).thenReturn(query);
         when(query.setWiki(rootReference.getWikiReference().getName())).thenReturn(query);
         when(query.setOffset(0)).thenReturn(query);
         when(query.setOffset(batchSize)).thenReturn(emptyQuery);
-        when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "A.B", "C", "de", "3.1" }));
+        when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "A.B", "C", "de", "3.1", 1L }));
 
-        Map<String, Object> namedParameters = new HashMap();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("space", "A.B");
         namedParameters.put("name", "C");
         when(query.getNamedParameters()).thenReturn(namedParameters);
@@ -207,21 +219,23 @@ class DatabaseDocumentIteratorTest
         when(countQuery.addFilter(this.countQueryFilter)).thenReturn(countQuery);
 
         String whereClause = " where doc.space = :space and doc.name = :name";
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager
+            .createQuery("select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc"
+                + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery(whereClause, Query.HQL)).thenReturn(countQuery);
 
-        DocumentIterator<String> iterator = this.databaseIterator;
+        DocumentIterator<DocumentIteratorEntry> iterator = this.databaseIterator;
         iterator.setRootReference(rootReference);
 
-        List<Pair<DocumentReference, String>> actualResults = new ArrayList<>();
+        List<Pair<DocumentReference, DocumentIteratorEntry>> actualResults = new ArrayList<>();
         while (iterator.hasNext()) {
             actualResults.add(iterator.next());
         }
 
-        List<Pair<DocumentReference, String>> expectedResults = new ArrayList<>();
-        expectedResults.add(new ImmutablePair<>(new DocumentReference(rootReference, Locale.GERMAN), "3.1"));
+        assertThrows(NoSuchElementException.class, iterator::next);
+
+        List<Pair<DocumentReference, DocumentIteratorEntry>> expectedResults = new ArrayList<>();
+        expectedResults.add(entry(new DocumentReference(rootReference, Locale.GERMAN), 1, "3.1"));
 
         assertEquals(expectedResults, actualResults);
 

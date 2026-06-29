@@ -27,16 +27,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.BootstrapSelect;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action.
@@ -289,6 +293,86 @@ public class EditPage extends BasePage
     public String getDocumentTitle()
     {
         return this.titleField.getAttribute("value");
+    }
+
+    /**
+     * Sets the value of the document title field.
+     * 
+     * @param title the new document title
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public void setDocumentTitle(String title)
+    {
+        this.titleField.clear();
+        this.titleField.sendKeys(title);
+    }
+
+    /**
+     * @return the field used to edit the document title
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public WebElement getDocumentTitleField()
+    {
+        return this.titleField;
+    }
+
+    /**
+     * Waits until the document title field is focused.
+     * 
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public void waitUntilDocumentTitleIsFocused()
+    {
+        waitUntilDocumentTitleIsFocused(getDriver().getTimeout());
+    }
+
+    /**
+     * Waits until the document title field is focused.
+     * 
+     * @param timeout the maximum time to wait in seconds
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public void waitUntilDocumentTitleIsFocused(int timeout)
+    {
+        getDriver().waitUntilCondition(driver -> titleField.equals(driver.switchTo().activeElement()), timeout);
+    }
+
+    /**
+     * @return {@code true} if the document title is valid, {@code false} otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean isDocumentTitleValid()
+    {
+        return getDriver().isValid(this.titleField);
+    }
+
+    /**
+     * @return the alert displayed when trying to save without a version summary while it's mandatory
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public Alert waitForVersionSummaryAlert()
+    {
+        Alert alert = getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+        assertEquals("Enter a brief description of your changes", alert.getText());
+        return alert;
     }
 
     protected Set<Locale> getExistingLocales(List<WebElement> elements)

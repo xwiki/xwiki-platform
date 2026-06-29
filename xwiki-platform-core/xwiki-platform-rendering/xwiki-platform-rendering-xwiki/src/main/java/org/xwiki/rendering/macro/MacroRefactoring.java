@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component dedicated to perform refactoring of existing macros.
@@ -79,7 +78,6 @@ public interface MacroRefactoring
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
      * @since 16.10.0RC1
      */
-    @Unstable
     default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
         Map<EntityReference, EntityReference> updatedEntities)
@@ -127,7 +125,6 @@ public interface MacroRefactoring
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
      * @since 16.10.0RC1
      */
-    @Unstable
     default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
         Map<EntityReference, EntityReference> updatedEntities)

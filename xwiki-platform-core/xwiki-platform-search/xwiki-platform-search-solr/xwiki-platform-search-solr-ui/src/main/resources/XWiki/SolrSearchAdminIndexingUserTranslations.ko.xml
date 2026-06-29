@@ -52,4 +52,4 @@ admin.indexinguser.explanation.mainwikionly=Solr 인덱서는 기본 위키에�
 XWiki.SolrSearchAdminIndexingUser_indexer.description=인덱싱 사용자
 XWiki.SolrSearchAdminIndexingUser_indexer.hint=백그라운드에서 페이지를 색인화하는 데 사용되는 XWiki 사용자 계정.
 </content>
-  </xwikidoc>
+</xwikidoc>

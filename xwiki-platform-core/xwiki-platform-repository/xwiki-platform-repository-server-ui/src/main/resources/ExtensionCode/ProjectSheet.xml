@@ -1,0 +1,233 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.7" reference="ExtensionCode.ProjectSheet" locale="">
+  <web>ExtensionCode</web>
+  <name>ProjectSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>#if($doc.getObject('ExtensionCode.ProjectClass'))$doc.getObject('ExtensionCode.ProjectClass').getProperty('name').value#{else}Project sheet#end</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set($isEditMode = true)
+#else
+  #set($isViewMode = true)
+#end
+
+## If the current page contains a ExtensionCode.ExtensionClass xobject then display the content
+## using the ExtensionCode.ExtensionSheet (and not ExtensionCode.ProjectSheet). This is so that
+## We can make all extension pages also contain a ExtensionCode.ProjectClass xobject (e.g. to
+## have a LT/LD of projects on the home page of e.x.o).
+#if (!$doc.getObject("ExtensionCode.ExtensionClass"))
+  #set($project = $doc.getObject("ExtensionCode.ProjectClass"))
+#end
+
+#if ($project)
+  #set($id = $project.getProperty('id').value)
+  $doc.use("ExtensionCode.ProjectClass")
+  #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
+  #if ($isViewMode)
+    ##------- Icon &amp; Summary -----------------
+    (% class="extensionSummary" %)
+    #set($icon = $doc.getValue("icon"))
+    #if ("$!{icon.trim()}" != "")
+      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**
+    #else
+      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**
+    #end
+
+    ## Viewing
+    ##
+    {{box cssClass="floatinginfobox col-xs-12 col-sm-6 pull-right"}}
+      #if ($hasEdit)
+        #if ($proxyExtensionObject)
+          #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
+          #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
+          {{info}}Project imported from repository [[$services.rendering.escape($services.rendering.escape($repositoryId, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($repositoryURI, 'xwiki/2.1')]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportProject||title="Update project" queryString="importProject=true&amp;projectId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
+        #end
+      #end
+
+     (% class="extensionInfo" %)
+      ##------- Project Type -----------------
+      |(% class="label" %)Type(%%)|Project
+      ##------- Last Version -----------------
+      #set($lastVersion = $doc.getValue("lastVersion"))
+      |(% class="label" %)Last version(%%)|#if ($lastVersion.isEmpty())
+          Unknown
+        #else
+          $doc.lastVersion
+        #end
+      ##------- Developed By --------
+      #set($authors = $doc.getValue("authors"))
+      #if (!$authors.isEmpty())
+      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
+          Unknown
+        #else
+          $doc.display('authors')
+        #end
+      #end
+      ##------- Website --------------
+      #set($website = $project.getProperty("website").value)
+      #if ("$!website" != '')
+        |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
+                                          [[{{{$website.substring(0, 40)...}}}&gt;&gt;url:$website]]
+                                        #else
+                                          $website
+                                        #end
+      #end
+      ##------- License --------
+      #set($licenseName = $doc.getValue("licenseName"))
+      #if ("$!licenseName" != "")
+        |(% class="label" %)License(%%)|$licenseName
+      #else
+        |(% class="label" %)License(%%)|Unknown
+      #end
+
+      ##------------------------
+      (%class="btn-group pull-right"%)(((
+        ##------- Website button --------------
+        #set($website = $extension.getProperty("website").value)
+        #if ("$!website" != '')
+          [[$services.icon.render('book') Documentation&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
+        #end
+        ##------- Source --------
+        #set($source = $doc.getValue("source"))
+        #if ("$!source" != "")
+          [[$services.icon.render('file-text') Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
+        ##------- Issues --------
+        #set($issues = $doc.getValue("issueManagementURL"))
+        #if ("$!issues" != "")
+          [[$services.icon.render('bug') Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
+      )))
+    {{/box}}
+
+    {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+    (%class="clearfix"%)((()))
+  #else
+    ## Editing
+    ##
+    {{toc/}}
+
+    = Documentation Help =
+
+    Here are some rules to follow when contributing an extension:
+    * Use a short summary. It's going to be displayed in the Project livetable and ideally shouldn't take more than 1 line in that table.
+    #if($proxyExtensionObject)
+      * When en extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+    #end
+
+    #if($proxyExtensionObject)
+      ; Automatically synchronize the extension informations
+      : $proxyExtensionObject.autoUpdate
+    #end
+
+    = Summary =
+    #if ($doc.isNew())
+      #if ($request.name)
+        $project.set('name', $request.name)##
+      #else
+        $project.set('name', $doc.documentReference.name)##
+      #end
+      $project.set('authors', $xcontext.user)##
+    #end
+
+    (% class="extension" %)
+    |Name|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end
+
+    |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end
+
+    ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
+    |Authors|#if($proxyExtensionObject)$doc.getValue('authors')#else$doc.display('authors')#end
+
+    |License|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end
+
+    |Source|#if($proxyExtensionObject)$doc.display('source', 'view')#else$doc.display('source')#end
+
+    |Display Icon Location
+(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
+
+  #end
+
+    #if ("$!doc.getValue('description')" != '')
+      = Description =
+      #if ($isViewMode)
+        ## Make sure to resolve reference based on the right document
+        $doc.getValue("description")
+      #else
+        $doc.display("description")
+      #end
+    #end
+    #if ("$!doc.getValue('entryPoints')" != '')
+      = Entry Points =
+      #if ($isViewMode)
+        $doc.getValue("entryPoints")
+      #else
+        $doc.display("entryPoints")
+      #end
+    #end
+    = Extensions =
+
+    This project contains the following Extensions.
+
+    ##set($columns = ["name", "summary", "category", "doc.creationDate", "doc.date", "installedCount", "rating"])
+    #set($columns = ["name", "summary", "category", "doc.creationDate", "doc.date", "installedCount"])
+    #set($columnsProperties = {
+      "name" : { "type" : "text", "link" : "view" },
+      "summary" : { "type" : "text" },
+      "category" : { "type" : "list" },
+      "doc.creationDate" : { "type" : "date" },
+      "doc.date" : { "type" : "date" },
+      "rating" : { 'html' : true, 'filterable' : false, 'sortable' : false}
+    })
+    #set($options = { 
+      "tagCloud": false,
+      "className": "ExtensionCode.ExtensionClass",
+      "selectedColumn": "doc.creationDate",
+      "defaultOrder": "desc",
+      "translationPrefix" : "extension.repository.",
+      "rowCount": 15,
+      "extraParams": "&amp;location=${escapetool.url($doc.space)}."
+    })
+    #livetable("extensions" $columns $columnsProperties $options)
+
+    ## Release notes
+    = {{id name="versions"/}}Versions =
+
+    #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+    {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+#else
+  This class sheet must be applied on a document containing an ExtensionCode.ProjectClass object
+#end
+{{/velocity}}</content>
+</xwikidoc>

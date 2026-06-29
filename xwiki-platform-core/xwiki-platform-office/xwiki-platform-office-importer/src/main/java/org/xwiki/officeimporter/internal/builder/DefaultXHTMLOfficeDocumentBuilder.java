@@ -32,6 +32,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -117,7 +118,7 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         throws OfficeImporterException
     {
         // Prepare the parameters for HTML cleaning.
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("targetDocument", this.entityReferenceSerializer.serialize(reference));
         // Extract the images that are embedded through the Data URI scheme and add them to the other artifacts so that
         // they end up as attachments.
@@ -151,8 +152,8 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         for (File file : officeConverterResult.getAllFiles()) {
             // Rename the file if it starts with the static prefix similar to the image filter.
             String filename = file.getName();
-            if (StringUtils.startsWith(filename, replacePrefix)) {
-                filename = replacementPrefix + StringUtils.removeStart(filename, replacePrefix);
+            if (Strings.CS.startsWith(filename, replacePrefix)) {
+                filename = replacementPrefix + Strings.CS.removeStart(filename, replacePrefix);
             }
             artifacts.put(filename, new FileOfficeDocumentArtifact(file.getName(), file));
         }

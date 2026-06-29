@@ -71,7 +71,7 @@ public class X509CertificateQuery extends AbstractX509StoreQuery
      */
     public Collection<CertifiedPublicKey> getCertificates()
     {
-        Collection<CertifiedPublicKey> result = new ArrayList<CertifiedPublicKey>();
+        Collection<CertifiedPublicKey> result = new ArrayList<>();
         try {
             for (String cert : this.<String>execute()) {
                 try {

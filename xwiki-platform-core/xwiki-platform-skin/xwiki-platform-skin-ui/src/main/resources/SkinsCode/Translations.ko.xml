@@ -36,12 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>skin.sheet.title=피부
-skin.sheet.properties=피부 속성
+  <content>skin.sheet.title=스킨
+skin.sheet.properties=스킨 속성
+skin.sheet.properties.logo.warning=이 로고는 일반적으로 색상 테마에 정의된 로고로 덮어쓰여집니다. 위키 로고를 변경하려면 현재 색상 테마를 편집하는 것을 고려해 보세요.
 skin.sheet.deprecatedProperties=더 이상 사용되지 않는 속성
 skin.sheet.overriddenTemplates=재정의된 템플릿
 skin.sheet.addTemplate=새 재정의 템플릿 추가
-skin.sheet.add=추가하다
+skin.sheet.add=추가
 skin.sheet.overrideTemplateWarning=이 섹션에서는 스킨 템플릿을 재정의할 수 있습니다. 이는 기술적인 문제이므로 결과를 알고 있어야 합니다.
 skin.sheet.deprecatedPropertiesWarning=이 섹션은 역호환성을 이유로 여기에 있습니다. 위의 '재정의된 템플릿' 메커니즘을 사용해야 합니다.
 skin.sheet.nojs=JavaScript가 없으면 이 섹션을 사용할 수 없습니다. 하지만 대신 {0}객체 편집기{1}를 사용하여 {2} 객체를 수동으로 추가할 수 있습니다.
@@ -50,9 +51,9 @@ skin.sheet.js.deletingDone=템플릿이 삭제되었습니다!
 skin.sheet.js.error.csrf=저장 시 CSRF 검증에 실패했습니다. 다시 시도하려면 브라우저를 새로 고치세요.
 skin.sheet.js.error.rights=권한이 부족하여 스킨을 저장하지 못했습니다.
 skin.sheet.js.deleteConfirmationText=이 템플릿을 삭제하시겠습니까?
-skin.sheet.js.deleteConfirmationYes=응, 삭제해
-skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다
-skin.sheet.js.adding=첨가...
+skin.sheet.js.deleteConfirmationYes=Yes,삭제해 주세요
+skin.sheet.js.deleteConfirmationNo=No, 취소합니다
+skin.sheet.js.adding=추가...
 skin.sheet.js.addingDone=템플릿이 추가되었습니다!
 
 ###############################################################################

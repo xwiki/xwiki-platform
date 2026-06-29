@@ -71,10 +71,7 @@ $response.setContentType("application/json")
 #if (!$offset || $offset < 0)
   #set($offset = 0)
 #end
-#set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
-#if (!$limit)
-  #set ($limit = 15)
-#end
+#getAndValidateQueryLimitFromRequest('limit', 15, $limit)
 ##
 ## Build the query
 ##

@@ -73,16 +73,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
     }
 )
-public class EditIT
+class EditIT
 {
     @BeforeAll
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
 
     @AfterEach
-    public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
+    void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
@@ -103,7 +103,7 @@ public class EditIT
      */
     @Test
     @Order(1)
-    public void showAndHideEditComments(TestUtils setup, TestReference reference) throws Exception
+    void showAndHideEditComments(TestUtils setup, TestReference reference) throws Exception
     {
         ViewPage vp = setup.gotoPage(reference);
 
@@ -122,6 +122,17 @@ public class EditIT
         } finally {
             setup.setPropertyInXWikiCfg("xwiki.editcomment.hidden=0");
         }
+
+        // Verify that disabling the version summary feature from Administration (Editing > Edit Mode,
+        // "Enable Version Summaries" = No, i.e. the "editcomment" wiki preference) removes the field entirely.
+        try {
+            setup.setWikiPreference("editcomment", "0");
+            vp = setup.gotoPage(reference);
+            wep = vp.editWiki();
+            assertFalse(wep.hasEditComment());
+        } finally {
+            setup.setWikiPreference("editcomment", "1");
+        }
     }
 
     /**
@@ -129,7 +140,7 @@ public class EditIT
      */
     @Test
     @Order(2)
-    public void minorEdit(TestUtils setup, TestReference reference)
+    void minorEdit(TestUtils setup, TestReference reference) throws Exception
     {
         setup.deletePage(reference);
         ViewPage vp = setup.gotoPage(reference);
@@ -139,14 +150,20 @@ public class EditIT
         // Save & Continue = minor edit.
         wep.clickSaveAndContinue();
 
+        wep.setContent("version=1.2");
+        wep.clickSaveAndContinue();
+
         wep.setContent("version=2.1");
 
         // Save & View = major edit
         wep.clickSaveAndView();
 
-        // Verify that the revision exists by navigating to it and by asserting its content
-        setup.gotoPage(reference, "view", "rev=2.1");
+        // Verify that the revisions exists by navigating to it and by asserting its content
+        setup.gotoPage(reference, "view", "rev=1.2");
+        vp = new ViewPage();
+        assertEquals("version=1.2", vp.getContent());
 
+        setup.gotoPage(reference, "view", "rev=2.1");
         vp = new ViewPage();
         assertEquals("version=2.1", vp.getContent());
 
@@ -159,6 +176,22 @@ public class EditIT
         setup.gotoPage(reference, "view", "rev=2.2");
         vp = new ViewPage();
         assertEquals("version=2.2", vp.getContent());
+
+        try {
+            // Verify that disabling the minor edit from preference hide it and prevent using it
+            setup.setWikiPreference("minoredit", "0");
+            wep = vp.editWiki();
+            assertFalse(wep.hasMinorEdit());
+
+            wep.setContent("version=3.1");
+            wep.clickSaveAndContinue();
+
+            setup.gotoPage(reference, "view", "rev=3.1");
+            vp = new ViewPage();
+            assertEquals("version=3.1", vp.getContent());
+        } finally {
+            setup.setWikiPreference("minoredit", "1");
+        }
     }
 
     /**
@@ -167,7 +200,7 @@ public class EditIT
      */
     @Test
     @Order(3)
-    public void emptyDocumentContentIsAllowed(TestUtils setup, TestReference reference)
+    void emptyDocumentContentIsAllowed(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         setup.createPage(reference, "this is some content", "EmptyContentAllowed");
@@ -182,7 +215,7 @@ public class EditIT
 
     @Test
     @Order(4)
-    public void emptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved(TestUtils setup, TestReference reference)
+    void emptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         String content = "\n== Section ==\n\ntext";
@@ -193,8 +226,10 @@ public class EditIT
     }
 
     @Test
+    @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
+        + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24487 .")
     @Order(5)
-    public void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
+    void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
     {
         testToolBarButton(setup, reference, "Bold", "**%s**", "Text in Bold");
         testToolBarButton(setup, reference, "Italics", "//%s//", "Text in Italics");
@@ -241,47 +276,36 @@ public class EditIT
      * page.
      */
     @Test
-    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
-    public void saveAndFormManipulation(TestUtils setup, TestReference reference)
+    void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         ViewPage viewPage = setup.gotoPage(reference);
         WikiEditPage editWiki = viewPage.editWiki();
 
-        try {
-            // Prevent from leaving the page so that we can check the UI before moving out of the page
-            setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+        // Change the default timeout of done event so that we can see it.
+        setup.getDriver()
+            .executeJavascript("XWiki.widgets.Notification.prototype.defaultOptions.done.timeout = 30");
 
-            // Change the default timeout of done event so that we can see it.
-            setup.getDriver()
-                .executeJavascript("XWiki.widgets.Notification.prototype.defaultOptions.done.timeout = 30");
+        // For new timeouts to be taken into account, we need to reset the listeners.
+        // First, we stop observing the save event, and that removes the existing listeners
+        setup.getDriver()
+            .executeJavascript("document.stopObserving('xwiki:actions:save')");
+        // Then, we create back the AjaxSaveAndContinue instance with the right timeout, and also override
+        // maybeRedirect to prevent actual page navigation so we can check the UI state after save.
+        // Note: Firefox 125+ only shows the beforeunload dialog for synchronous user-gesture-triggered
+        // navigation, not for async AJAX-triggered navigation, so the beforeunload dialog approach is unreliable,
+        // which is why we cannot use it here (FTR we used to use it).
+        setup.getDriver().executeJavascript(
+            "var saveAndContinue = new XWiki.actionButtons.AjaxSaveAndContinue();"
+                + "saveAndContinue.maybeRedirect = function(isContinue) { return true; };");
 
-            // For new timeouts to be taken into account we need to reset the listeners:
-            // first we stop observing save event, it will remove the existing listeners
-            setup.getDriver()
-                .executeJavascript("document.stopObserving('xwiki:actions:save')");
-            // then we create back the AjaxSaveAndContinue instance, it will create back the messages with the right
-            // timeout, and will also create the listener.
-            setup.getDriver().executeJavascript("new XWiki.actionButtons.AjaxSaveAndContinue()");
+        editWiki.clickSaveAndView(false);
 
-            editWiki.clickSaveAndView(false);
-
-            // An alert should appear to ask the user if he wants to leave the page.
-            setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
-
-            // We dismiss it so we can stay on the page and check the UI.
-            setup.getDriver().switchTo().alert().dismiss();
-
-            // Check that the saving message is displayed.
-            editWiki.waitForNotificationSuccessMessage("Saved");
-            // The form should remain disabled since we normally should be driven to another page.
-            assertFalse(editWiki.isEnabled());
-        } finally {
-            // Now allow to leave the page.
-            setup.getDriver().executeJavascript("window.onbeforeunload = null;");
-        }
+        // Check that the saving message is displayed.
+        editWiki.waitForNotificationSuccessMessage("Saved");
+        // The form should remain disabled since we normally should be driven to another page.
+        assertFalse(editWiki.isEnabled());
 
         // Go back to the editor to reset the status
         viewPage = setup.gotoPage(reference);
@@ -298,7 +322,7 @@ public class EditIT
 
     @Test
     @Order(7)
-    public void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
+    void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
     {
         try {
             DocumentReference invalidateCSRF = new DocumentReference("InvalidateCSRF",
@@ -437,7 +461,7 @@ public class EditIT
      */
     @Test
     @Order(8)
-    public void editWithConflict(TestUtils setup, TestReference testReference)
+    void editWithConflict(TestUtils setup, TestReference testReference)
     {
         // Fixture
         String title = testReference.getLastSpaceReference().getName();
@@ -784,7 +808,7 @@ public class EditIT
      */
     @Test
     @Order(9)
-    public void createDocumentLongTitle(TestUtils setup, TestReference reference)
+    void createDocumentLongTitle(TestUtils setup, TestReference reference)
     {
         String spaceName1 = "Company Presentation Events";
         String spaceName2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
@@ -813,7 +837,7 @@ public class EditIT
      */
     @Test
     @Order(10)
-    public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
+    void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
     {
         setup.deletePage(testReference);
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
@@ -849,7 +873,7 @@ public class EditIT
 
     @Test
     @Order(11)
-    public void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
+    void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
         TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.deletePage(testReference);
@@ -867,17 +891,15 @@ public class EditIT
 
         // Right now error messages from the server are different if we are using Save&View or Save&Continue.
         // This needs to be fixed as part of XWIKI-16425.
-        String saveContinueErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
+        String saveErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
             + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) + ".";
-
-        String saveViewErrorMessage = "Failed to save the page. Reason: Server Error";
 
         // try with save and continue
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndContinue(false);
         //wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
-        waitForSaveError(setup, wikiEditPage, saveContinueErrorMessage);
+        waitForSaveError(setup, saveErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum");
         wikiEditPage.clickSaveAndContinue();
 
@@ -885,7 +907,7 @@ public class EditIT
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndView(false);
         //wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
-        waitForSaveError(setup, wikiEditPage, saveViewErrorMessage);
+        waitForSaveError(setup, saveErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum version 2");
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
@@ -911,12 +933,13 @@ public class EditIT
     }
 
     // FIXME: remove when https://jira.xwiki.org/browse/XWIKI-18513 is fixed
-    private void waitForSaveError(TestUtils setup, WikiEditPage wikiEditPage, String mainError)
+    private void waitForSaveError(TestUtils setup, String mainError)
     {
         String fallbackError = "Failed to save the page. Reason: Server not responding";
 
         By notificationMessageLocator =
-            By.xpath(String.format("//div[contains(@class,'xnotification-error') and (contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
+            By.xpath(String.format("//div[contains(@class,'xnotification-error') and "
+                + "(contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
         setup.getDriver().waitUntilElementIsVisible(notificationMessageLocator);
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
@@ -930,7 +953,7 @@ public class EditIT
 
     @Test
     @Order(12)
-    public void switchSyntaxFromWikiEditMode(TestUtils setup, TestReference testReference) throws Exception
+    void switchSyntaxFromWikiEditMode(TestUtils setup, TestReference testReference) throws Exception
     {
         // Fixture: enable the XHTML syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
@@ -1032,7 +1055,7 @@ public class EditIT
 
     @Test
     @Order(13)
-    public void saveActionValidatesWhenXValidateIsPresent(TestUtils setup, TestReference testReference)
+    void saveActionValidatesWhenXValidateIsPresent(TestUtils setup, TestReference testReference)
     {
         String content = "{{velocity}}"
             + "value: $doc.display('prop')\n\n"
@@ -1073,7 +1096,7 @@ public class EditIT
 
     @Test
     @Order(14)
-    public void logoutDuringEdit(TestUtils setup, TestReference testReference)
+    void logoutDuringEdit(TestUtils setup, TestReference testReference)
     {
         // fixture: deny right edit to the guest user on the page, since we want to get a 401 as in XWiki Standard
         setup.createPage(testReference, "", "");

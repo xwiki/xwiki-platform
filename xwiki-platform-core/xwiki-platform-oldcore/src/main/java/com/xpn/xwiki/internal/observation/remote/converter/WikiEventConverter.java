@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -51,13 +50,10 @@ public class WikiEventConverter extends AbstractXWikiEventConverter
     /**
      * The events supported by this converter.
      */
-    private Set<Class<? extends Event>> events = new HashSet<Class<? extends Event>>()
-    {
-        {
-            add(WikiDeletedEvent.class);
-            add(WikiCreatedEvent.class);
-        }
-    };
+    private Set<Class<? extends Event>> events = Set.of(
+        WikiDeletedEvent.class,
+        WikiCreatedEvent.class
+    );
 
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)

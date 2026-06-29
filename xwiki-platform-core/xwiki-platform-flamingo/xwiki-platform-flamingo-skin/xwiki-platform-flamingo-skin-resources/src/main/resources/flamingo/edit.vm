@@ -48,6 +48,14 @@
           ## Allow the user to force the edit.
           #set ($newQueryString = "$!request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')"
             + '&amp;force=1')
+          #set ($forceTokenParameter = "force_token=$!{services.csrf.getToken()}")
+          #if (!$newQueryString.contains($forceTokenParameter))
+            ## Prepend the token to ensure it is the first value for the force_token parameter as we use the first
+            ## value if there are several and there could be an invalid token in the query string already.
+            ## We don't set the form_token parameter as this would also authorize other parameter that might already
+            ## be in the URL that are interpreted by the edit action and that could be used for attacks.
+            #set ($newQueryString = $forceTokenParameter + '&amp;' + $newQueryString)
+          #end
           #set ($forceEditURL = $tdoc.getURL($xcontext.action, ${newQueryString}))
           <a href="$forceEditURL" class="btn btn-warning">$escapetool.xml($editConfirmation.confirm)</a>
           $response.setStatus(423)

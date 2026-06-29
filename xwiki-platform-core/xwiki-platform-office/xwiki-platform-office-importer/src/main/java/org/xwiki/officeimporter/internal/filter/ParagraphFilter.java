@@ -87,7 +87,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
                     return isEmptyLineParagraph(element);
                 }
             });
-        List<Node> sequences = new ArrayList<Node>();
+        List<Node> sequences = new ArrayList<>();
         for (Element emptyLineParagraph : emptyLineParagraphs) {
             Node prev = emptyLineParagraph.getPreviousSibling();
             // Skip garbage.
@@ -112,12 +112,12 @@ public class ParagraphFilter extends AbstractHTMLFilter
      */
     private boolean isParagraph(Node node)
     {
-        return null != node && node.getNodeName().equals(TAG_P);
+        return null != node && TAG_P.equals(node.getNodeName());
     }
 
     /**
      * Checks if a node represents a {@code<p><br/></p>} element used by open office to represent an empty line.
-     * 
+     *
      * @param node the {@link Node}
      * @return true if the node represents an empty line.
      */
@@ -139,13 +139,13 @@ public class ParagraphFilter extends AbstractHTMLFilter
 
     /**
      * Checks if a node represents empty text content (white space).
-     * 
+     *
      * @param node the {@link Node}.
      * @return true if the node represents white space.
      */
     private boolean isEmptyTextNode(Node node)
     {
-        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().equals("");
+        return null != node && node.getNodeType() == Node.TEXT_NODE && node.getTextContent().trim().isEmpty();
     }
 
     /**
@@ -167,6 +167,6 @@ public class ParagraphFilter extends AbstractHTMLFilter
      */
     private boolean isLineBreak(Node node)
     {
-        return null != node && node.getNodeName().equals(TAG_BR);
+        return null != node && TAG_BR.equals(node.getNodeName());
     }
 }

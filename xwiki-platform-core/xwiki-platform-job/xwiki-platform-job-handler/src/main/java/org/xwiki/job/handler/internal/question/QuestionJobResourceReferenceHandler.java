@@ -119,7 +119,7 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         if (request instanceof ServletRequest) {
             HttpServletRequest httpRequest = ((ServletRequest) request).getHttpServletRequest();
 
-            if (httpRequest.getMethod().equals("POST")) {
+            if ("POST".equals(httpRequest.getMethod())) {
                 String token = httpRequest.getParameter("form_token");
 
                 // TODO: should probably move this check in some filter triggered by an annotation

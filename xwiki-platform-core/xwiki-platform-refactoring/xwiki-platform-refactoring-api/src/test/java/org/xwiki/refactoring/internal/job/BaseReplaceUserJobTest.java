@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Named;
@@ -56,7 +57,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList(value = BaseReplaceUserJob.class)
 @ComponentTest
-public class BaseReplaceUserJobTest
+class BaseReplaceUserJobTest
 {
     @InjectMockComponents
     private BaseReplaceUserJob replaceUserJob;
@@ -86,7 +87,7 @@ public class BaseReplaceUserJobTest
     private ReplaceUserRequest request = new ReplaceUserRequest();
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         this.request.setUserReference(this.carol);
         this.request.setAuthorReference(this.carol);
@@ -96,17 +97,17 @@ public class BaseReplaceUserJobTest
     }
 
     @Test
-    public void emptyRequest()
+    void emptyRequest()
     {
         this.replaceUserJob.run();
 
         assertTrue(this.replaceUserJob.updatedDocuments.isEmpty());
         assertEquals("Starting job of type [refactoring/replaceUser]", this.logCapture.getMessage(0));
-        assertEquals("Finished job of type [refactoring/replaceUser]", logCapture.getMessage(1));
+        assertEquals("Finished job of type [refactoring/replaceUser]", this.logCapture.getMessage(1));
     }
 
     @Test
-    public void replaceUser() throws Exception
+    void replaceUser() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("test", "Space", "WebHome");
         this.request.setEntityReferences(
@@ -145,9 +146,9 @@ public class BaseReplaceUserJobTest
         assertEquals("Skipping unsupported entity [test:Space.WebHome].", this.logCapture.getMessage(2));
         assertEquals("Updating documents from [Space test:Space].", this.logCapture.getMessage(3));
         assertEquals("Updating document [test:Some.Page(fr)].", this.logCapture.getMessage(4));
-        assertEquals("Finished job of type [refactoring/replaceUser]", logCapture.getMessage(5));
+        assertEquals("Finished job of type [refactoring/replaceUser]", this.logCapture.getMessage(5));
 
-        assertEquals(Arrays.asList(new DocumentReference(updatedDocRef, Locale.FRENCH)),
+        assertEquals(List.of(new DocumentReference(updatedDocRef, Locale.FRENCH)),
             this.replaceUserJob.updatedDocuments);
     }
 }

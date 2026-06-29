@@ -193,7 +193,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
         }
         nodeContent = context.getWiki().getVersioningStore()
             .loadRCSNodeContent(this.id, true, context);
-        this.contentRef = new SoftReference<XWikiRCSNodeContent>(nodeContent);
+        this.contentRef = new SoftReference<>(nodeContent);
         return nodeContent;
     }
 
@@ -203,7 +203,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     public void setContent(XWikiRCSNodeContent content)
     {
         content.setId(getId());
-        this.contentRef = new SoftReference<XWikiRCSNodeContent>(content);
+        this.contentRef = new SoftReference<>(content);
         setDiff(content.getPatch().isDiff());
     }
 

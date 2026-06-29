@@ -102,6 +102,8 @@ public class InlinePage extends ViewPage
     public void clickSaveAndView(boolean wait)
     {
         if (wait) {
+            // Increase the timeout as a page save can be slow
+            getDriver().setTimeout(30);
             getDriver().addPageNotYetReloadedMarker();
         }
 

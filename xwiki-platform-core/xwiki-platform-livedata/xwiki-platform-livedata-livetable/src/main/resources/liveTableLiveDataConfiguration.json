@@ -40,6 +40,15 @@
         "displayer": {"id": "link", "propertyHref": "doc.author_url"}
       },
       {"id": "doc.objectCount", "type": "Number", "sortable": false, "filterable": false, "editable": false},
+      {
+        "id": "doc.enforceRequiredRights",
+        "type": "Boolean",
+        "filter":  {
+          "id": "boolean",
+          "trueValue": true,
+          "falseValue": false
+        }
+      },
       {"id": "_images", "displayer": "html"},
       {"id": "_attachments", "displayer": "html"},
       {"id": "_actions", "displayer": {"id": "actions", "actions": ["edit", "delete"]}},

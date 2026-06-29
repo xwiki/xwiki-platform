@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.Reader;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,9 +53,13 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wysiwyg.converter.JakartaRequestParameterConversionResult;
+import org.xwiki.wysiwyg.converter.RequestParameterConverter;
+import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 import org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -116,8 +121,13 @@ class DefaultRequestParameterConverterTest
     void convert() throws Exception
     {
         when(this.request.getParameterValues("RequiresConversion")).thenReturn(new String[] {"test"});
-        when(this.request.getParameterMap()).thenReturn(Map.of("test", new String[] {"content"}, "test_inputSyntax",
-            new String[] {"input/1.0"}, "test_outputSyntax", new String[] {"output/1.0"}));
+        when(this.request.getParameterValues("RequiresConversionHtml")).thenReturn(new String[] {"testHtml"});
+        when(this.request.getParameterMap()).thenReturn(Map.of(
+            "test", new String[] {"content"},
+            "testHtml", new String[] {"Other content"},
+            "test_inputSyntax", new String[] {"input/1.0"},
+            "test_outputSyntax", new String[] {"output/1.0"}
+        ));
 
         PrintRenderer printRenderer = mock();
         ArgumentCaptor<WikiPrinter> wikiPrinterCaptor = ArgumentCaptor.forClass(WikiPrinter.class);
@@ -136,11 +146,48 @@ class DefaultRequestParameterConverterTest
         when(this.renderingContext.getTransformationId()).thenReturn("transformationId");
         when(this.renderingContext.isRestricted()).thenReturn(false);
 
-        Optional<ServletRequest> filteredRequest = this.converter.convert(this.request, this.response);
+        RequestParameterConverter converter1 = mock(RequestParameterConverter.class);
+        RequestParameterConverter converter2 = mock(RequestParameterConverter.class);
+        RequestParameterConverter defaultConverter = mock(RequestParameterConverter.class);
+        Map<String, Object> instanceMap = new LinkedHashMap<>();
+        instanceMap.put("converter1", converter1);
+        instanceMap.put("default", defaultConverter);
+        instanceMap.put("converter2", converter2);
+        when(this.contextComponentManager.getInstanceMap(RequestParameterConverter.class)).thenReturn(instanceMap);
 
-        assertEquals("converted content", filteredRequest.get().getParameter("test"));
-        assertEquals(1, filteredRequest.get().getParameterMap().size());
+        when(converter1.convert(any(ServletRequest.class))).then(invocationOnMock -> {
+            ServletRequest request = invocationOnMock.getArgument(0);
+            assertEquals("converted content", request.getParameter("test"));
+            assertEquals("Other content", request.getParameter("testHtml"));
+            assertEquals(2, request.getParameterMap().size());
 
+            JakartaRequestParameterConversionResult result = mock(JakartaRequestParameterConversionResult.class);
+            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) request);
+            when(result.getErrors()).thenReturn(Map.of());
+            when(result.getOutput()).thenReturn(Map.of(
+                "testHtml", "modified html content",
+                "test", "converted content"
+            ));
+            return result;
+        });
+        when(converter2.convert(any(ServletRequest.class))).then(invocationOnMock -> {
+            ServletRequest request = invocationOnMock.getArgument(0);
+            assertEquals("converted content", request.getParameter("test"));
+            assertEquals("Other content", request.getParameter("testHtml"));
+            assertEquals(2, request.getParameterMap().size());
+
+            JakartaRequestParameterConversionResult result = mock(JakartaRequestParameterConversionResult.class);
+            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) request);
+            when(result.getErrors()).thenReturn(Map.of());
+            when(result.getOutput()).thenReturn(Map.of());
+            return result;
+        });
+
+        Optional<ServletRequest> filteredRequestOpt = this.converter.convert(this.request, this.response);
+        assertTrue(filteredRequestOpt.isPresent());
+        ServletRequest filteredRequest = filteredRequestOpt.get();
+        assertEquals("converted content", filteredRequest.getParameter("test"));
+        assertEquals("Other content", filteredRequest.getParameter("testHtml"));
         verify((MutableRenderingContext) this.renderingContext).push(transformation, xdom, outputSyntax,
             "transformationId", false, outputSyntax);
         verify((MutableRenderingContext) this.renderingContext).pop();

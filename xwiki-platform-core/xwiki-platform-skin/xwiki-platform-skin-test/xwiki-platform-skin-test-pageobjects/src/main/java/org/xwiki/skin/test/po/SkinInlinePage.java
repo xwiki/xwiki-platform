@@ -59,6 +59,7 @@ public class SkinInlinePage extends InlinePage
             overrideObject.click();
         }
 
-        return new SkinTemplateElement(overrideObject.findElement(By.xpath("div[@class = 'overrideProperties']")));
+        return new SkinTemplateElement(overrideObject.findElement(By.xpath("div[@class = 'overrideProperties']")),
+            open);
     }
 }

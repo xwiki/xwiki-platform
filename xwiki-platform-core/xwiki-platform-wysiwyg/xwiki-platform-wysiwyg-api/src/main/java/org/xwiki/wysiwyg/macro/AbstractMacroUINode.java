@@ -40,6 +40,7 @@ public abstract class AbstractMacroUINode
     private boolean hidden;
     private boolean mandatory;
     private int order;
+    private String parent;
 
     /**
      * Default constructor.
@@ -172,6 +173,30 @@ public abstract class AbstractMacroUINode
         return (T) this;
     }
 
+    /**
+     * @return the identifier of the group the parameter belongs to or {@code null} if it doesn't belong to any group.
+     * @since 17.9.0RC1
+     */
+    @Unstable
+    public String getParent()
+    {
+        return parent;
+    }
+
+    /**
+     *
+     * @param parent see {@link #getParent()}.
+     * @param <T> the concrete type
+     * @return the current instance
+     * @since 17.9.0RC1
+     */
+    @Unstable
+    public <T extends AbstractMacroUINode> T setParent(String parent)
+    {
+        this.parent = parent;
+        return (T) this;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -193,6 +218,7 @@ public abstract class AbstractMacroUINode
             .append(id, that.id)
             .append(name, that.name)
             .append(description, that.description)
+            .append(parent, that.parent)
             .isEquals();
     }
 
@@ -207,6 +233,7 @@ public abstract class AbstractMacroUINode
             .append(hidden)
             .append(mandatory)
             .append(order)
+            .append(parent)
             .toHashCode();
     }
 
@@ -221,6 +248,7 @@ public abstract class AbstractMacroUINode
             .append("hidden", hidden)
             .append("mandatory", mandatory)
             .append("order", order)
+            .append("parent", parent)
             .toString();
     }
 }

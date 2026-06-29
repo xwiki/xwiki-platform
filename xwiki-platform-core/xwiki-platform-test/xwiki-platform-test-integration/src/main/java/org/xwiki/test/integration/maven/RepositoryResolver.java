@@ -130,6 +130,11 @@ public class RepositoryResolver
         String localRepoLocation = System.getProperty("maven.repo.local",
             String.format("%s/.m2/repository", System.getProperty("user.home")));
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        // Initialize the session with the current JVM system properties. Without this, the session has no system
+        // properties at all, and any POM in the resolved lineage that declares a profile activated by <jdk> (for
+        // example software.amazon.awssdk:aws-sdk-java-pom, imported transitively through xwiki-commons) cannot be
+        // evaluated since "java.version" is missing, which makes the Maven model building fail.
+        session.setSystemProperties(System.getProperties());
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 

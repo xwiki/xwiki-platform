@@ -364,6 +364,63 @@ define('paged-polyfill-patched', [
   }
 
   /**
+   * Paged.js doesn't handle very well tables with cells that span multiple rows or columns. You either end up with
+   * duplicated rows (best case) or with a partial export (worst case). As a temporary workaround, until paged.js
+   * improves table rendering, we replace the usage of colspan and rowspan with actual cells. If a cell spans 3 columns,
+   * we insert two empty cells after it and remove the colspan attribute. If a cell span 2 rows, we insert an empty cell
+   * below it and remove the rowspan attribute. This changes the table layout for sure, but at least the generated PDF
+   * doesn't lose content.
+   */
+  class ReplaceColAndRowSpan extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforeParsed(content) {
+      for (const table of content.querySelectorAll('table')) {
+        this._handleTable(table);
+      }
+    }
+
+    _handleTable(table) {
+      this._replaceColSpan(table);
+      this._replaceRowSpan(table);
+    }
+
+    _replaceColSpan(table) {
+      for (const row of table.rows) {
+        for (const cell of [...row.cells]) {
+          const colSpan = parseInt(cell.getAttribute('colspan') || '1');
+          cell.removeAttribute('colspan');
+          for (let i = 1; i &lt; colSpan; i++) {
+            const clone = cell.cloneNode(false);
+            clone.removeAttribute('id');
+            cell.after(clone);
+          }
+        }
+      }
+    }
+
+    _replaceRowSpan(table) {
+      for (let rowIndex = 0; rowIndex &lt; table.rows.length; rowIndex++) {
+        const row = table.rows.item(rowIndex);
+        for (let cellIndex = 0; cellIndex &lt; row.cells.length; cellIndex++) {
+          const cell = row.cells.item(cellIndex);
+          const rowSpan = parseInt(cell.getAttribute('rowspan') || '1');
+          cell.removeAttribute('rowspan');
+          for (let i = 1; i &lt; rowSpan; i++) {
+            const followingRow = table.rows.item(rowIndex + i);
+            const nextCell = followingRow?.cells.item(cellIndex);
+            const clone = cell.cloneNode(false);
+            clone.removeAttribute('id');
+            followingRow?.insertBefore(clone, nextCell);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Make sure the table rows are complete before determining the overflow otherwise the table layout is different than
    * in view mode. See XWIKI-21043 (The last lines of text from a print page are not always visible when they are inside
    * a table cell that is split between print pages).
@@ -539,12 +596,125 @@ define('paged-polyfill-patched', [
     }
   }
 
-  Paged.registerHandlers(
+  /**
+   * Tables can overflow the print page width when their cells have a minimum width set. To overcome this we first try
+   * to reduce the font size, and then scale down the table using CSS transformations.
+   */
+  class AutoScaleTables extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+
+      // Keep track of the tables that are planned to be added to the current print page. We reset this for each print
+      // page. We keep a reference to the source table, its clone and the observer used to detect overflow.
+      this._entries = [];
+    }
+
+    renderNode(clone, source) {
+      // We're interested only in table elements. The source table is not added to the print page. Instead, partial
+      // clones are made (e.g. if the table doesn't fit a single print page). We want to scale only the first clone and
+      // then reuse the same styles for the next clones, in order to have a consistent style across print pages.
+      if (clone?.nodeName?.toLowerCase() !== 'table' || source.__scaled) {
+        return;
+      }
+
+      // Paged.js doesn't add the full table to the print page in one step. Instead it adds rows one by one, until the
+      // print page is full or there are no rows left. This means we can't detect the overflow now. We have to wait for
+      // rows to be added to the table.
+      const observer = new MutationObserver(this._checkOverflow.bind(this, clone));
+      this._entries.push({clone, source, observer});
+      observer.observe(clone, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    afterPageLayout() {
+      for (const entry of this._entries) {
+        entry.observer.disconnect();
+        // The clone is not always added to the print page, e.g. if a page break was forced before the table.
+        if (entry.clone.isConnected) {
+          // The clone has been added to the print page. Update the original table so that the next print pages use the
+          // same styles, in case the table is long and needs to be split on multiple print pages.
+          entry.source.setAttribute('style', entry.clone.getAttribute('style'));
+          entry.source.__scaled = true;
+        }
+      }
+      this._entries = [];
+    }
+
+    _checkOverflow(table) {
+      const initialScale = this._getScale(table);
+      if (initialScale &lt; 1) {
+        // The table overflows horizontally so we need to scale it down, otherwise parts of its content might be cut
+        // from the print page. We first try to reduce the font-size.
+        const initialFontSize = table.style.fontSize;
+        // Reducing the font size more then 70% can make the text hard to read.
+        table.style.fontSize = (Math.max(initialScale, 0.7) * 100) + '%';
+        const scaleAfterFontSize = this._getScale(table);
+        if (scaleAfterFontSize &lt;= initialScale) {
+          // Rollback the font size change because it didn't increase the scale.
+          table.style.fontSize = initialFontSize;
+        } else if (scaleAfterFontSize &lt; 1) {
+          // There is still some overflow, possibly becuse the table contains images which are not affected by font
+          // size. Apply a CSS transformation.
+          const initialTransform = table.style.transform;
+          const initialTransformOrigin = table.style.transformOrigin;
+          table.style.transform = `scale(${scaleAfterFontSize})`;
+          table.style.transformOrigin = 'top left';
+          const scaleAfterTransform = this._getScale(table);
+          if (scaleAfterTransform &lt;= scaleAfterFontSize) {
+            // We didn't win anything by scaling down the table. Revert.
+            table.style.transform = initialTransform;
+            table.style.transform = initialTransformOrigin;
+          }
+        }
+      }
+    }
+
+    _getScale(table) {
+      let element = table;
+      // Look for a parent node that overflows, without getting out of the print page.
+      while (element &amp;&amp; !element.classList.contains('pagedjs_page_content')
+          &amp;&amp; element.clientWidth &gt;= element.scrollWidth) {
+        element = element.parentElement;
+      }
+      return element ? element.clientWidth / element.scrollWidth : 1;
+    }
+  }
+
+  /**
+   * Logs the time spent to layout each print page, useful for debugging PDF export timeouts.
+   */
+  class LoggingHandler extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforePageLayout(page) {
+      console.time(`Page ${page.position + 1}`);
+    }
+
+    afterPageLayout(pageFragment, page) {
+      console.timeEnd(`Page ${page.position + 1}`);
+    }
+  }
+
+  const handlers = [
     ShowInvisibleRowsOnPageBreaks,
     FixFloatingImages,
     FixTableLayout,
-    FixMaxChars
-  );
+    FixMaxChars,
+    LoggingHandler
+  ];
+  // The following handlers are more opionated, so we provide a way to disable them.
+  const config = new URLSearchParams(window.location.search);
+  if (config.get('export.pdf.replaceColAndRowSpan') !== 'false') {
+    handlers.push(ReplaceColAndRowSpan);
+  }
+  if (config.get('export.pdf.autoScaleTables') !== 'false') {
+    handlers.push(AutoScaleTables);
+  }
+  Paged.registerHandlers(...handlers);
 
   return PagedPolyfill;
 });
@@ -597,6 +767,9 @@ require([
   'xwiki-export-pdf-config',
   'xwiki-export-pdf-mutationObserverManager'
 ], function($, pageReady, pdfExportConfig, mutationObserverManager) {
+  console.time('PrintPreview');
+  console.time('PageReady');
+
   // Workaround for a paged.js bug (#267: Missing CSS stylesheets can break the page rendering).
   // See https://github.com/pagedjs/pagedjs/issues/267
   const protectAgainstMissingStyleSheets = function() {
@@ -651,82 +824,37 @@ require([
     }
   }
 
-  const refactorAnchors = function() {
-    // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
-    fixRelativeAnchors($('#xwikicontent'));
-    // Convert external anchors that target exported documents into internal anchor, whenever possible.
-    pdfExportConfig.documents?.forEach?.(document =&gt; {
-      const documentReference = XWiki.Model.resolve(document.reference, XWiki.EntityType.DOCUMENT,
-        XWiki.currentDocument.documentReference);
-      makeInternalAnchors($('#xwikicontent'), documentReference, document.idMap);
+  function refactorAnchors() {
+    const docInfos = (pdfExportConfig.documents || []).map(getAnchorRefactoringDocInfo);
+
+    const container = document.getElementById('xwikicontent');
+    container.querySelectorAll('a[href]').forEach(anchor =&gt; {
+      // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
+      fixRelativeAnchor(anchor, container);
+
+      // Convert external anchors that target exported documents into internal anchor, whenever possible.
+      docInfos.some(docInfo =&gt; makeInternalAnchor(anchor, docInfo));
     });
+
     // The anchors in the PDF table of contents are already using global fragment identifiers.
-    makeInternalAnchors($('.pdf-toc'), XWiki.currentDocument.documentReference);
-  };
-
-  /**
-   * When exporting multiple documents to PDF each of them can produce anchors with relative URLs that are by default
-   * resolved based on the current document used to trigger the PDF export, which is not what we want. Those relative
-   * anchors should target the documents that generated them.
-   *
-   * @param container where to look for relative anchors that need to be fixed
-   */
-  const fixRelativeAnchors = function(container) {
-    container.find('a[href]').each(function() {
-      const anchor = $(this);
-      let documentReference = anchor.parentsUntil(container).last().prevAll('h1[data-xwiki-document-reference]')
-        .first().attr('data-xwiki-document-reference');
-      if (documentReference) {
-        documentReference = XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT,
-          XWiki.currentDocument.documentReference);
-        const document = new XWiki.Document(documentReference);
-        const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL);
-        try {
-          anchor.attr('href', new URL(anchor.attr('href'), documentURL).href);
-        } catch (e) {
-          console.log('Failed to fix relative URL: ' + anchor.attr('href'));
-        }
-      }
+    const currentDocInfo = getAnchorRefactoringDocInfo({
+      reference: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
     });
-  };
+    document.querySelectorAll('.pdf-toc a[href]').forEach(anchor =&gt; makeInternalAnchor(anchor, currentDocInfo));
+  }
 
-  /**
-   * Look for external anchors that target the specified document (which is included in the PDF export) and convert them
-   * to internal anchors like this:
-   * &lt;ul&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document =&gt; #documentTitleHeadingId&lt;/li&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#localFragmentId =&gt; #globalFragmentId&lt;/li&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#globalFragmentId =&gt; #globalFragmentId&lt;/li&gt;
-   * &lt;/ul&gt;
-   */
-  const makeInternalAnchors = function(container, documentReference, idMap) {
-    const document = new XWiki.Document(documentReference);
-    const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL).href;
-    container.find('a[href]').each(function() {
-      const anchor = $(this);
-      try {
-        const anchorURL = new URL(anchor.attr('href'), pdfExportConfig.baseURL);
-        // Drop the '#' from the end of the URL when the hash is empty.
-        anchorURL.hash = anchorURL.hash;
-        if (anchorURL.href === documentURL + anchorURL.hash) {
-          // Assume the anchor targets a document fragment specified by its global id.
-          let fragmentId = anchorURL.hash.substring(1);
-          if (!fragmentId) {
-            // The anchor targets the start of the document.
-            fragmentId = getDocumentFragmentId(documentReference);
-          } else if (idMap) {
-            // The anchor targets a document fragment specified by its local id.
-            fragmentId = idMap[fragmentId];
-          }
-          if (fragmentId) {
-            anchor.attr('href', '#' + fragmentId);
-          }
-        }
-      } catch (e) {
-        console.log('Failed to parse URL: ' + anchor.prop('href'));
-      }
-    });
-  };
+  function getAnchorRefactoringDocInfo(doc) {
+    const resolvedReference = XWiki.Model.resolve(doc.reference, XWiki.EntityType.DOCUMENT,
+      XWiki.currentDocument.documentReference);
+    const xwikiDocument = new XWiki.Document(resolvedReference);
+    const url = new URL(xwikiDocument.getURL(), pdfExportConfig.baseURL).href;
+    return {
+      ...doc,
+      resolvedReference,
+      url,
+      fragmentId: getDocumentFragmentId(doc.reference)
+    };
+  }
 
   /**
    * Search for the heading that marks the start of the specified document in the rendering output and return its id,
@@ -734,11 +862,109 @@ require([
    *
    * @return the id of the heading that marks the start of the specified document
    */
-  const getDocumentFragmentId = function(documentReference) {
-    const stringDocRef = XWiki.Model.serialize(documentReference);
-    return $('#xwikicontent &gt; h1[data-xwiki-document-reference]').filter(function() {
-      return $(this).attr('data-xwiki-document-reference') === stringDocRef;
-    }).attr('id');
+  const getDocumentFragmentId = function(stringDocRef) {
+    const docTitleHeadings = document.querySelectorAll('#xwikicontent &gt; h1[data-xwiki-document-reference]');
+    for (let i = 0; i &lt; docTitleHeadings.length; i++) {
+      const docTitleHeading = docTitleHeadings[i];
+      if (docTitleHeading.dataset.xwikiDocumentReference === stringDocRef) {
+        return docTitleHeading.getAttribute('id');
+      }
+    }
+  };
+
+  /**
+   * When exporting multiple documents to PDF each of them can produce anchors with relative URLs that are by default
+   * resolved based on the current document used to trigger the PDF export, which is not what we want. Those relative
+   * anchors should target the documents that generated them.
+   *
+   * @param anchor the anchor that may need to be fixed
+   * @param container where to look for headings holding the document reference
+   */
+  function fixRelativeAnchor(anchor, container) {
+    const documentURL = getDocumentURLFromParent(anchor, container);
+    if (documentURL) {
+      const href = anchor.getAttribute('href');
+      try {
+        anchor.setAttribute('href', new URL(href, documentURL).href);
+      } catch (e) {
+        console.log('Failed to fix relative URL: ' + href);
+      }
+    }
+  }
+
+  /**
+   * Get the URL of the XWiki document that generated the given DOM node. Look within the specified subtree, which may
+   * include nodes generated by multiple XWiki documents.
+   *
+   * @param node the node for which to return the XWiki document URL
+   * @param root the subtree where to look for the XWiki document URL
+   */
+  function getDocumentURLFromParent(node, root) {
+    const path = [];
+
+    // Look for an ancestor that has the document URL.
+    while (node &amp;&amp; !node._xwikiDocumentURL &amp;&amp; node.parentNode !== root) {
+      path.push(node);
+      node = node.parentNode;
+    }
+
+    // Look for a previous level 1 sibling heading that has the document URL.
+    while (node &amp;&amp; !node._xwikiDocumentURL) {
+      if (node.nodeName?.toLowerCase() === 'h1' &amp;&amp; node.dataset.xwikiDocumentReference) {
+        const documentReference = XWiki.Model.resolve(node.dataset.xwikiDocumentReference, XWiki.EntityType.DOCUMENT,
+          XWiki.currentDocument.documentReference);
+        const document = new XWiki.Document(documentReference);
+        node._xwikiDocumentURL = new URL(document.getURL(), pdfExportConfig.baseURL);
+        break;
+      }
+      path.push(node);
+      node = node.previousSibling;
+    }
+
+    if (node?._xwikiDocumentURL) {
+      // Cache the URL for the entire path.
+      for (let item of path) {
+        item._xwikiDocumentURL = node._xwikiDocumentURL;
+      }
+      return node._xwikiDocumentURL;
+    }
+  }
+
+  /**
+   * Make the give anchor internal if it targets the specified document (included in the PDF export), like this:
+   *
+   * &lt;ul&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document =&gt; #documentTitleHeadingId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#localFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#globalFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   * &lt;/ul&gt;
+   *
+   * @return whether the anchor has been updated
+   */
+  const makeInternalAnchor = function(anchor, docInfo) {
+    try {
+      const anchorURL = new URL(anchor.getAttribute('href'), pdfExportConfig.baseURL);
+      // Drop the '#' from the end of the URL when the hash is empty.
+      anchorURL.hash = anchorURL.hash;
+      if (anchorURL.href === docInfo.url + anchorURL.hash) {
+        // Assume the anchor targets a document fragment specified by its global id.
+        let fragmentId = anchorURL.hash.substring(1);
+        if (!fragmentId) {
+          // The anchor targets the start of the document.
+          fragmentId = docInfo.fragmentId;
+        } else if (docInfo.idMap) {
+          // The anchor targets a document fragment specified by its local id.
+          fragmentId = docInfo.idMap[fragmentId];
+        }
+        if (fragmentId) {
+          anchor.setAttribute('href', '#' + fragmentId);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.log('Failed to parse URL: ' + anchor.getAttribute('href'));
+    }
+    return false;
   };
 
   const replaceCanvasesWithImages = function(container) {
@@ -952,14 +1178,39 @@ require([
 
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
+    console.timeEnd('PageReady');
+
+    console.time('protectAgainstMissingStyleSheets');
     protectAgainstMissingStyleSheets();
+    console.timeEnd('protectAgainstMissingStyleSheets');
+
+    console.time('refactorAnchors');
     refactorAnchors();
+    console.timeEnd('refactorAnchors');
+
+    console.time('removeEmptyTableOfContents');
     removeEmptyTableOfContents();
+    console.timeEnd('removeEmptyTableOfContents');
+
+    console.time('validateTableOfContentsAnchors');
     validateTableOfContentsAnchors();
+    console.timeEnd('validateTableOfContentsAnchors');
+
+    console.time('storeFormFieldValues');
     storeFormFieldValues();
+    console.timeEnd('storeFormFieldValues');
+
+    console.time('makeTableCellWidthRelative');
     makeTableCellWidthRelative();
+    console.timeEnd('makeTableCellWidthRelative');
+
+    console.time('preserveWhiteSpaceInCodeBlocks');
     preserveWhiteSpaceInCodeBlocks();
+    console.timeEnd('preserveWhiteSpaceInCodeBlocks');
+
+    console.time('preventLazyImageLoading');
     preventLazyImageLoading();
+    console.timeEnd('preventLazyImageLoading');
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -971,26 +1222,35 @@ require([
     const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
     if (usePagedPolyfill) {
       return new Promise((resolve, reject) =&gt; {
-        let start;
-        window.PagedConfig = {after: (...args) =&gt; {
-          const duration = (new Date().getTime() - start) / 1000;
-          console.debug(`Print preview ready in ${duration}s`);
-          resolve(...args);
-        }};
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
+        console.time('replaceCanvasesWithImages');
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
           console.log('Failed to replace canvases with images. Cause: ' + cause);
         }).finally(() =&gt; {
+          console.timeEnd('replaceCanvasesWithImages');
+
           // Splitting the content into print pages triggers a lot of DOM mutations. We disconnect all the mutation
           // observers in order to speed up the print preview generation and also because we consider the current state
           // of the content as final (i.e. that's how the content should end up in the PDF) so the DOM mutations
           // triggered by paged.js should not lead to any new content changes.
           mutationObserverManager.disconnectAll();
 
-          console.debug('Generating print preview...');
-          start = new Date().getTime();
-          require(['paged-polyfill'], function(PagedPolyfill) {});
+          // Recent versions of Paged.js fail if standard JavaScript types (e.g. Array) are overwritten by Prototype.js
+          restoreOriginalPrototypes();
+
+          console.time('PrintLayout');
+          // Don't start generating the print preview automatically because we need to patch Paged.js before. See the
+          // paged-polyfill-patched module defined above.
+          window.PagedConfig = {auto: false};
+          require(['paged-polyfill'], previewer =&gt; {
+            previewer.preview().then(flow =&gt; {
+              const durationPerPage = flow.performance / (flow.total || 1);
+              console.debug(`Rendered ${flow.total} print pages in ${flow.performance} ms (${durationPerPage} ms/page).`);
+              console.timeEnd('PrintLayout');
+              resolve(flow);
+            }, reject);
+          }, reject);
         })
       });
     }
@@ -1010,7 +1270,38 @@ require([
     // the base URL). We want the base URL to be taken into account only when resolving relative links in the generated
     // PDF.
     $('&lt;base/&gt;').attr('href', pdfExportConfig.baseURL).prependTo('head');
+
+    console.timeEnd('PrintPreview');
   });
+
+  /**
+   * Prototype.js is modifying the prototype of standard JavaScript types (e.g. Array) and this breaks Paged.js . We
+   * cannot stop loading Prototype.js because we still have JavaScript code in XWiki Standard and in XWiki extensions
+   * that rely on it. Even if we render only the page content, the are rendering macros (e.g. Live Table) that are still
+   * using Prototype.js . We overcome this problem by restoring the original prototypes before running Paged.js .
+   */
+  function restoreOriginalPrototypes() {
+    restoreOriginalPrototype(Array);
+  }
+
+  function restoreOriginalPrototype(constructor) {
+    // Restore standard key values.
+    const iframe = document.createElement('iframe');
+    iframe.src = 'about:blank';
+    document.body.appendChild(iframe);
+    const originalConstructor = iframe.contentWindow[constructor.name];
+    document.body.removeChild(iframe);
+    Object.getOwnPropertyNames(originalConstructor.prototype).forEach(property =&gt; {
+      constructor.prototype[property] = originalConstructor.prototype[property];
+    });
+
+    // Delete custom keys.
+    const customKeys = [];
+    for (let key in constructor.prototype) {
+      customKeys.push(key)
+    };
+    customKeys.forEach(customKey =&gt; delete constructor.prototype[customKey]);
+  }
 });</code>
     </property>
     <property>
@@ -1318,6 +1609,17 @@ require([
       choose is to make sure that the table text can always be split (hyphenate) on multiple lines. This is not a
       complete solution but it should cover most of the large tables. */
     .hyphenate();
+    /* The table layout needs to be auto in order to be able to enforce the minimum width on table cells, see below. */
+    table-layout: auto !important;
+  }
+  /* Table cell widths are made relative (a percentage of the row width) before the content is printed to PDF, but this
+    can lead to very narrow columns because the same value, say 5%, can be more than enough on a large screen but
+    insufficient on a printed page. For this reason we put a lower limit to the column width, of about 8 characters.
+    which can be overwritten from the PDF template. Note that this can make the table overflow the print page. We
+    overcome this by reducing the font size and scaling down the table, if needed, just before printing, using a
+    paged.js handler. */
+  th, td {
+    min-width: 8ch;
   }
 
   // Make sure the content of the code macro is not cut when it exceeds the print page width by:
@@ -1331,6 +1633,11 @@ require([
   }
   div.box &gt; div.code &gt; pre {
     margin: 0;
+  }
+
+  /* Make sure small code snippets are not cut when exceeding the print page width. */
+  .code, .code pre, .code *, .monospace, pre {
+    white-space: pre-wrap;
   }
 }</code>
     </property>

@@ -35,13 +35,16 @@ import org.xwiki.rest.model.jaxb.History;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}/history")
 public interface PageTranslationHistoryResource
 {
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @GET History getPageTranslationHistory(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("language") String language,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("order") @DefaultValue("desc") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;

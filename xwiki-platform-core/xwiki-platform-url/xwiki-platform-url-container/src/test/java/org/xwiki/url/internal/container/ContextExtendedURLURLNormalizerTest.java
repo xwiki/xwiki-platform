@@ -85,12 +85,30 @@ public class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
+    void normalizeWhenConfigurationPropertyDefinedWithMultiLevelContextPath()
+    {
+        when(this.configurationSource.getProperty("xwiki.webapppath")).thenReturn("l1/l2/xwiki");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
+        assertEquals("/l1/l2/xwiki/one/two", this.normalizer.normalize(extendedURL).serialize());
+    }
+
+    @Test
     void normalizeWhenConfigurationPropertyDefinedButWithLeadingAndTrailingSlash()
     {
         when(this.configurationSource.getProperty("xwiki.webapppath")).thenReturn("/xwiki/");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("/xwiki/one/two", this.normalizer.normalize(extendedURL).serialize());
+    }
+
+    @Test
+    void normalizeWhenConfigurationPropertyDefinedButWithLeadingAndTrailingSlashWithMultiLevelContextPath()
+    {
+        when(this.configurationSource.getProperty("xwiki.webapppath")).thenReturn("/l1/l2/xwiki/");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
+        assertEquals("/l1/l2/xwiki/one/two", this.normalizer.normalize(extendedURL).serialize());
     }
 
     @Test
@@ -102,6 +120,17 @@ public class ContextExtendedURLURLNormalizerTest
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("/xwiki/one/two", this.normalizer.normalize(extendedURL).serialize());
+    }
+
+    @Test
+    void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath() throws Exception
+    {
+        ServletContext sc = mock(ServletContext.class);
+        when(this.environment.getServletContext()).thenReturn(sc);
+        when(sc.getContextPath()).thenReturn("/l1/l2/xwiki");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
+        assertEquals("/l1/l2/xwiki/one/two", this.normalizer.normalize(extendedURL).serialize());
     }
 
     @Test

@@ -75,9 +75,9 @@ class XarExtensionScriptServiceTest
     private ExecutionContext executionContext = new ExecutionContext();
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(this.executionContext);
     }
 
     @Test

@@ -20,6 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
+import org.xwiki.container.Session;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
@@ -73,15 +75,17 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     @Inject
     private Logger logger;
 
-    private HttpSession getSession()
+    private HttpSession getHttpSession()
     {
-        return ((ServletSession) this.container.get().getSession()).getSession();
+        Session session = this.container.get().getSession();
+
+        return session != null ? ((ServletSession) session).getSession() : null;
     }
 
     private Optional<TemporaryAttachmentSession> getOrCreateSession()
     {
         Optional<TemporaryAttachmentSession> result = Optional.empty();
-        HttpSession session = this.getSession();
+        HttpSession session = this.getHttpSession();
         if (session != null) {
             TemporaryAttachmentSession temporaryAttachmentSession =
                 (TemporaryAttachmentSession) session.getAttribute(ATTRIBUTE_KEY);
@@ -128,7 +132,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
                 actualFilename = part.getSubmittedFileName();
             }
             xWikiAttachment.setFilename(actualFilename);
-            xWikiAttachment.setContent(part.getInputStream());
+            try (InputStream inputStream = part.getInputStream()) {
+                xWikiAttachment.setContent(inputStream);
+            }
             xWikiAttachment.setAuthorReference(context.getUserReference());
             // Initialize an empty document with the right document reference and locale. We don't set the actual
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the

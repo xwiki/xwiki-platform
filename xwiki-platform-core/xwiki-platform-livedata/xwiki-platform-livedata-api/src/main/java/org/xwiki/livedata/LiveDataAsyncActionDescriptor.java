@@ -21,8 +21,6 @@ package org.xwiki.livedata;
 
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The properties required to execute an action asynchrously. This includes status messages (loading, success,
  * failure...) as well as technical http client parameters to for developers to adapt the requests to their own needs.
@@ -30,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.2.0RC1
  */
-@Unstable
 public class LiveDataAsyncActionDescriptor
 {
     private String loadingMessage;

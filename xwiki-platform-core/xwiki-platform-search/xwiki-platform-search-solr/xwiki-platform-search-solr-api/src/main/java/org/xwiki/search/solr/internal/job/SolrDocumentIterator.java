@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.job;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 /**
@@ -53,8 +55,10 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("solr")
-public class SolrDocumentIterator extends AbstractDocumentIterator<String>
+public class SolrDocumentIterator extends AbstractDocumentIterator<DocumentIteratorEntry>
 {
+    private static final String SOLR_ANYVALUE = "[* TO *]";
+
     /**
      * The current index in the list of {@link #results}.
      */
@@ -92,12 +96,24 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
     }
 
     @Override
-    public Pair<DocumentReference, String> next()
+    public Pair<DocumentReference, DocumentIteratorEntry> next()
     {
-        SolrDocument result = getResults().get(index++);
+        List<SolrDocument> currentResults = getResults();
+
+        // Make sure there is indeed a next element
+        if (currentResults.size() <= this.index) {
+            throw new NoSuchElementException("No more element");
+        }
+
+        // Get current element
+        SolrDocument result = currentResults.get(this.index++);
+
         DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(result);
+        long docId = (long) result.getFieldValue(FieldUtils.DOC_ID);
         String version = (String) result.get(FieldUtils.VERSION);
-        return new ImmutablePair<DocumentReference, String>(documentReference, version);
+
+        return new ImmutablePair<>(documentReference,
+            new DocumentIteratorEntry(documentReference.getWikiReference(), docId, version));
     }
 
     @Override
@@ -142,21 +158,14 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
         if (query == null) {
             query = new SolrQuery(solrReferenceResolver.getQuery(rootReference));
             query.setFields(FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
-                FieldUtils.VERSION);
+                FieldUtils.VERSION, FieldUtils.DOC_ID);
             query.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
+            // Make sure to skip invalid documents, they will be re-indexed
+            query.addFilterQuery(FieldUtils.WIKI + ':' + SOLR_ANYVALUE);
+            query.addFilterQuery(FieldUtils.DOC_ID + ':' + SOLR_ANYVALUE);
             // This iterator must have the same order as the database iterator, otherwise the synchronization fails.
-            // Note that we had two options:
-            // (A) Sort the Solr index only by id and enable docValues on the id field to improve the speed. But then we
-            // need to sort the database on a computed field (fullName_locale) which is very slow (due to the missing
-            // database index for the computed column).
-            // (B) Sort the Solr index by multiple fields, each having a corresponding column in the database. This
-            // slows down a bit the Solr query but allows us to sort the database on stored columns that have indexes,
-            // thus improving the speed of the database query.
-            // We chose solution B because it offers a good tradeoff between Solr and database performance.
             query.addSort(FieldUtils.WIKI, ORDER.asc);
-            query.addSort(FieldUtils.SPACE_EXACT, ORDER.asc);
-            query.addSort(FieldUtils.NAME_EXACT, ORDER.asc);
-            query.addSort(FieldUtils.DOCUMENT_LOCALE, ORDER.asc);
+            query.addSort(FieldUtils.DOC_ID, ORDER.asc);
             // Cursor-based deep-paging requires the unique key to be included in the sort fields as a tie-breaker.
             // See https://issues.apache.org/jira/browse/SOLR-6277 .
             query.addSort(FieldUtils.ID, ORDER.asc);

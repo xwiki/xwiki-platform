@@ -32,6 +32,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
@@ -215,7 +216,23 @@ public class XWikiAttachment implements Cloneable
     @Override
     public XWikiAttachment clone()
     {
-        return internalClone(false, false);
+        return internalClone(false, false, true);
+    }
+
+    /**
+     * Perform a deep clone with both the archive and current content.
+     * @param context the context for loading the content before cloning
+     * @return a cloned instance
+     * @throws XWikiException in case of problem for loading the content
+     * @since 18.0.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
+    protected XWikiAttachment cloneWithActualContent(XWikiContext context) throws XWikiException
+    {
+        // We need to ensure to content is properly loaded if we want to clone it.
+        loadAttachmentContent(context);
+        return internalClone(false, false, false);
     }
 
     /**
@@ -231,13 +248,15 @@ public class XWikiAttachment implements Cloneable
     public XWikiAttachment clone(String name, XWikiContext context)
         throws XWikiException, IOException
     {
-        XWikiAttachment clone = internalClone(true, true);
+        XWikiAttachment clone = internalClone(true, true, true);
         if (clone == null) {
             // According to #internalClone, this should never happen.
             throw new XWikiException("Failed to clone the attachment", null);
         }
         clone.setFilename(name);
-        clone.setContent(this.getContentInputStream(context));
+        try (InputStream sourceContent = getContentInputStream(context)) {
+            clone.setContent(sourceContent);
+        }
         clone.setAttachment_archive(getAttachmentArchive(context).clone(clone, context));
         return clone;
     }
@@ -491,9 +510,6 @@ public class XWikiAttachment implements Cloneable
             if (updateDirty) {
                 if (isMetaDataDirty() && doc != null) {
                     doc.setMetaDataDirty(true);
-                }
-                if (getAttachment_content() != null) {
-                    getAttachment_content().setOwnerDocument(doc);
                 }
             }
         }
@@ -1039,7 +1055,7 @@ public class XWikiAttachment implements Cloneable
      */
     public List<Version> getVersionList() throws XWikiException
     {
-        final List<Version> list = new ArrayList<Version>();
+        final List<Version> list = new ArrayList<>();
         final String currentVersion = this.version.toString();
         Version v = new Version("1.1");
         for (;;) {
@@ -1259,7 +1275,9 @@ public class XWikiAttachment implements Cloneable
                 // can happen for small files if AutoCloseInputStream is used, which supports the mark and reset methods
                 // so Tika uses it directly. In this case, the input stream is automatically closed after the first
                 // detector reads it so the next detector fails to read it.
-                mediaType = TikaUtils.detect(new BufferedInputStream(getContentInputStream(xcontext)));
+                try (InputStream stream = new BufferedInputStream(getContentInputStream(xcontext))) {
+                    mediaType = TikaUtils.detect(stream);
+                }
             } catch (Exception e) {
                 LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type. Root cause: [{}]",
                     getReference(), ExceptionUtils.getRootCauseMessage(e));
@@ -1299,7 +1317,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
     {
-        if (StringUtils.equals(rev, this.getVersion())) {
+        if (Strings.CS.equals(rev, this.getVersion())) {
             return this;
         }
 
@@ -1323,7 +1341,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (StringUtils.equals(getMimeType(), attachment.getMimeType())) {
+        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }
@@ -1332,7 +1350,7 @@ public class XWikiAttachment implements Cloneable
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
 				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachment.getContentInputStream(null));
+					setContent(attachmentIs);
 					modified = true;
 				}
             }
@@ -1517,7 +1535,15 @@ public class XWikiAttachment implements Cloneable
         }
     }
 
-    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent)
+    /**
+     *
+     * @param skipArchive {@code true} to skip the attachment archive when cloning
+     * @param skipContent {@code true} to skip content metadata
+     * @param skipActualContent {@code false} will also include {@link XWikiAttachmentContent} content, but this
+     * flag is only used if {@code skipContent} is {@code false}.
+     * @return a clone of current instance.
+     */
+    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent, boolean skipActualContent)
     {
         XWikiAttachment attachment = null;
 
@@ -1535,8 +1561,7 @@ public class XWikiAttachment implements Cloneable
             attachment.setRCSVersion(getRCSVersion());
             attachment.setMetaDataDirty(isMetaDataDirty());
             if (!skipContent && getAttachment_content() != null) {
-                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
-                attachment.getAttachment_content().setAttachment(attachment);
+                attachment.setAttachment_content(getAttachment_content().clone(skipActualContent));
             }
             if (!skipArchive && getAttachment_archive() != null) {
                 attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());

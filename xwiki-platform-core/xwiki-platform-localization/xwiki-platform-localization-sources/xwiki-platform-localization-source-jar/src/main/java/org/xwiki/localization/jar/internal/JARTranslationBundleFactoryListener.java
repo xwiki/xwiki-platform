@@ -44,6 +44,7 @@ import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
+import org.xwiki.extension.jar.internal.handler.JarExtensionHandler;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
@@ -52,7 +53,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Generate and manage resource based translations bundles.
- * 
+ *
  * @version $Id$
  * @since 4.5M1
  */
@@ -67,14 +68,9 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     protected static final String NAME = "localization.bundle.JARTranslationBundleFactoryListener";
 
     /**
-     * The type of extension supported by this translation bundle.
-     */
-    private static final String EXTENSION_TYPE = "jar";
-
-    /**
      * The events to listen.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     /**
@@ -115,11 +111,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         InstalledExtension extension = (InstalledExtension) source;
 
         if (event instanceof ExtensionInstalledEvent) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (JarExtensionHandler.isSupported(extension.getType())) {
                 extensionAdded(extension, extensionEvent.getNamespace());
             }
         } else if (event instanceof ExtensionUninstalledEvent) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (JarExtensionHandler.isSupported(extension.getType())) {
                 extensionDeleted(extension, extensionEvent.getNamespace());
             }
         } else {
@@ -144,7 +140,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
     {
         // Load installed extensions
         for (InstalledExtension extension : this.installedRepository.getInstalledExtensions()) {
-            if (EXTENSION_TYPE.equals(extension.getType())) {
+            if (JarExtensionHandler.isSupported(extension.getType())) {
                 if (extension.isInstalled(null)) {
                     extensionAdded(extension, null);
                 } else {
@@ -162,7 +158,7 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
      */
     private ComponentDescriptor<TranslationBundle> createComponentDescriptor(URL jarURL)
     {
-        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
+        DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<>();
 
         descriptor.setImplementation(JARFileTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
@@ -194,11 +190,11 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         String namespace)
     {
         for (InstalledExtension previousExtension : previousExtensions) {
-            if (EXTENSION_TYPE.equals(previousExtension.getType())) {
+            if (JarExtensionHandler.isSupported(previousExtension.getType())) {
                 extensionDeleted(previousExtension, namespace);
             }
         }
-        if (EXTENSION_TYPE.equals(newExtension.getType())) {
+        if (JarExtensionHandler.isSupported(newExtension.getType())) {
             extensionAdded(newExtension, namespace);
         }
     }

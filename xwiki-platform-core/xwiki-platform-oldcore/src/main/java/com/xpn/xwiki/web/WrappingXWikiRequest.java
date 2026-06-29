@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.xwiki.container.Container;
+import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletRequestWrapper;
 
 /**
  * A wrapper around {@link XWikiRequest}.
@@ -35,7 +37,8 @@ import org.xwiki.container.Container;
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
 // @Deprecated(since = "17.0.0RC1")
-public class WrappingXWikiRequest extends HttpServletRequestWrapper implements XWikiRequest
+public class WrappingXWikiRequest extends HttpServletRequestWrapper
+    implements XWikiRequest, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletRequest>
 {
     protected final XWikiRequest request;
 
@@ -47,6 +50,16 @@ public class WrappingXWikiRequest extends HttpServletRequestWrapper implements X
         super(request);
 
         this.request = request;
+    }
+
+    @Override
+    public jakarta.servlet.http.HttpServletRequest getJakarta()
+    {
+        if (getRequest() instanceof JavaxToJakartaWrapper wrapper) {
+            return (jakarta.servlet.http.HttpServletRequest) wrapper.getJakarta();
+        }
+
+        return new JakartaToJavaxHttpServletRequestWrapper<>(this);
     }
 
     @Override

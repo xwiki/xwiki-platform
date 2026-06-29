@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,13 +63,13 @@ class DefaultIconSetCacheTest
     private Cache<IconSet> cache;
 
     @BeforeComponent
-    void setUp() throws Exception
+    void setup() throws Exception
     {
         CacheFactory cacheFactory = mock(CacheFactory.class);
         when(this.cacheManager.getCacheFactory()).thenReturn(cacheFactory);
         CacheConfiguration configuration = new CacheConfiguration("iconset");
-        this.cache = mock(Cache.class);
-        when(cacheFactory.<IconSet>newCache(eq(configuration))).thenReturn(this.cache);
+        this.cache = mock();
+        when(cacheFactory.<IconSet>newCache(configuration)).thenReturn(this.cache);
     }
 
     @Test

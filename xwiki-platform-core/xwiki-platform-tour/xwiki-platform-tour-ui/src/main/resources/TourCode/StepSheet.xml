@@ -242,7 +242,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
                   nbSteps     : nbSteps,
                   stepID      : stepID,
                   action      : 'editStep',
-                  xpage       : 'plain'
+                  xpage       : 'plain',
+                  form_token  : xm.form_token
                };
     $.ajax({
       url : "$xwiki.getURL('TourCode.AjaxActions')",
@@ -281,7 +282,13 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       onYes: function() {
         var notif = new XWiki.widgets.Notification(messages.deleting, 'inprogress');
         $.ajax({
-          url : "$xwiki.getURL('TourCode.AjaxActions', 'view', 'xpage=plain')" + '&amp;action=deleteStep' + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID),
+          url : "$xwiki.getURL('TourCode.AjaxActions', 'view', 'xpage=plain')",
+          data: {
+            action: 'deleteStep',
+            tourName: tourName,
+            stepID: stepID,
+            form_token: xm.form_token
+          },
           type: 'POST',
           success: function(rep) {
             $('#stepsContainer').html(rep);

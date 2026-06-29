@@ -28,11 +28,13 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -134,49 +136,125 @@ class CreatePageAndSpaceIT
         setup.createPage(new DocumentReference("WebHome", spaceReference), "", existingPageTitle);
 
         CreatePagePage createPage = new ViewPage().createPage();
+        DocumentPicker documentPicker = createPage.getDocumentPicker();
+        documentPicker.toggleLocationAdvancedEdit();
         // Check that by default we have an empty title and name and the parent is the current document's space.
-        assertEquals("", createPage.getDocumentPicker().getTitle());
-        assertEquals("", createPage.getDocumentPicker().getName());
-        assertEquals(spaceReference.getName(), createPage.getDocumentPicker().getParent());
+        assertEquals("", documentPicker.getTitle());
+        assertEquals("", documentPicker.getName());
+        assertEquals(spaceReference.getName(), documentPicker.getParent());
         // Check the initial state of the breadcrumb.
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Set a new title and check that the page name and the breadcrumb are also updated.
         String newTitle = "New Title";
-        createPage.getDocumentPicker().setTitle(newTitle);
-        createPage.getDocumentPicker().waitForName(newTitle);
+        documentPicker.setTitle(newTitle);
+        documentPicker.waitForName(newTitle);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
-        assertEquals(newTitle, createPage.getDocumentPicker().getName());
+        assertEquals(newTitle, documentPicker.getName());
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Set a new page name and check that the breadcrumb is not updated, since we have a title specified.
         String newName = "SomeNewName";
-        createPage.getDocumentPicker().setName(newName);
+        documentPicker.setName(newName);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Clear the title, set a page name and check that the breadcrumb now uses the page name as a fallback.
-        createPage.getDocumentPicker().setTitle("");
-        createPage.getDocumentPicker().waitForName("");
+        documentPicker.setTitle("");
+        documentPicker.waitForName("");
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
-        assertEquals("", createPage.getDocumentPicker().getName());
-        createPage.getDocumentPicker().setName(newName);
-        createPage.getDocumentPicker().waitForName(newName);
+        assertFalse(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("This field is required.", documentPicker.getNameLiveValidationMessages());
+
+        documentPicker.setName(newName);
+        documentPicker.waitForName(newName);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newName);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Set a new parent space and check that the breadcrumb is updated.
         // Before that, reset the title, just for completeness.
-        createPage.getDocumentPicker().setTitle(newTitle);
+        documentPicker.setTitle(newTitle);
         String newSpace = "SomeNewSpace";
-        createPage.getDocumentPicker().setParent(newSpace);
+        documentPicker.setParent(newSpace);
         createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newTitle);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Set a new parent in nested spaces and check that the breadcrumb is updated.
         String newSpaceLevel2 = "Level2";
-        createPage.getDocumentPicker().setParent(newSpace + "." + newSpaceLevel2);
+        documentPicker.setParent(newSpace + "." + newSpaceLevel2);
         createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newSpaceLevel2 + "/" + newTitle);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
 
         // Clear the parent and check that the breadcrumb is updated, since we are creating a top level document.
-        createPage.getDocumentPicker().setParent("");
+        documentPicker.setParent("");
         createPage.waitForLocationPreviewContent("/" + newTitle);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+
+        // Check the live validation of the parent and name fields.
+        createPage.setTerminalPage(true);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("This field is required for terminal pages.", documentPicker.getParentLiveValidationMessages());
+
+        documentPicker.setParent("Foo");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+
+        documentPicker.setName("");
+        assertFalse(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("This field is required.", documentPicker.getNameLiveValidationMessages());
+
+        documentPicker.setName(newTitle);
+        documentPicker.setParent("Foo.");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("The provided reference is invalid.", documentPicker.getParentLiveValidationMessages());
+
+        createPage.setTerminalPage(false);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("The provided reference is invalid.", documentPicker.getParentLiveValidationMessages());
+
+        documentPicker.setParent("");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+
+        documentPicker.setParent("Foo..Bar");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("The provided reference is invalid.", documentPicker.getParentLiveValidationMessages());
+
+        documentPicker.setParent("Foo.Bar");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+
+        documentPicker.setParent(".Foo.Bar");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("The provided reference is invalid.", documentPicker.getParentLiveValidationMessages());
+
+        createPage.setTerminalPage(true);
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("The provided reference is invalid.", documentPicker.getParentLiveValidationMessages());
+
+        documentPicker.setParent("");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertFalse(documentPicker.isParentLiveValidationSuccess());
+        assertEquals("This field is required for terminal pages.", documentPicker.getParentLiveValidationMessages());
+
+        documentPicker.setParent("Foo");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
     }
     
     /**

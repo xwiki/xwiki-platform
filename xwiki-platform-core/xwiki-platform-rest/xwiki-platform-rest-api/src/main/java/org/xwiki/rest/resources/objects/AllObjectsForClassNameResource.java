@@ -34,11 +34,13 @@ import org.xwiki.rest.model.jaxb.Objects;
 @Path("/wikis/{wikiName}/classes/{className}/objects")
 public interface AllObjectsForClassNameResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Objects getObjects(
             @PathParam("wikiName") String wikiName,
             @PathParam("className") String className,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("order") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;

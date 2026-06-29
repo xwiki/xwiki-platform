@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +181,7 @@ public class JsxAction extends AbstractSxAction
             String sourceMapKey = context.getURL().toString();
             // Remove the source map parameters from the query string.
             sourceMapKey = sourceMapKey.replaceFirst("(\\?)" + SOURCE_MAP_PARAMS + "(&|$)", "$1");
-            sourceMapKey = StringUtils.removeEnd(sourceMapKey, "?");
+            sourceMapKey = Strings.CS.removeEnd(sourceMapKey, "?");
             return sourceMaps.getOrDefault(sourceMapKey, "");
         }
         return "";

@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #set ($discard = $xwiki.ssx.use('Help.Code.VelocityMacros'))
 #set ($discard = $xwiki.jsx.use('Help.Code.VelocityMacros'))
-#set ($docextras = [])
+#set ($displayDocExtra = false)
 
 #macro (helpActionCard $data)
   &lt;div class="well"&gt;

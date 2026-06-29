@@ -53,6 +53,7 @@ import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.query.WrappingQuery;
 import org.xwiki.query.hql.internal.HQLStatementValidator;
+import org.xwiki.query.internal.AbstractQueryExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -73,7 +74,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 @Named("hql")
 @Singleton
-public class HqlQueryExecutor implements QueryExecutor, Initializable
+public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializable
 {
     /**
      * Path to Hibernate mapping with named queries. Configured via component manager.
@@ -211,11 +212,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             });
 
             // Filter the query result
-            if (query.getFilters() != null && !query.getFilters().isEmpty()) {
-                for (QueryFilter filter : query.getFilters()) {
-                    results = filter.filterResults(results);
-                }
-            }
+            results = filterResults(filteredQuery, results);
 
             return results;
         } catch (Exception e) {
@@ -272,35 +269,14 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         return createQuery(session, filterQuery(query));
     }
 
-    private Query filterQuery(Query query, String language)
+    @Override
+    protected Query filterQuery(Query query, String language)
     {
-        Query filteredQuery = query;
-
         // If there are Query parameters of type QueryParameter then, for convenience, automatically add the
         // "escapeLikeParameters" filter (if not already there)
         addEscapeLikeParametersFilter(query);
 
-        if (query.getFilters() != null && !query.getFilters().isEmpty()) {
-            for (QueryFilter filter : query.getFilters()) {
-                // Step 1: For backward-compatibility reasons call #filterStatement() first
-                String filteredStatement = filter.filterStatement(filteredQuery.getStatement(), language);
-                // Prevent unnecessary creation of WrappingQuery objects when the QueryFilter doesn't modify the
-                // statement.
-                if (!filteredStatement.equals(filteredQuery.getStatement())) {
-                    filteredQuery = new WrappingQuery(filteredQuery)
-                    {
-                        @Override
-                        public String getStatement()
-                        {
-                            return filteredStatement;
-                        }
-                    };
-                }
-                // Step 2: Run #filterQuery()
-                filteredQuery = filter.filterQuery(filteredQuery);
-            }
-        }
-        return filteredQuery;
+        return super.filterQuery(query, language);
     }
 
     private void addEscapeLikeParametersFilter(Query query)

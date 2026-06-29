@@ -55,6 +55,11 @@ abstract class AbstractRealtimeWYSIWYGEditorIT extends AbstractCKEditorIT
         multiUserSetup.closeTabs();
     }
 
+    protected void loginAsJohn(TestUtils setup)
+    {
+        setup.login("John", "pass");
+    }
+
     protected void loginAsBob(TestUtils setup)
     {
         setup.createUserAndLogin("Bob", "pass", "editor", "Wysiwyg");

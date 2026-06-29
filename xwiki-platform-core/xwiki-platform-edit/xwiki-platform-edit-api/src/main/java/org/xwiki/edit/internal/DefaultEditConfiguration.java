@@ -20,6 +20,7 @@
 package org.xwiki.edit.internal;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -50,6 +51,10 @@ public class DefaultEditConfiguration implements EditConfiguration
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
+    @Named("request")
+    private ConfigurationSource requestConfig;
+
+    @Inject
     @Named("editorBindings/all")
     private ConfigurationSource allEditorBindingsSource;
 
@@ -66,21 +71,56 @@ public class DefaultEditConfiguration implements EditConfiguration
     @Override
     public String getDefaultEditor(Type dataType, String category)
     {
+        // The default editor can be overridden using request parameters.
+        return getDefaultEditorFromRequest(dataType, category)
+            // Get the default editor configured using the standard configuration properties and sources.
+            .orElseGet(() -> getDefaultEditorFromStandardConfiguration(dataType, category)
+                // A custom configuration can look for the default editor in custom configuration sources, using custom
+                // properties, or it can simply return the default editor where there's no one configured.
+                .orElseGet(() -> getDefaultEditorFromCustomConfiguration(dataType, category).orElse(null)));
+    }
+
+    private Optional<String> getDefaultEditorFromRequest(Type dataType, String category)
+    {
+        // Request parameters are often passed in the request URL query string, so they increase the URL length, which
+        // is limited. Moreover, since requests have a limited lifetime, overwriting configuration properties from the
+        // request is more or less temporary. For these reasons, we reduce the length of the key even if it means that
+        // we could have conflicts.
+        String key = dataType instanceof Class ? ((Class<?>) dataType).getSimpleName() : dataType.getTypeName();
+        if (!StringUtils.isEmpty(category)) {
+            key += "." + category;
+        }
+        key += ".editor";
+        return Optional.ofNullable(this.requestConfig.getProperty(key, String.class));
+    }
+
+    private Optional<String> getDefaultEditorFromStandardConfiguration(Type dataType, String category)
+    {
         String dataTypeName = dataType.getTypeName();
         if (!StringUtils.isEmpty(category)) {
             dataTypeName += "#" + category;
         }
-        // Get the default editor configured using the standard configuration properties and sources.
-        String defaultEditor = getDefaultEditor(dataTypeName);
+        String defaultEditor = this.allEditorBindingsSource.getProperty(dataTypeName, String.class);
         if (StringUtils.isEmpty(defaultEditor)) {
-            // A custom configuration can look for the default editor in custom configuration sources, using custom
-            // properties, or it can simply return the default editor where there's no one configured.
-            EditorConfiguration<?> customConfig = getCustomConfiguration(dataType);
-            if (customConfig != null) {
-                defaultEditor = customConfig.getDefaultEditor(category);
+            defaultEditor = this.xwikiPropertiesSource.getProperty("edit.defaultEditor." + dataTypeName, String.class);
+            if (StringUtils.isEmpty(defaultEditor)) {
+                defaultEditor = null;
             }
         }
-        return defaultEditor;
+        return Optional.ofNullable(defaultEditor);
+    }
+
+    private Optional<String> getDefaultEditorFromCustomConfiguration(Type dataType, String category)
+    {
+        EditorConfiguration<?> customConfig = getCustomConfiguration(dataType);
+        String defaultEditor = null;
+        if (customConfig != null) {
+            defaultEditor = customConfig.getDefaultEditor(category);
+            if (StringUtils.isEmpty(defaultEditor)) {
+                defaultEditor = null;
+            }
+        }
+        return Optional.ofNullable(defaultEditor);
     }
 
     private <D extends Type> EditorConfiguration<D> getCustomConfiguration(D dataType)
@@ -92,14 +132,5 @@ public class DefaultEditConfiguration implements EditConfiguration
         } catch (ComponentLookupException e) {
             return null;
         }
-    }
-
-    private String getDefaultEditor(String dataType)
-    {
-        String defaultEditor = this.allEditorBindingsSource.getProperty(dataType, String.class);
-        if (StringUtils.isEmpty(defaultEditor)) {
-            defaultEditor = this.xwikiPropertiesSource.getProperty("edit.defaultEditor." + dataType, String.class);
-        }
-        return defaultEditor;
     }
 }

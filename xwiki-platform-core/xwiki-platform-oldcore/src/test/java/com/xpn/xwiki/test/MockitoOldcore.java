@@ -41,6 +41,7 @@ import javax.script.ScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hibernate.cfg.Configuration;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
@@ -353,14 +354,30 @@ public class MockitoOldcore
             // DocumentAuthorizationManager are available
             if (!getMocker().hasComponent(AuthorizationManager.class)) {
                 this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+            } else {
+                AuthorizationManager registered = getMocker().getInstance(AuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            } else {
+                ContextualAuthorizationManager registered =
+                    getMocker().getInstance(ContextualAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockContextualAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(DocumentAuthorizationManager.class)) {
                 this.mockDocumentAuthorizationManager =
                     getMocker().registerMockComponent(DocumentAuthorizationManager.class);
+            } else {
+                DocumentAuthorizationManager registered = getMocker().getInstance(DocumentAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockDocumentAuthorizationManager = registered;
+                }
             }
         }
 
@@ -674,9 +691,11 @@ public class MockitoOldcore
                     document.setSyntax(Syntax.PLAIN_1_0);
                     document.setOriginalDocument(document.clone());
                 } else {
-                    // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
-                    // by modifying the XWikiDocument instance and always return a new instance)
-                    document = document.clone();
+                    if (document.isMetaDataDirty()) {
+                        // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
+                        // by modifying the XWikiDocument instance and always return a new instance)
+                        document = document.clone();
+                    }
                 }
 
                 return document;
@@ -854,7 +873,7 @@ public class MockitoOldcore
                     XWikiDocument doc = invocation.getArgument(0);
                     String revision = invocation.getArgument(1);
 
-                    if (StringUtils.equals(revision, doc.getVersion())) {
+                    if (Strings.CS.equals(revision, doc.getVersion())) {
                         return doc;
                     }
 
@@ -1272,7 +1291,7 @@ public class MockitoOldcore
         // Make sure the document is not restricted.
         document.setRestricted(false);
 
-        XWikiDocument savedDocument = document.clone();
+        XWikiDocument savedDocument = document;
 
         this.documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 

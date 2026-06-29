@@ -98,7 +98,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ReferenceComponentList
-public class XWikiHibernateStoreTest
+class XWikiHibernateStoreTest
 {
     private static final String WIKI_NAME = "wiki";
 
@@ -556,14 +556,14 @@ public class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, times(1)).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again with no change
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, times(1)).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again but with disabled tracking
 

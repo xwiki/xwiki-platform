@@ -61,22 +61,83 @@ repository.supporter.sheet.createplan=Ajouter
 ### Missing: repository.supporter.sheet.plans=Plans
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
 ExtensionCode.ExtensionSupporterClass_doc.title=Nom
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
+ExtensionCode.ExtensionSupporterClass_summary=Résumé
 ExtensionCode.ExtensionSupporterClass_url=URL
 ExtensionCode.ExtensionSupporterClass_email=Email
 ExtensionCode.ExtensionSupporterClass_content=Détails
-### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
+ExtensionCode.ExtensionSupporterClass_active=Actif
 
 ## Support plans
 ### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
 ### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+repository.supportplan.sheet.supportedExtensions=Extensions supportées
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+ExtensionCode.ExtensionSupportPlanClass_summary=Résumé
 ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Détails
-### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_active=Actif
+ExtensionCode.ExtensionSupportPlanClass_paying=Paiement
+
+## Extension sheet
+repository.extension.sheet.name=Nom
+repository.extension.sheet.type=Type
+repository.extension.sheet.category=Catégorie
+repository.extension.sheet.summary=Résumé
+repository.extension.sheet.authors=Auteurs
+repository.extension.sheet.rating=Évaluation
+### Missing: repository.extension.sheet.title=Extension sheet
+repository.extension.sheet.imported=Extension importée depuis le dépôt
+repository.extension.sheet.updateExtension=Mettre à jour l'extension
+repository.extension.sheet.developedBy=Développé par
+repository.extension.sheet.unknown=Inconnu
+repository.extension.sheet.support=Support
+repository.extension.sheet.activeInstalls=Installations actives
+repository.extension.sheet.license=License
+repository.extension.sheet.installable=Installation possible via le gestionnaire d'extensions
+repository.extension.sheet.documentation=Documentation
+repository.extension.sheet.sources=Sources
+### Missing: repository.extension.sheet.issues=Issues
+### Missing: repository.extension.sheet.download=Download v{0}
+repository.extension.sheet.toc=Table des matières
+repository.extension.sheet.documentationHelp=Documentation d'aide
+### Missing: repository.extension.sheet.rulesIntro=Here are some rules to follow when contributing an extension:
+### Missing: repository.extension.sheet.ruleSummary=Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.
+### Missing: repository.extension.sheet.ruleImported=When an extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+### Missing: repository.extension.sheet.autoSync=Automatically synchronize the extension informations
+repository.extension.sheet.source=Source
+### Missing: repository.extension.sheet.iconLocation=Display Icon Location
+repository.extension.sheet.iconLocationSyntax=Syntaxe :
+repository.extension.sheet.iconLocationLinkText=Nom de l'icône
+repository.extension.sheet.showActiveInstalls=Afficher les installations actives
+### Missing: repository.extension.sheet.supportPlans=Support plans
+repository.extension.sheet.description=Description
+repository.extension.sheet.prerequisites=Prérequis et instructions d'installation
+### Missing: repository.extension.sheet.customInstallationOnly=Custom installation only
+### Missing: repository.extension.sheet.standardInstallationInstructions=Standard installation instructions
+### Missing: repository.extension.sheet.customInstallationInstructions=Custom installation instructions
+repository.extension.sheet.versions=Versions
+repository.extension.sheet.releaseNotes=Notes de version
+repository.extension.sheet.dependencies=Dépendances
+### Missing: repository.extension.sheet.dependenciesIntro=Dependencies for this extension ({0}):
+### Missing: repository.extension.sheet.currentDownloads=Current Downloads
+### Missing: repository.extension.sheet.addDownloads=Add Downloads
+### Missing: repository.extension.sheet.addDownloadsSaveFirst=In order to add Download information for this extension, save this page first and edit it again.
+### Missing: repository.extension.sheet.addDownloadsWarning=If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.
+### Missing: repository.extension.sheet.addDownloadsProcess=We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+### Missing: repository.extension.sheet.addDownloadsAttach=If you''re providing a new download, {0}attach the new version to this page{1} and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).
+### Missing: repository.extension.sheet.addDownloadsInfo=Add Download information for the new attachment by filing in a new {0}Extension Version{1}. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {2}.
+### Missing: repository.extension.sheet.currentDependencies=Current Dependencies
+repository.extension.sheet.addDependencies=Ajouter des dépendances
+### Missing: repository.extension.sheet.addDependenciesIntro=You can also associate dependencies to each version by filing in the following information in a new {0}Dependency{1}:
+### Missing: repository.extension.sheet.addDependenciesVersion=Extension version is the version on which this dependency is assigned
+### Missing: repository.extension.sheet.addDependenciesId=Dependency id is the identifier of the dependency extension on the repository where it is localed
+### Missing: repository.extension.sheet.addDependenciesConstraint=Dependency version constraint is the version related information of the dependency. Can be a version (e.g. 1.0) or one or several ranges of versions based on Maven standard syntax (e.g. [1.0,) which mean at least 1.0)
+### Missing: repository.extension.sheet.wrongObject=This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object
 </content>
 </xwikidoc>

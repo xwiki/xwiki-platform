@@ -25,9 +25,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.internal.JSONMerge;
 
 /**
  * Adds missing live data configuration values specific to the extension security source.
@@ -38,16 +37,15 @@ import org.xwiki.livedata.internal.JSONMerge;
 @Component
 @Singleton
 @Named(ExtensionSecurityLiveDataSource.ID)
-public class ExtensionSecurityLiveDataConfigurationResolver
-    implements LiveDataConfigurationResolver<LiveDataConfiguration>
+public class ExtensionSecurityLiveDataConfigurationResolver extends AbstractLiveDataConfigurationResolver
 {
     @Inject
     @Named(ExtensionSecurityLiveDataSource.ID)
     private Provider<LiveDataConfiguration> extensionSecurityLiveDataProvider;
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input)
+    protected LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration input)
     {
-        return new JSONMerge().merge(input, this.extensionSecurityLiveDataProvider.get());
+        return this.extensionSecurityLiveDataProvider.get();
     }
 }

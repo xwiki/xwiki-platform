@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 6.1RC1
  */
 @ComponentTest
-public class TemplateMimeMessageFactoryTest
+class TemplateMimeMessageFactoryTest
 {
     @InjectMockComponents
     private TemplateMimeMessageFactory templateMimeMessageFactory;
@@ -93,7 +93,7 @@ public class TemplateMimeMessageFactoryTest
         parameters.put("language", "fr");
         parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
 
-        MimeMessage message =this.templateMimeMessageFactory.createMessage(this.templateReference, parameters);
+        MimeMessage message = this.templateMimeMessageFactory.createMessage(this.templateReference, parameters);
 
         assertEquals("XWiki news", message.getSubject());
 

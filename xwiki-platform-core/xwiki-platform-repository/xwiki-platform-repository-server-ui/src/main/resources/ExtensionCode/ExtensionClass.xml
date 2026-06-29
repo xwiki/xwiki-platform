@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.ExtensionClass" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionClass" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionClass</name>
   <language/>
@@ -342,6 +342,34 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </name>
+    <project>
+      <cache>0</cache>
+      <classname>ExtensionCode.ProjectClass</classname>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <idField/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>project</name>
+      <number>30</number>
+      <picker>1</picker>
+      <prettyName>project</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort/>
+      <sql/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+    </project>
     <properties>
       <cache>0</cache>
       <customDisplay/>
@@ -442,6 +470,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </scmdevconnection>
+    <scmtag>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>scmtag</name>
+      <number>31</number>
+      <picker>0</picker>
+      <prettyName>Source tag</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </scmtag>
     <showInstalledCount>
       <customDisplay/>
       <defaultValue>1</defaultValue>
@@ -560,6 +602,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </validExtension>
+    <versionPage>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>versionPage</name>
+      <number>29</number>
+      <prettyName>Versions stored in dedicated pages</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </versionPage>
     <website>
       <contenttype>PureText</contenttype>
       <customDisplay/>

@@ -21,8 +21,6 @@ package org.xwiki.store;
 
 import java.util.concurrent.Future;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * An indicator if a store is ready, i.e., has completed all writes/indexing tasks that have been submitted before
  * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
@@ -31,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.9.0RC1
  * @version $Id$
  */
-@Unstable
 public interface ReadyIndicator extends Future<Void>
 {
     /**

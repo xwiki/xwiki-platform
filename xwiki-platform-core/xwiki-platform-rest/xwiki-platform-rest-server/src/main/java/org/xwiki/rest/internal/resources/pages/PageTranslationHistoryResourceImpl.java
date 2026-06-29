@@ -57,6 +57,8 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {
@@ -72,6 +74,7 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
         String spaceId = Utils.getLocalSpaceId(spaces);
 
         History history = new History();
+        int limit = validateAndGetLimit(number);
 
         try {
             String validOrder = HqlQueryUtils.getValidQueryOrder(order, "desc");
@@ -83,7 +86,10 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
             
             List<Object> queryResult = null;
             queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId)
-                .bindValue("name", pageName).setLimit(number).bindValue("language", language).setOffset(start)
+                .bindValue("name", pageName)
+                .bindValue("language", language)
+                .setLimit(limit)
+                .setOffset(start)
                 .setWiki(wikiName).execute();
 
             for (Object object : queryResult) {

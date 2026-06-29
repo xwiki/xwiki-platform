@@ -80,7 +80,7 @@ define('xwiki-attachment-picker',
           .addClass('active')
           .append($('<input/>')
             .attr('type', 'radio')
-            .attr('checked', true)
+            .attr('checked', 'checked')
             .attr('name', 'scope')
             .attr('value', 'local'))
           .append(document.createTextNode(translations.get('searchField.scope.currentPage')));

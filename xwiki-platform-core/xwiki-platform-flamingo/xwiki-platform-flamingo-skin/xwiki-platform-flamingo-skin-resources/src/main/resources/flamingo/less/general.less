@@ -83,6 +83,11 @@ pre {
   white-space: pre;
 }
 
+.monospace {
+  /* Don't use 'pre' because we want the text to wrap for inline styling. */
+  white-space: pre-wrap;
+}
+
 // Line numbers in code
 
 .linenoswrapper {
@@ -184,24 +189,19 @@ body {
       & .vertical-menu, // In vertical menus (user menu, syntax guide, ...), do not underline the menu items.
       & .jstree-xwiki, // Do not underline links in jstrees
       & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
-      & .xwiki-livedata .cell .breadcrumb // Do not underline links that are in breadcrumbs in livedatas
+      & .breadcrumb, // The breadcrumb contains enough presentation to distinguish it from neighboring text.
+      & nav, & *[role="navigation"] // Navigation nodes are meant to contain anchors. This meaning is most of the time conveyed through the style.
       {
         & a {
           .not-inline-link();
         }
       }
 
-      a {
-        &.user-name, &.group-name // Usually user names and group names displayed with the userDisplayMacro
-          // are next to the user avatar. This specific rule can be removed once XWIKI-22269 is fixed.
-        {
-          .not-inline-link();
-        }
-      }
-
-      /* Remove the underlining from links with the btn class.
-       Those are already styled differently from their neighboring text. */
-      & a.btn {
+      /* Remove the underlining from links styled like buttons.
+       Those are already different enough from their neighboring text. */
+      & a.btn,
+      & a.button,
+      & .buttonwrapper a {
         .not-inline-link();
       }
 
@@ -214,20 +214,24 @@ body {
       }
     }
 
-    // Helper classes for easier content customization. Note that those only work for this preference.
+    // Helper classes for easier content customization.
+    // Note that this does not override the underlining preference system.
+    // The users with the `Yes` and `No` preferences will still have the links the way they asked for.
     // This class can either be used on a common parent or the links themselves.
-    #xwikicontent .force-no-underline a,
-    #xwikicontent a.force-no-underline {
-      text-decoration: none;
+    // The use of !important here was agreed on.
+    .force-no-underline a,
+    a.force-no-underline {
+      text-decoration: none !important;
     }
 
     .force-underline a,
     a.force-underline {
-      text-decoration: underline;
+      text-decoration: underline !important;
     }
   }
 
-  &.preference-underlining-no {
+  /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering. */
+  &.preference-underlining-no:not(:hover):not(:focus) {
     a {
       text-decoration: none;
     }

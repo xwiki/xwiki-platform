@@ -34,7 +34,7 @@ public class ColorTheme extends HashMap<String, String>
      */
     public ColorTheme()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

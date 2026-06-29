@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class SkinActionTest
+class SkinActionTest
 {
     private SkinAction action;
 
@@ -51,43 +51,43 @@ public class SkinActionTest
     }
 
     @Test
-    public void isTextJavascriptJavaScriptMimetype()
+    void isTextJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("text/javascript"));
     }
 
     @Test
-    public void isApplicationJavascriptJavaScriptMimetype()
+    void isApplicationJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/javascript"));
     }
 
     @Test
-    public void isApplicationXJavascriptJavaScriptMimetype()
+    void isApplicationXJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/x-javascript"));
     }
 
     @Test
-    public void isTextEcmascriptJavaScriptMimetype()
+    void isTextEcmascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("text/ecmascript"));
     }
 
     @Test
-    public void isApplicationEcmascriptJavaScriptMimetype()
+    void isApplicationEcmascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/ecmascript"));
     }
 
     @Test
-    public void npeJavascriptMimetype()
+    void npeJavascriptMimetype()
     {
         assertFalse(this.action.isJavascriptMimeType(null));
     }
 
     @Test
-    public void incorrectSkinFile()
+    void incorrectSkinFile()
     {
         Throwable exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../../resources/js/xwiki/xwiki.js", "colibri");
@@ -120,7 +120,7 @@ public class SkinActionTest
     }
 
     @Test
-    public void incorrectResourceFile()
+    void incorrectResourceFile()
     {
         Throwable exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../skins/js/xwiki/xwiki.js");

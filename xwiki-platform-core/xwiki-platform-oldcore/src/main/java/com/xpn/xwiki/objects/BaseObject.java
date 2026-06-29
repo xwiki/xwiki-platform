@@ -40,14 +40,22 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Java abstraction of an XObject.
+ *
+ * @version $Id$
+ */
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
 
     private String guid;
+    private BaseClass sourceXClass;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -138,55 +146,130 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         this.referenceCache = null;
     }
 
+    /**
+     * Display a hidden input for the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display the value of the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display a hidden input for the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
-
+        displayHidden(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayView(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
-
+        displayView(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
-
+        displayEdit(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display a hidden input for the given property.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, XWikiContext context)
     {
         return displayHidden(name, "", context);
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayView(String name, XWikiContext context)
     {
         return displayView(name, "", context);
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, XWikiContext context)
     {
         return displayEdit(name, "", context);
@@ -219,6 +302,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
      * data but with a different identity.
+     * @return a duplicate of current instance
      *
      * @since 2.2.3
      */
@@ -232,6 +316,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     }
 
     /**
+     * Duplicate the current instance but set the given reference as document reference.
+     * @param documentReference the new reference to use
+     * @return a duplicate of current instance
+     * @see #duplicate()
      * @since 2.2.3
      */
     public BaseObject duplicate(DocumentReference documentReference)
@@ -277,106 +365,173 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         super.fromXML(oel);
     }
 
+    private BaseClass getSourceXClassOrFallback(XWikiContext context)
+    {
+        BaseClass result = getSourceXClass();
+        if (result == null) {
+            result = getXClass(context);
+        }
+        return result;
+    }
+
     @Override
     public List<ObjectDiff> getDiff(Object oldEntity, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseObject oldObject = (BaseObject) oldEntity;
         // Iterate over the new properties first, to handle changed and added objects
         for (String propertyName : this.getPropertyList()) {
-            BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
-            BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
-            BaseClass bclass = getXClass(context);
-            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : pclass.getClassType();
-
-            if (oldProperty == null) {
-                // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
-                    String newPropertyValue = (newProperty.getValue() instanceof String || pclass == null)
-                        ? newProperty.toText() : pclass.displayView(propertyName, this, context);
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
-                        ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
-                }
-            } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
-                // The property exists in both objects and is different
-                if (pclass != null) {
-                    // Put the values as they would be displayed in the interface
-                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                        : pclass.displayView(propertyName, this, context);
-                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                        : pclass.displayView(propertyName, oldObject, context);
-                    difflist.add(
-                        new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldPropertyValue, newPropertyValue));
-                } else {
-                    // Cannot get property definition, so use the plain value
-                    difflist.add(
-                        new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
-                }
-            }
+            handleChangedAndAddedPropertiesInDiff(context, propertyName, oldObject, difflist);
         }
 
         // Iterate over the old properties, in case there are some removed properties
         for (String propertyName : oldObject.getPropertyList()) {
-            BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
-            BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
-            BaseClass bclass = getXClass(context);
-            // Bulletproofing: in theory the BaseObject is defined with a xclass reference allowing to resolve it
-            // however, it's possible that the reference is not set, in which case we might still find the info
-            // in the old object.
-            if (bclass == null) {
-                bclass = oldObject.getXClass(context);
-            }
-            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : pclass.getClassType();
-
-            if (newProperty == null) {
-                // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
-                    if (pclass != null) {
-                        // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldObject, context);
-                        difflist.add(
-                            new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
-                                ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
-                    } else {
-                        // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(),
-                            oldObject.getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
-                            oldProperty.toText(), ""));
-                    }
-                }
-            }
+            handleRemovedPropertiesInDiff(context, propertyName, oldObject, difflist);
         }
 
         return difflist;
     }
 
+    private void handleRemovedPropertiesInDiff(XWikiContext context, String propertyName, BaseObject oldObject,
+        ArrayList<ObjectDiff> difflist)
+    {
+        BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
+        BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+        BaseClass oldPropertyXClass = oldObject.getSourceXClassOrFallback(context);
+        PropertyClass oldpclass =
+            (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
+        if (newProperty == null) {
+            // The property exists in the old object, but not in the new one
+            if ((oldProperty != null) && (!oldProperty.toText().isEmpty())) {
+                String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
+                    oldObject);
+                String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
+                difflist.add(
+                    new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
+                        isSensitive));
+            }
+        }
+    }
+
+    private String getDiffPropertyValue(XWikiContext context, BaseProperty property, PropertyClass propertyClass,
+        String propertyName, BaseObject object)
+    {
+        String result;
+        if (propertyClass == null) {
+            result = property.toText();
+        } else if (property.getValue() instanceof String propertyValue) {
+            result = propertyValue;
+        // We never want to perform a DB query to compute a diff, so we rely on the actual text value of the object.
+        } else if (property instanceof ListProperty listProperty && propertyClass instanceof DBListClass) {
+            result = listProperty.getTextValue();
+        } else {
+            result = propertyClass.displayView(propertyName, object, context);
+        }
+        return result;
+    }
+
+    private void handleChangedAndAddedPropertiesInDiff(XWikiContext context, String propertyName, BaseObject oldObject,
+        ArrayList<ObjectDiff> difflist)
+    {
+        BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
+        BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+        BaseClass newPropertyXClass = getSourceXClassOrFallback(context);
+        BaseClass oldPropertyXClass = oldObject.getSourceXClassOrFallback(context);
+        PropertyClass oldpclass =
+            (PropertyClass) ((oldPropertyXClass == null) ? null : oldPropertyXClass.getField(propertyName));
+        PropertyClass newpclass =
+            (PropertyClass) ((oldPropertyXClass == null) ? null : newPropertyXClass.getField(propertyName));
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
+        if (oldProperty == null) {
+            String propertyType;
+            String newPropertyValue;
+            // The property exist in the new object, but not in the old one
+            if ((newProperty != null) && (!newProperty.toText().isEmpty())) {
+                if (newpclass == null) {
+                    propertyType = "";
+                    newPropertyValue = newProperty.toText();
+                } else {
+                    propertyType = newpclass.getClassType();
+                    newPropertyValue = getDiffPropertyValue(context, newProperty, newpclass, propertyName,
+                        this);
+                }
+                difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
+                    ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                    isSensitive));
+            }
+        } else if (newProperty == null || !oldProperty.toText().equals(newProperty.toText())) {
+            // The property exists in both objects and is different
+            String newPropertyType = (newpclass != null) ? newpclass.getClassType() : "";
+            String newPropertyValue = getDiffPropertyValue(context, newProperty, newpclass, propertyName,
+                this);
+
+            String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName, oldObject);
+            difflist.add(
+                new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
+                    propertyName, newPropertyType, oldPropertyValue, newPropertyValue,
+                    isSensitive));
+        }
+    }
+
+    /**
+     * Wrap the given object in an {@link com.xpn.xwiki.api.Object}.
+     * @param obj the object to wrap
+     * @param context the context to use for wrapping
+     * @return a new instance of the object to be used in scripts
+     */
     public com.xpn.xwiki.api.Object newObjectApi(BaseObject obj, XWikiContext context)
     {
         return new com.xpn.xwiki.api.Object(obj, context);
     }
 
-    public void set(String fieldname, java.lang.Object value, XWikiContext context)
+    /**
+     * Set the defined property with the given value in the current object.
+     * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used.
+     * @param fieldname the name of the property to set
+     * @param value the value to set
+     * @param context the context to use for setting the value
+     * @throws XWikiException in case of problem when parsing the value
+     */
+    public void set(String fieldname, java.lang.Object value, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
+        boolean createProp = false;
         if ((value instanceof String) && (pclass != null)) {
-            prop = pclass.fromString((String) value);
+            BaseProperty newProp = pclass.fromString((String) value);
+            if (prop == null) {
+                prop = newProp;
+                createProp = true;
+            } else {
+                prop.setValue(newProp.getValue());
+            }
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();
+                createProp = true;
             }
             if (prop != null) {
                 prop.setValue(value);
             }
         }
 
-        if (prop != null) {
+        if (prop != null && createProp) {
             prop.setOwnerDocument(getOwnerDocument());
             safeput(fieldname, prop);
         }
@@ -464,5 +619,23 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     {
         ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);
         return objectEvaluator.evaluate(this);
+    }
+
+    /**
+     * @return the actual XClass defining that object.
+     */
+    public BaseClass getSourceXClass()
+    {
+        return sourceXClass;
+    }
+
+    /**
+     * @param sourceXClass see {@link #getSourceXClass()}.
+     * @return the current instance.
+     */
+    public BaseObject setSourceXClass(BaseClass sourceXClass)
+    {
+        this.sourceXClass = sourceXClass;
+        return this;
     }
 }

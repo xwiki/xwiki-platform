@@ -40,18 +40,23 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments")
 public interface AttachmentsResource
 {
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @GET Attachments getAttachments(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("name") @DefaultValue("") String name,
             @QueryParam("author") @DefaultValue("") String author,
             @QueryParam("types") @DefaultValue("") String types
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA) Response addAttachment(
             @PathParam("wikiName") String wikiName,

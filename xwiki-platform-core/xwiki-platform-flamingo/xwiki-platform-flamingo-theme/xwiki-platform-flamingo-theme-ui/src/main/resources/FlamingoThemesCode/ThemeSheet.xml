@@ -52,7 +52,8 @@
 ############################
 #set($variables = {
   "logos": {
-    "logo": "image"
+    "logo": "image",
+    "logo-description": "text"
   },
   "base-colors": {
     "text-color": "color",
@@ -235,8 +236,16 @@
       #foreach($var in $catVar.keySet())
         #set($varName = $var)
         #set($varType = $catVar.get($varName))
+        #set($hintKey = "${obj.xWikiClass.name}_${varName}_hint")
+        #set($hint = $services.localization.render($hintKey))
+        #if($hint == $hintKey)
+          #set($hint = $NULL)
+        #end
         &lt;div class="form-group"&gt;
           &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
+          #if ($hint)
+            &lt;span class="col-xs-12 xHint"&gt;$escapetool.xml($hint)&lt;/span&gt;
+          #end
           &lt;div class="col-xs-12"&gt;
             #if($varType == 'image')
               #fieldImage($varName, $obj)
@@ -745,6 +754,14 @@ require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], fun
 
 #iframe {
   height: 400px;
+}
+
+/* When reworking the DOM of this form, use the standard vertical form structure to avoid hard-coding styles like 
+this. */
+#panel-theme-variables .xHint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+  margin: 0.3em 0;
 }</code>
     </property>
     <property>

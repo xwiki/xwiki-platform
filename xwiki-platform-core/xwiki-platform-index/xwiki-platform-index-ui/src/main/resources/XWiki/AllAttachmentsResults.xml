@@ -51,10 +51,7 @@
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $numbertool.toNumber($request.limit).intValue())
-  #if (!$limit)
-    #set ($limit = 15)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
   ##
   ## Apply live table filters.
   ##

@@ -71,7 +71,7 @@ public class EntityChange implements Comparable<EntityChange>
     /**
      * The timestamp of the change.
      */
-    private final long timestamp = new Date().getTime();
+    private final long timestamp;
 
     /**
      * Creates a new entity change instance.
@@ -82,9 +82,25 @@ public class EntityChange implements Comparable<EntityChange>
      */
     public EntityChange(EntityReference entityReference, UserReference author, ScriptLevel scriptLevel)
     {
+        this(entityReference, author, scriptLevel, new Date().getTime());
+    }
+
+    /**
+     * Creates a new entity change instance.
+     *
+     * @param entityReference the changed entity
+     * @param author the author of the change
+     * @param scriptLevel the script level of the author of the change relative to the changed entity
+     * @param timestamp the timestamp of the change
+     * @since 17.10.1
+     * @since 18.0.0RC1
+     */
+    public EntityChange(EntityReference entityReference, UserReference author, ScriptLevel scriptLevel, long timestamp)
+    {
         this.entityReference = entityReference;
         this.author = author;
         this.scriptLevel = scriptLevel;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -109,6 +125,16 @@ public class EntityChange implements Comparable<EntityChange>
     public ScriptLevel getScriptLevel()
     {
         return scriptLevel;
+    }
+
+    /**
+     * @return the timestamp of the change
+     * @since 17.10.1
+     * @since 18.0.0RC1
+     */
+    public long getTimestamp()
+    {
+        return timestamp;
     }
 
     @Override

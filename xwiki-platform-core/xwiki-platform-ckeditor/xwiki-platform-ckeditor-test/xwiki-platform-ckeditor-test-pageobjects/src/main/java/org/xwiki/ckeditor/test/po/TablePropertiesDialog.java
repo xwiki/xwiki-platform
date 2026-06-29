@@ -19,6 +19,10 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+
 /**
  * The page object used to interact with the CKEditor table properties dialog.
  *
@@ -28,4 +32,18 @@ package org.xwiki.ckeditor.test.po;
  */
 public class TablePropertiesDialog extends CKEditorDialog
 {
+    /**
+     * Update the table header setting. Values can be `None`, `First Row` (default), `First column` or `Both`.
+     */
+    public TablePropertiesDialog setHeader(String value)
+    {
+        // The CKEditor table dialog does not have much semantics in its form, we use the label text to find the 
+        // select we're looking for.
+        WebElement headerLabel = getContainer().findElement(
+            By.xpath("//label[contains(text(), 'Headers')]"));
+        WebElement headerSelect = getDriver().findElement(By.id(headerLabel.getAttribute("for")));
+        Select select = new Select(headerSelect);
+        select.selectByVisibleText(value);
+        return this;
+    }
 }

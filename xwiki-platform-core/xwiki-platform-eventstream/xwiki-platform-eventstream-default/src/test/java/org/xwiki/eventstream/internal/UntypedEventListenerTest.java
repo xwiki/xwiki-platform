@@ -54,7 +54,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,11 +122,6 @@ class UntypedEventListenerTest
         Template template = mock(Template.class);
         when(this.templateManager.createStringTemplate(anyString(), any(), any(), any())).thenReturn(template);
         when(this.templateManager.execute(template)).thenReturn(mock(XDOM.class));
-    }
-
-    @BeforeEach
-    void watchObservationManager()
-    {
         this.answer = new MyAnswer();
         doAnswer(this.answer).when(this.observationManager)
             .notify(any(DefaultUntypedRecordableEvent.class), anyString(), any());
@@ -154,7 +148,7 @@ class UntypedEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
 
         // Verify
-        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
+        verify(this.observationManager).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
 
         assertNotNull(this.answer.getSentEvent());
         assertTrue(this.answer.getSentEvent().getTarget().isEmpty());
@@ -206,7 +200,7 @@ class UntypedEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), source, null);
 
         // Verify
-        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
+        verify(this.observationManager).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
         assertNotNull(this.answer.getSentEvent());
         assertEquals("myCustomEvent", this.answer.getSentEvent().getEventType());
     }
@@ -243,7 +237,7 @@ class UntypedEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
 
         // Verify
-        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
+        verify(this.observationManager).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
         assertNotNull(this.answer.getSentEvent());
         assertEquals("myCustomEvent", this.answer.getSentEvent().getEventType());
     }
@@ -276,7 +270,7 @@ class UntypedEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
 
         // Verify
-        verify(this.observationManager, times(1))
+        verify(this.observationManager)
             .notify(any(DefaultUntypedRecordableEvent.class), any(), any());
         assertNotNull(this.answer.getSentEvent());
         assertNotNull(this.answer.getSentEvent().getTarget());

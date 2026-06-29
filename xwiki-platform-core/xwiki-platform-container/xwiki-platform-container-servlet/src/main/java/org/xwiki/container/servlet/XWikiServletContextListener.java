@@ -23,6 +23,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -33,12 +34,13 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.internal.StackingComponentEventManager;
+import org.xwiki.component.internal.QueueComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.ApplicationContextListenerManager;
@@ -95,7 +97,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
         // be set up before we start sending events since there can be Observation Listener components that require
         // the Application Context (this is the case for example for the Office Importer Lifecycle Listener).
-        StackingComponentEventManager eventManager = new StackingComponentEventManager();
+        QueueComponentEventManager eventManager = new QueueComponentEventManager();
         this.componentManager.setComponentEventManager(eventManager);
 
         // Initialize the Environment
@@ -147,7 +149,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // Now that the Application Context is set up and the component are registered, send the Component instance
         // creation events we had stacked up.
         eventManager.setObservationManager(observationManager);
-        eventManager.shouldStack(false);
+        eventManager.shouldQueue(false);
         eventManager.flushEvents();
 
         // Force allowing any character in the input URLs, contrary to what Servlet 6 specifications indicate
@@ -258,7 +260,9 @@ public class XWikiServletContextListener implements ServletContextListener
                 uriCompliance = getUriCompliance(httpConfiguration);
             }
 
+            // Disable various violations applied by default by Jetty to URIs and redirect URIs
             MethodUtils.invokeMethod(httpConfiguration, "setUriCompliance", uriCompliance);
+            MethodUtils.invokeMethod(httpConfiguration, "setRedirectUriCompliance", uriCompliance);
         } catch (Exception e) {
             LOGGER.debug("Failed to set the URI compliance", e);
         }
@@ -274,11 +278,19 @@ public class XWikiServletContextListener implements ServletContextListener
 
         Class<?> uriComplianceClass = MethodUtils.invokeMethod(httpConfiguration, "getUriCompliance").getClass();
         Class violationsClass = getViolationClass(uriComplianceClass);
-        Set<?> violations = Set.of(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEGMENT"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_EMPTY_SEGMENT"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+        Set<Object> violations = new HashSet<>();
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_EMPTY_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+        violations.add(Enum.valueOf(violationsClass, "SUSPICIOUS_PATH_CHARACTERS"));
+
+        // Allow fragments in redirects (violation introduced in Jetty 12.1.0)
+        Object fragmentViolation = EnumUtils.getEnum(violationsClass, "FRAGMENT");
+        if (fragmentViolation != null) {
+            violations.add(fragmentViolation);
+        }
 
         return ConstructorUtils.invokeConstructor(uriComplianceClass, "XWiki", violations);
     }
@@ -288,7 +300,7 @@ public class XWikiServletContextListener implements ServletContextListener
         for (Class<?> innerClass : uriComplianceClass.getDeclaredClasses()) {
             // We cannot manipulate the class directly because it would probably be the wrong one, so we use reflection
             @SuppressWarnings("java:S1872")
-            boolean isViolationClass = innerClass.getName().equals("org.eclipse.jetty.http.UriCompliance$Violation");
+            boolean isViolationClass = "org.eclipse.jetty.http.UriCompliance$Violation".equals(innerClass.getName());
             if (isViolationClass) {
                 return innerClass;
             }

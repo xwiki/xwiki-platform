@@ -25,9 +25,9 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.6.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
-  <packaging>webjar</packaging>
+  <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-bootstrap</artifactId>
   <name>XWiki Platform - Bootstrap</name>
   <properties>
@@ -37,147 +37,50 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.webjars:bootstrap</xwiki.extension.features>
+    <!-- Vite already minifies/bundles the JavaScript, so the WebJar minification is not needed. -->
+    <xwiki.minification.skip>true</xwiki.minification.skip>
   </properties>
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- Keep the LESS sources into the WebJar payload, they are copied verbatim into the Flamingo skin. -->
           <execution>
-            <id>copy-bootstrap-resources</id>
-            <phase>validate</phase>
+            <id>copy-bootstrap-less</id>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>
+              <outputDirectory>${project.build.directory}/node-dist/less</outputDirectory>
               <resources>
                 <resource>
-                  <directory>src/main/</directory>
+                  <directory>${basedir}/src/main/node/less</directory>
                 </resource>
               </resources>
             </configuration>
           </execution>
+          <!-- Keep the glyphicon fonts (referenced at runtime by the less CSS compiled from LESS). -->
           <execution>
-            <id>copy-bootstrap-tests-resources</id>
-            <phase>validate</phase>
+            <id>copy-bootstrap-fonts</id>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/bootstrap/js/tests</outputDirectory>
+              <outputDirectory>${project.build.directory}/node-dist/fonts</outputDirectory>
               <resources>
                 <resource>
-                  <directory>src/tests/</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the generated bootstrap components to the WebJar folder. -->
-            <id>copy-bootstrap-components</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/bootstrap/dist</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the less bootstrap components to the WebJar folder. -->
-            <id>copy-bootstrap-less-components</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/less</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/bootstrap/less</directory>
+                  <directory>${basedir}/src/main/node/fonts</directory>
                 </resource>
               </resources>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <!-- We're disabling the JSHint check associated with the WebJar packaging because we use frontend-maven-plugin
-      below to perform linting. -->
-      <plugin>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-lint</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>install-node-and-npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>ci</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-build</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run build</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-test</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run test</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-          <execution>
-            <id>npm-run-lint</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run lint</arguments>
-            </configuration>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-        <configuration>
-          <workingDirectory>${project.build.directory}/bootstrap/</workingDirectory>
-        </configuration>
-      </plugin>
-      <!-- We're skipping the license check because we put the actual original license in bootstrap file and not the
-      XWiki license -->
+      <!-- We're skipping the license check because we keep the original Bootstrap license in the
+      sources and not the XWiki license. -->
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>

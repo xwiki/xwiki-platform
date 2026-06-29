@@ -90,7 +90,9 @@ public abstract class AbstractRequestParameterConverter implements RequestParame
     @Override
     public JakartaRequestParameterConversionResult convert(ServletRequest request)
     {
-        MutableJakartaServletRequest mutableServletRequest = this.mutableServletRequestFactory.newInstance(request);
+        MutableJakartaServletRequest mutableServletRequest =
+            (request instanceof MutableJakartaServletRequest mutableJakartaServletRequest)
+                ? mutableJakartaServletRequest : this.mutableServletRequestFactory.newInstance(request);
         JakartaRequestParameterConversionResult result =
             new JakartaRequestParameterConversionResult(mutableServletRequest);
 

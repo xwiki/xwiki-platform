@@ -43,7 +43,7 @@ public class SleepScriptService implements ScriptService
     public void sleepInSolr(long seconds)
     {
         // Check if we're in the Solr indexing thread.
-        if (Thread.currentThread().getName().equals("XWiki Solr index thread")) {
+        if ("XWiki Solr index thread".equals(Thread.currentThread().getName())) {
             try {
                 Thread.sleep(seconds * 1000);
             } catch (InterruptedException e) {

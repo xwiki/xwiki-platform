@@ -27,6 +27,7 @@ import java.util.Objects;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.slf4j.Logger;
@@ -218,12 +219,18 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     @Override
     public void setName(String name)
     {
+        // Empty property name is forbidden because it will cause problem (impossible to create an EntityReference for
+        // it)
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("An element name cannot be null or empty");
+        }
+
         // If a reference is already set, then you cannot set a name
         if (this.documentReference != null) {
             throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
         }
 
-        if (!StringUtils.equals(name, this.name)) {
+        if (!Strings.CS.equals(name, this.name)) {
             this.name = name;
             this.referenceCache = null;
 
@@ -284,7 +291,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**
@@ -499,7 +506,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         BaseElement<R> newBaseElement = (BaseElement<R>) newElement;
 
         // Pretty name
-        if (!StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
+        if (!Strings.CS.equals(newBaseElement.getPrettyName(), getPrettyName())) {
             setPrettyName(newBaseElement.getPrettyName());
             modified = true;
         }
@@ -622,5 +629,29 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public String toString()
     {
         return toXMLString(true);
+    }
+
+    /**
+     * Allow to load the owner document when it's not set and the document reference is provided.
+     * @return {@code true} if the owner document has been loaded, {@code false} otherwise.
+     * @since 18.1.0RC1
+     * @since 17.10.3
+     */
+    @Unstable
+    protected boolean loadOwnerDocument()
+    {
+        boolean result = false;
+        if (this.ownerDocument == null && this.documentReference != null) {
+            XWikiContext context = getXWikiContext();
+            try {
+                XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
+                setOwnerDocument(document);
+                result = true;
+            } catch (XWikiException e) {
+                LOGGER.error("Error while trying to load document [{}] as owner document of [{}]", documentReference,
+                    this);
+            }
+        }
+        return result;
     }
 }

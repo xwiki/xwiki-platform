@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=O wiki cujos documentos serão afetados pela açã
 solr.admin.indexing.wiki.select_farm=Toda a fazenda
 solr.admin.indexing.query.label=Requisição personalizada
 solr.admin.indexing.query.hint=Requisição opcional para limitar os documentos que serão afetados pela ação selecionada no índice.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 solr.admin.info.affectedDocuments=Documentos afetados no índice:
-solr.sortBy=Ordenado por\:
-solr.sortBy.score=Relevância
-solr.sortBy.title_sort=Título
-solr.sortBy.date=Data
-solr.sortBy.author_display_sort=Último autor
-solr.sortBy.filename_sort=Nome do Arquivo
-solr.sortBy.attsize_sort=Tamanho do Arquivo
-solr.sortBy.attdate_sort=Data de Envio
-solr.sortBy.attauthor_display_sort=Enviado por
-solr.sortOrder.asc=Ascendente
-solr.sortOrder.desc=Descendente
-solr.options=Mostrar\:
-solr.options.highlight=Destacar
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Exibir um extrato do que foi correspondido em cada resultado
-solr.options.facet=Facetas
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Permite aplicar mais filtros ao resultado
 solr.result.language=Linguagem
 solr.result.locatedIn=Localizado em
@@ -172,6 +172,18 @@ solr.result.location=Localizado em "{0}" &gt;&gt; "{1}" &gt;&gt; "{2}"
 
 ## until 7.2RC1
 solr.field.space=Espaço
+solr.sortBy=Ordenado por\:
+solr.sortBy.score=Relevância
+solr.sortBy.title_sort=Título
+solr.sortBy.date=Data
+solr.sortBy.author_display_sort=Último autor
+solr.sortBy.filename_sort=Nome do Arquivo
+solr.sortBy.attsize_sort=Tamanho do Arquivo
+solr.sortBy.attdate_sort=Data de Envio
+solr.sortBy.attauthor_display_sort=Enviado por
+solr.options=Mostrar\:
+solr.options.highlight=Destacar
+solr.options.facet=Facetas
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

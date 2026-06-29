@@ -45,10 +45,14 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
     private KeywordSearchSource keywordSearchSource;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public SearchResults search(String wikiName, String keywords, List<String> searchScopeStrings, Integer number,
         Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
             throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?%s",
             Utils.createURI(uriInfo.getBaseUri(), WikiSearchResource.class, wikiName).toString(),
@@ -64,7 +68,7 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
             .searchScopes(searchScopes)
             .wikiName(getXWikiContext().getWikiId())
             .space(null)
-            .number(number)
+            .number(limit)
             .start(start)
             .orderField(orderField)
             .order(order)

@@ -233,6 +233,7 @@ public class MacroDescriptorUIFactory
             }
             if (!children.isEmpty()) {
                 groupNode.setChildren(children.stream().map(AbstractMacroUINode::getKey).toList());
+                children.forEach(child -> child.setParent(groupNode.getKey()));
                 parametersMap.put(groupNode.getKey(), groupNode);
             }
         }
@@ -249,7 +250,7 @@ public class MacroDescriptorUIFactory
                     .setDisplayType(contentDescriptor.getType().getTypeName())
                     .setEditTemplate(CONTENT_TEMPLATE.trim())
                     .setName(getParameterTranslation("rendering.macroContent", "Content"))
-                    .setDescription(getParameterTranslation(macroTranslationKey + "content.description",
+                    .setDescription(getParameterTranslation(macroTranslationKey + ".content.description",
                         contentDescriptor.getDescription()))
                     .setMandatory(contentDescriptor.isMandatory())
                     .setOrder(contentDescriptor.getOrder());

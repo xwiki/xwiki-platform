@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.groovy.internal.DefaultGroovyConfiguration;
 import org.xwiki.groovy.internal.GroovyScriptEngineFactory;
+import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.logging.logback.internal.DefaultLoggerManager;
 import org.xwiki.logging.script.LoggingScriptService;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,6 +44,7 @@ import org.xwiki.rendering.internal.macro.box.DefaultBoxMacro;
 import org.xwiki.rendering.internal.macro.context.ContextMacro;
 import org.xwiki.rendering.internal.macro.context.ContextMacroDocument;
 import org.xwiki.rendering.internal.macro.groovy.GroovyMacro;
+import org.xwiki.rendering.internal.macro.message.InfoMessageMacro;
 import org.xwiki.rendering.internal.macro.script.PermissionCheckerListener;
 import org.xwiki.rendering.internal.macro.source.DefaultMacroWikiContentSourceFactory;
 import org.xwiki.rendering.internal.macro.toc.DefaultTocEntriesResolver;
@@ -50,7 +52,9 @@ import org.xwiki.rendering.internal.macro.toc.DefaultTocTreeBuilderFactory;
 import org.xwiki.rendering.internal.macro.toc.TocMacro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.repository.script.RepositoryScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
@@ -58,6 +62,7 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -95,6 +100,9 @@ import static org.mockito.Mockito.when;
     PermissionCheckerListener.class,
     TestNoScriptMacro.class,
     TocMacro.class,
+    InfoMessageMacro.class,
+    TemplateMacro.class,
+    TranslationMacro.class,
 })
 class ExtensionSheetPageTest extends PageTest
 {
@@ -114,6 +122,9 @@ class ExtensionSheetPageTest extends PageTest
 
     private static final DocumentReference EXTENSION_AUTHORS_DISPLAYER =
         new DocumentReference(WIKI_NAME, "ExtensionCode", "ExtensionAuthorsDisplayer");
+
+    private static final DocumentReference EXTENSION_PROXY_CLASS =
+        new DocumentReference(WIKI_NAME, "ExtensionCode", "ExtensionProxyClass");
 
     private static final DocumentReference TEST_PAGE =
         new DocumentReference(WIKI_NAME, "Test", "TestDocument");
@@ -189,6 +200,13 @@ class ExtensionSheetPageTest extends PageTest
         // Mock restricted contexts.
         when(this.groovyMacroPermissionPolicy.hasPermission(any(), any())).thenAnswer(i ->
             !((MacroTransformationContext) i.getArgument(1)).getTransformationContext().isRestricted());
+
+        // Mock repository script service
+        RepositoryScriptService repositoryScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "repository",
+                RepositoryScriptService.class, false);
+        when(repositoryScriptService.getVersionObject(any(), any())).thenReturn(new Object(extensionVersionObject,
+            null));
     }
 
     @Test
@@ -198,5 +216,30 @@ class ExtensionSheetPageTest extends PageTest
         // The only expectation is to not get any error log due to macro executions.
         Document document = renderHTMLPage(this.extensionSheetDocument);
         assertEquals(12, StringUtils.countMatches(document.text(), this.testString));
+    }
+
+    @Test
+    void checkProxyExtensionEscaping() throws Exception
+    {
+        // Set $hasEdit = true so the proxy extension info block is rendered
+        registerVelocityTool("hasEdit", true);
+
+        // Load the proxy class definition so it can be used to create objects
+        loadPage(EXTENSION_PROXY_CLASS);
+
+        // Add a proxy extension object with potentially content that can cause escaping issues.
+        BaseObject proxyObject = this.testPageDocument.newXObject(EXTENSION_PROXY_CLASS, this.context);
+        // testString contains ]] and wiki macros that would break link syntax if not escaped
+        proxyObject.setStringValue("repositoryId", this.testString);
+        // The ]] in this value would close the link early if repositoryURI is not escaped,
+        // causing "MARKER" to be injected as wiki text
+        proxyObject.setStringValue("repositoryURI", "http://example.com]]MARKER");
+
+        this.context.setDoc(this.testPageDocument);
+        Document document = renderHTMLPage(this.extensionSheetDocument);
+
+        assertEquals("repository.extension.sheet.imported %s".formatted(this.testString),
+            document.select("span.infomessage").text());
+        assertEquals("http://example.com]]MARKER", document.select("span.infomessage a").attr("href"));
     }
 }

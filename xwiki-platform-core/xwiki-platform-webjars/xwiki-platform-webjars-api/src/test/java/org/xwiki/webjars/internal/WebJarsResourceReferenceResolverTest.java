@@ -19,18 +19,16 @@
  */
 package org.xwiki.webjars.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.url.ExtendedURL;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link WebJarsResourceReferenceResolver}.
@@ -38,26 +36,26 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 7.1M1
  */
-public class WebJarsResourceReferenceResolverTest
+@ComponentTest
+class WebJarsResourceReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WebJarsResourceReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(WebJarsResourceReferenceResolver.class);
+    @InjectMockComponents
+    private WebJarsResourceReferenceResolver resolver;
 
     @Test
-    public void resolve() throws Exception
+    void resolve() throws Exception
     {
         Map<String, List<String>> parameters = new HashMap<>();
-        parameters.put("key1", Arrays.asList("value1"));
-        parameters.put("key2", Arrays.asList("value2", "value3"));
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("namespace", "one", "two"), parameters);
+        parameters.put("key1", List.of("value1"));
+        parameters.put("key2", List.of("value2", "value3"));
+        ExtendedURL extendedURL = new ExtendedURL(List.of("namespace", "one", "two"), parameters);
 
-        WebJarsResourceReference reference = this.mocker.getComponentUnderTest().resolve(extendedURL,
-            WebJarsResourceReference.TYPE, Collections.<String, Object>emptyMap());
+        WebJarsResourceReference reference = this.resolver.resolve(extendedURL,
+            WebJarsResourceReference.TYPE, Map.of());
 
         assertEquals("namespace", reference.getNamespace());
         assertEquals("one/two", reference.getResourceName());
         assertEquals("value1", reference.getParameterValue("key1"));
-        assertEquals(Arrays.asList("value2", "value3"), reference.getParameterValues("key2"));
+        assertEquals(List.of("value2", "value3"), reference.getParameterValues("key2"));
     }
 }

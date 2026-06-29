@@ -398,8 +398,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     private Deque<SecurityRuleEntry> getRules(SecurityReference entity)
         throws AuthorizationException
     {
-        Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
-        List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
+        Deque<SecurityRuleEntry> rules = new LinkedList<>();
+        List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<>();
         long invalidationCounter = getSecurityCache().getInvalidationCounter();
 
         for (SecurityReference ref : entity.getReversedSecurityReferenceChain()) {

@@ -123,7 +123,7 @@
           // We use the source document to compute the feed URL because we want the suggested link references to be
           // relative to the edited document (we want the editor to output relative references as much as possible).
           $.getJSON(editor.config.sourceDocument.getURL('get', $.param({
-            sheet: 'CKEditor.LinkSuggestions',
+            sheet: 'XWiki.WYSIWYG.LinkSuggestions',
             outputSyntax: 'plain',
             language: XWiki.locale,
             input: opts.query
@@ -163,76 +163,38 @@
         outputTemplate: function (item) {
           // Upload a new attachment.
           if (item.id === "_uploadAttachment") {
-
-            // Reuse attachment suggest code to show the file picker.
-            // Provides xwiki-attachments-store and xwiki-file-picker.
-            const requiredSkinExtensions = `<script src=` +
-              `'${XWiki.contextPath}/${XWiki.servletpath}` +
-              `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
-              `defer='defer'></script>`;
-            $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-
-            require([
-              'xwiki-attachments-store',
-              'xwiki-file-picker',
-              'resource'
-            ], function (attachmentsStore, filePicker, resource) {
-              const convertFilesToAttachments = function (files, documentReference) {
-                const attachments = [];
-                for (var i = 0; i < files.length; i++) {
-                  const file = files.item(i);
-                  const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-                    documentReference);
-                  attachments.push(attachmentsStore.create(attachmentReference, file));
-                }
-                return attachments;
-              };
-
+            require(['xwiki-file-picker'], function(filePicker) {
               // Open the file picker
               filePicker.pickLocalFiles({
                 accept: "*",
                 multiple: false
               }).then(function (files) {
-                const attachments = convertFilesToAttachments(
-                  files,
-                  editor.config.sourceDocument.documentReference
-                );
-
-                // Cancel the insertion when no file is picked.
-                if (attachments.length === 0) {
-                  return;
+                if (files.length) {
+                  // Disable the upload image widget temporarily because even if the selected file is an image, we want
+                  // to insert a link to the uploaded image attachment.
+                  const uploadImageWidgetDef = editor.widgets.registered.uploadimage;
+                  if (uploadImageWidgetDef) {
+                    uploadImageWidgetDef._supportedTypes = uploadImageWidgetDef.supportedTypes;
+                    // Use a regular expression that doesn't match any file type.
+                    uploadImageWidgetDef.supportedTypes = /\b\B/;
+                  }
+                  try {
+                    // Simulate a paste event, as if the selected files were pasted in the editor.
+                    editor.fire('paste', {
+                      method: 'paste',
+                      dataValue: '',
+                      dataTransfer: new CKEDITOR.plugins.clipboard.dataTransfer({
+                        files,
+                        types: ['Files'],
+                      })
+                    });
+                  } finally {
+                    if (uploadImageWidgetDef) {
+                      // Restore the supported image types configuration.
+                      uploadImageWidgetDef.supportedTypes = uploadImageWidgetDef._supportedTypes;
+                    }
+                  }
                 }
-
-                const attachment = attachments[0];
-                const resourceReference = resource.convertEntityReferenceToResourceReference(
-                  XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT),
-                  editor.config.sourceDocument.documentReference);
-
-                // Insert the link immediately after closing the file picker.
-                editor.insertHtml($('<a></a>').attr({
-                    href: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor),
-                    'data-reference': CKEDITOR.plugins.xwikiResource.serializeResourceReference(resourceReference)
-                  }).text(attachment.name).prop('outerHTML'));
-
-                const notification = new XWiki.widgets.Notification(
-                  editor.localization.get('xwiki-link.uploadProgress', attachment.name),
-                  'inprogress');
-
-                // Upload the selected attachment
-                const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
-                attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
-                  notification.replace(
-                    new XWiki.widgets.Notification(
-                      editor.localization.get('xwiki-link.uploadSuccess', attachment.name),
-                      'done')
-                  );
-                }).catch(() => {
-                  notification.replace(
-                    new XWiki.widgets.Notification(
-                      editor.localization.get('xwiki-link.uploadError', attachment.name),
-                      'error')
-                  );
-                });
               });
             });
 
@@ -405,9 +367,11 @@
         return data.resourceReference;
       },
       setup: function(data) {
-        // Create a link to a new page if the resource reference is not provided.
-        var resourceReference = data.resourceReference || this.getDefaultResourceReference();
-        if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
+        let resourceReference = data.resourceReference;
+        if (!resourceReference) {
+          // We're probably creating a new link so there's no resource to preselect.
+          return;
+        } else if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
             this.resourceTypes.indexOf('doc') >= 0) {
           // Convert the space resource reference to a document resource reference.
           resourceReference = {
@@ -460,20 +424,6 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
-      },
-      getDefaultResourceReference: function() {
-        // Compute the default reference by cleaning up the link label.
-        // Fall-back on the empty string if there's no text selection (e.g. if an image is selected).
-        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
-        // Normalize the white space.
-        var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
-        return {
-          type: this.resourceTypes[0],
-          reference: defaultReference,
-          // Make sure the picker doesn't try to resolve the link label as a resource reference.
-          isNew: true,
-          isInitialValue: true
-        };
       }
     });
   };
@@ -671,9 +621,8 @@
       },
       // We use this as a fall-back when the request for the wiki generated link content fails.
       getResourceLabel: function(resource) {
-        return (resource && resource.title) ||
-          (resource && resource.entityReference && resource.entityReference.name) ||
-          (resource && resource.reference && resource.reference.reference) ||
+        return resource?.labelWhenSelected || resource?.label ||
+          resource?.entityReference?.name || resource?.reference?.reference ||
           this.getDialog().getParentEditor().localization.get('xwiki-link.defaultLabel');
       },
       maybeGetWikiGeneratedLinkContent: function(resource) {
@@ -688,7 +637,7 @@
       getWikiGeneratedLinkContent: function(resource) {
         var sendRequest = (function() {
           this.getDialog().setState(CKEDITOR.DIALOG_STATE_BUSY);
-          var resourceReference = (resource && resource.reference) || {};
+          var resourceReference = resource?.reference || {};
           var config = this.getDialog().getParentEditor().config['xwiki-link'] || {};
           return $.get(config.labelGenerator, resourceReference).then(function(html) {
             // Extract the wiki generated link content from the HTML.

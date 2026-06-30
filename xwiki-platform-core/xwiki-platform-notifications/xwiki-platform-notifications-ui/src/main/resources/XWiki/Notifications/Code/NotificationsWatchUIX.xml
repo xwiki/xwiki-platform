@@ -830,7 +830,7 @@
       <name>org.xwiki.platform.notification.watchModal</name>
     </property>
     <property>
-      <parameters></parameters>
+      <parameters>order=1000</parameters>
     </property>
     <property>
       <scope>wiki</scope>

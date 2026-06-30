@@ -103,21 +103,18 @@ editors.AutoSave = Class.create({
     });
     // Labels
     let autosaveLabel = new Element('label', {'class': 'autosave'});
-    autosaveLabel.appendChild(this.autosaveCheckbox);
-    autosaveLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave'))"));
+    autosaveLabel.append(this.autosaveCheckbox,
+      "$escapetool.javascript($services.localization.render('core.edit.autosave'))");
     let frequencyLabel = new Element('label', {'class': 'frequency'});
-    frequencyLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave.frequency.label'))"));
-    frequencyLabel.appendChild(this.autosaveInput);
+    frequencyLabel.append("$escapetool.javascript($services.localization.render('core.edit.autosave.frequency.label'))",
+      this.autosaveInput);
     // A paragraph containing the whole thing
     let container = new Element('div', {"id": "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
     if (!this.options.enabled) {
       container.addClassName(this.classNameAutosaveDisabled);
     }
-    container.appendChild(autosaveLabel);
-    container.appendChild(document.createTextNode(" "));
-    container.appendChild(frequencyLabel);
-    container.appendChild(document.createTextNode(" "));
+    container.append(autosaveLabel, " ", frequencyLabel, " ");
     // Insert in the editing UI
     this.form.down('.buttons').insert(container);
   },

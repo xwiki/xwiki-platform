@@ -23,7 +23,7 @@
 #if ($services.debug.isEnabled())
 #template('debug.vm')
 #end
-<div class="modal-container">
+<div class="end-of-dom-container">
 #if (($displayAdminMenu || $displayMoreActionsMenu) && $canView)
   #template("export_modal.vm")
   #exportModal()

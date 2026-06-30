@@ -2014,7 +2014,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-e
     // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
     if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
       const annotation = new XWiki.Annotation(displayHighlight, wikiContent, displayed);
-      const annotatePopup = new AnnotatePopup(wikiContent, annotation.onAddAnnotationShortcut.bind(annotation));
+      new AnnotatePopup(wikiContent, annotation.onAddAnnotationShortcut.bind(annotation));
     }
   });
 });</code>

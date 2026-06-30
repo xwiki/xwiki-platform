@@ -144,15 +144,15 @@ const Constants = Object.freeze({
    */
   ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
   /**
-   * The debounce delay added to the selectionchange listener
+   * The debounce delay in milliseconds added to the "selectionchange" event listener
    * @type {number}
    */
-  DEBOUNCE_SELECT_MS: 515,
+  DEBOUNCE_SELECTIONCHANGE_MS: 515,
   /**
-   * The debounce delay added to the resize listener
+   * The debounce delay in milliseconds added to the "resize" event listener
    * @type {number}
    */
-  DEBOUNCE_VIEWPORT_MS: 75,
+  DEBOUNCE_RESIZE_MS: 75,
   /**
    * The CSS class that needs to be added to show the popup
    * @type {string}
@@ -249,11 +249,11 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       this.openAnnotationBubble = openAnnotationBubble;
 
       // Bind handlers to the class instance because event listeners call the function with a different "this"
-      this._onSelectionDebounced = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECT_MS);
+      this._onSelectionDebounced = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECTIONCHANGE_MS);
       this._onButtonClick = this._onButtonClick.bind(this);
       this._onEscapeKey = this._onEscapeKey.bind(this);
       this._onClickAway = this._onClickAway.bind(this);
-      this._onViewportChangeDebounced = debounce(this._onViewportChange.bind(this), Constants.DEBOUNCE_VIEWPORT_MS);
+      this._onViewportChangeDebounced = debounce(this._onViewportChange.bind(this), Constants.DEBOUNCE_RESIZE_MS);
 
       this._create();
       this._registerListeners();
@@ -398,7 +398,7 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
       }
     }
 
-    /*
+    /**
      * Event handler for a page click (popup click away listener)
      * @param {PointerEvent} event
      */

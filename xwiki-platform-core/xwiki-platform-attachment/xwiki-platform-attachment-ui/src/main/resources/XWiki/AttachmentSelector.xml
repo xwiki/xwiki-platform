@@ -793,8 +793,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       let url = null;
       if (targetElement.tagName === "a") {
         url = targetElement.href;
-      }
-      else {
+      } else {
         url = targetElement.dataset.modalUrl;
       }
       if (url.indexOf('?') &lt; 0) {
@@ -1620,13 +1619,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #end
     #set ($linkLabel = $escapetool.xml($buttontext))
     #set ($modalUrl = $escapetool.xml("$xcontext.macro.doc.URL?$escapetool.url($queryString)"))
-    (% class="buttonwrapper" %)##
-      {{html clean="false"}}
-        &lt;button class="attachment-picker-start button" 
-        title="$!{linkLabel}" 
-        data-modal-url="${modalUrl}"&gt;$!linkLabel
-        &lt;/button&gt;
-      {{/html}}(%%)##
+    {{html clean="false"}}&lt;span class="buttonwrapper"&gt;&lt;button type="button" class="attachment-picker-start button" title="$!{linkLabel}" data-modal-url="${modalUrl}"&gt;$!linkLabel&lt;/button&gt;&lt;/span&gt;{{/html}}##
   #end
 #end
 {{/velocity}}

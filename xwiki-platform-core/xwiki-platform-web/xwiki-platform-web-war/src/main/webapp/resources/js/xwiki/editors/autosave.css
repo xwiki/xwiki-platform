@@ -3,16 +3,16 @@
   white-space: nowrap;
 }
 
-#autosaveControl .interval {
+#autosaveControl .frequency {
   display: none;
   margin-left: 2em;
   
-  & .autosave-interval {
+  & .autosave-frequency {
     width: 3em;
     margin-left: 1em;
   }
 }
 
-#autosaveControl .autosave:has(input:checked) + .interval {
+#autosaveControl .autosave:has(input:checked) + .frequency {
   display: inline-block;
 }

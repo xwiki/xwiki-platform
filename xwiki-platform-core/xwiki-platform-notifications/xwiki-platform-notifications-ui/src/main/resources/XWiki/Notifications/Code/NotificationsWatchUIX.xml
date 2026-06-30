@@ -711,7 +711,7 @@
 #set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation','')")
 #set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world','wiki-option')")
 {{html clean='false'}}
-&lt;dialog class="modal fade" id="watchModal"&gt;
+&lt;dialog class="modal fade" id="watchModal" aria-labelledby="watchModalLabel"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
@@ -719,7 +719,7 @@
           &lt;span aria-hidden="true"&gt;
             $services.icon.renderHTML('cross')
           &lt;/span&gt;&lt;/button&gt;
-        &lt;div class="modal-title"&gt;
+        &lt;div class="modal-title" id="watchModalLabel"&gt;
           &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $services.localization.render("notifications.watch.modal.title.$watchedStatus", 'html/5.0', [])
         &lt;/div&gt;
       &lt;/div&gt;

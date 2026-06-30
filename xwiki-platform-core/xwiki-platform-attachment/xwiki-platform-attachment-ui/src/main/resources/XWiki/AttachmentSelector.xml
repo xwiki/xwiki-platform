@@ -789,13 +789,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
   document.observe('xwiki:dom:loaded', function() {
     $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
       event.stop();
-      var targetElement = event.element();
-      let url = null;
-      if (targetElement.tagName === "a") {
-        url = targetElement.href;
-      } else {
-        url = targetElement.dataset.modalUrl;
-      }
+      const targetElement = event.target.closest('.attachment-picker-start');
+      let url = targetElement.dataset.modalUrl;
       if (url.indexOf('?') &lt; 0) {
         url += '?';
       }

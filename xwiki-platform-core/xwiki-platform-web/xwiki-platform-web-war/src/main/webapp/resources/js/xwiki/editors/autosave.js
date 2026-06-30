@@ -95,7 +95,7 @@ editors.AutoSave = Class.create({
       id: "doAutosave"
     });
     // Input for setting the autosave frequency
-    this.autosaveFrequencyInput = new Element('input', {
+    this.autosaveInput = new Element('input', {
       type: "text",
       value: this.options.frequency,
       size: "2",
@@ -107,7 +107,7 @@ editors.AutoSave = Class.create({
     autosaveLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave'))"));
     let frequencyLabel = new Element('label', {'class': 'frequency'});
     frequencyLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave.frequency.label'))"));
-    frequencyLabel.appendChild(this.autosaveFrequencyInput);
+    frequencyLabel.appendChild(this.autosaveInput);
     // A paragraph containing the whole thing
     let container = new Element('div', {"id": "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
@@ -134,7 +134,7 @@ editors.AutoSave = Class.create({
       }
     };
     ["keydown", "keyup", "keypress"].each(function(eventName) {
-      this.autosaveFrequencyInput.observe(eventName, preventSubmit);
+      this.autosaveInput.observe(eventName, preventSubmit);
       this.autosaveCheckbox.observe(eventName, preventSubmit);
     }.bind(this));
 
@@ -144,9 +144,9 @@ editors.AutoSave = Class.create({
     }.bindAsEventListener(this));
 
     // Set autosave frequency
-    Event.observe(this.autosaveFrequencyInput, "blur", function() {
+    Event.observe(this.autosaveInput, "blur", function() {
       // is the given value valid?
-      let newFrequency = Number(this.autosaveFrequencyInput.value);
+      let newFrequency = Number(this.autosaveInput.value);
       if (newFrequency > 0) {
         // yes: memorize it
         this.options.frequency = newFrequency;
@@ -154,7 +154,7 @@ editors.AutoSave = Class.create({
         this.startTimer();
       } else {
         // no: restore the previous value in the input
-        this.autosaveFrequencyInput.value = this.options.frequency;
+        this.autosaveInput.value = this.options.frequency;
       }
     }.bindAsEventListener(this));
 
@@ -189,13 +189,13 @@ editors.AutoSave = Class.create({
     }
     if (this.options.enabled) {
       this.startTimer();
-      if (this.autosaveFrequencyInput) {
-        this.autosaveFrequencyInput.up(1).removeClassName(this.classNameAutosaveDisabled);
+      if (this.autosaveInput) {
+        this.autosaveInput.up(1).removeClassName(this.classNameAutosaveDisabled);
       }
     } else {
       this.stopTimer();
-      if (this.autosaveFrequencyInput) {
-        this.autosaveFrequencyInput.up(1).addClassName(this.classNameAutosaveDisabled);
+      if (this.autosaveInput) {
+        this.autosaveInput.up(1).addClassName(this.classNameAutosaveDisabled);
       }
     }
   },

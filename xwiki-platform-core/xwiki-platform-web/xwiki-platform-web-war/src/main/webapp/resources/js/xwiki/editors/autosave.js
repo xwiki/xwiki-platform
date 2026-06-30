@@ -31,7 +31,7 @@ editors.AutoSave = Class.create({
     /** Is the autosave enabled ? */
     enabled: false,
     /** If enabled, how frequent are the savings */
-    interval: 5, // minutes
+    frequency: 5, // minutes
     /** Is the UI for configuring the autosave enabled or not? */
     showConfigurationUI: true,
     /**
@@ -97,7 +97,7 @@ editors.AutoSave = Class.create({
     // Input for setting the autosave interval
     this.autosaveIntervalInput = new Element('input', {
       type: "text",
-      value: this.options.interval,
+      value: this.options.frequency,
       size: "2",
       "class": "autosave-interval"
     });
@@ -149,12 +149,12 @@ editors.AutoSave = Class.create({
       let newInterval = Number(this.autosaveIntervalInput.value);
       if (newInterval > 0) {
         // yes: memorize it
-        this.options.interval = newInterval;
+        this.options.frequency = newInterval;
         // reset autosave loop
         this.startTimer();
       } else {
         // no: restore the previous value in the input
-        this.autosaveIntervalInput.value = this.options.interval;
+        this.autosaveIntervalInput.value = this.options.frequency;
       }
     }.bindAsEventListener(this));
 
@@ -202,13 +202,13 @@ editors.AutoSave = Class.create({
 
   /**
    * Start autosave timer when the autosave is enabled.
-   * Every (this.options.interval * 60) seconds, the callback function doAutosave is called.
+   * Every (this.options.frequency * 60) seconds, the callback function doAutosave is called.
    */
   startTimer : function() {
     // Make sure we stop the existing timer.
     this.stopTimer();
     this.timer = new PeriodicalExecuter(this.doAutosave.bind(this),
-      this.options.interval * 60 /* seconds in a minute */);
+      this.options.frequency * 60 /* seconds in a minute */);
   },
 
   /**

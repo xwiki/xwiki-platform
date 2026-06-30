@@ -249,7 +249,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         CallableEntryExecutor(int poolSize)
         {
-            super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+            super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
             setThreadFactory(this);
         }

@@ -101,7 +101,7 @@ public class XWikiInjectionManager implements InjectionManager, Initializable
             try {
                 T component = this.componentManager.getInstance(XWikiRestComponent.class, contractOrImpl.getName());
 
-                // In a more standard setup of Jersey, the JAX-RS injection is done at the same time than the JSR-330
+                // In a more standard setup of Jersey, the JAX-RS injection is done at the same time as the JSR-330
                 // injection.
                 // Problem is that for XWiki components we want to use XWiki component manager and not JSR-330 component
                 // manager so we have to take care of the few field injection in the JAX-RS specification.

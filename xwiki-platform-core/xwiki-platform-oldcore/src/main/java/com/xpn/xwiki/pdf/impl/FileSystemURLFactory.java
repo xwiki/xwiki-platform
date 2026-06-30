@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -155,7 +156,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             File file = getTemporaryFile(key, context);
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
-                StringUtils.defaultString(wiki, context.getWikiId()), spaceNames, name), context);
+                Objects.toString(wiki, context.getWikiId()), spaceNames, name), context);
 
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (attachment == null) {
@@ -171,7 +172,9 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             }
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
-                IOUtils.copy(attachment.getContentInputStream(context), fos);
+                try (InputStream content = attachment.getContentInputStream(context)) {
+                    IOUtils.copy(content, fos);
+                }
             }
             usedFiles.put(key, file);
         }

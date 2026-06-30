@@ -64,6 +64,7 @@ import org.xwiki.rendering.test.integration.junit5.BlockAssert;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DefaultAuthorizationManager;
@@ -134,7 +135,7 @@ class DisplayMacroTest
     private PrintRendererFactory rendererFactory;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         MemoryConfigurationSource memoryConfigurationSource = new MemoryConfigurationSource();
         this.componentManager.registerComponent(ConfigurationSource.class, memoryConfigurationSource);
@@ -154,6 +155,11 @@ class DisplayMacroTest
         when(this.contextualAuthorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
         // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
         this.componentManager.registerMockComponent(WikiModel.class);
+
+        // The default TransformationManager implementation depends on the AuthorExecutor component but it doesn't use
+        // it unless a specific TransformationContext is used, which is not the case here. So we just register a mock
+        // AuthorExecutor to satisfy the dependency.
+        this.componentManager.registerMockComponent(AuthorExecutor.class);
     }
 
     @Test

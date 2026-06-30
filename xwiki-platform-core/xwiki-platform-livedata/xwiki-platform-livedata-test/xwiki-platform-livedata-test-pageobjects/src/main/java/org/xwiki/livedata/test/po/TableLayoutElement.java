@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.hamcrest.Description;
@@ -40,6 +41,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,6 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
-import org.xwiki.text.StringUtils;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -72,8 +73,6 @@ public class TableLayoutElement extends BaseElement
     public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
 
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
-
-    private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     private final LiveDataElement liveData;
 
@@ -134,7 +133,7 @@ public class TableLayoutElement extends BaseElement
             URIBuilder uriBuilder = new URIBuilder(initialUri);
             List<String> pathSegments = uriBuilder.getPathSegments();
             URI uri;
-            if (pathSegments.get(pathSegments.size() - 1).equals("")) {
+            if ("".equals(pathSegments.getLast())) {
                 pathSegments.remove(pathSegments.size() - 1);
                 try {
                     uri = uriBuilder.setPathSegments(pathSegments).build();
@@ -176,7 +175,7 @@ public class TableLayoutElement extends BaseElement
         @Override
         protected boolean matchesSafely(WebElement item)
         {
-            return item.getText().equals(this.value);
+            return this.value.equals(item.getText());
         }
 
         @Override
@@ -459,11 +458,11 @@ public class TableLayoutElement extends BaseElement
             }
 
             // Cells are displayed. And they are loaded.
-            if (isEmpty() || !areCellsLoaded()) {
+            if ((expectedRowCount > 0 && isEmpty()) || !areCellsLoaded()) {
                 return false;
             }
 
-            // And the count of row is greater than the expected count.
+            // And the count of row is equal to the expected count.
             int count = countRows();
             LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
             return count == expectedRowCount;
@@ -517,48 +516,82 @@ public class TableLayoutElement extends BaseElement
         WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
-        if (classes.contains("filter-list")) {
-            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
-                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                // Wait for the suggestions on selectize fields only if this is explicitly asked.
-                suggestInputElement.clearSelectedSuggestions().sendKeys(content);
-                if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
-                    suggestInputElement.waitForSuggestions().selectByVisibleText(content);
-                } else {
-                    suggestInputElement.selectTypedText();
-                }
-            } else {
-                new Select(element).selectByVisibleText(content);
-            }
-        } else if (classes.contains("filter-text")) {
-            element.clear();
-            if (content.isEmpty()) {
-                // Make sure we generate some actual key events so LD notices the empty filter.
-                element.sendKeys(" ", Keys.BACK_SPACE);
-            } else {
-                element.sendKeys(content);
-            }
-            try {
-                // Wait for the duration of the debounce, to make sure the text filtering process is started before
-                // continuing.
-                Thread.sleep(250);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        } else if (classes.contains("filter-date")) {
-            element.click();
-            DateRangePicker picker = new DateRangePicker(element);
-            if (StringUtils.isNotBlank(content)) {
-                element.clear();
-                element.sendKeys(content);
-                picker.applyRange();
-            } else {
-                picker.clearRange();
-            }
+        String filterType = classes.stream().filter(it -> it.startsWith("filter-")).findFirst()
+            .orElseThrow(() -> new IllegalStateException("No filter type found for column: " + columnLabel));
+        switch (filterType) {
+            case "filter-list" -> filterListColumn(content, options, element);
+            case "filter-text" -> filterTextColumn(content, element);
+            case "filter-date" -> filterDateColumn(content, element);
+            case "filter-boolean" -> filterBooleanColumn(content, element);
+            default -> throw new IllegalStateException("Unsupported filter type: " + filterType);
         }
 
         if (wait) {
             waitUntilReady();
+        }
+    }
+
+    private void filterListColumn(String content, Map<String, Object> options, WebElement filterElement)
+    {
+        SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
+        // Wait for the suggestions on selectize fields only if this is explicitly asked.
+        suggestInputElement.click().waitForSuggestions().clearSelectedSuggestions().sendKeys(content);
+        if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+            suggestInputElement.waitForSuggestions().selectByVisibleText(content);
+        } else {
+            suggestInputElement.selectTypedText();
+        }
+        // Sometimes, when the suggest input is focused, we need to click twice to perform an action (e.g. sort on a
+        // given column, open the "More actions" dropdown menu). The first click moves the focus to the new target (i.e.
+        // document.activeElement is updated) but the action is not performed until the second click. We couldn't
+        // reproduce this outside tests, and it doesn't reproduce for any suggest input filter in tests either, so we
+        // don't know if this is a Tom Select bug or some issue in Selenium / WebDriver, or a mix of both. The
+        // workaround is to blur the suggest input after selecting a value.
+        getDriver().executeScript("document.activeElement?.blur()");
+    }
+
+    private static void filterBooleanColumn(String content, WebElement filterElement)
+    {
+        SuggestInputElement suggestInputElement = new SuggestInputElement(filterElement);
+        if (StringUtils.isEmpty(content)) {
+            // Clear the boolean filter.
+            suggestInputElement.clearSelectedSuggestions().hideSuggestions();
+        } else {
+            suggestInputElement.clear().sendKeys(content);
+            // The boolean filter doesn't need a remote source, so we don't need to wait for suggestions to be fetched.
+            suggestInputElement.waitForNonTypedSuggestions(false);
+            suggestInputElement.selectByVisibleText(content);
+        }
+    }
+
+    private static void filterTextColumn(String content, WebElement filterElement)
+    {
+        filterElement.clear();
+        if (content.isEmpty()) {
+            // Make sure we generate some actual key events so LD notices the empty filter.
+            filterElement.sendKeys(" ", Keys.BACK_SPACE);
+        } else {
+            filterElement.sendKeys(content);
+        }
+        try {
+            // Wait for the duration of the debounce, to make sure the text filtering process is started before
+            // continuing.
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void filterDateColumn(String content, WebElement element)
+    {
+        element.click();
+        DateRangePicker picker = new DateRangePicker(element);
+        if (StringUtils.isNotBlank(content)) {
+            element.clear();
+            element.sendKeys(content);
+            picker.applyRange();
+        } else {
+            picker.clearRange();
         }
     }
 
@@ -597,18 +630,18 @@ public class TableLayoutElement extends BaseElement
         List<String> classes = Arrays.asList(getClasses(element));
         List<String> ret;
         if (classes.contains("filter-list")) {
-            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+            if (StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).contains("tomselected")) {
                 ret = new SuggestInputElement(element)
                     .getSelectedSuggestions()
                     .stream()
                     .map(SuggestInputElement.SuggestionElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
             } else {
                 ret = new Select(element)
                     .getAllSelectedOptions()
                     .stream()
                     .map(WebElement::getText)
-                    .collect(Collectors.toList());
+                    .toList();
             }
         } else if (classes.contains("filter-text")) {
             ret = singletonList(element.getText());
@@ -759,7 +792,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding document or XClass
+     * property
      * @param newValue the new value of the field
      */
     public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
@@ -772,7 +806,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding document or XClass
+     * property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @since 13.5RC1
      * @since 13.4.1
@@ -876,7 +911,7 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement getDropDownButton()
     {
-        return getRoot().findElement(By.cssSelector("a.dropdown-toggle"));
+        return getRoot().findElement(By.cssSelector("button.dropdown-toggle"));
     }
 
     /**
@@ -936,7 +971,7 @@ public class TableLayoutElement extends BaseElement
         return getRoot().findElements(By.cssSelector(".column-name .property-name"))
             .stream()
             .map(WebElement::getText)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private WebElement getRoot()
@@ -949,7 +984,7 @@ public class TableLayoutElement extends BaseElement
         List<WebElement> elements = getRoot().findElements(By.cssSelector("thead tr th .property-name"));
         int index = -1;
         for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).getText().equals(columnLabel)) {
+            if (columnLabel.equals(elements.get(i).getText())) {
                 index = i + 1;
                 break;
             }
@@ -968,7 +1003,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
-     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param fieldName the name of the field to edit, in other words, the name of the corresponding XClass or document
+     * property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @param save if the edit shall be saved (if false, the edit is cancelled)
      */
@@ -988,7 +1024,17 @@ public class TableLayoutElement extends BaseElement
         element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
 
         // Selector of the edited field.
-        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        By selector;
+        // Document properties don't have a name attribute on their input, so we need to handle them differently.
+        // When we should have different editable properties in XWiki standard, we should generalize this to also
+        // support other types of properties that don't start with "doc.".
+        if (fieldName.startsWith("doc.")) {
+            // At the moment, all included displayers in LiveData except for XObject properties use an input without a
+            // name attribute.
+            selector = By.cssSelector("input");
+        } else {
+            selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        }
 
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
@@ -1012,11 +1058,12 @@ public class TableLayoutElement extends BaseElement
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
         }
 
-        // Waits for the field to disappear.
-        getDriver().waitUntilCondition(input -> {
-            // The edited field is not displayed anymore.
-            return element.findElements(selector).isEmpty();
-        });
+        // Wait for...
+        getDriver().waitUntilCondition(ExpectedConditions.or(
+            // ...either the cell to become stale (which can happen if the new value doesn't match the current filters)
+            ExpectedConditions.stalenessOf(element),
+            // ...or the edit field to disappear.
+            ExpectedConditions.not(ExpectedConditions.presenceOfNestedElementLocatedBy(element, selector))));
 
         // Wait for reload after saving.
         if (save) {
@@ -1026,7 +1073,7 @@ public class TableLayoutElement extends BaseElement
 
     private String[] getClasses(WebElement element)
     {
-        return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
+        return StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).split("\\s+");
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)
@@ -1046,7 +1093,7 @@ public class TableLayoutElement extends BaseElement
         URIBuilder uriBuilder = new URIBuilder(initialUri);
         List<NameValuePair> cleanedUpParams = uriBuilder.getQueryParams().stream()
             .filter(it -> !Objects.equals(it.getName(), "form_token"))
-            .collect(Collectors.toList());
+            .toList();
         uriBuilder.setParameters(cleanedUpParams);
         URI uri;
         try {

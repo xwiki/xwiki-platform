@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -113,7 +112,6 @@ public interface XWikiVersioningStoreInterface
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     default Collection<Version> getXWikiDocVersions(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {
@@ -132,7 +130,6 @@ public interface XWikiVersioningStoreInterface
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     default long getXWikiDocVersionsCount(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {

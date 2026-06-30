@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiAttachmentsResourceImpl}.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -62,7 +62,7 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
         setUriInfo(this.wikiAttachmentsResource);
@@ -89,8 +89,8 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(forbiddenAttachment.getReference()).thenReturn(forbiddenAttachmentReference);
         when(this.authorization.hasAccess(Right.VIEW, forbiddenAttachmentReference)).thenReturn(false);
 
-        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment},
-            new Object[] {"Path.To", "ForbiddenPage", "1.3", forbiddenAttachment});
+        List<Object> results = Arrays.asList(new Object[] { "Path.To", "Page", "1.3", xwikiAttachment },
+            new Object[] { "Path.To", "ForbiddenPage", "1.3", forbiddenAttachment });
         when(query.execute()).thenReturn(results);
 
         when(this.defaultSpaceReferenceResover.resolve(eq("Path.To"), any()))

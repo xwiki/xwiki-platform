@@ -63,7 +63,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public WebElement getJobLogLabel()
     {
-        String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/label";
+        String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/button";
         return getDriver().findElementWithoutWaiting(container, By.xpath(xpath));
     }
 

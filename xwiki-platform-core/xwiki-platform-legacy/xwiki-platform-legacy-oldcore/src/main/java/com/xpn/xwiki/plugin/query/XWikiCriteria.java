@@ -30,7 +30,7 @@ import com.xpn.xwiki.util.Util;
 @Deprecated
 public class XWikiCriteria
 {
-    protected Map<String, Object> params = new HashMap<String, Object>();
+    protected Map<String, Object> params = new HashMap<>();
 
     public Object getParameter(String field)
     {
@@ -49,11 +49,11 @@ public class XWikiCriteria
 
     public Set<String> getClasses()
     {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (Iterator<String> it = params.keySet().iterator(); it.hasNext();) {
             String key = it.next();
             String objname = key.substring(0, key.indexOf('_'));
-            if ((!objname.equals("") && (!objname.equals("doc"))))
+            if ((!"".equals(objname) && (!"doc".equals(objname))))
                 set.add(objname);
         }
         return set;

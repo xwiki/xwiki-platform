@@ -144,7 +144,6 @@ require([
   'xwiki-l10n!xwiki-panels-navigation-config-messages',
   'xwiki-meta',
   'jquery-ui',
-  'jquery-ui-touch-punch',
   'xwiki-events-bridge'
 ], function($, l10n, xwikiMeta) {
   const $navigationTree = $('.navigationPanelConfiguration .xtree');

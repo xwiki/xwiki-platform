@@ -2,7 +2,6 @@ paths: {
   jquery: '/webjars/jquery.min',
 
   bootstrap: '/webjars/bootstrap',
-  'bootstrap3-typeahead': '/webjars/bootstrap3-typeahead.min',
 
   // Tree
   jsTree: '/webjars/jstree',
@@ -26,17 +25,17 @@ paths: {
   'xwiki-resource': 'xwiki-resource/plugin',
   'xwiki-table': 'xwiki-table/plugin',
 
-  resource: 'xwiki-resource/resource',
-  'resourcePicker.bundle': 'xwiki-resource/resourcePicker',
-  entityResourcePicker: 'xwiki-resource/entityResourcePicker',
-  entityResourceSuggester: 'xwiki-resource/entityResourceSuggester',
-  entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
   l10n: 'xwiki-localization/l10n',
-  modal: 'xwiki-dialog/modal',
 
-  macroService: 'xwiki-macro/macroService',
-  macroSelector: 'xwiki-macro/macroSelector',
-  macroSelectorTranslationKeys: 'xwiki-macro/macroSelector',
+  'xwiki-wysiwyg-resource': '/webjars/xwiki-platform-wysiwyg-webjar/resource/resource',
+  'xwiki-wysiwyg-resource-picker-bundle': '/webjars/xwiki-platform-wysiwyg-webjar/resource/resourcePicker',
+  'xwiki-wysiwyg-entity-resource-picker': '/webjars/xwiki-platform-wysiwyg-webjar/resource/entityResourcePicker',
+  'xwiki-wysiwyg-entity-resource-suggester': '/webjars/xwiki-platform-wysiwyg-webjar/resource/entityResourceSuggester',
+  'xwiki-wysiwyg-modal': '/webjars/xwiki-platform-wysiwyg-webjar/modal/modal',
+
+  'xwiki-wysiwyg-macro-service': '/webjars/xwiki-platform-wysiwyg-webjar/macro/macroService',
+  'xwiki-wysiwyg-macro-selector': '/webjars/xwiki-platform-wysiwyg-webjar/macro/macroSelector',
+  'xwiki-wysiwyg-macro-selector-translation-keys': '/webjars/xwiki-platform-wysiwyg-webjar/macro/macroSelector',
 
   textSelection: 'xwiki-selection/plugin',
   scrollUtils: 'xwiki-selection/plugin'
@@ -53,7 +52,12 @@ shim: {
   'xwiki-localization': ['ckeditor'],
   'xwiki-macro': ['ckeditor', 'xwiki-dialog', 'xwiki-loading', 'xwiki-localization', 'xwiki-marker', 'textSelection'],
   'xwiki-marker': ['ckeditor'],
-  'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker.bundle', 'l10n', 'xwiki-marker'],
+  'xwiki-resource': [
+    'ckeditor',
+    'xwiki-wysiwyg-resource',
+    'xwiki-wysiwyg-resource-picker-bundle',
+    'xwiki-marker'
+  ],
   'xwiki-table': ['ckeditor'],
 
   textSelection: ['ckeditor'],

@@ -29,6 +29,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // https://vite.dev/config/
 export default defineConfig({
   build: {
+    outDir: '../../../target/node-dist',
     lib: {
       entry: resolve(__dirname, 'src/main.js'),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
@@ -36,7 +37,7 @@ export default defineConfig({
     },
     sourcemap: true,
     rollupOptions: {
-      external: ['jquery', 'vue', 'vue-i18n'],
+      external: ['jquery', 'vue', 'vue-i18n', '@xwiki/platform-livedata-ui', 'xwiki-platform-localization-webjar'],
       output: {
         globals: {
           vue: 'Vue'

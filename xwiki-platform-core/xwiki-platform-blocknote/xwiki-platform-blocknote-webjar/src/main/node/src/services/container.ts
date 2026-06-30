@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,17 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DefaultLogger } from "@xwiki/cristal-api";
-import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/cristal-attachments-default";
-import { Container } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
+import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
+import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
+import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
+import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
+import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
+import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
+import { DefaultResourceReferenceParser } from "./model/reference/DefaultResourceReferenceParser";
 import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
 import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
 import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
@@ -39,6 +43,17 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
+import { DefaultUniAstIterator } from "./uniast/DefaultUniAstIterator";
+import { XWikiUniAstProcessor } from "./uniast/XWikiUniAstProcessor";
+import { DefaultLogger } from "@xwiki/platform-api";
+import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
+import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
+import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
+import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
+import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
+import { Container } from "inversify";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -53,7 +68,9 @@ DefaultModelReferenceSerializerProvider.bind(container);
 XWikiModelReferenceSerializer.bind(container);
 
 DefaultModelReferenceHandlerProvider.bind(container);
-XWikiModelReferenceHandler.bind(container);
+XWikiModelReferenceHandler.bindComponents(container);
+
+DefaultResourceReferenceParser.bind(container);
 
 DefaultRemoteURLParserProvider.bind(container);
 XWikiRemoteURLParser.bind(container);
@@ -72,5 +89,24 @@ XWikiDesignSystemLoader.bind(container);
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
+new MacroServiceComponentList(container);
+
+new CollaborationComponentList(container);
+new XWikiCollaborationComponentList(container);
+
+DefaultUniAstIterator.bind(container);
+XWikiUniAstProcessor.bind(container);
+XWikiMacroBlock.bind(container);
+XWikiInlineMacro.bind(container);
+
+DefaultImageWizard.bind(container);
+DefaultMacroWizard.bind(container);
+DefaultBlockNoteMacroWizard.bind(container);
+
+MinimalApp.bind(container);
+
+new MarkdownSyntaxConfig(container);
+new XWikiSyntaxConfig(container);
+new MinimalSyntaxConfig(container);
 
 export { container };

@@ -72,7 +72,6 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -94,7 +93,6 @@ import static org.mockito.Mockito.when;
     TestNoScriptMacro.class,
     // Various classes to prevent errors in the displayed document
     ModelScriptService.class,
-    TranslationMacro.class,
     WarningMessageMacro.class,
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,

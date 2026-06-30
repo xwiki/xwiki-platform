@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class DefaultXWikiBridgeTest
+class DefaultXWikiBridgeTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -67,13 +67,13 @@ public class DefaultXWikiBridgeTest
     // Tests
 
     @Test
-    public void toCompatibleEntityReferenceWhenNull()
+    void toCompatibleEntityReferenceWhenNull()
     {
         assertNull(this.bridge.toCompatibleEntityReference(null));
     }
 
     @Test
-    public void toCompatibleEntityReferenceWhenPartial()
+    void toCompatibleEntityReferenceWhenPartial()
     {
         EntityReference entityReference = new EntityReference("document", EntityType.DOCUMENT);
         DocumentReference documentReference = new DocumentReference("currentwiki", "currentspace", "document");
@@ -84,7 +84,7 @@ public class DefaultXWikiBridgeTest
     }
 
     @Test
-    public void toCompatibleEntityReferenceWhenPage()
+    void toCompatibleEntityReferenceWhenPage()
     {
         PageReference pageReference = new PageReference("wiki", "page");
         DocumentReference documentReference = new DocumentReference("wiki", "page", "WebHome");

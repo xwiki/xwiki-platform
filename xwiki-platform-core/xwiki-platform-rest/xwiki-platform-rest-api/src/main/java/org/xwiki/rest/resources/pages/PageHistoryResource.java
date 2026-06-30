@@ -35,6 +35,8 @@ import org.xwiki.rest.model.jaxb.History;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history")
 public interface PageHistoryResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET History getPageHistory(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

@@ -45,7 +45,7 @@ public class TransactionRunnable<T>
     /**
      * All of the runnables to be run then committed.
      */
-    private final List<TransactionRunnable> allRunnables = new ArrayList<TransactionRunnable>();
+    private final List<TransactionRunnable> allRunnables = new ArrayList<>();
 
     /**
      * The runnable which this runnable is being run inside of.
@@ -265,7 +265,7 @@ public class TransactionRunnable<T>
                 tr.onPreRun();
             }
         } catch (Throwable t) {
-            final List<Throwable> errors = new ArrayList<Throwable>();
+            final List<Throwable> errors = new ArrayList<>();
             errors.add(t);
             try {
                 completeAll(runPathIterator);
@@ -281,7 +281,7 @@ public class TransactionRunnable<T>
      */
     private List<TransactionRunnable> getRunPath()
     {
-        List<TransactionRunnable> runPath = new ArrayList<TransactionRunnable>();
+        List<TransactionRunnable> runPath = new ArrayList<>();
         this.addAllToRunPath(runPath);
         return runPath;
     }
@@ -318,7 +318,7 @@ public class TransactionRunnable<T>
                 runPathIterator.next().onRun();
             }
         } catch (Throwable t) {
-            final List<Throwable> errors = new ArrayList<Throwable>();
+            final List<Throwable> errors = new ArrayList<>();
             errors.add(t);
             try {
                 rollbackAll(runPathIterator);
@@ -355,7 +355,7 @@ public class TransactionRunnable<T>
                 runPathReverseIterator.previous().onCommit();
             }
         } catch (Throwable t) {
-            final List<Throwable> errors = new ArrayList<Throwable>();
+            final List<Throwable> errors = new ArrayList<>();
             errors.add(t);
             try {
                 this.rollback();
@@ -417,7 +417,7 @@ public class TransactionRunnable<T>
     private static void completeAll(final ListIterator<TransactionRunnable> iterator)
         throws TransactionException
     {
-        final List<ExceptionThrowingRunnable> list = new ArrayList<ExceptionThrowingRunnable>();
+        final List<ExceptionThrowingRunnable> list = new ArrayList<>();
 
         while (iterator.hasPrevious()) {
             final TransactionRunnable runnable = iterator.previous();
@@ -444,7 +444,7 @@ public class TransactionRunnable<T>
     private static void rollbackAll(final ListIterator<TransactionRunnable> iterator)
         throws TransactionException
     {
-        final List<ExceptionThrowingRunnable> list = new ArrayList<ExceptionThrowingRunnable>();
+        final List<ExceptionThrowingRunnable> list = new ArrayList<>();
 
         while (iterator.hasPrevious()) {
             final TransactionRunnable runnable = iterator.previous();
@@ -482,7 +482,7 @@ public class TransactionRunnable<T>
                 run.run();
             } catch (Throwable t) {
                 if (causes == null) {
-                    causes = new ArrayList<Throwable>();
+                    causes = new ArrayList<>();
                 }
                 causes.add(t);
             }

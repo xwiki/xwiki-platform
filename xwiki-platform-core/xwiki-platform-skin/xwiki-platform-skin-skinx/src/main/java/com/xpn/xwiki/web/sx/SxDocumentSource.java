@@ -27,13 +27,17 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -147,17 +151,7 @@ public class SxDocumentSource implements SxSource
                             sxObj.getStringValue(NAME_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(e));
                     }
                 } else if (parse == 1) {
-                    try {
-                        StringWriter writer = new StringWriter();
-                        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                        VelocityContext vcontext = velocityManager.getVelocityContext();
-                        velocityManager.getVelocityEngine().evaluate(vcontext, writer,
-                            this.document.getPrefixedFullName(), sxContent);
-                        sxContent = writer.toString();
-                    } catch (XWikiVelocityException ex) {
-                        LOGGER.error("Failed to interpret the Velocity in skin extension [{}] with content [{}]",
-                            sxObj.getReference(), sxContent, ex);
-                    }
+                    sxContent = parseContent(sxObj, sxContent);
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.
@@ -165,6 +159,32 @@ public class SxDocumentSource implements SxSource
             }
         }
         return resultBuilder.toString();
+    }
+
+    private String parseContent(BaseObject sxObj, String sxContent)
+    {
+        String result = sxContent;
+        try {
+            StringWriter writer = new StringWriter();
+            UserReference effectiveMetadataAuthor = this.document.getAuthors().getEffectiveMetadataAuthor();
+            UserReferenceSerializer<DocumentReference> userReferenceSerializer =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class,
+                    DocumentReference.class), "document");
+            DocumentReference metadataAuthorRef =
+                userReferenceSerializer.serialize(effectiveMetadataAuthor);
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+            result = authorExecutor.call(() -> {
+                VelocityContext vcontext = velocityManager.getVelocityContext();
+                velocityManager.getVelocityEngine().evaluate(vcontext, writer,
+                    this.document.getPrefixedFullName(), sxContent);
+                return writer.toString();
+            }, metadataAuthorRef, this.document.getDocumentReference());
+        } catch (Exception ex) {
+            LOGGER.error("Failed to interpret the Velocity in skin extension [{}] with content [{}]",
+                sxObj.getReference(), sxContent, ex);
+        }
+        return result;
     }
 
     @Override

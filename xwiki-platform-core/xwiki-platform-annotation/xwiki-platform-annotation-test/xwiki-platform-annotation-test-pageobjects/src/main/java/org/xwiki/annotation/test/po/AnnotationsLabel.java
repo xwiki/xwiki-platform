@@ -47,7 +47,7 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        getDriver().findElement(By.id(annotationId)).click();
+        getDriver().findElement(By.className(annotationId)).click();
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
@@ -98,8 +98,10 @@ public class AnnotationsLabel extends BaseElement
 
     public String getAnnotationIdByText(String searchText)
     {
-        getDriver().waitUntilElementIsVisible(By.xpath("//span[contains(.,'" + searchText + "')]"));
-        WebElement annotation = getDriver().findElement(By.xpath("//span[contains(.,'" + searchText + "')]"));
+        String xpathToFindAnnotationByText = "//*[contains(@class, 'annotation-highlight') " 
+            + "and contains(.,'" + searchText + "')]";
+        getDriver().waitUntilElementIsVisible(By.xpath(xpathToFindAnnotationByText));
+        WebElement annotation = getDriver().findElement(By.xpath(xpathToFindAnnotationByText));
         String classId = annotation.getAttribute("class");
         classId = classId.split("\\s+")[1];
         return classId;

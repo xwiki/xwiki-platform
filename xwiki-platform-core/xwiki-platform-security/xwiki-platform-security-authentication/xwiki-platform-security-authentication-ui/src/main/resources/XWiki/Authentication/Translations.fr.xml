@@ -54,7 +54,7 @@ security.authservice.admin.currentAuthService=Service d'authentification actuel
 security.authservice.admin.component.label=Définir le service d'authentification :
 security.authservice.admin.component.save=Enregistrer
 security.authservice.admin.component.noService=Aucun service d'authentification alternatif n'a été trouvé.
-### Missing: security.authservice.admin.other.warning=The current authentication service cannot be modified because it's injected by a custom system.
+security.authservice.admin.other.warning=Le service d'authentification actuel ne peut pas être modifié car il est issu d'une configuration personnalisée.
 security.authservice.admin.class.warning=Le service d'authentification ne peut pas être modifié car il est contrôlé par le fichier de configuration 'xwiki.cfg'.
 </content>
 </xwikidoc>

@@ -60,7 +60,7 @@ public class DefaultNotificationFilterDisplayer extends AbstractNotificationFilt
 
         try {
             // Try to get a template using the filter name; if no template is found, fallback on the default one.
-            String templateName = String.format("notification/filters/%s.vm", filter.getName().replaceAll("\\/", "."));
+            String templateName = String.format("notification/filters/%s.vm", filter.getName().replace("/", "."));
             Template template = templateManager.getTemplate(templateName);
 
             return (template != null) ? templateManager.execute(template)

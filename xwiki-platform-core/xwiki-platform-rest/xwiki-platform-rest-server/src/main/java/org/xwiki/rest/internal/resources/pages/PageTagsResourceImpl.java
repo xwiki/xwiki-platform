@@ -98,7 +98,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            List<String> tagNames = new ArrayList<String>();
+            List<String> tagNames = new ArrayList<>();
             for (Tag tag : tags.getTags()) {
                 tagNames.add(tag.getName());
             }
@@ -153,6 +153,6 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
             }
         }
 
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 }

@@ -223,7 +223,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public void waitForAnnotationsDisplayed()
     {
-        getDriver().waitUntilElementIsVisible(By.className("annotation-marker"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-highlight"));
     }
 
     // Un-checks the "Show Annotations" check box.
@@ -240,7 +240,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public int getAnnotationCount()
     {
-        return getDriver().findElementsWithoutWaiting(By.className("annotation-marker")).size();
+        return getDriver().findElementsWithoutWaiting(By.className("annotation-highlight")).size();
     }
 
     /**
@@ -270,7 +270,7 @@ public class AnnotatableViewPage extends BaseElement
     {
         WebElement body = getDriver().findElement(By.id("body"));
         String os = System.getProperty("os.name");
-        if (os.equals("Mac OS X")) {
+        if ("Mac OS X".equals(os)) {
             body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
         } else {
             body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
@@ -323,7 +323,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public WebElement getAnnotationTextById(int id)
     {
-        return getDriver().findElement(By.cssSelector(String.format("span.annotation.ID%d", id)));
+        return getDriver().findElement(By.cssSelector(String.format("mark.annotation.ID%d", id)));
     }
 
     /**

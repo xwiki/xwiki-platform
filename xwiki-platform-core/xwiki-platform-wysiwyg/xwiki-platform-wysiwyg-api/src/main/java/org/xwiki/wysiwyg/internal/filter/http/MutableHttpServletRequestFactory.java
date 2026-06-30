@@ -36,7 +36,7 @@ import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
     @Override
-    public synchronized MutableJakartaServletRequest newInstance(jakarta.servlet.ServletRequest request)
+    public MutableJakartaServletRequest newInstance(jakarta.servlet.ServletRequest request)
     {
         if (request instanceof HttpServletRequest httpRequest) {
             return new MutableJakartaHttpServletRequest(httpRequest);

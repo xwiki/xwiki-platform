@@ -19,8 +19,6 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -32,7 +30,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.StartableTransactionRunnable;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.filesystem.internal.AttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
@@ -107,30 +107,28 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @return an XWikiAttachmentArchive for the given attachment.
      * @throws IOException if the metadata cannot be found or there is a failure while parsing it.
      */
-    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final AttachmentFileProvider provider)
-        throws IOException
+    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final AttachmentBlobProvider provider)
+        throws Exception
     {
-        final File metaFile = provider.getAttachmentVersioningMetaFile();
+        final Blob metaFile = provider.getAttachmentVersioningMetaBlob();
 
         // If no meta file then assume no archive and return an empty archive.
         if (!metaFile.exists()) {
             return new ListAttachmentArchive(attachment);
         }
 
-        final ReadWriteLock lock = this.fileTools.getLockForFile(metaFile);
+        final ReadWriteLock lock = this.fileTools.getLockForFile(metaFile.getPath());
         final List<XWikiAttachment> attachList;
         lock.readLock().lock();
-        try {
-            final InputStream is = new FileInputStream(metaFile);
+        try (InputStream is = metaFile.getStream()) {
             attachList = this.metaSerializer.parse(is);
-            is.close();
         } finally {
             lock.readLock().unlock();
         }
 
         // Get the content file and lock for each revision.
         for (XWikiAttachment attach : attachList) {
-            final File contentFile = provider.getAttachmentVersionContentFile(attach.getVersion());
+            final Blob contentFile = provider.getAttachmentVersionContentBlob(attach.getVersion());
             attach.setAttachment_content(new FilesystemAttachmentContent(contentFile, attach));
             attach.setContentStore(FileSystemStoreUtils.HINT);
             // Pass the document since it will be lost in the serialize/deserialize.
@@ -184,7 +182,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @throws XWikiException if versions of the attachment cannot be loaded form the archive.
      */
     public StartableTransactionRunnable getArchiveSaveRunnable(final XWikiAttachmentArchive archive,
-        final XWikiContext context) throws XWikiException
+        final XWikiContext context) throws XWikiException, BlobStoreException
     {
         return new AttachmentArchiveSaveRunnable(archive, this.fileTools,
             this.fileTools.getAttachmentFileProvider(archive.getAttachment().getReference()), this.metaSerializer,
@@ -231,6 +229,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @return a StartableTransactionRunnable for deleting the attachment archive.
      */
     public StartableTransactionRunnable getArchiveDeleteRunnable(final XWikiAttachmentArchive archive)
+        throws BlobStoreException
     {
         if (archive == null) {
             throw new NullPointerException("The archive to delete cannot be null.");

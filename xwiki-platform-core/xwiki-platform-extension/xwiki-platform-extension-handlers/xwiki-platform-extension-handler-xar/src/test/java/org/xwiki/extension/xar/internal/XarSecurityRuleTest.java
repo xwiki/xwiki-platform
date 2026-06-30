@@ -41,17 +41,17 @@ class XarSecurityRuleTest
     @BeforeEach
     void setUp()
     {
-        xarSecurityTool = mock(XarSecurityTool.class);
+        this.xarSecurityTool = mock(XarSecurityTool.class);
 
         // Create some XarSecurityRules that will be compared
-        adminSimple = new XarSecurityRule(Right.ADMIN, true, xarSecurityTool);
-        adminSimple2 = new XarSecurityRule(Right.ADMIN, true, xarSecurityTool);
-        commentSimple = new XarSecurityRule(Right.COMMENT, true, xarSecurityTool);
-        adminExtended = new XarSecurityRule(Right.ADMIN, false, xarSecurityTool);
+        this.adminSimple = new XarSecurityRule(Right.ADMIN, true, this.xarSecurityTool);
+        this.adminSimple2 = new XarSecurityRule(Right.ADMIN, true, this.xarSecurityTool);
+        this.commentSimple = new XarSecurityRule(Right.COMMENT, true, this.xarSecurityTool);
+        this.adminExtended = new XarSecurityRule(Right.ADMIN, false, this.xarSecurityTool);
     }
 
     @Test
-    void testEquals()
+    void equals()
     {
         // Test the identity
         assertEquals(adminSimple, adminSimple);
@@ -65,7 +65,7 @@ class XarSecurityRuleTest
     }
 
     @Test
-    void testHashCode()
+    void hashCodeRule()
     {
         // Test the identity
         assertEquals(adminSimple.hashCode(), adminSimple.hashCode());

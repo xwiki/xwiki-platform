@@ -65,7 +65,7 @@ public class PropUpdateAction extends XWikiAction
         bclass2.setFields(new HashMap());
 
         // Prepare a Map for field renames
-        Map<String, String> fieldsToRename = new HashMap<String, String>();
+        Map<String, String> fieldsToRename = new HashMap<>();
 
         for (PropertyClass originalProperty : (Collection<PropertyClass>) bclass.getFieldList()) {
             PropertyClass newProperty = originalProperty.clone();
@@ -80,7 +80,7 @@ public class PropUpdateAction extends XWikiAction
             }
 
             if (newName.indexOf(" ") != -1) {
-                newName = newName.replaceAll(" ", "");
+                newName = newName.replace(" ", "");
                 newProperty.setName(newName);
             }
             bclass2.addField(newName, newProperty);

@@ -94,9 +94,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             // are not published on maven central. Hence, we only filter explicitly by version for other group ids.
             queryObject.setVersion(version);
         }
-        try {
+        try (HttpClient client = HttpClient.newHttpClient()) {
             String body = objectMapper
-                .setSerializationInclusion(NON_NULL)
+                .setDefaultPropertyInclusion(NON_NULL)
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .writeValueAsString(queryObject);
 
@@ -105,7 +105,6 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
-            HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, ofString());
             OsvResponse osvResponse = objectMapper.readValue(response.body(), OsvResponse.class);
             return this.osvResponseAnalyzer.analyzeOsvResponse(extensionId, version, osvResponse);

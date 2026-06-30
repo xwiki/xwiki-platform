@@ -106,7 +106,7 @@ public class Annotation
     /**
      * The values of the fields of this annotation.
      */
-    protected Map<String, Object> fields = new HashMap<String, Object>();
+    protected Map<String, Object> fields = new HashMap<>();
 
     /**
      * Builds an annotation description for the annotation with the passed id: used for annotation updates where only a

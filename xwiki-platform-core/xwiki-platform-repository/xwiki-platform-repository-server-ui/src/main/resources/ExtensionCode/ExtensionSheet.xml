@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
+  <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}$services.localization.render('repository.extension.sheet.title')#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -82,6 +82,7 @@
 #end
 
 #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
+#set($projectReference = $doc.getValue('project'))
 {{/velocity}}
 
 {{velocity}}
@@ -104,49 +105,53 @@
         #if ($proxyExtensionObject)
           #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
           #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
-          {{info}}Extension imported from repository [[$repositoryId&gt;&gt;$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
+          {{info}}{{translation key="repository.extension.sheet.imported"/}} [[$services.rendering.escape($services.rendering.escape($repositoryId, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($repositoryURI, 'xwiki/2.1')]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="$services.rendering.escape($services.localization.render('repository.extension.sheet.updateExtension'), 'xwiki/2.1')" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
         #end
       #end
 
       (% class="extensionInfo" %)
+      ##------- Project --------------
+      #if ("$!projectReference" != '')
+        |(% class="label" width='30%' %){{translation key="repository.extension.sheet.project"/}}(%%)|$doc.project
+      #end
       ##------- Type --------------
       #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
       #if ("$!typeDisplay" == '')
         #set($typeDisplay = $type)
       #end
-      |(% class="label" width='30%' %)Type(%%)|$services.rendering.escape($typeDisplay, 'xwiki/2.1')
+      |(% class="label" width='30%' %){{translation key="repository.extension.sheet.type"/}}(%%)|$services.rendering.escape($typeDisplay, 'xwiki/2.1')
       ##------- Category --------------
       #set($categoryDisplay = $extensionCategoryObject.getProperty('name').value)
       #if ("$!categoryDisplay" == '')
         #set($categoryDisplay = $category)
       #end
       #if ($categoryDisplay)
-      |(% class="label" width='30%' %)Category(%%)|$services.rendering.escape($categoryDisplay, 'xwiki/2.1')
+      |(% class="label" width='30%' %){{translation key="repository.extension.sheet.category"/}}(%%)|$services.rendering.escape($categoryDisplay, 'xwiki/2.1')
       #end
       ##------- Developed By --------
       #set($authors = $doc.getValue("authors"))
-      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
-          Unknown
+      |(% class="label" %){{translation key="repository.extension.sheet.developedBy"/}}(%%)|#if ($authors.isEmpty())
+          {{translation key="repository.extension.sheet.unknown"/}}
         #else
           $doc.display('authors')
         #end
       ##------- Supported By --------
       #set($supportPlans = $doc.getValue("supportPlans"))
       #if (!$supportPlans.isEmpty())
-        |(% class="label" %)Support(%%)|((({{html}}#displayExtensionSupportPlans($services.repository.resolveExtensionSupportPlans($supportPlans), true){{/html}})))
+        |(% class="label" %){{translation key="repository.extension.sheet.support"/}}(%%)|((({{html}}#displayExtensionSupportPlans($services.repository.resolveExtensionSupportPlans($supportPlans), true){{/html}})))
       #end
       ##------- Active Installs --------
       #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)
-        |(% class="label" %)Active Installs(%%)|$services.rendering.escape($!doc.getValue('installedCount'), 'xwiki/2.1')
+        |(% class="label" %){{translation key="repository.extension.sheet.activeInstalls"/}}(%%)|$services.rendering.escape($!doc.getValue('installedCount'), 'xwiki/2.1')
       #end
       ##------- Rating --------
-      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
+      |(% class="label" %){{translation key="repository.extension.sheet.rating"/}}(%%)|#displayFullRating($doc.documentReference)
       ##------- License --------
       #set($licenseName = $doc.getValue("licenseName"))
       #if ("$!licenseName" != "")
-        |(% class="label" %)License(%%)|$services.rendering.escape($licenseName, 'xwiki/2.1')
+        |(% class="label" %){{translation key="repository.extension.sheet.license"/}}(%%)|$services.rendering.escape($licenseName, 'xwiki/2.1')
       #else
-        |(% class="label" %)License(%%)|Unknown
+        |(% class="label" %){{translation key="repository.extension.sheet.license"/}}(%%)|{{translation key="repository.extension.sheet.unknown"/}}
       #end
       ##---------------------------------
       ##------- Sheet extensions --------
@@ -160,24 +165,24 @@
       ##------- Extension Manager -----------------
       #if ($doc.getValue('validExtension') == 1)
 
-        {{success}}**Installable with the Extension Manager**{{/success}}
+        {{success}}**{{translation key="repository.extension.sheet.installable"/}}**{{/success}}
       #end
       ##------------------------
       (%class="btn-group pull-right"%)(((
         ##------- Website button --------------
         #set($website = $extension.getProperty("website").value)
         #if ("$!website" != '')
-          [[$services.icon.render('book') Documentation>>$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
+          [[$services.icon.render('book') {{translation key="repository.extension.sheet.documentation"/}}&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
         #if ("$!source" != "")
-          [[$services.icon.render('file-text') Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
+          [[$services.icon.render('file-text') {{translation key="repository.extension.sheet.sources"/}}&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
         ##------- Issues --------
         #set($issues = $doc.getValue("issueManagementURL"))
         #if ("$!issues" != "")
-          [[$services.icon.render('bug') Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
+          [[$services.icon.render('bug') {{translation key="repository.extension.sheet.issues"/}}&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
         ##------- Download button ------
         #set($lastVersion = $doc.getValue("lastVersion"))
@@ -187,28 +192,28 @@
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
             #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-default"]]##
+              [[$services.icon.render('download') #wikiTranslation('repository.extension.sheet.download', [$version])&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-default"]]##
             #end
           #else
-            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-default"]]##
+            [[$services.icon.render('download') #wikiTranslation('repository.extension.sheet.download', [$version])&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-default"]]##
           #end
         #end
       )))
     {{/box}}
 
-    {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+    {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %){{translation key="repository.extension.sheet.toc"/}}(%%)((({{toc/}}))){{/box}}
     (%class="clearfix"%)((()))
   #else
     ## Editing
     ##
     {{toc/}}
 
-    = Documentation Help =
+    = {{translation key="repository.extension.sheet.documentationHelp"/}} =
 
-    Here are some rules to follow when contributing an extension:
-    * Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.
+    {{translation key="repository.extension.sheet.rulesIntro"/}}
+    * {{translation key="repository.extension.sheet.ruleSummary"/}}
     #if($proxyExtensionObject)
-      * When en extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+      * {{translation key="repository.extension.sheet.ruleImported"/}}
     #end
 
     #foreach($sheetExtension in $sheetExtensions)
@@ -216,11 +221,11 @@
     #end
 
     #if($proxyExtensionObject)
-      ; Automatically synchronize the extension informations
+      ; {{translation key="repository.extension.sheet.autoSync"/}}
       : $proxyExtensionObject.autoUpdate
     #end
 
-    = Summary =
+    = {{translation key="repository.extension.sheet.summary"/}} =
     #if ($doc.isNew())
       #if ($request.name)
         $extension.set('id', "${defaultIdPrefix}${request.name.toLowerCase().replace(' ', '-')}")##
@@ -234,18 +239,25 @@
     #end
 
     (% class="extension" %)
-    |Name|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end~
-    |Type|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end~
-    |Category|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end~
-    |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~
+    |{{translation key="repository.extension.sheet.name"/}}|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end
+
+    |{{translation key="repository.extension.sheet.type"/}}|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end
+
+    |{{translation key="repository.extension.sheet.category"/}}|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end
+
+    |{{translation key="repository.extension.sheet.summary"/}}|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end
+
     ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
-    |Authors|#if($proxyExtensionObject)$services.rendering.escape($doc.getValue('authors').toString(), 'xwiki/2.1')#else$doc.display('authors')#end~
-    |License|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end~
-    |Source|$doc.display('source')
-    |Display Icon Location
-(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
-    |Show Active Installs|$doc.display('showInstalledCount')
-    |Support plans|$doc.display('supportPlans')
+    |{{translation key="repository.extension.sheet.authors"/}}|#if($proxyExtensionObject)$services.rendering.escape($doc.getValue('authors').toString(), 'xwiki/2.1')#else$doc.display('authors')#end
+
+    |{{translation key="repository.extension.sheet.license"/}}|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end
+
+    |{{translation key="repository.extension.sheet.source"/}}|#if($proxyExtensionObject)$doc.display('source', 'view')#else$doc.display('source')#end
+
+    |{{translation key="repository.extension.sheet.iconLocation"/}}
+(#set($comment = '##'){{translation key="repository.extension.sheet.iconLocationSyntax"/}} ${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;$escapetool.xml($services.localization.render('repository.extension.sheet.iconLocationLinkText'))&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
+    |{{translation key="repository.extension.sheet.showActiveInstalls"/}}|$doc.display('showInstalledCount')
+    |{{translation key="repository.extension.sheet.supportPlans"/}}|$doc.display('supportPlans')
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)
@@ -254,7 +266,7 @@
 
     ## If there's a website specified, then don't display the Description (since Description is a local documentation).
     #if (($isViewMode &amp;&amp; "$!website" == '') || !$isViewMode)
-      = Description =
+      = {{translation key="repository.extension.sheet.description"/}} =
     #end
     #if ($isViewMode &amp;&amp; "$!website" == '')
       ## Make sure to resolve reference based on the right document
@@ -262,7 +274,9 @@
         $doc.getValue('description')
       {{/context}}
     #elseif (!$isViewMode)
+      (((
       $doc.display('description')
+      )))
     #end
 
     #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
@@ -273,17 +287,17 @@
     #set($extraInstallation = "$!{doc.getValue('installation')}")
 
     #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')
-      = Prerequisites &amp; Installation Instructions =
+      = {{translation key="repository.extension.sheet.prerequisites"/}} =
 
       #if ($isEditMode)
-        ; Custom installation only
+        ; {{translation key="repository.extension.sheet.customInstallationOnly"/}}
         : $extension.display('customInstallationOnly', 'edit')
       #end
       ##
       ## Standard installation
       #if ($standardInstallation != '')
         #if ($isEditMode)
-          == Standard installation instructions
+          == {{translation key="repository.extension.sheet.standardInstallationInstructions"/}}
 
         #end
         $extensionTypeObject.display('installation', 'view')
@@ -291,9 +305,11 @@
       ##
       ## Extra installation
       #if ($isEditMode)
-        == Custom installation instructions
+        == {{translation key="repository.extension.sheet.customInstallationInstructions"/}}
 
+        (((
         $extension.display('installation', 'edit')
+        )))
       #elseif ($extraInstallation != '')
         {{context transformationContext="document" restricted=true}}
           $extraInstallation
@@ -302,11 +318,16 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($doc.getValue('versionPage') == 1)
+    #if ($doc.getValue('versionPage') == 1 &amp;&amp; $proxyExtensionObject.getValue('proxyLevel') != 'history')
       #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
-      = Versions =
+      = {{id name="versions"/}}{{translation key="repository.extension.sheet.versions"/}} =
 
-      {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      #if ("$!projectReference" != '')
+        [[See project page&gt;&gt;$services.rendering.escape($services.model.serialize($projectReference), 'xwiki/2.1')||anchor="versions"]]
+      #else
+        #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+        {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      #end
     #elseif ($lastVersionObject)
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
@@ -320,7 +341,7 @@
       ## Reverse the list to have latest versions first
       #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
       #if (!$releaseNotes.isEmpty())
-        = Release Notes =
+        = {{translation key="repository.extension.sheet.releaseNotes"/}} =
         #foreach ($entry in $releaseNotes)
           == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
           $entry.get(1)
@@ -330,9 +351,9 @@
 
     #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
     #if ($extensionDependencies.size() &gt; 0)
-      = Dependencies =
+      = {{translation key="repository.extension.sheet.dependencies"/}} =
 
-       Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
+       $services.rendering.escape($services.localization.render('repository.extension.sheet.dependenciesIntro', ["${extension.getValue('id')} ${doc.getValue('lastVersion')}"]), 'xwiki/2.1')
        #foreach($extensionDependency in $extensionDependencies)
         #set($dependencyDocumentName = $null)
         #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
@@ -350,47 +371,47 @@
     #if ($isEditMode &amp;&amp; !$proxyExtensionObject)
       #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #if($extversions &amp;&amp; $extversions.size()&gt;0)
-      = Current Downloads =
+      = {{translation key="repository.extension.sheet.currentDownloads"/}} =
          #foreach($versionobj in $extversions)
             #set($ok = $doc.use($versionobj))
             {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}
          #end
       #end
 
-      = Add Downloads =
+      = {{translation key="repository.extension.sheet.addDownloads"/}} =
       #if ($doc.isNew())
-        {{info}}In order to add Download information for this extension, save this page first and edit it again.{{/info}}
+        {{info}}{{translation key="repository.extension.sheet.addDownloadsSaveFirst"/}}{{/info}}
       #else
-        {{warning}}If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.{{/warning}}
+        {{warning}}{{translation key="repository.extension.sheet.addDownloadsWarning"/}}{{/warning}}
 
-        We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
-        * If you're providing a new download, [[attach the new version to this page&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]] and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).
+        {{translation key="repository.extension.sheet.addDownloadsProcess"/}}
+        * $services.localization.render('repository.extension.sheet.addDownloadsAttach', ['[[', "&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]]"])
  
       #set($xredirect = $doc.getURL("edit"))
       #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionVersionClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
-      * Add Download information for the new attachment by filing in a new [[Extension Version&gt;&gt;path:$addobjecturl]]. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {{{attach:ubercoolmacro-1.0.xar}}}.
+      * $services.localization.render('repository.extension.sheet.addDownloadsInfo', ['[[', "&gt;&gt;path:$addobjecturl]]", "{{{attach:ubercoolmacro-1.0.xar}}}"])
 
       #set($extdeps = $doc.getObjects("ExtensionCode.ExtensionDependencyClass"))
       #if($extdeps &amp;&amp; $extdeps.size()&gt;0)
-      = Current Dependencies =
+      = {{translation key="repository.extension.sheet.currentDependencies"/}} =
          #foreach($depobj in $extdeps)
             #set($ok = $doc.use($depobj))
             {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionDependencySheet") {{/html}}
          #end
       #end
 
-      = Add Dependencies =
+      = {{translation key="repository.extension.sheet.addDependencies"/}} =
 
       #set($xredirect = $doc.getURL("edit"))
       #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionDependencyClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
-        You can also associate dependencies to each version by filing in the following information in a new [[Dependency&gt;&gt;path:$addobjecturl]]:
-        * ${escapetool.h}#Extension version${escapetool.h}# is the version on which this dependency is assigned
-        * ${escapetool.h}#Dependency id${escapetool.h}# is the identifier of the dependency extension on the repository where it is localed
-        * ${escapetool.h}#Dependency version constraint${escapetool.h}# is the version related information of the dependency. Can be a version (e.g. ${escapetool.h}#1.0${escapetool.h}#) or one or several ranges of versions based on Maven standard syntax (e.g. ${escapetool.h}#[1.0,)${escapetool.h}# which mean at least ${escapetool.h}#1.0${escapetool.h}#)
+        $services.localization.render('repository.extension.sheet.addDependenciesIntro', ['[[', "&gt;&gt;path:$addobjecturl]]"])
+        * {{translation key="repository.extension.sheet.addDependenciesVersion"/}}
+        * {{translation key="repository.extension.sheet.addDependenciesId"/}}
+        * {{translation key="repository.extension.sheet.addDependenciesConstraint"/}}
       #end
     #end
 #else
-  This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object
+  {{translation key="repository.extension.sheet.wrongObject"/}}
 #end
 {{/velocity}}</content>
   <object>

@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.filter.input;
 import java.lang.reflect.ParameterizedType;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -88,7 +89,8 @@ public class BaseObjectEventGenerator
 
         // Object class
 
-        BaseClass xclass = xobject.getXClass(xcontext);
+        BaseClass sourceXClass = xobject.getSourceXClass();
+        BaseClass xclass = (sourceXClass != null) ? sourceXClass : xobject.getXClass(xcontext);
         ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
 
         // Properties
@@ -98,19 +100,30 @@ public class BaseObjectEventGenerator
         Iterator<BaseProperty<?>> it = xobject.getSortedIterator();
         while (it.hasNext()) {
             BaseProperty<?> xproperty = it.next();
-
-            String pname = xproperty.getName();
-            if (StringUtils.isNotBlank(pname)
-                && (!(xclass.get(pname) instanceof PropertyClass propertyClass)
-                || !properties.getExcludedPropertyTypes().contains(propertyClass.getClassType())))
+            if (shouldDisplayProperty(xproperty, xclass, properties))
             {
-                ((BasePropertyEventGenerator) this.propertyEventGenerator).write(xproperty, filter,
-                    (Map<String, Object>) properties);
+                this.propertyEventGenerator.write(xproperty, filter, (Map<String, Object>) properties);
             }
         }
 
         // < WikiObject
 
         objectFilter.endWikiObject(xobject.getReference().getName(), objectParameters);
+    }
+
+    private boolean shouldDisplayProperty(BaseProperty<?> xproperty, BaseClass xclass,
+        DocumentInstanceInputProperties properties)
+    {
+        String pname = xproperty.getName();
+        boolean result = StringUtils.isNotBlank(pname);
+        boolean sensitiveExcluded = properties.isSensitiveFieldsExcluded();
+        Set<String> excludedPropertyTypes = properties.getExcludedPropertyTypes();
+
+        if (sensitiveExcluded && xproperty.isSensitive(xcontextProvider.get())) {
+            result = false;
+        } else if (xclass.get(pname) instanceof PropertyClass propertyClass) {
+            result = result && !excludedPropertyTypes.contains(propertyClass.getClassType());
+        }
+        return result;
     }
 }

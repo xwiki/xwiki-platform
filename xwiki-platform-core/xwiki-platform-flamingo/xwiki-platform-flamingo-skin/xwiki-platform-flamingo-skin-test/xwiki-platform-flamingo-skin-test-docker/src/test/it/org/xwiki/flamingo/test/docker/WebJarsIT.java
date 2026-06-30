@@ -22,7 +22,7 @@ package org.xwiki.flamingo.test.docker;
 import java.net.URI;
 
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
@@ -42,13 +42,15 @@ class WebJarsIT
     @Order(1)
     void pathTraversal(TestUtils setup) throws Exception
     {
-        URI uri = new URI(StringUtils.removeEnd(setup.rest().getBaseURL(), "rest")
+        URI uri = new URI(Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest")
             + "webjars/wiki%3Axwiki/..%2F..%2F..%2F..%2F..%2FWEB-INF%2Fxwiki.cfg");
 
         GetMethod response = setup.rest().executeGet(uri);
 
-        assertNotEquals(200, response.getStatusCode());
-
-        response.releaseConnection();
+        try {
+            assertNotEquals(200, response.getStatusCode());
+        } finally {
+            response.releaseConnection();
+        }
     }
 }

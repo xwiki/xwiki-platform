@@ -19,14 +19,13 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
@@ -46,24 +45,27 @@ import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.text.StringUtils;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Unit tests for {@link ExpressionNodeToHQLConverter}.
  */
-public class ExpressionNodeToHQLConverterTest
+@ComponentTest
+class ExpressionNodeToHQLConverterTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<ExpressionNodeToHQLConverter> mocker =
-            new MockitoComponentMockingRule<>(ExpressionNodeToHQLConverter.class);
+    @InjectMockComponents
+    private ExpressionNodeToHQLConverter parser;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
 
     private static final String TEST_VALUE_1 = "aRandomStringValue";
     private static final String TEST_VALUE_1_IDENTIFIER = String.format("value_%s", sha256Hex(TEST_VALUE_1));
@@ -71,105 +73,94 @@ public class ExpressionNodeToHQLConverterTest
     private static final String TEST_VALUE_2 = "another_ random_string_ & value";
     private static final String TEST_VALUE_2_IDENTIFIER = String.format("value_%s", sha256Hex(TEST_VALUE_2));
 
-    private ExpressionNodeToHQLConverter parser;
-    private EntityReferenceSerializer<String> serializer;
-
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void parseWithEmptyNode()
     {
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        parser = mocker.getComponentUnderTest();
+        assertEquals(StringUtils.EMPTY, this.parser.parse(new EmptyNode()).getQuery());
     }
 
     @Test
-    public void parseWithEmptyNode()
+    void parseWithPropertyValueNode()
     {
-        assertEquals(StringUtils.EMPTY, parser.parse(new EmptyNode()).getQuery());
+        assertEquals("event.type", this.parser.parse(new PropertyValueNode(EventProperty.TYPE)).getQuery());
     }
 
     @Test
-    public void parseWithPropertyValueNode()
+    void parseWithStringValueNode()
     {
-        // Check with a PropertyValueNode first
-        assertEquals("event.type", parser.parse(new PropertyValueNode(EventProperty.TYPE)).getQuery());
-    }
-
-    @Test
-    public void parseWithStringValueNode()
-    {
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(new StringValueNode(TEST_VALUE_1));
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(new StringValueNode(TEST_VALUE_1));
         assertEquals(String.format(":%s", TEST_VALUE_1_IDENTIFIER), result.getQuery());
         assertEquals(TEST_VALUE_1, result.getQueryParameters().get(TEST_VALUE_1_IDENTIFIER));
     }
 
     @Test
-    public void parseWithNotNode()
+    void parseWithNotNode()
     {
         AbstractNode testAST = new NotNode(new EqualsNode(new StringValueNode(TEST_VALUE_1),
                 new StringValueNode(TEST_VALUE_2)));
 
         assertEquals(String.format(" NOT (:%s = :%s)", TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER),
-                parser.parse(testAST).getQuery());
+                this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseWithEqualsNode()
+    void parseWithEqualsNode()
     {
         AbstractNode testAST = new EqualsNode(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
 
         assertEquals(String.format(":%s = :%s", TEST_VALUE_1_IDENTIFIER,
-                TEST_VALUE_2_IDENTIFIER), parser.parse(testAST).getQuery());
+                TEST_VALUE_2_IDENTIFIER), this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseWithNotEqualsNode()
+    void parseWithNotEqualsNode()
     {
         AbstractNode testAST = new NotEqualsNode(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
 
         assertEquals(String.format(":%s <> :%s", TEST_VALUE_1_IDENTIFIER,
-                TEST_VALUE_2_IDENTIFIER), parser.parse(testAST).getQuery());
+                TEST_VALUE_2_IDENTIFIER), this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseWithOrNode()
+    void parseWithOrNode()
     {
         AbstractNode testAST = value(TEST_VALUE_1).eq(value(TEST_VALUE_2))
                 .or(value(TEST_VALUE_1).eq(value(TEST_VALUE_2)));
 
         assertEquals(String.format("(:%s = :%s) OR (:%s = :%s)", TEST_VALUE_1_IDENTIFIER,
                 TEST_VALUE_2_IDENTIFIER, TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER),
-                parser.parse(testAST).getQuery());
+                this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseWithAndNode()
+    void parseWithAndNode()
     {
         AbstractNode testAST = value(TEST_VALUE_1).eq(value(TEST_VALUE_2))
                 .and(value(TEST_VALUE_1).eq(value(TEST_VALUE_2)));
 
         assertEquals(String.format("(:%s = :%s) AND (:%s = :%s)", TEST_VALUE_1_IDENTIFIER,
                 TEST_VALUE_2_IDENTIFIER, TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER),
-                parser.parse(testAST).getQuery());
+                this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseWithStartsWithNode()
+    void parseWithStartsWithNode()
     {
         AbstractNode testAST = new StartsWith(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
 
         assertEquals(String.format(":%s LIKE concat(:%s, '%%') ESCAPE '!'", TEST_VALUE_1_IDENTIFIER,
-                TEST_VALUE_2_IDENTIFIER), parser.parse(testAST).getQuery());
+                TEST_VALUE_2_IDENTIFIER), this.parser.parse(testAST).getQuery());
     }
 
     @Test
-    public void parseEntityReferenceNode()
+    void parseEntityReferenceNode()
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "Main", "WebHome");
-        when(serializer.serialize(documentReference)).thenReturn("xwiki:Main.WebHome");
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Main.WebHome");
 
         AbstractNode testAST = new EntityReferenceNode(documentReference);
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(":entity_e9f8294b0de086574bed923c45695bc8afc27d3ede9c35ed44db8d2100929de4",
                 result.getQuery());
@@ -179,20 +170,20 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithBooleanValueNode()
+    void parseWithBooleanValueNode()
     {
-        assertEquals("true", parser.parse(new BooleanValueNode(true)).getQuery());
-        assertEquals("false", parser.parse(new BooleanValueNode(false)).getQuery());
+        assertEquals("true", this.parser.parse(new BooleanValueNode(true)).getQuery());
+        assertEquals("false", this.parser.parse(new BooleanValueNode(false)).getQuery());
     }
 
     @Test
-    public void parseDateNode()
+    void parseDateNode()
     {
         Date date = new Date(0);
 
         AbstractNode testAST = new DateValueNode(date);
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(":date_" + DigestUtils.sha256Hex(date.toString()),
                 result.getQuery());
@@ -202,12 +193,12 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithGreaterThanNode()
+    void parseWithGreaterThanNode()
     {
         AbstractNode testAST = new GreaterThanNode(new PropertyValueNode(EventProperty.DATE),
                 new StringValueNode(TEST_VALUE_1));
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(String.format("event.date >= :%s", TEST_VALUE_1_IDENTIFIER),
                 result.getQuery());
@@ -216,12 +207,12 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithInNode()
+    void parseWithInNode()
     {
         AbstractNode testAST = new InNode(new PropertyValueNode(EventProperty.PAGE),
-                Arrays.asList(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2)));
+                List.of(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2)));
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(String.format("event.page IN (:%s, :%s)", TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER),
                 result.getQuery());
@@ -232,12 +223,12 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithLesserThanNode()
+    void parseWithLesserThanNode()
     {
         AbstractNode testAST = new LesserThanNode(new PropertyValueNode(EventProperty.DATE),
                 new StringValueNode(TEST_VALUE_1));
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(String.format("event.date <= :%s", TEST_VALUE_1_IDENTIFIER),
                 result.getQuery());
@@ -246,7 +237,7 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithOrderBy()
+    void parseWithOrderBy()
     {
         AbstractNode testAST = new OrderByNode(
                 new EqualsNode(
@@ -257,7 +248,7 @@ public class ExpressionNodeToHQLConverterTest
                 OrderByNode.Order.ASC
         );
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals("event.space = event.page ORDER BY event.date ASC",
                 result.getQuery());
@@ -265,17 +256,17 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithInListOfReadEventsNode()
+    void parseWithInListOfReadEventsNode()
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "userA");
 
-        when(serializer.serialize(user)).thenReturn("xwiki:XWiki.UserA");
+        when(this.serializer.serialize(user)).thenReturn("xwiki:XWiki.UserA");
 
         AbstractNode testAST = new NotNode(
                 new InListOfReadEventsNode(user)
         );
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(" NOT (" +
                         "event IN (select status.activityEvent from LegacyEventStatus status " +
@@ -286,11 +277,11 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithInSubQueryNode()
+    void parseWithInSubQueryNode()
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "userA");
 
-        when(serializer.serialize(user)).thenReturn("xwiki:XWiki.UserA");
+        when(this.serializer.serialize(user)).thenReturn("xwiki:XWiki.UserA");
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("id", 12345);
@@ -299,7 +290,7 @@ public class ExpressionNodeToHQLConverterTest
                         "select fb.name in FooBar fb where fb.id = :id", parameters)
         );
 
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
 
         assertEquals(" NOT (event.requestId IN (select fb.name in FooBar fb where fb.id = :id))",
                 result.getQuery());
@@ -307,10 +298,10 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithConcatNode()
+    void parseWithConcatNode()
     {
         AbstractNode testAST = value(TEST_VALUE_1).concat(value(TEST_VALUE_2)).concat(value(TEST_VALUE_2));
-        ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
+        ExpressionNodeToHQLConverter.HQLQuery result = this.parser.parse(testAST);
         assertEquals(String.format("CONCAT(CONCAT(:%s, :%s), :%s)", TEST_VALUE_1_IDENTIFIER,
                 TEST_VALUE_2_IDENTIFIER, TEST_VALUE_2_IDENTIFIER), result.getQuery());
     }

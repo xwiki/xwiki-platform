@@ -47,14 +47,32 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
     @Inject
     private XARXMLReader<ClassPropertyReader.WikiClassProperty> propertyReader;
 
+    /**
+     * Dedicated class to hold information about a read XWiki class.
+     */
     public static class WikiClass
     {
+        /**
+         * The name of the xclass.
+         */
         public String name;
 
+        /**
+         * The parameters of the xclass.
+         */
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public Map<String, WikiClassProperty> properties = new LinkedHashMap<String, WikiClassProperty>();
+        /**
+         * The properties of the xclass.
+         */
+        public Map<String, WikiClassProperty> properties = new LinkedHashMap<>();
 
+        /**
+         * Send events related to the xclass to the proxy filter.
+         *
+         * @param proxyFilter the proxy filter where to send the events.
+         * @throws FilterException in case of problem when sending events.
+         */
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
             proxyFilter.beginWikiClass(this.parameters);
@@ -66,11 +84,18 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
             proxyFilter.endWikiClass(this.parameters);
         }
 
+        /**
+         * @return {@code true} if the properties are empty.
+         */
         public boolean isEmpty()
         {
             return this.properties.isEmpty();
         }
 
+        /**
+         * Put a new property indexed by its name.
+         * @param property the property to be added.
+         */
         public void addProperty(WikiClassProperty property)
         {
             this.properties.put(property.name, property);

@@ -19,11 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.code.source;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.internal.parser.pygments.PygmentsUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -37,8 +35,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.EmailClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
@@ -51,9 +47,6 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 @Singleton
 public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMacroSourceLoader
 {
-    @Inject
-    private GeneralMailConfiguration mailConfiguration;
-
     @Override
     public CodeMacroSource load(XWikiDocument document, EntityReference entityReference,
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
@@ -81,18 +74,9 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
 
         if (xclass != null) {
             PropertyInterface xclassProperty = xclass.get(entityReference.getName());
-
-            // Displaying a password is forbidden
-            if (xclassProperty instanceof PasswordClass) {
+            if (xclassProperty != null && xclassProperty.isSensitive(xcontext)) {
                 throw new MacroExecutionException(String.format(
-                    "Displaying content of property [%s] is not allowed because it's a passwordl", entityReference));
-            }
-
-            // Displaying email is forbidden when obfuscation is enabled
-            if (xclassProperty instanceof EmailClass && this.mailConfiguration.shouldObfuscate()) {
-                throw new MacroExecutionException(
-                    String.format("Displaying content of property [%s] is not allowed because it's an obfuscated email",
-                        entityReference));
+                    "Displaying content of property [%s] is not allowed because it's sensitive.", entityReference));
             }
 
             String language = null;

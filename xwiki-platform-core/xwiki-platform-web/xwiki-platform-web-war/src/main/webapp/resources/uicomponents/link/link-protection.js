@@ -45,11 +45,30 @@ require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-brid
     let currentHostname = window.location.hostname;
     let anchorHostname = anchor.hostname;
     let customizedMessage = l10n.get('url.api.followLinkConfirmationText', currentHostname, anchorHostname);
-    if (configuration == null && !isAnchorCurrentDomain(anchor)) {
-      return confirm(customizedMessage);
-    } else if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
-      return confirm(customizedMessage);
+    let checkURLPolicy = (configuration === null) ? 'COMMENTS' : configuration.frontendUrlCheckPolicy;
+    if (!doesAnchorPositionRequireConfirmation(anchor, checkURLPolicy)) {
+      return true;
     } else {
+      if (configuration == null && !isAnchorCurrentDomain(anchor)) {
+        return confirm(customizedMessage);
+      } else if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
+        return confirm(customizedMessage);
+      } else {
+        return true;
+      }
+    }
+  }
+
+  function doesAnchorPositionRequireConfirmation (anchor, checkUrlPolicy) {
+    // we discard checks if the config is disabled or if we're in the WYSIWYG editor.
+    if (checkUrlPolicy === 'DISABLED' || $(anchor).parents('.cke_editable').length > 0) {
+      return false;
+    } else if (checkUrlPolicy === 'COMMENTS') {
+      return $(anchor).parents('.xwikicomment').length > 0;
+    } else if (checkUrlPolicy === 'ENABLED') {
+      return true;
+    } else {
+      console.error("Unknown frontend check url policy: ", checkUrlPolicy);
       return true;
     }
   }

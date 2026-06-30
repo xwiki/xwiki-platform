@@ -25,15 +25,20 @@
   .xwiki-livedata {
     // LayoutTable
     .layout-table .responsive-table > thead {
-      /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
+      /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use grid display
         because we have two rows, property names and filters, that we want to display as two equally sized columns. */
-      display: flex;
+      display: grid;
+      /* We want the property names column to have the same width as the filter column. */
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: auto;
 
       > tr {
-        /* We want the property names column to have the same width as the filter column. */
-        flex: 1;
-        /* We need to set the width in order to be able to trim long property names. */
-        width: calc(50vw - @grid-gutter-width);
+        display: grid;
+        /* Align the property names column with the filter column. */
+        grid-template-rows: subgrid;
+        /* We need to set a span that is at least as large as the number of properties + 1 (for the entry selector). */
+        /* Hide the calc expression from the LESS compiler as it isn't supported. */
+        grid-row: span calc(~"var(--livedata-property-count) + 1");
       }
     }
 
@@ -47,7 +52,7 @@
     // LayoutTableHeaderNames.vue
     .layout-table th.draggable-item {
       /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
-      display: block;
+      display: flex;
       /* Trim long property names. */
 
       .property-name {

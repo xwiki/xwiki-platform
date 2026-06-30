@@ -21,7 +21,6 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +120,6 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.context);
-        when(this.container.getSession()).thenReturn(this.servletSession);
         Utils.setComponentManager(mockitoComponentManager);
 
         when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
@@ -129,6 +127,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
     private void setupSession()
     {
+        when(this.container.getSession()).thenReturn(this.servletSession);
         when(this.servletSession.getSession()).thenReturn(this.httpSession);
     }
 
@@ -276,11 +275,11 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         XWikiAttachment attachment2 = mock(XWikiAttachment.class);
         XWikiAttachment attachment3 = mock(XWikiAttachment.class);
 
-        List<XWikiAttachment> expectedList = Arrays.asList(attachment1, attachment2, attachment3);
+        List<XWikiAttachment> expectedList = List.of(attachment1, attachment2, attachment3);
         when(temporaryAttachmentSession.getAttachments(documentReference)).thenReturn(expectedList);
 
         // session is null
-        assertEquals(Collections.emptyList(), this.attachmentManager.getUploadedAttachments(documentReference));
+        assertEquals(List.of(), this.attachmentManager.getUploadedAttachments(documentReference));
 
         setupSession();
         assertEquals(expectedList,

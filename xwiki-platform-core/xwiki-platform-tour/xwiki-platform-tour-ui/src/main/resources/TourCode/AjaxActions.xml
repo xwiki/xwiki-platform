@@ -44,7 +44,11 @@
 {{velocity}}
 #set ($action = $request.action)
 #set ($tourName = $request.tourName)
-#if ("$!tourName" != '')
+#if ("$!tourName" != '' &amp;&amp; "$!action" != '')
+  #if (!$services.csrf.isTokenValid($request.form_token))
+    $response.sendError(403, 'CSRF token invalid')
+    #stop
+  #end
   #set ($tourDoc = $xwiki.getDocument($tourName))
   #if ($action == 'editStep')
     ## Save step

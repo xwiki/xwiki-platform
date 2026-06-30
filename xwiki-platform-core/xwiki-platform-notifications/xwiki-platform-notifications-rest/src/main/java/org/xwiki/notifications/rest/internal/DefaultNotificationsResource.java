@@ -46,9 +46,11 @@ import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -82,9 +84,24 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private DefaultNotificationParametersFactory notificationParametersFactory;
 
     @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @Inject
     private RSSFeedRenderer rssFeedRenderer;
 
+    private boolean hasAccess(String userId) throws XWikiException
+    {
+        if (!StringUtils.isEmpty(userId)) {
+            DocumentReference userDoc = this.documentReferenceResolver.resolve(userId);
+            DocumentReference loggedInUserRef = getXWikiContext().getUserReference();
+            return loggedInUserRef != null && loggedInUserRef.equals(userDoc)
+                || this.contextualAuthorizationManager.hasAccess(Right.ADMIN, userDoc);
+        }
+        return true;
+    }
+
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response getNotifications(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -93,39 +110,45 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages,
-            spaces, wikis, users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
-            displayReadEvents, tags, currentWiki, async, asyncId, false, false);
-
-        if (result instanceof String) {
-            response = Response.status(Status.ACCEPTED);
-            response.entity(Collections.singletonMap(ASYNC_ID, result));
+        if (!hasAccess(userId)) {
+            response = Response.status(Status.UNAUTHORIZED);
         } else {
-            // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
-            XWikiContext xcontext = getXWikiContext();
-            xcontext.setURLFactory(
-                xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
+            Object result =
+                getCompositeEvents(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages,
+                    spaces, wikis, users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents,
+                    displaySystemEvents,
+                    displayReadEvents, tags, currentWiki, async, asyncId, false, false);
 
-            // Make sure to rendering the notifications in the right wiki
-            String currentOriginalWiki = xcontext.getOriginalWikiId();
-            try {
-                if (currentWiki != null) {
-                    xcontext.setOriginalWikiId(currentWiki);
+            if (result instanceof String) {
+                response = Response.status(Status.ACCEPTED);
+                response.entity(Collections.singletonMap(ASYNC_ID, result));
+            } else {
+                // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
+                XWikiContext xcontext = getXWikiContext();
+                xcontext.setURLFactory(
+                    xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
+
+                // Make sure to rendering the notifications in the right wiki
+                String currentOriginalWiki = xcontext.getOriginalWikiId();
+                try {
+                    if (currentWiki != null) {
+                        xcontext.setOriginalWikiId(currentWiki);
+                    }
+
+                    Notifications notifications = new Notifications(this.notificationsRenderer
+                        .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+
+                    response = Response.ok(notifications);
+                } finally {
+                    xcontext.setOriginalWikiId(currentOriginalWiki);
                 }
-
-                Notifications notifications = new Notifications(this.notificationsRenderer
-                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
-
-                response = Response.ok(notifications);
-            } finally {
-                xcontext.setOriginalWikiId(currentOriginalWiki);
             }
-        }
 
-        // Add the "cache control" header.
-        CacheControl cacheControl = new CacheControl();
-        cacheControl.setNoCache(true);
-        response.cacheControl(cacheControl);
+            // Add the "cache control" header.
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setNoCache(true);
+            response.cacheControl(cacheControl);
+        }
 
         return response.build();
     }
@@ -135,6 +158,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return validateAndGetLimit(NumberUtils.toInt(maxCount, defaultMaxCount));
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -176,6 +200,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response getNotificationsCount(String useUserPreferences, String userId, String pages, String spaces,
         String wikis, String users, String maxCount, String displayOwnEvents, String displayMinorEvents,
         String displaySystemEvents, String displayReadEvents, String displayReadStatus, String tags, String currentWiki,
@@ -183,8 +208,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
-        if (!StringUtils.isEmpty(userId) && xWikiUser == null) {
+        if (!hasAccess(userId)) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
             Object result = getCompositeEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
@@ -207,16 +231,13 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public String getNotificationsRSS(String useUserPreferences, String userId, String untilDate, String blackList,
         String pages, String spaces, String wikis, String users, String maxCount, String displayOwnEvents,
         String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
         String tags, String currentWiki) throws Exception
     {
-        // Build the response
-        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
-        DocumentReference userIdDoc = this.documentReferenceResolver.resolve(userId);
-        if ((xWikiUser == null && !StringUtils.isEmpty(userId))
-            || (xWikiUser != null && !userIdDoc.equals(xWikiUser.getUserReference()))) {
+        if (!hasAccess(userId)) {
             getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         } else {
@@ -230,6 +251,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response postNotifications(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String count, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -241,6 +263,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,

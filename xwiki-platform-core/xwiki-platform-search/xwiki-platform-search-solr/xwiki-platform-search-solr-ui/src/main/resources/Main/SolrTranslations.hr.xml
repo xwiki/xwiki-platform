@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija im
 solr.admin.indexing.wiki.select_farm=Cijela farma
 solr.admin.indexing.query.label=Korisnički upit
 solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-solr.sortBy=Poredaj po\:
-solr.sortBy.score=Relevantnosti
-solr.sortBy.title_sort=Naslovu
-solr.sortBy.date=Datumu posljednje izmjene
-solr.sortBy.author_display_sort=Posljednjem autoru
-solr.sortBy.filename_sort=Imenu datoteke
-solr.sortBy.attsize_sort=Veličini datoteke
-solr.sortBy.attdate_sort=Datumu otpreme
-solr.sortBy.attauthor_display_sort=Otpremitelju
-solr.sortOrder.asc=Uzlazno
-solr.sortOrder.desc=Silazno
-solr.options=Prikaži\:
-solr.options.highlight=Označavanje
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Prikaži ekstrakt podudaranja u svakom rezultatu
-solr.options.facet=Facete
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Omogući dodatno filtriranje rezultata
 solr.result.language=Jezik
 solr.result.locatedIn=Na lokaciji
@@ -172,6 +172,18 @@ solr.result.location=Na lokaciji {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Lokacija
+solr.sortBy=Poredaj po\:
+solr.sortBy.score=Relevantnosti
+solr.sortBy.title_sort=Naslovu
+solr.sortBy.date=Datumu posljednje izmjene
+solr.sortBy.author_display_sort=Posljednjem autoru
+solr.sortBy.filename_sort=Imenu datoteke
+solr.sortBy.attsize_sort=Veličini datoteke
+solr.sortBy.attdate_sort=Datumu otpreme
+solr.sortBy.attauthor_display_sort=Otpremitelju
+solr.options=Prikaži\:
+solr.options.highlight=Označavanje
+solr.options.facet=Facete
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

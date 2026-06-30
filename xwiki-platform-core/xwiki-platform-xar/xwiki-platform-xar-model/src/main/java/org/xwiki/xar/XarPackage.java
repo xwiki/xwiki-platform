@@ -195,16 +195,12 @@ public class XarPackage
      */
     public void read(InputStream xarStream) throws IOException
     {
-        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false);
-
-        try {
+        try (ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false)) {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
                 if (!entry.isDirectory() && zis.canReadEntryData(entry)) {
                     readEntry(zis, entry.getName());
                 }
             }
-        } finally {
-            zis.close();
         }
     }
 

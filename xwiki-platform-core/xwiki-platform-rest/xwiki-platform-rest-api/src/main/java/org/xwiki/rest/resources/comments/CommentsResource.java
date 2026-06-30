@@ -38,6 +38,8 @@ import org.xwiki.rest.model.jaxb.Comments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/comments")
 public interface CommentsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Comments getComments(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +49,8 @@ public interface CommentsResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @POST Response postComment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

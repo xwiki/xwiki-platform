@@ -52,10 +52,10 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 public final class XWikiSecurityRule implements SecurityRule
 {
     /** The set of users. */
-    private final Set<DocumentReference> users = new HashSet<DocumentReference>();
+    private final Set<DocumentReference> users = new HashSet<>();
 
     /** The set of groups. */
-    private final Set<DocumentReference> groups = new HashSet<DocumentReference>();
+    private final Set<DocumentReference> groups = new HashSet<>();
 
     /** The set of right levels. */
     private final RightSet rights = new RightSet();

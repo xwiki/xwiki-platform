@@ -52,4 +52,12 @@ public interface RepositoryConfiguration
      * @throws XWikiException when failing to access the configuration
      */
     boolean isValidType(String type) throws XWikiException;
+
+    /**
+     * @return true if the REST API allows passing a custom repository, false otherwise
+     * @throws XWikiException when failing to access the configuration
+     * @since 18.3.0
+     * @since 17.10.8
+     */
+    boolean isAllowedCustomRepository() throws XWikiException;
 }

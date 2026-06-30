@@ -123,6 +123,8 @@ public interface AuthorizationManager
 
     /**
      * Unregister the given custom {@link Right}.
+     * Note: this method doesn't have any effect until
+     * <a href="https://jira.xwiki.org/browse/XWIKI-23939">XWIKI-23939</a> is properly fixed.
      *
      * @param right the custom right to unregister.
      * @throws AuthorizationException if the right is not custom.

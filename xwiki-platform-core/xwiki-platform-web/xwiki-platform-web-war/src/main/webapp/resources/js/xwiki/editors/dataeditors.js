@@ -18,18 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'jquery-ui': $services.webjars.url('jquery-ui', "jquery-ui#if ($services.debug.minify).min#{end}.js")
-})
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
 
-(function(icons, paths) {
+(function(icons) {
   "use strict";
-  require.config({
-    paths
-  });
   define('dataeditors-translations', {
     prefix: 'core.editors.',
     keys: [
@@ -66,6 +60,7 @@
           deletedXObjects: {} // objects deleted but not removed yet
         };
         this.editedDocument = XWiki.currentDocument;
+        this.submitInProgress = false;
         this.unsavedChanges = false;
 
         $('.xclass').each(function() {
@@ -105,7 +100,12 @@
           }
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+
+        $(document).on('xwiki:document:saveFailed', function () {
+          self.submitInProgress = false;
         });
 
         // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
@@ -115,7 +115,15 @@
           $('input[name=addedObjects]').remove();
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+        // Disable the leave confirmation during Save & View navigation while preserving the dirty state for Save &
+        // Continue until the save has actually completed.
+        $(document).on('xwiki:actions:save', function (event, data) {
+          if (!data?.continue) {
+            self.submitInProgress = true;
+          }
         });
         // We want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
         // to create a property or an object.
@@ -123,11 +131,11 @@
             return $(this).parents('#add_xproperty,#add_xobject').length === 0
                 && $(this).parents('.xclass').length > 0;
         };
-        $('input,textarea').filter(filterInputs).on('change', function(e) {
+        $('input,textarea,select').filter(filterInputs).on('change', function(e) {
           self.unsavedChanges = true;
         });
         $(document).on('xwiki:dom:updated', function (event, data) {
-          $(data.elements).find('input,textarea').filter(filterInputs).on('change', function (e) {
+          $(data.elements).find('input,textarea,select').filter(filterInputs).on('change', function (e) {
             self.unsavedChanges = true;
           });
         });
@@ -136,6 +144,10 @@
         // We cannot use jQuery style to listen on event for this one as apparently it's not working
         // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
         window.onbeforeunload = function(event) {
+          if (self.submitInProgress) {
+            self.submitInProgress = false;
+            return;
+          }
           if (Object.keys(self.editorStatus.addedXObjects).length > 0
             || Object.keys(self.editorStatus.deletedXObjects).length > 0
             || self.unsavedChanges) {
@@ -302,7 +314,6 @@
           this.ajaxObjectDeletion(object);
           this.editButtonBehavior(object);
           this.expandCollapseObject(object);
-          this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
         }
       }
 
@@ -490,7 +501,9 @@
             if (!item.disabled) {
               item.prop('disabled', true);
               let notification = new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.inProgress'], "inprogress");
-              $.post(item.href).done(function(data) {
+              $.post(item.attr('data-action'), {
+                'form_token': xm.form_token
+              }).done(function(data) {
                 // Remove deprecated properties box
                 container.find(".deprecatedProperties").remove();
                 notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.done'], "done"));
@@ -533,9 +546,9 @@
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
                 let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
-                // Expand the newly inserted property, since the user will probably want to edit it once it was added
-                self.expandCollapseMetaProperty(insertedPropertyElt);
-                // Make teh newly added property sortable
+                // Make the newly added property collapsable since the user will probably want to edit it
+                self.expandCollapseMetaProperty(insertedPropertyElt, true);
+                // Make the newly added property sortable
                 self.makeSortable(insertedPropertyElt);
                 self.ajaxPropertyDeletion(insertedPropertyElt);
                 self.makeDisableVisible(insertedPropertyElt);
@@ -543,7 +556,8 @@
               }).fail(function (error) {
                 // FIXME: we should change translation value for action.addClassProperty.error.invalidName
                 let failureReason = error.responseText.replaceAll("&#60;br/&#62;", "<br/>") || 'Server not responding';
-                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason, "error"));
+                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason,
+                  "error", {textHtml: true}));
               }).always(function () {
                 item.prop('disabled', false);
               });
@@ -653,6 +667,7 @@
               // display the elements before firing the event to be sure they are visible.
               object.toggleClass('collapsed');
               $(document).trigger('xwiki:dom:updated', {elements: objectContent.toArray()});
+              self.ajaxRemoveDeprecatedProperties(objectContent, ".syncProperties");
               notification.replace(new XWiki.widgets.Notification(l10n['object.loadObject.done'], "done"));
             }).fail(function (error) {
               let failureReason = error.responseText || 'Server not responding';
@@ -683,15 +698,20 @@
 
       // ------------------------------------
       // Class editor: expand-collapse meta properties
-      expandCollapseMetaProperty(property) {
+      expandCollapseMetaProperty(property, startExpanded = false) {
         let propertyTitle = property.find('.xproperty-title');
         if (!propertyTitle) {
           // No such object...
           return;
         }
         property.addClass('collapsable');
-        property.addClass('collapsed');
-        propertyTitle.on('click', function() {
+        // By default, the property is collapsed when made collapsable.
+        if(!startExpanded) {
+          property.addClass('collapsed');
+        }
+        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // especially the move action which is dragAndDrop.
+        propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
         });
       }
@@ -798,7 +818,7 @@
     }
 
     function init() {
-      XWiki = window.XWiki || {};
+      const XWiki = globalThis.XWiki = globalThis.XWiki || {};
       XWiki.editors = XWiki.editors || {};
       XWiki.editors.XDataEditors = new XDataEditors();
       initSwitchClassListener();
@@ -807,4 +827,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $paths]));
+}).apply(']]#', $jsontool.serialize([$icons]));

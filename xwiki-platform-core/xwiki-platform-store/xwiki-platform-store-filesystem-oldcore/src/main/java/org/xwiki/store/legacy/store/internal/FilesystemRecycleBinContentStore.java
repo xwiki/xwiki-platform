@@ -19,7 +19,6 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
@@ -29,9 +28,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.FileDeleteTransactionRunnable;
-import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.blob.Blob;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
+import org.xwiki.store.internal.BlobSaveTransactionRunnable;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -61,7 +61,7 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private Provider<DeletedDocumentContentFileSerializer> serializerProvider;
+    private Provider<DeletedDocumentContentBlobSerializer> serializerProvider;
 
     @Override
     public String getHint()
@@ -76,15 +76,16 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
 
         final XWikiHibernateTransaction transaction = new XWikiHibernateTransaction(xcontext);
 
-        final File contentFile =
-            this.fileTools.getDeletedDocumentFileProvider(document.getDocumentReferenceWithLocale(), index)
-                .getDeletedDocumentContentFile();
-        DeletedDocumentContentFileSerializer serializer = this.serializerProvider.get();
-        serializer.init(document, StandardCharsets.UTF_8.name());
-        new FileSaveTransactionRunnable(contentFile, fileTools.getTempFile(contentFile),
-            fileTools.getBackupFile(contentFile), fileTools.getLockForFile(contentFile), serializer).runIn(transaction);
-
         try {
+            final Blob contentFile =
+                this.fileTools.getDeletedDocumentFileProvider(document.getDocumentReferenceWithLocale(), index)
+                    .getDeletedDocumentContentBlob();
+            DeletedDocumentContentBlobSerializer serializer = this.serializerProvider.get();
+            serializer.init(document, StandardCharsets.UTF_8.name());
+            new BlobSaveTransactionRunnable(contentFile, this.fileTools.getTempFile(contentFile),
+                this.fileTools.getBackupFile(contentFile),
+                this.fileTools.getLockForFile(contentFile.getPath()), serializer).runIn(transaction);
+
             transaction.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -97,11 +98,17 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     public XWikiDeletedDocumentContent get(DocumentReference reference, long index, boolean bTransaction)
         throws XWikiException
     {
-        final File contentFile =
-            this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentFile();
+        try {
+            final Blob contentFile =
+                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentBlob();
 
-        if (contentFile.exists()) {
-            return new XWikiFileDeletedDocumentContent(contentFile, StandardCharsets.UTF_8);
+            if (contentFile.exists()) {
+                return new XWikiFileDeletedDocumentContent(contentFile, StandardCharsets.UTF_8);
+            }
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
+                "Exception while loading deleted document content.", e);
         }
 
         return null;
@@ -114,16 +121,16 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
 
         final XWikiHibernateTransaction transaction = new XWikiHibernateTransaction(xcontext);
 
-        final File contentFile =
-            this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentFile();
-        new FileDeleteTransactionRunnable(contentFile, this.fileTools.getBackupFile(contentFile),
-            this.fileTools.getLockForFile(contentFile)).runIn(transaction);
-
         try {
+            final Blob contentFile =
+                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentBlob();
+            new BlobDeleteTransactionRunnable(contentFile, this.fileTools.getBackupFile(contentFile),
+                this.fileTools.getLockForFile(contentFile.getPath())).runIn(transaction);
+
             transaction.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                 "Exception while deleting deleted document content.", e);
         }
     }

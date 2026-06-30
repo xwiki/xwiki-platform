@@ -72,6 +72,20 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
         return this.usersLiveData;
     }
 
+    /**
+     * Click on the edit button of the given user.
+     *
+     * @param rowNumber the row number of the user to edit
+     * @return the edit user modal
+     * @since 17.10.9
+     * @since 18.4.0RC1
+     */
+    public EditUserModal clickEditUser(int rowNumber)
+    {
+        getUsersLiveData().getTableLayout().clickAction(rowNumber, "edit");
+        return new EditUserModal();
+    }
+
     public DeleteUserConfirmationModal clickDeleteUser(int rowNumber)
     {
         getUsersLiveData().getTableLayout().clickAction(rowNumber, "delete");

@@ -24,6 +24,8 @@
 #if($xcontext.getAction() != 'edit')
   $response.sendRedirect($doc.getURL('edit',"editor=object"))
 #end
+## Include xwikivars to ensure variables are available
+#template('xwikivars.vm')
 ## Macros
 ##
 #*
@@ -98,16 +100,27 @@
       <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
         #foreach ($prop in $deprecatedProperties)
-          <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-          <dd class="disabled">${escapetool.xml($prop.value)}</dd>
+          <dt class="disabled property-name"><label>${escapetool.xml($prop.name)}:</label></dt>
+          #if ($prop.sensitive)
+            <dd class="disabled obfuscated property-value" data-property-name="$escapetool.xml($prop.name)">
+              <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+                $services.icon.renderHTML('info')
+              </span>
+            </dd>
+          #else
+            <dd class="disabled property-value" data-property-name="$escapetool.xml($prop.name)">
+              ${escapetool.xml($prop.value)}
+            </dd>
+          #end
         #end
       </dl>
       <div>
-        <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
+        <button class="btn btn-danger syncProperties"
+          data-action='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">
           $services.icon.renderHTML('cross')
           $services.localization.render('core.editors.object.removeDeprecatedProperties.link')
-        </a>
+        </button>
       </div>
     #end
     #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
@@ -263,10 +276,13 @@
   #if ($mustSync)
     #define ($warningMessageContent)
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" 
-        title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+      <div>
+        <button class="btn btn-danger syncProperties syncAllProperties" data-action="$doc.getURL('objectsync')"
+              title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+        $services.icon.renderHTML('cross')
         $services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')
-      </a></div>
+        </button>
+      </div>
     #end
     #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
   #end
@@ -410,9 +426,6 @@
       <input type="hidden" name="xcontinue" value="$doc.getURL($xcontext.action, $q)"/>
       ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from other views.
       <input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}" />
-      ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
-      ## to prevent from accidentally adding objects when pressing enter.
-      #editActionButton('preview', 'preview')
     </div>
     <div id="xwikiobjects">
   #if (!$hasCustomClass)

@@ -21,19 +21,22 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,49 +49,46 @@ import static org.mockito.Mockito.when;
  * @since 9.6RC1
  * @version $Id$
  */
-public class LiveNotificationEmailListenerTest
+@ComponentTest
+class LiveNotificationEmailListenerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<LiveNotificationEmailListener> mocker =
-            new MockitoComponentMockingRule<>(LiveNotificationEmailListener.class);
+    @InjectMockComponents
+    private LiveNotificationEmailListener listener;
 
+    @MockComponent
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
+    @MockComponent
     private LiveNotificationEmailManager liveNotificationEmailManager;
 
+    @MockComponent
     private NotificationConfiguration notificationConfiguration;
 
+    @MockComponent
+    @Named("context")
     private ComponentManager componentManager;
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.recordableEventDescriptorManager =
-                this.mocker.registerMockComponent(RecordableEventDescriptorManager.class);
-
-        this.liveNotificationEmailManager = this.mocker.registerMockComponent(LiveNotificationEmailManager.class);
-
-        this.notificationConfiguration = this.mocker.registerMockComponent(NotificationConfiguration.class);
-
-        this.componentManager = this.mocker.registerMockComponent(ComponentManager.class, "context");
-
         // Override the default output streams in order for the tests to pass even if the thread raised by the test
         // crashes and log its crash to console.
-        System.setOut(new PrintStream(outContent));
-        System.setErr(new PrintStream(errContent));
+        System.setOut(new PrintStream(this.outContent));
+        System.setErr(new PrintStream(this.errContent));
     }
 
-    @After
-    public void cleanUpStreams() {
+    @AfterEach
+    void cleanUpStreams()
+    {
         System.setOut(null);
         System.setErr(null);
     }
 
     @Test
-    public void testOnEvent() throws Exception
+    void onEvent() throws Exception
     {
         Event eventStreamEvent = mock(Event.class);
         EventStreamAddedEvent event = mock(EventStreamAddedEvent.class);
@@ -96,13 +96,13 @@ public class LiveNotificationEmailListenerTest
         RecordableEventDescriptor eventDescriptor = mock(RecordableEventDescriptor.class);
         when(eventDescriptor.getEventType()).thenReturn("eventType");
         when(this.recordableEventDescriptorManager.getRecordableEventDescriptors(true))
-                .thenReturn(Arrays.asList(eventDescriptor));
+                .thenReturn(List.of(eventDescriptor));
         when(eventStreamEvent.getType()).thenReturn("eventType");
 
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
         when(this.notificationConfiguration.isEnabled()).thenReturn(true);
 
-        this.mocker.getComponentUnderTest().onEvent(event, eventStreamEvent, null);
+        this.listener.onEvent(event, eventStreamEvent, null);
 
         verify(this.liveNotificationEmailManager, times(1)).addEvent(eventStreamEvent);
     }

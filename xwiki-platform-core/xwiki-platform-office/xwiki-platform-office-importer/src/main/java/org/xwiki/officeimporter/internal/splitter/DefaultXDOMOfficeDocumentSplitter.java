@@ -74,8 +74,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         OfficeDocumentSplitterParameters parameters) throws OfficeImporterException
     {
         ComponentManager componentManager = this.componentManagerProvider.get();
-        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
-            new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
+        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result = new HashMap<>();
 
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion =

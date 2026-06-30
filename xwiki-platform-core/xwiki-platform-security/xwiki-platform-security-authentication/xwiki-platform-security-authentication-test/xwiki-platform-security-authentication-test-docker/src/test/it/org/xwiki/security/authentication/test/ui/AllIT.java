@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authentication.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,13 +32,11 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Reset Password")
     class NestedResetPasswordIT extends ResetPasswordIT
     {
     }
 
     @Nested
-    @DisplayName("Forgot Username")
     class NestedForgotUsernameIT extends ForgotUsernameIT
     {
     }

@@ -19,19 +19,20 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -44,15 +45,17 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ReferenceComponentList
-public class CommentEventGeneratorListenerTest
+@OldcoreTest
+class CommentEventGeneratorListenerTest
 {
-    public MockitoComponentMockingRule<CommentEventGeneratorListener> mocker =
-        new MockitoComponentMockingRule<CommentEventGeneratorListener>(CommentEventGeneratorListener.class);
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
+    @InjectMockComponents
+    private CommentEventGeneratorListener listener;
 
-    private ObservationManager mockObservation;
+    @MockComponent
+    private ObservationManager observationManager;
 
     private XWikiDocument commentXClassDocument;
 
@@ -64,8 +67,8 @@ public class CommentEventGeneratorListenerTest
 
     private XWikiDocument documentOrigin;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void beforeEach()
     {
         this.commentXClassDocument = new XWikiDocument(new DocumentReference("wiki", "XWiki", "XWikiComments"));
         this.commentXClass = this.commentXClassDocument.getXClass();
@@ -77,42 +80,40 @@ public class CommentEventGeneratorListenerTest
 
         this.commentXObject = new BaseObject();
         this.commentXObject.setXClassReference(this.commentXClass.getDocumentReference());
-
-        this.mockObservation = this.mocker.getInstance(ObservationManager.class);
     }
 
     @Test
-    public void testAddComment() throws ComponentLookupException
+    void addComment()
     {
         this.document.addXObject(this.commentXObject);
 
         final Event event = new CommentAddedEvent("wiki:space.page", "0");
 
-        this.mocker.getComponentUnderTest().onEvent(new XObjectAddedEvent(this.commentXObject.getReference()), this.document,
+        this.listener.onEvent(new XObjectAddedEvent(this.commentXObject.getReference()), this.document,
             this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment added event
-        verify(this.mockObservation)
-            .notify(any(event.getClass()), same(document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager)
+            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testDeleteComment() throws ComponentLookupException
+    void deleteComment()
     {
         this.documentOrigin.addXObject(this.commentXObject);
 
         final Event event = new CommentDeletedEvent("wiki:space.page", "0");
 
-        this.mocker.getComponentUnderTest().onEvent(new XObjectDeletedEvent(this.commentXObject.getReference()),
-            this.document, this.oldcore.getXWikiContext());
+        this.listener.onEvent(new XObjectDeletedEvent(this.commentXObject.getReference()), this.document,
+            this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment deleted event
-        verify(this.mockObservation)
-            .notify(any(event.getClass()), same(document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager)
+            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedComment() throws ComponentLookupException
+    void modifiedComment()
     {
         this.document.addXObject(this.commentXObject);
         this.documentOrigin.addXObject(this.commentXObject.clone());
@@ -121,11 +122,11 @@ public class CommentEventGeneratorListenerTest
 
         final Event event = new CommentUpdatedEvent("wiki:space.page", "0");
 
-        this.mocker.getComponentUnderTest().onEvent(new XObjectUpdatedEvent(this.commentXObject.getReference()),
-            this.document, this.oldcore.getXWikiContext());
+        this.listener.onEvent(new XObjectUpdatedEvent(this.commentXObject.getReference()), this.document,
+            this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment updated event
-        verify(this.mockObservation)
-            .notify(any(event.getClass()), same(document), same(this.oldcore.getXWikiContext()));
+        verify(this.observationManager)
+            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 }

@@ -93,6 +93,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initializable
 {
     /**

@@ -106,7 +106,7 @@ class ObjectsAtPageVersionResourceImplTest
     private XWikiDocument document;
 
     @BeforeEach
-    public void setUp() throws XWikiException, URISyntaxException, IllegalAccessException
+    void setUp() throws XWikiException, URISyntaxException, IllegalAccessException
     {
         when(this.uriInfo.getBaseUri()).thenReturn(new URI("https://test/"));
         FieldUtils.writeField(this.objectsAtPageVersionResource, "uriInfo", this.uriInfo, true);
@@ -127,9 +127,8 @@ class ObjectsAtPageVersionResourceImplTest
         baseObject.setStringListValue(XWikiConstant.TAG_CLASS_PROP_TAGS, List.of("deleted"));
         when(this.deletedDocumentRevisionProvider.getRevision(this.document.getDocumentReferenceWithLocale(),
             "1")).thenReturn(deletedVersion);
-        when(this.mockitoOldcore.getMockRightService().hasAccessLevel("view",
-            this.mockitoOldcore.getXWikiContext().getUser(), this.document.getPrefixedFullName(),
-            this.mockitoOldcore.getXWikiContext())).thenReturn(true);
+        when(this.mockitoOldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW,
+            this.document.getDocumentReference())).thenReturn(true);
 
         Objects objects = this.objectsAtPageVersionResource.getObjects(DOCUMENT_REFERENCE.getWikiReference().getName(),
             DOCUMENT_REFERENCE.getParent().getName(), DOCUMENT_REFERENCE.getName(), version, 0, 10, false);
@@ -142,9 +141,12 @@ class ObjectsAtPageVersionResourceImplTest
         doThrow(new AuthorizationException("Access denied")).when(this.deletedDocumentRevisionProvider)
             .checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, "1");
 
+        String wikiName = DOCUMENT_REFERENCE.getWikiReference().getName();
+        String parentName = DOCUMENT_REFERENCE.getParent().getName();
+        String documentName = DOCUMENT_REFERENCE.getName();
         WebApplicationException webApplicationException = assertThrows(WebApplicationException.class,
-            () -> this.objectsAtPageVersionResource.getObjects(DOCUMENT_REFERENCE.getWikiReference().getName(),
-                DOCUMENT_REFERENCE.getParent().getName(), DOCUMENT_REFERENCE.getName(), version, 0, 10, false));
+            () -> this.objectsAtPageVersionResource.getObjects(wikiName,
+                parentName, documentName, version, 0, 10, false));
         assertEquals(404, webApplicationException.getResponse().getStatus());
     }
 }

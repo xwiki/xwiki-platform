@@ -26,6 +26,7 @@ import org.openqa.selenium.Keys;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomeEditPage;
+import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationTemplateProviderEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -158,5 +159,45 @@ class ApplicationNameIT
         // Proceed to the next step.
         assertEquals("/" + appName + "/Code/" + appName + "Class",
             appCreatePage.clickNextStep().getBreadcrumbContent());
+    }
+
+    /**
+     * The default location of a new application must be the wiki root, regardless of the wiki home page. The wizard
+     * uses the wiki reference as the default parent, which is independent of the page configured as the wiki home page.
+     *
+     * @since 18.6.0RC1
+     */
+    @Order(4)
+    @Test
+    void defaultLocationIsWikiRootEvenWhenHomePageChanged(TestUtils setup, TestReference testReference)
+    {
+        String appName = testReference.getLastSpaceReference().getName();
+        try {
+            // Change the main wiki home page to a non-default page. The main wiki descriptor is
+            // XWiki.XWikiServerXwiki, holding an XWiki.XWikiServerClass object whose "homepage" field drives the
+            // wiki home page. The target page need not exist since the test never navigates to it.
+            setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "homepage",
+                "Sandbox.WebHome");
+
+            // Create an application, leaving the location (step 1) at its default.
+            ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
+            appCreatePage.setApplicationName(appName);
+
+            // The default parent is the wiki root, displayed as an empty parent input.
+            assertEquals("", appCreatePage.getLocationPicker().getParent());
+
+            // Finish the wizard and verify the created application sits at the wiki root.
+            ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
+            ApplicationTemplateProviderEditPage templatePage = classEditPage.clickNextStep();
+            ApplicationHomeEditPage homeEditPage = templatePage.clickNextStep();
+            ApplicationHomePage homePage = homeEditPage.clickFinish();
+
+            // An application at the wiki root has a breadcrumb made only of its own name.
+            assertEquals("/" + appName, homePage.getBreadcrumbContent());
+        } finally {
+            // Restore the default main wiki home page so other tests are not affected.
+            setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "homepage",
+                "Main.WebHome");
+        }
     }
 }

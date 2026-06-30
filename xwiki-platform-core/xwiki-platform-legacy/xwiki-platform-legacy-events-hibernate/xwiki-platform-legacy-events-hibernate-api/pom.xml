@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-legacy-events-hibernate</artifactId>
-        <version>17.10.0-SNAPSHOT</version>
+        <version>18.6.0-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
     <name>XWiki Platform - Legacy - Events Hibernate - API</name>
@@ -73,22 +73,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <configuration>
-                            <excludes>
-                                org/xwiki/eventstream/store/internal/LegacyEventStatusManager.java
-                            </excludes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

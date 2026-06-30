@@ -156,7 +156,7 @@
     &lt;div class='candidateDetails'&gt;
       &lt;form class='xformInline' method='post'&gt;
         &lt;div class='candidateNameAndComment'&gt;
-          $xwiki.getUserName($userFullName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
+          $xwiki.getUserName($userFullName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$escapetool.xml($userComment)&lt;/span&gt;#end
         &lt;/div&gt;
         &lt;div class='date xHint'&gt;
           #if ($candidateMember.getValue('date'))

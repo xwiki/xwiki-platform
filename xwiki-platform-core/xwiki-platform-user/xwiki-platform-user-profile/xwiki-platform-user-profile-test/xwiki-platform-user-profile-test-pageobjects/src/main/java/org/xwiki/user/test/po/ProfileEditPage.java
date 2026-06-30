@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -55,7 +56,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserFirstName()
     {
-        return this.userFirstName.getText();
+        return this.userFirstName.getAttribute("value");
     }
 
     public void setUserFirstName(String userFirstName)
@@ -66,7 +67,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserLastName()
     {
-        return this.userLastName.getText();
+        return this.userLastName.getAttribute("value");
     }
 
     public void setUserLastName(String userLastName)
@@ -77,7 +78,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserCompany()
     {
-        return this.userCompany.getText();
+        return this.userCompany.getAttribute("value");
     }
 
     public void setUserCompany(String userCompany)
@@ -88,7 +89,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserAbout()
     {
-        return this.userAbout.getText();
+        return this.userAbout.getAttribute("value");
     }
 
     public void setUserAbout(String userAbout)
@@ -99,7 +100,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserEmail()
     {
-        return this.userEmail.getText();
+        return this.userEmail.getAttribute("value");
     }
 
     public void setUserEmail(String userEmail)
@@ -110,7 +111,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserPhone()
     {
-        return this.userPhone.getText();
+        return this.userPhone.getAttribute("value");
     }
 
     public void setUserPhone(String userPhone)
@@ -121,7 +122,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserAddress()
     {
-        return this.userAddress.getText();
+        return this.userAddress.getAttribute("value");
     }
 
     public void setUserAddress(String userAddress)
@@ -132,7 +133,7 @@ public class ProfileEditPage extends EditPage
 
     public String getUserBlog()
     {
-        return this.userBlog.getText();
+        return this.userBlog.getAttribute("value");
     }
 
     public void setUserBlog(String userBlog)
@@ -143,12 +144,26 @@ public class ProfileEditPage extends EditPage
 
     public String getUserBlogFeed()
     {
-        return this.userBlogFeed.getText();
+        return this.userBlogFeed.getAttribute("value");
     }
 
     public void setUserBlogFeed(String userBlogFeed)
     {
         this.userBlogFeed.clear();
         this.userBlogFeed.sendKeys(userBlogFeed);
+    }
+
+    /**
+     * Sets the value of a custom {@code XWiki.XWikiUsers} property (i.e. one added to extend the user profile).
+     *
+     * @param propertyName the name of the property on the {@code XWiki.XWikiUsers} class
+     * @param value the value to set
+     * @since 18.5.0RC1
+     */
+    public void setUserCustomProperty(String propertyName, String value)
+    {
+        WebElement field = getDriver().findElement(By.id("XWiki.XWikiUsers_0_" + propertyName));
+        field.clear();
+        field.sendKeys(value);
     }
 }

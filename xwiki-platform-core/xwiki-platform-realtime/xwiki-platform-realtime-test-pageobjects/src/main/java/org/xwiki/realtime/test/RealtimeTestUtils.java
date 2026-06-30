@@ -39,6 +39,10 @@ import org.xwiki.test.ui.TestUtils;
  */
 public final class RealtimeTestUtils
 {
+    private static final String NETFLUX = "'netflux'";
+
+    private static final String BAD_NETFLUX = "'bad-netflux'";
+
     private RealtimeTestUtils()
     {
     }
@@ -71,7 +75,7 @@ public final class RealtimeTestUtils
         Property realtimeConfigProperty = setup.rest().get(ObjectPropertyResource.class,
             realtimeConfigReference);
         String originalValue = realtimeConfigProperty.getValue();
-        realtimeConfigProperty.setValue(originalValue.replace("'netflux'", "'bad-netflux'"));
+        realtimeConfigProperty.setValue(originalValue.replace(NETFLUX, BAD_NETFLUX));
         TestUtils.assertStatusCodes(
             setup.rest().executePut(
                 ObjectPropertyResource.class,
@@ -87,8 +91,10 @@ public final class RealtimeTestUtils
 
         } finally {
             // Restore the original realtime configuration.
+            setup.maybeLeaveEditMode();
             setup.loginAsSuperAdmin();
-            realtimeConfigProperty.setValue(originalValue);
+            // The original value might used the 'bad-netflux' value due to a previous failed test.
+            realtimeConfigProperty.setValue(originalValue.replace(BAD_NETFLUX, NETFLUX));
             TestUtils.assertStatusCodes(
                 setup.rest().executePut(
                     ObjectPropertyResource.class,

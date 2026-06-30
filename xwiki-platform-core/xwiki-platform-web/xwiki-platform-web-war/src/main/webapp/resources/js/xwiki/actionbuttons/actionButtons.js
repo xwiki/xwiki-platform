@@ -23,24 +23,15 @@
 
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
-  var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
+  const actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
-  // we need to handle the creation of document
-  var currentDocument;
-  var editingVersionDateField = $('editingVersionDate');
-  var previousVersionField = $('previousVersion');
-  var isNewField = $('isNew');
-
-  var refreshVersion = function (event) {
-    if (currentDocument.equals(event.memo.documentReference)) {
-      if (previousVersionField) {
-        previousVersionField.setValue(event.memo.version);
-      }
-      if (isNewField) {
-        isNewField.setValue(false);
-      }
+  function refreshVersion(event) {
+    if (XWiki.currentDocument.documentReference.equals(event.memo.documentReference)) {
+      $('previousVersion')?.setValue(event.memo.version);
+      $('editingVersionDate')?.setValue(Date.now());
+      $('isNew')?.setValue(false);
     }
-  };
+  }
 
   /**
    * Allow custom validation messages to be set on the validated field usin data attributes.
@@ -87,6 +78,11 @@ var XWiki = (function(XWiki) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'preview'));
       }.bind(this));
       $$('input[name=action_save]').each(function(item) {
+        item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
+      }.bind(this));
+      // Bind also on propupdate which is used in the class editor. This is a custom form, but we still bind the
+      // button here to have the same save events.
+      $$('input[name=action_propupdate]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
       }.bind(this));
       $$('input[name=action_saveandcontinue]').each(function(item) {
@@ -228,7 +224,7 @@ var XWiki = (function(XWiki) {
       this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
       this.failedBox = new XWiki.widgets.Notification(
         '$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""></span>"]))',
-        "error", {inactive: true});
+        "error", {inactive: true, textHtml: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
       this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});
@@ -257,9 +253,9 @@ var XWiki = (function(XWiki) {
         this.form?.enable();
       }
     },
-    getFormData: function(action) {
+    getFormData: function(action, forceAction = false) {
       const formData = new FormData(this.form);
-      if (this.hasFormAction(action)) {
+      if (forceAction || this.hasFormAction(action)) {
         formData.set(action, '');
       }
       return new URLSearchParams(formData);
@@ -283,7 +279,11 @@ var XWiki = (function(XWiki) {
       this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1;
+      let isCustomForm = this.form.action.indexOf("/preview/") === -1 && this.form.action.indexOf("/save/") === -1;
+      const customFormAttribute = this.form.dataset.customForm;
+      if (customFormAttribute !== undefined) {
+        isCustomForm = customFormAttribute !== 'false';
+      }
       if (isCustomForm && !isContinue) {
         return;
       }
@@ -321,7 +321,13 @@ var XWiki = (function(XWiki) {
       if (isContinue) {
         submitValue = 'action_saveandcontinue';
       }
-      var formData = this.getFormData(submitValue);
+
+      // If the submit button has a custom value, use it instead of the default action.
+      const customSubmitValue = event.element()?.dataset?.submitValue;
+      if (customSubmitValue) {
+        submitValue = customSubmitValue;
+      }
+      const formData = this.getFormData(submitValue, !!customSubmitValue);
       if (isContinue) {
         formData.set('minorEdit', '1');
       }
@@ -372,22 +378,24 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
-      var hasBeenSaved = false;
+      let hasBeenSaved = false;
       if (state.isCreateFromTemplate) {
         // We might have a responseJSON containing other information than links, if the template cannot be accessed.
-        if (response.responseJSON && response.responseJSON.links) {
+        if (response.responseJSON?.links) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
-          // in such case the page is saved, so we'll need to maybe redirect
+          // In such case the page is saved, so we'll need to maybe redirect.
           hasBeenSaved = true;
         }
       } else {
         this.progressBox.hide();
-        if (response.responseJSON && response.responseJSON.mergedDocument) {
+        if (response.responseJSON?.mergedDocument) {
           this.savingBox.replace(this.savedWithMergeBox);
+        } else if (response.responseJSON?.noChanges) {
+          this.savingBox.hide();
         } else {
           this.savingBox.replace(this.savedBox);
         }
@@ -401,23 +409,18 @@ var XWiki = (function(XWiki) {
         }
       }
 
-      if (response.responseJSON && response.responseJSON.newVersion) {
-        // update the version
+      if (response.responseJSON?.newVersion) {
+        // Update the version.
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
-
-        // We only update this field since the other ones are updated by the callback of setVersion.
-        if (editingVersionDateField) {
-          editingVersionDateField.setValue(new Date().getTime());
-        }
       }
 
-      // Announce that the document has been saved
+      // Announce that the document has been saved.
       state.saveButton.fire("xwiki:document:saved", response.responseJSON);
 
       // If documents have been merged we need to reload to get latest saved version.
-      if (response.responseJSON && response.responseJSON.mergedDocument) {
+      if (response.responseJSON?.mergedDocument) {
         this.reloadEditor();
       }
     },
@@ -730,13 +733,13 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (!response.statusText) {
-        $('ajaxRequestFailureReason').update('Server not responding');
-      } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
         // Regard the body of plain text responses as custom status messages.
         $('ajaxRequestFailureReason').update(response.responseText);
-      } else {
+      } else if (response.statusText) {
         $('ajaxRequestFailureReason').update(response.statusText);
+      } else {
+        $('ajaxRequestFailureReason').update('Server not responding');
       }
       // Announce that a document save attempt has failed
       state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
@@ -806,10 +809,6 @@ var XWiki = (function(XWiki) {
   });
 
   function init() {
-    require(['xwiki-meta'], function (xm) {
-      currentDocument = xm.documentReference;
-    });
-
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();
     return true;

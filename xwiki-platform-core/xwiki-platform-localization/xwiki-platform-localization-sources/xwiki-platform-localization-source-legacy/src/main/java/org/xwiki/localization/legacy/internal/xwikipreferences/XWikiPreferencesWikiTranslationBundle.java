@@ -55,12 +55,25 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBundle
     implements EventListener, DisposableCacheValue
 {
+    /**
+     * The identifier of this translation bundle.
+     */
     public static final String ID = XWikiPreferencesTranslationBundle.ID + ".wiki";
 
     /**
      * The name of the property containing the list of global document bundles.
      */
     private static final String DOCUMENT_BUNDLE_PROPERTY = "documentBundles";
+
+    /**
+     * The name of the {@code XWiki} space holding the wiki preferences document.
+     */
+    private static final String XWIKI_SPACE = "XWiki";
+
+    /**
+     * The name of the {@code XWikiPreferences} document holding the wiki preferences.
+     */
+    private static final String XWIKI_PREFERENCES_PAGE = "XWikiPreferences";
 
     /**
      * String to use when joining the list of document names.
@@ -81,6 +94,12 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
 
     private Map<DocumentReference, XWikiPreferencesDocumentTranslationBundle> bundles;
 
+    /**
+     * @param wiki the wiki for which to provide the preferences-based translations
+     * @param parent the parent bundle aggregating the per-wiki bundles
+     * @param componentManager the component manager used to look up required components
+     * @throws ComponentLookupException if a required component cannot be found
+     */
     public XWikiPreferencesWikiTranslationBundle(String wiki, XWikiPreferencesTranslationBundle parent,
         ComponentManager componentManager) throws ComponentLookupException
     {
@@ -97,7 +116,7 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
 
         // Observation
 
-        DocumentReference preferences = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
+        DocumentReference preferences = new DocumentReference(this.wiki, XWIKI_SPACE, XWIKI_PREFERENCES_PAGE);
 
         EntityReference documentBundlesProperty = new EntityReference(DOCUMENT_BUNDLE_PROPERTY,
             EntityType.OBJECT_PROPERTY, BaseObjectReference.any("XWiki.XWikiPreferences", preferences));
@@ -110,7 +129,8 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
 
     private Set<DocumentReference> getDocuments()
     {
-        DocumentReference preferencesReference = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
+        DocumentReference preferencesReference =
+            new DocumentReference(this.wiki, XWIKI_SPACE, XWIKI_PREFERENCES_PAGE);
 
         String documentNameListString = (String) this.documentAccessBridge.getProperty(preferencesReference,
             preferencesReference, DOCUMENT_BUNDLE_PROPERTY);
@@ -119,7 +139,7 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
         if (documentNameListString != null) {
             String[] documentNameList = documentNameListString.split(JOIN_SEPARATOR);
 
-            documents = new LinkedHashSet<DocumentReference>(documentNameList.length);
+            documents = new LinkedHashSet<>(documentNameList.length);
             for (String documentName : documentNameList) {
                 documents.add(this.resolver.resolve(documentName.trim(), preferencesReference));
             }
@@ -135,7 +155,7 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
         Set<DocumentReference> documents = getDocuments();
 
         Map<DocumentReference, XWikiPreferencesDocumentTranslationBundle> newBundles =
-            new LinkedHashMap<DocumentReference, XWikiPreferencesDocumentTranslationBundle>(documents.size());
+            new LinkedHashMap<>(documents.size());
         for (DocumentReference document : documents) {
             newBundles.put(document, this.parent.getDocumentTranslationBundle(document));
         }

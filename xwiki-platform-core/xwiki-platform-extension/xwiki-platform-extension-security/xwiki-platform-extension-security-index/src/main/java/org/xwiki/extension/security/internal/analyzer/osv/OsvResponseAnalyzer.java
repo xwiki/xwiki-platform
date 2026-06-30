@@ -92,7 +92,7 @@ public class OsvResponseAnalyzer
                 .setId(id)
                 .setAliases(resolveAliases(vulnObject, id))
                 .setURL(vulnObject.getMainURL())
-                .setSeverityScore(vulnObject.getSeverityCCSV3())
+                .setSeverityScore(vulnObject.getSeverityCVSS())
                 .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null)));
     }
 

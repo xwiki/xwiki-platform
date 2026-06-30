@@ -20,7 +20,7 @@
 package org.xwiki.vfs.internal;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @since 7.4M2
  */
 @ComponentTest
-public class VfsResourceReferenceSerializerTest
+class VfsResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private VfsResourceReferenceSerializer vfsResourceReferenceSerializer;
@@ -65,18 +65,18 @@ public class VfsResourceReferenceSerializerTest
     private Provider<ComponentManager> componentManagerProvider;
 
     @BeforeComponent
-    public void setup(MockitoComponentManager componentManager)
+    void setup(MockitoComponentManager componentManager)
     {
         when(this.componentManagerProvider.get()).thenReturn(componentManager);
     }
 
     @Test
-    public void serializeWhenNoSpecificSchemeSerializer() throws Exception
+    void serializeWhenNoSpecificSchemeSerializer() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("somescheme:wiki:space.page@attachment"), "path1/path2/test.txt");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
+        ExtendedURL extendedURL = new ExtendedURL(List.of(
             "vfs", "somescheme:wiki:space.page@attachment", "path1", "path2", "test.txt"));
 
         when(this.urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
@@ -86,14 +86,14 @@ public class VfsResourceReferenceSerializerTest
     }
 
     @Test
-    public void serializeWhenSpecificSchemeSerializer() throws Exception
+    void serializeWhenSpecificSchemeSerializer() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:attachment"), "path1/path2/test.txt");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
+        ExtendedURL extendedURL = new ExtendedURL(List.of(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));
-        when(serializer.serialize(reference)).thenReturn(extendedURL);
+        when(this.serializer.serialize(reference)).thenReturn(extendedURL);
 
         assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
             this.vfsResourceReferenceSerializer.serialize(reference).toString());

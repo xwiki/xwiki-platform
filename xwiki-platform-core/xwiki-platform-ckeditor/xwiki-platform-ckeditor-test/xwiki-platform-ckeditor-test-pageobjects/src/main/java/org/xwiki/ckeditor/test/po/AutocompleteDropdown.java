@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
@@ -122,6 +123,22 @@ public class AutocompleteDropdown extends BaseElement
             .findElementsWithoutWaiting(By.cssSelector(".cke_autocomplete_opened .cke_autocomplete_selected"));
         if (!selectedItems.isEmpty()) {
             this.selectedItem = selectedItems.get(0);
+        }
+    }
+
+    /**
+     * Check if the dropdown is displayed by trying to instantiate the PO and waiting.
+     * If the timeout occurs we conclude it's not displauyed.
+     * @return {@code true} if the PO can be instantiated, {@code false} if a timeout occurred.
+     * @since 18.2.0RC1
+     */
+    public static boolean isDisplayed()
+    {
+        try {
+            new AutocompleteDropdown();
+            return true;
+        } catch (TimeoutException e) {
+            return false;
         }
     }
 

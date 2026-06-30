@@ -81,7 +81,7 @@ public class Class extends Collection
     public List<String> getEnabledPropertyNames()
     {
         List<com.xpn.xwiki.objects.classes.PropertyClass> properties = this.getBaseClass().getEnabledProperties();
-        List<String> result = new ArrayList<String>(properties.size());
+        List<String> result = new ArrayList<>(properties.size());
         for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
             if (property != null) {
                 result.add(property.getName());
@@ -101,7 +101,7 @@ public class Class extends Collection
     public List<String> getDisabledPropertyNames()
     {
         List<com.xpn.xwiki.objects.classes.PropertyClass> properties = this.getBaseClass().getDisabledProperties();
-        List<String> result = new ArrayList<String>(properties.size());
+        List<String> result = new ArrayList<>(properties.size());
         for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
             if (property != null) {
                 result.add(property.getName());
@@ -125,7 +125,7 @@ public class Class extends Collection
     {
         List<com.xpn.xwiki.objects.classes.PropertyClass> properties =
             this.getBaseClass().getDisabledObjectProperties(object.getBaseObject());
-        List<String> result = new ArrayList<String>(properties.size());
+        List<String> result = new ArrayList<>(properties.size());
         for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
             if (property != null) {
                 result.add(property.getName());
@@ -147,7 +147,7 @@ public class Class extends Collection
     public List<String> getDeprecatedObjectPropertyNames(Object object)
     {
         List<BaseProperty> properties = this.getBaseClass().getDeprecatedObjectProperties(object.getBaseObject());
-        List<String> result = new ArrayList<String>(properties.size());
+        List<String> result = new ArrayList<>(properties.size());
         for (BaseProperty property : properties) {
             if (property != null) {
                 result.add(property.getName());
@@ -189,7 +189,7 @@ public class Class extends Collection
         List<com.xpn.xwiki.objects.classes.PropertyClass> enabledProperties =
             getBaseClass().getEnabledProperties();
 
-        List<PropertyClass> result = new ArrayList<PropertyClass>(enabledProperties.size());
+        List<PropertyClass> result = new ArrayList<>(enabledProperties.size());
 
         for (com.xpn.xwiki.objects.classes.PropertyClass property : enabledProperties) {
             result.add(new PropertyClass(property, getXWikiContext()));
@@ -211,7 +211,7 @@ public class Class extends Collection
         List<com.xpn.xwiki.objects.classes.PropertyClass> disabledProperties =
             getBaseClass().getDisabledProperties();
 
-        List<PropertyClass> result = new ArrayList<PropertyClass>(disabledProperties.size());
+        List<PropertyClass> result = new ArrayList<>(disabledProperties.size());
 
         for (com.xpn.xwiki.objects.classes.PropertyClass property : disabledProperties) {
             result.add(new PropertyClass(property, getXWikiContext()));
@@ -236,7 +236,7 @@ public class Class extends Collection
         List<com.xpn.xwiki.objects.classes.PropertyClass> disabledObjectProperties =
             getBaseClass().getDisabledObjectProperties(object.getBaseObject());
 
-        List<PropertyClass> result = new ArrayList<PropertyClass>(disabledObjectProperties.size());
+        List<PropertyClass> result = new ArrayList<>(disabledObjectProperties.size());
         for (com.xpn.xwiki.objects.classes.PropertyClass property : disabledObjectProperties) {
             result.add(new PropertyClass(property, getXWikiContext()));
         }
@@ -259,7 +259,7 @@ public class Class extends Collection
         List<BaseProperty> deprecatedObjectProperties =
             getBaseClass().getDeprecatedObjectProperties(object.getBaseObject());
 
-        List<Property> result = new ArrayList<Property>(deprecatedObjectProperties.size());
+        List<Property> result = new ArrayList<>(deprecatedObjectProperties.size());
         for (BaseProperty property : deprecatedObjectProperties) {
             result.add(new Property(property, getXWikiContext()));
         }

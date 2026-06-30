@@ -22,8 +22,6 @@ package org.xwiki.livedata;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -199,7 +197,6 @@ public class LiveDataActionDescriptor extends BaseDescriptor implements Initiali
      * @return the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
-    @Unstable
     public LiveDataAsyncActionDescriptor getAsync()
     {
         return this.async;
@@ -209,7 +206,6 @@ public class LiveDataActionDescriptor extends BaseDescriptor implements Initiali
      * @param async the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
-    @Unstable
     public void setAsync(LiveDataAsyncActionDescriptor async)
     {
         this.async = async;

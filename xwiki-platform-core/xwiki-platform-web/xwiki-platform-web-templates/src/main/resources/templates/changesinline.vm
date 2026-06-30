@@ -98,6 +98,5 @@
 </div>
 ## Pass the required skin extensions to the client side to be injected automatically in the HTML head by xwiki.js.
 #if ($isAjaxRequest)
-  #getRequiredSkinExtensions($requiredSkinExtensions)
-  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #sendRequiredSkinExtensions()
 #end

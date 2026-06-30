@@ -57,9 +57,8 @@
     #foreach($userReference in $likeRecords)
         #set ($grayed = $xcontext.userReference == $userReference.reference)
         #set ($userDoc = $xwiki.getDocument($userReference.reference))
-        #set ($userProperties = $services.user.getProperties($userReference))
-        #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
-        #if ($services.security.authorization.hasAccess('view', $userDoc.documentReference))
+        #if ($userDoc)
+            #set ($userProperties = $services.user.getProperties($userReference))
             #set ($row = {
                 'grayed': $grayed,
                 'doc_fullName': $userDoc.fullName,

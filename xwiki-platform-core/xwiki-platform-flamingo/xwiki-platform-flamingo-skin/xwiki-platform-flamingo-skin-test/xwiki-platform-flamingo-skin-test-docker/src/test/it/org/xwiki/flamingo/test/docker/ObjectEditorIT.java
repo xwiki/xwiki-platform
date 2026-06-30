@@ -27,18 +27,20 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
@@ -91,9 +93,6 @@ class ObjectEditorIT
 
     @Test
     @Order(1)
-    @IgnoreBrowser(value = "chrome", reason = "Chrome has recently started to ignore the unhandledPromptBehavior "
-        + "capability which allows us to handle alerts shown before page unload. "
-        + "See https://issues.chromium.org/issues/351858989#comment30 .")
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
         // fixture
@@ -122,7 +121,7 @@ class ObjectEditorIT
         objectEditPane.setPropertyValue("number", "48");
 
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
 
         objectEditPage.clickSaveAndContinue();
 
@@ -137,7 +136,7 @@ class ObjectEditorIT
         assertFalse(objectEditPane.isEditLinkDisplayed());
 
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
         objectEditPage.deleteObject(NUMBER_CLASS, 1);
 
         // State should be same as before adding
@@ -159,7 +158,7 @@ class ObjectEditorIT
         // Delete the saved object
         objectEditPage.deleteObject(NUMBER_CLASS, 0);
         testUtils.gotoPageWithoutWaiting(testReference);
-        testUtils.getDriver().switchTo().alert().dismiss();
+        dismissBeforeUnloadAlert(testUtils);
 
         objectEditPage.clickSaveAndContinue();
 
@@ -608,5 +607,54 @@ class ObjectEditorIT
         SuggestInputElement.SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
         assertEquals("Admin", author.getLabel());
         assertEquals("XWiki.Admin", author.getValue());
+    }
+
+    @Test
+    @Order(11)
+    void deprecatedObfuscatedProperties(TestUtils testUtils, TestReference testReference)
+    {
+        String testClass = testUtils.serializeLocalReference(testReference);
+        ClassEditPage classEditPage = ClassEditPage.gotoPage(testReference);
+        classEditPage.addProperty("stringTest", "String");
+        ClassPropertyEditPane classPropertyEditPane = classEditPage.addProperty("mypass", "Password");
+        classPropertyEditPane.setMetaProperty("storageType", "Clear");
+        classEditPage.clickSaveAndView();
+
+        ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = objectEditor.addObject(testClass);
+        objectEditPane.setPropertyValue("stringTest", "My value 42");
+        objectEditPane.setPropertyValue("mypass", "foobar");
+        objectEditor.clickSaveAndView();
+
+        objectEditor = ObjectEditPage.gotoPage(testReference);
+        List<ObjectEditPane> objectsOfClass = objectEditor.getObjectsOfClass(testClass, true);
+        assertEquals(1, objectsOfClass.size());
+
+        objectEditPane = objectsOfClass.get(0);
+        assertEquals("My value 42", objectEditPane.getFieldValue(objectEditPane.byPropertyName("stringTest")));
+        assertEquals("********", objectEditPane.getFieldValue(objectEditPane.byPropertyName("mypass")));
+
+        classEditPage = ClassEditPage.gotoPage(testReference);
+        classEditPage.deleteProperty("stringTest");
+        classEditPage.deleteProperty("mypass");
+        classEditPage.clickSaveAndView();
+
+        objectEditor = ObjectEditPage.gotoPage(testReference);
+        objectsOfClass = objectEditor.getObjectsOfClass(testClass, true);
+        assertEquals(1, objectsOfClass.size());
+        objectEditPane = objectsOfClass.get(0);
+
+        assertTrue(objectEditor.isPropertyDeprecated(testClass, "stringTest"));
+        assertTrue(objectEditor.isPropertyDeprecated(testClass, "mypass"));
+
+        assertFalse(objectEditPane.isDeprecatedPropertyObfuscated("stringTest"));
+        assertEquals("My value 42", objectEditPane.getDeprecatedPropertyValue("stringTest"));
+        assertTrue(objectEditPane.isDeprecatedPropertyObfuscated("mypass"));
+    }
+
+    private void dismissBeforeUnloadAlert(TestUtils testUtils)
+    {
+        Alert alert = testUtils.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+        alert.dismiss();
     }
 }

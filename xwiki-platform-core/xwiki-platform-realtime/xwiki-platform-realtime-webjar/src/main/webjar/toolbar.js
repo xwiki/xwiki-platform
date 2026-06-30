@@ -63,6 +63,11 @@ define('xwiki-realtime-toolbar', [
 
     _activateDoneButton() {
       this._doneButton = this._toolbar.querySelector('.realtime-action-done');
+      if (this._doneButton.dataset.toggle === 'modal') {
+        // The Done button opens the Summarize & Done modal. This happens when version summary is mandatory.
+        return;
+      }
+      // The Done button saves the document directly.
       this._doneButton.addEventListener('click', event => {
         event.preventDefault();
         // FIXME: We can't rely on the save status to determine whether to save or cancel (e.g. to prevent creating a
@@ -201,8 +206,17 @@ define('xwiki-realtime-toolbar', [
     }
 
     async _saveChangeSummary() {
-      const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
+      // Select the summary tab in order to be able to show validation errors, e.g. when the summary is mandatory.
+      $(this._changeSummaryModal.querySelector('a[aria-controls="realtime-changeSummaryModal-summaryTab"]'))
+        .tab('show');
+
       const changeSummaryTextArea = this._changeSummaryModal.querySelector('textarea[name=summary]');
+      if (!changeSummaryTextArea.reportValidity()) {
+        // The provided change summary is not valid.
+        return;
+      }
+
+      const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
       const minorChangeCheckbox = this._changeSummaryModal.querySelector('input[name="minorChange"]');
       const continueEditing = this._changeSummaryModal.dataset.continue === 'true';
       // Put the change summary and the minor edit checkbox in the form.
@@ -261,7 +275,10 @@ define('xwiki-realtime-toolbar', [
     }
 
     _disableSaveTriggersIf(condition) {
-      this._doneButton.disabled = condition;
+      // Disable the Done button only if it doesn't open a modal, which is the case when version summary is mandatory.
+      if (this._doneButton.dataset.toggle !== 'modal') {
+        this._doneButton.disabled = condition;
+      }
       // The summarize action is not available if version summaries are disabled from the wiki administration.
       if (this._summarizeSubmit) {
         this._summarizeSubmit.disabled = condition;
@@ -272,12 +289,23 @@ define('xwiki-realtime-toolbar', [
       if (!this._lastReviewedVersion) {
         this._lastReviewedVersion = version.number;
       }
-      const versions = this._toolbar.querySelectorAll('.realtime-version');
+      // Make sure we don't add the same version twice. This can happen if some of the previous versions were deleted
+      // and their version numbers are being reused.
+      const versions = [...this._toolbar.querySelectorAll('.realtime-version')].filter(existingVersion => {
+        if (JSON.parse(existingVersion.dataset.version).number === version.number) {
+          // The version element is wrapped in a list item element, that we need to remove as well.
+          existingVersion.parentElement.remove();
+          return false;
+        }
+        return true;
+      });
+      // Limit the number of versions shown in the dropdown.
       const limit = Number.parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
       if (versions.length >= limit) {
-        // The version element is wrapped in a list item element.
+        // The version element is wrapped in a list item element, that we need to remove as well.
         versions[0].parentElement.remove();
       }
+      // Insert the new version.
       const versionWrapper = this._createVersionElement(version);
       this._toolbar.querySelector('.realtime-versions > .divider').before(versionWrapper);
     }
@@ -319,8 +347,9 @@ define('xwiki-realtime-toolbar', [
 
     onConnectionStatusChange(status, userId) {
       this._setStatus('.realtime-connection-status', status);
-      this._disableSaveTriggersIf(status !== 2 /* connected */);
-      if (this._doneButton.disabled) {
+      const notConnected = status !== 2 /* connected */;
+      this._disableSaveTriggersIf(notConnected);
+      if (notConnected) {
         this.onUserListChange([]);
       }
       if (userId) {

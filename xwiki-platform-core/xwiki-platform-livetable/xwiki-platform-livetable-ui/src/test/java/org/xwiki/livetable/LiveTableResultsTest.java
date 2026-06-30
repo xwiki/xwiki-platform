@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -567,6 +568,32 @@ class LiveTableResultsTest extends PageTest
     }
 
     @Test
+    void noAccessToPasswordFieldsWithClassPerProperty() throws Exception
+    {
+        // Initialize an XClass with a password field.
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "MyClass");
+        XWikiDocument xwikiDocument = this.xwiki.getDocument(documentReference, this.context);
+        BaseClass xClass = xwikiDocument.getXClass();
+        xClass.addPasswordField("password", "Password", 30);
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(0L);
+        when(this.query.execute()).thenReturn(Collections.emptyList());
+
+        this.request.put("password", "abcd");
+        this.request.put("password_class", "XWiki.MyClass");
+        this.request.put("collist", "password");
+
+        renderPage();
+
+        verify(this.queryService).hql("  where 1=1  ");
+    }
+
+    @Test
     void highLimitIsRejected() throws Exception
     {
         setLimit(2000);
@@ -791,6 +818,194 @@ class LiveTableResultsTest extends PageTest
         List<Map<String, Object>> rows = getRows();
         assertEquals("SuperAdmin", rows.get(0).get("doc_author"));
         assertEquals("/xwiki/bin/view/XWiki/superadmin", rows.get(0).get("doc_author_url"));
+    }
+
+    /**
+     * Verify the query and its bound values when an empty matcher is used on a DB list with multi-select and
+     * relational storage (DBStringListProperty).
+     */
+    @Test
+    void filterDBStringListEmptyMatcher() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyClass"));
+        StaticListClass list = document.getXClass().addStaticListField("dbList");
+        list.setValues("A|B|C");
+        list.setMultiSelect(true);
+        list.setRelationalStorage(true);
+        this.xwiki.saveDocument(document, "creates MyClass", true, this.context);
+
+        setColumns("dbList");
+        setClassName("Space.MyClass");
+        setFilter("dbList_match", "empty");
+        setFilter("dbList", "-");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(
+            ", BaseObject as obj , DBStringListProperty as prop_dbList  "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_dbList.id.id "
+                + "and prop_dbList.id.name = :prop_dbList_id_name "
+                + "and size(prop_dbList.list) = 0 ");
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList"
+        );
+        verify(this.query).bindValues(values);
+    }
+
+    @Test
+    void filterDBStringListEmptyAndExactMatcherOr() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyClass"));
+        StaticListClass list = document.getXClass().addStaticListField("dbList");
+        list.setValues("A|B|C");
+        list.setMultiSelect(true);
+        list.setRelationalStorage(true);
+        this.xwiki.saveDocument(document, "creates MyClass", true, this.context);
+
+        setColumns("dbList");
+        setClassName("Space.MyClass");
+
+        // First value: empty
+        setFilter("dbList_match", "empty");
+        setFilter("dbList", "-");
+        // Second value: exact 'A'
+        setFilter("dbList_match", "exact");
+        setFilter("dbList", "A");
+        // Join mode: OR
+        setJoinMode("dbList", "OR");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(
+            ", BaseObject as obj , DBStringListProperty as prop_dbList  "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_dbList.id.id and prop_dbList.id.name = :prop_dbList_id_name "
+                + "and ("
+                + ":prop_dbList_list_1 in elements(prop_dbList.list) "
+                + "OR size(prop_dbList.list) = 0"
+                + ") "
+        );
+
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList",
+            "prop_dbList_list_1", "A"
+        );
+
+        verify(this.query).bindValues(values);
+    }
+
+    @Test
+    void filterDBStringWithPrefixMatcher() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyClass"));
+        StaticListClass list = document.getXClass().addStaticListField("dbList");
+        list.setValues("Apple|Banana|Cherry");
+        list.setMultiSelect(true);
+        list.setRelationalStorage(true);
+        this.xwiki.saveDocument(document, "creates MyClass", true, this.context);
+
+        setColumns("dbList");
+        setClassName("Space.MyClass");
+
+        setFilter("dbList_match", "prefix");
+        setFilter("dbList", "Ba");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(
+            ", BaseObject as obj , DBStringListProperty as prop_dbList join prop_dbList.list as prop_dbList_item   "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_dbList.id.id "
+                + "and prop_dbList.id.name = :prop_dbList_id_name "
+                + "and (upper(prop_dbList_item) like upper(:prop_dbList_item_1)"
+                + ") "
+        );
+
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList",
+            "prop_dbList_item_1", "Ba%"
+        );
+        verify(this.query).bindValues(values);
+    }
+
+    private static Stream<Arguments> provideBooleanColumnFilters()
+    {
+        // Outer stream: for each boolean column to test.
+        return Stream.of("hidden", "minorEdit1", "enforceRequiredRights")
+            .flatMap(column -> {
+                String fullColumnName = "doc." + column;
+                String filterName = "doc_" + column + "_filter";
+                String whereString = "  where 1=1  and %s = :%s ".formatted(fullColumnName, filterName);
+                // Inner stream: for each possible boolean filter value.
+                return Stream.of(
+                        new ImmutablePair<>("true", true),
+                        new ImmutablePair<>("1", true),
+                        new ImmutablePair<>("false", false),
+                        new ImmutablePair<>("0", false),
+                        // Other values should be treated as false.
+                        new ImmutablePair<>("other", false)
+                    )
+                    .map(pair -> Arguments.of(
+                        fullColumnName,
+                        pair.getLeft(),
+                        whereString,
+                        Map.of(filterName, pair.getRight())
+                    ));
+            });
+    }
+
+    @ParameterizedTest(name = "{0} filtered by ''{1}''")
+    @MethodSource("provideBooleanColumnFilters")
+    void filterBooleanColumns(String columnName, String filterValue, String expectedHql,
+        Map<String, Object> expectedBindValues) throws Exception
+    {
+        setColumns(columnName);
+        setFilter(columnName, filterValue);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(expectedHql);
+        verify(this.query).bindValues(expectedBindValues);
     }
 
     //

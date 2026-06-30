@@ -25,7 +25,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.container.Request;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -50,7 +49,6 @@ public interface XWikiRequest extends HttpServletRequest
      * @since 16.4.1
      * @since 16.6.0RC1
      */
-    @Unstable
     default Optional<UserReference> getEffectiveAuthor()
     {
         return Optional.ofNullable((UserReference) getAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR));

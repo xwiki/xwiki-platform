@@ -90,21 +90,21 @@ public interface URLConfiguration
     }
 
     /**
-     * @return {@code true} if checks should be done in the frontend when clicking on a link to validate it's driving
-     * to an authorized domain. This is independent from {@link #isTrustedDomainsEnabled()} which aims at enabling
-     * checks server side only.
-     * @since 17.9.0RC1
-     * @since 17.4.6
-     * @since 16.10.13
+     * Define the policy to use for URL checks performed in the UI, whether the user should be asked for confirmation
+     * when going to an untrusted domain.
+     * @return the configured policy
+     * @since 17.9.0
+     * @since 17.4.7
+     * @since 16.10.14
      */
     @Unstable
-    default boolean isFrontendUrlCheckEnabled()
+    default FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
     {
-        return true;
+        return FrontendURLCheckPolicy.COMMENTS;
     }
 
     /**
-     * Define a list of allowed frontend URLs: in case the {@link #isFrontendUrlCheckEnabled()} is enabled, then
+     * Define a list of allowed frontend URLs: in case the {@link #getFrontendUrlCheckPolicy()} is enabled, then
      * this list can be used to allow specific URLs without asking confirmation from the user, while avoiding to add
      * an entire domain in the list of trusted domains.
      *

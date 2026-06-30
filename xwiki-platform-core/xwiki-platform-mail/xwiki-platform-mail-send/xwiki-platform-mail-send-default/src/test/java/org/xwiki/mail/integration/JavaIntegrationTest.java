@@ -22,14 +22,13 @@ package org.xwiki.mail.integration;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Provider;
-import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -113,7 +112,7 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class JavaIntegrationTest extends AbstractMailIntegrationTest
+class JavaIntegrationTest extends AbstractMailIntegrationTest
 {
     private static final String PERMDIR = "target/" + JavaIntegrationTest.class.getSimpleName();
 
@@ -140,12 +139,12 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     private MailSender sender;
 
     @BeforeComponent
-    public void registerConfiguration() throws Exception
+    void registerConfiguration() throws Exception
     {
         this.greenMail.start();
 
-        this.configuration = new TestMailSenderConfiguration(
-            this.greenMail.getSmtp().getPort(), null, null, new Properties());
+        this.configuration =
+            new TestMailSenderConfiguration(this.greenMail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
 
         // Set the current wiki in the Context
@@ -155,15 +154,15 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("wiki");
 
-        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(xcontext);
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);
 
-        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
-            ExecutionContext.class));
+        this.componentManager
+            .registerMockComponent(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
@@ -171,16 +170,16 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @BeforeEach
-    public void initialize() throws Exception
+    void initialize() throws Exception
     {
         // Make sure files for temporary attachments are saved in the target directory
         StandardEnvironment environment = this.componentManager.getInstance(Environment.class);
         environment.setTemporaryDirectory(new File(TMPDIR));
 
-        this.defaultBodyPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-        this.htmlBodyPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+        this.defaultBodyPartFactory = this.componentManager
+            .getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
+        this.htmlBodyPartFactory = this.componentManager
+            .getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
         this.attachmentBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         this.sender = this.componentManager.getInstance(MailSender.class);
@@ -205,7 +204,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @AfterEach
-    public void cleanUp() throws Exception
+    void cleanUp() throws Exception
     {
         logCapture.ignoreAllMessages();
 
@@ -219,7 +218,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendTextMail() throws Exception
+    void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
         Session session = Session.getInstance(this.configuration.getAllProperties());
@@ -232,12 +231,12 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
         // Add text in the body
-        multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
-            Collections.singletonMap("mimetype", "text/plain")));
+        multipart.addBodyPart(
+            this.defaultBodyPartFactory.create("some text here", Collections.singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
         // We also test using some default BCC addresses from configuration in this test
-        this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
+        this.configuration.setBCCAddresses(List.of("bcc1@doe.com", "bcc2@doe.com"));
 
         // Ensure we do not reuse the same message identifier for multiple similar messages in this test
         MimeMessage message2 = new MimeMessage(message);
@@ -248,22 +247,23 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message, message2, message3), session, memoryMailListener);
+        this.sender.sendAsynchronously(List.of(message, message2, message3), session, memoryMailListener);
 
         // Note: we don't test status reporting from the listener since this is already tested in the
         // ScriptingIntegrationTest test class.
 
         // Verify that the mails have been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 3);
-        MimeMessage[] messages = this.greenMail.getReceivedMessages();
+        jakarta.mail.internet.MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
         assertEquals(9, messages.length);
 
         // Assert the email parts that are the same for all mails
         assertEquals("subject", messages[0].getHeader("Subject", null));
-        assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
-        BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        assertEquals(1, ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getCount());
+        jakarta.mail.BodyPart textBodyPart =
+            ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
@@ -273,7 +273,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendHTMLAndCalendarInvitationMail() throws Exception
+    void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
         Session session = Session.getInstance(this.configuration.getAllProperties());
@@ -286,35 +286,17 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("alternative");
         // Add an HTML body part
-        multipart.addBodyPart(this.htmlBodyPartFactory.create(
-            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>", Collections.emptyMap()));
+        multipart.addBodyPart(this.htmlBodyPartFactory
+            .create("<font size=\"\\\"2\\\"\">simple meeting invitation</font>", Collections.emptyMap()));
         // Add the Calendar invitation body part
-        String calendarContent = "BEGIN:VCALENDAR\r\n"
-            + "METHOD:REQUEST\r\n"
-            + "PRODID: Meeting\r\n"
-            + "VERSION:2.0\r\n"
-            + "BEGIN:VEVENT\r\n"
-            + "DTSTAMP:20140616T164100\r\n"
-            + "DTSTART:20140616T164100\r\n"
-            + "DTEND:20140616T194100\r\n"
-            + "SUMMARY:test request\r\n"
-            + "UID:324\r\n"
+        String calendarContent = "BEGIN:VCALENDAR\r\n" + "METHOD:REQUEST\r\n" + "PRODID: Meeting\r\n"
+            + "VERSION:2.0\r\n" + "BEGIN:VEVENT\r\n" + "DTSTAMP:20140616T164100\r\n" + "DTSTART:20140616T164100\r\n"
+            + "DTEND:20140616T194100\r\n" + "SUMMARY:test request\r\n" + "UID:324\r\n"
             + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
-            + "ORGANIZER:MAILTO:john@doe.com\r\n"
-            + "LOCATION:on the net\r\n"
-            + "DESCRIPTION:learn some stuff\r\n"
-            + "SEQUENCE:0\r\n"
-            + "PRIORITY:5\r\n"
-            + "CLASS:PUBLIC\r\n"
-            + "STATUS:CONFIRMED\r\n"
-            + "TRANSP:OPAQUE\r\n"
-            + "BEGIN:VALARM\r\n"
-            + "ACTION:DISPLAY\r\n"
-            + "DESCRIPTION:REMINDER\r\n"
-            + "TRIGGER;RELATED=START:-PT00H15M00S\r\n"
-            + "END:VALARM\r\n"
-            + "END:VEVENT\r\n"
-            + "END:VCALENDAR";
+            + "ORGANIZER:MAILTO:john@doe.com\r\n" + "LOCATION:on the net\r\n" + "DESCRIPTION:learn some stuff\r\n"
+            + "SEQUENCE:0\r\n" + "PRIORITY:5\r\n" + "CLASS:PUBLIC\r\n" + "STATUS:CONFIRMED\r\n" + "TRANSP:OPAQUE\r\n"
+            + "BEGIN:VALARM\r\n" + "ACTION:DISPLAY\r\n" + "DESCRIPTION:REMINDER\r\n"
+            + "TRIGGER;RELATED=START:-PT00H15M00S\r\n" + "END:VALARM\r\n" + "END:VEVENT\r\n" + "END:VCALENDAR";
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("mimetype", "text/calendar;method=CANCEL");
         parameters.put("headers", Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage"));
@@ -323,29 +305,31 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+        this.sender.sendAsynchronously(List.of(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.greenMail.getReceivedMessages();
+        jakarta.mail.internet.MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
-        assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
+        assertEquals(2, ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getCount());
 
-        BodyPart htmlBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        jakarta.mail.BodyPart htmlBodyPart =
+            ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/html; charset=UTF-8", htmlBodyPart.getHeader("Content-Type")[0]);
         assertEquals("<font size=\"\\\"2\\\"\">simple meeting invitation</font>", htmlBodyPart.getContent());
 
-        BodyPart calendarBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(1);
+        jakarta.mail.BodyPart calendarBodyPart =
+            ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getBodyPart(1);
         assertEquals("text/calendar;method=CANCEL", calendarBodyPart.getHeader("Content-Type")[0]);
         InputStream is = (InputStream) calendarBodyPart.getContent();
         assertEquals(calendarContent, IOUtils.toString(is));
     }
 
     @Test
-    public void sendMailWithAttachment() throws Exception
+    void sendMailWithAttachment() throws Exception
     {
         // Remove any tmp file to start with a clean slate
         FileUtils.cleanDirectory(new File(MAILTMPDIR));
@@ -371,18 +355,19 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         assertEquals(1, new File(MAILTMPDIR).listFiles().length);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
+        this.sender.sendAsynchronously(List.of(message), session, null);
 
         // Verify that the mail has been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.greenMail.getReceivedMessages();
+        jakarta.mail.internet.MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
-        assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
+        assertEquals(1, ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getCount());
 
-        BodyPart attachmentPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        jakarta.mail.BodyPart attachmentPart =
+            ((jakarta.mail.internet.MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("attachment content", attachmentPart.getContent());
 
         // Make sure that our special tmp file location header is not sent in the mail
@@ -393,7 +378,7 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
     }
 
     @Test
-    public void sendMailWithCustomMessageId() throws Exception
+    void sendMailWithCustomMessageId() throws Exception
     {
         Session session = Session.getInstance(this.configuration.getAllProperties());
         MimeMessage message = new MimeMessage(session)
@@ -412,11 +397,11 @@ public class JavaIntegrationTest extends AbstractMailIntegrationTest
         message.setSubject("subject");
 
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
+        this.sender.sendAsynchronously(List.of(message), session, memoryMailListener);
 
         // Verify that the mails have been received (wait maximum 30 seconds).
         this.greenMail.waitForIncomingEmail(30000L, 1);
-        MimeMessage[] messages = this.greenMail.getReceivedMessages();
+        jakarta.mail.internet.MimeMessage[] messages = this.greenMail.getReceivedMessages();
 
         assertEquals("<custom@domain>", messages[0].getMessageID());
     }

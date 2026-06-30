@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
@@ -44,17 +43,16 @@ public class XWikiConfig extends Properties
 
     public XWikiConfig(String path) throws XWikiException
     {
-        try {
-            FileInputStream fis = new FileInputStream(path);
-            try {
-                loadConfig(fis, path);
-            } finally {
-                IOUtils.closeQuietly(fis);
-            }
+        try (FileInputStream fis = new FileInputStream(path)) {
+            loadConfig(fis, path);
         } catch (FileNotFoundException e) {
             Object[] args = { path };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
+        } catch (IOException e) {
+            Object[] args = { path };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
+                XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR, "Error reading configuration file", e, args);
         }
     }
 

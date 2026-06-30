@@ -30,7 +30,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provider various tools to help implement {@link MessageBodyWriter} and {@link MessageBodyReader}.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.2.0RC1
  */
 @Role
-@Unstable
 public interface JAXRSUtils
 {
     /**

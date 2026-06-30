@@ -77,7 +77,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * and the top of the stack is the last opened
      * <code>{@link Element}</code>.
      */
-    protected Stack<Element> parent = new Stack<Element>();
+    protected Stack<Element> parent = new Stack<>();
 
     /**
      * Current <code>{@link OutputStream}</code> of this writer.
@@ -89,10 +89,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      */
     private LastCharWriter lcWriter;
 
-    /** True if the last thing written was content from an InputStream and 
-     private boolean indentUnsafe;
-
-     /** Need to catch this exception so this has to be done in an initializer block. */
+    // Need to catch this exception so this has to be done in an initializer block.
     static {
         try {
             NEWLINE = System.getProperty("line.separator").getBytes("UTF-8");

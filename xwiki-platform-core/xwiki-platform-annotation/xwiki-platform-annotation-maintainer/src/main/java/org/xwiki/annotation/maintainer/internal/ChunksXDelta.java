@@ -52,7 +52,6 @@ public class ChunksXDelta extends AbstractXDelta
      */
     public ChunksXDelta(int position, String original, String edited)
     {
-        super();
         this.position = position;
         this.original = original;
         this.edited = edited;

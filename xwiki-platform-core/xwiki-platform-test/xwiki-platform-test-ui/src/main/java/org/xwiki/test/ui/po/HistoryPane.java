@@ -197,6 +197,7 @@ public class HistoryPane extends BaseElement
      */
     public int getNumberOfVersions()
     {
+        // TODO: Use the PaginationFilterPane object to get this value.
         String xpath = ".//div[@class='paginationFilter' and following-sibling::div[@id='historycontent']]";
         WebElement paginationDiv = getDriver().findElementWithoutWaiting(By.xpath(xpath));
         return Integer.parseInt(getDriver().findElementWithoutWaiting(paginationDiv, By.className("totalResultsNo"))

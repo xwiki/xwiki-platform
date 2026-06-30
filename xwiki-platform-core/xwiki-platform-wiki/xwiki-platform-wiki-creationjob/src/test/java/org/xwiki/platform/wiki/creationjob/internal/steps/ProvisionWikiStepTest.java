@@ -21,9 +21,8 @@ package org.xwiki.platform.wiki.creationjob.internal.steps;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiProvisionedEvent;
 import org.xwiki.bridge.event.WikiProvisioningEvent;
@@ -34,13 +33,15 @@ import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiSource;
 import org.xwiki.platform.wiki.creationjob.internal.ExtensionInstaller;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.provisioning.WikiCopier;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -51,35 +52,35 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class ProvisionWikiStepTest
+@ComponentTest
+class ProvisionWikiStepTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ProvisionWikiStep> mocker =
-            new MockitoComponentMockingRule<>(ProvisionWikiStep.class);
+    @InjectMockComponents
+    private ProvisionWikiStep provisionWikiStep;
 
+    @MockComponent
     private WikiCopier wikiCopier;
 
+    @MockComponent
     private ExtensionInstaller extensionInstaller;
 
+    @MockComponent
     private ObservationManager observationManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
     private XWikiContext xcontext;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        wikiCopier = mocker.getInstance(WikiCopier.class);
-        extensionInstaller = mocker.getInstance(ExtensionInstaller.class);
-        observationManager = mocker.getInstance(ObservationManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
-    public void executeWhenSourceIsExtension() throws Exception
+    void executeWhenSourceIsExtension() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -88,17 +89,17 @@ public class ProvisionWikiStepTest
         request.setExtensionId(extensionId);
 
         // Test
-        mocker.getComponentUnderTest().execute(request);
+        this.provisionWikiStep.execute(request);
 
         // Verify
-        verify(extensionInstaller).installExtension(eq("wikiId"), eq(extensionId));
-        verify(observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verify(observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verifyNoInteractions(wikiCopier);
+        verify(this.extensionInstaller).installExtension(eq("wikiId"), eq(extensionId));
+        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verify(this.observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verifyNoInteractions(this.wikiCopier);
     }
 
     @Test
-    public void executeWhenSourceIsTemplate() throws Exception
+    void executeWhenSourceIsTemplate() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -106,48 +107,43 @@ public class ProvisionWikiStepTest
         request.setTemplateId("template");
 
         // Test
-        mocker.getComponentUnderTest().execute(request);
+        this.provisionWikiStep.execute(request);
 
         // Verify
-        verify(wikiCopier).copyDocuments(eq("template"), eq("wikiId"), eq(false));
-        verify(observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verify(observationManager).notify(eq(new WikiCopiedEvent("template", "wikiId")), eq("template"), eq(xcontext));
-        verify(observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verifyNoInteractions(extensionInstaller);
+        verify(this.wikiCopier).copyDocuments(eq("template"), eq("wikiId"), eq(false));
+        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verify(this.observationManager).notify(eq(new WikiCopiedEvent("template", "wikiId")), eq("template"),
+            eq(this.xcontext));
+        verify(this.observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verifyNoInteractions(this.extensionInstaller);
     }
 
     @Test
-    public void executeWhenException() throws Exception
+    void executeWhenException() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
         request.setWikiSource(WikiSource.EXTENSION);
         ExtensionId extensionId = new ExtensionId("id", "version");
         request.setExtensionId(extensionId);
-        
+
         // Mocks
         WikiCreationException exception = new WikiCreationException("Exception in ExtensionInstaller");
-        doThrow(exception).when(extensionInstaller).installExtension("wikiId", extensionId);
+        doThrow(exception).when(this.extensionInstaller).installExtension("wikiId", extensionId);
 
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().execute(request);    
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-
-        // Verify
-        assertNotNull(caughtException);
+        // Test and verify
+        WikiCreationException caughtException = assertThrows(WikiCreationException.class,
+            () -> this.provisionWikiStep.execute(request));
         assertEquals("Failed to provision the wiki [wikiId].", caughtException.getMessage());
         assertEquals(exception, caughtException.getCause());
-        verify(observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verify(observationManager).notify(eq(new WikiProvisioningFailedEvent("wikiId")), eq("wikiId"), eq(xcontext));
+        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verify(this.observationManager).notify(eq(new WikiProvisioningFailedEvent("wikiId")), eq("wikiId"),
+            eq(this.xcontext));
     }
 
     @Test
-    public void getOrder() throws Exception
+    void getOrder()
     {
-        assertEquals(3000, mocker.getComponentUnderTest().getOrder());
+        assertEquals(3000, this.provisionWikiStep.getOrder());
     }
 }

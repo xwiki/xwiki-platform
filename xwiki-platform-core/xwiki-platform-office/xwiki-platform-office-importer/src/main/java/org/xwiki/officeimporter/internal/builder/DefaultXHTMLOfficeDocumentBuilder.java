@@ -118,7 +118,7 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         throws OfficeImporterException
     {
         // Prepare the parameters for HTML cleaning.
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("targetDocument", this.entityReferenceSerializer.serialize(reference));
         // Extract the images that are embedded through the Data URI scheme and add them to the other artifacts so that
         // they end up as attachments.

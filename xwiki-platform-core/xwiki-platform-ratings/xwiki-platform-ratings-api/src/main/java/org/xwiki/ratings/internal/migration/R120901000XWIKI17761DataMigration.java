@@ -77,6 +77,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Named("R120901000XWIKI17761")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE_FOR_LOG = 100;

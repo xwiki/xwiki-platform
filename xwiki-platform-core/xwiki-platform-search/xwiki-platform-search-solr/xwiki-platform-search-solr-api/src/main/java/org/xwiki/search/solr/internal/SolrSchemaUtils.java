@@ -54,9 +54,25 @@ public class SolrSchemaUtils
     public static final String SOLR_TYPENAME_CVERSION = "__cversion";
 
     /**
+     * The name of the class of the type holding the version value.
+     * 
+     * @since 18.4.0RC1
+     * @since 17.10.9
+     */
+    public static final String SOLR_VERSIONFIELDTYPE_CLASS = "solr.TextField";
+
+    /**
      * The name of the attribute holding the version value.
      */
-    public static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
+    public static final String SOLR_VERSIONFIELDTYPE_VALUE = "positionIncrementGap";
+
+    /**
+     * The name of the attribute holding the version value before XWiki 18.4.0RC1 and 17.10.9.
+     * 
+     * @since 18.4.0RC1
+     * @since 17.10.9
+     */
+    public static final String SOLR_VERSIONFIELDTYPE_VALUE_LEGACY = "defVal";
 
     /**
      * The name of property holding the field class.
@@ -676,6 +692,9 @@ public class SolrSchemaUtils
         }
 
         String value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
+        if (value == null) {
+            value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE_LEGACY);
+        }
 
         return NumberUtils.createLong(value);
     }
@@ -759,7 +778,7 @@ public class SolrSchemaUtils
      */
     public void setVersion(XWikiSolrCore core, String name, long version) throws SolrException
     {
-        setFieldType(core, name, "solr.ExternalFileField", SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
+        setFieldType(core, name, SOLR_VERSIONFIELDTYPE_CLASS, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
             String.valueOf(version));
     }
 
@@ -773,7 +792,7 @@ public class SolrSchemaUtils
      */
     public void setVersion(XWikiSolrCore core, String name, long version, Boolean add) throws SolrException
     {
-        setFieldType(core, name, "solr.ExternalFileField", SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
+        setFieldType(core, name, SOLR_VERSIONFIELDTYPE_CLASS, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
             String.valueOf(version), add);
     }
 }

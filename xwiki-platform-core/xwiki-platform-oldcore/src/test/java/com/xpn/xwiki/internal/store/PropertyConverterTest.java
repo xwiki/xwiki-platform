@@ -28,9 +28,11 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DoubleProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
+import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.DBListClass;
@@ -41,6 +43,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
@@ -180,5 +183,23 @@ public class PropertyConverterTest
         assertSame(Level.WARN, logEvent.getLevel());
         assertEquals("Incompatible data migration when changing field [age] of class [Some.Class]",
             logEvent.getFormattedMessage());
+    }
+
+    @Test
+    void passwordToString() throws Exception
+    {
+        PasswordProperty passwordProperty = new PasswordProperty();
+        passwordProperty.setId(45);
+        passwordProperty.setName("mypassword");
+        passwordProperty.setValue("password");
+
+        StringClass stringClass = mock(StringClass.class);
+        when(stringClass.newProperty()).thenReturn(new StringProperty());
+
+        BaseProperty<?> property = this.converter.convertProperty(passwordProperty, stringClass);
+        assertInstanceOf(StringProperty.class, property);
+        assertEquals("", ((StringProperty) property).getValue());
+        assertEquals("mypassword", property.getName());
+        assertEquals(45, property.getId());
     }
 }

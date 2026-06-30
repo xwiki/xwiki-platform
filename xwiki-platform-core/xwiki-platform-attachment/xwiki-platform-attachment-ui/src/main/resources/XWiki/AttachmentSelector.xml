@@ -472,6 +472,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   function uploadTemporaryAttachment() {
     // Require jquery locally until we are able to fully migrate this code away from prototype.
     const form = this.property.up('form');
+    const propertyReferenceInput = this.property.querySelector('input[type="hidden"].property-reference');
     require(['jquery'], function ($) {
       const data = new FormData();
       const uploadedFile = $('#attachfile')[0].files[0];
@@ -483,7 +484,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
       const params = {
         'form_token': $(form).find('[name="form_token"]').val(),
-        'sheet': 'CKEditor.FileUploader',
+        'sheet': 'XWiki.WYSIWYG.FileUploader',
         'outputSyntax': 'plain'
       };
   
@@ -510,7 +511,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           .prop('type', 'hidden')
           .prop('name', 'uploadedFiles')
           .prop('value', response.fileName))
-        $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
+        propertyReferenceInput.value = response.fileName;
         this.updateAttachment(response.fileName, response.url);
         this.dialog.closeDialog();
       }.bind(this)).fail(function  () {
@@ -1592,9 +1593,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #set ($attachmentResource = '')
   #end
   #if ($displayImage)
-    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
+    (% class="${services.rendering.escape($!cssClass, 'xwiki/2.1')}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
   #else
-      (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{services.rendering.escape($!{attachmentName}, 'xwiki/2.1')}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+    (% class="${services.rendering.escape($!cssClass, 'xwiki/2.1')}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{services.rendering.escape($!{attachmentName}, 'xwiki/2.1')}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
   #end
 #end
 

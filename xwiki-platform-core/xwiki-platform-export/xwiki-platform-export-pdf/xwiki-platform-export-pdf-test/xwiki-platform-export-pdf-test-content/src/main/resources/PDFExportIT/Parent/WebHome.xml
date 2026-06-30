@@ -40,7 +40,7 @@
 
 Content of first chapter. Current user is {{velocity}}$xcontext.userReference{{/velocity}}.
 
-Link to [[child page&gt;&gt;.Child.WebHome]].
+Link to the [[child page&gt;&gt;.Child.WebHome]].
 
 {{html clean="false"}}
 &lt;div id="dynamic-content"&gt;loading...&lt;/div&gt;

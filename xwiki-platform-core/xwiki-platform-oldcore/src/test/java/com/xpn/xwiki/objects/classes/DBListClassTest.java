@@ -21,9 +21,18 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryBuilder;
+import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,7 +43,12 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DBListClass}.
@@ -47,6 +61,15 @@ class DBListClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private QueryBuilder<DBListClass> queryBuilder;
+
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
 
     @BeforeEach
     void before()
@@ -398,5 +421,42 @@ class DBListClassTest
         DBListClass dblc = new DBListClass();
         assertEquals("-", dblc.returnCol("do something", true));
         assertEquals("-", dblc.returnCol("do something", false));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "10, 20, false",
+        "20, 10, true",
+        "0, 0, false",
+        "0, -1, false",
+        "20, -1, false",
+        "0, 20, true"
+    })
+    void getDBListLimit(int queryLimit, int configuredLimit, boolean setLimit) throws Exception
+    {
+        Query mockQuery = mock();
+        when(mockQuery.getLimit()).thenReturn(queryLimit);
+        when(mockQuery.execute()).thenReturn(List.of());
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(configuredLimit);
+
+        when(this.authorExecutor.call(any(), any(), any())).then(invocation -> {
+            Callable<?> callable = invocation.getArgument(0);
+            return callable.call();
+        });
+
+        XWikiDocument ownerDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        DBListClass dbListClass = new DBListClass();
+        dbListClass.setOwnerDocument(ownerDocument);
+
+        when(this.queryBuilder.build(dbListClass)).thenReturn(mockQuery);
+
+        dbListClass.getDBList(this.oldcore.getXWikiContext());
+
+        if (setLimit) {
+            verify(mockQuery).setLimit(configuredLimit);
+        } else {
+            verify(mockQuery, never()).setLimit(anyInt());
+        }
+        verify(mockQuery).execute();
     }
 }

@@ -26,7 +26,6 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.template.Template;
  * @since 16.1.0RC1
  */
 @Role
-@Unstable
 public interface EmailTemplateRenderer
 {
     /**

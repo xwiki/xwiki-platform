@@ -118,7 +118,7 @@ class InternalSkinManagerTest
     {
         when(this.wikiSkinUtils.isWikiSkin("test")).thenReturn(false);
 
-        when(this.environment.getResource("/skins/test/skin.properties")).thenReturn(new URL("file:/"));
+        when(this.environment.getResource("/skins/test/", "skin.properties")).thenReturn(new URL("file:/"));
 
         Skin returnedSkin = this.internalSkinManager.getSkin("test");
 
@@ -131,7 +131,7 @@ class InternalSkinManagerTest
     void getSkinCreateClassLoaderWiki() throws Exception
     {
         when(this.wikiSkinUtils.isWikiSkin("test")).thenReturn(false);
-        when(this.environment.getResource("/skins/test/skin.properties")).thenReturn(null);
+        when(this.environment.getResource("/skins/test/", "skin.properties")).thenReturn(null);
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
 
         Skin returnedSkin = this.internalSkinManager.getSkin("test");

@@ -626,7 +626,7 @@ public class DefaultSolrUtils implements SolrUtils
             return null;
         }
 
-        List<T> collection = new ArrayList<T>(solrCollection.size());
+        List<T> collection = new ArrayList<>(solrCollection.size());
 
         solrCollection.forEach(e -> collection.add(toValue(e, targetType)));
 

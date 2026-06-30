@@ -209,45 +209,65 @@ public class ScopeNotificationFilterLocationStateComputer
     private Optional<WatchedLocationState> handleExclusiveFilters(EntityReference location,
         ScopeNotificationFilterPreferencesHierarchy preferences, boolean allTypesAndEvents)
     {
-        WatchedLocationState.WatchedState state = null;
-        int deepestLevel = 0;
-        Date startingDate = null;
+        ExclusiveMatch match = new ExclusiveMatch();
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            int deepLevel = pref.getScopeReference().size();
-            boolean isExactMatch = isExactMatch(pref, location);
-            boolean isParentMatch = isParentMatch(pref, location);
-            boolean isSpaceMatch = isSpaceMatch(pref, location);
-
-            // If the exclusive filter match the event location...
-            if ((isExactMatch || isParentMatch) && deepLevel > deepestLevel) {
-                state = getWatchedState(allTypesAndEvents, isExactMatch, isSpaceMatch, false);
-                startingDate = pref.getStartingDate();
-                deepestLevel = deepLevel;
-
-                // then we watch the location if there is at least an inclusive filter child matching it
-                for (ScopeNotificationFilterPreference child : pref.getChildren()) {
-                    int childDeepLevel = child.getScopeReference().size();
-                    boolean isChildExactMatch = isExactMatch(child, location);
-                    boolean isChildParentMatch = isParentMatch(child, location);
-                    boolean isChildSpaceMatch = isSpaceMatch(child, location);
-                    if ((isChildExactMatch || isChildParentMatch) && childDeepLevel > deepestLevel) {
-                        state = getWatchedState(allTypesAndEvents, isChildExactMatch, isChildSpaceMatch, true);
-                        deepestLevel = childDeepLevel;
-                        startingDate = child.getStartingDate();
-                    }
-                }
-            }
+            handleExclusiveFilter(it.next(), location, allTypesAndEvents, match);
         }
 
-        if (state != null) {
-            return Optional.of(new WatchedLocationState(state, startingDate));
+        if (match.state != null) {
+            return Optional.of(new WatchedLocationState(match.state, match.startingDate));
         } else {
             return Optional.empty();
         }
+    }
+
+    private void handleExclusiveFilter(ScopeNotificationFilterPreference pref, EntityReference location,
+        boolean allTypesAndEvents, ExclusiveMatch match)
+    {
+        int deepLevel = pref.getScopeReference().size();
+        boolean isExactMatch = isExactMatch(pref, location);
+        boolean isParentMatch = isParentMatch(pref, location);
+        boolean isSpaceMatch = isSpaceMatch(pref, location);
+
+        // If the exclusive filter match the event location...
+        if ((isExactMatch || isParentMatch) && deepLevel > match.deepestLevel) {
+            match.state = getWatchedState(allTypesAndEvents, isExactMatch, isSpaceMatch, false);
+            match.startingDate = pref.getStartingDate();
+            match.deepestLevel = deepLevel;
+
+            // then we watch the location if there is at least an inclusive filter child matching it
+            for (ScopeNotificationFilterPreference child : pref.getChildren()) {
+                handleExclusiveChild(child, location, allTypesAndEvents, match);
+            }
+        }
+    }
+
+    private void handleExclusiveChild(ScopeNotificationFilterPreference child, EntityReference location,
+        boolean allTypesAndEvents, ExclusiveMatch match)
+    {
+        int childDeepLevel = child.getScopeReference().size();
+        boolean isChildExactMatch = isExactMatch(child, location);
+        boolean isChildParentMatch = isParentMatch(child, location);
+        boolean isChildSpaceMatch = isSpaceMatch(child, location);
+        if ((isChildExactMatch || isChildParentMatch) && childDeepLevel > match.deepestLevel) {
+            match.state = getWatchedState(allTypesAndEvents, isChildExactMatch, isChildSpaceMatch, true);
+            match.deepestLevel = childDeepLevel;
+            match.startingDate = child.getStartingDate();
+        }
+    }
+
+    /**
+     * Holds the current best match found while iterating over the exclusive filters and their children.
+     */
+    private static final class ExclusiveMatch
+    {
+        private WatchedLocationState.WatchedState state;
+
+        private int deepestLevel;
+
+        private Date startingDate;
     }
 
     private boolean isSpaceMatch(ScopeNotificationFilterPreference pref, EntityReference location)

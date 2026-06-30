@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -40,6 +40,11 @@
     <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.previousIds>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.features>
+    <xwiki.extension.javascript.modules.importmap>
+     {
+       "fuse": "org.webjars.npm:fuse.js/dist/fuse.basic.min.mjs"
+     }
+     </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
@@ -50,11 +55,11 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
-    <!-- Bootstrap is used for the editor modals (insert / edit link, image, macro) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bootstrap</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-webjar</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- This is used by the resource tree picker on the link modal. -->
     <dependency>
@@ -72,12 +77,6 @@
       <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature.. -->
       <optional>true</optional>
     </dependency>
-    <!-- This is used by the resource suggest picker on the link modal. -->
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>bootstrap-3-typeahead</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <!-- This is used to preserve the selection when switching between WYSIWYG and Source modes. -->
     <dependency>
       <groupId>org.webjars.npm</groupId>
@@ -88,7 +87,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>fuse.js</artifactId>
-      <version>7.1.0</version>
+      <version>7.4.1</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -100,39 +99,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.github.blutorange</groupId>
-        <artifactId>closure-compiler-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-bundles</id>
-            <goals>
-              <!-- This is the only goal available, so we have to use it, even if we only want to merge some files. -->
-              <goal>minify</goal>
-            </goals>
-            <phase>compile</phase>
-            <configuration>
-              <baseSourceDir>
-                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}
-              </baseSourceDir>
-              <sourceDir>${project.version}</sourceDir>
-              <baseTargetDir>
-                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}
-              </baseTargetDir>
-              <targetDir>${project.version}</targetDir>
-              <skipMerge>false</skipMerge>
-              <bundleConfiguration>src/main/config/bundleConfiguration.json</bundleConfiguration>
-              <!-- There's no configuration option to keep the unminified aggregated file so we include its source
-                in the generated source map file.  -->
-              <closureIncludeSourcesContent>true</closureIncludeSourcesContent>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
       <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)

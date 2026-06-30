@@ -74,8 +74,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ComputedFieldClass;
@@ -85,8 +85,6 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-
-import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -154,13 +152,13 @@ class ModelFactoryTest
     @BeforeEach
     void mockUpTestDocument() throws Exception
     {
-        baseURI = new URI("https://localhost/");
+        this.baseURI = new URI("https://localhost/");
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
-        when(testDocument.getPrefixedFullName()).thenReturn("wiki:Path.To.Page");
-        when(testDocument.getWiki()).thenReturn("wiki");
-        when(testDocument.getSpace()).thenReturn("Path.To");
-        when(testDocument.getName()).thenReturn("Page");
-        when(testDocument.getDocumentReference()).thenReturn(documentReference);
+        when(this.testDocument.getPrefixedFullName()).thenReturn("wiki:Path.To.Page");
+        when(this.testDocument.getWiki()).thenReturn("wiki");
+        when(this.testDocument.getSpace()).thenReturn("Path.To");
+        when(this.testDocument.getName()).thenReturn("Page");
+        when(this.testDocument.getDocumentReference()).thenReturn(documentReference);
 
         this.xcontext = this.oldCore.getXWikiContext();
         this.xcontext.setWikiReference(documentReference.getWikiReference());
@@ -170,7 +168,7 @@ class ModelFactoryTest
 
     /**
      * A separate set up only for tests which needs an object.
-     * 
+     *
      * @return the object for test, prefilled witha few values
      */
     private BaseObject setUpTestObject() throws Exception
@@ -179,7 +177,7 @@ class ModelFactoryTest
         BaseClass xwikiClass = mock(BaseClass.class);
 
         when(xwikiObject.getPropertyNames()).thenReturn(new String[] {});
-        when(xwikiObject.getXClass(xcontext)).thenReturn(xwikiClass);
+        when(xwikiObject.getXClass(this.xcontext)).thenReturn(xwikiClass);
         when(xwikiObject.getClassName()).thenReturn("Some.XClass");
         when(xwikiObject.getNumber()).thenReturn(0);
 
@@ -187,22 +185,20 @@ class ModelFactoryTest
         stringField.setName(TEST_STRING_FIELD);
         StringProperty textElement = new StringProperty();
         textElement.setName(TEST_STRING_FIELD);
-        textElement.setClassType("String");
         textElement.setValue(TEST_STRING_VALUE);
         when(xwikiObject.get(TEST_STRING_FIELD)).thenReturn(textElement);
 
         PasswordClass pwField = new PasswordClass();
         pwField.setName(TEST_PASSWORD_FIELD);
-        StringProperty pwElement = new StringProperty();
+        BaseProperty pwElement = pwField.newProperty();
         pwElement.setName(TEST_PASSWORD_FIELD);
-        pwElement.setClassType("Password");
         pwElement.setValue(TEST_PASSWORD_VALUE);
         when(xwikiObject.get(TEST_PASSWORD_FIELD)).thenReturn(pwElement);
 
         ComputedFieldClass computedField = new ComputedFieldClass();
         computedField.setName(TEST_COMPUTED_FIELD);
 
-        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField, computedField});
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { stringField, pwField, computedField });
 
         return xwikiObject;
     }
@@ -210,11 +206,11 @@ class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForNonAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(false);
 
         BaseObject xwikiObject = setUpTestObject();
 
-        Object result = modelFactory.toRestObject(baseURI, testDocument, xwikiObject, false, false);
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
 
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
@@ -225,15 +221,15 @@ class ModelFactoryTest
     @Test
     void toRestObjectCheckWhichObjectValuesAreAvailableForAdmins() throws Exception
     {
-        when(authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, new WikiReference("wiki"))).thenReturn(true);
 
         BaseObject xwikiObject = setUpTestObject();
 
-        Object result = modelFactory.toRestObject(baseURI, testDocument, xwikiObject, false, false);
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
 
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
-        expectedValues.put(TEST_PASSWORD_FIELD, null);
+        expectedValues.put(TEST_PASSWORD_FIELD, "");
         assertExpectedPropertyValues(result.getProperties(), expectedValues);
     }
 
@@ -241,21 +237,20 @@ class ModelFactoryTest
     {
         return Stream.of(
             // no mail obfuscation
-            Arguments.of(false, true, "user@domain.tld", "user@domain.tld", null),
+            Arguments.of(false, true, "user@domain.tld", "user@domain.tld"),
             // mail obfuscation activated but the current user has edit rights
-            Arguments.of(true, true, "user@domain.tld", "user@domain.tld", null),
+            Arguments.of(true, true, "user@domain.tld", "user@domain.tld"),
             // mail obfuscation activated and the current user does not have edit rights 
-            Arguments.of(true, false, "user@domain.tld", "u...@domain.tld", null),
+            Arguments.of(true, false, "user@domain.tld", "u...@domain.tld"),
             // mail obfuscation activated, the current user does not have edit rights and the mail is badly formatted
-            Arguments.of(true, false, "wrong@", "",
-                "Failed to parse [wrong@] to an email address. Cause: [AddressException: Missing domain]")
+            Arguments.of(true, false, "wrong@", "")
         );
     }
 
     @ParameterizedTest
     @MethodSource("toRestObjectWithObfuscatedMailSource")
     void toRestObjectWithObfuscatedMail(boolean shouldObfuscate, boolean hasEditRight, String inputMail,
-        String expectedEmail, String expectedWarning) throws Exception
+        String expectedEmail) throws Exception
     {
         ObjectReference objectReference = mock(ObjectReference.class);
         when(this.generalMailConfiguration.shouldObfuscate()).thenReturn(shouldObfuscate);
@@ -272,25 +267,17 @@ class ModelFactoryTest
 
         EmailClass emailField = new EmailClass();
         emailField.setName("emailValue");
-        StringProperty emailElement = new StringProperty();
+        BaseProperty emailElement = emailField.newProperty();
         emailElement.setName("emailValue");
-        emailElement.setClassType("Password");
         emailElement.setValue(inputMail);
-        BaseCollection baseCollection = mock(BaseCollection.class);
-        when(baseCollection.getReference()).thenReturn(objectReference);
-        emailElement.setObject(baseCollection);
+        emailElement.setObject(xwikiObject);
+        when(xwikiClass.get("emailValue")).thenReturn(emailField);
         when(xwikiObject.get("emailValue")).thenReturn(emailElement);
-
         when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { emailField });
 
         Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
 
         assertExpectedPropertyValues(result.getProperties(), Map.of("emailValue", expectedEmail));
-
-        if (expectedWarning != null) {
-            assertEquals(expectedWarning, this.logCapture.getMessage(0));
-            assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        }
     }
 
     @Test
@@ -311,13 +298,11 @@ class ModelFactoryTest
 
         EmailClass emailField = new EmailClass();
         emailField.setName("emailValue");
-        StringProperty emailElement = new StringProperty();
+        BaseProperty emailElement = emailField.newProperty();
         emailElement.setName("emailValue");
-        emailElement.setClassType("Password");
         emailElement.setValue("user@domain.tld");
-        BaseCollection baseCollection = mock(BaseCollection.class);
-        when(baseCollection.getReference()).thenReturn(objectReference);
-        emailElement.setObject(baseCollection);
+        emailElement.setObject(xwikiObject);
+        when(xwikiClass.get("emailValue")).thenReturn(emailField);
         when(xwikiObject.get("emailValue")).thenReturn(emailElement);
 
         when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { emailField });

@@ -103,7 +103,7 @@ public class DefaultNotificationManager implements NotificationManager
     public long getEventsCount(String userId, int maxCount) throws NotificationException
     {
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
+        parameters.user = this.documentReferenceResolver.resolve(userId);
         parameters.format = NotificationFormat.ALERT;
         parameters.expectedCount = maxCount;
         parameters.onlyUnread = true;
@@ -114,7 +114,7 @@ public class DefaultNotificationManager implements NotificationManager
         Date untilDate, boolean untilDateIncluded, Date fromDate, List<String> blackList) throws NotificationException
     {
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = documentReferenceResolver.resolve(userId);
+        parameters.user = this.documentReferenceResolver.resolve(userId);
         parameters.format = format;
         parameters.expectedCount = expectedCount;
         parameters.endDate = untilDate;
@@ -129,18 +129,18 @@ public class DefaultNotificationManager implements NotificationManager
     @Override
     public List<NotificationPreference> getPreferences() throws NotificationException
     {
-        return notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
+        return this.notificationPreferenceManager.getAllPreferences(this.documentAccessBridge.getCurrentUserReference());
     }
 
     @Override
     public List<NotificationPreference> getPreferences(String userId) throws NotificationException
     {
-        return notificationPreferenceManager.getAllPreferences(documentReferenceResolver.resolve(userId));
+        return this.notificationPreferenceManager.getAllPreferences(this.documentReferenceResolver.resolve(userId));
     }
 
     @Override
     public void setStartDate(String userId, Date startDate) throws NotificationException
     {
-        notificationPreferenceManager.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
+        this.notificationPreferenceManager.setStartDateForUser(this.documentReferenceResolver.resolve(userId), startDate);
     }
 }

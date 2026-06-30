@@ -37,8 +37,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -170,7 +170,7 @@ public class SaveAction extends EditAction
         // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
         XWikiDocument tdoc;
 
-        if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default"))
+        if (doc.isNew() || (language == null) || (language.isEmpty()) || ("default".equals(language))
             || (language.equals(doc.getDefaultLanguage()))) {
             // Saving the default document translation.
             // Need to save parent and defaultLanguage if they have changed
@@ -477,7 +477,7 @@ public class SaveAction extends EditAction
 
                     List<MetaDataDiff> filteredMetaDataDiff = new ArrayList<>();
                     for (MetaDataDiff dataDiff : metaDataDiff) {
-                        if (!dataDiff.getField().equals("author")) {
+                        if (!"author".equals(dataDiff.getField())) {
                             filteredMetaDataDiff.add(dataDiff);
                         }
                     }

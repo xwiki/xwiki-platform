@@ -30,15 +30,17 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jakarta.inject.Provider;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.PropertyGroupDescriptor;
@@ -72,35 +74,21 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConstants
 {
-    /**
-     * The {@link ComponentManager} component.
-     */
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * The {@link Execution} component used for accessing XWikiContext.
-     */
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private DocumentAuthorizationManager authorization;
 
-    /**
-     * The logger to log.
-     */
     @Inject
     private Logger logger;
 
-    /**
-     * Utility method for accessing XWikiContext.
-     * 
-     * @return the XWikiContext.
-     */
     private XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return this.xcontextProvider.get();
     }
 
     @Override
@@ -389,15 +377,23 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     @Override
     public boolean containsWikiMacro(DocumentReference documentReference)
     {
-        boolean result;
         try {
-            XWikiDocument doc = getContext().getWiki().getDocument(documentReference, getContext());
-            BaseObject macroDefinition = doc.getXObject(WIKI_MACRO_CLASS_REFERENCE);
-            result = (null != macroDefinition);
-        } catch (XWikiException ex) {
-            result = false;
+            XWikiDocument document = getContext().getWiki().getDocument(documentReference, getContext());
+
+            return containsWikiMacro(document);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to get document", e);
         }
-        return result;
+
+        return false;
+    }
+
+    @Override
+    public boolean containsWikiMacro(DocumentModelBridge document)
+    {
+        BaseObject macroDefinition = ((XWikiDocument) document).getXObject(WIKI_MACRO_CLASS_REFERENCE);
+
+        return (null != macroDefinition);
     }
 
     @Override

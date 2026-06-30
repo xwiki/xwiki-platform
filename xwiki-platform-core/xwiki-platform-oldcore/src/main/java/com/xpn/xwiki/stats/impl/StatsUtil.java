@@ -748,7 +748,7 @@ public final class StatsUtil
         }
 
         if (!StringUtils.isBlank(users)) {
-            userList = new ArrayList<String>();
+            userList = new ArrayList<>();
 
             int begin = 0;
             boolean escaped = false;

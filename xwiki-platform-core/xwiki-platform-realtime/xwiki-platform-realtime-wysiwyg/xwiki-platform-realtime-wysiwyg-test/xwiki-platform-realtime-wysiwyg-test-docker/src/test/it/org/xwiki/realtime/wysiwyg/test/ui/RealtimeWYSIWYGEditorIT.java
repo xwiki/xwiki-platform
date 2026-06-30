@@ -23,9 +23,12 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
@@ -38,10 +41,7 @@ import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
-import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
@@ -73,8 +73,9 @@ import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-
-import com.mchange.io.FileUtils;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -391,8 +392,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitForContentRefresh();
 
         // Replace the default message text.
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        secondTextArea.sendKeys("my info");
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        secondTextArea.sendKeys(Keys.BACK_SPACE, "my info");
 
         //
         // First Tab
@@ -697,7 +698,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         File file = setup.getResourceFile("/image.gif");
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(FileUtils.getBytes(file), uploadedAttachmentContent));
+        assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
 
         // Focus the caption and edit it.
         secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
@@ -710,7 +711,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Tree");
-        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ", Keys.ARROW_LEFT);
 
         // Verify that the image uploaded from the second tab is visible in the first tab.
         firstTextArea.verifyContent(content -> {
@@ -733,7 +734,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
+        firstTextArea.sendKeys("est");
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickDone();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",
@@ -763,8 +764,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Replace the default message text.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        firstTextArea.sendKeys("one");
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE, "one");
 
         MacroDialogEditModal firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
         firstMacroEditModal.setMacroParameter("title", "Some");
@@ -1040,7 +1041,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Select the default information message and delete it.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE);
 
         // Insert a nested error box.
         firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
@@ -1051,8 +1053,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Replace the default error message.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        firstTextArea.sendKeys("nested");
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE, "nested");
 
         // Type some text after the information box.
         firstTextArea.sendKeys(Keys.ARROW_DOWN, "after");
@@ -2087,7 +2089,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Resolve the merge conflict caused by the fact that we saved from Source mode.
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.submitCurrentChoice(true);
-        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.getContent());
+        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.waitForView().getContent());
     }
 
     @Test
@@ -2159,7 +2161,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = new RealtimeCKEditor().getRichTextArea();
 
         secondTextArea.sendKeys("three");
-        secondTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("three"));
 
         //
         // First Tab
@@ -2226,7 +2229,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
         firstTextArea.waitUntilTextContains("four");
         firstTextArea.sendKeys("zero ");
-        firstTextArea.waitUntilLocalChangesArePushed();
+        // Wait for the local changes to be propagated.
+        editInSeparateTab(setup, testReference, textArea -> textArea.waitUntilTextIs("zero four"));
 
         //
         // Second Tab
@@ -2280,10 +2284,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(syntaxConfirmationModal.getMessage()
             .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
         syntaxConfirmationModal.confirmSyntaxConversion();
-        // Wait for the syntax conversion.
-        firstEditPage.waitForNotificationSuccessMessage("Syntax converted");
-        // Wait for the editor to be reloaded (recreated).
-        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
 
         // The editor was recreated.
         firstEditor = firstEditPage.getContenEditor();
@@ -2319,8 +2319,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(syntaxConfirmationModal.getMessage()
             .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
         syntaxConfirmationModal.confirmSyntaxConversion();
-        // Wait for the editor to be reloaded (recreated).
-        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
 
         // The editor was re-created.
         firstEditor = new RealtimeCKEditor();
@@ -2585,6 +2583,351 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("superadmin", historyPane.getCurrentAuthor());
     }
 
+    @Test
+    @Order(26)
+    void undoRedoAlone(TestUtils setup, TestReference testReference) {
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        assertTrue(firstEditor.getToolBar().isUndoDisabled());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstTextArea.sendKeys("1");
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+        
+        firstTextArea.sendKeys("2", Keys.LEFT);
+        firstTextArea.waitUntilLocalChangesArePushed();
+        
+        // Select "1" and replace it.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.LEFT));
+        firstTextArea.sendKeys("3");
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("1");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("");
+        assertTrue(firstEditor.getToolBar().isUndoDisabled());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("1");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("32");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("12");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstTextArea.sendKeys("4");
+        firstTextArea.waitUntilLocalChangesArePushed();
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+        assertEquals("142", firstTextArea.getText());
+    }
+
+    @Test
+    @Order(27)
+    void localUndoRedo(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab (standalone).
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        // Save the page in order to be able to edit in in-place in the second browser tab.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+        firstTextArea.sendKeys("one |", Keys.LEFT);
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab (in-place).
+        RealtimeInplaceEditablePage inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        RealtimeCKEditor secondEditor = new RealtimeCKEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilTextContains("|");
+        secondTextArea.sendKeys(Keys.END, " red");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("red");
+        firstTextArea.sendKeys("two ");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("two");
+        secondTextArea.sendKeys(" green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("green");
+        firstTextArea.sendKeys(Keys.HOME);
+        // Select "one" and replace.
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        firstTextArea.sendKeys("1");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("1");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT));
+        // Select "red" and replace.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        secondTextArea.sendKeys("-");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("-");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one two | - green");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        firstTextArea.waitUntilTextIs("one | - green");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        firstTextArea.waitUntilTextIs("one two | - green");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextIs("one two | - green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one two | red green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one two | red");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one two | red green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextIs("one two | red green");
+        firstTextArea.sendKeys("[");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("[");
+
+        // Verify we can still redo local changes after a remote change is received.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | red");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | red green");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "z"));
+        secondTextArea.waitUntilTextIs("one[ two | - green");
+
+        // Verify the care position after a redo/undo sequence.
+        secondTextArea.sendKeys("]");
+        assertEquals("one[ two | -] green", secondTextArea.getText());
+    }
+
+    @Test
+    @Order(28)
+    void mandatoryTitleAndVersionSummary(TestUtils setup, TestReference testReference) throws Exception
+    {
+        //
+        // Make title mandatory and disable the version summary.
+        //
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("xwiki.title.mandatory", "1");
+        setup.setWikiPreference("editcomment", "0");
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor editor = editPage.getContenEditor();
+        RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
+        textArea.sendKeys("zero");
+
+        // Check that the mandatory title has a initial value.
+        assertEquals(testReference.getLastSpaceReference().getName(), editPage.getDocumentTitle());
+        assertTrue(editPage.isDocumentTitleValid());
+
+        // Check that the "Summarize & Done" and "Summarize Changes" actions are not available.
+        assertFalse(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertFalse(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+
+        // Check that Done acts as Save & View. We can save because the title is not empty.
+        ViewPage viewPage = editPage.clickDone();
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitle());
+
+        // Edit again and check that we can't save with an empty title.
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        editPage.getDocumentTitleField().clear();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with Save & Continue.
+        textArea.clear();
+        textArea.sendKeys("one");
+        editPage.getToolbar().sendSaveShortcutKey(false);
+        editPage.waitUntilDocumentTitleIsFocused();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with Done.
+        textArea.sendKeys(" two");
+        editPage.getToolbar().clickDone();
+        editPage.waitUntilDocumentTitleIsFocused();
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Try with auto-save.
+        textArea.sendKeys(" three");
+        // Use a larger timeout in order to match the auto-save delay.
+        editPage.waitUntilDocumentTitleIsFocused(70);
+        assertFalse(editPage.isDocumentTitleValid());
+
+        // Now set the title and check that we can save again.
+        editPage.getDocumentTitleField().sendKeys("Mandatory Title And Version Summary");
+        assertTrue(editPage.isDocumentTitleValid());
+        viewPage = editPage.clickDone();
+        assertEquals("Mandatory Title And Version Summary", viewPage.getDocumentTitle());
+
+        // Check that we have only two versions in the document history.
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(2, historyPane.getNumberOfVersions());
+
+        //
+        // Now make the title optional again, then enable the version summary and make it mandatory.
+        //
+        setup.setWikiPreference("xwiki.title.mandatory", "0");
+        setup.setWikiPreference("editcomment", "1");
+        setup.setWikiPreference("editcomment_mandatory", "1");
+
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        editPage.getDocumentTitleField().clear();
+        assertTrue(editPage.isDocumentTitleValid());
+
+        // Check that only "Summarize Changes" action is available. The "Summarize & Done" action is actually offered
+        // by the Done button.
+        assertFalse(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertTrue(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+
+        // Try to save with an empty version summary.
+        textArea.clear();
+        SummaryModal summaryModal = editPage.getToolbar().getHistoryDropdown().open().summarizeChanges();
+        summaryModal.viewChanges();
+        summaryModal.clickSave(false);
+        summaryModal.waitUntilSummaryIsFocused();
+        assertFalse(summaryModal.isSummaryValid());
+
+        // Try again with a summary.
+        summaryModal.setSummary("empty content");
+        summaryModal.clickSave(true);
+
+        // Try the Save & Continue shortcut key. The user should be forced to enter a summary.
+        textArea.sendKeys("red");
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+        editPage.getToolbar().sendSaveShortcutKey(false);
+        Alert alert = editPage.waitForVersionSummaryAlert();
+        alert.sendKeys("color");
+        alert.accept();
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
+
+        // Try the auto-save. In this case a default summary is used.
+        textArea.sendKeys(" green");
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+        editPage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
+
+        // Try the Done button. It should behave like Summarize & Done, i.e. force the user to enter a summary.
+        textArea.sendKeys(" blue");
+        editPage.getToolbar().clickDone();
+        summaryModal = new SummaryModal();
+        // The previously typed version summary is preserved.
+        assertEquals("empty content", summaryModal.getSummary());
+        summaryModal.getSummaryTextArea().clear();
+        assertFalse(summaryModal.isSummaryValid());
+        summaryModal.setSummary("done with summary");
+        assertTrue(summaryModal.isSummaryValid());
+        summaryModal.clickSave(true);
+
+        viewPage = new ViewPage();
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitle());
+
+        historyPane = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(6, historyPane.getNumberOfVersions());
+        assertTrue(historyPane.hasVersionWithSummary("empty content"));
+        assertTrue(historyPane.hasVersionWithSummary("color"));
+        assertTrue(historyPane.hasVersionWithSummary("Auto-saved during real-time collaboration"));
+        assertTrue(historyPane.hasVersionWithSummary("done with summary"));
+
+        //
+        // Make the version summary optional again.
+        //
+        setup.setWikiPreference("editcomment_mandatory", "0");
+
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        assertTrue(editPage.getToolbar().hasSummarizeAndDoneAction());
+        assertTrue(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
+        viewPage = editPage.clickDone();
+        assertEquals(6, viewPage.openHistoryDocExtraPane().showMinorEdits().getNumberOfVersions());
+    }
+
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();
@@ -2599,5 +2942,23 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().addPageNotYetReloadedMarker();
         sectionPage.clickSave();
         setup.getDriver().waitUntilPageIsReloaded();
+    }
+
+    private void editInSeparateTab(TestUtils setup, DocumentReference documentReference,
+        Consumer<RealtimeRichTextAreaElement> editAction)
+    {
+        String currentTabHandle = setup.getDriver().getWindowHandle();
+        setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(documentReference);
+        RealtimeRichTextAreaElement textArea = editPage.getContenEditor().getRichTextArea();
+
+        editAction.accept(textArea);
+        setup.leaveEditMode();
+
+        setup.getDriver().close();
+        if (currentTabHandle != null) {
+            setup.getDriver().switchTo().window(currentTabHandle);
+        }
     }
 }

@@ -34,7 +34,7 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 @Component
 @Singleton
 public class WikiObjectPropertyReader extends AbstractWikiObjectPropertyReader
-    implements XARXMLReader<WikiObjectPropertyReader.WikiObjectProperty>
+    implements XARXMLReader<AbstractWikiObjectPropertyReader.WikiObjectProperty>
 {
     @Override
     public WikiObjectProperty read(XMLStreamReader xmlReader, XARInputProperties properties)

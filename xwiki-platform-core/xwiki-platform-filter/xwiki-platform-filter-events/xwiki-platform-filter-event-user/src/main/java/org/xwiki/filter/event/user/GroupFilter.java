@@ -44,6 +44,12 @@ public interface GroupFilter
      */
     String PARAMETER_REVISION_DATE = "revision_date";
 
+    /**
+     * @type {@link java.lang.Boolean}
+     * @since 18.6.0RC1
+     */
+    String PARAMETER_OVERWRITE = "overwrite";
+
     // Events
 
     /**

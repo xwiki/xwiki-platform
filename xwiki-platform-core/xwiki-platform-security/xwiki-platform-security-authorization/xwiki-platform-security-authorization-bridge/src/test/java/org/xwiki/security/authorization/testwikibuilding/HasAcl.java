@@ -29,7 +29,6 @@ package org.xwiki.security.authorization.testwikibuilding;
  */
 public interface HasAcl
 {
-
     /**
      * Add an "allow" right to a named user.
      * 

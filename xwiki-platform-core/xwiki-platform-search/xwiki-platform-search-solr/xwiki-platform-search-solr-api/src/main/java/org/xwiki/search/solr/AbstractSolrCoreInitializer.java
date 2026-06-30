@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -146,9 +145,23 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_16_7 = 160700000;
 
     /**
+     * The base schema version for XWiki 17.10.1.
+     *
+     * @since 17.10.1
+     */
+    public static final long SCHEMA_VERSION_17_10_1 = 171001000;
+
+    /**
+     * The base schema version for XWiki 17.10.9.
+     *
+     * @since 17.10.9
+     */
+    public static final long SCHEMA_VERSION_17_10_9 = 171009000;
+
+    /**
      * The base schema version.
      */
-    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_10;
+    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_17_10_9;
 
     /**
      * The name of the attribute containing the name of the Solr field.
@@ -479,7 +492,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @return the number of document to retrieve at the same time when migrating the data
      * @since 16.2.0RC1
      */
-    @Unstable
     protected int getMigrationBatchRows()
     {
         return DEFAULT_MIGRATION_BATCH_ROWS;
@@ -571,7 +583,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         for (String fieldName : sourceDocument.getFieldNames()) {
             // Fix special fields:
             // * _version_: internal Solr field used for atomic updates
-            if (!fieldName.equals("_version_")) {
+            if (!"_version_".equals(fieldName)) {
                 targetDocument.setField(fieldName, sourceDocument.getFieldValue(fieldName));
             }
         }

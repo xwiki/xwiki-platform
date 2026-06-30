@@ -34,6 +34,7 @@ import org.xwiki.filter.xar.internal.XARFilterUtils;
  * @since 6.2M1
  */
 @Component(hints = {
+    XARFilterUtils.ROLEHINT_17,
     XARFilterUtils.ROLEHINT_16,
     XARFilterUtils.ROLEHINT_15,
     XARFilterUtils.ROLEHINT_14,
@@ -45,6 +46,9 @@ import org.xwiki.filter.xar.internal.XARFilterUtils;
 public class XARInputFilterStreamFactory
     extends AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>
 {
+    /**
+     * Default constructor.
+     */
     public XARInputFilterStreamFactory()
     {
         super(FilterStreamType.XWIKI_XAR_CURRENT);

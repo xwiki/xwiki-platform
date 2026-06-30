@@ -89,7 +89,9 @@
           // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the
           // dirty state in order to avoid getting the leave confirmation when leaving the editor just after it was
           // loaded.
-          editor.resetDirty();
+          if (editor.mode === 'wysiwyg') {
+            editor.resetDirty();
+          }
 
           // Leave / rejoin the realtime session when switching between WYSIWYG and Source modes.
           // We flush uncommitted work before leaving the WYSIWYG mode, in order to avoid losing local changes. We do
@@ -198,7 +200,9 @@
 
   function preserveSpaceCharAtTheEndOfLine(editor) {
     editor.on('beforeGetData', () => {
-      const range = !editor.isDetached() && editor.getSelection()?.getRanges()[0];
+      // The selection is bound to the window so editor.getSelection() throws an exception if there's no window which is
+      // the case when either the editor or its editable area is detached.
+      const range = !editor.isDetached() && !editor.editable()?.isDetached() && editor.getSelection()?.getRanges()[0];
       const textNode = range?.startContainer;
       // Check if the caret is at the end of a text node that ends with a space and is followed by a line break.
       if (editor.mode === 'wysiwyg' && range?.collapsed && textNode.type === CKEDITOR.NODE_TEXT &&
@@ -235,7 +239,7 @@
       field: editor.name,
       // This is used to generate the WYSIWYG editor URL so we need to take into account if we are in view mode
       // (i.e. in-place editing) or in edit mode (standalone editing).
-      href: window.XWiki?.contextaction === 'view' ? '&force=1' : '&editor=wysiwyg&force=1',
+      href: window.XWiki?.contextaction === 'view' ? '' : '&editor=wysiwyg',
       name: 'WYSIWYG',
       compatible: ['wysiwyg', 'wiki']
     };
@@ -245,6 +249,10 @@
       return await new Promise((resolve, reject) => {
         require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
           editor._realtime.connect = async () => {
+            if (editor.mode !== 'wysiwyg') {
+              // Realtime collaboration is supported, but we can't join until the user switches to WYSIWYG mode.
+              return true;
+            }
             if (!editor._realtime.editor) {
               editor._realtime.editor = new RealtimeWysiwygEditor(editor._realtime.adapter, editor._realtime.context);
               await editor._realtime.editor.toBeConnected();

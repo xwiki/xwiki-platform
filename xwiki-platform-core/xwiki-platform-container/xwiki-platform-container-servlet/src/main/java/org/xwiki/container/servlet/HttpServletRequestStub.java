@@ -219,7 +219,7 @@ public class HttpServletRequestStub implements HttpServletRequest
             this.serverName = builder.requestURL.getHost();
             this.serverPort = builder.requestURL.getPort();
 
-            this.secure = this.protocol.equalsIgnoreCase("https");
+            this.secure = "https".equalsIgnoreCase(this.protocol);
 
             this.requestURI = builder.requestURL.getPath();
             this.requestURL = new StringBuffer(builder.requestURL.toString());
@@ -322,7 +322,7 @@ public class HttpServletRequestStub implements HttpServletRequest
             this.headers = new LinkedHashMap<>();
         }
 
-        this.headers.put("x-forwarded-host", new Vector<String>(Arrays.asList(host)));
+        this.headers.put("x-forwarded-host", new Vector<>(Arrays.asList(host)));
     }
 
     public void setScheme(String scheme)

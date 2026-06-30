@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.Spaces;
 @Path("/wikis/{wikiName}/spaces")
 public interface SpacesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Spaces getSpaces(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

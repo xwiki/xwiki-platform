@@ -33,10 +33,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
-public class QueryExceptionTest
+class QueryExceptionTest
 {
     @Test
-    public void getMessageWhenStatement()
+    void getMessageWhenStatement()
     {
         Query query = mock(Query.class);
         when(query.isNamed()).thenReturn(false);
@@ -50,7 +50,7 @@ public class QueryExceptionTest
     }
 
     @Test
-    public void getMessageWhenNamedQuery()
+    void getMessageWhenNamedQuery()
     {
         Query query = mock(Query.class);
         when(query.isNamed()).thenReturn(true);

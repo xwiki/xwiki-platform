@@ -27,6 +27,7 @@ import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -71,6 +72,9 @@ class ModelValidationScriptServiceTest
 
     @MockComponent
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
+    @MockComponent
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
 
     @MockComponent
     private EntityNameValidation nameStrategy;
@@ -119,6 +123,17 @@ class ModelValidationScriptServiceTest
         when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
         assertSame(this.replaceCharacterEntityNameValidationConfiguration,
             this.scriptService.getReplaceCharacterEntityNameValidationConfiguration());
+    }
+
+    @Test
+    void getSlugNameStrategyConfiguration()
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+        assertNull(this.scriptService.getSlugEntityNameValidationConfiguration());
+
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        assertSame(this.slugEntityNameValidationConfiguration,
+            this.scriptService.getSlugEntityNameValidationConfiguration());
     }
 
     @Test

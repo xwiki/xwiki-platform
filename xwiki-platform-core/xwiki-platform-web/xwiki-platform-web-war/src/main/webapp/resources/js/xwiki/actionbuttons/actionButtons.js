@@ -80,6 +80,11 @@ var XWiki = (function(XWiki) {
       $$('input[name=action_save]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
       }.bind(this));
+      // Bind also on propupdate which is used in the class editor. This is a custom form, but we still bind the
+      // button here to have the same save events.
+      $$('input[name=action_propupdate]').each(function(item) {
+        item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
+      }.bind(this));
       $$('input[name=action_saveandcontinue]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save', true));
       }.bind(this));
@@ -219,7 +224,7 @@ var XWiki = (function(XWiki) {
       this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
       this.failedBox = new XWiki.widgets.Notification(
         '$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""></span>"]))',
-        "error", {inactive: true});
+        "error", {inactive: true, textHtml: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
       this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});
@@ -248,9 +253,9 @@ var XWiki = (function(XWiki) {
         this.form?.enable();
       }
     },
-    getFormData: function(action) {
+    getFormData: function(action, forceAction = false) {
       const formData = new FormData(this.form);
-      if (this.hasFormAction(action)) {
+      if (forceAction || this.hasFormAction(action)) {
         formData.set(action, '');
       }
       return new URLSearchParams(formData);
@@ -274,7 +279,11 @@ var XWiki = (function(XWiki) {
       this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1;
+      let isCustomForm = this.form.action.indexOf("/preview/") === -1 && this.form.action.indexOf("/save/") === -1;
+      const customFormAttribute = this.form.dataset.customForm;
+      if (customFormAttribute !== undefined) {
+        isCustomForm = customFormAttribute !== 'false';
+      }
       if (isCustomForm && !isContinue) {
         return;
       }
@@ -312,7 +321,13 @@ var XWiki = (function(XWiki) {
       if (isContinue) {
         submitValue = 'action_saveandcontinue';
       }
-      var formData = this.getFormData(submitValue);
+
+      // If the submit button has a custom value, use it instead of the default action.
+      const customSubmitValue = event.element()?.dataset?.submitValue;
+      if (customSubmitValue) {
+        submitValue = customSubmitValue;
+      }
+      const formData = this.getFormData(submitValue, !!customSubmitValue);
       if (isContinue) {
         formData.set('minorEdit', '1');
       }
@@ -718,13 +733,13 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (!response.statusText) {
-        $('ajaxRequestFailureReason').update('Server not responding');
-      } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
+      if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
         // Regard the body of plain text responses as custom status messages.
         $('ajaxRequestFailureReason').update(response.responseText);
-      } else {
+      } else if (response.statusText) {
         $('ajaxRequestFailureReason').update(response.statusText);
+      } else {
+        $('ajaxRequestFailureReason').update('Server not responding');
       }
       // Announce that a document save attempt has failed
       state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});

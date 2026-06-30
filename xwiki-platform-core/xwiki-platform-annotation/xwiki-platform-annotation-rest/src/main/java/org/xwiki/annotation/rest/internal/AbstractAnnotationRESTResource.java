@@ -187,7 +187,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         List<String> requestedFields)
     {
         ObjectFactory factory = new ObjectFactory();
-        List<AnnotationStub> set = new ArrayList<AnnotationStub>();
+        List<AnnotationStub> set = new ArrayList<>();
 
         Set<String> actualRequestedFields = new LinkedHashSet<>(requestedFields);
         actualRequestedFields.add(Annotation.PLAIN_TEXT_START_OFFSET_FIELD);
@@ -318,14 +318,14 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     protected Collection<Annotation> filterAnnotations(Collection<Annotation> annotations, AnnotationRequest request)
     {
-        Collection<Annotation> result = new ArrayList<Annotation>();
+        Collection<Annotation> result = new ArrayList<>();
 
-        Map<String, List<String>> filters = new HashMap<String, List<String>>();
+        Map<String, List<String>> filters = new HashMap<>();
         for (AnnotationField annotationField : request.getFilter().getFields()) {
             String filterName = annotationField.getName();
             List<String> values = filters.get(filterName);
             if (values == null) {
-                values = new ArrayList<String>();
+                values = new ArrayList<>();
                 filters.put(filterName, values);
             }
             if (annotationField.getValue() != null) {

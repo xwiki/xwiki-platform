@@ -28,9 +28,13 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Pages;
 
+//FIXME: Write Javadoc describing the REST API parameters
+@SuppressWarnings("checkstyle:MissingJavadocType")
 @Path("/wikis/{wikiName}/tags/{tagNames}")
 public interface PagesForTagsResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Pages getTags(
             @PathParam("wikiName") String wikiName,
             @PathParam("tagNames") String tagNames,

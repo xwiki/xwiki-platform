@@ -43,13 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  */
 @ComponentTest
-public class MessageMimeMessageFactoryTest
+class MessageMimeMessageFactoryTest
 {
     @InjectMockComponents
     private MessageMimeMessageFactory mimeMessageFactory;
 
     @Test
-    public void createMessageWithBadSource()
+    void createMessageWithBadSource()
     {
         Throwable exception = assertThrows(MessagingException.class, () -> {
             this.mimeMessageFactory.createMessage("source", null);
@@ -58,7 +58,7 @@ public class MessageMimeMessageFactoryTest
     }
 
     @Test
-    public void createMultipleMessages() throws Exception
+    void createMultipleMessages() throws Exception
     {
         MimeMessage source = new MimeMessage(Session.getInstance(new Properties()));
         source.setFrom(new InternetAddress("localhost@xwiki.org"));
@@ -66,7 +66,7 @@ public class MessageMimeMessageFactoryTest
         source.setSubject("Subject");
         source.setText("Content");
 
-        MimeMessage first =this.mimeMessageFactory.createMessage(source, null);
+        MimeMessage first = this.mimeMessageFactory.createMessage(source, null);
 
         assertEqualMimeMessage(first, source);
 
@@ -82,7 +82,7 @@ public class MessageMimeMessageFactoryTest
     }
 
     @Test
-    public void ensureMessageReceiveSameMessageID() throws Exception
+    void ensureMessageReceiveSameMessageID() throws Exception
     {
         MimeMessage source = new MimeMessage(Session.getInstance(new Properties()));
         source.setText("Content");

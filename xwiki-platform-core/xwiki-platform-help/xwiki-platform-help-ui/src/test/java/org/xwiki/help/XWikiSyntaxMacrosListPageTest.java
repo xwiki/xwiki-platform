@@ -91,8 +91,7 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
     // End of XWikiWikiModel
     DocumentXHTMLLinkTypeRenderer.class,
     DocumentResourceReferenceEntityReferenceResolver.class,
-    TestNoScriptMacro.class,
-    TranslationMacro.class
+    TestNoScriptMacro.class
 })
 class XWikiSyntaxMacrosListPageTest extends PageTest
 {

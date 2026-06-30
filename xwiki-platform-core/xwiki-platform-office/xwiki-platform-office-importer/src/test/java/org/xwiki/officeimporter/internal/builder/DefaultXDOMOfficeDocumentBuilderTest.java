@@ -82,7 +82,7 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
     private XDOMOfficeDocumentBuilder xdomOfficeDocumentBuilder;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         this.xdomOfficeDocumentBuilder = this.componentManager.getInstance(XDOMOfficeDocumentBuilder.class);
     }
@@ -112,18 +112,19 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
         final OfficeConverter mockDocumentConverter = mock(OfficeConverter.class);
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
 
-        when(mockOfficeServer.getConverter()).thenReturn(mockDocumentConverter);
+        when(this.mockOfficeServer.getConverter()).thenReturn(mockDocumentConverter);
         when(mockDocumentConverter.convertDocument(mockInput, internalInputFilename, "output.html"))
             .thenReturn(converterResult);
-        when(mockDocumentReferenceResolver.resolve("xwiki:Main.Test")).thenReturn(documentReference);
-        when(mockDefaultStringEntityReferenceSerializer.serialize(documentReference)).thenReturn("xwiki:Main.Test");
+        when(this.mockDocumentReferenceResolver.resolve("xwiki:Main.Test")).thenReturn(documentReference);
+        when(this.mockDefaultStringEntityReferenceSerializer.serialize(documentReference)).thenReturn(
+            "xwiki:Main.Test");
 
         XDOMOfficeDocument document =
-            xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
+            this.xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
         assertEquals("xwiki:Main.Test", document.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
         assertEquals("**Hello There**", document.getContentAsString());
         assertEquals(0, document.getArtifactsMap().size());
 
-        verify(mockOfficeServer).getConverter();
+        verify(this.mockOfficeServer).getConverter();
     }
 }

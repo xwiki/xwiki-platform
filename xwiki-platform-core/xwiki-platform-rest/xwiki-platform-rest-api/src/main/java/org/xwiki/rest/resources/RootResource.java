@@ -30,5 +30,7 @@ import org.xwiki.rest.model.jaxb.Xwiki;
 @Path("/")
 public interface RootResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Xwiki getRoot();
 }

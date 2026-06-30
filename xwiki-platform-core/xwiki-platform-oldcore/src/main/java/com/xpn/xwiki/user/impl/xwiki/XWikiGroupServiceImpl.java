@@ -221,7 +221,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         if (memberWiki != null) {
             equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP + memberName);
 
-            if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
+            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
                 equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
@@ -229,7 +229,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             equals |= currentMember.equals(memberName);
 
-            if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
+            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
                 equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
@@ -328,7 +328,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
-            if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
+            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + memberName + HQLLIKE_ALL_SYMBOL);
             } else {
                 parameterValues
@@ -357,7 +357,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     @Deprecated
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         try {
             if (group == null) {
@@ -503,7 +503,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     where.append(" and lower(" + fieldPrefix + ".value) like ?" + parameterValues.size());
 
                     fieldMap.put(fieldName, fieldPrefix);
-                } else if (user && matchFields.length == 1 && fieldName.equals("name")) {
+                } else if (user && matchFields.length == 1 && "name".equals(fieldName)) {
                     // In case we are only looking to mach on the document name, we should also take care of
                     // filtering on the first name or the last name of the user.
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
@@ -518,7 +518,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
                     // We do not support OR filters by default, however this may be useful in the case where users or
                     // groups come with a manually defined title.
-                    if (fieldName.equals("name")) {
+                    if ("name".equals(fieldName)) {
                         where.append(String.format(" and (lower(doc.name) like ?%s or lower(doc.title) like ?%s)",
                             parameterValues.size(), parameterValues.size()));
                     } else {
@@ -603,7 +603,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         List<?> groups = null;
 
         if (context.getWiki().getHibernateStore() != null) {
-            List<Object> parameterValues = new ArrayList<Object>();
+            List<Object> parameterValues = new ArrayList<>();
             String where = createMatchUserOrGroupWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails) {
@@ -651,7 +651,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
         throws XWikiException
     {
-        List<Object> parameterValues = new ArrayList<Object>();
+        List<Object> parameterValues = new ArrayList<>();
         String where = createMatchUserOrGroupWhereClause(user, matchFields, null, parameterValues);
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
@@ -757,7 +757,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             Collection<DocumentReference> groupReferences =
                 getAllGroupsReferencesForMember(memberReference, nb, start, context);
 
-            groupNames = new ArrayList<String>(groupReferences.size());
+            groupNames = new ArrayList<>(groupReferences.size());
             for (DocumentReference groupReference : groupReferences) {
                 groupNames.add(this.localWikiEntityReferenceSerializer.serialize(groupReference));
             }
@@ -783,7 +783,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     .bindValue("shortname", XWikiRightService.GUEST_USER_FULLNAME)
                     .bindValue("veryshortname", XWikiRightService.GUEST_USER);
             } else if (memberReference.getWikiReference().getName().equals(context.getWikiId())
-                || (memberReference.getLastSpaceReference().getName().equals("XWiki")
+                || ("XWiki".equals(memberReference.getLastSpaceReference().getName())
                     && memberReference.getName().equals(XWikiRightService.GUEST_USER))) {
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
                     .bindValue("username", this.entityReferenceSerializer.serialize(memberReference))
@@ -802,7 +802,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
 
-        groupReferences = new HashSet<DocumentReference>(groupNames.size());
+        groupReferences = new HashSet<>(groupNames.size());
         for (String groupName : groupNames) {
             groupReferences.add(this.currentMixedDocumentReferenceResolver.resolve(groupName));
         }

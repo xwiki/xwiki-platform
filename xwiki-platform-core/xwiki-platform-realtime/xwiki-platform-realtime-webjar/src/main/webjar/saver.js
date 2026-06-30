@@ -23,10 +23,11 @@ define('xwiki-realtime-saver', [
   'chainpad-netflux',
   'json.sortify',
   'xwiki-realtime-crypto',
-  'xwiki-realtime-document'
+  'xwiki-realtime-document',
+  'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument
+  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument, Messages
 ) {
   'use strict';
 
@@ -153,7 +154,7 @@ define('xwiki-realtime-saver', [
     }
 
     _someState(predicate) {
-      return Object.values(this._getStates()).some(predicate);
+      return Object.values(this._getStates()).some(state => predicate(state));
     }
 
     _getStates() {
@@ -566,6 +567,7 @@ define('xwiki-realtime-saver', [
         throw new Error('Merge conflict prevents save.');
       }
 
+      const isAutoSave = !button;
       button = button || this._getSaveButton(true);
       if (!$(button).is(':enabled')) {
         throw new Error('The save button is disabled or missing.');
@@ -579,8 +581,12 @@ define('xwiki-realtime-saver', [
       $(button).on('xwiki:actions:save.realtime-saver', event => {
         savePrevented = event.isDefaultPrevented();
       });
+
+      const restoreVersionSummary = this._maybeSetAutoSaveVersionSummary(form, isAutoSave);
       $(button).click();
       $(button).off('xwiki:actions:save.realtime-saver');
+      restoreVersionSummary?.();
+
       if (savePrevented) {
         // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
         // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
@@ -590,6 +596,19 @@ define('xwiki-realtime-saver', [
       }
 
       this._afterSave(await submitResultPromise);
+    }
+
+    _maybeSetAutoSaveVersionSummary(form, isAutoSave) {
+      const commentInput = form?.querySelector('input[name="comment"]');
+      if (commentInput && isAutoSave) {
+        // Backup the version summary before setting the auto-save value.
+        const versionSummary = commentInput.value;
+        commentInput.value = Messages.autoSaveSummary;
+        return () => {
+          // Restore the version summary after the auto-save was triggered.
+          commentInput.value = versionSummary;
+        };
+      }
     }
 
     _getSaveButton(continueEditing) {
@@ -609,7 +628,7 @@ define('xwiki-realtime-saver', [
             // conflict to be handled by multiple users because this leads to more merge conflicts).
             this._waitForMergeConflictResolution(form).then(resolve, reject);
           } else {
-            reject('Failed to save.');
+            reject(new Error('Failed to save.'));
           }
         });
       });
@@ -625,12 +644,12 @@ define('xwiki-realtime-saver', [
         this._getSubmitResult(form, removeListeners).then(resolve, reject);
         // ... or for the editor to be reloaded, if the user decides to discard the local changes.
         this._once(form, removeListeners, 'xwiki:actions:reload', () => {
-          reject('Discarding local changes by reloading the editor.');
+          reject(new Error('Discarding local changes by reloading the editor.'));
         });
         // ... or for the merge conflict modal to be closed without resolving the conflict.
         this._once(document, removeListeners, 'hide.bs.modal.realtime-saver', '#previewDiffModal', () => {
           if ($('#previewDiffModal').data('action') === 'cancel') {
-            reject('Save canceled.');
+            reject(new Error('Save canceled.'));
           } else {
             // The modal was closed but not canceled so we still need to wait for a save (successful or not) or reload
             // event. Keep the other event listeners in the group.

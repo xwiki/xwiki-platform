@@ -39,7 +39,7 @@ import org.bouncycastle.util.encoders.Base64;
  */
 public class ExtendedMimeMessage extends MimeMessage
 {
-    private static final ThreadLocal<SHA1Digest> SHA1_DIGEST = new ThreadLocal<SHA1Digest>();
+    private static final ThreadLocal<SHA1Digest> SHA1_DIGEST = new ThreadLocal<>();
 
     private static final String MESSAGE_ID_HEADER = "Message-ID";
     private static final String TO_HEADER = "To";

@@ -62,7 +62,7 @@ public class SolrSearchResult extends BaseElement
     public Map<String, List<String>> getHighlights()
     {
         // If there is a link to show all highlights, click it so they are visible.
-        getDriver().findElementsWithoutWaiting(this.container, By.cssSelector("a.search-result-highlightAll"))
+        getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".search-result-highlightAll"))
             .forEach(WebElement::click);
         WebElement highlightContainer = this.container.findElement(By.className("search-result-highlights"));
         List<WebElement> highlightElements =

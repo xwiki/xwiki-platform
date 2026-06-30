@@ -105,7 +105,7 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
 
         ResourceReference resourceReference = getResourceReference(context.getCurrentMacroBlock(), parameters);
 
-        Map<String, Object> viewParameters = new HashMap<String, Object>();
+        Map<String, Object> viewParameters = new HashMap<>();
         viewParameters.put("filterStyles", parameters.isFilterStyles());
         viewParameters.put("ownerDocument", getOwnerDocument(context.getCurrentMacroBlock()));
 

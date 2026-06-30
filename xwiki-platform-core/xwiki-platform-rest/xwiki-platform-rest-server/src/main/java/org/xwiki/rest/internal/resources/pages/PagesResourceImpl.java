@@ -72,7 +72,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {
-                if (parentFilterExpression.equals("null")) {
+                if ("null".equals(parentFilterExpression)) {
                     parentFilter = Pattern.compile("");
                 } else {
                     parentFilter = Pattern.compile(parentFilterExpression);

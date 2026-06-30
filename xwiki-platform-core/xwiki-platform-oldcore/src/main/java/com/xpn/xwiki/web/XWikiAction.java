@@ -512,14 +512,14 @@ public abstract class XWikiAction implements LegacyAction
 
             String sajax = context.getRequest().get("ajax");
             boolean ajax = false;
-            if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
+            if (sajax != null && !"".equals(sajax.trim()) && !"0".equals(sajax)) {
                 ajax = true;
             }
             context.put("ajax", ajax);
 
             boolean async = false;
             if (StringUtils.isNotEmpty(sasync)) {
-                async = sasync.equals("true");
+                async = "true".equals(sasync);
             } else {
                 // By default allow asynchronous rendering for "human oriented" actions which are not executing an ajax
                 // request
@@ -648,7 +648,7 @@ public abstract class XWikiAction implements LegacyAction
                         String page = Utils.getPage(context.getRequest(), renderResult);
 
                         getProgress().startStep(this, "Execute template [" + page + "]");
-                        Utils.parseTemplate(page, !page.equals("direct"), context);
+                        Utils.parseTemplate(page, !"direct".equals(page), context);
                     }
                 }
                 return;
@@ -705,7 +705,7 @@ public abstract class XWikiAction implements LegacyAction
                         // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
                         // the logs with unnecessary stack traces. It just means the client side has cancelled the
                         // connection.
-                        if (ExceptionUtils.getRootCauseMessage(e).equals("IOException: Broken pipe")) {
+                        if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
                             return;
                         }
                         LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
@@ -1064,7 +1064,7 @@ public abstract class XWikiAction implements LegacyAction
         throws XWikiException
     {
         XWikiDocument tdoc;
-        if (StringUtils.isBlank(language) || language.equals("default") || language.equals(doc.getDefaultLanguage())) {
+        if (StringUtils.isBlank(language) || "default".equals(language) || language.equals(doc.getDefaultLanguage())) {
             tdoc = doc;
         } else {
             tdoc = doc.getTranslatedDocument(language, context);

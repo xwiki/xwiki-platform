@@ -22,7 +22,7 @@
 ## The template used by XWikiDocumentLockEditConfirmationChecker, used in case of page locked by another user.
 ##
 #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
-<p class="xwikimessage">
+<p class="xwikimessage force-underline">
   #set ($message = $escapetool.xml($services.localization.render('platform.core.editConfirmation.lock.lockedBy', ['__USER__'])))
   $message.replace("__USER__", $lockingUser.trim())
 </p>

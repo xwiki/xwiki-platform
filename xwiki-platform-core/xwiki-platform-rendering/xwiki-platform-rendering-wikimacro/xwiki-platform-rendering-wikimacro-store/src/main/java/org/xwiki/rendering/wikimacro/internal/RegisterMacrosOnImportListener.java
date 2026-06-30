@@ -71,7 +71,7 @@ public class RegisterMacrosOnImportListener implements EventListener
     /**
      * The events observed by this event listener.
      */
-    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new XARImportedEvent()));
+    private final List<Event> eventsList = new ArrayList<>(Arrays.asList(new XARImportedEvent()));
 
     @Override
     public List<Event> getEvents()

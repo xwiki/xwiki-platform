@@ -35,6 +35,8 @@ import org.xwiki.rest.XWikiRestException;
     )
 public interface AttachmentVersionResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

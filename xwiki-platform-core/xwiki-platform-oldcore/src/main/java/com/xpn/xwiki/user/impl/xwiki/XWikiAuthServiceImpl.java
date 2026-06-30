@@ -90,7 +90,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Each wiki has its own authenticator.
      */
-    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<String, XWikiAuthenticator>();
+    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<>();
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
@@ -337,7 +337,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         // Trim the username to allow users to enter their names with spaces before or after
-        String cannonicalUsername = username.replaceAll(" ", "");
+        String cannonicalUsername = username.replace(" ", "");
 
         // Check for superadmin
         if (isSuperAdmin(cannonicalUsername)) {

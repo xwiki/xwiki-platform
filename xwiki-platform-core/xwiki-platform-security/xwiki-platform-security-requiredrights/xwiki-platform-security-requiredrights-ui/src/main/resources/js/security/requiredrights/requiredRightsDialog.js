@@ -545,8 +545,9 @@ define('xwiki-requiredrights-dialog', [
             // First, resolve the entity reference.
             const analysisResults = data.analysisResults.map(result => {
                 // The client-side resolver isn't fully compatible with the entity references generated in Java.
+                // This should be removed when https://jira.xwiki.org/browse/XWIKI-22869 is fixed.
                 result.entityReference =
-                    XWiki.Model.resolve(result.entityReference.replace(/^(object|class)_property/, '$1'));
+                    XWiki.Model.resolve(result.entityReference.replace(/^(object|class)_property/, '$1Property'));
                 return result;
             });
 
@@ -606,7 +607,7 @@ define('xwiki-requiredrights-dialog', [
             const classPropertyResults = analysisResults.filter(
                 result => result.entityReference.type === XWiki.EntityType.CLASS_PROPERTY);
             if (classPropertyResults.length > 0) {
-                dialog.addResultsHeading(3, l10n['classProperties']);
+                dialog.addResultsHeading(3, l10n['modal.classProperties']);
 
                 // Group the results by property name
                 const classPropertyResultsByProperty = groupBy(classPropertyResults,
@@ -738,5 +739,5 @@ require(['jquery', 'xwiki-l10n!xwiki-requiredrights-messages'], function ($, l10
                     };
                 });
         }
-    })
-})
+    });
+});

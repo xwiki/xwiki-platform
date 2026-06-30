@@ -59,12 +59,12 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     /**
      * Row key set used for validating the absense of duplicate row keys.
      */
-    private final Set<String> rowKeySet = new HashSet<String>();
+    private final Set<String> rowKeySet = new HashSet<>();
 
     /**
      * Column key set used for validating the absense of duplicate column keys.
      */
-    private final Set<String> columnKeySet = new HashSet<String>();
+    private final Set<String> columnKeySet = new HashSet<>();
 
     @Override
     public void setNumberOfRows(int numberOfRows)

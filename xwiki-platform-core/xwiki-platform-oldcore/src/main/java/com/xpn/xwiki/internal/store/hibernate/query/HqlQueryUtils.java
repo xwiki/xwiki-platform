@@ -166,7 +166,7 @@ public final class HqlQueryUtils
         sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
         sql.append(" from XWikiDocument as doc");
 
-        if (!normalizedWhereSQL.equals("")) {
+        if (!normalizedWhereSQL.isEmpty()) {
             if ((!normalizedWhereSQL.startsWith(WHERE)) && (normalizedWhereSQL.charAt(0) != ',')) {
                 sql.append(" where ");
             } else {

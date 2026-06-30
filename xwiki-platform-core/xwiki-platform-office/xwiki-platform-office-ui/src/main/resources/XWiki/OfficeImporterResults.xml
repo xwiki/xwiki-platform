@@ -89,7 +89,7 @@
 ############
   #if($fileName)
     #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**" +
-      "&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
+      "&gt;&gt;doc:$services.rendering.escape($services.model.serialize($targetDocumentReference), 'xwiki/2.1')]]")
     #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference,
       $filterStyles))
     #if ($xdomOfficeDoc)
@@ -116,12 +116,12 @@
           $services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack])
           {{/info}}
         #else
-          {{error}}$services.officeimporter.errorMessage{{/error}}
+          {{error}}$services.rendering.escape($services.officeimporter.errorMessage, 'xwiki/2.1'){{/error}}
         #end
       #end
       #set ($discard = $xdomOfficeDoc.close())
     #else
-      {{error}}$services.officeimporter.errorMessage{{/error}}
+      {{error}}$services.rendering.escape($services.officeimporter.errorMessage, 'xwiki/2.1'){{/error}}
     #end
   #end
 #end

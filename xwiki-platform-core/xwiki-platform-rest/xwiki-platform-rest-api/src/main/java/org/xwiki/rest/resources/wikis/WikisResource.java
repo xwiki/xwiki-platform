@@ -31,5 +31,7 @@ import org.xwiki.rest.model.jaxb.Wikis;
 @Path("/wikis")
 public interface WikisResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Wikis getWikis() throws XWikiRestException;
 }

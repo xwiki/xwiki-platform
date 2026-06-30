@@ -23,7 +23,7 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', {'forceSkinAction': true, 'version': $environmentVersion}))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', {'forceSkinAction': true, 'version': $environmentVersion}))
 #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js', {'forceSkinAction': true, 'version': $environmentVersion}))
-#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', {'version': $environmentVersion}))
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js', {'forceSkinAction': true, 'version': $environmentVersion}))
 
 #set($discard = $services.template.execute('job_macros.vm'))
@@ -81,7 +81,7 @@
         ## We don't use #em_submitButton because we want to use <button> instead of <input type="submit">, in order to 
         ## be able to use HTML content inside the text of the button (the search icon and the hidden span for screen readers).
         <span class="buttonwrapper">
-          <button class="btn btn-primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
+          <button class="btn btn-primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="sr-only">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
         <button type="button" id="extensionMoreButton" class="btn btn-default" data-toggle="collapse" data-target=".extension-search-more">$escapetool.xml($services.localization.render('extensions.search.more.label'))</button>
       </div>
@@ -110,7 +110,7 @@
           #else
             #set ($compatible = true)
           #end
-          <div class="extension-search-more collapse#if($customExtensionFilter) in#end">
+          <div class="extension-search-more collapse#if($customExtensionFilter) in#end" role="tabpanel">
             <div>
               <span class="box">
                 #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
@@ -142,27 +142,29 @@
       </div>
     </form>
     ## Advanced search form.
-    <form action="$xwiki.relativeRequestURL" class="xform extension-search-more collapse#if($customExtensionFilter) in#end">
-      <fieldset id="extension-search-advanced">
-        <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
-        <div id="extension-search-advanced-body"></div>
-        <div class="plainmessage extension-search-advanced-popup hidden">
-          #if ($request.section)
-            <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
-          #end
-          <dl>
-            <dt><label for="advancedExtensionSearch-id">$services.localization.render('extensions.advancedSearch.id.label')</label></dt>
-            <dd><input type="text" name="extensionId" id="advancedExtensionSearch-id" value="" /></dd>
-            <dt><label for="advancedExtensionSearch-version">$services.localization.render('extensions.advancedSearch.version.label')</label></dt>
-            <dd><input type="text" name="extensionVersion" id="advancedExtensionSearch-version" value="" /></dd>
-          </dl>
-          <p>
-            #em_submitButton('extensions.advancedSearch.actions.submit')
-            #em_linkButton('#extension-search-simple' 'extensions.advancedSearch.actions.cancel' 'actionCancel')
-          </p>
-        </div>
-      </fieldset>
-    </form>
+    <div class="extension-search-more collapse#if($customExtensionFilter) in#end" role="tabpanel">
+      <form action="$xwiki.relativeRequestURL" class="xform">
+        <fieldset id="extension-search-advanced">
+          <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
+          <div id="extension-search-advanced-body"></div>
+          <div class="plainmessage extension-search-advanced-popup hidden">
+            #if ($request.section)
+              <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
+            #end
+            <dl>
+              <dt><label for="advancedExtensionSearch-id">$services.localization.render('extensions.advancedSearch.id.label')</label></dt>
+              <dd><input type="text" name="extensionId" id="advancedExtensionSearch-id" value="" /></dd>
+              <dt><label for="advancedExtensionSearch-version">$services.localization.render('extensions.advancedSearch.version.label')</label></dt>
+              <dd><input type="text" name="extensionVersion" id="advancedExtensionSearch-version" value="" /></dd>
+            </dl>
+            <p>
+              #em_submitButton('extensions.advancedSearch.actions.submit')
+              #em_linkButton('#extension-search-simple' 'extensions.advancedSearch.actions.cancel' 'actionCancel')
+            </p>
+          </div>
+        </fieldset>
+      </form>
+    </div>
     <div class="clearfloats"></div>
   </div>
 #end
@@ -1055,10 +1057,10 @@ $namespace##
             </$supporterElementName>
           #else
             <$supporterElementName class="supporter support-multi-plan dropdown">
-              <span class="supporter-name support-multi-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button class="supporter-name support-multi-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 $escapetool.xml($extensionSupporter.name)
                 <span class="caret"></span>
-              </span>
+              </button>
               <div class="support-dialog dropdown-menu">
                 $escapetool.xml($extensionSupporter.name) <a href="$escapetool.xml($extensionSupporter.uRL)"> $services.icon.renderHTML('link') </a>
                 <h4>$escapetool.xml($services.localization.render('extensions.info.support.supportPlans'))</h4>

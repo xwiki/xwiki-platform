@@ -121,15 +121,13 @@ class TemplateManagerTest
         this.velocityEngineMock = mock();
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
-
-        when(this.environmentMock.getResource("/templates/")).thenReturn(new URL("file://templates/"));
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException
     {
         when(this.environmentMock.getResourceAsStream("/templates/template"))
             .thenReturn(new ByteArrayInputStream(content.getBytes("UTF8")));
-        when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("file://templates/template"));
+        when(this.environmentMock.getResource("/templates/", "template")).thenReturn(new URL("file://templates/template"));
     }
 
     private void mockVelocity(String source, String result) throws XWikiVelocityException
@@ -186,13 +184,9 @@ class TemplateManagerTest
     @Test
     void templateCheatingProtection() throws Exception
     {
-        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure%5B%5D"));
-        when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
-            .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
-
         mockVelocity("source", "KO");
 
-        assertEquals("", this.templateManager.render("../secure[]"));
+        assertThrows(IllegalArgumentException.class, () -> this.templateManager.render("../secure[]"));
     }
 
     @Test

@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=여기에서 응용 프로그램 표시줄(기본적으로 왼쪽)에 표시되는 응용 프로그램을 선택할 수 있습니다. 새로운 응용 프로그램이 여기에 표시됩니다. 그 중 일부를 제거하려면 첫 번째 상자에서 다른 상자로 아이콘을 끌어다 놓으면 됩니다. 원하는 대로 애플리케이션을 다시 주문할 수도 있습니다. 변경 사항을 저장하는 것을 잊지 마세요!
+  <content>platform.panels.applications.helper=여기에서 어플리케이션 표시줄(기본적으로 왼쪽)에 표시되는 어플리케이션을 선택할 수 있습니다. 새로운 어플리케이션이 여기에 표시됩니다. 그 중 일부를 제거하려면 첫 번째 상자에서 다른 상자로 아이콘을 끌어다 놓으면 됩니다. 원하는 대로 애플리케이션을 다시 주문할 수도 있습니다. 변경 사항을 저장하는 것을 잊지 마세요!
 platform.panels.applications.displayedapps=바의 애플리케이션
 platform.panels.applications.blacklistedapps=바에 없는 애플리케이션
 platform.panels.applications.save=저장

@@ -25,7 +25,6 @@ import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
@@ -227,7 +226,6 @@ public interface DocumentModelBridge
      * use more rights than defined in the object, {@code false} otherwise
      * @since 16.10.0RC1
      */
-    @Unstable
     default boolean isEnforceRequiredRights()
     {
         return false;

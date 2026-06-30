@@ -133,9 +133,9 @@
       globalSearchInput.trigger('focus');
     }
     function hideSearchInput() {
+      globalSearchInput.attr('disabled', 'disabled');
       globalSearch.addClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'false');
-      globalSearchInput.attr('disabled','');
       document.fire('xwiki:suggest:collapsed');
     }
 

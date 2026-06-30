@@ -67,6 +67,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     private Container container;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
         Boolean withPrettyNames, String name, String author, String fileTypes) throws XWikiRestException
     {

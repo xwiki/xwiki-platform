@@ -35,6 +35,8 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/history")
 public interface AttachmentHistoryResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Attachments getAttachmentHistory(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

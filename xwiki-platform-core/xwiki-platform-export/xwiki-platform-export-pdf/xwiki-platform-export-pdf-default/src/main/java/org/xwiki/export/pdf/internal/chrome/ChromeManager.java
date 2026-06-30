@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +47,7 @@ import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
 import com.github.kklisura.cdt.protocol.commands.Target;
+import com.github.kklisura.cdt.protocol.types.target.WindowState;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
@@ -185,10 +187,11 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
                 this.logger.debug("Creating incognito tab.");
                 Target browserTarget = this.browserDevToolsService.getTarget();
 
-                String browserContextId = browserTarget.createBrowserContext(true, null, null);
+                String browserContextId = browserTarget.createBrowserContext(true, null, null, List.of());
                 this.logger.debug("Created browser context [{}].", browserContextId);
 
-                String tabTargetId = browserTarget.createTarget("", null, null, browserContextId, false, false, false);
+                String tabTargetId = browserTarget.createTarget("", null, null, null, null, WindowState.NORMAL,
+                    browserContextId, false, null, false, false, false);
                 this.logger.debug("Created incognito tab [{}].", tabTargetId);
 
                 Optional<ChromeTab> tab =

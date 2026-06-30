@@ -83,6 +83,10 @@ class NavigationPanelIT
         setup.gotoPage(page);
         assertFalse(new NavigationPanel().getNavigationTree().hasDocument(appName, "WebHome"),
             "The application home page is not excluded from the Navigation Panel");
+
+        // Clean up the application created by this test because its top level page interferes with the navigation
+        // panel administration test (which asserts the exact list of top level pages).
+        AppWithinMinutesHomePage.gotoPage().deleteApplication(appName);
     }
 
     private ApplicationHomePage createEmptyApp(String appName)

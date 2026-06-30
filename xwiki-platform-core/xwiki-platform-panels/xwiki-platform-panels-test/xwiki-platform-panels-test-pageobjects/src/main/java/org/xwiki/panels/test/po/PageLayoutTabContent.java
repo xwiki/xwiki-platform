@@ -56,6 +56,9 @@ public class PageLayoutTabContent extends BaseElement
     @FindBy(css = "#XWiki\\.XWikiPreferences_0_rightPanels")
     private WebElement rightPanelsInput;
 
+    @FindBy(css = "#XWiki\\.XWikiPreferences_0_leftPanels")
+    private WebElement leftPanelsInput;
+
     @FindBy(id = "rightPanels")
     private WebElement rightPanels;
 
@@ -119,6 +122,27 @@ public class PageLayoutTabContent extends BaseElement
     {
         this.rightPanelsInput.clear();
         this.rightPanelsInput.sendKeys(rightPanels);
+        return this;
+    }
+
+    /**
+     * @return the comma-separated list of panels configured for the left column
+     * @since 18.6.0RC1
+     */
+    public String getLeftPanels()
+    {
+        return this.leftPanelsInput.getText();
+    }
+
+    /**
+     * @param leftPanels the comma-separated list of panels to set for the left column
+     * @return this object
+     * @since 18.6.0RC1
+     */
+    public PageLayoutTabContent setLeftPanels(String leftPanels)
+    {
+        this.leftPanelsInput.clear();
+        this.leftPanelsInput.sendKeys(leftPanels);
         return this;
     }
 

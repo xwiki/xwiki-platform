@@ -695,8 +695,7 @@
   #set ($ancestorWatchStatus = $ancestorFirstFilter.right)
 #end
 
-## TODO: better way for that?
-#set ($isTerminal = ($doc.getDocumentReference().name != 'WebHome'))
+#set ($isTerminal = ($doc.documentReference.name != $services.model.getEntityReference('DOCUMENT', 'default').name))
 
 #set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page','')")
 #set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation','')")

@@ -47,7 +47,7 @@
       </div>
     </div>
   </dialog>
-  #if ($doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
+  #if ($doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name && $xwiki.exists('XWiki.ExportDocumentTree'))
     #exportTreeModal()
   #end
 #end
@@ -107,7 +107,7 @@
     'name': $doc.fullName,
     'pages': [$services.model.serialize($doc.documentReference, 'default')]
   })
-  #if ($doc.documentReference.name == 'WebHome')
+  #if ($doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
     ## When nested page also export WebPreferences which contain among other things the right of this entity
     #set ($preferencesReference = $services.model.createDocumentReference('WebPreferences',
       $doc.documentReference.lastSpaceReference))

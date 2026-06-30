@@ -52,7 +52,7 @@ public class XWikiConfig extends Properties
         } catch (IOException e) {
             Object[] args = { path };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
-                XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR, "Error reading configuration file", e, args);
+                XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR, "Error reading configuration file {0}", e, args);
         }
     }
 

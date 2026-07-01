@@ -202,6 +202,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
      */
     public void setCopyright(String value)
     {
+        this.copyright.clear();
         this.copyright.sendKeys(value);
     }
 
@@ -211,6 +212,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
      */
     public void setVersion(String value)
     {
+        this.version.clear();
         this.version.sendKeys(value);
     }
 }

@@ -93,7 +93,7 @@
       >
         {{ $t("livedata.bottombar.noEntries") }}
       </div>
-      <LivedataPagination />
+      <LivedataPagination/>
     </LivedataBottombar>
   </div>
 </template>

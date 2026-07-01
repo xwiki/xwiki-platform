@@ -58,6 +58,7 @@ export async function i18nResolver(
       "action.columnName.sortable.hint",
       "action.columnName.default.hint",
       "action.resizeColumn.hint",
+      "table.entrySelector.hint",
       "panel.heading.actions.collapse.hint",
       "panel.heading.actions.close.hint",
       "panel.filter.title",

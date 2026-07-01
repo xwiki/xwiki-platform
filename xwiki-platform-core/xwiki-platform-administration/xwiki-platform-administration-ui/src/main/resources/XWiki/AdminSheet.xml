@@ -1095,6 +1095,7 @@ require(['jquery'], function($) {
 }
 
 .admin-category-name {
+  font-size: 1.44em;
   font-weight: var(--font-weight-semibold);
 }
 

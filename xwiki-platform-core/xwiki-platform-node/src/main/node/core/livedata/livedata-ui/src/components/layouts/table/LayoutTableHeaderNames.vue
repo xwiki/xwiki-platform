@@ -287,6 +287,10 @@ export default {
 </script>
 
 <style>
+.layout-table th {
+  background-color: var(--panel-bg);
+}
+
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;
@@ -295,16 +299,24 @@ export default {
 
 .layout-table .column-name {
   display: flex;
+  font-weight: var(--font-weight-semibold);
   justify-content: space-between;
   /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
  when the column has been resized to a smaller width that is prevented by some table cell. */
   min-width: 100%;
+  padding: var(--padding-large-vertical) 0;
+}
+
+.layout-table .column-name:hover {
+  transition: background-color 250ms;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .layout-table .draggable-item .resize-handle {
   /* Position the resize handle at the right edge of the column name and ensure it spans the full height. */
   position: absolute;
-  right: 0;
+  /* Ensure horizontal centering of the hit area */
+  right: -6px;
   top: 0;
   bottom: 0;
   /* Hide the resize handle by default. */
@@ -318,17 +330,38 @@ export default {
   /* Indicate with the mouse cursor that this is a resize handle. */
   cursor: col-resize;
   /* Style the resize handle as 4px wide in default state. */
-  width: 4px;
+  width: 16px;
   /* Ensure that the resize handle is above the next column name. */
   z-index: 1;
 }
 
-.layout-table .draggable-item:focus-within .resize-handle,
-.layout-table .draggable-item:hover .resize-handle {
+.layout-table .draggable-item:last-child .resize-handle {
+  right: 0; /* Prevents an always showing horizontal scrollbar below the table */
+}
+
+.layout-table .draggable-item .resize-handle:focus-within,
+.layout-table .draggable-item .resize-handle:hover {
   /* Show the resize handle and increase its width when the column is focused or hovered. */
   opacity: 1;
-  background: var(--text-muted);
-  width: 6px;
+  transition: opacity 250ms;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.layout-table .draggable-item .resize-handle:focus-within:after,
+.layout-table .draggable-item:hover .resize-handle:after {
+  /* Show the resize handle bar. This is done as a pseudo element so we can have a larger hit area but with a small UI footprint*/
+  content: " ";
+  position: absolute;
+  pointer-events: none;
+  left: 8px; /*center the handle horizontally, should be changed in case the resize-handle area is increased*/
+  /* Centers the handle vertically, takes 50% of the height and then move it 50% of the result of the operation */
+  top: calc((1em - 50%) * -1);
+  background: var(--input-border-focus);
+  width: 3px;
+  height: 2em;
+  border-radius: 99px;
 }
 
 /* Center the resize handle between the current and the next column name, if there is one. */
@@ -351,7 +384,9 @@ export default {
   border: 0;
   text-align: left;
   padding: var(--table-cell-padding);
+  /*Ensure that we have vertical alignment*/
   padding-top: 0;
+  padding-bottom: 0;
 }
 
 .layout-table .draggable-item .property-name {

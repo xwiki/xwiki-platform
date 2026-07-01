@@ -152,11 +152,11 @@
       <scope>user</scope>
     </property>
   </object>
-  <content>* [[image:icon:house Home&gt;&gt;Main.WebHome]]
+  <content>* [[{{displayIcon name="home"/}} Home&gt;&gt;Main.WebHome]]
 * ----
 * Applications
-** [[image:icon:application_view_tile Dashboard&gt;&gt;Dashboard.WebHome]]
-** [[image:icon:group User Directory&gt;&gt;Main.UserDirectory]]
+** [[{{displayIcon name="application_view_tile"/}} Dashboard&gt;&gt;Dashboard.WebHome]]
+** [[{{displayIcon name="group"/}} User Directory&gt;&gt;Main.UserDirectory]]
 ** ----
 ** [[Create&gt;&gt;AppWithinMinutes.WebHome]]
 ** [[Install&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]

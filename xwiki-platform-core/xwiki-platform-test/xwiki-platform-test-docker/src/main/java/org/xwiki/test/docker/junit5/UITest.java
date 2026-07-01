@@ -197,6 +197,18 @@ public @interface UITest
     boolean office() default false;
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution. When true, two things happen: (1) the generated WAR contains the full set of core
+     *         extensions of the standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
+     *         {@code xwiki-platform-distribution-war-dependencies}) instead of the minimal set (resolved from
+     *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
+     *         not need to declare it as a dependency. False by default.
+     * @since 18.6.0RC1
+     */
+    boolean standardFlavor() default false;
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1

@@ -41,37 +41,35 @@
 {{velocity}}
 #_sheetInit('ExtensionCode.ExtensionSupportPlanClass', 'repository.supportplan')
 {{html wiki="true" clean="false"}}
-&lt;div class="xform">
-  &lt;dl>
-    &lt;div class="row">
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'name')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'supporter')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-12">
-        #_formProperty($object, 'summary')
-      &lt;/div>
-    &lt;/div>
-    &lt;div class="row">
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'url')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'paying')
-      &lt;/div>
-      &lt;div class="col-md-4 col-sm-6">
-        #_formProperty($object, 'active')
-      &lt;/div>
-    &lt;/div>
-    &lt;div class="row">
-      &lt;div class="col-md-12">
-        #_formProperty($object, 'content')
-      &lt;/div>
-    &lt;/div>
-  &lt;/dl>
-&lt;/div>
+&lt;div class="xform"&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'name')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'supporter')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'summary')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'url')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'paying')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'active')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'content')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 {{/html}}
 
 =={{translation key="repository.supportplan.sheet.supportedExtensions"/}}==

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.5.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.5.0-SNAPSHOT</version>
+  <version>18.6.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -68,7 +68,7 @@
     <netty.version>4.2.15.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.155.0</metaeffekt.version>
+    <metaeffekt.version>0.156.2</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -114,7 +114,7 @@
     <mysql.version>9.7.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.8</mariadb.version>
+    <mariadb.version>3.5.9</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -713,7 +713,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>2.1.8</version>
+        <version>2.1.9</version>
         <exclusions>
           <!--  -->
           <exclusion>
@@ -1183,7 +1183,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.34</version>
+        <version>3.5.38</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -1237,6 +1237,8 @@
               <!-- This property makes it simple for some module to exclude the check (for example for functional
                    tests) -->
               <xwiki.surefire.captureconsole.skip>${xwiki.surefire.captureconsole.skip}</xwiki.surefire.captureconsole.skip>
+              <!-- Same as above but for the check that tests don't generate files outside of "target". -->
+              <xwiki.surefire.captureworkingdir.skip>${xwiki.surefire.captureworkingdir.skip}</xwiki.surefire.captureworkingdir.skip>
             </systemPropertyVariables>
           </configuration>
           <dependencies>
@@ -1552,7 +1554,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>2.0.0</version>
+          <version>2.0.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
@@ -1566,6 +1568,17 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <!-- The "test" execution (inherited from the Commons POM) runs the TemporaryFileCheck verifying that tests
+               don't generate files outside of "target". We skip it (using the same property that skips the equivalent
+               runtime check) until the platform tests that currently violate it have been fixed. -->
+          <execution>
+            <id>test</id>
+            <configuration>
+              <skip>${xwiki.surefire.captureworkingdir.skip}</skip>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- Check license headers -->
       <plugin>
@@ -1837,6 +1850,9 @@
         <!-- Don't check that unit tests don't output anything to the console since for example Clover will output
              messages such as "Updating existing database at '...'." during tests! -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+        <!-- Don't check that tests don't generate files outside "target" since Clover generates a coverage database
+             that can be located outside of it. -->
+        <xwiki.surefire.captureworkingdir.skip>true</xwiki.surefire.captureworkingdir.skip>
       </properties>
       <build>
         <pluginManagement>

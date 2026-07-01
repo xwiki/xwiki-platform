@@ -44,6 +44,7 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**
@@ -238,13 +239,13 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             if (wsValue != null) {
                 wikiAttachmentSource.parameters.put(parameter.name, wsValue);
             }
-        } else if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
+        } else if (XarAttachmentModel.ELEMENT_NAME.equals(elementName)) {
             wikiAttachmentSource.name = xmlReader.getElementText();
-        } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+        } else if (XarAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
             wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
-        } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+        } else if (XarAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
             readContent(xmlReader, wikiAttachmentSource);
-        } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
+        } else if (XarAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
             // Skip revisions if history is disabled
             if (properties.isWithHistory()) {
                 readRevisions(xmlReader, wikiAttachmentSource);
@@ -262,7 +263,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+            if (XarAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
                 wikiAttachment.revisions.add(readRevision(xmlReader));
             }
         }
@@ -284,11 +285,11 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         wikiAttachmentRevisionSource.parameters.put(parameter.name, wsValue);
                     }
                 } else {
-                    if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+                    if (XarAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
                         wikiAttachmentRevisionSource.version = xmlReader.getElementText();
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+                    } else if (XarAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
                         wikiAttachmentRevisionSource.size = Long.valueOf(xmlReader.getElementText());
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+                    } else if (XarAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
                         readContent(xmlReader, wikiAttachmentRevisionSource);
                     } else {
                         unknownElement(xmlReader);

@@ -21,7 +21,6 @@ package org.xwiki.rendering.async.internal;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;

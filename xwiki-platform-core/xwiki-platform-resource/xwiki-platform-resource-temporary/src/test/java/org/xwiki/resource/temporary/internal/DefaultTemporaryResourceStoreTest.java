@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
@@ -50,18 +51,24 @@ class DefaultTemporaryResourceStoreTest
     @MockComponent
     private Environment environment;
 
+    // Use the module's "target" directory as the temporary directory so that no file leaks outside the build
+    // workspace.
+    @TempDir
+    private File temporaryDirectory;
+
     @AfterComponent
     void beforeEach()
     {
-        when(this.environment.getTemporaryDirectory()).thenReturn(new File("/tmp/xwiki"));
+        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
     }
 
     @Test
     void getTemporaryFile() throws IOException
     {
-        assertEquals(new File("/tmp/xwiki/tmp/moduleid/c/4/53919da9e226032c090ffc08d7506d/resource/file.txt"),
-            this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", List.of("resource/file.txt"),
-                new DocumentReference("xwiki", "Test", "Test"))));
+        File expected = new File(this.temporaryDirectory,
+            "tmp/moduleid/c/4/53919da9e226032c090ffc08d7506d/resource/file.txt");
+        assertEquals(expected, this.store.getTemporaryFile(new TemporaryResourceReference("moduleid",
+            List.of("resource/file.txt"), new DocumentReference("xwiki", "Test", "Test"))));
     }
 
     @Test

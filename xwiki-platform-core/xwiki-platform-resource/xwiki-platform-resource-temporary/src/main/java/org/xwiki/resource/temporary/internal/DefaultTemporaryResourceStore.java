@@ -20,7 +20,6 @@
 package org.xwiki.resource.temporary.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -70,15 +69,8 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
     public File createTemporaryFile(TemporaryResourceReference reference, InputStream content) throws IOException
     {
         File temporaryFile = getTemporaryFile(reference);
-        FileOutputStream fos = null;
-        try {
-            // Make sure the parent folders exist.
-            temporaryFile.getParentFile().mkdirs();
-            fos = new FileOutputStream(temporaryFile);
-            IOUtils.copy(content, fos);
-        } finally {
-            IOUtils.closeQuietly(fos);
-        }
+        // FileUtils#copyInputStreamToFile takes care of creating the parent folders and of closing the streams.
+        FileUtils.copyInputStreamToFile(content, temporaryFile);
 
         return temporaryFile;
     }

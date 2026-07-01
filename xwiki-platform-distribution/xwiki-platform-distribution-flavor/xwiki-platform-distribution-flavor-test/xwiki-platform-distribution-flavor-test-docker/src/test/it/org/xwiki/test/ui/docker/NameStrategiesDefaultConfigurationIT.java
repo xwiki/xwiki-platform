@@ -37,7 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 18.5.0RC1
  */
-@UITest
+// standardFlavor = true so that the shipped default is validated on an instance equivalent to a standard flavor
+// install: a WAR whose WEB-INF/lib core extensions match the standard XWiki distribution WAR, with the standard flavor
+// installed automatically on top.
+@UITest(standardFlavor = true)
 class NameStrategiesDefaultConfigurationIT
 {
     @BeforeAll

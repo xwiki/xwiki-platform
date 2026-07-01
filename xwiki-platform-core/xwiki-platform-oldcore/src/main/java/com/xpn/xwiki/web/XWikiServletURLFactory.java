@@ -457,7 +457,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
-        encodedName = encodedName.replaceAll("\\+", "%20");
+        encodedName = encodedName.replace("+", "%20");
 
         return encodedName;
     }

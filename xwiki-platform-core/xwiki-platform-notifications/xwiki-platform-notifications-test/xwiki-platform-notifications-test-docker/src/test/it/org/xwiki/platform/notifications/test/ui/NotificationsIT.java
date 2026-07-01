@@ -508,8 +508,9 @@ class NotificationsIT
 
         setup.forceGuestUser();
         setup.gotoPage(subWikiDashboard);
+        // Events are processed asynchronously, so wait until the macro displays the two expected notifications.
         NotificationsContainerElement notificationsContainerElement =
-            NotificationsContainerElement.getElementForMacroInPage();
+            NotificationsContainerElement.waitUntilNotificationCount(2);
 
         for (int i = 0; i < notificationsContainerElement.getNotificationsListCount(); i++) {
             assertFalse(notificationsContainerElement.isNotificationEventRelatedToOtherWiki(i),
@@ -521,10 +522,10 @@ class NotificationsIT
         assertEquals("Test Notif Subwiki", notificationsContainerElement.getNotificationPage(1));
 
         setup.gotoPage(mainWikiDashboard);
-        notificationsContainerElement =
-            NotificationsContainerElement.getElementForMacroInPage();
+        // This test should have produced 6 events, but more were produced with previous tests. Wait until at least
+        // the 6 events of this test are displayed.
+        notificationsContainerElement = NotificationsContainerElement.waitUntilNotificationCount(6);
 
-        // this test should have produced 6 events, but more were produced with previous tests.
         assertTrue(notificationsContainerElement.getNotificationsListCount() >= 6);
         assertEquals("Sub Wiki Dashboard (wiki1)", notificationsContainerElement.getNotificationPage(0));
         assertEquals("Main Wiki Dashboard", notificationsContainerElement.getNotificationPage(1));

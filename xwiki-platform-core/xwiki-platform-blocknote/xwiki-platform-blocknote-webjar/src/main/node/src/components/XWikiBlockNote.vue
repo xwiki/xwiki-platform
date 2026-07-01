@@ -25,7 +25,7 @@
         ref="editor"
         :editor-props
         :editor-content
-        :container
+        :deps-container="container"
         :macros
         :collaboration
         @instant-change="dirty = true"
@@ -77,8 +77,11 @@
 </template>
 
 <script setup lang="ts">
+import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
+import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { Container } from "inversify";
 import {
   inject,
@@ -100,9 +103,13 @@ import type {
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
 import type {
+  BlockNoteViewWrapperProps,
   BlockOfType,
   EditorLanguage,
   ImageUpdateResult,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
 } from "@xwiki/platform-editors-blocknote-react";
 import type {
   MacroWithUnknownParamsType,
@@ -110,6 +117,7 @@ import type {
 } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 import type { Ref } from "vue";
 
@@ -209,6 +217,20 @@ const imageEdition = (
   });
 };
 
+const syntaxes = container.getAll<SyntaxConfig>(
+  SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
+);
+
+const syntax =
+  syntaxes.find((conf) => conf.id === outputSyntax) ??
+  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+
+if (!syntax) {
+  throw new Error(
+    "Document syntax is not supported, and minimal syntax is not available",
+  );
+}
+
 // This is passed to the BlockNote editor component.
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
@@ -224,6 +246,7 @@ const editorProps = shallowRef<
   overrides: {
     imageEdition,
   },
+  syntax,
 });
 
 // This is passed to the BlockNote editor component.
@@ -259,7 +282,7 @@ onUnmounted(() => {
 });
 
 // This is passed to the BlockNote editor component.
-const macros = {
+const macros: BlockNoteViewWrapperProps["macros"] = {
   list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
     openParamsEditor: async (
@@ -280,6 +303,41 @@ const macros = {
       } catch (error) {
         console.error("Failed to edit the macro", error);
       }
+    },
+
+    openInsertionEditor: async (
+      prefill: MacroInsertionEditorPrefillData,
+      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+    ) => {
+      const macroWizard: BlockNoteMacroWizard = container.get(
+        "BlockNoteMacroWizard",
+      );
+
+      const call = await macroWizard.insert(prefill.kind, prefill.params);
+
+      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
+        kind: call.inline ? "inline" : "block",
+        id: call.name,
+        body: call.content
+          ? { type: "raw", content: call.content }
+          : { type: "none" },
+        params: Object.fromEntries(
+          Object.entries(call.parameters).map(([key, value]) => [
+            key,
+            typeof value === "string" ? value : value.value,
+          ]),
+        ),
+      };
+
+      insert({
+        kind: call.inline ? "inline" : "block",
+        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
+        params: {
+          call: JSON.stringify(invocation),
+          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
+        },
+        body: { type: "none" },
+      });
     },
   },
 };

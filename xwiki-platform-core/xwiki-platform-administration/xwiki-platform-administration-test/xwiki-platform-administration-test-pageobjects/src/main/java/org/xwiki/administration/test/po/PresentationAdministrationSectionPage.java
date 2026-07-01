@@ -199,6 +199,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
 
     /**
      * @param value the value to set for the "Copyright" option
+     * @since 18.6.0RC1
      */
     public void setCopyright(String value)
     {
@@ -206,6 +207,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     }
     /**
      * @return the content of the copyright section in the page footer
+     * @since 18.6.0RC1
      */
     public String getCopyright()
     {
@@ -214,6 +216,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
 
     /**
      * @param value the value to set for the "Version" option
+     * @since 18.6.0RC1
      */
     public void setVersion(String value)
     {
@@ -221,6 +224,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     }
     /**
      * @return return the content of the version section in the page footer
+     * @since 18.6.0RC1
      */
     public String getFooterVersion()
     {

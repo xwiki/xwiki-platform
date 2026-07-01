@@ -35,4 +35,9 @@ class AllIT
     class NestedIconThemesRestIT extends IconThemesRestIT
     {
     }
+    
+    @Nested
+    class NestedIconThemesAdminIT extends IconThemesAdminIT
+    {
+    }
 }

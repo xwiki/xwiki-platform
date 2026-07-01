@@ -115,7 +115,7 @@ public class LogoAttachmentExtractor
         attachment.loadAttachmentContent(xcontext);
 
         // Make sure the attachment have the right name
-        if (!attachment.getFilename().equals(LOGO)) {
+        if (!LOGO.equals(attachment.getFilename())) {
             return newLogoAttachment(attachment.getMimeType(xcontext),
                 (XWikiAttachmentContent) attachment.getAttachment_content().clone(), xcontext);
         } else {

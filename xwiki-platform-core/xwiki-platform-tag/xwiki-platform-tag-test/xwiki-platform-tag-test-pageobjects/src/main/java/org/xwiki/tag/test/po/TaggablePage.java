@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -39,6 +40,12 @@ public class TaggablePage extends ViewPage
      */
     @FindBy(id = "xdocTags")
     private WebElement tagsContainer;
+
+    public static TaggablePage gotoPage(EntityReference entityReference)
+    {
+        getUtil().gotoPage(entityReference);
+        return new TaggablePage();
+    }
 
     /**
      * @return {@code true} if this page has the specified tag, {@code false} otherwise
@@ -92,6 +99,6 @@ public class TaggablePage extends ViewPage
         WebElement tag = getDriver().findElementWithoutWaiting(
             By.xpath("//span[@class='tag']/a[. = '" + tagName + "' ]"));
         tag.click();
-        return new TagPage();
+        return new TagPage(tagName);
     }
 }

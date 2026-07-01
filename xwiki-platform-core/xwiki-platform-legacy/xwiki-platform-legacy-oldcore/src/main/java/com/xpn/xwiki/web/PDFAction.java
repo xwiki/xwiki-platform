@@ -64,7 +64,7 @@ public class PDFAction extends XWikiAction
             // computing a directory hierarchy but a file name
             EntityReferenceSerializer<String> serializer =
                 Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
-            String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+            String filename = serializer.serialize(doc.getDocumentReference()).replace("/", "_");
             // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
             filename = StringUtils.abbreviateMiddle(filename, "__", 255);
 

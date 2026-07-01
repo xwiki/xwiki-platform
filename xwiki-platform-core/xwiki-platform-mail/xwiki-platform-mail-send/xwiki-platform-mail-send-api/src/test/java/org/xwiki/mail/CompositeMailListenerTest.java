@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
  * 
  * @version $Id$
  */
-public class CompositeMailListenerTest
+class CompositeMailListenerTest
 {
     private CompositeMailListener compositeListener;
 

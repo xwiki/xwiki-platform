@@ -67,7 +67,6 @@ import static org.mockito.Mockito.when;
 @LiveDataMacroComponentList
 @LoggingScriptServiceComponentList
 @ComponentList({
-    TranslationMacro.class,
     ErrorMessageMacro.class,
     SuccessMessageMacro.class,
     EnumConverter.class

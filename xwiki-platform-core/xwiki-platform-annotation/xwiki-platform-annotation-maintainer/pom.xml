@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-maintainer</artifactId>
   <name>XWiki Platform - Annotations - Maintainer</name>
@@ -96,20 +96,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used for the component list -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

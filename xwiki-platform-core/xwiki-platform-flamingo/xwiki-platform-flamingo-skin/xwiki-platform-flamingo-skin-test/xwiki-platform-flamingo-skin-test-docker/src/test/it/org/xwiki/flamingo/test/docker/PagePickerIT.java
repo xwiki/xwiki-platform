@@ -64,11 +64,10 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
-
-        pagePicker.sendKeys(pageName.substring(0, 3)).waitForSuggestions().selectByVisibleText(pageName);
-        pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForSuggestions()
+        pagePicker.sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions().selectByVisibleText(pageName);
+        // Clear and perform the same query again. We don't wait for remote suggestions this time because the query
+        // results have been cached.
+        pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions(false)
             .selectByVisibleText(pageName);
     }
 
@@ -99,11 +98,11 @@ class PagePickerIT
 
         // Search for the space and ensure that we get it (and just that space, not any of the children).
         List<SuggestInputElement.SuggestionElement> suggestions =
-            pagePicker.sendKeys(pageName).waitForSuggestions().getSuggestions();
+            pagePicker.sendKeys(pageName).waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
         assertEquals(pageTitle, suggestions.get(0).getLabel());
         // Just to be sure that searching for the children also works, search and select the first child.
-        pagePicker.clear().sendKeys(childName + "0").waitForSuggestions()
+        pagePicker.clear().sendKeys(childName + "0").waitForNonTypedSuggestions()
             .selectByVisibleText("Child page 0");
     }
 
@@ -125,11 +124,8 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        pagePicker.click().waitForSuggestions();
-
         List<SuggestInputElement.SuggestionElement> suggestions =
-            pagePicker.sendKeys(searchText).waitForSuggestions().getSuggestions();
+            pagePicker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions();
         assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
         assertEquals(title, suggestions.get(0).getLabel());
     }

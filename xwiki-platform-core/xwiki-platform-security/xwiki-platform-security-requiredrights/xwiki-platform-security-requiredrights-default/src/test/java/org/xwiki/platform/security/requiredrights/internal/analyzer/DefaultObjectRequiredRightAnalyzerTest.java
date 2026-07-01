@@ -66,6 +66,10 @@ import static org.mockito.Mockito.when;
 @ComponentList({ VelocityDetector.class })
 class DefaultObjectRequiredRightAnalyzerTest
 {
+    // Inject the component here with mock components so we don't need to declare all injected components as mocks.
+    @InjectMockComponents
+    private ObjectPropertyRequiredRightAnalyzer objectPropertyRequiredRightAnalyzer;
+
     @InjectMockComponents
     private DefaultObjectRequiredRightAnalyzer analyzer;
 

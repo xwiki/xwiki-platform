@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Optional;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -34,13 +33,12 @@ import org.xwiki.livedata.rest.model.jaxb.Source;
 
 /**
  * Default implementation of {@link LiveDataSourceResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataSourceResource")
-@Singleton
 public class DefaultLiveDataSourceResource extends AbstractLiveDataResource implements LiveDataSourceResource
 {
     @Override

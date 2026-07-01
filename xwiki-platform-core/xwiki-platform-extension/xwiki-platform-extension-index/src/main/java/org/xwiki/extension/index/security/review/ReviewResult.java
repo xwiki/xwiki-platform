@@ -19,15 +19,12 @@
  */
 package org.xwiki.extension.index.security.review;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The review result of a vulnerability.
  *
  * @version $Id$
  * @since 15.6RC1
  */
-@Unstable
 public enum ReviewResult
 {
     /**

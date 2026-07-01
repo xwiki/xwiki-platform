@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -33,7 +34,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation for {@link NotificationRenderer}.
@@ -84,7 +84,7 @@ public class DefaultNotificationRenderer implements NotificationRenderer
 
             // Return the displayer if it supports the given event
             for (String supportedEvent : displayer.getSupportedEvents()) {
-                if (StringUtils.equals(supportedEvent, event.getType())) {
+                if (Strings.CS.equals(supportedEvent, event.getType())) {
                     return displayer;
                 }
             }

@@ -22,7 +22,6 @@ package org.xwiki.mail.internal.thread;
 import java.util.concurrent.TimeUnit;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Handles all operations on the Mail Queues.
@@ -69,7 +68,6 @@ public interface MailQueueManager<T extends MailQueueItem>
      *         timeout time
      * @since 15.0RC1
      */
-    @Unstable
     default boolean addMessageToQueue(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
     {
         addToQueue(mailQueueItem);

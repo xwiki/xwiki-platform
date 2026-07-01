@@ -19,6 +19,7 @@
  */
 package org.xwiki.internal.document;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authorization.Right;
@@ -60,6 +62,20 @@ public class DocumentRequiredRightsReader
      */
     public static final String PROPERTY_NAME = "level";
 
+    private static final DocumentRequiredRights ENFORCED_EMPTY = new DocumentRequiredRights(true, Set.of());
+
+    private static final DocumentRequiredRights ENFORCED_SCRIPT = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.SCRIPT, EntityType.DOCUMENT)));
+
+    private static final DocumentRequiredRights ENFORCED_PROGRAMMING = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.PROGRAM, null)));
+
+    private static final DocumentRequiredRights ENFORCED_ADMIN = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.ADMIN, EntityType.WIKI)));
+
+    private static final List<DocumentRequiredRights> STATIC_INSTANCES = List.of(ENFORCED_EMPTY, ENFORCED_SCRIPT,
+        ENFORCED_PROGRAMMING, ENFORCED_ADMIN);
+
     @Inject
     private Logger logger;
 
@@ -71,28 +87,53 @@ public class DocumentRequiredRightsReader
      */
     public DocumentRequiredRights readRequiredRights(XWikiDocument document)
     {
-        return new DocumentRequiredRights(document.isEnforceRequiredRights(),
-            document.getXObjects(CLASS_REFERENCE).stream()
-                .filter(Objects::nonNull)
-                .map(this::readRequiredRight)
-                // Don't allow edit right/edit right implies no extra right.
-                // Filter out invalid values.
-                .filter(requiredRight ->
-                    !Right.EDIT.equals(requiredRight.right()) && !Right.ILLEGAL.equals(requiredRight.right()))
-                .collect(Collectors.toUnmodifiableSet()));
+        boolean enforce = document.isEnforceRequiredRights();
+        Set<DocumentRequiredRight> rights = document.getXObjects(CLASS_REFERENCE).stream()
+            .filter(Objects::nonNull)
+            .map(this::readRequiredRight)
+            // Don't allow edit right/edit right implies no extra right.
+            // Filter out invalid values.
+            .filter(requiredRight ->
+                !Right.EDIT.equals(requiredRight.right()) && !Right.ILLEGAL.equals(requiredRight.right()))
+            .collect(Collectors.toUnmodifiableSet());
+
+        // Try returning a static instance to avoid creating lots of objects that contain the same values as most
+        // documents will be in the case of one of the static instances. This is also to reduce the memory usage of
+        // the cache.
+        if (!enforce && rights.isEmpty()) {
+            return DocumentRequiredRights.EMPTY;
+        }
+
+        // Return the static instance that has the same set of rights.
+        if (enforce) {
+            for (DocumentRequiredRights staticInstance : STATIC_INSTANCES) {
+                if (staticInstance.rights().equals(rights)) {
+                    return staticInstance;
+                }
+            }
+        }
+
+        return new DocumentRequiredRights(enforce, rights);
     }
 
-    private DocumentRequiredRight readRequiredRight(BaseObject object)
+    /**
+     * Read the required right from an XObject.
+     *
+     * @param object the XObject to read the required right from. Must not be {@code null}
+     * @return the required right. Can be an illegal right if the value of the property is not a valid right
+     * @since 17.4.0RC1
+     */
+    public DocumentRequiredRight readRequiredRight(BaseObject object)
     {
         String value = object.getStringValue(PROPERTY_NAME);
-        EntityType entityType = EntityType.DOCUMENT;
+        EntityType initialEntityType = EntityType.DOCUMENT;
         Right right = Right.toRight(value);
         if (right.equals(Right.ILLEGAL)) {
             String[] levelRight = StringUtils.split(value, "_", 2);
             if (levelRight.length == 2) {
                 right = Right.toRight(levelRight[1]);
                 try {
-                    entityType = EntityType.valueOf(levelRight[0].toUpperCase());
+                    initialEntityType = EntityType.valueOf(levelRight[0].toUpperCase());
                 } catch (IllegalArgumentException e) {
                     // Ensure that we return an illegal right even if the right part of the value could be parsed.
                     right = Right.ILLEGAL;
@@ -101,15 +142,35 @@ public class DocumentRequiredRightsReader
             }
         }
 
+        EntityType entityType = getEffectiveEntityType(right, initialEntityType, object.getDocumentReference());
+
+        return new DocumentRequiredRight(right, entityType);
+    }
+
+    /**
+     * Determines the most specific effective {@link EntityType} based on the specified parameters. It adjusts
+     * the entity type according to the rights' targeted entity types and the provided base document reference.
+     *
+     * @param right the {@link Right} being analyzed; it defines the targeted entity types to consider
+     * @param initialEntityType the initial {@link EntityType} to be evaluated
+     * @param baseDocumentReference the base {@link DocumentReference} used to adjust and validate the entity type
+     * @return the most specific {@link EntityType} that is targeted by the {@link Right} and the same level or above
+     * the given initial entity type in the hierarchy of the document reference. If no suitable entity type is found,
+     * it defaults to {@link EntityType#DOCUMENT}, or null if the right targets only the farm level
+     */
+    public EntityType getEffectiveEntityType(Right right, EntityType initialEntityType,
+        DocumentReference baseDocumentReference)
+    {
+        EntityType entityType = initialEntityType;
         Set<EntityType> targetedEntityTypes = right.getTargetedEntityType();
         if (targetedEntityTypes == null) {
             // This means the right targets only the farm level, which is null.
             entityType = null;
         } else {
-            EntityReference entityReference = object.getDocumentReference().extractReference(entityType);
+            EntityReference entityReference = baseDocumentReference.extractReference(entityType);
             // The specified entity type seems to be below the document level. Fall back to document level instead.
             if (entityReference == null) {
-                entityReference = object.getDocumentReference();
+                entityReference = baseDocumentReference;
             }
             // Try to get the lowest level where this right can be assigned. This is done to ensure that, e.g.,
             // programming right can imply admin right on the wiki level even if programming right is only specified on
@@ -124,7 +185,6 @@ public class DocumentRequiredRightsReader
                 entityType = EntityType.DOCUMENT;
             }
         }
-
-        return new DocumentRequiredRight(right, entityType);
+        return entityType;
     }
 }

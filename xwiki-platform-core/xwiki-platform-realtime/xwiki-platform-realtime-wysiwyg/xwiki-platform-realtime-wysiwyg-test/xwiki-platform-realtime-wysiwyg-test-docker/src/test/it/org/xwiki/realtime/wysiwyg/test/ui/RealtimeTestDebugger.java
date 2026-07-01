@@ -72,16 +72,17 @@ public class RealtimeTestDebugger implements TestExecutionExceptionHandler
             driver.manage().logs().get(LogType.BROWSER).forEach(entry -> LOGGER.info(entry.toString()));
         } catch (Exception e) {
             // Not all browser drivers support getting the logs.
-            LOGGER.warn("Failed to get browser console logs: " + e.getMessage());
+            LOGGER.warn("Failed to get browser console logs: {}", e.getMessage());
         }
     }
 
     private void printRealtimeDebugInfo(XWikiWebDriver driver)
     {
         try {
-            LOGGER.info("Realtime debug info: " + driver.executeScript("return JSON.stringify(window.REALTIME_DEBUG)"));
+            LOGGER.info("Realtime debug info: {}",
+                driver.executeScript("return JSON.stringify(window.REALTIME_DEBUG)"));
         } catch (Exception e) {
-            LOGGER.warn("Failed to get realtime debug info: " + e.getMessage());
+            LOGGER.warn("Failed to get realtime debug info: {}", e.getMessage());
         }
     }
 }

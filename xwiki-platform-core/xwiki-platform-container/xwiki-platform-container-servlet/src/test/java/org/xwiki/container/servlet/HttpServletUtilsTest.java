@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class HttpServletUtilsTest
+class HttpServletUtilsTest
 {
     private HttpServletRequest request(String urlString, Map<String, String>... headerGroup)
         throws MalformedURLException
@@ -96,7 +96,7 @@ public class HttpServletUtilsTest
     // Tests
 
     @Test
-    public void getSourceBaseURL() throws MalformedURLException
+    void getSourceBaseURL() throws MalformedURLException
     {
         assertSourceBaseURL("http://host:8080", "http://host:8080");
         assertSourceBaseURL("http://host", "http://host");
@@ -125,5 +125,23 @@ public class HttpServletUtilsTest
             xhost("sourcehost2"), xproto("http"));
         assertSourceBaseURL("https://sourcehost", "http://host:8080", forwarded("host=sourcehost"),
             xhost("sourcehost2"), xproto("https"));
+    }
+
+    @Test
+    void getClientIP()
+    {
+        jakarta.servlet.http.HttpServletRequest request = mock(jakarta.servlet.http.HttpServletRequest.class);
+
+        when(request.getRemoteAddr()).thenReturn("192.168.0.3");
+        assertEquals("192.168.0.3", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.0.1");
+        assertEquals("192.168.0.1", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.0.1,192.168.0.2");
+        assertEquals("192.168.0.1", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("");
+        assertEquals("192.168.0.3", HttpServletUtils.getClientIP(request));
     }
 }

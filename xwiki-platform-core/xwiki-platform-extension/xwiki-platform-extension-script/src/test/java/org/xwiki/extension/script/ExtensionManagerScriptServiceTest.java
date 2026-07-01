@@ -23,15 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
@@ -40,48 +39,49 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+@OldcoreTest
 @AllComponents
-public class ExtensionManagerScriptServiceTest
+@ExtendWith(MockitoRepositoryUtilsExtension.class)
+class ExtensionManagerScriptServiceTest
 {
-    private MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
-
-    private MockitoOldcoreRule xwikiBridge = new MockitoOldcoreRule(this.mocker);
-
-    @Rule
-    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.mocker, this.xwikiBridge);
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private XWiki mockXWiki;
 
-    private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
+    private Map<String, BaseClass> classes = new HashMap<>();
 
     private DocumentReference contextUser;
 
     private ExtensionManagerScriptService scriptService;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before() throws Exception
     {
         // mock
 
         this.mockXWiki = mock(XWiki.class);
 
-        this.xwikiBridge.mockQueryManager();
+        this.oldcore.mockQueryManager();
 
-        this.xwikiBridge.getXWikiContext().setWiki(this.mockXWiki);
-        this.xwikiBridge.getXWikiContext().setWikiId("xwiki");
-        this.contextUser =
-            new DocumentReference(this.xwikiBridge.getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
+        this.oldcore.getXWikiContext().setWiki(this.mockXWiki);
+        this.oldcore.getXWikiContext().setWikiId("xwiki");
+        this.contextUser = new DocumentReference(
+            this.oldcore.getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
 
         // classes
 
@@ -90,14 +90,14 @@ public class ExtensionManagerScriptServiceTest
 
         // checking
 
-        this.xwikiBridge.getXWikiContext().setUserReference(this.contextUser);
+        this.oldcore.getXWikiContext().setUserReference(this.contextUser);
 
-        ((XWikiStubContextProvider) this.mocker.getInstance(XWikiStubContextProvider.class))
-            .initialize(this.xwikiBridge.getXWikiContext());
+        ((XWikiStubContextProvider) this.oldcore.getMocker().getInstance(XWikiStubContextProvider.class))
+            .initialize(this.oldcore.getXWikiContext());
 
         // lookup
 
-        this.scriptService = this.mocker.getInstance(ScriptService.class, "extension");
+        this.scriptService = this.oldcore.getMocker().getInstance(ScriptService.class, "extension");
     }
 
     // tools
@@ -113,7 +113,7 @@ public class ExtensionManagerScriptServiceTest
 
         List<LogEvent> errors = job.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            throw errors.getFirst().getThrowable();
         }
 
         return job;
@@ -130,7 +130,7 @@ public class ExtensionManagerScriptServiceTest
 
         List<LogEvent> errors = job.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            throw errors.getFirst().getThrowable();
         }
 
         return job;
@@ -141,21 +141,22 @@ public class ExtensionManagerScriptServiceTest
     // install
 
     @Test
-    public void testInstallOnRoot() throws Throwable
+    void testInstallOnRoot()
     {
-        install("extension", "version", null);
+        assertDoesNotThrow(() -> install("extension", "version", null));
     }
 
     @Test
-    public void testInstallOnNamespace() throws Throwable
+    void testInstallOnNamespace()
     {
-        install("extension", "version", "namespace");
+        assertDoesNotThrow(() -> install("extension", "version", "namespace"));
     }
 
     @Test
-    public void testOverwriteAllowedNamespaces() throws Throwable
+    void testOverwriteAllowedNamespaces() throws Throwable
     {
-        InstallRequest installRequest = this.scriptService.createInstallRequest("extension", "version", "namespace");
+        InstallRequest installRequest =
+            this.scriptService.createInstallRequest("extension", "version", "namespace");
 
         // Indicate all extensions of type "test" should be installed on root
         ((ScriptExtensionRewriter) installRequest.getRewriter()).installExtensionTypeOnRootNamespace("test");
@@ -172,71 +173,72 @@ public class ExtensionManagerScriptServiceTest
 
         List<LogEvent> errors = job.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            throw errors.getFirst().getThrowable();
         }
 
         // Validate
 
-        InstalledExtensionRepository repository = mocker.getInstance(InstalledExtensionRepository.class);
+        InstalledExtensionRepository repository =
+            this.oldcore.getMocker().getInstance(InstalledExtensionRepository.class);
 
         assertNotNull(repository.getInstalledExtension("extension", null));
     }
 
-    @Test(expected = InstallException.class)
-    public void testInstallOnRootWithoutProgrammingRigths() throws Throwable
+    @Test
+    void testInstallOnRootWithoutProgrammingRights() throws Throwable
     {
-        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
             .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
-        install("extension", "version", null);
+        assertThrows(InstallException.class, () -> install("extension", "version", null));
     }
 
-    @Test(expected = InstallException.class)
-    public void testInstallOnNamespaceWithoutProgrammingRigths() throws Throwable
+    @Test
+    void testInstallOnNamespaceWithoutProgrammingRights() throws Throwable
     {
-        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
             .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
-        install("extension", "version", "namespace");
+        assertThrows(InstallException.class, () -> install("extension", "version", "namespace"));
     }
 
     // uninstall
 
     @Test
-    public void testUninstallFromRoot() throws Throwable
+    void testUninstallFromRoot()
     {
-        uninstall("installedonroot", null);
+        assertDoesNotThrow(() -> uninstall("installedonroot", null));
     }
 
     @Test
-    public void testUninstallOnNamespace() throws Throwable
+    void testUninstallOnNamespace()
     {
-        uninstall("installedonnamespace", "namespace");
-    }
-
-    @Test(expected = UninstallException.class)
-    public void testUninstallOnRootWithoutProgrammingRigths() throws Throwable
-    {
-        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
-            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
-
-        uninstall("installedonroot", null);
-    }
-
-    @Test(expected = UninstallException.class)
-    public void testUninstallOnNamespaceWithoutProgrammingRigths() throws Throwable
-    {
-        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
-            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
-
-        uninstall("installedonnamespace", "namespace");
+        assertDoesNotThrow(() -> uninstall("installedonnamespace", "namespace"));
     }
 
     @Test
-    public void testGet()
+    void testUninstallOnRootWithoutProgrammingRights() throws Throwable
     {
-        Assert.assertNotNull(this.scriptService.get(CoreExtensionScriptService.ID));
-        Assert.assertNotNull(this.scriptService.get(LocalExtensionScriptService.ID));
-        Assert.assertNotNull(this.scriptService.get(InstalledExtensionScriptService.ID));
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
+
+        assertThrows(UninstallException.class, () -> uninstall("installedonroot", null));
+    }
+
+    @Test
+    void testUninstallOnNamespaceWithoutProgrammingRights() throws Throwable
+    {
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
+
+        assertThrows(UninstallException.class, () -> uninstall("installedonnamespace", "namespace"));
+    }
+
+    @Test
+    void testGet()
+    {
+        assertNotNull(this.scriptService.get(CoreExtensionScriptService.ID));
+        assertNotNull(this.scriptService.get(LocalExtensionScriptService.ID));
+        assertNotNull(this.scriptService.get(InstalledExtensionScriptService.ID));
     }
 }

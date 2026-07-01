@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class RightsFilterListenerTest
+class RightsFilterListenerTest
 {
     @MockComponent
     private AuthorizationManager authorization;
@@ -87,7 +87,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noRight()
+    void noRight()
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -100,7 +100,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noChange() throws XWikiException
+    void noChange() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, oldcore.getXWikiContext());
@@ -114,7 +114,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newEmptyRightObject() throws XWikiException
+    void newEmptyRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -128,7 +128,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newAllowedRightObject() throws XWikiException
+    void newAllowedRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -144,7 +144,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newDeniedRightObject() throws XWikiException, AccessDeniedException
+    void newDeniedRightObject() throws XWikiException, AccessDeniedException
     {
         XWikiDocument document = createTestDocument();
         BaseObject rightObject =
@@ -231,6 +231,30 @@ public class RightsFilterListenerTest
         this.listener.onEvent(event, document, null);
         assertTrue(event.isCanceled());
         verify(this.authorization, never()).checkAccess(eq(Right.PROGRAM), any(), any());
+    }
+
+    @Test
+    void checkNewEnforcedProgrammingRight() throws Exception
+    {
+        XWikiDocument document = createTestDocument();
+        document.setOriginalDocument(document.clone());
+        BaseObject rightObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        rightObject.setStringValue("levels", "programming");
+
+        DocumentRequiredRights requiredRights = new DocumentRequiredRights(true,
+            Set.of(new DocumentRequiredRight(Right.PROGRAM, null)));
+
+        when(this.requiredRightsReader.readRequiredRights(same(document))).thenReturn(requiredRights);
+        when(this.requiredRightsReader.readRequiredRights(same(document.getOriginalDocument())))
+            .thenReturn(DocumentRequiredRights.EMPTY);
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.PROGRAM, null,
+            null);
+
+        UserUpdatingDocumentEvent event = new UserUpdatingDocumentEvent();
+        this.listener.onEvent(event, document, null);
+        assertTrue(event.isCanceled());
     }
 
     @Test

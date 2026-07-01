@@ -63,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -182,7 +183,7 @@ class XWikiContextContextStoreTest
         assertEquals(headers, contextStore.get(XWikiContextContextStore.PROP_REQUEST_HEADERS));
         assertEquals("172.12.0.2", contextStore.get(XWikiContextContextStore.PROP_REQUEST_REMOTE_ADDR));
 
-        assertEquals(session,
+        assertSame(session,
             ((SerializableHttpSessionWrapper) contextStore.get(XWikiContextContextStore.PROP_REQUEST_SESSION))
                 .getSession());
 

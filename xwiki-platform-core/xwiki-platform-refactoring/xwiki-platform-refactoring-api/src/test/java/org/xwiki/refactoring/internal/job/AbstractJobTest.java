@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.4RC1
  */
-public abstract class AbstractJobTest
+abstract class AbstractJobTest
 {
     @MockComponent
     protected ModelBridge modelBridge;
@@ -56,15 +56,15 @@ public abstract class AbstractJobTest
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    protected void configure() throws Exception
+    void configure()
     {
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
     }
 
     protected LogCaptureExtension getLogCapture()
     {
-        return logCapture;
+        return this.logCapture;
     }
 
     protected Job run(Request request) throws Throwable

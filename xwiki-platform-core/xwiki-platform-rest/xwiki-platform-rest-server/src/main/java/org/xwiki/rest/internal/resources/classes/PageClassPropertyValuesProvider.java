@@ -37,6 +37,7 @@ import org.xwiki.query.QueryBuilder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -95,17 +96,23 @@ public class PageClassPropertyValuesProvider extends AbstractDocumentListClassPr
 
     private String getLabel(EntityReference entityReference)
     {
-        String label;
-        try {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            XWikiDocument document;
-            document = xcontext.getWiki().getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
-            label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
-        } catch (XWikiException e) {
-            this.logger.error("Error while loading the document [{}]. Root cause is [{}]", entityReference,
-                ExceptionUtils.getRootCause(e));
-            if (entityReference instanceof DocumentReference) {
-                label = super.getLabel((DocumentReference) entityReference, "");
+        String label = null;
+
+        if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, entityReference)) {
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                XWikiDocument document;
+                document = xcontext.getWiki().getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
+                label = document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
+            } catch (XWikiException e) {
+                this.logger.error("Error while loading the document [{}]. Root cause is [{}]", entityReference,
+                    ExceptionUtils.getRootCauseMessage(e), e);
+            }
+        }
+
+        if (label == null) {
+            if (entityReference instanceof DocumentReference documentReference) {
+                label = super.getLabel(documentReference, "");
             } else {
                 label = entityReference.getName();
             }

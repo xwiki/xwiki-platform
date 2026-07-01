@@ -49,7 +49,7 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      */
     public AbstractCommentEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

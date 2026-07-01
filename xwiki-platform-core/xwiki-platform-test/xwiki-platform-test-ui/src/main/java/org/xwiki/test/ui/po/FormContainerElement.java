@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,20 +73,29 @@ public class FormContainerElement extends BaseElement
 
     public void fillFieldsByName(Map<String, String> valuesByNames)
     {
-        Map<WebElement, String> valuesByElements = new HashMap<>((int) (valuesByNames.size() / 0.75));
-
+        Map<WebElement, String> valuesByElements = new LinkedHashMap<>();
+        
+        WebElement lastElement = null;
         for (String name : valuesByNames.keySet()) {
-            valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
+            lastElement = getFormElement().findElement(By.name(name));
+            valuesByElements.put(lastElement, valuesByNames.get(name));
         }
         fillFieldsByElements(valuesByElements);
         
         /* Register password confirmation is usually the last element that needs to be validated by liveValidation.
           This wait allows to solve a race condition between the form submission and the computation of the status of
           those fields. We force the status to be solved before we try anything else, especially submitting the form.
+          Unfortunately in Java17 we do not have lastEntry() from LinkedHashMaps, 
+          so we use a few non optimized operations instead. 
+          This is okay because the Map should not contain a lot of elements.
+          ---
+          Not all forms use live-validation, we make sure the last element has some validation going on before waiting.
           */
-        if (valuesByNames.containsKey("register2_password")) {
-            getDriver().waitUntilCondition(driver -> !getFormElement().findElement(By.name("register2_password"))
-                .getAttribute(CLASS_ATTRIBUTE).isEmpty());
+        if(!valuesByElements.isEmpty() && lastElement != null && !lastElement.findElements(
+            By.xpath("//following-sibling::span[contains(@class, 'LV_validation_message')]"))
+            .isEmpty()) {
+            WebElement finalLastElement = lastElement;
+            getDriver().waitUntilCondition(driver -> !finalLastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }
     }
 
@@ -120,10 +130,10 @@ public class FormContainerElement extends BaseElement
     {
         getDriver().scrollTo(fieldElement);
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
-            setCheckBox(fieldElement, value.equals("true"));
+            setCheckBox(fieldElement, "true".equals(value));
         } else if ("select".equals(fieldElement.getTagName())) {
             // if a select uses selectized then we should use a SuggestInputElement.
-            if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("selectized")) {
+            if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("tomselected")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(fieldElement);
                 suggestInputElement.clearSelectedSuggestions();
 
@@ -131,8 +141,7 @@ public class FormContainerElement extends BaseElement
                 // we split the values and add them all.
                 // We reuse the multiple check from selenium.support.ui.Select.
                 if (fieldElement.getAttribute("multiple") != null
-                    && !"false".equals(fieldElement.getAttribute("multiple"))
-                    && value.contains("|")) {
+                    && !"false".equals(fieldElement.getAttribute("multiple")) && value.contains("|")) {
                     for (String singleValue : value.split("\\|")) {
                         suggestInputElement.sendKeys(singleValue).selectTypedText();
                     }
@@ -198,7 +207,7 @@ public class FormContainerElement extends BaseElement
 
         public SelectElement(WebElement select)
         {
-            if (!select.getTagName().toLowerCase().equals("select")) {
+            if (!"select".equalsIgnoreCase(select.getTagName())) {
                 throw new WebDriverException("Can only create a select element from a webelement of tag name select.");
             }
             this.select = select;

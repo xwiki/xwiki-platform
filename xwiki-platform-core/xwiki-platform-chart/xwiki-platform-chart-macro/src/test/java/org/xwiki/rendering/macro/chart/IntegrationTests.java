@@ -34,14 +34,16 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,13 +54,18 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-public class IntegrationTests implements RenderingTests
+public class IntegrationTests extends RenderingTest
 {
-    private final static String WIKI_CONTENT_FILE = "wiki.txt";
+    private static final String WIKI_CONTENT_FILE = "wiki.txt";
 
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
+        // The default TransformationManager implementation depends on the AuthorExecutor component but it doesn't use
+        // it unless a specific TransformationContext is used, which is not the case here. So we just register a mock
+        // AuthorExecutor to satisfy the dependency.
+        componentManager.registerMockComponent(AuthorExecutor.class);
+
         ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("currentWiki"));
 
@@ -77,8 +84,8 @@ public class IntegrationTests implements RenderingTests
 
         DocumentDisplayer displayer = componentManager.registerMockComponent(DocumentDisplayer.class);
         Parser parser = componentManager.getInstance(Parser.class, Syntax.XWIKI_2_0.toIdString());
-        final XDOM xdom = parser.parse(new InputStreamReader(
-            getClass().getClassLoader().getResourceAsStream(WIKI_CONTENT_FILE)));
+        final XDOM xdom =
+            parser.parse(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(WIKI_CONTENT_FILE)));
         when(displayer.display(eq(document), any(DocumentDisplayerParameters.class))).thenReturn(xdom);
 
         AuthorizationManager authorizationManager = componentManager.registerMockComponent(AuthorizationManager.class);

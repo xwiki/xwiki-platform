@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -33,9 +34,15 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.QueryException;
 import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Named("repository")
@@ -61,6 +68,9 @@ public class RepositoryScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
@@ -94,18 +104,55 @@ public class RepositoryScriptService implements ScriptService
         }
     }
 
+    private ExtensionRepository getRepository(String repositoryId) throws ExtensionException
+    {
+        ExtensionRepository repository = this.extensionRepositoryManager.getRepository(repositoryId);
+
+        if (repository == null) {
+            throw new ExtensionException("Can't find any registered repository with id [" + repositoryId + "]");
+        }
+
+        return repository;
+    }
+
+    /**
+     * Create or update an extension from the metadata found in the indicated repository.
+     * 
+     * @param extensionId the identifier of the extension to import
+     * @param repositoryId the identifier of the repository from which to import the extension
+     * @return the reference to the main document created or updated for the extension, or {@code null} if an error
+     *         occurred
+     */
     public DocumentReference importExtension(String extensionId, String repositoryId)
     {
         setError(null);
 
         try {
-            ExtensionRepository repository = this.extensionRepositoryManager.getRepository(repositoryId);
+            return this.repositoryManager.importExtension(extensionId, getRepository(repositoryId),
+                Version.Type.STABLE);
+        } catch (Exception e) {
+            setError(e);
+        }
 
-            if (repository == null) {
-                throw new ExtensionException("Can't find any registered repository with id [" + repositoryId + "]");
-            }
+        return null;
+    }
 
-            return this.repositoryManager.importExtension(extensionId, repository, Version.Type.STABLE);
+    /**
+     * Create or update a project from the metadata found in the indicated repository.
+     * 
+     * @param projectId the identifier of the project to import
+     * @param repositoryId the identifier of the repository from which to import the project
+     * @return the reference to the main document created or updated for the project, or {@code null} if an error
+     *         occurred
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public DocumentReference importProject(String projectId, String repositoryId)
+    {
+        setError(null);
+
+        try {
+            return this.repositoryManager.importProject(projectId, getRepository(repositoryId), Version.Type.STABLE);
         } catch (Exception e) {
             setError(e);
         }
@@ -121,5 +168,44 @@ public class RepositoryScriptService implements ScriptService
     public ExtensionSupportPlans resolveExtensionSupportPlans(Collection<String> supportPlanIds)
     {
         return this.extensionStore.resolveExtensionSupportPlans(supportPlanIds);
+    }
+
+    /**
+     * @param extensionId the identifier of the extension
+     * @param version the version for which to find the object
+     * @return the object holding the extension version metadata
+     * @throws QueryException when failing to get the version object
+     * @throws XWikiException when failing to get the version object
+     * @since 17.9.0RC1
+     */
+    public Object getVersionObject(String extensionId, String version) throws QueryException, XWikiException
+    {
+        XWikiDocument extensionDocument = this.extensionStore.getExistingExtensionDocumentById(extensionId);
+
+        XWikiContext context = this.contextProvider.get();
+        // FIXME: add some checks
+        XWikiDocument extensionVersionDocument =
+            this.extensionStore.getExtensionVersionDocument(extensionDocument, version, context);
+        return new Object(this.extensionStore.getExtensionVersionObject(extensionVersionDocument, version), context);
+    }
+
+    /**
+     * @param projectId the identifier of the project
+     * @param version the version for which to find the object
+     * @return the object holding the project version metadata
+     * @throws QueryException when failing to get the version object
+     * @throws XWikiException when failing to get the version object
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public Object getProjectVersionObject(String projectId, String version) throws QueryException, XWikiException
+    {
+        XWikiDocument projectDocument = this.extensionStore.getExistingProjectDocumentById(projectId);
+
+        XWikiContext context = this.contextProvider.get();
+        // FIXME: add some checks
+        XWikiDocument projectVersionDocument =
+            this.extensionStore.getProjectVersionDocument(projectDocument, version, context);
+        return new Object(this.extensionStore.getProjectVersionObject(projectVersionDocument, version), context);
     }
 }

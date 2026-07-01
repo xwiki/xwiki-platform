@@ -25,9 +25,9 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
-  <packaging>webjar</packaging>
+  <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-notifications-webjar</artifactId>
   <name>XWiki Platform - Notifications - WebJar</name>
   <properties>
@@ -37,6 +37,10 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>{
+      "@xwiki/platform-livedata-componentstore": "org.xwiki.platform:xwiki-platform-livedata-node-componentstore/index.es.js",
+      "@xwiki/platform-livedata-ui": "org.xwiki.platform:xwiki-platform-livedata-node-ui/index.es.js"
+    }</xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>
@@ -51,6 +55,18 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-componentstore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-node-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
       <scope>runtime</scope>
@@ -60,103 +76,10 @@
       <artifactId>bootstrap-switch</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-vue-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/vue</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/vue</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the generated Vue components to the WebJar folder. -->
-            <id>copy-vue-components</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/vue/dist</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Skip jsHint because we use ESLint through the frontend-maven-plugin -->
-      <plugin>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-lint</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>install-node-and-npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>ci</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-build</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run build</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-lint</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run lint</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-        </executions>
-        <configuration>
-          <workingDirectory>${project.build.directory}/vue</workingDirectory>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

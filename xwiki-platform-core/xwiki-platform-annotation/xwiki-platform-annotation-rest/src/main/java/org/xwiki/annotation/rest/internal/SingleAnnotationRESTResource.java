@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.PUT;
@@ -54,7 +53,6 @@ import com.xpn.xwiki.XWikiException;
 @Component
 @Named("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotation/{id}")
-@Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {
     /**

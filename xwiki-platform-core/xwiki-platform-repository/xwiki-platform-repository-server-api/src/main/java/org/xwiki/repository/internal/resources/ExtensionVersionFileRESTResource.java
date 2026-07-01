@@ -27,7 +27,6 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -61,6 +60,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.repository.Resources;
+import org.xwiki.repository.internal.RepositoryConfiguration;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
 
@@ -77,7 +77,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
-@Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject
@@ -85,6 +84,9 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
     @Inject
     private ExtensionRepositoryManager extensionRepositoryManager;
+
+    @Inject
+    private RepositoryConfiguration repositoryConfiguration;
 
     @GET
     public Response downloadExtension(@PathParam(Resources.PPARAM_EXTENSIONID) String extensionId,
@@ -99,7 +101,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         if (repositoryId != null) {
             response =
                 downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
-        } else if (repositoryType != null && repositoryURI != null) {
+        } else if (repositoryType != null && repositoryURI != null
+            && this.repositoryConfiguration.isAllowedCustomRepository()) {
             response = downloadRemoteExtension(
                 new ExtensionResourceReference(extensionId, extensionVersion, repositoryType, new URI(repositoryURI)));
         } else {
@@ -117,7 +120,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         checkRights(extensionDocument);
 
         ResourceReference resourceReference =
-            repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
+            this.repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
 
@@ -168,7 +171,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             response.type(type);
 
             BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String extensionType = this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+            String extensionType =
+                this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
             response.entity(entity.getContent());
             response.header("Content-Disposition",
                 "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");

@@ -28,8 +28,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.ReplacingInputStream;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
@@ -51,6 +54,10 @@ public class QueryRegistrationHandler implements EventListener
 {
     @Inject
     private HibernateSessionFactory sessionFactory;
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configuration;
 
     @Inject
     private Logger logger;
@@ -75,10 +82,25 @@ public class QueryRegistrationHandler implements EventListener
 
     protected void loadMappingFile(String path)
     {
-        try (InputStream stream = Util.getResourceAsStream(path)) {
+        String collation = this.configuration.getProperty("index.sortCollation", "");
+        String beforeOrderModifier;
+        String afterOrderModifier;
+        if (StringUtils.isNotBlank(collation)) {
+            beforeOrderModifier = "";
+            afterOrderModifier = "collate " + collation;
+        } else {
+            beforeOrderModifier = "lower(";
+            afterOrderModifier = ")";
+        }
+        try (InputStream stream = Util.getResourceAsStream(path);
+             InputStream beforeReplacedStream = new ReplacingInputStream(stream, "BEFORE_ORDER_MODIFIER",
+                 beforeOrderModifier);
+             InputStream replacedStream = new ReplacingInputStream(beforeReplacedStream, "AFTER_ORDER_MODIFIER",
+                 afterOrderModifier))
+        {
             // This only adds the mappings to a queue. The mappings will be available after the session factory is
             // created.
-            this.sessionFactory.getConfiguration().addInputStream(stream);
+            this.sessionFactory.getConfiguration().addInputStream(replacedStream);
         } catch (IOException e) {
             this.logger.error("Failed to close the resoure stream", e);
         }

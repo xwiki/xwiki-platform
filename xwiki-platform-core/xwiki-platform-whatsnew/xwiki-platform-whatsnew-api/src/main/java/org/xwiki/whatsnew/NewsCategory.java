@@ -19,15 +19,12 @@
  */
 package org.xwiki.whatsnew;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The different categories of news we support.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public enum NewsCategory
 {
     /**

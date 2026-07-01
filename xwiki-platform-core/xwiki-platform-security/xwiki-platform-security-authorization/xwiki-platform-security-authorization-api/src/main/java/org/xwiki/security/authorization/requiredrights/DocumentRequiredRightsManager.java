@@ -24,7 +24,6 @@ import java.util.Optional;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manager for document required rights.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.10.0RC1
  */
-@Unstable
 @Role
 public interface DocumentRequiredRightsManager
 {

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -55,7 +54,6 @@ import org.xwiki.repository.internal.XWikiRepositoryModel;
 @Component
 @Named("org.xwiki.repository.internal.resources.SearchRESTResource")
 @Path(Resources.SEARCH)
-@Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
     /**

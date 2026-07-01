@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.api;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
 
 import javax.inject.Named;
 
@@ -37,21 +40,23 @@ import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
@@ -62,9 +67,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
@@ -72,11 +79,13 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
@@ -89,6 +98,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @ComponentList({ DocumentRequiredRightsReader.class, RequiredRightClassMandatoryDocumentInitializer.class })
+@XWikiDocumentFilterUtilsComponentList
 class DocumentTest
 {
     @InjectMockitoOldcore
@@ -111,10 +121,13 @@ class DocumentTest
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @MockComponent
-    private DocumentRequiredRightsManager documentRequiredRightsManager;
+    private GeneralMailConfiguration generalMailConfiguration;
 
-    @InjectMockComponents
-    private DocumentRequiredRightsReader documentRequiredRightsReader;
+    @MockComponent
+    private SkinManager skinManager;
+
+    @MockComponent
+    private RenderingCache renderingCache;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
@@ -122,17 +135,6 @@ class DocumentTest
     @BeforeEach
     void setUp() throws AuthorizationException, ComponentLookupException
     {
-        when(this.documentRequiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
-        {
-            DocumentReference reference = invocationOnMock.getArgument(0);
-            XWikiDocument document =
-                this.oldcore.getSpyXWiki().getDocument(reference.withoutLocale(), this.oldcore.getXWikiContext());
-            if (document.isNew()) {
-                return Optional.empty();
-            }
-            return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
-        });
-
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
 
         DefaultParameterizedType currentUserReferenceResolverType =
@@ -176,7 +178,7 @@ class DocumentTest
     }
 
     @Test
-    void getObject()
+    void getObject() throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
@@ -227,6 +229,23 @@ class DocumentTest
                 assertEquals("Comment", ((BaseProperty) obj.get("comment")).getValue());
             }
         }
+    }
+
+    @Test
+    void removeAttachment() throws IOException
+    {
+        XWikiContext context = new XWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+
+        doc.setAttachment("filename.ext", new ByteArrayInputStream("content".getBytes()), context);
+
+        Document apiDocument = new Document(doc, context);
+
+        Attachment removedAttachment = apiDocument.removeAttachment("filename.ext");
+
+        assertNotNull(removedAttachment);
+        assertEquals("filename.ext", removedAttachment.getFilename());
+        assertNull(apiDocument.getAttachment("filename.ext"));
     }
 
     @Test
@@ -347,8 +366,11 @@ class DocumentTest
         xdoc.setCreatorReference(new DocumentReference("wiki1", "XWiki", "initialcreator"));
 
         xdoc.getXClass().addTextField("key", "Key", 30);
-        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
+        xdoc.setContentDirty(false);
+        // perform a fake save to ensure the xclass is set when creating the new xobject.
+        this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
+        xdoc.newXObject(xdoc.getDocumentReference(), this.oldcore.getXWikiContext());
         xdoc.setContentDirty(false);
         this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
@@ -649,5 +671,114 @@ class DocumentTest
                 document.getDocumentRevision(revision));
         }
         verify(revisionProvider).checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, documentReference, revision);
+    }
+
+    @Test
+    void getXML() throws XWikiException
+    {
+        Skin skin = mock();
+        when(this.skinManager.getCurrentSkin(anyBoolean())).thenReturn(skin);
+        when(skin.getOutputSyntax()).thenReturn(Syntax.HTML_5_0);
+        when(generalMailConfiguration.shouldObfuscate()).thenReturn(true);
+
+        XWikiDocument classDocument =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("Wiki", "XWiki", "TestClass"),
+                this.oldcore.getXWikiContext());
+        String passwordField = "secret";
+        classDocument.getXClass().addPasswordField(passwordField, "Secret Field", 20);
+        String emailField = "contact";
+        classDocument.getXClass().addEmailField(emailField, "Contact", 20);
+        String textField = "name";
+        classDocument.getXClass().addTextField(textField, "Name", 10);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        DocumentReference documentReference = new DocumentReference("Wiki", "Space", "Page");
+        String content = "content";
+        when(this.renderingCache.getRenderedContent(new DocumentReference(documentReference, Locale.ROOT), content,
+            this.oldcore.getXWikiContext())).thenReturn("Rendered content");
+        XWikiDocument xdoc = new XWikiDocument(documentReference);
+        BaseObject object = xdoc.newXObject(classDocument.getDocumentReference(), this.oldcore.getXWikiContext());
+        object.set(passwordField, "MySecret", this.oldcore.getXWikiContext());
+        object.set(emailField, "hello@example.com", this.oldcore.getXWikiContext());
+        object.set(textField, "John", this.oldcore.getXWikiContext());
+        xdoc.setContent(content);
+        long timestamp = 1740501147000L;
+        Date date = new Date(timestamp);
+        xdoc.setCreationDate(date);
+        xdoc.setContentUpdateDate(date);
+        xdoc.setDate(date);
+        Document document = new Document(xdoc, this.oldcore.getXWikiContext());
+        assertEquals(
+            """
+                <?xml version='1.1' encoding='UTF-8'?>
+                <xwikidoc version="1.7" reference="Space.Page" locale="">
+                  <web>Space</web>
+                  <name>Page</name>
+                  <language/>
+                  <defaultLanguage/>
+                  <translation>0</translation>
+                  <creator>XWiki.XWikiGuest</creator>
+                  <creationDate>1740501147000</creationDate>
+                  <author>XWiki.XWikiGuest</author>
+                  <originalMetadataAuthor>XWiki.XWikiGuest</originalMetadataAuthor>
+                  <contentAuthor>XWiki.XWikiGuest</contentAuthor>
+                  <date>1740501147000</date>
+                  <contentUpdateDate>1740501147000</contentUpdateDate>
+                  <version>1.1</version>
+                  <title/>
+                  <comment/>
+                  <minorEdit>false</minorEdit>
+                  <syntaxId>xwiki/2.1</syntaxId>
+                  <hidden>false</hidden>
+                  <content>content</content>
+                  <renderedcontent>Rendered content</renderedcontent>
+                  <object>
+                    <name>Space.Page</name>
+                    <number>0</number>
+                    <className>XWiki.TestClass</className>
+                    <guid>%s</guid>
+                    <class>
+                      <name>XWiki.TestClass</name>
+                      <customClass/>
+                      <customMapping/>
+                      <defaultViewSheet/>
+                      <defaultEditSheet/>
+                      <defaultWeb/>
+                      <nameField/>
+                      <validationScript/>
+                      <contact>
+                        <disabled>0</disabled>
+                        <name>contact</name>
+                        <number>2</number>
+                        <prettyName>Contact</prettyName>
+                        <size>20</size>
+                        <unmodifiable>0</unmodifiable>
+                        <validationRegExp>/^(([^@\\s]+)@((?:[-a-zA-Z0-9]+\\.)+[a-zA-Z]{2,}))?$/</validationRegExp>
+                        <classType>com.xpn.xwiki.objects.classes.EmailClass</classType>
+                      </contact>
+                      <name>
+                        <disabled>0</disabled>
+                        <name>name</name>
+                        <number>3</number>
+                        <prettyName>Name</prettyName>
+                        <size>10</size>
+                        <unmodifiable>0</unmodifiable>
+                        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+                      </name>
+                      <secret>
+                        <disabled>0</disabled>
+                        <name>secret</name>
+                        <number>1</number>
+                        <prettyName>Secret Field</prettyName>
+                        <size>20</size>
+                        <unmodifiable>0</unmodifiable>
+                        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
+                      </secret>
+                    </class>
+                    <property type="String">
+                      <name>John</name>
+                    </property>
+                  </object>
+                </xwikidoc>""".formatted(object.getGuid()), document.getXMLContent());
     }
 }

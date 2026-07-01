@@ -73,7 +73,12 @@ public class LoginPage extends ViewPage
             if (rememberMe) {
                 this.rememberMeCheckbox.click();
             }
+            // For some reason, the WebDriver is not always waiting for the login form to be submitted (even if there is
+            // no JavaScript involved) and the web page to be reloaded (either the same page, in case of a login error,
+            // or a different one, where the user is redirected after a successful login).
+            getDriver().addPageNotYetReloadedMarker();
             this.submitButton.click();
+            getDriver().waitUntilPageIsReloaded();
         }
     }
 
@@ -84,7 +89,7 @@ public class LoginPage extends ViewPage
 
     public boolean hasInvalidCredentialsErrorMessage()
     {
-        return getErrorMessages().contains("Error: Invalid credentials");
+        return getErrorMessages().contains("Error\nInvalid credentials");
     }
 
     /**
@@ -92,7 +97,7 @@ public class LoginPage extends ViewPage
      */
     public boolean hasCaptchaErrorMessage()
     {
-        return getErrorMessages().contains("Error: Please fill the captcha form to login.");
+        return getErrorMessages().contains("Error\nPlease fill the captcha form to login.");
     }
 
     /**
@@ -101,7 +106,7 @@ public class LoginPage extends ViewPage
     public String getErrorMessages()
     {
         StringBuilder messages = new StringBuilder();
-        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='box errormessage']"))) {
+        for (WebElement element : getDriver().findElements(By.xpath("//div[contains(@class, 'errormessage')]"))) {
             messages.append(element.getText());
         }
         return messages.toString();

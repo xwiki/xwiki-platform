@@ -31,7 +31,6 @@ import org.xwiki.ckeditor.test.po.LinkTreeElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -45,28 +44,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 15.0RC1
  * @since 14.10.3
  */
-@UITest(properties = {
-    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
-    }, extraJARs = {
-    "org.xwiki.platform:xwiki-platform-search-solr-query",
-    "org.xwiki.platform:xwiki-platform-notifications-filters-default"
-})
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+        // Solr search is used to get suggestions for the link quick action.
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    resolveExtraJARs = true
+)
 class LinkIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void beforeAll(TestUtils setup) throws Exception
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
 
         createAndLoginStandardUser(setup);
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
     }
 
     @Test
@@ -74,31 +85,27 @@ class LinkIT extends AbstractCKEditorIT
     void insertLinks(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a sub-page with an attachment, to have something to link to.
-        String attachmentName = "image.gif";
+        String attachmentName = "text.txt";
         setup.createPage(testReference, "", "");
         DocumentReference subPage = new DocumentReference("subPage", testReference.getLastSpaceReference());
         setup.createPage(subPage, "", "");
-        setup.attachFile(subPage, attachmentName,
-            getClass().getResourceAsStream("/ResourcePicker/" + attachmentName), false);
+        setup.attachFile(subPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
 
         edit(setup, testReference, false);
 
-        String spaceName = testReference.getLastSpaceReference().getParent().getName();
-        editor.getToolBar().insertOrEditLink()
-            .setResourceValue("subPage")
-            .selectPageItem(String.format("%s / insertLinks", spaceName), "subPage")
-            .submit();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        linkDialog.getResourceSuggestInput().click().waitForSuggestions().sendKeys("subPage").waitForSuggestions()
+            .selectByVisibleText("subPage");
+        linkDialog.submit();
 
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
 
-        editor.getToolBar().insertOrEditLink()
-            .setResourceType("attach")
-            .setResourceValue("image")
-            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), "image.gif")
-            .submit();
+        linkDialog = editor.getToolBar().insertOrEditLink().setResourceType("attach");
+        linkDialog.getResourceSuggestInput().sendKeys("text").waitForSuggestions().selectByVisibleText(attachmentName);
+        linkDialog.submit();
 
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@image.gif]]");
+        assertSourceEquals("[[subPage>>doc:subPage]]\n\n[[text.txt>>attach:subPage@text.txt]]");
     }
 
     @Test
@@ -129,18 +136,18 @@ class LinkIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         editor.getToolBar()
             .insertOrEditLink()
-            .setResourceValue("Foo.Bar.Buz.Test")
+            .setResourceReference("Foo.Bar.Buz.Test")
             .createLinkOfNewPage(true)
             .submit();
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
         editor.getToolBar()
             .insertOrEditLink()
-            .setResourceValue("Fa.Fi.Foo")
+            .setResourceReference("Fa.Fi.Foo")
             .createLinkOfNewPage(false)
             .submit();
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
-        LinkPickerModal linkPickerModal = linkDialog.openDocumentPicker();
+        LinkPickerModal linkPickerModal = linkDialog.openLinkPickerModal();
         LinkTreeElement tree = linkPickerModal.getTree();
         tree.waitForIt();
         assertTrue(tree.hasNewPageCreation(testReference));
@@ -153,10 +160,11 @@ class LinkIT extends AbstractCKEditorIT
         linkPickerModal.select();
         linkDialog.submit();
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:Foo.Bar.Buz.Test]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.SubPage.Another.WebHome]]");
+        assertSourceEquals("""
+            [[Test>>doc:Foo.Bar.Buz.Test]]
+
+            [[Fa.Fi.Foo>>doc:.Fa\\.Fi\\.Foo.WebHome]]
+
+            [[Another>>doc:.SubPage.Another.WebHome]]""");
     }
 }

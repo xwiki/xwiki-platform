@@ -50,13 +50,13 @@ public class RecipientConverter extends AbstractConverter<Message.RecipientType>
         Message.RecipientType recipientType;
 
         String valueAsString = value.toString();
-        if (valueAsString.equalsIgnoreCase("to")) {
+        if ("to".equalsIgnoreCase(valueAsString)) {
             recipientType = Message.RecipientType.TO;
-        } else if (valueAsString.equalsIgnoreCase("cc")) {
+        } else if ("cc".equalsIgnoreCase(valueAsString)) {
             recipientType = Message.RecipientType.CC;
-        } else if (valueAsString.equalsIgnoreCase("bcc")) {
+        } else if ("bcc".equalsIgnoreCase(valueAsString)) {
             recipientType = Message.RecipientType.BCC;
-        } else if (valueAsString.equalsIgnoreCase("newsgroups")) {
+        } else if ("newsgroups".equalsIgnoreCase(valueAsString)) {
             recipientType = MimeMessage.RecipientType.NEWSGROUPS;
         } else {
             throw new ConversionException(String.format("Cannot convert [%s] to [%s]", value,

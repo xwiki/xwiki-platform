@@ -108,7 +108,7 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
             return parameters;
         }
 
-        Map<String, String> aliasParameters = new HashMap<String, String>();
+        Map<String, String> aliasParameters = new HashMap<>();
         addMultilingualFieldAliases(fieldNames, aliasParameters, parameters);
         addTypedDynamicFieldAliases(fieldNames, aliasParameters, parameters);
 
@@ -178,7 +178,7 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      */
     public Set<String> extractFieldNames(String query)
     {
-        Set<String> fieldNames = new HashSet<String>();
+        Set<String> fieldNames = new HashSet<>();
         Matcher matcher = FIELD_PATTERN.matcher(query);
         while (matcher.find()) {
             fieldNames.add(matcher.group(1));
@@ -209,7 +209,7 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      */
     private static List<String> getSupportedLocales(SolrParams parameters)
     {
-        List<String> supportedLocalesList = new ArrayList<String>();
+        List<String> supportedLocalesList = new ArrayList<>();
         supportedLocalesList.add("_");
         String supportedLocales = parameters.get("xwiki.supportedLocales");
         if (supportedLocales != null) {

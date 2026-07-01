@@ -30,7 +30,6 @@ import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * A bridge allowing to isolate the {@link org.xwiki.component.wiki.WikiComponentManager} from the old model.
@@ -96,7 +95,6 @@ public interface WikiComponentBridge
      * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
      * @since 15.4RC1
      */
-    @Unstable
     int getRoleTypePriority(DocumentReference reference) throws WikiComponentException;
 
     /**
@@ -109,7 +107,6 @@ public interface WikiComponentBridge
      * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
      * @since 15.4RC1
      */
-    @Unstable
     int getRoleHintPriority(DocumentReference reference) throws WikiComponentException;
 
     /**

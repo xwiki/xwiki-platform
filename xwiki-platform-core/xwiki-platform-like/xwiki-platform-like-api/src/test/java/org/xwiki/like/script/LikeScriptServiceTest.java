@@ -156,7 +156,7 @@ class LikeScriptServiceTest
         assertFalse(this.likeScriptService.displayButton(entityReference));
 
         // check that this one has only be called once.
-        verify(this.authorizationManager, times(1)).hasAccess(this.likeRight, this.docUserReference, entityReference);
+        verify(this.authorizationManager).hasAccess(this.likeRight, this.docUserReference, entityReference);
     }
 
     @Test

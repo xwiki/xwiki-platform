@@ -1,0 +1,136 @@
+/*!
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## The variables defined in this file were added in XWiki 17.3.0-RC1
+## Those variables will become stable at the end of the cycle 17.
+
+######################
+## Preparation
+######################
+#set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+#if ($themeDocFullName == '')
+#set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
+#end
+#set ($themeDoc = $xwiki.getDocument($themeDocFullName))
+#set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+
+## List of all the new variables added to the CSS property set (from oldest to latest).
+## Those variables do not have a LESS variable equivalent in previous systems. They were introduced mostly to replace
+## whole mixins. There should be no overlap between this category of variables and the others.
+## List of versions where variables were introduced:
+## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
+## * 17.9.0RC1: login-form-max-width
+## * 18.0.0RC1: mark-bg, mark-highlighted-bg
+#set($newVariables = {
+"100vw": "100vw",
+"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
+"login-form-max-width": "450px",
+"font-weight-regular": 400,
+"font-weight-semibold": 700,
+"font-weight-bold": "900",
+"mark-bg": "color-mix(in srgb, var(--btn-warning-bg), white)",
+"mark-updated-bg": "color-mix(in srgb, color-mix(in srgb, var(--btn-warning-bg), var(--btn-danger-bg) 35%), white)",
+"mark-altered-bg": "color-mix(in srgb, var(--btn-danger-bg), white)",
+"mark-highlighted-bg": "var(--btn-warning-bg)"
+})
+
+## Retrieve the lists of variables
+#template('variablelist.vm')
+## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared
+## with LESS variables defined in xwiki-platform-flamingo-skin-resources -> variablesInit.vm -> initFromOldColorTheme
+## A couple variables are excluded from the set, we do not port them to CSS
+#set($excludeFromOldColorThemeMapping = ['xwiki-panel-header-bg', 'xwiki-panel-header-text'])
+#foreach($excludedVariable in $excludeFromOldColorThemeMapping)
+  #set($discard = $oldColorThemeVariables.remove($excludedVariable))
+#end
+
+## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo
+## theme editor. These mappings will not always end up in the initialization of a CSS variable.
+## If you want to update the values set for the flamingo colortheme, see the colortheme xml,
+## a source of truth shared with LESS variables, defined in xwiki-platform-flamingo-theme-ui
+## To make sure all of those variables are still available even when not set in the colortheme,
+## we make sure that they all appear in another mapping above.
+## The key is the name and the value is a type for the variable.
+
+## $xsVariablesValuesCSS is the list of all the variables set in XWiki standard for various purposes.
+## Those should all be defined in variables.less and variablesInit.vm
+## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variables.less
+
+
+## $bootstrapVariables is the list of Bootstrap variables we need to give default values for XWiki standard variables
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
+
+## We merge the four maps into one list.
+## We allow different values from different maps for the same variable. This is an extra fallback in case the first one
+## doesn't work. This could be the case for defaults that rely on other variables.
+## Values follow CSS cascading order (last one wins).
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariablesValuesCSS, $newVariables])
+
+######################
+## Generation
+######################
+
+#define($css)
+## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and
+## Units module Level 4 is accepted and supported in browsers.
+## https://drafts.csswg.org/css-values/#calc-type-checking
+@property --100vw {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+:root {
+## First, we make sure that the necessary variables from bootstrap and XS are given at least one value.
+#foreach($variableWithValue in $variableValueSets)
+  #foreach($variableName in $variableWithValue.keySet())
+    #set($value = $variableWithValue.get($variableName))
+    #if("$!value" != '')
+      --$variableName: $!value;
+    #end
+  #end
+#end
+
+## Create CSS variables for each flamingo colorTheme variable that is set.
+## Right now we have the variable type info for all of those, but we don't use those yet.
+## Those values will override anything already declared in the XS/bootstrap defaults.
+#foreach($property in $flamingoColorThemeVariables.keySet())
+#set($value = $themeDoc.getValue($property, $themeObj))
+#if("$!value" != '')
+## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
+#if($stringtool.startsWith($!value, '@'))
+#set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
+#end
+#set($propertyType = $flamingoColorThemeVariables.get($property))
+## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with
+## LESS variables. We could use the extra info we have on the variable types to use the @property syntax later.
+#if($propertyType == 'escapedText')
+--$property: "$escapetool.javascript($!value)";
+#else
+--$property: $!value;
+#end
+#end
+#end
+}
+#end
+*/$!css

@@ -74,11 +74,30 @@ public abstract class AbstractNotificationFilterLiveDataEntryStore implements Li
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
+    /**
+     * Hold information whether the LiveData is for the wiki or a user.
+     */
     protected static final class TargetInformation
     {
-        public boolean isWikiTarget;
-        public EntityReference ownerReference;
+        private boolean isWikiTarget;
+        private EntityReference ownerReference;
 
+        /**
+         * @return {@code true} if the LD is for a wiki, {@code false} if it's for a user.
+         */
+        public boolean isWikiTarget()
+        {
+            return isWikiTarget;
+        }
+
+        /**
+         * @return a {@link WikiReference} if {@link #isWikiTarget} is {@code true}, otherwise the
+         * {@link DocumentReference} of the user.
+         */
+        public EntityReference getOwnerReference()
+        {
+            return ownerReference;
+        }
     }
 
     protected Map<String, Object> getStaticListInfo(List<String> items)

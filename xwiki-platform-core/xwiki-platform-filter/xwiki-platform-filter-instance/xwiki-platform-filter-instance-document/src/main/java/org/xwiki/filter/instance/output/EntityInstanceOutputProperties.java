@@ -22,7 +22,6 @@ package org.xwiki.filter.instance.output;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.stability.Unstable;
 
 /**
  * Entity Instance output filter stream properties (shared between DocumentInstanceOutputProperties and
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.0.0RC1
  */
-@Unstable
 public class EntityInstanceOutputProperties extends InstanceOutputProperties
 {
     /**
@@ -104,7 +102,7 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
      * @return Indicate if the version related information coming from the events should be kept
      */
     @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions related informations coming from the events should be kept")
+    @PropertyDescription("Indicate if the versions related data coming from the events should be kept")
     public boolean isVersionPreserved()
     {
         return this.versionPreserved;

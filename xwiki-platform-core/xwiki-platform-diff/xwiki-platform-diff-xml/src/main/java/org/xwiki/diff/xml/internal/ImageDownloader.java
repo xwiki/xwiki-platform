@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -134,7 +135,7 @@ public class ImageDownloader
             String contentType = entity.getContentType();
             contentType = StringUtils.substringBefore(contentType, ";");
 
-            if (!StringUtils.startsWith(contentType, "image/")) {
+            if (!Strings.CS.startsWith(contentType, "image/")) {
                 throw new IOException(String.format("The content of [%s] is not an image.", uri));
             }
 

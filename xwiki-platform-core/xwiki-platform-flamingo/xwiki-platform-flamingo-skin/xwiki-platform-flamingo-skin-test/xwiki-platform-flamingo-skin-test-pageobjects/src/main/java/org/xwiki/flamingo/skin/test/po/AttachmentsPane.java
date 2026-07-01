@@ -186,7 +186,7 @@ public class AttachmentsPane extends BaseElement
      */
     public void clickHideProgress()
     {
-        this.pane.findElement(By.xpath("//a[text()='Hide upload status']")).click();
+        this.pane.findElement(By.xpath("//button[text()='Hide upload status']")).click();
     }
 
     /**

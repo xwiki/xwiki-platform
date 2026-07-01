@@ -19,8 +19,6 @@
  */
 package org.xwiki.evaluation;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception raised during evaluation of XObjects properties.
  *
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.5.5
  * @since 15.10.2
  */
-@Unstable
 public class ObjectEvaluatorException extends Exception
 {
     /**

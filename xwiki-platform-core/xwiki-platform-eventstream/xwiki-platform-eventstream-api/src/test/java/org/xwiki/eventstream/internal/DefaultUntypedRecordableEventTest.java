@@ -19,16 +19,15 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.RecordableEvent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DefaultUntypedRecordableEvent}.
@@ -36,11 +35,11 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 9.6RC1
  */
-public class DefaultUntypedRecordableEventTest
+class DefaultUntypedRecordableEventTest
 {
     private DefaultUntypedRecordableEvent defaultUntypedRecordableEvent;
 
-    private final class RandomRecordableEvent implements RecordableEvent
+    private static final class RandomRecordableEvent implements RecordableEvent
     {
         @Override
         public boolean matches(Object o)
@@ -49,52 +48,48 @@ public class DefaultUntypedRecordableEventTest
         }
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        defaultUntypedRecordableEvent = new DefaultUntypedRecordableEvent("test");
+        this.defaultUntypedRecordableEvent = new DefaultUntypedRecordableEvent("test");
     }
 
     @Test
-    public void eventType() throws Exception
+    void eventType()
     {
         DefaultUntypedRecordableEvent event = new DefaultUntypedRecordableEvent("unitTestEvent");
         assertEquals("unitTestEvent", event.getEventType());
     }
 
     @Test
-    public void matchesWithCorrectEvent() throws Exception
+    void matchesWithCorrectEvent()
     {
-        assertTrue(this.defaultUntypedRecordableEvent.matches(
-                new DefaultUntypedRecordableEvent("otherEvent")));
+        assertTrue(this.defaultUntypedRecordableEvent.matches(new DefaultUntypedRecordableEvent("otherEvent")));
     }
 
     @Test
-    public void matchesWithNullObject() throws Exception
+    void matchesWithNullObject()
     {
         assertFalse(this.defaultUntypedRecordableEvent.matches(null));
     }
 
     @Test
-    public void matchesWithIncorrectObject() throws Exception
+    void matchesWithIncorrectObject()
     {
         assertFalse(this.defaultUntypedRecordableEvent.matches(new RandomRecordableEvent()));
     }
 
     @Test
-    public void target() throws Exception
+    void target()
     {
-        HashSet<String> target = new HashSet<>();
-        target.add("a");
-        target.add("b");
-        DefaultUntypedRecordableEvent event = new DefaultUntypedRecordableEvent("unitTestEvent",
-                target);
+        Set<String> target = Set.of("a", "b");
+        DefaultUntypedRecordableEvent event = new DefaultUntypedRecordableEvent("unitTestEvent", target);
         assertEquals(target, event.getTarget());
 
         DefaultUntypedRecordableEvent event2 = new DefaultUntypedRecordableEvent("unitTestEvent");
-        assertEquals(Collections.emptySet(), event2.getTarget());
+        assertEquals(Set.of(), event2.getTarget());
 
         DefaultUntypedRecordableEvent event3 = new DefaultUntypedRecordableEvent();
-        assertEquals(Collections.emptySet(), event3.getTarget());
+        assertEquals(Set.of(), event3.getTarget());
     }
 }

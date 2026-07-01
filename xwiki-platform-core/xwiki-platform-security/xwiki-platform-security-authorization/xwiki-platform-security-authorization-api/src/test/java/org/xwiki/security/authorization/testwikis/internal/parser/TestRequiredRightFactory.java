@@ -58,7 +58,14 @@ public class TestRequiredRightFactory extends AbstractEntityFactory<TestRequired
     {
         Right right = Right.toRight(attributes.getValue("type"));
         String scopeValue = attributes.getValue("scope");
-        EntityType scope = scopeValue != null ? EntityType.valueOf(scopeValue.toUpperCase()) : EntityType.DOCUMENT;
+        EntityType scope;
+        if (scopeValue == null) {
+            scope = EntityType.DOCUMENT;
+        } else if ("farm".equalsIgnoreCase(scopeValue)) {
+            scope = null;
+        } else {
+            scope = EntityType.valueOf(scopeValue.toUpperCase());
+        }
 
         return new DefaultTestRequiredRight(right, scope, parent);
     }

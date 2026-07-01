@@ -19,19 +19,35 @@
  */
 package org.xwiki.user.internal.document;
 
+import java.util.List;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.stubbing.Answer;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.internal.MapCache;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserException;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -41,11 +57,15 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import jakarta.inject.Named;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,10 +74,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList(UserCache.class)
 class DocumentUserManagerTest
 {
     @InjectMockComponents
     private DocumentUserManager userManager;
+
+    @InjectMockComponents
+    private UserCache userCache;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -65,8 +89,32 @@ class DocumentUserManagerTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
+    private CacheManager cacheManager;
+
+    @MockComponent
+    private QueryManager queryManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
+
+    @Captor
+    private ArgumentCaptor<DocumentUserReference> documentUserReferenceCaptor;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    private MapCache<Boolean> cache = new MapCache<>();
+
+    @BeforeComponent
+    public void beforeComponent() throws Exception
+    {
+        when(this.cacheManager.<Boolean>createNewCache(any())).thenReturn(this.cache);
+    }
 
     @Test
     void exists() throws Exception
@@ -80,8 +128,9 @@ class DocumentUserManagerTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
         when(document.isNew()).thenReturn(false);
-        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
-            EntityType.SPACE)))).thenReturn(mock(BaseObject.class));
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+                .thenReturn(mock(BaseObject.class));
 
         assertTrue(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
@@ -97,8 +146,9 @@ class DocumentUserManagerTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.isNew()).thenReturn(false);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
-        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
-            EntityType.SPACE)))).thenReturn(null);
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+                .thenReturn(null);
 
         assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
@@ -161,5 +211,53 @@ class DocumentUserManagerTest
         UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
         assertEquals("Failed to determine if wiki [wiki] exists.", userException.getMessage());
         assertEquals(WikiManagerException.class, userException.getCause().getClass());
+    }
+
+    @Test
+    void hasUser() throws UserException, QueryException
+    {
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery("select doc.id from Document doc, doc.object(XWiki.XWikiUsers) as user",
+            Query.XWQL)).thenReturn(query);
+        WikiReference wikiReference = new WikiReference("wiki");
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+        assertFalse(this.cache.get(wikiReference.getName()));
+
+        verify(query).setWiki(wikiReference.getName());
+        verify(this.queryManager).createQuery(any(), any());
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+
+        verify(query).setWiki(wikiReference.getName());
+        verify(this.queryManager).createQuery(any(), any());
+
+        when(query.execute()).thenReturn(List.of(0));
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+
+        this.userCache.invalidate(wikiReference);
+
+        assertTrue(this.userManager.hasUsers(wikiReference));
+    }
+
+    @Test
+    void hasAccess()
+    {
+        when(this.documentUserReferenceSerializer.serialize(this.documentUserReferenceCaptor.capture()))
+            .then((Answer<DocumentReference>)
+                invocationOnMock -> this.documentUserReferenceCaptor.getValue().getReference());
+
+        Right mockRight = mock(Right.class);
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user1");
+        DocumentReference targetReference = new DocumentReference("xwiki", "XWiki", "user2");
+
+        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(false);
+        assertFalse(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
+
+        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(true);
+        assertTrue(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+            new DocumentUserReference(targetReference, true)));
     }
 }

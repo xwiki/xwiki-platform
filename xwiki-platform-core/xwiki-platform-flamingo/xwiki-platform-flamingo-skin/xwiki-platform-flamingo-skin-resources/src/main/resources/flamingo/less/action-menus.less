@@ -28,6 +28,8 @@
 
     &.navbar-right {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
   }
   .navbar-form {
@@ -45,6 +47,10 @@
       float: left;
       margin-left: @navbar-padding-horizontal;
       margin-right: @navbar-padding-horizontal;
+      /* Without this rule, the left navbar will cause unexpected layout shifts even when it's empty. */
+      &:not(:has(> *)) {
+        margin-top: 0;
+      }  
     }
   }
 }
@@ -128,11 +134,12 @@ li:has(+ li #tmRegister) #tmLogin {
 
   // The global search input
   #headerglobalsearchinput { // we need to be that specific to be applied
-    border-radius: 0;
+    border-radius: ~"var(--border-radius-small)";
     border: 0;
     min-width: 0;
     transition: width 300ms ease-in-out, padding 300ms ease-in-out;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
+    margin-right: @padding-small-horizontal; //small gap so the border doesn't touch the neighboring element
   }
 
   // When the global search is closed

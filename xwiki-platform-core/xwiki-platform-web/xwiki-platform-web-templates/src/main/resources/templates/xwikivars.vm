@@ -21,7 +21,7 @@
 ##!unique=request
 #template("frequentlyUsedDocs.vm")
 #set ($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
-#set ($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
+#set ($isSuperAdmin = $services.security.authorization.isSuperAdmin($xcontext.getUser()))
 ## Does the current user have edit rights on the current document
 #set ($hasEdit = $services.security.authorization.hasAccess('edit'))
 ## Does the current user have admin rights on the current document

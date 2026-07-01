@@ -39,6 +39,8 @@ public class AnnotatableViewPage extends BaseElement
     private static final String XWIKI_SYNTAX_1_WARNING =
         "Annotations are not available for pages written in XWiki/1.0 syntax.";
 
+    private static final String ANNOTATIONSLINK = "Annotationslink";
+
     private AnnotationsPane annotationsPane;
 
     private AnnotationsWindow annotationsWindow;
@@ -221,7 +223,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public void waitForAnnotationsDisplayed()
     {
-        getDriver().waitUntilElementIsVisible(By.className("annotation-marker"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-highlight"));
     }
 
     // Un-checks the "Show Annotations" check box.
@@ -238,7 +240,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public int getAnnotationCount()
     {
-        return getDriver().findElementsWithoutWaiting(By.className("annotation-marker")).size();
+        return getDriver().findElementsWithoutWaiting(By.className("annotation-highlight")).size();
     }
 
     /**
@@ -268,7 +270,7 @@ public class AnnotatableViewPage extends BaseElement
     {
         WebElement body = getDriver().findElement(By.id("body"));
         String os = System.getProperty("os.name");
-        if (os.equals("Mac OS X")) {
+        if ("Mac OS X".equals(os)) {
             body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
         } else {
             body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
@@ -321,6 +323,17 @@ public class AnnotatableViewPage extends BaseElement
      */
     public WebElement getAnnotationTextById(int id)
     {
-        return getDriver().findElement(By.cssSelector(String.format("span.annotation.ID%d", id)));
+        return getDriver().findElement(By.cssSelector(String.format("mark.annotation.ID%d", id)));
+    }
+
+    /**
+     * @return if the annotations doc extra pane is available
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean isAnnotationsDocExtraPaneAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(ANNOTATIONSLINK));
     }
 }

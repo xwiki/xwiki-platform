@@ -6,6 +6,9 @@
     ],
     "mediaType": "text/html",
     "inputFamily": "WEB",
+    "loadProperties": {
+      "FilterName": "HTML (StarWriter)"
+    },
     "storeProperties": {
       "SPREADSHEET": {
         "FilterName": "HTML (StarCalc)"

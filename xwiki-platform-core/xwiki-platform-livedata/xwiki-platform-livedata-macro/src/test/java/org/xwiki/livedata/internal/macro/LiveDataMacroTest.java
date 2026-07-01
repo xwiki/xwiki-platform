@@ -80,6 +80,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
@@ -244,7 +245,7 @@ class LiveDataMacroTest
 
         LiveDataPaginationConfiguration paginationConfiguration = new LiveDataPaginationConfiguration();
         paginationConfiguration.setMaxShownPages(10);
-        paginationConfiguration.setPageSizes(List.of(15,25,50,100));
+        paginationConfiguration.setPageSizes(List.of(15, 25, 50, 100));
         paginationConfiguration.setShowEntryRange(true);
         paginationConfiguration.setShowNextPrevious(true);
         meta.setPagination(paginationConfiguration);
@@ -292,8 +293,10 @@ class LiveDataMacroTest
     {
 
         String expected =
-            String.format("<div class=\"liveData loading\" data-config=\"%s\" "
-                + "data-config-content-trusted=\"true\"></div>",
+            String.format("""
+                    <div class="liveData loading" data-config="%s">\
+                    <script type='application/json' data-config-content-trusted="true"></script>\
+                    </div>""",
                 escapeXML(json(this.liveDataConfiguration)));
 
         List<Block> blocks =
@@ -324,13 +327,16 @@ class LiveDataMacroTest
         query.setLimit(10);
 
         LiveDataPaginationConfiguration pagination = this.liveDataConfiguration.getMeta().getPagination();
-        pagination.setPageSizes(List.of(10,15,25,50));
+        pagination.setPageSizes(List.of(10, 15, 25, 50));
         pagination.setShowPageSizeDropdown(true);
 
         this.liveDataConfiguration.getMeta().setDescription("A description");
 
-        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
-            + "data-config-content-trusted=\"true\"></div>", escapeXML(json(this.liveDataConfiguration)));
+        String expected = String.format("""
+                <div class="liveData loading" id="test" data-config="%s">\
+                <script type='application/json' data-config-content-trusted="true"></script>\
+                </div>""",
+            escapeXML(json(this.liveDataConfiguration)));
 
         LiveDataMacroParameters parameters = new LiveDataMacroParameters();
         parameters.setId("test");
@@ -385,14 +391,23 @@ class LiveDataMacroTest
         query.setLimit(10);
 
         LiveDataPaginationConfiguration pagination = this.liveDataConfiguration.getMeta().getPagination();
-        pagination.setPageSizes(List.of(10,15,25,50,100));
+        pagination.setPageSizes(List.of(10, 15, 25, 50, 100));
 
-        String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
-            + "data-config-content-trusted=\"false\"></div>", escapeXML(json(this.liveDataConfiguration)));
+        String expected = String.format("""
+                <div class="liveData loading" id="test" data-config="%s">\
+                <script type='application/json' data-config-content-trusted="false"></script>\
+                </div>""",
+            escapeXML(json(this.liveDataConfiguration)));
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, json(advancedConfig.toString()),
             this.macroTransformationContext);
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void isIsolated()
+    {
+        assertTrue(this.liveDataMacro.isExecutionIsolated(new LiveDataMacroParameters(), "test"));
     }
 
     private String json(String text)

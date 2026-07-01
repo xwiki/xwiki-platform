@@ -115,33 +115,22 @@
 
 {{velocity}}
 {{html clean="false"}}
-&lt;div class="row"&gt;
+&lt;ul class="card-list two-cols"&gt;
   #foreach ($card in $actionCards)
-    ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-      &lt;div class="clearfix visible-sm-block visible-md-block visible-lg-block"&gt;&lt;/div&gt;
-    #end
-    &lt;div class="col-xs-12 col-sm-6"&gt;
+    &lt;li class="card"&gt;
       #helpActionCard($card)
-    &lt;/div&gt;
+    &lt;/li&gt;
   #end
-&lt;/div&gt;
+&lt;/ul&gt;
 &lt;h3 id="HExamples"&gt;Examples&lt;/h3&gt;
 &lt;p&gt;Need help or confused with some of our macros? Check out their documentation and find out more about their functionality.&lt;/p&gt;
-&lt;div class="row"&gt;
+&lt;ul class="card-list three-cols"&gt;
   #foreach ($card in $exampleCards)
-    ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-      &lt;div class="clearfix visible-sm-block "&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
-      &lt;div class="clearfix visible-md-block visible-lg-block"&gt;&lt;/div&gt;
-    #end
-    &lt;div class="col-xs-12 col-sm-6 col-md-4"&gt;
+    &lt;li class="card"&gt;
       #helpExampleCard($card)
-    &lt;/div&gt;
+    &lt;/li&gt;
   #end
-&lt;/div&gt;
+&lt;/ul&gt;
 &lt;p&gt;&lt;a href="https://extensions.xwiki.org/xwiki/bin/view/Main/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro" class="wikiexternallink"&gt;$services.localization.render('help.macros.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>

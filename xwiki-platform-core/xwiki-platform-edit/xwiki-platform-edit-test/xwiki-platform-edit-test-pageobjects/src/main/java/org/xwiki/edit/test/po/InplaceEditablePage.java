@@ -36,6 +36,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
+    private static final By TITLE_INPUT = By.id("document-title-input");
+
     @FindBy(id = "commentinput")
     private WebElement versionSummaryInput;
 
@@ -97,7 +99,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage setDocumentTitle(String title)
     {
-        WebElement titleInput = getDriver().findElement(By.id("document-title-input"));
+        WebElement titleInput = getDriver().findElement(TITLE_INPUT);
         titleInput.clear();
         titleInput.sendKeys(title);
         return this;
@@ -106,13 +108,13 @@ public class InplaceEditablePage extends ViewPage
     @Override
     public String getDocumentTitle()
     {
-        List<WebElement> titleInput = getDriver().findElementsWithoutWaiting(By.id("document-title-input"));
+        List<WebElement> titleInput = getDriver().findElementsWithoutWaiting(TITLE_INPUT);
         if (titleInput.isEmpty()) {
             // View mode.
             return super.getDocumentTitle();
         } else {
             // Edit (in-place) mode.
-            return titleInput.get(0).getAttribute("value");
+            return titleInput.get(0).getDomProperty("value");
         }
     }
 
@@ -130,7 +132,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public String getDocumentTitleValidationMessage()
     {
-        return getDriver().findElement(By.id("document-title-input")).getDomProperty("validationMessage");
+        return getDriver().findElement(TITLE_INPUT).getDomProperty("validationMessage");
     }
 
     /**
@@ -138,7 +140,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public String getDocumentTitlePlaceholder()
     {
-        return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+        return getDriver().findElement(TITLE_INPUT).getDomAttribute("placeholder");
     }
 
     /**

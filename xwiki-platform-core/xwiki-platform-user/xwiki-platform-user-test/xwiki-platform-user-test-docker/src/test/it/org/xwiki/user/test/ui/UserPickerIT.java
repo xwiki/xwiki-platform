@@ -70,7 +70,7 @@ public class UserPickerIT
         SuggestInputElement userPicker =
             createUserPicker(setup, testReference, true, Collections.singletonMap("id", "testAuthor"));
 
-        List<SuggestionElement> suggestions = userPicker.sendKeys("ma").waitForSuggestions().getSuggestions();
+        List<SuggestionElement> suggestions = userPicker.sendKeys("ma").waitForNonTypedSuggestions().getSuggestions();
         assertEquals(2, suggestions.size());
         assertEquals("Iasi, Romania", suggestions.get(0).getHint());
         assertFalse(suggestions.get(1).hasHint());

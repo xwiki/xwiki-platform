@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Nazwa
 extension.repository.summary=skrót
 extension.repository.type=rodzaj
@@ -49,5 +49,34 @@ extension.repository.rating=wskaźnik
 extension.repository.installedCount=instaluje
 
 ## Administration UI
-admin.repository=Repozytorium Rozszerzeń</content>
+admin.repository=Repozytorium Rozszerzeń
+
+## Support
+repository.support.createsupporter=Zarejestruj się
+
+## Supporters
+repository.supporter.sheet.description=Ta strona kontroluje sposób wyświetlania stron ExtensionSupporter zarówno w trybie widoku, jak i edycji.
+repository.supporter.sheet.noObject=Bieżąca strona nie posiada oczekiwanego obiektu ExtensionSupporter.
+repository.supporter.sheet.createplan=Dodaj
+repository.supporter.sheet.plans=Plany
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Nazwa
+ExtensionCode.ExtensionSupporterClass_summary=Podsumowanie
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=Email
+ExtensionCode.ExtensionSupporterClass_content=Szczegóły
+ExtensionCode.ExtensionSupporterClass_active=Aktywny
+
+## Support plans
+repository.supportplan.sheet.description=Ta strona kontroluje sposób wyświetlania stron ExtensionSupportPlan zarówno w trybie widoku, jak i edycji.
+repository.supportplan.sheet.noObject=Bieżąca strona nie ma oczekiwanego obiektu ExtensionSupportPlan.
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Nazwa
+ExtensionCode.ExtensionSupportPlanClass_supporter=Wspierający
+ExtensionCode.ExtensionSupportPlanClass_summary=Podsumowanie
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Szczegóły
+ExtensionCode.ExtensionSupportPlanClass_active=Aktywny
+ExtensionCode.ExtensionSupportPlanClass_paying=Płacąc
+</content>
 </xwikidoc>

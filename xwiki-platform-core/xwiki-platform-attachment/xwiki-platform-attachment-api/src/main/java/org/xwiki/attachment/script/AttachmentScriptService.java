@@ -40,13 +40,12 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.AUTO_REDIRECT;
 import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.DESTINATION;
 import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.UPDATE_REFERENCES;
@@ -168,7 +167,6 @@ public class AttachmentScriptService implements ScriptService
      * @return the current configuration for attachments
      * @since 16.3.0RC1
      */
-    @Unstable
     public AttachmentConfiguration getConfiguration()
     {
         return this.attachmentConfiguration;

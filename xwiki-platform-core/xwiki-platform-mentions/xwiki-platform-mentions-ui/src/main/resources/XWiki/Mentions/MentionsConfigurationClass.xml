@@ -76,6 +76,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </quoteActivated>
+    <selfMentionsForeground>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>selfMentionsForeground</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Self Mentions foreground</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </selfMentionsForeground>
     <selfMentionsColor>
       <customDisplay/>
       <disabled>0</disabled>

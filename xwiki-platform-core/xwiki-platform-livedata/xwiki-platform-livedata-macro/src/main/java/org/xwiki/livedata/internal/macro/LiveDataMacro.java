@@ -78,4 +78,10 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     {
         return false;
     }
+
+    @Override
+    public boolean isExecutionIsolated(LiveDataMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

@@ -20,6 +20,7 @@
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -70,6 +71,9 @@ class ConfigurableClassRequiredRightsAnalyzerTest
     @MockComponent
     @Named("stringCode")
     private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
+
+    @InjectMockComponents
+    private ObjectPropertyRequiredRightAnalyzer objectPropertyRequiredRightAnalyzer;
 
     @InjectMockComponents
     private ConfigurableClassRequiredRightsAnalyzer configurableClassRequiredRightsAnalyzer;
@@ -137,6 +141,8 @@ class ConfigurableClassRequiredRightsAnalyzerTest
         when(headingField.getReference()).thenReturn(this.headingFieldReference);
         when(headingField.getValue()).thenReturn(heading);
         when(result.getField(HEADING)).thenReturn(headingField);
+
+        when(result.getPropertyList()).thenReturn(Set.of(CODE_TO_EXECUTE, HEADING));
 
         return result;
     }

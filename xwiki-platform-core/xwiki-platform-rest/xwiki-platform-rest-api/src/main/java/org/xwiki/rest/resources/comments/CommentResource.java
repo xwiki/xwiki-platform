@@ -35,6 +35,8 @@ import org.xwiki.rest.model.jaxb.Comment;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/comments/{id}")
 public interface CommentResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Comment getComment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

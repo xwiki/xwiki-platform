@@ -1,3 +1,4 @@
+org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider
 org.xwiki.model.internal.reference.DeprecatedDefaultReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.DeprecatedDefaultReferenceDocumentReferenceResolver2
 org.xwiki.model.internal.reference.DeprecatedDefaultReferenceEntityReferenceResolver
@@ -19,3 +20,4 @@ org.xwiki.model.internal.reference.DeprecatedLocalReferenceEntityReferenceSerial
 org.xwiki.model.internal.reference.DeprecatedLocalReferenceEntityReferenceSerializer2
 org.xwiki.model.internal.reference.DeprecatedLocalStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.DeprecatedRelativeStringEntityReferenceResolver
+500:org.xwiki.model.script.LegacyModelScriptService

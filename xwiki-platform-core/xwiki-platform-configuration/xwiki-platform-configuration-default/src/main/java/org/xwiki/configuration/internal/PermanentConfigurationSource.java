@@ -37,7 +37,6 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.environment.Environment;
@@ -53,7 +52,7 @@ import org.xwiki.environment.Environment;
 @Component
 @Named("permanent")
 @Singleton
-public class PermanentConfigurationSource extends CommonsConfigurationSource implements Initializable
+public class PermanentConfigurationSource extends AbstractCommonsConfigurationSource
 {
     private static final String XWIKI_PROPERTIES_FILE = "configuration.properties";
 
@@ -68,6 +67,8 @@ public class PermanentConfigurationSource extends CommonsConfigurationSource imp
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         setConfiguration(loadConfiguration());
     }
 

@@ -118,7 +118,7 @@ public class WysiwygHTMLCleaner implements HTMLCleaner
         HTMLCleanerConfiguration configuration = this.defaultHtmlCleaner.getDefaultConfiguration();
 
         // Add office cleaning filters after the default filters.
-        List<HTMLFilter> filters = new ArrayList<HTMLFilter>(configuration.getFilters());
+        List<HTMLFilter> filters = new ArrayList<>(configuration.getFilters());
         filters.addAll(Arrays.asList(
             this.stripperFilter,
             this.styleFilter,

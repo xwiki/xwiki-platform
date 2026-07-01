@@ -34,8 +34,9 @@
       // Note that $resource may be initialized after its first use, but the chances are very low because $resource is
       // used in a dialog (e.g. insert link) that is opened after the editor is ready, and the resource picker code is
       // normally bundled with the code of this plugin so there no need for additional HTTP request to bring the code.
-      require(['resource', 'resourcePicker.bundle'], function () {
+      require(['xwiki-wysiwyg-resource', 'xwiki-wysiwyg-resource-picker-bundle'], function () {
         $resource = arguments[0];
+        Object.assign(CKEDITOR.plugins.xwikiResource, $resource);
       });
     },
 
@@ -45,7 +46,7 @@
         // We use the source document to compute the resource dispatcher URL because the resource reference can be
         // relative and thus it needs to be resolved relative to the edited document.
         dispatcher: editor.config.sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.ResourceDispatcher',
+          sheet: 'XWiki.WYSIWYG.ResourceDispatcher',
           outputSyntax: 'plain',
           language: editor.getContentLocale()
         }))
@@ -140,7 +141,7 @@
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');
-          var resourceReferenceInput = this.getElement().findOne('input.resourceReference');
+          var resourceReferenceInput = this.getElement().findOne('.ts-control > input');
           var tabIndex = this.tabIndex;
           [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
@@ -155,28 +156,65 @@
               dialog._.currentFocusIndex = this._focusable.focusIndex;
             });
           }, this.getDialog());
-          // Fix reference input id.
-          var id = CKEDITOR.tools.getNextId();
-          resourceReferenceInput.setAttribute('id', id);
+          // Fix the binding between the label and the input.
+          let id = resourceReferenceInput.getAttribute('id');
+          if (!id) {
+            id = CKEDITOR.tools.getNextId();
+            resourceReferenceInput.setAttribute('id', id);
+          }
           this.getElement().findOne('label').setAttribute('for', id);
         },
         validate: function() {
           var resourceReference = this.getValue();
+          var resourceTypeConfig = $resource.types[resourceReference.type] || {};
           if (resourceReference.reference === '') {
             // Check if the selected resource type supports empty references.
-            var resourceTypeConfig = $resource.types[resourceReference.type] || {};
             if (resourceTypeConfig.allowEmptyReference !== true) {
               return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
                 this.getLabelElement().getText());
             }
+          } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
+            return this.validateInput(resourceReference);
           }
           return true;
         },
+        validateInput: function(resourceReference) {
+          if (!this.validationRequest) {
+            // Trigger a new validation.
+            this.validationRequest = this.validateAsync(resourceReference).always(() => {
+              // Re-submit the dialog after the current event is handled.
+              setTimeout(() => {
+                this.getDialog().click('ok');
+              }, 0);
+            });
+            return false;
+          } else if (this.validationRequest.state() === 'pending') {
+            // Block the submit while the validation takes place.
+            return false;
+          } else {
+            // Trigger a new validation next time validate() is called.
+            delete this.validationRequest;
+            if (!this.validationRequestResult) {
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
+            }
+          }
+        },
+        validateAsync(resourceReference) {
+          const serviceReference = XWiki.Model.resolve('XWiki.WYSIWYG.LinkNameStrategyHelper',
+            XWiki.EntityType.DOCUMENT, XWiki.currentDocument.documentReference);
+          return $.post(new XWiki.Document(serviceReference).getURL('get'), {
+            outputSyntax: 'plain',
+            input: resourceReference.reference,
+            action: 'validate'
+          }).done(data => {
+            this.validationRequestResult = data.validated;
+          }).fail(error => {
+            console.error("Error while loading validation link response", error);
+            this.validationRequestResult = false;
+          });
+        },
         getValue: function() {
           var resourcePickerInput = this.getResourcePickerInput();
-          // Make sure the resource picker has updated the resource picker input. This is needed in Internet Explorer
-          // where the dialog buttons are not selectable and so the change event is not fired before the click event.
-          $(resourcePickerInput.$).trigger('beforeGetValue');
           var serializedResourceReference = resourcePickerInput.getValue();
           var separatorIndex = serializedResourceReference.indexOf(':');
           var resourceReference = {
@@ -188,15 +226,15 @@
             // Preserve the typed field if the resource type and reference have not changed.
             resourceReference.typed = this.selectedResource.reference.typed;
           }
+          resourceReference.notSelected = !this.selectedResource ||
+            this.selectedResource.reference.reference !== resourceReference.reference;
           return resourceReference;
         },
         setValue: function(resourceReference) {
           // Reset the resource picker if no resource reference is provided.
           resourceReference = resourceReference || {
             type: this.resourceTypes[0],
-            reference: '',
-            // Make sure the picker doesn't try to resolve the empty reference.
-            isNew: true
+            reference: ''
           };
           var serializedResourceReference = (resourceReference.type || '') + ':' + (resourceReference.reference || '');
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {

@@ -20,7 +20,6 @@
 package org.xwiki.diff.xml;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration for the data URI converter in the XML diff module.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.6
  * @version $Id$
  */
-@Unstable
 @Role
 public interface XMLDiffDataURIConverterConfiguration
 {

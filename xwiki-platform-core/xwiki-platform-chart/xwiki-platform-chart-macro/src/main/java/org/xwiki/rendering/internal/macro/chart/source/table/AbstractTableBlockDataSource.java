@@ -19,9 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -187,7 +185,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         datasetBuilder.setNumberOfRows(endRow - startRow + 1);
 
         if (startColumn > 0) {
-            Set<String> rowKeySet = new HashSet<String>();
             for (int i = startRow; i <= endRow; i++) {
                 TableRowBlock tableRow = (TableRowBlock) tableBlock.getChildren().get(i);
                 String key = cellContentAsString((TableCellBlock) tableRow.getChildren().get(startColumn - 1));

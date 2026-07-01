@@ -162,7 +162,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         Collection<String> keys = this.mappingCache.get(documentReferenceString);
 
         if (keys == null) {
-            keys = new HashSet<String>();
+            keys = new HashSet<>();
             this.mappingCache.set(documentReferenceString, keys);
         }
 

@@ -31,20 +31,29 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 8.1M2
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface EntityReferenceConstants
 {
     /**
      * The hierarchy of Entity Types.
-     * 
-     * @deprecated since 10.6RC1, use {@link EntityType#getAllowedParents()} instead
+     *
+     * @deprecated use {@link EntityType#getAllowedParents()} instead
      */
-    @Deprecated
-    Map<EntityType, List<EntityType>> PARENT_TYPES = new EnumMap<EntityType, List<EntityType>>(EntityType.class)
+    @Deprecated(since = "10.6RC1")
+    Map<EntityType, List<EntityType>> PARENT_TYPES = createParentTypes();
+
+    /**
+     * Creates the parent types map.
+     *
+     * @return the parent types map
+     */
+    private static Map<EntityType, List<EntityType>> createParentTypes()
     {
-        {
-            for (EntityType type : EntityType.values()) {
-                put(type, type.getAllowedParents());
-            }
+        Map<EntityType, List<EntityType>> map = new EnumMap<>(EntityType.class);
+        for (EntityType type : EntityType.values()) {
+            map.put(type, type.getAllowedParents());
         }
-    };
+        return map;
+    }
 }

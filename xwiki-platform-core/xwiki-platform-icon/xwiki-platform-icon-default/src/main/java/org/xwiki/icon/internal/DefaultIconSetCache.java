@@ -65,7 +65,7 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     {
         try {
             CacheConfiguration configuration = new CacheConfiguration(ICON_SET_CACHE_ID);
-            CacheFactory cacheFactory = cacheManager.getCacheFactory();
+            CacheFactory cacheFactory = this.cacheManager.getCacheFactory();
             this.cache = cacheFactory.newCache(configuration);
         } catch (ComponentLookupException | CacheException e) {
             throw new InitializationException("Failed to initialize the IconSet Cache.", e);
@@ -80,7 +80,7 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     @Override
     public IconSet get(String name)
     {
-        return cache.get(getKeyFromName(name));
+        return this.cache.get(getKeyFromName(name));
     }
 
     @Override
@@ -92,13 +92,13 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     @Override
     public IconSet get(DocumentReference documentReference)
     {
-        return cache.get(getKeyFromDocument(documentReference));
+        return this.cache.get(getKeyFromDocument(documentReference));
     }
 
     @Override
     public void put(String name, IconSet iconSet)
     {
-        cache.set(getKeyFromName(name), iconSet);
+        this.cache.set(getKeyFromName(name), iconSet);
     }
 
     @Override
@@ -110,25 +110,25 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     @Override
     public void put(DocumentReference documentReference, IconSet iconSet)
     {
-        cache.set(getKeyFromDocument(documentReference), iconSet);
+        this.cache.set(getKeyFromDocument(documentReference), iconSet);
     }
 
     @Override
     public void clear()
     {
-        cache.removeAll();
+        this.cache.removeAll();
     }
 
     @Override
     public void clear(DocumentReference documentReference)
     {
-        cache.remove(getKeyFromDocument(documentReference));
+        this.cache.remove(getKeyFromDocument(documentReference));
     }
 
     @Override
     public void clear(String name)
     {
-        cache.remove(getKeyFromName(name));
+        this.cache.remove(getKeyFromName(name));
     }
 
     @Override
@@ -144,6 +144,6 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
 
     private String getKeyFromDocument(DocumentReference docRef)
     {
-        return DOCUMENT_SUFFIX  + entityReferenceSerializer.serialize(docRef);
+        return DOCUMENT_SUFFIX  + this.entityReferenceSerializer.serialize(docRef);
     }
 }

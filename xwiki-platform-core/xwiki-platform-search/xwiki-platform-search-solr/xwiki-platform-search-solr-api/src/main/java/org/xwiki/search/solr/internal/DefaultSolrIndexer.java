@@ -19,17 +19,22 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
@@ -49,6 +54,7 @@ import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -57,11 +63,12 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
-import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
+import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.store.ReadyIndicator;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
@@ -232,33 +239,49 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 }
 
                 try {
-                    switch (queueEntry.operation) {
-                        case READY_MARKER:
-                            queueEntry.readyIndicator.switchToIndexQueue();
-                            DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
-                            break;
-                        case INDEX:
-                            Iterable<EntityReference> references = retrieveReferences(queueEntry);
-
-                            for (EntityReference reference : references) {
-                                indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
-                            }
-                            break;
-                        default:
-                            if (queueEntry.recurse) {
-                                indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                    queueEntry.operation));
-                            } else if (queueEntry.reference != null) {
-                                indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
-                            }
-                    }
+                    dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
                     logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
                         queueEntry.reference, e);
+                } finally {
+                    // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
+                    // waitReady() which does not increment pendingResolveItems.
+                    if (queueEntry.operation != IndexOperation.READY_MARKER) {
+                        DefaultSolrIndexer.this.pendingResolveItems.decrementAndGet();
+                    }
                 }
             }
 
             logger.debug("Stop SOLR resolver thread");
+        }
+
+        private void dispatchQueueEntry(ResolveQueueEntry queueEntry)
+            throws SolrIndexerException, InterruptedException
+        {
+            switch (queueEntry.operation) {
+                case READY_MARKER:
+                    queueEntry.readyIndicator.switchToIndexQueue();
+                    DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
+                    break;
+                case INDEX:
+                    Iterable<EntityReference> references = retrieveReferences(queueEntry);
+
+                    for (EntityReference reference : references) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(reference),
+                            queueEntry.operation));
+                    }
+                    break;
+                default:
+                    if (queueEntry.recurse) {
+                        indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                            queueEntry.operation));
+                    } else if (queueEntry.reference != null) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(queueEntry.reference),
+                            queueEntry.operation));
+                    }
+            }
         }
 
         private Iterable<EntityReference> retrieveReferences(ResolveQueueEntry queueEntry) throws SolrIndexerException
@@ -349,6 +372,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private Provider<XWikiContext> xWikiContextProvider;
 
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
+
     /**
      * The queue of index operation to perform.
      */
@@ -358,6 +384,16 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * The queue of resolve references and add them to the index queue.
      */
     private BlockingQueue<ResolveQueueEntry> resolveQueue;
+
+    /**
+     * The executor for Solr client operations.
+     */
+    private ExecutorService solrClientExecutor;
+
+    /**
+     * Future to wait on the last commit operation.
+     */
+    private Future<Void> commitFuture;
 
     /**
      * Thread in which the indexUpdater will be executed.
@@ -382,6 +418,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private final AtomicLong resolveQueueRemovalCounter = new AtomicLong();
 
     /**
+     * Tracks the number of items currently waiting in or actively being processed by the resolver — i.e. items that
+     * have been submitted via {@link #addToQueue} but whose resolved references have not yet been fully placed into
+     * the index queue. Incrementing before the {@link #resolveQueue} put and decrementing only after all resolved
+     * references have been put into {@link #indexQueue} prevents {@link #getQueueSize()} from transiently returning
+     * zero while the resolver is in the middle of a database look-up.
+     */
+    private final AtomicInteger pendingResolveItems = new AtomicInteger();
+
+    /**
      * Indicate of the component has been disposed.
      */
     private boolean disposed;
@@ -391,12 +436,31 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private volatile int batchSize;
 
+    /**
+     * The length of the not yet sent batch in characters.
+     */
+    private int batchLength;
+
+    /**
+     * The size of the batch that is currently being sent and committed.
+     */
+    private volatile int committingBatchSize;
+
     @Override
     public void initialize() throws InitializationException
     {
         // Initialize the queues before starting the threads.
         this.resolveQueue = new LinkedBlockingQueue<>();
         this.indexQueue = new LinkedBlockingQueue<>(this.configuration.getIndexerQueueCapacity());
+
+        // Launch the Solr client executor.
+        this.solrClientExecutor = Executors.newSingleThreadExecutor(r -> {
+            Thread thread = new Thread(r);
+            thread.setName("XWiki Solr client thread");
+            thread.setDaemon(true);
+            thread.setPriority(Thread.NORM_PRIORITY - 1);
+            return thread;
+        });
 
         // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
@@ -424,6 +488,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         for (ResolveQueueEntry entry = this.resolveQueue.poll(); entry != null; entry = this.resolveQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
                 entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+            } else if (entry.operation != IndexOperation.READY_MARKER) {
+                this.pendingResolveItems.decrementAndGet();
             }
         }
         this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
@@ -480,17 +546,18 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private boolean processBatch(IndexQueueEntry queueEntry)
     {
-        int length = 0;
+        List<SolrInputDocument> solrDocuments = new ArrayList<>();
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             this.indexQueueRemovalCounter.incrementAndGet();
 
             if (batchEntry == INDEX_QUEUE_ENTRY_STOP) {
+                // Handle the shutdown of the executor here to avoid that the executor is shut down before the batch
+                // processing finished.
+                this.solrClientExecutor.shutdown();
                 // Discard the current batch and stop the indexing thread.
                 return false;
             }
-
-            IndexOperation operation = batchEntry.operation;
 
             // For the current contiguous operations queue, group the changes
             try {
@@ -499,24 +566,28 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
                 xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
 
-                switch (operation) {
+                switch (batchEntry.operation) {
                     case INDEX:
-                        LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
+                        XWikiSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                         if (solrDocument != null) {
-                            solrInstance.add(solrDocument);
-                            length += solrDocument.getLength();
+                            solrDocuments.add(solrDocument);
+                            this.batchLength += solrDocument.getLength();
                             ++this.batchSize;
                         }
                         break;
                     case DELETE:
+                        // Ensure that all queued additions are processed before any deletions are processed.
+                        flushDocuments(solrDocuments);
                         applyDeletion(batchEntry);
 
                         ++this.batchSize;
                         break;
                     case READY_MARKER:
-                        commit();
-                        batchEntry.readyIndicator.complete(null);
-                        length = 0;
+                        commit(solrDocuments);
+                        // Add the completion of the ready indicator to the same queue to ensure that it is processed
+                        // after the commit.
+                        IndexQueueEntry finalBatchEntry = batchEntry;
+                        this.solrClientExecutor.execute(() -> finalBatchEntry.readyIndicator.complete(null));
                         break;
                     default:
                         // Do nothing.
@@ -529,48 +600,92 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
-            if (shouldCommit(length, this.batchSize)) {
-                commit();
-                length = 0;
+            if (shouldCommit(this.batchLength, this.batchSize)) {
+                commit(solrDocuments);
             }
         }
 
         // Commit what's left
         if (this.batchSize > 0) {
-            commit();
+            commit(solrDocuments);
         }
 
         return true;
     }
 
-    private void applyDeletion(IndexQueueEntry queueEntry) throws SolrServerException, IOException, SolrIndexerException
+    private void applyDeletion(IndexQueueEntry queueEntry) throws SolrIndexerException
     {
-        if (queueEntry.reference == null) {
-            solrInstance.deleteByQuery(queueEntry.deleteQuery);
-        } else {
-            solrInstance.delete(this.solrRefereceResolver.getId(queueEntry.reference));
+        String id = queueEntry.reference == null ? null : this.solrRefereceResolver.getId(queueEntry.reference);
+        this.solrClientExecutor.execute(() -> {
+            try {
+                if (id == null) {
+                    this.solrInstance.deleteByQuery(queueEntry.deleteQuery);
+                } else {
+                    this.solrInstance.delete(id);
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to delete document [{}] from the Solr server", queueEntry, e);
+            }
+        });
+    }
+
+    private void flushDocuments(List<SolrInputDocument> documents)
+    {
+        try {
+            // Copy the documents to flush to a new list so that we can clear the original list without affecting the
+            // documents that are being added to the Solr server.
+            List<SolrInputDocument> documentsToFlush = new ArrayList<>(documents);
+            this.solrClientExecutor.execute(() -> {
+                try {
+                    this.solrInstance.add(documentsToFlush);
+                } catch (Exception e) {
+                    this.logger.error("Failed to add documents to the Solr server", e);
+                }
+            });
+        } finally {
+            // Clear the list of documents even when adding them failed to avoid leaking memory and to avoid
+            // re-submitting the same documents to the Solr server multiple times.
+            documents.clear();
         }
     }
 
     /**
      * Commit.
      */
-    private void commit()
+    private void commit(List<SolrInputDocument> documents)
     {
-        try {
-            solrInstance.commit();
-        } catch (Exception e) {
-            this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
-
+        flushDocuments(documents);
+        if (this.commitFuture != null) {
             try {
-                solrInstance.rollback();
-            } catch (Exception ex) {
-                // Just log the failure.
-                this.logger.error("Failed to rollback index changes.", ex);
+                Uninterruptibles.getUninterruptibly(this.commitFuture);
+            } catch (ExecutionException e) {
+                this.logger.error("Failed to commit index changes to the Solr server", e);
             }
         }
 
+        // At this point, we can be sure that there is no more commit in the queue - so we can safely store the size
+        // of the next commit.
+        this.committingBatchSize = this.batchSize;
+        this.commitFuture = this.solrClientExecutor.submit(() -> {
+            try {
+                this.solrInstance.commit();
+            } catch (Exception e) {
+                this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
+
+                try {
+                    this.solrInstance.rollback();
+                } catch (Exception ex) {
+                    // Just log the failure.
+                    this.logger.error("Failed to rollback index changes.", ex);
+                }
+            }
+
+            this.committingBatchSize = 0;
+
+            return null;
+        });
         this.batchSize = 0;
+        this.batchLength = 0;
     }
 
     /**
@@ -599,7 +714,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      * @throws ExecutionContextException
      */
-    private LengthSolrInputDocument getSolrDocument(EntityReference reference)
+    private XWikiSolrInputDocument getSolrDocument(EntityReference reference)
         throws SolrIndexerException, IllegalArgumentException, ExecutionContextException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
@@ -663,10 +778,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
         if (!this.disposed) {
+            // Increment before the put so that getQueueSize() never transiently returns zero while the resolver is
+            // consuming this entry from resolveQueue but has not yet placed resolved references into indexQueue.
+            this.pendingResolveItems.incrementAndGet();
             // Don't block because the capacity of the resolver queue is not limited.
             try {
-                this.resolveQueue.put(new ResolveQueueEntry(reference, recurse, operation));
+                this.resolveQueue.put(
+                    new ResolveQueueEntry(this.entityReferenceFactory.getReference(reference), recurse, operation));
             } catch (InterruptedException e) {
+                this.pendingResolveItems.decrementAndGet();
                 this.logger.error("Failed to add reference [{}] to Solr indexing queue", reference, e);
             }
         }
@@ -675,7 +795,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public int getQueueSize()
     {
-        return this.indexQueue.size() + this.resolveQueue.size() + this.batchSize;
+        return this.indexQueue.size() + this.pendingResolveItems.get() + this.batchSize + this.committingBatchSize;
     }
 
     @Override

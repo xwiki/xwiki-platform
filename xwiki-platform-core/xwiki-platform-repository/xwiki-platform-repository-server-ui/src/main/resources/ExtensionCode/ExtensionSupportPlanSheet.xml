@@ -42,16 +42,63 @@
 #_sheetInit('ExtensionCode.ExtensionSupportPlanClass', 'repository.supportplan')
 {{html wiki="true" clean="false"}}
 &lt;div class="xform"&gt;
-  &lt;dl&gt;
-    #_formProperty($object, 'name')
-    #_formProperty($object, 'supporter')
-    #_formProperty($object, 'summary')
-    #_formProperty($object, 'url')
-    #_formProperty($object, 'content')
-    #_formProperty($object, 'paying')
-    #_formProperty($object, 'active')
-  &lt;/dl&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'name')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'supporter')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'summary')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'url')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'paying')&lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-4 col-sm-6"&gt;
+      &lt;dl&gt;#_formProperty($object, 'active')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+      &lt;dl&gt;#_formProperty($object, 'content')&lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
 &lt;/div&gt;
 {{/html}}
+
+=={{translation key="repository.supportplan.sheet.supportedExtensions"/}}==
+
+{{liveData
+  id="supportedExtensions"
+  source="liveTable"
+  properties="name,summary,category,authors,doc.creationDate,doc.date,supportPlans"
+  sourceParameters="translationPrefix=extension.repository.&amp;className=ExtensionCode.ExtensionClass&amp;supportPlans=${escapetool.url($doc.fullName)}"
+  sort="name:asc"
+}}
+{
+  "meta": {
+    "propertyDescriptors": [
+      {
+        "id": "name",
+        "displayer": {
+          "id": "link",
+          "propertyHref": "doc.url"
+        }
+      },
+      {
+        "id": "supportPlans",
+        "type": "hidden",
+        "visible": false
+      }
+    ]
+  }
+}
+{{/liveData}}
 {{/velocity}}</content>
 </xwikidoc>

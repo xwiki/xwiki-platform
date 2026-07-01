@@ -19,17 +19,16 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link AbstractNotificationPreference}.
@@ -37,11 +36,11 @@ import static org.junit.Assert.assertEquals;
  * @since 9.6RC1
  * @version $Id$
  */
-public class AbstractNotificationPreferenceTest
+class AbstractNotificationPreferenceTest
 {
     private class NotificationPreferenceImplementation extends AbstractNotificationPreference
     {
-        public NotificationPreferenceImplementation(boolean isNotificationEnabled, NotificationFormat format,
+        NotificationPreferenceImplementation(boolean isNotificationEnabled, NotificationFormat format,
                 NotificationPreferenceCategory category, Date startDate, String providerHint,
                 Map<NotificationPreferenceProperty, Object> properties)
         {
@@ -50,14 +49,14 @@ public class AbstractNotificationPreferenceTest
     }
 
     @Test
-    public void testPublicGetters() throws Exception
+    void publicGetters()
     {
         Date testDate = new Date();
 
         NotificationPreference testPreference = new NotificationPreferenceImplementation(
                 true, NotificationFormat.ALERT, NotificationPreferenceCategory.SYSTEM,
                 testDate, "userProfile",
-                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "eventType"));
+                Map.of(NotificationPreferenceProperty.EVENT_TYPE, "eventType"));
 
         assertEquals("eventType", testPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
 

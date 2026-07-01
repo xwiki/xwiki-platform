@@ -19,22 +19,85 @@
  */
 package org.xwiki.container.servlet;
 
+import java.util.Enumeration;
+
+import jakarta.servlet.http.HttpSession;
+
+import org.xwiki.container.Request;
 import org.xwiki.container.Session;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+/**
+ * This is the implementation of {@link Request} for {@link HttpSession}.
+ * 
+ * @version $Id$
+ */
 public class ServletSession implements Session
 {
-    private HttpSession httpSession;
+    private final HttpSession httpSession;
 
-    public ServletSession(HttpServletRequest request)
+    /**
+     * @param request the servlet request
+     * @deprecated use {@link #ServletSession(HttpSession)} instead
+     */
+    @Deprecated(since = "17.0.0RC1")
+    public ServletSession(javax.servlet.http.HttpServletRequest request)
     {
-        this.httpSession = request.getSession(true);
+        this(JakartaServletBridge.toJakarta(request.getSession(true)));
     }
 
-    public HttpSession getHttpSession()
+    /**
+     * @param session the Servlet session
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public ServletSession(HttpSession session)
+    {
+        this.httpSession = session;
+    }
+
+    /**
+     * @return the current Servlet session
+     * @deprecated use {@link #getSession()} instead
+     */
+    @Deprecated(since = "17.0.0RC1")
+    public javax.servlet.http.HttpSession getHttpSession()
+    {
+        return JakartaServletBridge.toJavax(this.httpSession);
+    }
+
+    /**
+     * @return the current Servlet session
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public HttpSession getSession()
     {
         return this.httpSession;
+    }
+
+    @Override
+    public Object getAttribute(String name)
+    {
+        return this.httpSession.getAttribute(name);
+    }
+
+    @Override
+    public Enumeration<String> getAttributeNames()
+    {
+        return this.httpSession.getAttributeNames();
+    }
+
+    @Override
+    public void removeAttribute(String name)
+    {
+        this.httpSession.removeAttribute(name);
+    }
+
+    @Override
+    public void setAttribute(String name, Object value)
+    {
+        this.httpSession.setAttribute(name, value);
     }
 }

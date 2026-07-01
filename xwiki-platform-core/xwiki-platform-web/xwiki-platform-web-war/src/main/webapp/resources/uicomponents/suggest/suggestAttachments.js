@@ -448,7 +448,8 @@ define('xwiki-suggestAttachments', [
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
     var attachmentName = $('<em></em>').text(attachment.label).prop('outerHTML');
-    var notification = new XWiki.widgets.Notification(l10n.get('uploading', attachmentName), 'inprogress');
+    var notification = new XWiki.widgets.Notification(l10n.get('uploading', attachmentName), 'inprogress',
+      {textHtml: true});
     attachment.data.upload = {
       status: 'pending',
       progress: {
@@ -468,12 +469,14 @@ define('xwiki-suggestAttachments', [
     }).then(attachment => {
       attachment.data.upload = {status: 'done'};
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadDone', attachmentName), 'done'));
+      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadDone', attachmentName), 'done',
+        {textHtml: true}));
       return attachment;
     }).catch(() => {
       attachment.data.upload.status = 'failed';
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadFailed', attachmentName), 'error'));
+      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadFailed', attachmentName), 'error',
+        {textHtml: true}));
       return Promise.reject();
     });
   };

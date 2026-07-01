@@ -82,7 +82,7 @@ class AutomaticRedirectCreatorListenerTest
     private DeleteRequest deleteRequest = new DeleteRequest();
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
@@ -116,19 +116,6 @@ class AutomaticRedirectCreatorListenerTest
     void onDocumentRenamedWithoutRenameRequest()
     {
         this.listener.onEvent(documentRenamedEvent, null, null);
-
-        verify(this.modelBridge).createRedirect(oldReference, newReference);
-
-        assertEquals("Creating automatic redirect from [wiki:Users.Alice] to [wiki:Users.Bob].",
-            logCapture.getMessage(0));
-    }
-
-    @Test
-    void onDocumentDeletedWithAutomaticRedirect()
-    {
-        deleteRequest.setAutoRedirect(true);
-
-        this.listener.onEvent(documentDeletedEvent, null, null);
 
         verify(this.modelBridge).createRedirect(oldReference, newReference);
 

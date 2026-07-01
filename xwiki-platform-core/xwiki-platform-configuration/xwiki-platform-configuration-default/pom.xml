@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-configuration</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-configuration-default</artifactId>
   <name>XWiki Platform - Configuration - Default</name>
@@ -40,6 +40,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -85,16 +90,6 @@
       <type>pom</type>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -111,7 +106,6 @@
                 org/xwiki/configuration/internal/AbstractDocumentConfigurationSource.java,
                 org/xwiki/configuration/internal/AllConfigurationSource.java,
                 org/xwiki/configuration/internal/CommonsConfigurationSource.java,
-                org/xwiki/configuration/internal/CompositeConfigurationSource.java,
                 org/xwiki/configuration/internal/DefaultConfigurationSource.java
               </excludes>
             </configuration>

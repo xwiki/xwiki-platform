@@ -1,65 +1,59 @@
-#template('colorThemeInit.vm')
-
 /* Overwrite the styles associated with the 'full' CSS class from the XWiki skin. */
-.selectize-input.full {
-  min-height: 34px;
-  padding: 6px 12px;
+.ts-wrapper.full {
+  width: unset;
 }
 
-/* The selectize widget adds padding around the text input so we need to reduce the height of the text input. */
-.selectize-input > input[type="text"] {
+.ts-control {
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius-base);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.focus .ts-control {
+  border-color: var(--input-border-focus);
+  box-shadow: inset 0 1px 1px rgb(0, 0, 0, .075), 0 0 8px rgb(from var(--input-border-focus) r g b / 0.6);
+}
+
+.ts-control,
+.full .ts-control,
+.ts-wrapper.single.input-active .ts-control {
+  background: var(--input-bg);
+}
+
+.ts-dropdown,
+.ts-control,
+.ts-control input {
+  color: var(--input-color);
+}
+
+/* The Tom Select widget adds padding around the text input so we need to reduce the height of the text input. */
+.ts-control > input[type="text"] {
+  /* Remove the border radius because it makes the caret look strange at the start, and the border is not visible
+    anyway. */
+  border-radius: 0;
   height: 20px;
-}
-
-/* Styles for the loading state. */
-.selectize-control.loading .selectize-input,
-.selectize-control.single.loading .selectize-input.input-active {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-  background-repeat: no-repeat;
-}
-/*
-Add enough padding to have room to display the spinning loader. That way, the selectize field do not have a brief
-change of width during load.
-The second 'has-items' selector is required to override the one from default bootstrap's selectize css. */
-.selectize-control.multi .selectize-input,
-.selectize-control.multi .selectize-input.has-items {
-  padding-right: 32px;
-}
-.selectize-control.multi.loading .selectize-input {
-  background-position: center right 12px;
-}
-/**
-Add enough padding to have room to display the spinning loader. That way, the selectize field do not have a brief
-change of width during load.
- */
-.selectize-control.single .selectize-input,
-.selectize-control.single .selectize-input.input-active {
-  padding-right: 55px;
-}
-.selectize-control.single.loading .selectize-input,
-.selectize-control.single.loading .selectize-input.input-active {
-  background-position: center right 36px;
+  width: unset;
 }
 
 /* Dropdown styles */
-/* Override width: 100% defined in selectize.bootstrap3.css, see XWIKI-19453. */
-/* Override z-index so that the suggestions can be displayed in modal, see XWIKI-19870 */
-.selectize-dropdown {
+.ts-dropdown.active {
+  /* Override width 100% set by Tom Select, see XWIKI-19453. */
   width: auto;
+  /* Override z-index so that the suggestions can be displayed in modal, see XWIKI-19870 */
   z-index: 10051;
 }
 
-.selectize-dropdown-left,
-.selectize-dropdown-right {
+.ts-dropdown-left,
+.ts-dropdown-right {
   margin-top: -3px;
 }
-.selectize-dropdown-right {
+.ts-dropdown-right {
   left: auto;
   right: 0;
 }
 
-.selectize-dropdown .option,
-.selectize-dropdown .optgroup-header {
+.ts-dropdown .option,
+.ts-dropdown .optgroup-header {
   padding: 3px 20px;
 }
 
@@ -75,42 +69,42 @@ change of width during load.
   text-align: center;
   width: 18px;
 }
-.selectize-input .xwiki-selectize-option-icon {
+.ts-control .xwiki-selectize-option-icon {
   margin-right: .3em;
 }
 img.xwiki-selectize-option-icon {
   border-radius: 5px;
   max-height: 18px;
   max-width: 18px;
-  vertical-align: text-top;
+  vertical-align: sub;
 }
 a.xwiki-selectize-option-label {
   color: inherit;
   text-decoration: none;
 }
 .xwiki-selectize-option-hint {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: smaller;
 }
 
 /* Asynchronous Create */
-.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option {
+.ts-wrapper.async-create > .ts-control > div.xwiki-selectize-option {
   background-image: none;
   border-left: 2px solid transparent;
   border-radius: 5px;
   padding-left: 3px;
   padding-right: 3px;
 }
-.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-pending,
-.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-running {
-  border-left: 2px solid $theme.notificationSuccessColor;
+.ts-wrapper.async-create > .ts-control > div.xwiki-selectize-option.create-pending,
+.ts-wrapper.async-create > .ts-control > div.xwiki-selectize-option.create-running {
+  border-left: 2px solid var(--brand-success);
 }
-.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-failed {
+.ts-wrapper.async-create > .ts-control > div.xwiki-selectize-option.create-failed {
   background-color: #f2dede;
-  border-left: 2px solid $theme.notificationErrorColor;
+  border-left: 2px solid var(--brand-danger);
 }
-.selectize-control.is-dragover > .selectize-input {
-  border: 1px dashed $theme.notificationSuccessColor;
+.ts-wrapper.is-dragover > .ts-control {
+  border: 1px dashed var(--brand-success);
 }
 
 /* Styles for bigger option icons */
@@ -122,7 +116,7 @@ a.xwiki-selectize-option-label {
   width: 36px;
 }
 .xwiki-selectize-option-icon-wrapper.pull-left .xwiki-selectize-option-icon {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: 32px;
   vertical-align: middle;
 }
@@ -132,6 +126,6 @@ a.xwiki-selectize-option-label {
 }
 
 /* Live Table Filter */
-.xwiki-livetable-display-header-filter .selectize-input {
+.xwiki-livetable-display-header-filter .ts-wrapper {
   display: block;
 }

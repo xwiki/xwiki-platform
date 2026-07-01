@@ -1,6 +1,19 @@
 //
 // New variables provided by XWiki
 // --------------------------------------------------
+
+// This variable declaration is kept here because we don't have a 1 to 1 equivalent in CSS
+@loginFormMaxWidth:                 450px;
+// We create a guarded mixin to change the background color alternative differently depending on the
+// initial color. The simple 'if' syntax didn't compile.
+._menubackground-alt(@a) when (lightness(@a) < 50%) {
+  @menu-default-bg:               lighten(@a, 5%);
+}
+._menubackground-alt(@a) when (lightness(@a) >= 50%) {
+  @menu-default-bg:               darken(desaturate(@a, 20%), 10%);
+}
+._menubackground-alt(@navbar-default-bg);
+
 @figure-caption-font-size:          90%;
 @figure-caption-color:              @text-muted;
 @login-form-max-width:              450px;

@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -294,7 +295,6 @@ public class LiveDataMeta implements InitializableLiveDataElement
      * @return an optional textual description of the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public String getDescription()
     {
         return this.description;
@@ -304,7 +304,6 @@ public class LiveDataMeta implements InitializableLiveDataElement
      * @param description an optional textual description of the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public void setDescription(String description)
     {
         this.description = description;
@@ -349,5 +348,61 @@ public class LiveDataMeta implements InitializableLiveDataElement
         this.pagination = initialize(this.pagination, new LiveDataPaginationConfiguration());
         this.entryDescriptor = initialize(this.entryDescriptor, new LiveDataEntryDescriptor());
         this.selection = initialize(this.selection, new LiveDataSelectionConfiguration());
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataMeta that = (LiveDataMeta) o;
+
+        return new EqualsBuilder()
+            .append(this.layouts, that.layouts)
+            .append(this.defaultLayout, that.defaultLayout)
+            .append(this.propertyDescriptors, that.propertyDescriptors)
+            .append(this.propertyTypes, that.propertyTypes)
+            .append(this.filters, that.filters)
+            .append(this.defaultFilter, that.defaultFilter)
+            .append(this.displayers, that.displayers)
+            .append(this.defaultDisplayer, that.defaultDisplayer)
+            .append(this.pagination, that.pagination)
+            .append(this.entryDescriptor, that.entryDescriptor)
+            .append(this.actions, that.actions)
+            .append(this.selection, that.selection)
+            .append(this.description, that.description)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.layouts)
+            .append(this.defaultLayout)
+            .append(this.propertyDescriptors)
+            .append(this.propertyTypes)
+            .append(this.filters)
+            .append(this.defaultFilter)
+            .append(this.displayers)
+            .append(this.defaultDisplayer)
+            .append(this.pagination)
+            .append(this.entryDescriptor)
+            .append(this.actions)
+            .append(this.selection)
+            .append(this.description)
+            .toHashCode();
     }
 }

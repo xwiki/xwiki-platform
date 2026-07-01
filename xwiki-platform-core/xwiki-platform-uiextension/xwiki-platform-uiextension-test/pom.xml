@@ -20,120 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-uiextension</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-test</artifactId>
-  <name>XWiki Platform - UI Extension Extension - Functional Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
-  <packaging>jar</packaging>
-  <description>XWiki Platform - User Interface Extension - Functional Tests</description>
+  <name>XWiki Platform - UI Extension - Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - UI Extension - Tests - Parent POM</description>
   <properties>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Override in order to activate the macro transformation required by UI Extensions -->
-    <xwikiRenderingTransformations>macro</xwikiRenderingTransformations>
-    <!-- Functional tests are allowed to output content to the console -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-uiextension-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Required since the content of the UI extensions used in the tests is written in velocity -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
-         systems go through SLF4J -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <testSourceDirectory>src/test/it</testSourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
-      <id>clover</id>
-      <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
-           It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
-      <dependencies>
-        <dependency>
-          <groupId>org.openclover</groupId>
-          <artifactId>clover</artifactId>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
-               that have been instrumented with Clover (XWiki oldcore for example) -->
-          <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.openclover</groupId>
-                <artifactId>clover</artifactId>
-                <version>${clover.version}</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-        </plugins>
-      </build>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-uiextension-test-docker</module>
+      </modules>
     </profile>
   </profiles>
 </project>

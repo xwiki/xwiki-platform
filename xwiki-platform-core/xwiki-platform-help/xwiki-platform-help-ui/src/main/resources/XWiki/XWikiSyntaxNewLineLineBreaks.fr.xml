@@ -59,10 +59,6 @@ Nouvelle ligne|Ligne Nouvelle ligne
 
 Une nouvelle ligne est un retour chariot. Un saut de ligne est une nouvelle ligne forcée qui peut apparaître n'importe où dans le texte.
 
-{{info}}
-En syntaxe XWiki 2.0, les nouvelles lignes sont ignorées, ce qui n'est pas le cas de la syntaxe XWiki 1.0 et Creole.
-{{/info}}
-
 |=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
 |Saut de ligne|{{{Ligne\\Nouvelle ligne}}}|Ligne
 Nouvelle ligne

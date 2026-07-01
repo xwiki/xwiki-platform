@@ -39,6 +39,8 @@ import org.xwiki.rest.resources.wikis.WikiAttachmentsResource;
 public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource implements WikiAttachmentsResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Attachments getAttachments(String wiki, String name, String page, String space, String author,
         String fileTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
@@ -49,6 +51,7 @@ public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource impleme
         filters.put("author", author);
         filters.put("fileTypes", fileTypes);
 
-        return super.getAttachments(new WikiReference(wiki), filters, offset, limit, withPrettyNames);
+        return super.getAttachments(new WikiReference(wiki), filters, offset, validateAndGetLimit(limit),
+            withPrettyNames);
     }
 }

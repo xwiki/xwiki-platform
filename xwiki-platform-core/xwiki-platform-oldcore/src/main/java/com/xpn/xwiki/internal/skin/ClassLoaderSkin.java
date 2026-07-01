@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.inject.Provider;
 
 import org.slf4j.Logger;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
@@ -66,9 +67,9 @@ public class ClassLoaderSkin extends AbstractResourceSkin
     }
 
     @Override
-    protected URL getResourceURL(String resourcePath)
+    protected URL getResourceURL(String prefixPath, String resourcePath)
     {
-        return this.classloader.getResource(resourcePath);
+        return ClassLoaderUtils.getResource(this.classloader, prefixPath, resourcePath);
     }
 
     @Override

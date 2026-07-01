@@ -20,10 +20,10 @@
 package com.xpn.xwiki.internal.filter.output;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -49,7 +49,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterStream<PropertyClass>
 {
     @Inject
-    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
@@ -87,7 +86,7 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
                 } else {
                     // In previous versions the class type was the full Java class name of the property class
                     // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
-                    String classType = StringUtils.removeEnd(StringUtils.substringAfterLast(type, "."), "Class");
+                    String classType = Strings.CS.removeEnd(StringUtils.substringAfterLast(type, "."), "Class");
                     if (componentManager.hasComponent(PropertyClassProvider.class, classType)) {
                         provider = componentManager.getInstance(PropertyClassProvider.class, classType);
                     } else {
@@ -128,23 +127,37 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
         throws FilterException
     {
         if (this.entity != null) {
+            Object classReference = this.entity.getObject().getName();
+            if (classReference == null) {
+                classReference = this.entity.getObject().getDocumentReference();
+            }
+
             PropertyClass propertyClass;
             try {
                 propertyClass = (PropertyClass) this.currentClassPropertyMeta.get(name);
             } catch (XWikiException e) {
-                throw new FilterException(String.format("Failed to get definition of field [%s] for property type [%s]",
-                    name, this.entity.getClassType()), e);
+                throw new FilterException(
+                    String.format("Failed to get definition of field [%s] for property type [%s] in class [%s]", name,
+                        this.entity.getClassType(), classReference),
+                    e);
             }
 
             // Make sure the property is known
             if (propertyClass == null) {
-                this.logger.warn("Unknown property meta class field [{}] for property type [{}]", name,
-                    this.entity.getClassType());
+                this.logger.warn("{} - Unknown property meta class field [{}] for property type [{}] in class [{}]",
+                    this.currentEntityReference, name, this.entity.getClassType(), classReference);
 
                 return;
             }
 
-            BaseProperty<?> field = propertyClass.fromString(value);
+            BaseProperty<?> field = null;
+            try {
+                field = propertyClass.fromString(value);
+            } catch (XWikiException e) {
+                throw new FilterException(
+                    String.format("Failed to parse value [%s] for field [%s] in class reference [%s]",
+                    value, name, classReference), e);
+            }
 
             this.entity.safeput(name, field);
         }

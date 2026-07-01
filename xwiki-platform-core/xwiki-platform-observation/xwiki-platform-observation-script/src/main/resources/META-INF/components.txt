@@ -1,0 +1,2 @@
+org.xwiki.observation.remote.script.ObservationScriptService
+org.xwiki.observation.remote.script.RemoteObservationScriptService

@@ -148,6 +148,18 @@ public class ScriptXWikiServletRequestTest
     }
 
     @Test
+    void getRequest()
+    {
+        setProgramingRight(true);
+
+        assertSame(this.request, this.scriptRequest.getRequest());
+
+        setProgramingRight(false);
+
+        assertNull(this.scriptRequest.getRequest());
+    }
+
+    @Test
     void sessionGetServletContext()
     {
         ScriptHttpSession scriptSession = (ScriptHttpSession) this.scriptRequest.getSession();

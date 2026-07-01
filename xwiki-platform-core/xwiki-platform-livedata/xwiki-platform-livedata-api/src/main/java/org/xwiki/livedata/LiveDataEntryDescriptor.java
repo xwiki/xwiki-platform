@@ -19,6 +19,9 @@
  */
 package org.xwiki.livedata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -48,5 +51,37 @@ public class LiveDataEntryDescriptor implements InitializableLiveDataElement
     public void setIdProperty(String idProperty)
     {
         this.idProperty = idProperty;
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataEntryDescriptor that = (LiveDataEntryDescriptor) o;
+
+        return new EqualsBuilder()
+            .append(this.idProperty, that.idProperty)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.idProperty)
+            .toHashCode();
     }
 }

@@ -20,12 +20,9 @@
 package org.xwiki.lesscss.internal.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -39,7 +36,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,69 +46,63 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @since 6.4RC1
  * @version $Id$
+ * @since 6.4RC1
  */
-public class SSXListenerTest
+@ComponentTest
+class SSXListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SSXListener> mocker =
-            new MockitoComponentMockingRule<>(SSXListener.class);
+    @InjectMockComponents
+    private SSXListener ssxListener;
 
+    @MockComponent
     private LESSResourcesCache lessResourcesCache;
 
+    @MockComponent
     private ColorThemeCache colorThemeCache;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void getName()
     {
-        lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
-        colorThemeCache = mocker.getInstance(ColorThemeCache.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        lessResourceReferenceFactory = mocker.getInstance(LESSResourceReferenceFactory.class);
+        assertEquals("LESS SSX objects listener", this.ssxListener.getName());
     }
 
     @Test
-    public void getName() throws Exception
+    void getEvents()
     {
-        assertEquals("LESS SSX objects listener", mocker.getComponentUnderTest().getName());
+        List<Event> eventsToObserve = List.of(
+            new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent());
+
+        assertEquals(eventsToObserve, this.ssxListener.getEvents());
     }
 
     @Test
-    public void getEvents() throws Exception
-    {
-        List<Event> eventsToObserve = Arrays.<Event>asList(
-                new DocumentCreatedEvent(),
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent());
-
-        assertEquals(eventsToObserve, mocker.getComponentUnderTest().getEvents());
-    }
-
-    @Test
-    public void onEvent() throws Exception
+    void onEvent() throws Exception
     {
         // Mocks
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
         XWikiDocument doc = mock(XWikiDocument.class);
         BaseObject obj1 = mock(BaseObject.class);
         BaseObject obj2 = mock(BaseObject.class);
         List<BaseObject> objList = new ArrayList<>();
         DocumentReference ssxDocRef = new DocumentReference("wiki", "XWiki", "StyleSheetExtension");
-        when(doc.getXObjects(eq(ssxDocRef))).thenReturn(objList);
+        when(doc.getXObjects(ssxDocRef)).thenReturn(objList);
         objList.add(obj1);
         objList.add(null);
         objList.add(obj2);
@@ -132,19 +125,18 @@ public class SSXListenerTest
         when(entityReferenceSerializer.serialize(any(EntityReference.class), any(EntityReference.class)))
             .thenReturn("objName");
 
-        ObjectPropertyReference objPropertyReference = 
-                new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));
-        LESSObjectPropertyResourceReference lessObjectPropertyResourceReference = 
-                new LESSObjectPropertyResourceReference(objPropertyReference, null, null);
-        when(lessResourceReferenceFactory.createReferenceForXObjectProperty(eq(objPropertyReference)))
-                .thenReturn(lessObjectPropertyResourceReference);
+        ObjectPropertyReference objPropertyReference =
+            new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));
+        LESSObjectPropertyResourceReference lessObjectPropertyResourceReference =
+            new LESSObjectPropertyResourceReference(objPropertyReference, null, null, null);
+        when(this.lessResourceReferenceFactory.createReferenceForXObjectProperty(objPropertyReference))
+            .thenReturn(lessObjectPropertyResourceReference);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), doc, new Object());
+        this.ssxListener.onEvent(new DocumentUpdatedEvent(), doc, new Object());
 
         // Verify
-        
-        verify(lessResourcesCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
-        verify(colorThemeCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
+        verify(this.lessResourcesCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
+        verify(this.colorThemeCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
     }
 }

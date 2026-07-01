@@ -19,11 +19,17 @@
  */
 package org.xwiki.url.internal.standard;
 
-import org.junit.*;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import javax.inject.Named;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -32,45 +38,45 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 5.3M1
  */
-public class DefaultStandardURLConfigurationTest
+@ComponentTest
+class DefaultStandardURLConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultStandardURLConfiguration> mocker =
-        new MockitoComponentMockingRule<>(DefaultStandardURLConfiguration.class);
+    @InjectMockComponents
+    private DefaultStandardURLConfiguration configuration;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource source;
 
     @Test
-    public void isPathBasedMultiWiki() throws Exception
+    void isPathBasedMultiWiki() throws Exception
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(source.getProperty("url.standard.multiwiki.isPathBased", Boolean.TRUE)).thenReturn(Boolean.TRUE);
+        when(this.source.getProperty("url.standard.multiwiki.isPathBased", Boolean.TRUE)).thenReturn(Boolean.TRUE);
 
-        assertTrue(this.mocker.getComponentUnderTest().isPathBasedMultiWiki());
+        assertTrue(this.configuration.isPathBasedMultiWiki());
     }
 
     @Test
-    public void getWikiPathPrefix() throws Exception
+    void getWikiPathPrefix() throws Exception
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(source.getProperty("url.standard.multiwiki.wikiPathPrefix", "wiki")).thenReturn("wiki");
+        when(this.source.getProperty("url.standard.multiwiki.wikiPathPrefix", "wiki")).thenReturn("wiki");
 
-        assertEquals("wiki", this.mocker.getComponentUnderTest().getWikiPathPrefix());
+        assertEquals("wiki", this.configuration.getWikiPathPrefix());
     }
 
     @Test
-    public void getEntityPathPrefix() throws Exception
+    void getEntityPathPrefix() throws Exception
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
-        when(source.getProperty("url.standard.entityPathPrefix", "bin")).thenReturn("bin");
+        when(this.source.getProperty("url.standard.entityPathPrefix", "bin")).thenReturn("bin");
 
-        assertEquals("bin", this.mocker.getComponentUnderTest().getEntityPathPrefix());
+        assertEquals("bin", this.configuration.getEntityPathPrefix());
     }
 
     @Test
-    public void isViewActionHidden() throws Exception
+    void isViewActionHidden() throws Exception
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         when(source.getProperty("url.standard.hideViewAction", false)).thenReturn(false);
 
-        assertFalse(this.mocker.getComponentUnderTest().isViewActionHidden());
+        assertFalse(this.configuration.isViewActionHidden());
     }
 }

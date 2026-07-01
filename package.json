@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@xwiki/platform",
+  "devDependencies": {
+    "nx": "catalog:"
+  }
+}

@@ -130,6 +130,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         return results;
     }
 
+    @SuppressWarnings("checkstyle:CyclomaticComplexity")
     private boolean handleEntity(WatchedEntityReference entity, UserReference user, boolean shouldBeWatched)
             throws NotificationException
     {

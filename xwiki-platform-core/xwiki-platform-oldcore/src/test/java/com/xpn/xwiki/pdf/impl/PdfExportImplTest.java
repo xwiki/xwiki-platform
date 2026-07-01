@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -153,7 +154,11 @@ class PdfExportImplTest
         this.cssProperties = "span { color:red; }";
 
         // Set up HTML cleaner.
-        Document htmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // Prevent network requests to w3.org to fetch the DTD.
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        Document htmlDocument = factory.newDocumentBuilder()
             .parse(new ByteArrayInputStream(this.htmlContent.getBytes()));
         HTMLCleanerConfiguration cleanerConfiguration = new DefaultHTMLCleanerConfiguration();
         when(this.htmlCleaner.getDefaultConfiguration()).thenReturn(cleanerConfiguration);

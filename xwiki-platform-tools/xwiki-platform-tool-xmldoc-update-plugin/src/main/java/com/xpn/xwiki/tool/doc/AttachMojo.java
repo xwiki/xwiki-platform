@@ -64,7 +64,7 @@ public class AttachMojo extends AbstractDocumentMojo
      */
     public AttachMojo() throws MojoExecutionException
     {
-        super();
+        // Nothing to do.
     }
 
     @Override

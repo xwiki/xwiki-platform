@@ -20,7 +20,6 @@
 package org.xwiki.attachment.configuration;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * General configuration values for attachments.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.3.0RC1
  */
-@Unstable
 @Role
 public interface AttachmentConfiguration
 {

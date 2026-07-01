@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -297,7 +298,7 @@ class ListClassTest
     }
 
     @Test
-    void fromStringArray()
+    void fromStringArray() throws XWikiException
     {
         String[] array = new String[] { "Foo||Bar", "Baz,Buz,", " ", "Other", "Thing" };
         ListClass listClass = new ListClass()

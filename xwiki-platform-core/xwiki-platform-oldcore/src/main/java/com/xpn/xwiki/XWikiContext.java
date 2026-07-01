@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.localization.LocaleUtils;
@@ -43,7 +44,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -270,11 +270,21 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.engine_context = engine_context;
     }
 
+    /**
+     * @return the request in the context
+     * @deprecated use the {@link Container} API instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     public XWikiRequest getRequest()
     {
         return this.request;
     }
 
+    /**
+     * @param request the request to put in the context
+     * @deprecated use the {@link Container} API instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     public void setRequest(XWikiRequest request)
     {
         this.request = request;
@@ -290,11 +300,21 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.action = action;
     }
 
+    /**
+     * @return the response in the context
+     * @deprecated use the {@link Container} API instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     public XWikiResponse getResponse()
     {
         return this.response;
     }
 
+    /**
+     * @param response the response to put in the context
+     * @deprecated use the {@link Container} API instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     public void setResponse(XWikiResponse response)
     {
         this.response = response;
@@ -829,6 +849,16 @@ public class XWikiContext extends Hashtable<Object, Object>
         put("mainxwiki", str);
     }
 
+    /**
+     * @return the reference of the main wiki, or null if none is set
+     * @since 18.2.0RC1
+     * @since 17.10.5
+     */
+    public WikiReference getMainWikiReference()
+    {
+        return new WikiReference(getMainXWiki());
+    }
+
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {
@@ -1037,7 +1067,6 @@ public class XWikiContext extends Hashtable<Object, Object>
      *
      * @since 16.10.0RC1
      */
-    @Unstable
     public XWikiDocument getSecureDocument()
     {
         XWikiDocument sdoc = (XWikiDocument) get(XWikiDocument.CKEY_SDOC);

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -78,7 +79,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private int refreshPeriod;
 
-    private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
+    private Map<String, UpdateThread> updateThreads = new HashMap<>();
 
     private Converter syntaxConverter;
 
@@ -226,7 +227,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         } else {
             feeds = sfeeds.split("\\|");
         }
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        List<SyndEntry> entries = new ArrayList<>();
         SyndFeed outputFeed = new SyndFeedImpl();
         if (context.getDoc() != null) {
             outputFeed.setTitle(context.getDoc().getFullName());
@@ -298,7 +299,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 @SuppressWarnings("unchecked")
                 Map<String, Exception> map = (Map<String, Exception>) context.get("invalidFeeds");
                 if (map == null) {
-                    map = new HashMap<String, Exception>();
+                    map = new HashMap<>();
                     context.put("invalidFeeds", map);
                 }
                 map.put(sfeed, ex);
@@ -399,7 +400,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     @SuppressWarnings("unchecked")
                     Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
                     if (map == null) {
-                        map = new HashMap<String, Exception>();
+                        map = new HashMap<>();
                         context.put("updateFeedError", map);
                     }
                     map.put(feedDocName, e);
@@ -426,7 +427,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
     }
 
-    public void stopUpdateFeedsInSpace(String space, XWikiContext context) throws XWikiException
+    public void stopUpdateFeedsInSpace(String space, XWikiContext context)
     {
         UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread != null) {
@@ -494,7 +495,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             @SuppressWarnings("unchecked")
             Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
             if (map == null) {
-                map = new HashMap<String, Exception>();
+                map = new HashMap<>();
                 context.put("updateFeedError", map);
             }
             map.put(feedurl, e);
@@ -527,7 +528,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             SyndEntry entry = entries.get(i);
             if (oneDocPerEntry) {
                 String hashCode = "" + entry.getLink().hashCode();
-                String pagename = feedname + "_" + hashCode.replaceAll("-", "") + "_" + entry.getTitle();
+                String pagename = feedname + "_" + hashCode.replace("-", "") + "_" + entry.getTitle();
                 doc =
                     context.getWiki().getDocument(
                         prefix + "_" + context.getWiki().clearName(pagename, true, true, context), context);
@@ -596,7 +597,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.entryContent"))) {
             // If entry content is not configured, we do the best guess between XWiki syntaxes 1 and 2
             content =
-                StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
+                Strings.CS.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
                     ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
                     : "{{include reference=\"XWiki.FeedEntryClassSheet\" /}}";
         } else {
@@ -657,7 +658,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     private void saveEntry(String feedname, String feedurl, SyndEntry entry, XWikiDocument doc, BaseObject obj,
-        boolean fullContent, XWikiContext context) throws XWikiException
+        boolean fullContent, XWikiContext context)
     {
         obj.setStringValue("feedname", feedname);
         obj.setStringValue("title", entry.getTitle());
@@ -725,7 +726,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (fullContent) {
             String url = entry.getLink();
-            if ((url != null) && (!url.trim().equals(""))) {
+            if ((url != null) && (!url.trim().isEmpty())) {
                 try {
                     String sfullContent = context.getWiki().getURLContent(url, context);
                     obj.setLargeStringValue("fullContent",
@@ -780,7 +781,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return null;
             }
 
-            List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<com.xpn.xwiki.api.Object>();
+            List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<>();
             for (Object obj[] : res) {
                 try {
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
@@ -793,7 +794,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     @SuppressWarnings("unchecked")
                     Map<String, Exception> map = (Map<String, Exception>) context.get("searchFeedError");
                     if (map == null) {
-                        map = new HashMap<String, Exception>();
+                        map = new HashMap<>();
                         context.put("searchFeedError", map);
                     }
                     map.put(query, e);
@@ -879,7 +880,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(context);
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        List<SyndEntry> entries = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             SyndEntry entry = getFeedEntry(context);
             try {
@@ -899,8 +900,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source,
         Map<String, Object> sourceParams, XWikiContext context) throws XWikiException
     {
-        List<Object> entries = new ArrayList<Object>();
-        entries.addAll(context.getWiki().getStore().searchDocumentsNames(query, count, start, context));
+        List<Object> entries =
+            new ArrayList<>(context.getWiki().getStore().searchDocumentsNames(query, count, start, context));
         return getFeed(entries, source, sourceParams, context);
     }
 

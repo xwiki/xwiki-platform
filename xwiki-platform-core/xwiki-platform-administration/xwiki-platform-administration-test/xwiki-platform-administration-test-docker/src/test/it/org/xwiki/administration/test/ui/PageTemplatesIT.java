@@ -27,19 +27,28 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
+import org.xwiki.administration.test.po.TemplateProviderViewPage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentDoesNotExistPage;
+import org.xwiki.test.ui.po.InformationPane;
+import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,7 +60,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 12.9RC1
  */
-@UITest
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
+@SuppressWarnings({ "checkstyle:MultipleStringLiterals", "checkstyle:ClassFanOutComplexity" })
 class PageTemplatesIT
 {
     /**
@@ -59,8 +78,20 @@ class PageTemplatesIT
      */
     public static final String TEMPLATE_NAME = "TestTemplate";
 
+    /**
+     * Name of the descendant page created under the template, used to verify that the template hierarchy is recreated
+     * when a page is created from the template (see XWIKI-18303).
+     */
+    private static final String CHILD_TEMPLATE_NAME = "ChildPage";
+
+    /**
+     * Content of the template's descendant page, used to verify that the descendant is actually copied from the
+     * template (and not merely auto-created).
+     */
+    private static final String CHILD_TEMPLATE_CONTENT = "Child Template Content";
+
     @BeforeEach
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
@@ -68,6 +99,7 @@ class PageTemplatesIT
     /**
      * Tests if a new page can be created from a template.
      */
+    @SuppressWarnings({ "checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS" })
     @Test
     @Order(1)
     void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
@@ -82,11 +114,11 @@ class PageTemplatesIT
         String templateProviderFullName = setup.serializeReference(templateProviderReference);
         String testSpace = setup.serializeReference(templateProviderReference.getParent());
 
-        // Step 1: Create a Template and a Template Provider and try to create a new page by using the Add Menu and
-        // using the created Template
+        // Step 1: Create a Template (with a descendant page) and a Template Provider and try to create a new page by
+        // using the Add Menu and using the created Template
 
         ViewPage templateProviderView = createTemplateAndTemplateProvider(setup, templateProviderReference,
-            templateContent, "Test Template Title", false);
+            templateContent, "Test Template Title", false, true);
 
         // Create the new document from template
         CreatePagePage createPagePage = templateProviderView.createPage();
@@ -111,6 +143,12 @@ class PageTemplatesIT
         // Put a wanted link in the template instance
         templateInstanceEdit.setContent("[[doc:NewPage]]");
         ViewPage vp = templateInstanceEdit.clickSaveAndView();
+
+        // Make sure the attachment has been copied from the template
+        // FIXME: Remove the following wait when XWIKI-6688 is fixed.
+        vp.waitForDocExtraPaneActive("Comments");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
 
         // Verify that clicking on the wanted link pops up a box to choose the template.
         EntityReference wantedLinkReference =
@@ -172,7 +210,7 @@ class PageTemplatesIT
         templateProviderView = setup.gotoPage(templateProviderReference);
         templateProviderView.editInline();
         TemplateProviderInlinePage templateProviderInline = new TemplateProviderInlinePage();
-        List<String> allowedSpaces = new ArrayList<String>();
+        List<String> allowedSpaces = new ArrayList<>();
         allowedSpaces.add(testSpace);
         templateProviderInline.setVisibilityRestrictions(allowedSpaces);
         templateProviderInline.setCreationRestrictions(allowedSpaces);
@@ -201,11 +239,25 @@ class PageTemplatesIT
 
         // make sure that the template provider is not in the list of templates
         assertFalse(createPagePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // Step 6: Verify that the descendant page of the template has been copied under the new page (XWIKI-18303).
+        // The template instance created in Step 1 is a non-terminal (WebHome) page and the template root is also a
+        // non-terminal page with a descendant, so the hierarchy must be recreated under the instance.
+        SpaceReference templateInstanceSpace =
+            new SpaceReference(templateInstanceName, testReference.getLastSpaceReference());
+        DocumentReference templateInstanceChildReference =
+            new DocumentReference("WebHome", new SpaceReference(CHILD_TEMPLATE_NAME, templateInstanceSpace));
+        ViewPage templateInstanceChildView = setup.gotoPage(templateInstanceChildReference);
+        assertTrue(templateInstanceChildView.exists(),
+            "The descendant page of the template was not copied under the new page.");
+        // Make sure the descendant was copied from the template (and not merely auto-created).
+        assertEquals(CHILD_TEMPLATE_CONTENT, templateInstanceChildView.getContent());
     }
 
     /**
      * Tests that creating a page or a space that already exists displays an error.
      */
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
     @Test
     @Order(2)
     void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
@@ -347,7 +399,7 @@ class PageTemplatesIT
         ViewPage viewPage = setup.gotoPage(templateReference);
         assertTrue(viewPage.isForbidden());
 
-        setup.gotoPage(newDoc, "edit", "template=" + templateReference.toString());
+        setup.gotoPage(newDoc, "edit", "template=" + templateReference);
         WikiEditPage wikiEditPage = new WikiEditPage();
 
         assertTrue(wikiEditPage.getContent().isEmpty());
@@ -381,22 +433,281 @@ class PageTemplatesIT
     }
 
     /**
+     * The goal of this test is to check that if the template enforces required rights, then the created page also
+     * enforces the same rights.
+     */
+    @Test
+    @Order(6)
+    void createPageFromTemplateWithRequiredRights(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        String templateContent = "Templates are fun";
+        String providerName = "RequiredRightsTemplateProvider";
+        LocalDocumentReference templateProviderReference = new LocalDocumentReference(providerName,
+            testReference.getLocalDocumentReference().getParent());
+        createTemplateAndTemplateProvider(setup, templateProviderReference,
+            templateContent, "Required Rights Template", true);
+
+        // Edit the template to enforce required rights.
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference("TestTemplate", templateProviderReference.getParent());
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        RequiredRightsModal requiredRightsModal = viewPage.openInformationDocExtraPane().openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+
+        // Create the page from template
+        CreatePagePage createPagePage = setup.gotoPage(templateProviderReference).createPage();
+        EditPage templateInstanceEditWysiwyg =
+            createPagePage.createPageFromTemplate("Test Page With Required Rights From Template",
+                testReference.getLastSpaceReference().getName(),
+                TEMPLATE_NAME + "Instance", setup.serializeReference(templateProviderReference));
+        ViewPage templateInstanceView = templateInstanceEditWysiwyg.clickSaveAndView();
+
+        // Verify that the page has the required rights
+        InformationPane informationPane = templateInstanceView.openInformationDocExtraPane();
+        assertThat(informationPane.getRequiredRightsStatusMessage(),
+            containsString("This page is enforcing required rights"));
+        assertEquals(List.of("Script right"), informationPane.getRequiredRights());
+    }
+
+    /**
+     * Consider the following scenario:
+     * <ul>
+     *  <li>A template requires script right.</li>
+     *  <li>The test user has script right, but only in space "Scripting" and not in space "NoScripting".</li>
+     * </ul>
+     * Verify the following:
+     * <ul>
+     *  <li>The template is listed in space "Scripting" but not in space "NoScripting"</li>
+     *  <li>When opening the create page dialog in "Scripting" but selecting the space "NoScripting", an error is
+     *  displayed.</li>
+     * </ul>
+     */
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
+    @Test
+    @Order(7)
+    void templateWithRequiredRightsVisibilityAndEnforcement(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        SpaceReference scriptingSpaceReference = new SpaceReference("Scripting", testSpaceReference);
+        SpaceReference noScriptingSpaceReference = new SpaceReference("NoScripting", testSpaceReference);
+
+        DocumentReference scriptingSpaceHome = new DocumentReference("WebHome", scriptingSpaceReference);
+        DocumentReference noScriptingSpaceHome = new DocumentReference("WebHome", noScriptingSpaceReference);
+
+        setup.rest().savePage(scriptingSpaceHome, "Content", "Scripting");
+        setup.rest().savePage(noScriptingSpaceHome, "Content", "NoScripting");
+
+        LocalDocumentReference templateProviderReference =
+            new LocalDocumentReference(TEMPLATE_NAME + "Provider",
+                testReference.getLocalDocumentReference().getParent());
+
+        createTemplateAndTemplateProvider(setup, templateProviderReference,
+            "{{velocity}}Script{{/velocity}}", "Script Template", true);
+
+        // Edit the template to enforce required rights.
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference("TestTemplate", templateProviderReference.getParent());
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        RequiredRightsModal requiredRightsModal = viewPage.openInformationDocExtraPane().openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+
+        String userName = "PageTemplateITScriptUser";
+        setup.createUser(userName, userName, "", "usertype", "Advanced");
+
+        String userFullName = String.format("%s:XWiki.%s", testReference.getWikiReference().getName(), userName);
+        setup.setRightsOnSpace(scriptingSpaceReference, null, userFullName, "script", true);
+        setup.setRightsOnSpace(noScriptingSpaceReference, null, userFullName, "script", false);
+
+        setup.login(userName, userName);
+
+        // The template should be available when creating a page in the Scripting space.
+        ViewPage scriptingSpaceView = setup.gotoPage(scriptingSpaceHome);
+        CreatePagePage scriptingCreatePage = scriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        String templateProviderFullName = setup.serializeReference(templateProviderReference);
+        assertTrue(scriptingCreatePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // The template should not be available when creating a page in the NoScripting space.
+        ViewPage noScriptingSpaceView = setup.gotoPage(noScriptingSpaceHome);
+        CreatePagePage noScriptingCreatePage = noScriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertFalse(noScriptingCreatePage.getAvailableTemplates().contains(templateProviderFullName));
+
+        // When creating a page from the Scripting space but selecting the NoScripting space as target, the creation
+        // should fail with an error.
+        scriptingSpaceView = setup.gotoPage(scriptingSpaceHome);
+        scriptingCreatePage = scriptingSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        scriptingCreatePage.setTemplate(templateProviderFullName);
+        scriptingCreatePage.getDocumentPicker().toggleLocationAdvancedEdit();
+        scriptingCreatePage.getDocumentPicker().setParent(setup.serializeReference(noScriptingSpaceReference));
+        scriptingCreatePage.getDocumentPicker().setName("Target");
+
+        scriptingCreatePage.clickCreate();
+        scriptingCreatePage.waitForErrorMessage();
+
+        assertThat(scriptingCreatePage.getErrorMessage(),
+            containsString("You don't have the required rights to create pages from the template ["
+                + templateProviderFullName + "]."));
+    }
+
+    /**
+     * Tests creating a template provider with icon, description, and visibility restrictions, verifying that the
+     * template is available only in the restricted location.
+     */
+    @Test
+    @Order(8)
+    void createTemplateProviderWithIconAndRestrictions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+        EntityReference testLocalParent = testReference.getLocalDocumentReference().getParent();
+
+        SpaceReference visibilitySpaceReference = new SpaceReference("VisibilitySpace", testSpaceReference);
+        SpaceReference creationSpaceReference = new SpaceReference("CreationSpace", testSpaceReference);
+        SpaceReference otherSpaceReference = new SpaceReference("OtherSpace", testSpaceReference);
+
+        setup.rest().savePage(new DocumentReference("WebHome", visibilitySpaceReference), "", "Visibility Space");
+        setup.rest().savePage(new DocumentReference("WebHome", creationSpaceReference), "", "Creation Space");
+        setup.rest().savePage(new DocumentReference("WebHome", otherSpaceReference), "", "Other Space");
+
+        String templateContent = "Restricted template content";
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference(TEMPLATE_NAME, testLocalParent);
+        setup.rest().savePage(templateReference, templateContent, "Restricted Template");
+
+        String providerName = "RestrictedProvider";
+        LocalDocumentReference templateProviderReference =
+            new LocalDocumentReference(providerName, testLocalParent);
+        String templateProviderFullName = setup.serializeReference(templateProviderReference);
+        String testSpace = setup.serializeReference(templateProviderReference.getParent());
+        String visibilitySpace = testSpace + ".VisibilitySpace";
+        String creationSpace = testSpace + ".CreationSpace";
+
+        TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
+        TemplateProviderInlinePage templateProviderInline =
+            sectionPage.createTemplateProvider(templateProviderReference);
+        templateProviderInline.setTemplateName("Restricted Template");
+        templateProviderInline.setIcon("page");
+        templateProviderInline.setDescription("A template with visibility restrictions");
+        templateProviderInline.setTemplate(setup.serializeReference(templateReference));
+
+        List<String> visibilityRestrictions = new ArrayList<>();
+        visibilityRestrictions.add(visibilitySpace);
+        templateProviderInline.setVisibilityRestrictions(visibilityRestrictions);
+
+        List<String> creationRestrictions = new ArrayList<>();
+        creationRestrictions.add(creationSpace);
+        templateProviderInline.setCreationRestrictions(creationRestrictions);
+
+        templateProviderInline.clickSaveAndView();
+        TemplateProviderViewPage templateProviderViewPage = new TemplateProviderViewPage();
+        assertEquals("page", templateProviderViewPage.getIcon());
+        assertEquals("A template with visibility restrictions", templateProviderViewPage.getDescription());
+
+        // The template is visible only in the visibility-restricted space
+        ViewPage visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        CreatePagePage createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertTrue(createPageInVisibilitySpace.getAvailableTemplates().contains(templateProviderFullName));
+        assertEquals("page", createPageInVisibilitySpace.getTemplateIcon(templateProviderFullName));
+        assertEquals("A template with visibility restrictions",
+            createPageInVisibilitySpace.getTemplateDescription(templateProviderFullName));
+
+        // The template is not visible outside the visibility-restricted space
+        ViewPage otherSpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", otherSpaceReference));
+        CreatePagePage createPageInOtherSpace = otherSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertFalse(createPageInOtherSpace.getAvailableTemplates().contains(templateProviderFullName));
+
+        // The template can be used to create a page only in the creation-restricted space
+        visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        createPageInVisibilitySpace.setTemplate(templateProviderFullName);
+        createPageInVisibilitySpace.getDocumentPicker().toggleLocationAdvancedEdit();
+        EditPage editPage = createPageInVisibilitySpace
+            .createPageFromTemplate("RestrictedPage", creationSpace, null, templateProviderFullName);
+        ViewPage createdPage = editPage.clickSaveAndView();
+        assertEquals(templateContent, createdPage.getContent());
+
+        // The template cannot be used to create a page outside the creation-restricted space
+        visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        createPageInVisibilitySpace.setTemplate(templateProviderFullName);
+        createPageInVisibilitySpace.getDocumentPicker().toggleLocationAdvancedEdit();
+        createPageInVisibilitySpace.getDocumentPicker().setParent(visibilitySpace);
+        createPageInVisibilitySpace.getDocumentPicker().setName("ShouldNotWork");
+        String currentURL = setup.getDriver().getCurrentUrl();
+        createPageInVisibilitySpace.clickCreate(false);
+        assertEquals(currentURL, setup.getDriver().getCurrentUrl());
+        createPageInVisibilitySpace.waitForFieldErrorMessage();
+    }
+
+    /**
      * Helper function to Create both a Template and a Template Provider for the tests in this class.
      */
     private ViewPage createTemplateAndTemplateProvider(TestUtils setup,
         LocalDocumentReference templateProviderReference, String templateContent, String templateTitle,
         boolean saveAndEdit) throws Exception
     {
+        return createTemplateAndTemplateProvider(setup, templateProviderReference, templateContent, templateTitle,
+            saveAndEdit, false);
+    }
+
+    /**
+     * Helper function to Create both a Template and a Template Provider for the tests in this class. When
+     * {@code withChildTemplate} is {@code true} the template is created as a non-terminal (WebHome) page with a
+     * descendant page so that the template hierarchy can be exercised (see XWIKI-18303).
+     */
+    private ViewPage createTemplateAndTemplateProvider(TestUtils setup,
+        LocalDocumentReference templateProviderReference, String templateContent, String templateTitle,
+        boolean saveAndEdit, boolean withChildTemplate) throws Exception
+    {
         // Create the template page in the same space as the template provider.
-        LocalDocumentReference templateReference =
-            new LocalDocumentReference(TEMPLATE_NAME, templateProviderReference.getParent());
-        setup.rest().savePage(templateReference, templateContent, templateTitle);
+        LocalDocumentReference templateReference;
+        if (withChildTemplate) {
+            // Use a non-terminal (WebHome) template so that it can have a descendant page. We build the spaces with
+            // the generic EntityReference constructor because the template provider reference is local (wiki-less)
+            // and a SpaceReference requires a non-null parent.
+            EntityReference templateSpace =
+                new EntityReference(TEMPLATE_NAME, EntityType.SPACE, templateProviderReference.getParent());
+            templateReference = new LocalDocumentReference("WebHome", templateSpace);
+            setup.rest().savePage(templateReference, templateContent, templateTitle);
+            // Create a descendant page under the template.
+            EntityReference childTemplateSpace =
+                new EntityReference(CHILD_TEMPLATE_NAME, EntityType.SPACE, templateSpace);
+            LocalDocumentReference childTemplateReference = new LocalDocumentReference("WebHome", childTemplateSpace);
+            setup.rest().savePage(childTemplateReference, CHILD_TEMPLATE_CONTENT, "Child Template Title");
+        } else {
+            templateReference = new LocalDocumentReference(TEMPLATE_NAME, templateProviderReference.getParent());
+            setup.rest().savePage(templateReference, templateContent, templateTitle);
+        }
+        EntityReference attachmentReference = new EntityReference("file.txt", EntityType.ATTACHMENT, templateReference);
+        setup.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        setup.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
 
         // Create the template provider.
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
         TemplateProviderInlinePage templateProviderInline =
             sectionPage.createTemplateProvider(templateProviderReference);
-        templateProviderInline.setTemplateName("Test Template");
+        templateProviderInline.setTemplateName(templateTitle);
         templateProviderInline.setTemplate(setup.serializeReference(templateReference));
         if (saveAndEdit) {
             templateProviderInline.setActionOnCreate(TemplateProviderInlinePage.ACTION_SAVEANDEDIT);

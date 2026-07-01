@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -55,6 +56,15 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 public class BasePage extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+
+    private static final By EDIT_BUTTON_LOCATOR = By.xpath("//li[@id='tmEdit']/a[contains(@class, 'btn')]");
+
+    /**
+     * Number of times the axe-core accessibility analysis is attempted before giving up, to work around the
+     * axe-injection race (see {@link #analyzeWithAxeReadyRetry}).
+     */
+    private static final int WCAG_ANALYZE_ATTEMPTS = 3;
+
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -67,10 +77,10 @@ public class BasePage extends BaseElement
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
 
-    @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@class, 'btn')]")
+    @FindBy(xpath = "//li[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
 
-    @FindBy(xpath = "//div[@id='tmMoreActions']/button")
+    @FindBy(xpath = "//li[@id='tmMoreActions']/button")
     private WebElement moreActionsMenu;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
@@ -191,7 +201,17 @@ public class BasePage extends BaseElement
      */
     protected void clickEditSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//li[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]"), id);
+    }
+
+    /**
+     * @return whether the "edit" button is available on the current page
+     * @since 17.5.0
+     * @since 17.4.1
+     */
+    public boolean isEditAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(EDIT_BUTTON_LOCATOR);
     }
 
     /**
@@ -199,8 +219,7 @@ public class BasePage extends BaseElement
      */
     public void edit()
     {
-        WebElement editMenuButton =
-            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]"));
+        WebElement editMenuButton = getDriver().findElement(EDIT_BUTTON_LOCATOR);
         editMenuButton.click();
     }
 
@@ -209,7 +228,7 @@ public class BasePage extends BaseElement
      */
     public String getEditURL()
     {
-        return getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]")).getAttribute("href");
+        return getDriver().findElement(EDIT_BUTTON_LOCATOR).getAttribute("href");
     }
 
     /**
@@ -317,7 +336,7 @@ public class BasePage extends BaseElement
      */
     public void clickMoreActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/button"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//li[@id='tmMoreActions']/button"), id);
     }
 
     /**
@@ -692,7 +711,7 @@ public class BasePage extends BaseElement
             if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
                 XWikiWebDriver driver = this.getDriver();
                 AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-                Results axeResult = axeBuilder.analyze(driver);
+                Results axeResult = analyzeWithAxeReadyRetry(axeBuilder, driver);
                 wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
                 long stopTime = System.currentTimeMillis();
                 long deltaTime = stopTime - startTime;
@@ -711,6 +730,27 @@ public class BasePage extends BaseElement
                 LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
             }
         }
+    }
+
+    private Results analyzeWithAxeReadyRetry(AxeBuilder axeBuilder, XWikiWebDriver driver)
+    {
+        // The axe-core library injects its script and then immediately probes window.axe. On a page that changes
+        // underneath the analysis (e.g. the refactoring job status page refreshing while the job runs), the page can
+        // navigate between the injection and the probe, leaving window.axe undefined and making analyze() fail. Waiting
+        // for the page to settle and re-running the analysis avoids this race.
+        JavascriptException lastError = null;
+        for (int attempt = 0; attempt < WCAG_ANALYZE_ATTEMPTS; attempt++) {
+            try {
+                return axeBuilder.analyze(driver);
+            } catch (JavascriptException e) {
+                if (e.getMessage() == null || !e.getMessage().contains("window.axe")) {
+                    throw e;
+                }
+                lastError = e;
+                waitUntilPageIsReady();
+            }
+        }
+        throw lastError;
     }
 
     /**
@@ -842,5 +882,25 @@ public class BasePage extends BaseElement
     public boolean hasRenderingError()
     {
         return getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror"));
+    }
+
+    /**
+     * @return {@code true} if an icon rendered by the Font Awesome (font-based) icon theme is displayed in the page
+     *         content; Font Awesome renders icons as {@code <span class="fa ...">} elements
+     * @since 18.6.0RC1
+     */
+    public boolean isFontAwesomeIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent span.fa"));
+    }
+
+    /**
+     * @return {@code true} if an icon rendered by the Silk (image-based) icon theme is displayed in the page content;
+     *         Silk renders icons as {@code <img src=".../icons/silk/...">} elements
+     * @since 18.6.0RC1
+     */
+    public boolean isSilkIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent img[src*='/icons/silk/']"));
     }
 }

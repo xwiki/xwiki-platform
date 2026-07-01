@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -41,13 +43,14 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
 import com.github.kklisura.cdt.protocol.commands.Target;
+import com.github.kklisura.cdt.protocol.types.target.WindowState;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
+import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
 import com.github.kklisura.cdt.services.types.ChromeTab;
 import com.github.kklisura.cdt.services.types.ChromeVersion;
 
@@ -89,7 +92,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
     private ExecutorService executorService;
 
     @Inject
-    private PDFExportConfiguration configuration;
+    private Provider<ChromeDevToolsServiceConfiguration> configProvider;
 
     @Override
     public void initialize() throws InitializationException
@@ -113,7 +116,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
         this.chromeService = this.chromeServiceFactory.createChromeService(host, remoteDebuggingPort);
 
         // Create a new WebSocket session.
-        ChromeVersion chromeVersion = waitForChromeService(this.configuration.getChromeRemoteDebuggingTimeout());
+        ChromeVersion chromeVersion = waitForChromeService(this.configProvider.get().getReadTimeout());
         this.browserDevToolsService = this.chromeServiceFactory.createBrowserDevToolsService(chromeVersion);
     }
 
@@ -137,11 +140,11 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
         return false;
     }
 
-    private ChromeVersion waitForChromeService(int timeoutSeconds) throws TimeoutException
+    private ChromeVersion waitForChromeService(long timeoutSeconds) throws TimeoutException
     {
         this.logger.debug("Waiting [{}] seconds for Chrome to accept remote debugging connections.", timeoutSeconds);
 
-        int timeoutMillis = timeoutSeconds * 1000;
+        long timeoutMillis = timeoutSeconds * 1000;
         int retryIntervalSeconds = 2;
         Exception exception = null;
         long start = System.currentTimeMillis();
@@ -179,22 +182,24 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
 
         Exception exception = null;
         try {
+            ChromeDevToolsServiceConfiguration config = this.configProvider.get();
             return getWithTimeout(() -> {
                 this.logger.debug("Creating incognito tab.");
                 Target browserTarget = this.browserDevToolsService.getTarget();
 
-                String browserContextId = browserTarget.createBrowserContext(true, null, null);
+                String browserContextId = browserTarget.createBrowserContext(true, null, null, List.of());
                 this.logger.debug("Created browser context [{}].", browserContextId);
 
-                String tabTargetId = browserTarget.createTarget("", null, null, browserContextId, false, false, false);
+                String tabTargetId = browserTarget.createTarget("", null, null, null, null, WindowState.NORMAL,
+                    browserContextId, false, null, false, false, false);
                 this.logger.debug("Created incognito tab [{}].", tabTargetId);
 
                 Optional<ChromeTab> tab =
                     this.chromeService.getTabs().stream().filter(t -> tabTargetId.equals(t.getId())).findFirst();
                 if (tab.isPresent()) {
                     return new org.xwiki.export.pdf.internal.chrome.ChromeTab(
-                        this.chromeService.createDevToolsService(tab.get()), this.browserDevToolsService,
-                        this.configuration);
+                        this.chromeService.createDevToolsService(tab.get(), config), this.browserDevToolsService,
+                        config);
                 } else {
                     throw new IOException(
                         String.format("The incognito tab [%s] we just created is missing.", tabTargetId));
@@ -243,7 +248,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
         // Disable new tasks from being submitted.
         this.executorService.shutdown();
         try {
-            int timeout = this.configuration.getChromeRemoteDebuggingTimeout();
+            long timeout = this.configProvider.get().getReadTimeout();
             // Wait a while for existing tasks to terminate.
             if (!this.executorService.awaitTermination(timeout, TimeUnit.SECONDS)) {
                 // Cancel currently executing tasks.
@@ -265,7 +270,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
     {
         if (this.executorService != null) {
             Future<T> future = this.executorService.submit(request);
-            return future.get(this.configuration.getChromeRemoteDebuggingTimeout(), TimeUnit.SECONDS);
+            return future.get(this.configProvider.get().getReadTimeout(), TimeUnit.SECONDS);
         } else {
             throw new IllegalStateException("The Chrome Manager must be initialized before making any requests.");
         }

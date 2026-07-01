@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link AttachmentDiff}.
@@ -29,33 +29,33 @@ import org.junit.Assert;
  * @version $Id$
  * @since 5.0M2
  */
-public class AttachmentDiffTest
+class AttachmentDiffTest
 {
     @Test
-    public void toStringWhenVersionsNotNull()
+    void toStringWhenVersionsNotNull()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", "1.1", "1.2");
-        Assert.assertEquals("filename: 1.1 \u21E8 1.2", diff.toString());
+        assertEquals("filename: 1.1 \u21E8 1.2", diff.toString());
     }
 
     @Test
-    public void toStringWhenNoOriginalVersion()
+    void toStringWhenNoOriginalVersion()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", null, "1.1");
-        Assert.assertEquals("filename: () \u21E8 1.1", diff.toString());
+        assertEquals("filename: () \u21E8 1.1", diff.toString());
     }
 
     @Test
-    public void toStringWhenNoNewVersion()
+    void toStringWhenNoNewVersion()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", "1.1", null);
-        Assert.assertEquals("filename: 1.1 \u21E8 ()", diff.toString());
+        assertEquals("filename: 1.1 \u21E8 ()", diff.toString());
     }
 
     @Test
-    public void toStringWhenNoVersions()
+    void toStringWhenNoVersions()
     {
         AttachmentDiff diff = new AttachmentDiff("filename", null, null);
-        Assert.assertEquals("filename: () \u21E8 ()", diff.toString());
+        assertEquals("filename: () \u21E8 ()", diff.toString());
     }
 }

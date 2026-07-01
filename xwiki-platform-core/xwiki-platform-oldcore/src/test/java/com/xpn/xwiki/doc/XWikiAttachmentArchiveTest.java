@@ -19,11 +19,13 @@
  */
 package com.xpn.xwiki.doc;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 
@@ -32,7 +34,7 @@ import org.suigeneris.jrcs.rcs.Version;
  * 
  * @version $Id$
  */
-public class XWikiAttachmentArchiveTest
+class XWikiAttachmentArchiveTest
 {
     /**
      * The object being tested.
@@ -41,53 +43,53 @@ public class XWikiAttachmentArchiveTest
 
     private XWikiAttachment attachment = mock(XWikiAttachment.class);
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
-        archive.setAttachment(attachment);
+        this.archive.setAttachment(this.attachment);
     }
 
     @Test
-    public void getVersionsWhenThereIsNoHistory()
+    void getVersionsWhenThereIsNoHistory()
     {
         Version version = new Version(3, 4);
-        when(attachment.getRCSVersion()).thenReturn(version);
+        when(this.attachment.getRCSVersion()).thenReturn(version);
 
-        assertArrayEquals(new Version[] {version}, archive.getVersions());
+        assertArrayEquals(new Version[] {version}, this.archive.getVersions());
     }
 
     @Test
-    public void getVersions() throws Exception
+    void getVersions() throws Exception
     {
         Archive rcsArchive = new Archive(new Object[] {"line"}, "file.txt", "5.2");
         rcsArchive.addRevision(new Object[] {"line modified"}, "");
-        archive.setRCSArchive(rcsArchive);
+        this.archive.setRCSArchive(rcsArchive);
 
-        assertArrayEquals(new Version[] {new Version(5, 2), new Version(5, 3)}, archive.getVersions());
+        assertArrayEquals(new Version[] {new Version(5, 2), new Version(5, 3)}, this.archive.getVersions());
     }
 
     @Test
-    public void getCurrentRevisionWhenThereIsNoHistory() throws Exception
+    void getCurrentRevisionWhenThereIsNoHistory() throws Exception
     {
         String version = "1.3";
-        when(attachment.getVersion()).thenReturn(version);
+        when(this.attachment.getVersion()).thenReturn(version);
 
-        assertEquals(attachment, archive.getRevision(null, version, null));
+        assertEquals(this.attachment, this.archive.getRevision(null, version, null));
     }
 
     @Test
-    public void getRevisionWhenThereIsNoHistory() throws Exception
+    void getRevisionWhenThereIsNoHistory() throws Exception
     {
-        when(attachment.getVersion()).thenReturn("1.1");
+        when(this.attachment.getVersion()).thenReturn("1.1");
 
-        assertNull(archive.getRevision(null, "2.7", null));
+        assertNull(this.archive.getRevision(null, "2.7", null));
     }
 
     @Test
-    public void getRevisionWhichDoesNotExist() throws Exception
+    void getRevisionWhichDoesNotExist() throws Exception
     {
-        archive.setRCSArchive(new Archive(new Object[] {"text"}, "file.txt", "1.2"));
+        this.archive.setRCSArchive(new Archive(new Object[] {"text"}, "file.txt", "1.2"));
 
-        assertNull(archive.getRevision(null, "7.2", null));
+        assertNull(this.archive.getRevision(null, "7.2", null));
     }
 }

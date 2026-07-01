@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-sources</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-source-legacy</artifactId>
   <name>XWiki Platform - Localization - Source - Legacy</name>
@@ -64,7 +64,6 @@
     </dependency>
 
     <!-- Test dependencies -->
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
@@ -72,31 +71,5 @@
       <type>pom</type>
       <scope>test</scope>
     </dependency>
-
-    <!-- Used to mock XWiki class -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <excludes>
-                **/XWikiPreferencesWikiTranslationBundle.java
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

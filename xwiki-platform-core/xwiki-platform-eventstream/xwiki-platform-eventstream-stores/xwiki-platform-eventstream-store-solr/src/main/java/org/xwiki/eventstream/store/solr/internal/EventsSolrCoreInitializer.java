@@ -19,11 +19,13 @@
  */
 package org.xwiki.eventstream.store.solr.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.store.solr.internal.migration.SolrDocumentMigration171001000;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
@@ -79,10 +81,13 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
      */
     public static final String FIELD_DOCUMENT_INDEX = "document_index";
 
+    @Inject
+    private SolrDocumentMigration171001000 migration171001000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_14_7;
+        return SCHEMA_VERSION_17_10_1;
     }
 
     @Override
@@ -128,6 +133,10 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
         }
         if (cversion < SCHEMA_VERSION_14_7) {
             setStringField(Event.FIELD_REMOTE_OBSERVATION_ID, false, false);
+        }
+        if (cversion < SCHEMA_VERSION_17_10_1) {
+            setPDateField(Event.FIELD_PREFILTERING_DATE, false, false);
+            this.migration171001000.migrateAllDocuments(this.core);
         }
     }
 

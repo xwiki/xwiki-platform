@@ -26,10 +26,10 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -68,7 +68,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * The CKEditor instance that owns this rich text area.
      */
-    private CKEditor editor;
+    protected CKEditor editor;
 
     /**
      * The element that defines the rich text area.
@@ -181,8 +181,25 @@ public class RichTextAreaElement extends BaseElement
                 getActiveElement().sendKeys(keysToSend);
             } finally {
                 maybeSwitchToDefaultContent();
+                forceSelectionChange();
             }
         }
+    }
+
+    /**
+     * CKEditor updates its internal selection state asynchronously (with a delay) after a change occurs in the editing
+     * area. This means the selection returned by CKEditor is not always up-to-date right after typing. This is
+     * especially problematic during test execution when keyboard events are simulated in quick succession. We have code
+     * both on the test framework side and on the CKEditor side that relies on the selection. When this code is executed
+     * right after sending keys to the editing area the outcome is not always the same, leading to test instability. We
+     * prevent this by forcing CKEditor to update its selection state.
+     */
+    private void forceSelectionChange()
+    {
+        getDriver().executeScript("""
+            const name = arguments[0];
+            const editor = CKEDITOR.instances[name];
+            editor.selectionChange(true);""", this.editor.getName());
     }
 
     /**
@@ -231,15 +248,20 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentContains(String html)
     {
+        waitUntilContentContains(html, getDriver().getTimeout());
+    }
+
+    protected void waitUntilContentContains(String html, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getContent(), html);
+                return Strings.CS.contains(getContent(), html);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**
@@ -251,15 +273,46 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilTextContains(String textFragment)
     {
+        waitUntilTextContains(textFragment, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextContains(String textFragment, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getText(), textFragment);
+                return Strings.CS.contains(getText(), textFragment);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
+    }
+
+    /**
+     * Waits until the rich text area has the specified plain text.
+     *
+     * @param text the text to wait for
+     * @since 17.10.2
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public void waitUntilTextIs(String text)
+    {
+        waitUntilTextIs(text, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextIs(String text, int timeout)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return Objects.equals(getText(), text);
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        }, timeout);
     }
 
     /**
@@ -268,22 +321,18 @@ public class RichTextAreaElement extends BaseElement
     private WebElement getActiveElement()
     {
         WebElement rootEditableElement = getRootEditableElement();
-        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
-        if (browserName.contains("firefox")) {
-            // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
-            // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
-            // of it using the arrow keys (as if the editing scope is set to that nested editable).
-            focus(rootEditableElement);
-            return rootEditableElement;
-        } else {
-            // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
-            // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
-            // inline the characters we type will be inserted outside the macro content nested editable).
-            WebElement activeElement = getDriver().switchTo().activeElement();
-            boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
-                .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
-            return rootEditableElementIsOrContainsActiveElement ? activeElement : rootEditableElement;
+        // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
+        // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
+        // inline the characters we type will be inserted outside the macro content nested editable).
+        WebElement activeElement = getDriver().switchTo().activeElement();
+        boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
+            .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
+        if (!rootEditableElementIsOrContainsActiveElement) {
+            activeElement = rootEditableElement;
         }
+        // Firefox ignores the sent keys if the target element is not focused.
+        focus(activeElement);
+        return activeElement;
     }
 
     /**
@@ -321,7 +370,7 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilContentEditable()
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
-            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
+            () -> "true".equals(getRootEditableElement(false).getDomAttribute("contenteditable"))));
         this.cachedRefreshCounter = getRefreshCounter();
     }
 
@@ -333,8 +382,8 @@ public class RichTextAreaElement extends BaseElement
     {
         try {
             WebElement rootEditableElement = getRootEditableElement();
-            getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
+            getDriver().waitUntilCondition(driver -> Objects.equals(placeholder,
+                rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -423,44 +472,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public String getRefreshCounter()
     {
-        return getFromEditedContent(() -> getRootEditableElement(false).getAttribute("data-xwiki-refresh-counter"));
-    }
-
-    /**
-     * Sends the Save &amp; Continue shortcut key to the text area and waits for the success notification message.
-     *
-     * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
-     */
-    public void sendSaveShortcutKey()
-    {
-        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
-
-        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
-        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
-        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
-        // and restore it after the save confirmation.
-        WebElement activeElement;
-        try {
-            activeElement = getActiveElement();
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
-
-        // This steals the focus from the rich text area because it clicks on the success notification message in order
-        // to hide it.
-        waitForNotificationSuccessMessage("Saved");
-
-        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
-        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
-        // the image caption).
-        maybeSwitchToEditedContent();
-        try {
-            focus(activeElement);
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
+        return getFromEditedContent(() -> getRootEditableElement(false).getDomAttribute("data-xwiki-refresh-counter"));
     }
 
     private void focus(WebElement element)
@@ -516,6 +528,7 @@ public class RichTextAreaElement extends BaseElement
             script.append("document.body.append(fileInput);\n");
             script.append("return fileInput;\n");
             WebElement fileInput = (WebElement) getDriver().executeScript(script.toString());
+            assert fileInput != null;
 
             // Set the file input value.
             String absolutePath = Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath();
@@ -570,22 +583,61 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForOwnNotificationSuccessMessage(String message)
     {
-        waitForOwnNotificationMessage("success", message);
+        waitForOwnNotificationMessage("success", message, true);
     }
 
-    private void waitForOwnNotificationMessage(String level, String message)
+    /**
+     * Waits for an information notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public void waitForOwnNotificationInfoMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, true);
+    }
+
+    /**
+     * Waits for a warning notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public void waitForOwnNotificationWarningMessage(String message)
+    {
+        waitForOwnNotificationMessage("warning", message, true);
+    }
+
+    /**
+     * Waits for a progress notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     */
+    public void waitForOwnNotificationProgressMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, false);
+    }
+
+    private void waitForOwnNotificationMessage(String level, String message, boolean close)
     {
         String notificationMessageLocator =
             String.format("//div[contains(@class,'cke_notification_%s') and contains(., '%s')]", level, message);
         getDriver().waitUntilElementIsVisible(By.xpath(notificationMessageLocator));
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
-        try {
-            String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
-            getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
-        } catch (WebDriverException e) {
-            // The notification message may disappear before we get to click on it and thus we ignore in case there's
-            // an error.
+        if (close) {
+            try {
+                String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
+                getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
+            } catch (WebDriverException e) {
+                // The notification message may disappear before we get to click on it.
+            }
         }
     }
 
@@ -601,7 +653,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return !StringUtils.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
+                return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -620,5 +672,72 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * @return the text selected in the rich text area, or an empty string if no text is selected
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public String getSelectedText()
+    {
+        return (String) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]].getSelection().getSelectedText()", this.editor.getName());
+    }
+
+    /**
+     * @return the size of the rich text area
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public Dimension getSize()
+    {
+        return this.container.getSize();
+    }
+
+    /**
+     * @param xOffset the horizontal offset from the text area's left border
+     * @param yOffset the vertical offset from the text area's top border
+     * @return {@code true} if the specified point inside the text area is visible (i.e. inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(int xOffset, int yOffset)
+    {
+        return getDriver().isVisible(this.container, xOffset, yOffset);
+    }
+
+    /**
+     * Drag the specified image relative to its current position.
+     * 
+     * @param imageIndex the index of the image to be dragged (0-based)
+     * @param xOffset the horizontal move offset (from the current position of the image)
+     * @param yOffset the vertical move offset (from the current position of the image)
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void dragAndDropImageBy(int imageIndex, int xOffset, int yOffset)
+    {
+        verifyContent(editedContent -> {
+            WebElement targetImage = editedContent.getImages().get(imageIndex);
+            WebElement dragHandle = targetImage
+                .findElement(By.xpath("./ancestor::*[@data-cke-widget-wrapper]//*[@data-cke-widget-drag-handler]"));
+            // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
+            // text area is implemented using an iframe. Here's what we tried:
+            // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
+            // and so on)
+            // * clicking the image before dragging it
+            // * clicking the rich text area before dragging the image
+            // * use the root editable element as the drop target, and consider the offsets relative to the top left
+            // corner of the rich text area
+            // * calling perform() after each action
+            // * switching to the top frame and dropping on the iframe element used by the rich text area
+            getDriver().createActions()
+                // Hover the image first to make sure the drag handle is visible.
+                .moveToElement(targetImage)
+                // We have to drag the image using the dedicated drag handle.
+                .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+        });
     }
 }

@@ -22,6 +22,8 @@ package org.xwiki.search.solr.ui;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,6 +44,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.feed.FeedPlugin;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -79,6 +83,19 @@ class SolrSearchPageTest extends PageTest
         this.xwiki.getPluginManager().addPlugin("feed", FeedPlugin.class.getName(), this.context);
 
         loadPage(SOLR_SEARCH_MACROS_REFERENCE);
+    }
+
+    @Test
+    void noEmptyParagraph() throws Exception
+    {
+        // Prevent that the search UI triggers a redirect.
+        this.request.put("r", "1");
+        Document searchDocument = renderHTMLPage(SOLR_SEARCH_REFERENCE);
+        Element firstElement = searchDocument.body().firstElementChild();
+        assertNotNull(firstElement);
+        // When there is whitespace inserted in the Velocity macro output, the first tag is a paragraph instead.
+        assertEquals("div", firstElement.tagName());
+        assertEquals("search-ui", firstElement.className());
     }
 
     @Test

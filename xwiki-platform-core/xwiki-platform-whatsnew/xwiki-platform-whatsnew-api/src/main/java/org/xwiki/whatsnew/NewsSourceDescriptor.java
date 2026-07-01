@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -33,7 +32,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public class NewsSourceDescriptor
 {
     private String id;

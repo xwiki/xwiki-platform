@@ -47,11 +47,6 @@ import org.xwiki.model.reference.EntityReference;
  */
 public abstract class AbstractInstanceInputEventGenerator<F> implements InstanceInputEventGenerator, Initializable
 {
-    @Inject
-    private FilterDescriptorManager filterDescriptorManager;
-
-    private List<Class<?>> filerInterfaces;
-
     protected Map<String, Object> properties;
 
     protected Object filter;
@@ -60,11 +55,16 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
 
     protected String currentWiki;
 
-    protected Stack<String> currentSpaces = new Stack<String>();
+    protected Stack<String> currentSpaces = new Stack<>();
 
     protected EntityReference currentReference;
 
     protected FilterStreamDescriptor descriptor;
+
+    @Inject
+    private FilterDescriptorManager filterDescriptorManager;
+
+    private List<Class<?>> filerInterfaces;
 
     @Override
     public void initialize() throws InitializationException

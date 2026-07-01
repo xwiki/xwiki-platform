@@ -49,6 +49,7 @@
           // group.
           {name: 'id', weight: 5},
           {name: 'nameTokens', weight: 4},
+          {name: 'name', weight: 3},
           {name: 'descriptionTokens', weight: 2},
           {name: 'group.id', weight: 1},
           {name: 'group.nameTokens', weight: 1}
@@ -70,11 +71,11 @@
       this.groups = {};
 
       // Initialize the quick action search asynchronously.
-      this.searchReady = new Promise(function(resolve, reject) {
-        require(['fuse'], function(Fuse) {
+      this.searchReady = new Promise((resolve, reject) => {
+        require(['es-module!fuse'], ({'default': Fuse}) => {
           resolve(new Fuse(this.actions, this.config.search));
-        }.bind(this), reject);
-      }.bind(this));
+        }, reject);
+      });
     }
 
     /**
@@ -250,17 +251,20 @@
       originalAutoCompletePrototype.attach.apply(this, arguments);
       this.view.element.setAttribute('aria-label', this.view.editor.localization.get('xwiki-slash.dropdown.hint'));
     },
+
     open: function() {
       originalAutoCompletePrototype.open.apply(this, arguments);
       // Include the query in the view so that we can properly wait for the auto-complete drop-down in our integration
       // tests.
       this.view.element.setAttribute('data-query', this.model.query);
     },
+
     getHtmlToInsert: function(...args) {
       return withStrictHTMLEncoding(() => {
         return originalAutoCompletePrototype.getHtmlToInsert.apply(this, args);
       });
     },
+
     getTextWatcher: function(...args) {
       // When pressing enter to select a shortcut Quick Action, the shortcut's textWatcher catches the event
       // and opens the new drop-down. It however doesn't catch click events by default, which is an other
@@ -269,6 +273,66 @@
       const textWatcher = originalAutoCompletePrototype.getTextWatcher.apply(this, args);
       this.editor.on("afterInsertHtml", function () {textWatcher.check(false);});
       return textWatcher;
+    },
+
+    /**
+     * We overwrite the default implementation because:
+     * - it sets the {@code aria-controls} attribute to the id of the current AutoComplete instance, loosing the
+     *   previous values (we should keep all the values, space separated)
+     * - it sets the {@code aria-expanded} attribute which is not supported by the {@code textbox} role; we should use
+     *   instead the {@code aria-haspopup} attribute
+     */
+    addAriaAttributesToEditable: function() {
+      const editable = this.editor.editable();
+      const autocompleteId = this.view.element.getAttribute('id');
+      if (editable?.isInline()) {
+        // The textbox role supports autocompletion.
+        // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/textbox_role#associated_aria_properties
+        editable.setAttribute('aria-autocomplete', 'list');
+        // The editor can have multiple AutoComplete instances (e.g. quick actions, mentions, links, etc.), each with
+        // their own dropdown. We need to list all of them (it's fine if the dropdowns are currently hidden).
+        editable.setAttribute('aria-controls', `${editable.getAttribute('aria-controls') || ''} ${autocompleteId}`
+          .trim());
+        // The autocomplete dropdown is hidden by default. We'll set this to true when we have suggestions to show.
+        // See #updateAriaAttributesOnEditable
+        editable.setAttribute('aria-haspopup', 'false');
+        // We'll use this to indicate the selected (active) suggestion.
+        // See #updateAriaActiveDescendantAttributeOnEditable
+        editable.setAttribute('aria-activedescendant', '');
+      }
+    },
+
+    /**
+     * We overwrite the default implementation because it sets the {@code aria-expanded} attribute which is not
+     * supported by the {@code textbox} role. We have to use the {@code aria-haspopup} attribute instead.
+     *
+     * @param {CKEDITOR.event} event the {@code change-isActive} event triggered by the model
+     */
+    updateAriaAttributesOnEditable: function(event) {
+      const editable = this.editor.editable();
+      const isActive = event.data;
+      if (editable?.isInline()) {
+        editable.setAttribute('aria-haspopup', isActive ? 'true' : 'false');
+        if (!isActive) {
+          editable.setAttribute('aria-activedescendant', '');
+        }
+      }
+    },
+
+    /**
+     * We overwrite the default implementation in order to remove the {@code aria-autocomplete} and
+     * {@code aria-haspopup} attributes.
+     */
+    removeAriaAttributesFromEditable: function() {
+      var editable = this.editor.editable();
+      if (editable?.isInline()) {
+        editable.removeAttributes([
+          'aria-autocomplete',
+          'aria-controls',
+          'aria-haspopup',
+          'aria-activedescendant'
+        ]);
+      }
     }
   });
 
@@ -282,6 +346,14 @@
       args[0] = CSS.escape(args[0]);
       return originalViewPrototype.getItemById.apply(this, args);
     },
+
+    createElement: function(...args) {
+      const element = originalViewPrototype.createElement.apply(this, args);
+      // WCAG: Scrollable region must have keyboard access
+      element.setAttribute('tabindex', '0');
+      return element;
+    },
+
     createItem: function(...args) {
       return withStrictHTMLEncoding(() => {
         return originalViewPrototype.createItem.apply(this, args);
@@ -409,11 +481,16 @@
         return CKEDITOR.plugins.textMatch.match(range, function(text, offset) {
           // Get the text before the caret.
           var left = text.slice(0, offset),
-              // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
-          if (match) {
+            partRegEx = escapeRegExp(config.marker) + '.{0,30}$',
+            // Will look for the marker followed by text.
+            // We make a distinction between the match starting at the beginning of a line
+            // and the match starting after a space, since we want to keep the space the
+            // so the index is different then.
+            matchBeginLine = left.match(new RegExp('^' + partRegEx)),
+            matchAfterSpace = left.match(new RegExp('\\s' + partRegEx));
+          if (matchBeginLine || matchAfterSpace) {
             return {
-              start: match.index,
+              start: (matchBeginLine) ? matchBeginLine.index : matchAfterSpace.index + 1,
               end: offset
             };
           }
@@ -434,6 +511,15 @@
       '</li>'
     ].join('');
     this.view.groupTemplate = new CKEDITOR.template(groupTemplate);
+
+    // The base implementation performs the cleanup on the 'destroy' event, which is triggered after the editable is
+    // destroyed so it's too late for us to remove the aria attributes that were added in the initialization phase. We
+    // need to perform the cleanup before the editable is destroyed.
+    editor.on('beforeDestroy', function() {
+      this.destroy();
+      // The 'destroy' event listener has not been removed so we make sure it doesn't do anything.
+      this.destroy = function() {};
+    }, this);
   };
   // Inherit the autocomplete methods.
   AdvancedAutoComplete.prototype = CKEDITOR.tools.prototypedCopy(AutoComplete.prototype);
@@ -458,7 +544,14 @@
     getHtmlToInsert: function(item) {
       // Schedule the command execution after the AutoComplete panel is closed.
       this.maybeScheduleCommand(item);
-      return item.outputHTML || '';
+      if (item.outputHTML) {
+        return item.outputHTML;
+      } else if (this.outputTemplate) {
+        const encodedItem = encodeItem(item);
+        return this.outputTemplate.output(encodedItem);
+      } else {
+        return '';
+      }
     },
 
     /**
@@ -785,10 +878,7 @@
           command: {
             name: 'xwiki-macro',
             data: {
-              name: 'code',
-              parameters: {
-                language: 'none'
-              },
+              name: 'code'
             }
           }
         },

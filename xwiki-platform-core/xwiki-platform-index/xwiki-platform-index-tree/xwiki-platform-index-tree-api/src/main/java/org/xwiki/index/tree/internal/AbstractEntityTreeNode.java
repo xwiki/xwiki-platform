@@ -40,17 +40,18 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.tree.EntityTreeNode;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for tree nodes that represent entities.
- * 
+ *
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
-public abstract class AbstractEntityTreeNode extends AbstractTreeNode
+public abstract class AbstractEntityTreeNode extends AbstractTreeNode implements EntityTreeNode
 {
     /**
      * There is a single farm node and this is its id.

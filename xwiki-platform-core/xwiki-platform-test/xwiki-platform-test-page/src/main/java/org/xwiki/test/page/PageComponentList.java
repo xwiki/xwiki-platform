@@ -27,7 +27,6 @@ import java.lang.annotation.Target;
 import org.xwiki.cache.internal.DefaultCacheControl;
 import org.xwiki.classloader.internal.DefaultClassLoaderManager;
 import org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory;
-import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.display.internal.ConfiguredDocumentDisplayer;
@@ -37,14 +36,15 @@ import org.xwiki.display.internal.DefaultDocumentDisplayer;
 import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
+import org.xwiki.display.internal.DocumentReferenceDequeContext;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
-import org.xwiki.internal.document.DefaultDocumentRequiredRightsManager;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.internal.velocity.XWikiVelocityManager;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
+import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -62,6 +62,7 @@ import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRendererFactory;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.macro.message.MacroIconPrettyNameProvider;
+import org.xwiki.rendering.internal.macro.script.DefaultScriptMacroTools;
 import org.xwiki.rendering.internal.macro.velocity.DefaultVelocityMacroConfiguration;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFilter;
@@ -79,6 +80,7 @@ import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
+import org.xwiki.rendering.internal.transformation.macro.IsolatedExecutionConfiguration;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
@@ -89,8 +91,10 @@ import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.script.internal.service.DefaultScriptServiceManager;
 import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
+import org.xwiki.security.internal.DefaultSecurityConfiguration;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.InternalVelocityEngine;
@@ -99,21 +103,7 @@ import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.internal.XWikiMathTool;
 import org.xwiki.velocity.internal.XWikiNumberTool;
 import org.xwiki.velocity.internal.XWikiVelocityConfiguration;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
-import org.xwiki.xml.internal.html.DefaultHTMLElementSanitizer;
-import org.xwiki.xml.internal.html.HTMLDefinitions;
-import org.xwiki.xml.internal.html.HTMLElementSanitizerConfiguration;
-import org.xwiki.xml.internal.html.MathMLDefinitions;
-import org.xwiki.xml.internal.html.SVGDefinitions;
-import org.xwiki.xml.internal.html.SecureHTMLElementSanitizer;
-import org.xwiki.xml.internal.html.XWikiHTML5TagProvider;
-import org.xwiki.xml.internal.html.filter.AttributeFilter;
-import org.xwiki.xml.internal.html.filter.BodyFilter;
-import org.xwiki.xml.internal.html.filter.FontFilter;
-import org.xwiki.xml.internal.html.filter.LinkFilter;
-import org.xwiki.xml.internal.html.filter.ListFilter;
-import org.xwiki.xml.internal.html.filter.ListItemFilter;
-import org.xwiki.xml.internal.html.filter.SanitizerFilter;
+import org.xwiki.xml.html.DefaultHTMLCleanerComponentList;
 
 import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
 import com.xpn.xwiki.internal.DefaultXWikiStubContextProvider;
@@ -187,6 +177,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultMacroManager.class,
     DefaultMacroIdFactory.class,
     DefaultErrorBlockGenerator.class,
+    IsolatedExecutionConfiguration.class,
 
     // Properties
     DefaultBeanManager.class,
@@ -210,6 +201,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     BaseAsyncRendererExecutor.class,
     DefaultAsyncContext.class,
     SheetDocumentDisplayer.class,
+    DocumentReferenceDequeContext.class,
 
     // Sheet
     DefaultSheetManager.class,
@@ -247,24 +239,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultVelocityMacroConfiguration.class,
     IndentVelocityMacroFilter.class,
 
-    // HTML Cleaner
-    DefaultHTMLCleaner.class,
-    ListFilter.class,
-    ListItemFilter.class,
-    FontFilter.class,
-    BodyFilter.class,
-    AttributeFilter.class,
-    LinkFilter.class,
-    SanitizerFilter.class,
-    DefaultHTMLElementSanitizer.class,
-    SecureHTMLElementSanitizer.class,
-    HTMLElementSanitizerConfiguration.class,
-    RestrictedConfigurationSourceProvider.class,
-    HTMLDefinitions.class,
-    MathMLDefinitions.class,
-    SVGDefinitions.class,
-    XWikiHTML5TagProvider.class,
-
     // HTML Macro
     HTMLMacro.class,
     HTMLMacroXHTMLRendererFactory.class,
@@ -291,6 +265,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLocalizationManager.class,
     DefaultTranslationBundleContext.class,
     XWikiLocalizationContext.class,
+    TranslationMacro.class,
+    DefaultScriptMacroTools.class,
 
     // Property Class Providers (needed when the page has xobjects)
     StaticListMetaClass.class,
@@ -306,17 +282,21 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // Template Manager
     DefaultTemplateManager.class,
     InternalTemplateManager.class,
+    TemplateScriptService.class,
     TemplateContext.class,
     VelocityTemplateEvaluator.class,
     TemplateAsyncRenderer.class,
     DefaultCacheControl.class,
 
     // Required rights (needed for Document/Object API)
-    DefaultDocumentRequiredRightsManager.class,
-    DocumentRequiredRightsReader.class
+    DocumentRequiredRightsReader.class,
+
+    // Security configuration, needed for query limits, e.g., in DBListClass
+    DefaultSecurityConfiguration.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList
+@DefaultHTMLCleanerComponentList
 public @interface PageComponentList
 {
 }

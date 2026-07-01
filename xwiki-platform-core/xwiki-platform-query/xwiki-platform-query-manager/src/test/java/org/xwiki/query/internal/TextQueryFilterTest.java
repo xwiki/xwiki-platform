@@ -35,32 +35,72 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 9.8RC1
  */
 @ComponentTest
-public class TextQueryFilterTest
+class TextQueryFilterTest
 {
     @InjectMockComponents
     private TextQueryFilter filter;
 
     @Test
-    public void filterStatement()
+    void filterStatement()
     {
         String result = this.filter
-            .filterStatement(" \nseLEct  disTinCT   user.alias  as alias,\n user.name, user.age as unfilterable_age "
-                + "\n\r\tfROm Users user\r\nwHere  user.age >= 18\n", Query.HQL);
-        assertEquals("seLEct  disTinCT   user.alias  as alias,\n user.name, user.age as unfilterable_age "
-            + "\n\r\tfROm Users user\r\n"
-            + "wHere  (lower(str(user.alias)) like lower(:text) or lower(str(user.name)) like lower(:text))"
-            + " and (user.age >= 18)", result);
+            .filterStatement("""
+                \s
+                seLEct  disTinCT   user.alias  as alias,
+                 user.name, user.age as unfilterable_age\s
+                \r\tfROm Users user\r
+                wHere  user.age >= 18
+                """, Query.HQL);
+        assertEquals("""
+                seLEct  disTinCT   user.alias  as alias,
+                 user.name, user.age as unfilterable_age\s
+                \r\tfROm Users user\r
+                wHere  (lower(str(user.alias)) like lower(:text) or lower(str(user.name)) like lower(:text)) and (user.age >= 18)""",
+            result);
     }
 
     @Test
-    public void filterStatementWithNoFilterableColumns()
+    void filterStatementWithNoFilterableColumns()
     {
         String statement = "select age as unfilterable_age from Users";
         assertEquals(statement, this.filter.filterStatement(statement, Query.HQL));
     }
 
     @Test
-    public void filterResults()
+    void filterStatementWithClob()
+    {
+        String statement = "select prop.textValue as stringValue, 1 as unfilterable0 "
+            + "from BaseObject as obj, StringListProperty as prop "
+            + "where obj.className = :className "
+            + "  and obj.name <> :templateName "
+            + "  and prop.id.id = obj.id "
+            + "  and prop.id.name = :propertyName "
+            + "  and not exists ("
+            + "    select 1 from StringListProperty as prop2 "
+            + "    where prop2.id.name = :propertyName "
+            + "      and prop2.id.id < prop.id.id "
+            + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.textValue, prop.textValue) = 0"
+            + "  ) "
+            + "order by obj.id";
+        String result = this.filter.filterStatement(statement, Query.HQL);
+        assertEquals("select prop.textValue as stringValue, 1 as unfilterable0 "
+            + "from BaseObject as obj, StringListProperty as prop "
+            + "where (lower(prop.textValue) like lower(:text)) "
+            + "and (obj.className = :className "
+            + "  and obj.name <> :templateName "
+            + "  and prop.id.id = obj.id "
+            + "  and prop.id.name = :propertyName "
+            + "  and not exists ("
+            + "    select 1 from StringListProperty as prop2 "
+            + "    where prop2.id.name = :propertyName "
+            + "      and prop2.id.id < prop.id.id "
+            + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.textValue, prop.textValue) = 0"
+            + "  )) "
+            + "order by obj.id", result);
+    }
+
+    @Test
+    void filterResults()
     {
         assertEquals(Arrays.asList("one", "two"), this.filter.filterResults(Arrays.asList("one", "two")),
             "Results should not be filtered.");

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -86,7 +86,7 @@ public class NestedPageCounter
             query.bindValue("space", this.localEntityReferenceSerializer.serialize(rootReference.getParent()));
             String spacePrefix = this.localEntityReferenceSerializer
                 .serialize(new DocumentReference(String.valueOf('X'), rootReference.getLastSpaceReference()));
-            spacePrefix = StringUtils.removeEnd(spacePrefix, String.valueOf('X'));
+            spacePrefix = Strings.CS.removeEnd(spacePrefix, String.valueOf('X'));
             query.bindValue("spacePrefix").literal(spacePrefix).anyChars();
             query.addFilter(this.countFilter);
             return query.<Long>execute().get(0);

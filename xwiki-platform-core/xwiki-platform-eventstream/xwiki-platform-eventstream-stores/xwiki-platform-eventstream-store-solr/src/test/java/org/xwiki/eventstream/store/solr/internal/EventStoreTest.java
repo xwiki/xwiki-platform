@@ -55,6 +55,7 @@ import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
+import org.xwiki.eventstream.store.solr.internal.migration.SolrDocumentMigration171001000;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,7 +63,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -92,7 +93,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({EventsSolrCoreInitializer.class, WikiDeletedListener.class, WikiReferenceConverter.class,
     SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class})
 @ReferenceComponentList
-@SolrComponentList
+@EmbeddedSolrComponentList
 public class EventStoreTest
 {
     private static final DefaultEvent EVENT1 = event("id1");
@@ -164,6 +165,9 @@ public class EventStoreTest
 
     @MockComponent
     private WikiDescriptorManager wikis;
+
+    @MockComponent
+    private SolrDocumentMigration171001000 migration171000000;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;

@@ -94,7 +94,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 &lt;/table&gt;
 }}}
 
-{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]]を参照してください。{{/info}}
+{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]]を参照してください。{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")
@@ -143,7 +143,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |セル21|セル22
 }}}
 
-{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]]を参照してください。{{/info}}
+{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]]を参照してください。{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")

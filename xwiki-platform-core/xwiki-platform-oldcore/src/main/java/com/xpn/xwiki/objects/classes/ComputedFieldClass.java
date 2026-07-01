@@ -22,8 +22,10 @@ package com.xpn.xwiki.objects.classes;
 import javax.script.ScriptContext;
 
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,6 +42,13 @@ import com.xpn.xwiki.web.Utils;
  */
 public class ComputedFieldClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "ComputedField";
+
     /**
      * Constant defining the field name.
      **/
@@ -120,7 +129,7 @@ public class ComputedFieldClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         // There is no content in a computed field
         return null;
@@ -131,6 +140,12 @@ public class ComputedFieldClass extends PropertyClass
     {
         // There is no content in a computed field
         return null;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

@@ -216,7 +216,7 @@ public class XWikiDocumentLocaleEventGenerator
         // Attachments
 
         if (properties.isWithWikiAttachments()) {
-            List<XWikiAttachment> sortedAttachments = new ArrayList<XWikiAttachment>(document.getAttachmentList());
+            List<XWikiAttachment> sortedAttachments = new ArrayList<>(document.getAttachmentList());
             Collections.sort(sortedAttachments, new Comparator<XWikiAttachment>()
             {
                 @Override

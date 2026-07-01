@@ -21,8 +21,6 @@ package org.xwiki.security.authorization.requiredrights;
 
 import java.util.Set;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents the required rights that are configured on a document.
  *
@@ -32,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.10.0RC1
  */
-@Unstable
 public record DocumentRequiredRights(boolean enforce, Set<DocumentRequiredRight> rights)
 {
     /**

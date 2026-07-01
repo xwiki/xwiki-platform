@@ -300,6 +300,14 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
             ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0],
               failureMessage: "$!mustMatch.failureMessage", identifier: 'must-match'});
+            // We want to update the validation status of the field when its mustmatch field is updated.
+            // We use the 'blur' event, which is the same as the one used to trigger validation in
+            // livevalidation_prototype.js 
+            $$("input[name=$!mustMatch.name]")[0].on("blur", function() {
+              // Somehow in this context I couldn't get the 'trigger' function from jquery to work
+              // so instead we trigger the event with native javascript.
+              $$("input[name=$!fieldName]")[0].dispatchEvent(new Event("blur"));
+            });
           #end
         #end
         ##

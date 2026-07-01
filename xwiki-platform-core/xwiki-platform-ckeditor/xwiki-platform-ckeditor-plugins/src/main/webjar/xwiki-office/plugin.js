@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
+ define('officeImporterModal', ['jquery', 'xwiki-wysiwyg-modal'], function($, $modal) {
   'use strict';
   return $modal.createModalStep({
     'class': 'office-importer-modal',
@@ -89,6 +89,37 @@
       }
     },
 
+    afterInit: function(editor) {
+      if (editor.config.applyPasteFilterAfterPasteFromWord) {
+        const triggerAfterPasteFromWord = filteredWordContent => {
+          const data = {dataValue: filteredWordContent};
+          // This will apply the XWiki paste filter to the filtered content. See below.
+          editor.fire('afterPasteFromWord', data);
+          return data.dataValue;
+        };
+
+        // Make sure the XWiki paste filter is also applied when pasting from LibreOffice and Google Docs.
+        // See XWIKI-22750: Styles are not filtered anymore when pasting from LibreOffice
+        // The problem is that the LibreOffice and Google Docs paste filters are loaded and registered on demand, when
+        // the user pastes content from these tools, so we need to overwrite them when the paste event is triggered.
+        const targetPasteFilters = {'gdocs': false, 'libreoffice': false};
+        editor.on('paste', function(event) {
+          Object.keys(targetPasteFilters)
+            // Overwrite the target filters that have been loaded and are not already overwritten.
+            .filter(filterName => !targetPasteFilters[filterName] && CKEDITOR.pasteFilters?.[filterName])
+            .forEach(filterName => {
+              targetPasteFilters[filterName] = CKEDITOR.pasteFilters[filterName];
+              // Overwrite the target paste filter to trigger the 'afterPasteFromWord' event.
+              CKEDITOR.pasteFilters[filterName] = function(...args) {
+                const result = targetPasteFilters[filterName].apply(this, args);
+                return triggerAfterPasteFromWord(result);
+              };
+            });
+        // Our paste listener needs to be called before the pastetools one (which uses priority 3).
+        }, this, null, 2);
+      }
+    },
+
     // The paste filter is not applied by default for content pasted from Word.
     // https://dev.ckeditor.com/ticket/13093
     // https://stackoverflow.com/questions/45501341/ckeditor-pastefromword-ignores-pastefilter
@@ -146,14 +177,7 @@
             filterStyles: upload.file.filterStyles,
             useOfficeViewer: upload.file.useOfficeViewer,
             outputSyntax: 'plain'
-          }).done(function(html, textStatus, jqXHR) {
-            // Load the required skin extensions reusing the function defined by the Macro Wizard. This is needed for
-            // instance when importing a presentation using the Office Viewer macro which requires the gallery widget so
-            // we need to load the gallery CSS and JavaScript resources (skin extensions).
-            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            require(['macroWizard'], function() {
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-            });
+          }).done(function(html) {
             widget.replaceWith(html);
             notification.update({
               message: editor.localization.get('xwiki-office.importer.done'),

@@ -26,6 +26,8 @@ import org.xwiki.filter.event.model.WikiAttachmentFilter;
  * @version $Id$
  * @since 6.2M1
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface XWikiWikiAttachmentFilter extends WikiAttachmentFilter
 {
     /**

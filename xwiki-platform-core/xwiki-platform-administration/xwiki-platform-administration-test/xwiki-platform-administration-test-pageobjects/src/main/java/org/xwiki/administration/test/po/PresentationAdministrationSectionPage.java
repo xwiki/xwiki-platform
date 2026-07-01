@@ -19,7 +19,6 @@
  */
 package org.xwiki.administration.test.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.Select;
@@ -205,14 +204,6 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     {
         this.copyright.sendKeys(value);
     }
-    /**
-     * @return the content of the copyright section in the page footer
-     * @since 18.6.0RC1
-     */
-    public String getFooterCopyright()
-    {
-        return this.getDriver().findElement(By.id("xwikilicence")).getText();
-    }
 
     /**
      * @param value the value to set for the "Version" option
@@ -221,13 +212,5 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     public void setVersion(String value)
     {
         this.version.sendKeys(value);
-    }
-    /**
-     * @return return the content of the version section in the page footer
-     * @since 18.6.0RC1
-     */
-    public String getFooterVersion()
-    {
-        return this.getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 }

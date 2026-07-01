@@ -193,6 +193,7 @@
       {{ $t("livedata.pagination.resultsPerPage") }}
       <select
         :title="$t('livedata.pagination.selectPageSize')"
+        :aria-label="$t('livedata.pagination.selectPageSize')"
         @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->

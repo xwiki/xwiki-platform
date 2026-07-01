@@ -226,4 +226,9 @@ public class AllIT
     class NestedCreatePageNestedDocumentsIT extends CreatePageNestedDocumentsIT
     {
     }
+
+    @Nested
+    class NestedNameStrategiesReplaceCharacterIT extends NameStrategiesReplaceCharacterIT
+    {
+    }
 }

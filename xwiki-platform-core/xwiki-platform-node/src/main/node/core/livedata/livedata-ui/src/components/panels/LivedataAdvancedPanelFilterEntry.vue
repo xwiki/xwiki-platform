@@ -33,7 +33,7 @@
     -->
     <select
       class="operator-select"
-      :aria-label="$t('livedata.panel.filter.operator', [propertyName])"
+      :aria-label="$t('livedata.panel.filter.operator.hint', [propertyName])"
       @change="
         logic.filter(propertyId, filterIndex, { operator: $event.target.value })
       "

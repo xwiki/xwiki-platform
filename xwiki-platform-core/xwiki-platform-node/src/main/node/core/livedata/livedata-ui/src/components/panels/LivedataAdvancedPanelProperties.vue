@@ -157,5 +157,6 @@ export default {
 
 .livedata-advanced-panel-properties .property-name {
   padding: 6px 0px;
+  margin-left: 1rem;
 }
 </style>

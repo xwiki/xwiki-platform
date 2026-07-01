@@ -238,7 +238,12 @@ public final class DockerTestUtils
      */
     public static File getScreenshotsDirectory(TestConfiguration testConfiguration)
     {
-        File directory = new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
+        // Save screenshots and videos directly under the Maven build directory (and not under the
+        // configuration-specific output directory returned by getOutputDirectory()) so that they always end up in
+        // "<maven.build.dir>/screenshots". This keeps a stable, predictable location for the CI pipeline that attaches
+        // them to failing tests. The configuration name is still part of the file name (see getResultFileLocation()) so
+        // that artifacts stay unique when Jenkins flattens them during archiving.
+        File directory = new File(String.format("%s/screenshots", testConfiguration.getMavenBuildDirectory()));
         directory.mkdirs();
         return directory;
     }
@@ -279,8 +284,8 @@ public final class DockerTestUtils
         // Note: There's currently a limitation in Jenkins when archiving artifacts: they are copied without caring
         // about their locations. And since we run the same test several times but with different configurations,
         // the test name is not enough to uniquely point to a given test in a given configuration. Thus we also
-        // need to save the configuration name, even though the directory in which we're saving the screenshot
-        // is already named after the executing configuration name.
+        // need to prefix the file name with the configuration name so that artifacts stay unique across
+        // configurations once Jenkins has flattened them.
         File newDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
         // Tests could be repeated and if they are we need to compute a file name that takes into account the repetition
         // There seems to be no easy way to get them right now, see https://github.com/junit-team/junit5/issues/1884

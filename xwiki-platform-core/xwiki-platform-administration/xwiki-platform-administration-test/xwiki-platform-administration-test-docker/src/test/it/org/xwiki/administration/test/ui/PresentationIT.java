@@ -21,6 +21,7 @@ package org.xwiki.administration.test.ui;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
@@ -72,6 +73,7 @@ class PresentationIT
      * Validate that the show information setting of the Presentation section of the administration has an effect.
      */
     @Test
+    @Order(1)
     void showPageInformationTabSettings(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -93,6 +95,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(2)
     void showPageAttachmentsTab(TestUtils setup, TestReference testReference)
     {
         setup.createPage(testReference, "");
@@ -117,6 +120,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(3)
     void showPageCommentsTab(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -138,6 +142,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(4)
     void showPageHistoryTab(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -159,6 +164,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(5)
     void customizeCopyright(TestUtils setup, TestReference testReference)
     {
         PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
@@ -171,6 +177,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(6)
     void customizeVersion(TestUtils setup, TestReference testReference) throws Exception
     {
         PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();

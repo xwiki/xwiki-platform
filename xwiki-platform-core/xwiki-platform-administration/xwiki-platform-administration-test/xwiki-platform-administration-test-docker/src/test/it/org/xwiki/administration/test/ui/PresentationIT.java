@@ -163,11 +163,11 @@ class PresentationIT
     {
         PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
         // Check that there is no copyright in the footer by default
-        assertTrue(presentationSectionPage.getCopyright().isEmpty());
+        assertTrue(presentationSectionPage.getFooterCopyright().isEmpty());
         presentationSectionPage.setCopyright("test-copyright");
         presentationSectionPage.clickSave();
         // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
-        assertEquals("test-copyright", presentationSectionPage.getCopyright());
+        assertEquals("test-copyright", presentationSectionPage.getFooterCopyright());
     }
 
     @Test

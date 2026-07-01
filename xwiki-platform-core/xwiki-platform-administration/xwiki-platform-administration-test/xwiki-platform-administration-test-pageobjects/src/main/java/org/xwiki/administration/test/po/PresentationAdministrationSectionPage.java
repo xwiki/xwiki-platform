@@ -209,7 +209,7 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
      * @return the content of the copyright section in the page footer
      * @since 18.6.0RC1
      */
-    public String getCopyright()
+    public String getFooterCopyright()
     {
         return this.getDriver().findElement(By.id("xwikilicence")).getText();
     }

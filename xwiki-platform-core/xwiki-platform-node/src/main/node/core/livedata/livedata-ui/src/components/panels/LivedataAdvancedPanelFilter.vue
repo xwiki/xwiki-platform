@@ -140,6 +140,7 @@
       <select
         class="add-filters-select"
         v-show="unfilteredProperties.length > 0"
+        :aria-label="$t('livedata.panel.filter.addProperty.hint')"
         @change="addFilterGroup($event.target.value)"
       >
         <!--

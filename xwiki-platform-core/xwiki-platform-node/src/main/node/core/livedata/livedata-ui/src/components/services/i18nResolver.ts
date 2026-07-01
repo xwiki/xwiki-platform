@@ -64,6 +64,7 @@ export async function i18nResolver(
       "panel.filter.noneFilterable",
       "panel.filter.addConstraint",
       "panel.filter.addProperty",
+      "panel.filter.addProperty.hint",
       "panel.filter.operator.hint",
       "panel.filter.delete",
       "panel.filter.deleteAll",

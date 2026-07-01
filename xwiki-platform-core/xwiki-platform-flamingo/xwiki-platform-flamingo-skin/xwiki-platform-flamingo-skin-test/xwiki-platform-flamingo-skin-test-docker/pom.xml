@@ -140,6 +140,13 @@
       <artifactId>xwiki-platform-diff-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for NameStrategiesReplaceCharacterIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -166,6 +173,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed for NameStrategiesReplaceCharacterIT: the Name Strategies administration section page object. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

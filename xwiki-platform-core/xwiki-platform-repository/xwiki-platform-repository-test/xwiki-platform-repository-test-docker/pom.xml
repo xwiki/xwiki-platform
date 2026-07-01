@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository-test</artifactId>
-    <version>18.5.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-test-docker</artifactId>
   <name>XWiki Platform - Repository - Tests - Functional Docker Tests</name>
@@ -111,6 +111,15 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to serve the maven test extension repository over HTTP from a container reachable by XWiki, since XWiki
+         can run in a container and then can't access the maven repository on the host filesystem (in particular in the
+         DOOD setup used on the CI). -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-nginx</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

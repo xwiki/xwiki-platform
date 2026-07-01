@@ -28,6 +28,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNestedElementsLocatedBy;
 
 /**
  * Represents the BlockNote rich text area.
@@ -114,6 +115,30 @@ public class BlockNoteRichTextArea extends BaseElement
             getActiveElement().sendKeys(keysToSend);
         }
         return this;
+    }
+
+    /**
+     * Appends a new paragraph at the end of the content and types the given keys in it.
+     * <p>
+     * Since BlockNote 0.51 the trailing block (the empty area at the bottom of the editor) is no longer a real,
+     * editable paragraph but a non-editable decoration widget that inserts a new paragraph (and places the caret in it)
+     * only when clicked. As a consequence we can't simply move the caret to the end of the content (e.g. with
+     * {@code PAGE_DOWN}) and type, because the typed text would have no editable target and would be dropped. We have
+     * to click the trailing block first to materialize a real paragraph.
+     * <p>
+     * An alternative way to insert an end-of-content new line is to move the caret to the end of the last line, then
+     * press {@code ENTER}.
+     *
+     * @param keysToSend the sequence of keys to type in the new paragraph
+     * @return this blocknote rich text area instance
+     * @since 18.6.0RC1
+     */
+    public BlockNoteRichTextArea appendParagraph(CharSequence... keysToSend)
+    {
+        By trailingBlock = By.cssSelector(".bn-trailing-block");
+        getDriver().waitUntilCondition(visibilityOfNestedElementsLocatedBy(this.container, trailingBlock));
+        getDriver().createActions().click(this.container.findElement(trailingBlock)).perform();
+        return sendKeys(keysToSend);
     }
 
     /**

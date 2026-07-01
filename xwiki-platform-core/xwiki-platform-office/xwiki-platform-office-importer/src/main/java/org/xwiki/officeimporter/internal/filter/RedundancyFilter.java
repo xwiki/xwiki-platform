@@ -86,7 +86,7 @@ public class RedundancyFilter extends AbstractHTMLFilter
             if ("".equals(textContent)) {
                 element.getParentNode().removeChild(element);
             } else {
-                element.setTextContent(textContent.replaceAll(" ", "&nbsp;"));
+                element.setTextContent(textContent.replace(" ", "&nbsp;"));
             }
         }
     }

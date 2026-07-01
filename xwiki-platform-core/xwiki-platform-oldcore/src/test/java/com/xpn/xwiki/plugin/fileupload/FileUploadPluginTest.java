@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.fileupload;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.servlet.http.Part;
@@ -26,6 +27,7 @@ import javax.servlet.http.Part;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -83,6 +85,11 @@ class FileUploadPluginTest
     @Mock
     private Part part0;
 
+    // Store uploaded file items under the module's "target" directory so that they don't leak outside the build
+    // workspace.
+    @TempDir
+    private Path temporaryDirectory;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -98,7 +105,7 @@ class FileUploadPluginTest
     @Test
     void loadFileList() throws Exception
     {
-        this.fileUploadPlugin.loadFileList(100, 10, "/tmp", this.context);
+        this.fileUploadPlugin.loadFileList(100, 10, this.temporaryDirectory.toString(), this.context);
         verify(this.attachmentValidator).validateAttachment(any(AttachmentAccessWrapper.class));
         verify(this.context).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));
@@ -110,8 +117,8 @@ class FileUploadPluginTest
     {
         doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
             .validateAttachment(any(AttachmentAccessWrapper.class));
-        assertThrows(AttachmentValidationException.class, () -> this.fileUploadPlugin.loadFileList(100, 10, "/tmp",
-            this.context));
+        assertThrows(AttachmentValidationException.class,
+            () -> this.fileUploadPlugin.loadFileList(100, 10, this.temporaryDirectory.toString(), this.context));
         verify(this.attachmentValidator).validateAttachment(any(AttachmentAccessWrapper.class));
         verify(this.context, never()).put(eq(FILE_LIST_KEY), any());
         assertEquals("Loading uploaded files", this.logCapture.getMessage(0));

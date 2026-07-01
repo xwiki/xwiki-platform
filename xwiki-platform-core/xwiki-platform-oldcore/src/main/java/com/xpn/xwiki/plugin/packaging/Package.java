@@ -526,7 +526,7 @@ public class Package
                             "Failed to parse document [{}] from XML during import, thus it will not be installed. "
                                 + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
-                        addToErrors(entry.getName().replaceAll("/", "."), context);
+                        addToErrors(entry.getName().replace("/", "."), context);
 
                         continue;
                     }

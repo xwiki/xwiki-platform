@@ -103,7 +103,7 @@
           #end
           &lt;div class="engine $type #if ($currentType != $type)hidden#end radio"&gt;
             &lt;label&gt;
-              &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" value="$engine" $maybeChecked /&gt;
+              &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" value="$escapetool.xml($engine)" $maybeChecked /&gt;
               $escapetool.xml($services.localization.render("captcha.jcaptcha.engine.$engine"))
             &lt;/label&gt;
           &lt;/div&gt;
@@ -116,7 +116,7 @@
             &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
             $escapetool.xml($services.localization.render('captcha.jcaptcha.engine.custom'))
           &lt;/label&gt;
-          &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$currentEngine"#end /&gt;
+          &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$escapetool.xml($currentEngine)"#end /&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/dd&gt;

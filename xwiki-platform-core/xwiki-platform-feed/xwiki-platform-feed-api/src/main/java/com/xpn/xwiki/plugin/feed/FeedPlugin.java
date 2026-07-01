@@ -528,7 +528,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             SyndEntry entry = entries.get(i);
             if (oneDocPerEntry) {
                 String hashCode = "" + entry.getLink().hashCode();
-                String pagename = feedname + "_" + hashCode.replaceAll("-", "") + "_" + entry.getTitle();
+                String pagename = feedname + "_" + hashCode.replace("-", "") + "_" + entry.getTitle();
                 doc =
                     context.getWiki().getDocument(
                         prefix + "_" + context.getWiki().clearName(pagename, true, true, context), context);

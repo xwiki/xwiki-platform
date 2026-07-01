@@ -20,10 +20,13 @@
 import { Container, inject, injectable } from "inversify";
 import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
 import type {
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+} from "@xwiki/platform-editors-blocknote-react";
+import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
 } from "@xwiki/platform-macros-api";
-import type { MacroInvocation } from "@xwiki/platform-uniast-api";
 
 /**
  * Describes a macro call.
@@ -137,6 +140,20 @@ interface BlockNoteMacroWizard {
     parameters: UnknownMacroParamsType,
     options: Partial<MacroWizardOptions>,
   ): Promise<UnknownMacroParamsType>;
+
+  /**
+   * Opens the Macro Wizard to select a macro to insert
+   *
+   * @param type - indicates whether the macro is a block or inline
+   * @param parameters - the parameters to prefill the editor with
+   * @returns a promise that resolves to the resulting macro call
+   *
+   * @since 18.6.0RC1
+   */
+  insert(
+    type: "block" | "inline",
+    parameters: UnknownMacroParamsType | null,
+  ): Promise<MacroCall>;
 }
 
 /**
@@ -172,9 +189,17 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
       return parameters;
     }
 
-    const macroInvocation: MacroInvocation = JSON.parse(
-      parameters.call as string,
-    );
+    if (typeof parameters.call !== "string") {
+      console.error({ macro, parameters, options });
+
+      throw new Error(
+        'Missing or invalid "call" property on macro\'s parameters',
+      );
+    }
+
+    const macroInvocation: MacroBlockInvocation | InlineMacroInvocation =
+      JSON.parse(parameters.call);
+
     // Set default values for the configuration options.
     const actualOptions: MacroWizardOptions = {
       inlineParameters: this.getInlineParameters(macro, macroInvocation),
@@ -194,9 +219,35 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
     );
   }
 
+  public async insert(
+    type: "block" | "inline",
+    parameters: UnknownMacroParamsType | null,
+  ): Promise<MacroCall> {
+    return await this.macroWizard.insertOrUpdate(
+      {
+        inline: type === "inline",
+        parameters: parameters
+          ? Object.fromEntries(
+              Object.entries(parameters).map(([key, value]) => [
+                key,
+                value.toString(),
+              ]),
+            )
+          : {},
+      },
+      {
+        inlineParameters: {},
+        inlineParametersSyntax: "uniast/1.0",
+        showInlineParameters: true,
+        sourceDocumentReference: XWiki.currentDocument.documentReference,
+        syntax: XWiki.docsyntax,
+      },
+    );
+  }
+
   private getInlineParameters(
     macro: MacroWithUnknownParamsType,
-    macroInvocation: MacroInvocation,
+    macroInvocation: MacroBlockInvocation | InlineMacroInvocation,
   ): Record<string, string> {
     const inlineParameters = Object.fromEntries(
       Object.entries(macroInvocation.params)
@@ -207,16 +258,22 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
           this.serializeInlineParameterValue(value),
         ]),
     );
-    switch (macroInvocation.body.type) {
-      case "inlineContent":
-        inlineParameters.$content = this.serializeInlineParameterValue(
-          macroInvocation.body.inlineContent,
-        );
+
+    switch (macroInvocation.kind) {
+      case "block":
+        if (macroInvocation.body) {
+          inlineParameters.$content = this.serializeInlineParameterValue(
+            macroInvocation.body,
+          );
+        }
         break;
-      case "inlineContents":
-        inlineParameters.$content = this.serializeInlineParameterValue(
-          macroInvocation.body.inlineContents,
-        );
+
+      case "inline":
+        if (macroInvocation.body) {
+          inlineParameters.$content = this.serializeInlineParameterValue(
+            macroInvocation.body,
+          );
+        }
         break;
     }
     return inlineParameters;
@@ -229,7 +286,7 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
 
   private getMacroCall(
     macro: MacroWithUnknownParamsType,
-    macroInvocation: MacroInvocation,
+    macroInvocation: MacroBlockInvocation | InlineMacroInvocation,
     inlineParameters: Record<string, string>,
   ): MacroCall {
     const macroCall: MacroCall = {
@@ -253,13 +310,16 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
     return macroCall;
   }
 
-  private getMacroInvocation(macroCall: MacroCall): MacroInvocation {
+  private getMacroInvocation(
+    macroCall: MacroCall,
+  ): MacroBlockInvocation | InlineMacroInvocation {
     return {
+      kind: macroCall.inline ? "inline" : "block",
       id: macroCall.name,
       params: Object.fromEntries(
         Object.entries(macroCall.parameters).map(([key, value]) => [
           key,
-          value as string,
+          typeof value === "string" ? value : value.value,
         ]),
       ),
       body: macroCall.content
@@ -269,7 +329,7 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
   }
 
   private getMacroParameters(
-    macroInvocation: MacroInvocation,
+    macroInvocation: MacroBlockInvocation | InlineMacroInvocation,
     output: string | number | boolean,
   ): UnknownMacroParamsType {
     return {

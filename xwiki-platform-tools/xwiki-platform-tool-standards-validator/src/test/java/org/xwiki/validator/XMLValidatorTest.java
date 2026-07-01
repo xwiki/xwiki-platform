@@ -21,17 +21,17 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.validator.framework.AbstractXMLValidator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class XMLValidatorTest
+class XMLValidatorTest
 {
-    public class XMLValidator extends AbstractXMLValidator
+    class XMLValidator extends AbstractXMLValidator
     {
         public String getName()
         {
@@ -41,14 +41,14 @@ public class XMLValidatorTest
 
     private XMLValidator validator;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.validator = new XMLValidator();
     }
 
     @Test
-    public void testValidate()
+    void validate()
     {
         this.validator.setValidateXML(false);
 

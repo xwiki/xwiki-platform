@@ -19,7 +19,6 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
@@ -48,7 +47,7 @@ type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros"
+    "content" | "macros" | "depsContainer"
   >;
 
   /** Set to `false` to disable macros entirely */
@@ -64,8 +63,8 @@ type Props = {
 
   collaboration?: Collaboration;
 
-  /** InversifyJS container to inject dependencies from */
-  container: Container;
+  /** Container to inject dependencies from */
+  depsContainer: Container;
 };
 
 const {
@@ -73,7 +72,7 @@ const {
   editorContent: uniAst,
   macros,
   collaboration = undefined,
-  container,
+  depsContainer,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
@@ -120,9 +119,6 @@ const { t } = useI18n({
   messages,
 });
 
-// Create the link edition context
-const linkEditionCtx = createLinkEditionContext(container);
-
 // Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   ...editorProps,
@@ -132,7 +128,6 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
   blockNoteOptions: editorProps.blockNoteOptions,
   macros,
-  linkEditionCtx,
   // We need to pass the raw version of the collaboration session (but most importantly for the yjs document inside it),
   // otherwise realtime synchronization fails.
   collaboration: toRaw(collaboration),
@@ -141,17 +136,15 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
       editorRef.value = editor;
     },
   },
+  depsContainer,
 };
 
 const blockNoteToUniAst = new BlockNoteToUniAstConverter(
-  linkEditionCtx.remoteURLParser,
-  linkEditionCtx.modelReferenceSerializer,
+  depsContainer,
   macros ? macros.list : [],
 );
 
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(
-  linkEditionCtx.remoteURLSerializer,
-);
+const uniAstToBlockNote = new UniAstToBlockNoteConverter(depsContainer);
 
 const content =
   uniAst instanceof Error
@@ -264,6 +257,17 @@ onBeforeUnmount(() => {
       margin: 0;
       padding: 0;
     }
+  }
+
+  /* Since BlockNote 0.51 the image element no longer gets a fallback "alt" attribute, so a broken or not-yet-loaded
+    image (e.g. a missing attachment) collapses to a zero size and can no longer be selected or clicked in the editor
+    (to edit or remove it). Give images a minimum size so they stay visible and selectable. Real images are larger
+    than this minimum so they are not affected. */
+  & .bn-visual-media {
+    /* 2em minimum width to keep some space to click on the image even with the resize handles displayed on hover,
+    this is especially useful for very small images, of missing images. */
+    min-width: 2em;
+    min-height: 1em;
   }
 }
 </style>

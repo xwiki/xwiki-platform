@@ -577,7 +577,7 @@ public class Utils
     public static String SQLFilter(String text)
     {
         try {
-            return text.replaceAll("'", "''");
+            return text.replace("'", "''");
         } catch (Exception e) {
             return text;
         }

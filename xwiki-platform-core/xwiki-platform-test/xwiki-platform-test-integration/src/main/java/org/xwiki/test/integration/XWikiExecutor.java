@@ -676,11 +676,8 @@ public class XWikiExecutor
 
     private void saveProperties(String path, Properties properties) throws Exception
     {
-        FileOutputStream fos = new FileOutputStream(path);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(path)) {
             properties.store(fos, null);
-        } finally {
-            fos.close();
         }
     }
 

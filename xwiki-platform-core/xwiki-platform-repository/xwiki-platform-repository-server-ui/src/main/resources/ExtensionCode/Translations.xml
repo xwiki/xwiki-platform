@@ -85,6 +85,7 @@ ExtensionCode.ExtensionSupportPlanClass_paying=Paying
 
 ## Extension sheet
 repository.extension.sheet.name=Name
+repository.extension.sheet.project=Project
 repository.extension.sheet.type=Type
 repository.extension.sheet.category=Category
 repository.extension.sheet.summary=Summary
@@ -130,7 +131,7 @@ repository.extension.sheet.addDownloadsSaveFirst=In order to add Download inform
 repository.extension.sheet.addDownloadsWarning=If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.
 repository.extension.sheet.addDownloadsProcess=We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
 ## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
-## to reorder words and reposition the link). The link markup boundaries ([[ and >>target]]) are
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
 ## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
 ## pattern, and any untrusted data injected into the markup is escaped by the sheet.
 repository.extension.sheet.addDownloadsAttach=If you''re providing a new download, {0}attach the new version to this page{1} and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).

@@ -25,10 +25,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -75,43 +77,49 @@ public class ImportmapMojo extends AbstractMojo
             var importMap = new JavascriptImportmapParser().parse(property);
             var dependencies = this.project.getArtifacts();
             for (Map.Entry<String, ImportmapPathDescriptor> entry : importMap.entrySet()) {
-                var key = entry.getKey();
-                var value = entry.getValue();
-                var descriptor = value.descriptor();
-                var webjarId = descriptor.webjarId().split(":", 2);
-                var groupIdWebjar = webjarId[0];
-                var artifactIdWebjar = webjarId[1];
-                var path = descriptor.path();
-                getLog().debug("Checking key [%s] for webjar reference [%s]".formatted(key, value));
-                var isSelf =
-                    areDependenciesEquals(model.getGroupId(), model.getArtifactId(), groupIdWebjar, artifactIdWebjar);
-                if (isSelf) {
-                    if (!checkPathInSelf(this.project, computeFullPathInJar(artifactIdWebjar,
-                        this.project.getVersion(), path)))
-                    {
-                        throw new MojoExecutionException(
-                            "Unable to find path [%s] in the current module".formatted(path));
-                    }
-                    continue;
-                }
-                boolean dependencyNotFound = true;
-                for (var dependency : dependencies) {
-                    if (areDependenciesEquals(dependency.getGroupId(), dependency.getArtifactId(),
-                        groupIdWebjar, artifactIdWebjar))
-                    {
-                        dependencyNotFound = false;
-                        checkIfPathExistsInDependency(dependency, artifactIdWebjar, path);
-                        break;
-                    }
-                }
-                if (dependencyNotFound) {
-                    throw new MojoExecutionException(
-                        "Unable to find a declared dependency for [%s]".formatted(descriptor.webjarId()));
-                }
+                verifyImportmapEntry(model, dependencies, entry);
             }
         } catch (JavascriptImportmapException e) {
             throw new MojoExecutionException(
                 "Failed to parse the [%s] property".formatted(JAVASCRIPT_IMPORTMAP_PROPERTY), e);
+        }
+    }
+
+    private void verifyImportmapEntry(Model model, Set<Artifact> dependencies,
+        Map.Entry<String, ImportmapPathDescriptor> entry) throws MojoExecutionException
+    {
+        var key = entry.getKey();
+        var value = entry.getValue();
+        var descriptor = value.descriptor();
+        var webjarId = descriptor.webjarId().split(":", 2);
+        var groupIdWebjar = webjarId[0];
+        var artifactIdWebjar = webjarId[1];
+        var path = descriptor.path();
+        getLog().debug("Checking key [%s] for webjar reference [%s]".formatted(key, value));
+        var isSelf =
+            areDependenciesEquals(model.getGroupId(), model.getArtifactId(), groupIdWebjar, artifactIdWebjar);
+        if (isSelf) {
+            if (!checkPathInSelf(this.project, computeFullPathInJar(artifactIdWebjar,
+                this.project.getVersion(), path)))
+            {
+                throw new MojoExecutionException(
+                    "Unable to find path [%s] in the current module".formatted(path));
+            }
+            return;
+        }
+        boolean dependencyNotFound = true;
+        for (var dependency : dependencies) {
+            if (areDependenciesEquals(dependency.getGroupId(), dependency.getArtifactId(),
+                groupIdWebjar, artifactIdWebjar))
+            {
+                dependencyNotFound = false;
+                checkIfPathExistsInDependency(dependency, artifactIdWebjar, path);
+                break;
+            }
+        }
+        if (dependencyNotFound) {
+            throw new MojoExecutionException(
+                "Unable to find a declared dependency for [%s]".formatted(descriptor.webjarId()));
         }
     }
 

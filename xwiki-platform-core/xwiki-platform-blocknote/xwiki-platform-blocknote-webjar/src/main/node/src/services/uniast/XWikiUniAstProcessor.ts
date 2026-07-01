@@ -20,7 +20,11 @@
 import { Container, inject, injectable } from "inversify";
 import type { UniAstIterator, UniAstNode } from "./UniAstIterator";
 import type { UniAstProcessor } from "./UniAstProcessor";
-import type { MacroInvocation, UniAst } from "@xwiki/platform-uniast-api";
+import type {
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  UniAst,
+} from "@xwiki/platform-uniast-api";
 
 /**
  * XWik specific implementation of a UniAstProcessor.
@@ -61,7 +65,7 @@ export class XWikiUniAstProcessor implements UniAstProcessor {
   private loadMacro(
     macroNode: {
       type: "macroBlock" | "inlineMacro";
-      call: MacroInvocation;
+      call: MacroBlockInvocation | InlineMacroInvocation;
       output?: unknown;
     },
     id: string,
@@ -70,6 +74,7 @@ export class XWikiUniAstProcessor implements UniAstProcessor {
     const call = JSON.stringify(macroNode.call);
     delete macroNode.output;
     macroNode.call = {
+      kind: macroNode.call.kind,
       id,
       params: {
         call,
@@ -95,7 +100,7 @@ export class XWikiUniAstProcessor implements UniAstProcessor {
 
   private saveMacro(macroNode: {
     type: "macroBlock" | "inlineMacro";
-    call: MacroInvocation;
+    call: MacroBlockInvocation | InlineMacroInvocation;
     output?: unknown;
   }): void {
     if (

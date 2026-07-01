@@ -24,12 +24,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.apache.commons.collections4.SetUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,7 +41,11 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -49,124 +54,155 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.notifications.NotificationFormat.ALERT;
+import static org.xwiki.notifications.NotificationFormat.EMAIL;
+import static org.xwiki.notifications.filters.NotificationFilterType.EXCLUSIVE;
+import static org.xwiki.notifications.filters.NotificationFilterType.INCLUSIVE;
 
 /**
+ * Test of {@link NotificationFilterPreferencesMigrator}.
+ *
  * @version $Id$
- * @since
  */
-public class NotificationFilterPreferencesMigratorTest
+@ComponentTest
+class NotificationFilterPreferencesMigratorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<NotificationFilterPreferencesMigrator> mocker =
-            new MockitoComponentMockingRule<>(NotificationFilterPreferencesMigrator.class);
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
+    @InjectMockComponents
+    private NotificationFilterPreferencesMigrator migrator;
+
+    @MockComponent
     private FilterPreferencesModelBridge filterPreferencesModelBridge;
+
+    @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
     private DocumentReferenceResolver<String> referenceResolver;
+
+    @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Mock
     private XWikiContext xwikicontext;
+
+    @Mock
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        filterPreferencesModelBridge = mocker.getInstance(FilterPreferencesModelBridge.class);
-        queryManager = mocker.getInstance(QueryManager.class);
-        referenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xwikicontext = mock(XWikiContext.class);
-        when(contextProvider.get()).thenReturn(xwikicontext);
-        xwiki = mock(XWiki.class);
-        when(xwikicontext.getWiki()).thenReturn(xwiki);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("xwiki"));
+        when(this.contextProvider.get()).thenReturn(this.xwikicontext);
+        when(this.xwikicontext.getWiki()).thenReturn(this.xwiki);
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("xwiki"));
     }
 
     @Test
-    public void migrate() throws Exception
+    void migrate() throws Exception
     {
         Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
+        when(this.queryManager.createQuery(anyString(), anyString())).thenReturn(query);
         when(query.setWiki("xwiki")).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.asList("XWiki.UserA"));
+        when(query.execute()).thenReturn(List.of("XWiki.UserA"));
 
         WikiReference wikiReference = new WikiReference("xwiki");
-        when(xwikicontext.getWikiReference()).thenReturn(wikiReference);
+        when(this.xwikicontext.getWikiReference()).thenReturn(wikiReference);
 
         DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
-        when(referenceResolver.resolve("XWiki.UserA", wikiReference)).thenReturn(userA);
+        when(this.referenceResolver.resolve("XWiki.UserA", wikiReference)).thenReturn(userA);
 
         XWikiDocument userAdoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(userA, xwikicontext)).thenReturn(userAdoc);
+        when(this.xwiki.getDocument(userA, this.xwikicontext)).thenReturn(userAdoc);
+        // Arrays.asList is intentional here: the list contains a null element (simulating a missing XObject)
         List<BaseObject> objects = Arrays.asList(
-                mockObject(Arrays.asList("alert"), "filter1", true, "inclusive",
-                        new Date(100L), Arrays.asList("update", "create"), Arrays.asList("page1", "page2"),
-                        Arrays.asList("space1", "space2"), Arrays.asList("wiki1", "wiki2"),
-                        Arrays.asList("user1", "user2")),
-                null,
-                mockObject(Arrays.asList("alert", "email"), "filter2", false, "exclusive",
-                        new Date(90L), Arrays.asList("comment"), Arrays.asList("page3"),
-                        Arrays.asList(), Arrays.asList(), Arrays.asList())
+            mockObject(List.of("alert"), "filter1", true, "inclusive",
+                new Date(100L), List.of("update", "create"), List.of("page1", "page2"),
+                List.of("space1", "space2"), List.of("wiki1", "wiki2"), List.of("user1", "user2")),
+            null,
+            mockObject(List.of("alert", "email"), "filter2", false, "exclusive",
+                new Date(90L), List.of("comment"), List.of("page3"), List.of(), List.of(), List.of())
         );
-        DocumentReference classReference = new DocumentReference("xwiki", Arrays.asList("XWiki", "Notifications", "Code"),
-                "NotificationFilterPreferenceClass");
+        DocumentReference classReference = new DocumentReference("xwiki", List.of("XWiki", "Notifications", "Code"),
+            "NotificationFilterPreferenceClass");
         when(userAdoc.getXObjects(classReference)).thenReturn(objects);
 
         DocumentReference notificationFilterPreferenceClass = new DocumentReference("xwiki",
-                Arrays.asList("XWiki", "Notifications", "Code"), "NotificationFilterPreferenceClass");
+            List.of("XWiki", "Notifications", "Code"), "NotificationFilterPreferenceClass");
         XWikiDocument oldClass = mock(XWikiDocument.class);
-        when(xwiki.getDocument(notificationFilterPreferenceClass, xwikicontext)).thenReturn(oldClass);
+        when(this.xwiki.getDocument(notificationFilterPreferenceClass, this.xwikicontext)).thenReturn(oldClass);
         when(oldClass.isNew()).thenReturn(false);
-        when(xwiki.exists(notificationFilterPreferenceClass, xwikicontext)).thenReturn(true);
+        when(this.xwiki.exists(notificationFilterPreferenceClass, this.xwikicontext)).thenReturn(true);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
+        this.migrator.onEvent(new ApplicationReadyEvent(), null, null);
+
+        // Verify log messages from the migration
+        assertEquals(
+            "Getting the list of the users having notification filter preferences to migrate on wiki [xwiki].",
+            this.logCapture.getMessage(0));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Migrating the notification filter preferences of user [xwiki:XWiki.UserA].",
+            this.logCapture.getMessage(1));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(1).getLevel());
+        assertEquals("Loading the current notification filter preferences of user [xwiki:XWiki.UserA].",
+            this.logCapture.getMessage(2));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(2).getLevel());
+        assertEquals(
+            "Saving the migrated notification filter preferences of user [xwiki:XWiki.UserA] in the new store.",
+            this.logCapture.getMessage(3));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(3).getLevel());
+        assertEquals(
+            "Removing the old notification filter preferences in the page of the user [xwiki:XWiki.UserA]"
+                + " (please wait, it could be long).",
+            this.logCapture.getMessage(4));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(4).getLevel());
+        assertEquals("Removing the old notification filter preference class on wiki [xwiki].",
+            this.logCapture.getMessage(5));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(5).getLevel());
 
         // Verify
-        verify(xwiki).deleteDocument(oldClass, false, xwikicontext);
+        verify(this.xwiki).deleteDocument(oldClass, false, this.xwikicontext);
         verify(userAdoc).removeXObjects(classReference);
-        verify(xwiki).saveDocument(userAdoc, "Migrate notification filter preferences to the new store.",
-                xwikicontext);
+        verify(this.xwiki).saveDocument(userAdoc, "Migrate notification filter preferences to the new store.",
+            this.xwikicontext);
 
-        verify(filterPreferencesModelBridge).saveFilterPreferences(userA, Arrays.asList(
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "", "page1", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "", "page2", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "space1", "", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "space2", "", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "wiki1", "", "", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "wiki2", "", "", ""),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "", "", "user1"),
-                createExpectedPreference(SetUtils.hashSet("update", "create"),
-                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
-                        "filter1", true, new Date(100L), "", "", "", "user2"),
-                createExpectedPreference(SetUtils.hashSet("comment"),
-                        SetUtils.hashSet(NotificationFormat.ALERT, NotificationFormat.EMAIL), NotificationFilterType.EXCLUSIVE,
-                        "filter2", false, new Date(90L), "", "", "page3", "")
+        verify(this.filterPreferencesModelBridge).saveFilterPreferences(userA, List.of(
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "", "page1", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "", "page2", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "space1", "", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "space2", "", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "wiki1", "", "", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "wiki2", "", "", ""),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "", "", "user1"),
+            createExpectedPreference(SetUtils.hashSet("update", "create"), SetUtils.hashSet(ALERT), INCLUSIVE,
+                "filter1", true, new Date(100L), "", "", "", "user2"),
+            createExpectedPreference(SetUtils.hashSet("comment"), SetUtils.hashSet(ALERT, EMAIL), EXCLUSIVE,
+                "filter2", false, new Date(90L), "", "", "page3", "")
         ));
     }
 
     private BaseObject mockObject(List<String> formats, String filterName, boolean isEnabled,
-            String filterType, Date date, List<String> eventTypes, List<String> pages, List<String> spaces,
-            List<String> wikis, List<String> users)
+        String filterType, Date date, List<String> eventTypes, List<String> pages, List<String> spaces,
+        List<String> wikis, List<String> users)
     {
         BaseObject obj = mock(BaseObject.class);
 
@@ -185,11 +221,9 @@ public class NotificationFilterPreferencesMigratorTest
         return obj;
     }
 
-    private DefaultNotificationFilterPreference createExpectedPreference(
-            Set<String> eventType,
-            Set<NotificationFormat> formats,
-            NotificationFilterType filterType, String filterName, boolean isEnabled, Date date,
-            String wiki, String page, String pageOnly, String user)
+    private DefaultNotificationFilterPreference createExpectedPreference(Set<String> eventType,
+        Set<NotificationFormat> formats, NotificationFilterType filterType, String filterName, boolean isEnabled,
+        Date date, String wiki, String page, String pageOnly, String user)
     {
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
         preference.setEventTypes(eventType);

@@ -76,7 +76,7 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     private Template getSpecificTemplate(CompositeEvent eventNotification)
     {
         String templateName = String.format("notification/%s.vm",
-            eventNotification.getType().replaceAll("\\/", "."));
+            eventNotification.getType().replace("/", "."));
         return this.templateManager.getTemplate(templateName);
     }
 

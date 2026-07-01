@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.fileupload;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import javax.servlet.http.Part;
 import org.apache.commons.fileupload.FileItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -61,6 +63,11 @@ class FileUploadUtilsTest
     @Mock
     private Part part0;
 
+    // Store uploaded file items under the module's "target" directory so that they don't leak outside the build
+    // workspace.
+    @TempDir
+    private Path temporaryDirectory;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -72,7 +79,8 @@ class FileUploadUtilsTest
     @Test
     void getFileItems() throws Exception
     {
-        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100, "/tmp", this.request, this.validator);
+        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100,
+            this.temporaryDirectory.toString(), this.request, this.validator);
         assertEquals(1, fileItems.size());
         verify(this.validator).validateAttachment(any(AttachmentAccessWrapper.class));
     }
@@ -82,8 +90,8 @@ class FileUploadUtilsTest
     {
         doThrow(AttachmentValidationException.class).when(this.validator)
             .validateAttachment(any(AttachmentAccessWrapper.class));
-        assertThrows(AttachmentValidationException.class, () -> FileUploadUtils.getFileItems(100, 100, "/tmp",
-            this.request, this.validator));
+        assertThrows(AttachmentValidationException.class, () -> FileUploadUtils.getFileItems(100, 100,
+            this.temporaryDirectory.toString(), this.request, this.validator));
         verify(this.validator).validateAttachment(any(AttachmentAccessWrapper.class));
     }
 
@@ -94,7 +102,8 @@ class FileUploadUtilsTest
         // "filepath". Such file parts must still be validated against the attachment size limit.
         when(this.part0.getName()).thenReturn("upload");
 
-        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100, "/tmp", this.request, this.validator);
+        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100,
+            this.temporaryDirectory.toString(), this.request, this.validator);
 
         assertEquals(1, fileItems.size());
         verify(this.validator).validateAttachment(any(AttachmentAccessWrapper.class));
@@ -107,7 +116,8 @@ class FileUploadUtilsTest
         when(this.part0.getName()).thenReturn("xredirect");
         when(this.part0.getSubmittedFileName()).thenReturn(null);
 
-        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100, "/tmp", this.request, this.validator);
+        Collection<FileItem> fileItems = FileUploadUtils.getFileItems(100, 100,
+            this.temporaryDirectory.toString(), this.request, this.validator);
 
         assertEquals(1, fileItems.size());
         verify(this.validator, never()).validateAttachment(any(AttachmentAccessWrapper.class));

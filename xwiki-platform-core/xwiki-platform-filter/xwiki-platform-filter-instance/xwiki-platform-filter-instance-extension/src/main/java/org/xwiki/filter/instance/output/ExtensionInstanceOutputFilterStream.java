@@ -31,8 +31,10 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -45,6 +47,7 @@ import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * @version $Id$
@@ -72,6 +75,9 @@ public class ExtensionInstanceOutputFilterStream
 
     @Inject
     private ExtensionFactory factory;
+
+    @Inject
+    private ObservationManager observation;
 
     @Inject
     private Logger logger;
@@ -173,7 +179,11 @@ public class ExtensionInstanceOutputFilterStream
             }
 
             // Register the extension as installed
-            installedRepository.installExtension(localExtension, namespace, false);
+            InstalledExtension installedExtension =
+                installedRepository.installExtension(localExtension, namespace, false);
+
+            // Notify about the install
+            this.observation.notify(new ExtensionInstalledEvent(localExtension.getId(), namespace), installedExtension);
         } catch (Exception e) {
             this.logger.error("Failed to register extenion [{}] from the XAR", extensionId, e);
         }

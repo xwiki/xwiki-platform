@@ -129,9 +129,7 @@ class MacroIT extends AbstractBlockNoteIT
             {{/info}}
 
             (% style="color:default;background-color:default;text-align:left" %)
-            end
-
-            (% style="color:default;background-color:default;text-align:left" %)""", wikiEditor.getContent());
+            end""", wikiEditor.getContent());
 
         // Edit the page again to verify that we can also change the macro, not just its parameters.
         wikiEditor.clickCancel();
@@ -203,8 +201,6 @@ class MacroIT extends AbstractBlockNoteIT
             {{/warning}}
 
             (% style="color:default;background-color:default;text-align:left" %)
-            end
-
-            (% style="color:default;background-color:default;text-align:left" %)""", wikiEditor.getContent());
+            end""", wikiEditor.getContent());
     }
 }

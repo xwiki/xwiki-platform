@@ -148,6 +148,7 @@ export default {
 .livedata-advanced-panel-properties .visibility {
   padding: 6px 1rem;
   margin-bottom: 0;
+  font-weight: var(--font-weight-regular);
 }
 
 .livedata-advanced-panel-properties .visibility input {

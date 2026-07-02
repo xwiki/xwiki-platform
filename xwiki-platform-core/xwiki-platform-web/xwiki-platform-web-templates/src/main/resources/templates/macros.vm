@@ -242,6 +242,7 @@ $xwiki.getUserName("xwiki:${username}")
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
  *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
+ *   disabled: false // @since 18.1.0 whether to show or not that the user got removed.
  * }
  *#
 #macro (displayUser $arg $options)
@@ -258,7 +259,8 @@ $xwiki.getUserName("xwiki:${username}")
     'showAlias': false,
     'useInlineHTML': false,
     'wrapAvatar': false,
-    'displayLink': true
+    'displayLink': true,
+    'disabled': false
   })
   #if ($options.entrySet())
     #set ($discard = $macro.options.putAll($options))
@@ -315,9 +317,13 @@ $xwiki.getUserName("xwiki:${username}")
     #else
       #set($userNameTag = 'span')
     #end
+    #set($userClasses = $type)
+    #if($macro.options.disabled)
+      #set($userClasses = "${userClasses} disabled")
+    #end
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
-      "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+      "<$userTag class=""$userClasses"" data-reference=""$escapetool.xml($userReference)"">",
         "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
           "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
@@ -348,6 +354,14 @@ $xwiki.getUserName("xwiki:${username}")
  *#
 #macro (displayGroup $arg $options)
   #displayUser($arg $options)
+#end
+
+#**
+ * Util macro used to display users a specific way in a couple places in XWiki Standard.
+ * This is not an API, avoid relying on it.
+ *#
+#macro (_displayUserAliasWithAvatar $userReference $disabled)
+  #displayUser($userReference {'useInlineHTML': true, 'wrapAvatar': true, 'disabled': $disabled})
 #end
 
 

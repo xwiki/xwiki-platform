@@ -19,11 +19,6 @@
  */
 import { ImageFilePanel } from "../images/ImageFilePanel";
 import type { EditorType } from "../../blocknote";
-<<<<<<< HEAD
-=======
-import type { LinkEditionContext } from "../../misc/linkEditionCtx";
-import type React from "react";
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
 
 export type FilePanelProps = {
   editor: EditorType;

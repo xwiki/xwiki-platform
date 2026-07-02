@@ -19,12 +19,11 @@
  */
 
 import { EntityType } from "@xwiki/platform-model-api";
+import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
   Link,
-<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
-=======
   LinkSuggestService,
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts
   LinkSuggestServiceProvider,
   LinkType,
 } from "@xwiki/platform-link-suggest-api";
@@ -32,10 +31,6 @@ import type {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
-<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
-import type { Container } from "inversify";
-=======
 import type {
   ModelReferenceHandler,
   ModelReferenceHandlerProvider,
@@ -51,22 +46,6 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
-
-/**
- * @since 18.5.0RC1
- * @beta
- */
-type LinkEditionContext = {
-  linkSuggestService: LinkSuggestService | null;
-  modelReferenceParser: ModelReferenceParser;
-  modelReferenceSerializer: ModelReferenceSerializer;
-  modelReferenceHandler: ModelReferenceHandler;
-  remoteURLParser: RemoteURLParser;
-  remoteURLSerializer: RemoteURLSerializer;
-  attachmentsService: AttachmentsService;
-  documentService: DocumentService;
-};
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
@@ -91,6 +70,22 @@ type LinkSuggestion = {
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
 
 /**
+ * (Internal) Link edition context
+ *
+ * Contains various services needed by multiple components, avoids duplication
+ */
+type LinkEditionContext = {
+  linkSuggestService: LinkSuggestService | null;
+  modelReferenceParser: ModelReferenceParser;
+  modelReferenceSerializer: ModelReferenceSerializer;
+  modelReferenceHandler: ModelReferenceHandler;
+  remoteURLParser: RemoteURLParser;
+  remoteURLSerializer: RemoteURLSerializer;
+  attachmentsService: AttachmentsService;
+  documentService: DocumentService;
+};
+
+/**
  * Create a link edition context from a Cristal container
  *
  * @param container - The container to provide from
@@ -100,9 +95,9 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * @beta
  */
 function createLinkEditionContext(container: Container): LinkEditionContext {
-  const linkSuggestService = container
-    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-    .get();
+  const linkSuggestServiceProvider = container.get<LinkSuggestServiceProvider>(
+    "LinkSuggestServiceProvider",
+  );
 
   const modelReferenceParser = container
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
@@ -130,7 +125,7 @@ function createLinkEditionContext(container: Container): LinkEditionContext {
   const documentService = container.get<DocumentService>("DocumentService")!;
 
   return {
-    linkSuggestService: linkSuggestService ?? null,
+    linkSuggestService: linkSuggestServiceProvider.get() ?? null,
     modelReferenceParser,
     modelReferenceSerializer,
     modelReferenceHandler,
@@ -149,18 +144,13 @@ function createLinkEditionContext(container: Container): LinkEditionContext {
  * @since 18.0.0RC1
  * @beta
  */
-function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
-  const linkSuggestService = depsContainer
-    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-    .get()!;
-
+function createLinkSuggestor({
+  linkSuggestService,
+  modelReferenceParser,
+}: LinkEditionContext): LinkSuggestor | null {
   if (!linkSuggestService) {
     return null;
   }
-
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
 
   // Return an array of suggestions from a query
 
@@ -220,10 +210,5 @@ function queryEqualityOperator(query: string) {
   };
 }
 
-<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react/src/misc/linkSuggest.ts
-export { createLinkSuggestor };
-export type { LinkSuggestion, LinkSuggestor, LinkType };
-=======
 export { createLinkEditionContext, createLinkSuggestor };
-export type { LinkEditionContext, LinkSuggestion, LinkSuggestor };
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog):xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui/src/linkSuggest.ts
+export type { LinkEditionContext, LinkSuggestion, LinkSuggestor, LinkType };

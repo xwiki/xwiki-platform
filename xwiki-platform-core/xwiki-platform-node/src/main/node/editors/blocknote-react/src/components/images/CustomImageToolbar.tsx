@@ -24,10 +24,6 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
-<<<<<<< HEAD
-=======
-import type { LinkEditionContext } from "../../misc/linkEditionCtx";
->>>>>>> b6b7f1704e (XWIKI-24269: Improvements for the link insertion dialog)
 
 type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;

@@ -56,7 +56,6 @@ import type {
   BlockNoteConcreteMacro,
   ContextForMacros,
 } from "../blocknote/utils";
-import type { LinkEditionContext } from "../misc/linkEditionCtx";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { BlockNoteEditorOptions } from "@blocknote/core";

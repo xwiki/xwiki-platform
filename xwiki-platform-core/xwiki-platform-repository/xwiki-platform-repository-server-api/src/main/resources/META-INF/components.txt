@@ -4,6 +4,9 @@ org.xwiki.repository.internal.ExtensionSupporterProtectionListener
 org.xwiki.repository.internal.ExtensionSupportProtectionListener
 org.xwiki.repository.internal.ExtensionUpdaterListener
 org.xwiki.repository.internal.RepositoryManager
+org.xwiki.repository.internal.job.TemporaryCoreExtensionRepository
+org.xwiki.repository.internal.job.TemporaryLocalExtensionRepository
+org.xwiki.repository.internal.job.XIPExportJob
 org.xwiki.repository.internal.reference.ExtensionResourceReferenceTypeParser
 org.xwiki.repository.internal.resources.ExtensionRESTResource
 org.xwiki.repository.internal.resources.ExtensionsRESTResource

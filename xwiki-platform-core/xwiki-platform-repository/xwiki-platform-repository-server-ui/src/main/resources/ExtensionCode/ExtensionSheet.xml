@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="ExtensionCode.ExtensionSheet" locale="">
+<xwikidoc version="1.7" reference="ExtensionCode.ExtensionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
@@ -83,12 +83,98 @@
 
 #set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
 #set($projectReference = $doc.getValue('project'))
+
+#macro (_handleExtensionAction $extension)
+  #if ("$!request.action" != '' &amp;&amp; !$services.csrf.isTokenValid($request.get('form_token')))
+    set ($discard = $response.sendError(401, 'CSRF token verification failed!'))
+  #elseif ($request.data == 'supportedXWikiVersions')
+    #_returnSupportedXWikiVersions($extension)
+  #elseif ($request.data == 'xipJobStatus')
+    #set ($xipExportJobId = $request.jobId.split('/'))
+    #_returnXIPExportJobStatusJSON($xipExportJobId)
+  #elseif ($request.action == 'exportXIP')
+    #set ($extensionId = $services.extension.createExtensionId($request.extensionId, $request.extensionVersion))
+    #set ($xipExportJob = $services.repository.exportExtension($extensionId, $request.xwikiVersion))
+    #_returnXIPExportJobStatusJSON($xipExportJob.request.id)
+  #elseif ($request.action == 'cancelXIP')
+    #set ($xipExportJobId = $request.jobId.split('/'))
+    #set ($xipExportJobStatus = $services.job.getJobStatus($xipExportJobId))
+    #set ($discard = $xipExportJobStatus.cancel())
+    #_returnXIPExportJobStatusJSON($xipExportJobId)
+  #end
+#end
+
+#macro (_returnSupportedXWikiVersions $extension)
+  #set ($xwikiVersions = $collectiontool.linkedList)
+  ## TODO: Find a way to keep only the XWiki versions where the specified extension can be installed.
+  #foreach ($version in $extensionManager.resolveVersions('org.xwiki.platform:xwiki-platform-distribution-war', 0, -1))
+    #if ($version.type == 'STABLE')
+      #set ($discard = $xwikiVersions.push($version.value))
+    #end
+  #end
+  #jsonResponse($xwikiVersions)
+#end
+
+#macro (_returnXIPExportJobStatusJSON $xipExportJobId)
+  #set ($xipExportJobStatusJSON = {})
+  #if ($xipExportJobId)
+    #set ($xipExportJobStatus = $services.job.getJobStatus($xipExportJobId))
+    #if ($xipExportJobStatus)
+      #set ($discard = $xipExportJobStatusJSON.putAll({
+        'id': $xipExportJobStatus.request.id,
+        'state': $xipExportJobStatus.state,
+        'canceled': $xipExportJobStatus.canceled,
+        'progress': {
+          'offset': $xipExportJobStatus.progress.offset
+        }
+      }))
+      #if ($xipExportJobStatus.state == 'FINISHED')
+        #if ($services.resource.temporary.exists($xipExportJobStatus.getXIPFileReference()))
+          #set ($xipExportJobStatusJSON.xipFileURL = $services.resource.temporary.getURL(
+            $xipExportJobStatus.getXIPFileReference()))
+        #end
+        ## Check if the XIP export job failed.
+        #set ($lastError = {'throwable': $xipExportJobStatus.error})
+        #set ($xipExportJobStatusJSON.failed = "$!lastError.throwable" != '')
+        #if (!$xipExportJobStatusJSON.failed)
+          ## The XIP export job log can contain errors even if the job did not fail. Let's extract the last error and warn
+          ## the user because it may justify why the result is not as expected.
+          #set ($lastError = $xipExportJobStatus.logTail.getLastLogEvent('ERROR'))
+        #end
+        ## Extract the error message from the last error.
+        #if ($lastError.throwable)
+          #set ($lastError = $exceptiontool.getRootCauseMessage($lastError.throwable))
+        #else
+          #set ($lastError = $lastError.formattedMessage)
+        #end
+        #set ($xipExportJobStatusJSON.lastError = $lastError)
+      #end
+    #else
+      #set ($xipExportJobStatusJSON.id = $xipExportJobId)
+      #set ($xipExportJobStatusJSON.failed = true)
+      #set ($xipExportJobStatusJSON.lastError = 'XIP export job not found')
+    #end
+  #else
+    #set ($xipExportJobStatusJSON.failed = true)
+    #set ($xipExportJobStatusJSON.lastError = 'XIP export job ID is missing')
+  #end
+  #jsonResponse($xipExportJobStatusJSON)
+#end
 {{/velocity}}
 
 {{velocity}}
-#if ($extension)
+#if ($extension &amp;&amp; $xcontext.action == 'get')
+  ##
+  ## Extension Action
+  ##
+  #_handleExtensionAction($extension)
+#elseif ($extension)
+  ##
+  ## Extension Display
+  ##
   $doc.use("ExtensionCode.ExtensionClass")
   #if ($isViewMode)
+    #set ($discard = $xwiki.jsx.use('ExtensionCode.ExtensionSheet'))
     ##------- Icon &amp; Summary -----------------
     (% class="extensionSummary" %)
     #set($icon = $doc.getValue("icon"))
@@ -198,11 +284,72 @@
             [[$services.icon.render('download') #wikiTranslation('repository.extension.sheet.download', [$version])&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-default"]]##
           #end
         #end
+        ##------- XIP export ------
+        ## Provide the XIP button only if the extension is valid (has an ID and a version) and only for authenticated
+        ## users (to reduce abuse, since generating the XIP can be costly).
+        #set ($extensionId = $extension.getProperty('id').value)
+        #set ($extensionVersion = $lastVersionObject.getProperty('version').value)
+        #if ($extensionId &amp;&amp; $extensionVersion &amp;&amp; $doc.getValue('validExtension') == 1 &amp;&amp; "$!xcontext.userReference" != '')
+          [[$services.icon.render('file-archive') {{translation key="repository.extension.sheet.installOffline"/}}&gt;&gt;||anchor="installOffline" class="btn btn-default" data-toggle="modal" data-target="#installOffline"]]
+        #end
       )))
     {{/box}}
 
     {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %){{translation key="repository.extension.sheet.toc"/}}(%%)((({{toc/}}))){{/box}}
     (%class="clearfix"%)((()))
+
+    ##
+    ## Install Offline (XIP export) Modal
+    ##
+    {{html clean="false"}}
+    &lt;form class="xform modal fade" id="installOffline" tabindex="-1" role="dialog" aria-labelledby="installOfflineLabel"
+        data-keyboard="false"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('cancel'))"
+              &gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+            &lt;h4 class="modal-title" id="installOfflineLabel"&gt;
+              $escapetool.xml($services.localization.render('repository.extension.sheet.installOffline'))
+            &lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body"&gt;
+            &lt;p&gt;$escapetool.xml($services.localization.render('repository.extension.sheet.installOffline.help'))&lt;/p&gt;
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label&gt;
+                  $escapetool.xml($services.localization.render(
+                    'repository.extension.sheet.installOffline.xwikiVersion'))
+                &lt;/label&gt;
+                &lt;span class="xHint"&gt;
+                  $escapetool.xml($services.localization.render(
+                    'repository.extension.sheet.installOffline.xwikiVersionHint'))
+                &lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                &lt;input type="text" name="xwikiVersion" /&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-footer"&gt;
+            &lt;div hidden="hidden"&gt;
+              &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)" /&gt;
+              &lt;input type="hidden" name="extensionId" value="$!escapetool.xml($extensionId)" /&gt;
+              &lt;input type="hidden" name="extensionVersion" value="$!escapetool.xml($extensionVersion)" /&gt;
+            &lt;/div&gt;
+            &lt;button type="submit" class="btn btn-primary" name="action" value="exportXIP" disabled="disabled"&gt;
+              $services.icon.renderHTML('download')
+              $escapetool.xml($services.localization.render('repository.extension.sheet.installOffline.exportXIP'))
+            &lt;/button&gt;
+            &lt;button type="button" class="btn btn-default" name="action" value="cancelXIP" data-dismiss="modal"&gt;
+              $escapetool.xml($services.localization.render('cancel'))
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+    {{/html}}
   #else
     ## Editing
     ##
@@ -264,56 +411,73 @@
     #end
   #end
 
-    ## If there's a website specified, then don't display the Description (since Description is a local documentation).
-    #if (($isViewMode &amp;&amp; "$!website" == '') || !$isViewMode)
-      = {{translation key="repository.extension.sheet.description"/}} =
+  ## If there's a website specified, then don't display the Description (since Description is a local documentation).
+  #if (($isViewMode &amp;&amp; "$!website" == '') || !$isViewMode)
+    = {{translation key="repository.extension.sheet.description"/}} =
+  #end
+  #if ($isViewMode &amp;&amp; "$!website" == '')
+    ## Make sure to resolve reference based on the right document
+    {{context transformationContext="document" restricted=true}}
+      $doc.getValue('description')
+    {{/context}}
+  #elseif (!$isViewMode)
+    (((
+    $doc.display('description')
+    )))
+  #end
+
+  #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
+    #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
+  #else
+    #set($standardInstallation = '')
+  #end
+  #set($extraInstallation = "$!{doc.getValue('installation')}")
+
+  #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')
+    = {{translation key="repository.extension.sheet.prerequisites"/}} =
+
+    #if ($isEditMode)
+      ; {{translation key="repository.extension.sheet.customInstallationOnly"/}}
+      : $extension.display('customInstallationOnly', 'edit')
     #end
-    #if ($isViewMode &amp;&amp; "$!website" == '')
-      ## Make sure to resolve reference based on the right document
-      {{context transformationContext="document" restricted=true}}
-        $doc.getValue('description')
-      {{/context}}
-    #elseif (!$isViewMode)
+    ##
+    ## Standard installation
+    #if ($standardInstallation != '')
+      #if ($isEditMode)
+        == {{translation key="repository.extension.sheet.standardInstallationInstructions"/}}
+
+      #end
+      $extensionTypeObject.display('installation', 'view')
+    #end
+    ##
+    ## Extra installation
+    #if ($isEditMode)
+      == {{translation key="repository.extension.sheet.customInstallationInstructions"/}}
+
       (((
-      $doc.display('description')
+      $extension.display('installation', 'edit')
       )))
+    #elseif ($extraInstallation != '')
+      {{context transformationContext="document" restricted=true}}
+        $extraInstallation
+      {{/context}}
     #end
+  #end
 
-    #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
-      #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
-    #else
-      #set($standardInstallation = '')
-    #end
-    #set($extraInstallation = "$!{doc.getValue('installation')}")
+  ## Only display release notes if there are downloads and release notes
+  #if ($doc.getValue('versionPage') == 1 &amp;&amp; $proxyExtensionObject.getValue('proxyLevel') != 'history')
+    #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+    = {{translation key="repository.extension.sheet.versions"/}} =
 
-    #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')
-      = {{translation key="repository.extension.sheet.prerequisites"/}} =
-
-      #if ($isEditMode)
-        ; {{translation key="repository.extension.sheet.customInstallationOnly"/}}
-        : $extension.display('customInstallationOnly', 'edit')
-      #end
-      ##
-      ## Standard installation
-      #if ($standardInstallation != '')
-        #if ($isEditMode)
-          == {{translation key="repository.extension.sheet.standardInstallationInstructions"/}}
-
-        #end
-        $extensionTypeObject.display('installation', 'view')
-      #end
-      ##
-      ## Extra installation
-      #if ($isEditMode)
-        == {{translation key="repository.extension.sheet.customInstallationInstructions"/}}
-
-        (((
-        $extension.display('installation', 'edit')
-        )))
-      #elseif ($extraInstallation != '')
-        {{context transformationContext="document" restricted=true}}
-          $extraInstallation
-        {{/context}}
+    {{display page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+  #elseif ($lastVersionObject)
+    #set ($releaseNotes = [])
+    #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+    #foreach ($versionObject in $versions)
+      #set ($notes = $!{versionObject.display('notes', 'read')})
+      #set ($version = $!{versionObject.getProperty('version').value})
+      #if ("$!notes" != '' &amp;&amp; "$!version" != '')
+        #set ($discard = $releaseNotes.add([$version, $notes]))
       #end
     #end
 
@@ -348,44 +512,45 @@
         #end
       #end
     #end
+  #end
 
-    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
-    #if ($extensionDependencies.size() &gt; 0)
-      = {{translation key="repository.extension.sheet.dependencies"/}} =
+  #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
+  #if ($extensionDependencies.size() &gt; 0)
+    = {{translation key="repository.extension.sheet.dependencies"/}} =
 
-       $services.rendering.escape($services.localization.render('repository.extension.sheet.dependenciesIntro', ["${extension.getValue('id')} ${doc.getValue('lastVersion')}"]), 'xwiki/2.1')
-       #foreach($extensionDependency in $extensionDependencies)
-        #set($dependencyDocumentName = $null)
-        #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
-        #if (!$dependencyDocumentNames.isEmpty())
-          #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
-        #end
-        #if ($dependencyDocumentName)
-          * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
-        #else
-          * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
-        #end
+    $services.rendering.escape($services.localization.render('repository.extension.sheet.dependenciesIntro', ["${extension.getValue('id')} ${doc.getValue('lastVersion')}"]), 'xwiki/2.1')
+    #foreach($extensionDependency in $extensionDependencies)
+      #set($dependencyDocumentName = $null)
+      #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+      #if (!$dependencyDocumentNames.isEmpty())
+        #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+      #end
+      #if ($dependencyDocumentName)
+        * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
+      #else
+        * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
+      #end
+    #end
+  #end
+
+  #if ($isEditMode &amp;&amp; !$proxyExtensionObject)
+    #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+    #if($extversions &amp;&amp; $extversions.size()&gt;0)
+      = {{translation key="repository.extension.sheet.currentDownloads"/}} =
+      #foreach($versionobj in $extversions)
+        #set($ok = $doc.use($versionobj))
+        {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}
       #end
     #end
 
-    #if ($isEditMode &amp;&amp; !$proxyExtensionObject)
-      #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
-      #if($extversions &amp;&amp; $extversions.size()&gt;0)
-      = {{translation key="repository.extension.sheet.currentDownloads"/}} =
-         #foreach($versionobj in $extversions)
-            #set($ok = $doc.use($versionobj))
-            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}
-         #end
-      #end
+    = {{translation key="repository.extension.sheet.addDownloads"/}} =
+    #if ($doc.isNew())
+      {{info}}{{translation key="repository.extension.sheet.addDownloadsSaveFirst"/}}{{/info}}
+    #else
+      {{warning}}{{translation key="repository.extension.sheet.addDownloadsWarning"/}}{{/warning}}
 
-      = {{translation key="repository.extension.sheet.addDownloads"/}} =
-      #if ($doc.isNew())
-        {{info}}{{translation key="repository.extension.sheet.addDownloadsSaveFirst"/}}{{/info}}
-      #else
-        {{warning}}{{translation key="repository.extension.sheet.addDownloadsWarning"/}}{{/warning}}
-
-        {{translation key="repository.extension.sheet.addDownloadsProcess"/}}
-        * $services.localization.render('repository.extension.sheet.addDownloadsAttach', ['[[', "&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]]"])
+      {{translation key="repository.extension.sheet.addDownloadsProcess"/}}
+      * $services.localization.render('repository.extension.sheet.addDownloadsAttach', ['[[', "&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]]"])
  
       #set($xredirect = $doc.getURL("edit"))
       #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionVersionClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
@@ -393,27 +558,303 @@
 
       #set($extdeps = $doc.getObjects("ExtensionCode.ExtensionDependencyClass"))
       #if($extdeps &amp;&amp; $extdeps.size()&gt;0)
-      = {{translation key="repository.extension.sheet.currentDependencies"/}} =
-         #foreach($depobj in $extdeps)
-            #set($ok = $doc.use($depobj))
-            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionDependencySheet") {{/html}}
-         #end
+        = {{translation key="repository.extension.sheet.currentDependencies"/}} =
+        #foreach($depobj in $extdeps)
+          #set($ok = $doc.use($depobj))
+          {{html clean="false"}}$xwiki.includeForm("ExtensionCode.ExtensionDependencySheet"){{/html}}
+        #end
       #end
 
       = {{translation key="repository.extension.sheet.addDependencies"/}} =
 
       #set($xredirect = $doc.getURL("edit"))
       #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionDependencyClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
-        $services.localization.render('repository.extension.sheet.addDependenciesIntro', ['[[', "&gt;&gt;path:$addobjecturl]]"])
-        * {{translation key="repository.extension.sheet.addDependenciesVersion"/}}
-        * {{translation key="repository.extension.sheet.addDependenciesId"/}}
-        * {{translation key="repository.extension.sheet.addDependenciesConstraint"/}}
-      #end
+      $services.localization.render('repository.extension.sheet.addDependenciesIntro', ['[[', "&gt;&gt;path:$addobjecturl]]"])
+      * {{translation key="repository.extension.sheet.addDependenciesVersion"/}}
+      * {{translation key="repository.extension.sheet.addDependenciesId"/}}
+      * {{translation key="repository.extension.sheet.addDependenciesConstraint"/}}
     #end
+  #end
 #else
   {{translation key="repository.extension.sheet.wrongObject"/}}
 #end
 {{/velocity}}</content>
+  <object>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5cdfdbd4-bdb9-47ca-b3bc-b0cf042684b8</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property type="String">
+      <cache>long</cache>
+    </property>
+    <property type="LargeString">
+      <code>//repository.extension.sheet.installOffline
+
+define('xwiki-repository-installOffline-messages', {
+  prefix: 'repository.extension.sheet.installOffline.',
+  keys: [
+    'inProgress',
+    'failed',
+    'canceling',
+    'canceled',
+    'cancelFailed'
+  ]
+});
+
+require([
+  'jquery',
+  'xwiki-l10n!xwiki-repository-installOffline-messages',
+  'xwiki-job-runner',
+  'xwiki-selectize'
+], function($, l10n, JobRunner) {
+  const $installOfflineModal = $('#installOffline');
+  const $xwikiVersionPicker = $installOfflineModal.find('input[name="xwikiVersion"]');
+  const $exportXIPButton = $installOfflineModal.find('button[value="exportXIP"]');
+  const $cancelXIPButton = $installOfflineModal.find('button[value="cancelXIP"]');
+
+  //
+  // XWiki Version Picker
+  //
+
+  $installOfflineModal.on('show.bs.modal', function(event) {
+    maybeInitXWikiVersionPicker();
+  });
+
+  async function maybeInitXWikiVersionPicker() {
+    if (!$xwikiVersionPicker.data('selectize')) {
+      try {
+        const xwikiVersions = await fetchSupportedXWikiVersions();
+        $xwikiVersionPicker.xwikiSelectize({
+          options: xwikiVersions,
+          maxItems: 1
+        }).data('selectize').on('change', function(version) {
+          $exportXIPButton.prop('disabled', !version);
+        });
+      } catch (error) {
+        console.log('Failed to fetch the list of supported XWiki versions: ', error);
+      }
+    }
+  }
+
+  async function fetchSupportedXWikiVersions() {
+    const url = XWiki.currentDocument.getURL('get', 'data=supportedXWikiVersions');
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const versions = await response.json();
+      return versions.map(version =&gt; ({value: version, text: version}));
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  //
+  // Export XIP
+  //
+
+  $exportXIPButton.on('click', function(event) {
+    event.preventDefault();
+    $('body').css('cursor', 'wait');
+    const notification = new XWiki.widgets.Notification(l10n['inProgress'], 'inprogress');
+    const data = $installOfflineModal.serializeArray();
+    data.push({name: $exportXIPButton.attr('name'), value: $exportXIPButton.val()});
+    // Prevent multiple clicks on the export button.
+    $exportXIPButton.prop('disabled', true);
+    $xwikiVersionPicker.data('selectize').disable();
+    exportXIP(data).then(() =&gt; {
+      // XIP export job finished.
+      notification.hide();
+    }).catch(reason =&gt; {
+      // XIP export job failed.
+      let message = l10n['failed'];
+      if (reason) {
+        message += `: ${reason.message || reason}`;
+      }
+      notification.replace(new XWiki.widgets.Notification(message, 'error'));
+    }).finally(() =&gt; {
+      // Re-enable the XIP export modal.
+      $exportXIPButton.prop('disabled', false);
+      $xwikiVersionPicker.data('selectize').enable();
+      $('body').css('cursor', '');
+    });
+  });
+
+  async function exportXIP(data) {
+    const job = await runXIPExportJob(data);
+    // Remove the exception name from the start of the error message to make it less technical.
+    const lastError = ((job.lastError || '') + '').replace(/^\w+Exception: /, '');
+    if (job.canceled) {
+      // Do nothing.
+    } else if (job.failed) {
+      throw new Error(lastError);
+    } else if (job.xipFileURL) {
+      // The XIP file was generated on the server-side. The user just needs to download it.
+      window.location.href = job.xipFileURL;
+    }
+  }
+
+  // There's no XIP export job started. This promise is used to cancel the XIP export job (the job needs to be started
+  // before we can cancel it).
+  let xipExportJobStarted = false;
+
+  async function runXIPExportJob(data) {
+    let resolveXIPExportJobStarted, rejectXIPExportJobStarted;
+    xipExportJobStarted = new Promise((resolve, reject) =&gt; {
+      resolveXIPExportJobStarted = resolve;
+      rejectXIPExportJobStarted = reject;
+    });
+    try {
+      const jobRunner = new JobRunner({
+        createStatusRequest: function(jobId) {
+          resolveXIPExportJobStarted(jobId);
+          return {
+            url: XWiki.currentDocument.getURL('get'),
+            data: {
+              data: 'xipJobStatus',
+              jobId: jobId.join('/')
+            }
+          };
+        }
+      });
+      const job = await jobRunner.run(XWiki.currentDocument.getURL('get'), data);
+      return job;
+    } catch (error) {
+      // We need to reject any pending cancel requests.
+      rejectXIPExportJobStarted();
+      // But we also need to reject the XIP export itself.
+      throw error;
+    } finally {
+      xipExportJobStarted = false;
+    }
+  }
+
+  //
+  // Cancel XIP
+  //
+
+  $installOfflineModal.on('hide.bs.modal', event =&gt; {
+    if ($cancelXIPButton.prop('disabled')) {
+      // Don't close the modal because there's a pending cancel request.
+      return event.preventDefault();
+    } else if (xipExportJobStarted) {
+      // Cancel the running XIP export job.
+      const notification = new XWiki.widgets.Notification(l10n['canceling'], 'inprogress');
+      // Prevent multiple cancel requests.
+      const $closeModalButton = $installOfflineModal.find('.modal-header button.close');
+      $closeModalButton.prop('disabled', true);
+      $cancelXIPButton.prop('disabled', true);
+      xipExportJobStarted.then(cancelXIPExportJob).then(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['canceled'], 'done'));
+      }).catch(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['cancelFailed'], 'error'));
+      }).finally(() =&gt; {
+        // Allow the user to retry the cancel (e.g. in case it failed due to some network issue).
+        $closeModalButton.prop('disabled', false);
+        $cancelXIPButton.prop('disabled', false);
+      });
+      // Don't close the modal because the job doesn't finish immediately after being canceled.
+      return event.preventDefault();
+    }
+  });
+
+  async function cancelXIPExportJob(jobId) {
+    const data = $installOfflineModal.serializeArray();
+    data.push({name: $cancelXIPButton.attr('name'), value: $cancelXIPButton.val()});
+    data.push({name: 'jobId', value: jobId.join('/')});
+    return await $.post(XWiki.currentDocument.getURL('get'), data);
+  };
+});</code>
+    </property>
+    <property type="String">
+      <name/>
+    </property>
+    <property type="Integer">
+      <parse>0</parse>
+    </property>
+    <property type="String">
+      <use>onDemand</use>
+    </property>
+  </object>
   <object>
     <name>ExtensionCode.ExtensionSheet</name>
     <number>0</number>
@@ -454,7 +895,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -516,10 +956,10 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>#template('colorThemeInit.vm')
 
 .extensionSummary {
@@ -554,16 +994,16 @@
   margin-right: 10px
 }</code>
     </property>
-    <property>
+    <property type="String">
       <contentType>CSS</contentType>
     </property>
-    <property>
+    <property type="String">
       <name>Extension CSS</name>
     </property>
-    <property>
+    <property type="Integer">
       <parse>1</parse>
     </property>
-    <property>
+    <property type="String">
       <use>always</use>
     </property>
   </object>
@@ -607,7 +1047,6 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -669,10 +1108,10 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <property>
+    <property type="String">
       <cache>long</cache>
     </property>
-    <property>
+    <property type="LargeString">
       <code>.extensionSummary td, /* PROBLEM: General styling reset */
 .extensionInfo td {
   border: 0;
@@ -711,16 +1150,16 @@
   vertical-align: baseline;
 }</code>
     </property>
-    <property>
+    <property type="String">
       <contentType>CSS</contentType>
     </property>
-    <property>
+    <property type="String">
       <name>Junco</name>
     </property>
-    <property>
+    <property type="Integer">
       <parse/>
     </property>
-    <property>
+    <property type="String">
       <use>currentPage</use>
     </property>
   </object>

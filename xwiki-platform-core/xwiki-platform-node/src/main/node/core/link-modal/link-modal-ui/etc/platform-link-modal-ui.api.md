@@ -5,23 +5,13 @@
 ```ts
 
 import { AttachmentReference } from '@xwiki/platform-model-api';
-import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
 import { DocumentReference } from '@xwiki/platform-model-api';
-import { DocumentService } from '@xwiki/platform-document-api';
-import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
-import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
-import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
-
-// @beta
-export function createLinkEditionContext(container: Container): LinkEditionContext;
 
 // @beta
 export type LinkAttachmentConfig = {
@@ -36,18 +26,6 @@ export type LinkData = {
     target: LinkTarget;
 };
 
-// @beta (undocumented)
-export type LinkEditionContext = {
-    linkSuggestService: LinkSuggestService | null;
-    modelReferenceParser: ModelReferenceParser;
-    modelReferenceSerializer: ModelReferenceSerializer;
-    modelReferenceHandler: ModelReferenceHandler;
-    remoteURLParser: RemoteURLParser;
-    remoteURLSerializer: RemoteURLSerializer;
-    attachmentsService: AttachmentsService;
-    documentService: DocumentService;
-};
-
 // @beta
 export type LinkEmailConfig = {
     address: string;
@@ -58,13 +36,13 @@ export type LinkEmailConfig = {
 // @beta
 export const LinkModal: DefineComponent<    {
 current: LinkData;
-linkEditionCtx: LinkEditionContext;
+depsContainer: Container;
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
 }, string, PublicProps, Readonly<{
 current: LinkData;
-linkEditionCtx: LinkEditionContext;
+depsContainer: Container;
 }> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;

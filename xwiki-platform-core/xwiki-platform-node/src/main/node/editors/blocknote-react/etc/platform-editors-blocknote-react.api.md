@@ -36,6 +36,7 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
 
 // @beta
@@ -52,22 +53,12 @@ export type BlockNoteViewWrapperProps = {
     } | false;
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     depsContainer: Container;
-=======
     linkEditionHandler: LinkEditionHandler;
-=======
->>>>>>> 1e2e66bd72 (update)
-=======
-    linkEditionHandler: LinkEditionHandler;
->>>>>>> c78a77d5a8 (update)
-    linkEditionCtx: LinkEditionContext;
->>>>>>> 357cbef0fc (update)
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
+    syntax: SyntaxConfig;
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -202,14 +193,6 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
     unmount: () => void;
 };
 
-<<<<<<< HEAD
-=======
-// Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
-//
-// @beta
-export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
-
->>>>>>> 1e2e66bd72 (update)
 // (No @packageDocumentation comment for this package)
 
 ```

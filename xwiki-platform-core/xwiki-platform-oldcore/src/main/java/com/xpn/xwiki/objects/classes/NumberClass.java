@@ -191,7 +191,9 @@ public class NumberClass extends PropertyClass
                 }
             }
         } catch (NumberFormatException e) {
-            throw new XWikiException(String.format("Error when parsing [%s] to type [%s]", value, ntype), e);
+            String message = localizePlainOrKey("core.validation.number.message.invalidFormat", value, ntype);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, message, e);
         }
 
         property.setValue(nvalue);
@@ -210,7 +212,7 @@ public class NumberClass extends PropertyClass
             input.setValue(prop.toText());
         }
 
-        input.setType("text");
+        input.setType("number");
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());

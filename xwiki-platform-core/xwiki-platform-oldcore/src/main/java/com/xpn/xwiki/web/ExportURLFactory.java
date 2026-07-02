@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -49,6 +48,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -80,6 +81,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
     private EntityReferenceSerializer<String> fsPathEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "fspath");
 
+    private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+
     /**
      * Pages for which to convert URL to local.
      *
@@ -96,6 +99,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
     @Deprecated
     protected File exportDir;
 
+    private boolean checkAccess;
+
     private FilesystemExportContext exportContext;
 
     /**
@@ -103,6 +108,17 @@ public class ExportURLFactory extends XWikiServletURLFactory
      */
     public ExportURLFactory()
     {
+    }
+
+    /**
+     * @param checkAccess true if the access to linked resources should be verified against the context user
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public ExportURLFactory(boolean checkAccess)
+    {
+        this.checkAccess = checkAccess;
     }
 
     /**
@@ -532,35 +548,41 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @return a relative {@code file://} URL referencing the attachment within the export directory
      * @throws XWikiException if the document holding the attachment cannot be loaded
      * @throws IOException if the attachment's content cannot be written to the export directory
-     * @throws URISyntaxException if a valid relative URL cannot be computed for the exported attachment
      */
     private URL createAttachmentURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
-        throws XWikiException, IOException, URISyntaxException
+        throws XWikiException, IOException
     {
         String db = (xwikidb == null ? context.getWikiId() : xwikidb);
-        DocumentReference documentReference =
-            new DocumentReference(db, this.legacySpaceResolver.resolve(spaces), name);
-        String serializedReference = this.fsPathEntityReferenceSerializer.serialize(
-            new AttachmentReference(filename, documentReference));
+        DocumentReference documentReference = new DocumentReference(db, this.legacySpaceResolver.resolve(spaces), name);
+        AttachmentReference attachmentReference = new AttachmentReference(filename, documentReference);
+
+        String serializedReference = this.fsPathEntityReferenceSerializer.serialize(attachmentReference);
         String path = "attachment/" + serializedReference;
 
-        File file = new File(getFilesystemExportContext().getExportDir(), path);
-        if (!file.exists()) {
-            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
-            XWikiAttachment attachment = doc.getAttachment(filename);
-            // If the attachment doesn't exist, then don't perform any action. It usually means that the
-            // createAttachmentURL() was called to get a URL, independently of whether it exists or not.
-            // This is the case for example in the Color Theme Sheet which uses:
-            //      $xwiki.getAttachmentURL($doc.fullName, '__tochange__')
-            // This clearly doesn't point to an existing attachment.
-            // In addition, it's possible that there's a link to a non-existing attachment and in this case we simply
-            // don't need to do anything (it'll lead to a broken link which is the correct outcome).
-            if (attachment != null) {
-                file.getParentFile().mkdirs();
-                try (InputStream stream = attachment.getContentInputStream(context)) {
-                    FileUtils.copyInputStreamToFile(stream, file);
+        // Copy the attachment file in the package only if the target user is allowed to access the attachment
+        if (!this.checkAccess || this.authorization.hasAccess(Right.VIEW, attachmentReference)) {
+            File file = new File(getFilesystemExportContext().getExportDir(), path);
+            if (!file.exists()) {
+                XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
+                XWikiAttachment attachment = doc.getAttachment(filename);
+                // If the attachment doesn't exist, then don't perform any action. It usually means that the
+                // createAttachmentURL() was called to get a URL, independently of whether it exists or not.
+                // This is the case for example in the Color Theme Sheet which uses:
+                // $xwiki.getAttachmentURL($doc.fullName, '__tochange__')
+                // This clearly doesn't point to an existing attachment.
+                // In addition, it's possible that there's a link to a non-existing attachment and in this case we
+                // simply
+                // don't need to do anything (it'll lead to a broken link which is the correct outcome).
+                if (attachment != null) {
+                    file.getParentFile().mkdirs();
+                    try (InputStream stream = attachment.getContentInputStream(context)) {
+                        FileUtils.copyInputStreamToFile(stream, file);
+                    }
                 }
             }
+        } else {
+            LOGGER.warn("User [{}] doesn't have access to attachment [{}] so it won't be exported",
+                context.getUserReference(), attachmentReference);
         }
 
         StringBuilder newPath = new StringBuilder("file://");

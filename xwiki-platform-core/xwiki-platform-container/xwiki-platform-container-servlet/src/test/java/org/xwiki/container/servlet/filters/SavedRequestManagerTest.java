@@ -65,6 +65,10 @@ public class SavedRequestManagerTest
             will(returnValue(new StringBuffer(TEST_URL)));
             allowing(mockRequest).getParameter("srid");
             will(returnValue("r4Nd0m"));
+            allowing(mockRequest).getHeaderNames();
+            will(returnValue(null));
+            allowing(mockRequest).getMethod();
+            will(returnValue("get"));
         }});
         final Map<String, SavedRequest> saveMap = new HashMap<String, SavedRequest>();
         saveMap.put("r4Nd0m", new SavedRequest(mockRequest));

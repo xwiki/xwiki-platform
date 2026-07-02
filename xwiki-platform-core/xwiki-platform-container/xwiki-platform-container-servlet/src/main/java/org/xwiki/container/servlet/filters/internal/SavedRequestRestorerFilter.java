@@ -208,7 +208,7 @@ public class SavedRequestRestorerFilter implements Filter
                 // a browser. Also, it ensures we can test that in Selenium.
                 if (!headers.containsKey(SEC_FETCH_SITE_HEADER)
                     || (headers.containsKey(SEC_FETCH_SITE_HEADER)
-                        && !Strings.CI.equals("cross-site", headers.get(SEC_FETCH_SITE_HEADER).getFirst()))) {
+                        && !Strings.CI.equals("cross-site", headers.get(SEC_FETCH_SITE_HEADER).get(0)))) {
                     result = this.savedRequest.getMethod();
                 }
             }

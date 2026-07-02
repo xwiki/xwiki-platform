@@ -18,19 +18,7 @@ import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 357cbef0fc (update)
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 1e2e66bd72 (update)
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 94cc4892b8 (--wip-- [skip ci])
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
@@ -44,19 +32,7 @@ getContent: () => UniAst | Error;
 "instant-change": () => any;
 "debounced-change": (content: UniAst) => any;
 }, string, PublicProps, Readonly<{
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 357cbef0fc (update)
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 1e2e66bd72 (update)
-=======
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
->>>>>>> 94cc4892b8 (--wip-- [skip ci])
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
 list: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;

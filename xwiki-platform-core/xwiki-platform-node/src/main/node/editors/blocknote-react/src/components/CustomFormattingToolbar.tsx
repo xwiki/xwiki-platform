@@ -144,10 +144,15 @@ const getDefaultFormattingToolbarItems = (
             macrosList={macros.list}
             ctxForMacros={macros.ctx}
           />,
-          <CustomInsertMacroButton
-            key={"insertMacroButton"}
-            openEditor={macros.ctx.openInsertionEditor}
-          />,
+          // Hide the insert action when no insertion editor is available.
+          ...(macros.ctx.openInsertionEditor
+            ? [
+                <CustomInsertMacroButton
+                  key={"insertMacroButton"}
+                  openEditor={macros.ctx.openInsertionEditor}
+                />,
+              ]
+            : []),
         ]
       : [],
   );

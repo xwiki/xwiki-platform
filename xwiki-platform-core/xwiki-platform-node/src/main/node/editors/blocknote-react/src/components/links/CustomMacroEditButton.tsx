@@ -43,7 +43,11 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
   const selection = editor.getSelection();
 
   const openMacroEditor = useMemo(() => {
+    // Hide the edit action when no params editor is available.
+    const openParamsEditor = ctxForMacros.openParamsEditor;
+
     if (
+      !openParamsEditor ||
       !selection ||
       selection.blocks.length !== 1 ||
       !selection.blocks[0].type.startsWith(MACRO_NAME_PREFIX)
@@ -65,7 +69,7 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
     }
 
     return () => {
-      ctxForMacros.openParamsEditor(macro, macroBlock.props, (newProps) =>
+      openParamsEditor(macro, macroBlock.props, (newProps) =>
         editor.updateBlock(macroBlock.id, { props: newProps }),
       );
     };

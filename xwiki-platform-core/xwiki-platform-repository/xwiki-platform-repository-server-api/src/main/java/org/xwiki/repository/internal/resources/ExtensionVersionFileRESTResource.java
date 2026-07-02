@@ -20,6 +20,7 @@
 package org.xwiki.repository.internal.resources;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,13 +38,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.CoreProtocolPNames;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.util.Timeout;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
@@ -143,39 +147,69 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // It's an URL
             URL url = new URL(resourceReference.getReference());
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setResponseTimeout(Timeout.ofSeconds(60))
+                .setConnectTimeout(Timeout.ofSeconds(10))
+                .build();
 
-            httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "XWikiExtensionRepository");
-            httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-            httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+            final CloseableHttpClient httpClient = HttpClients.custom()
+                .setUserAgent("XWikiExtensionRepository")
+                .setDefaultRequestConfig(requestConfig)
+                .setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+                .build();
 
-            ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
-                httpClient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
-            httpClient.setRoutePlanner(routePlanner);
-
-            HttpGet getMethod = new HttpGet(url.toString());
-
-            HttpResponse subResponse;
+            // Stream the entity content back to the caller without buffering it in memory.
+            // Ownership of httpClient and subResponse is transferred to the returned InputStream:
+            // when JAX-RS closes the stream after writing the response, both are closed too.
+            // If anything fails before that handoff, the finally block releases them.
+            boolean handoffSucceeded = false;
+            ClassicHttpResponse subResponse = null;
             try {
-                subResponse = httpClient.execute(getMethod);
-            } catch (Exception e) {
-                throw new IOException("Failed to request [" + getMethod.getURI() + "]", e);
+                HttpGet getMethod = new HttpGet(url.toString());
+
+                try {
+                    subResponse = httpClient.executeOpen(null, getMethod, null);
+                } catch (Exception e) {
+                    throw new IOException("Failed to request [" + url + "]", e);
+                }
+
+                response = Response.status(subResponse.getCode());
+
+                HttpEntity entity = subResponse.getEntity();
+                String contentTypeStr = entity != null ? entity.getContentType() : null;
+                MediaType type = contentTypeStr != null ? MediaType.valueOf(contentTypeStr)
+                    : MediaType.APPLICATION_OCTET_STREAM_TYPE;
+                response.type(type);
+
+                BaseObject extensionObject = getExtensionObject(extensionDocument);
+                String extensionType =
+                    this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+
+                final ClassicHttpResponse responseToClose = subResponse;
+                InputStream baseStream = entity != null ? entity.getContent() : InputStream.nullInputStream();
+                InputStream contentStream = new ProxyInputStream(baseStream)
+                {
+                    @Override
+                    public void close() throws IOException
+                    {
+                        try {
+                            super.close();
+                        } finally {
+                            IOUtils.closeQuietly(responseToClose, httpClient);
+                        }
+                    }
+                };
+
+                response.entity(contentStream);
+                response.header("Content-Disposition",
+                    "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
+
+                handoffSucceeded = true;
+            } finally {
+                if (!handoffSucceeded) {
+                    IOUtils.closeQuietly(subResponse, httpClient);
+                }
             }
-
-            response = Response.status(subResponse.getStatusLine().getStatusCode());
-
-            HttpEntity entity = subResponse.getEntity();
-
-            MediaType type = entity.getContentType() != null ? MediaType.valueOf(entity.getContentType().getValue())
-                : MediaType.APPLICATION_OCTET_STREAM_TYPE;
-            response.type(type);
-
-            BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String extensionType =
-                this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
-            response.entity(entity.getContent());
-            response.header("Content-Disposition",
-                "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;
             if (resourceReference instanceof ExtensionResourceReference) {

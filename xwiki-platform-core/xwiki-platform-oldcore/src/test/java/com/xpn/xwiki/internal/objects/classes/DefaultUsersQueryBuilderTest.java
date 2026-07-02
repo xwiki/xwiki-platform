@@ -91,13 +91,13 @@ class DefaultUsersQueryBuilderTest
     {
         assertQuery("select doc.fullName as userReference,"
             + " firstName.value||' '||lastName.value as userName "
-            + "from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName "
-            + "where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
+            + "from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName"
+            + ", IntegerProperty active"
+            + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
             + " and obj.id = firstName.id.id and firstName.id.name = 'first_name'"
             + " and obj.id = lastName.id.id and lastName.id.name = 'last_name'"
             + " and doc.space = 'XWiki' "
-            + "and obj.id not in (select activeProp.id.id from IntegerProperty activeProp"
-            + " where activeProp.id.name = 'active' and activeProp.value = 0) "
+            + "and obj.id = active.id.id and active.id.name = 'active' and active.value = 1 "
             + "order by lower(firstName.value), firstName.value, lower(lastName.value), lastName.value");
     }
 

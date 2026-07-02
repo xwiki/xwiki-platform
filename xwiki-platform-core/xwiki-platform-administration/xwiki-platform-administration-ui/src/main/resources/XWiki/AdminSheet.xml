@@ -239,7 +239,7 @@
 #macro(admin_displayCategory $sections $translationPrefix)
 (% class="admin-category" %)
 #set ($sortedSections = [])
-## XWIKI-24518 Without the ((())) the following line was outputing a <p> filled with &nbsp;
+## XWIKI-24518 Without the ((())) the following line was outputing a paragraph filled with empty spaces
 (((#sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections))))
 (% class="admin-categories-container" %)
 (((

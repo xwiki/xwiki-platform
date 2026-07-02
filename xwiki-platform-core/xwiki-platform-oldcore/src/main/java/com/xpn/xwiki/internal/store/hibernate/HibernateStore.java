@@ -20,10 +20,7 @@
 package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -35,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
@@ -43,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -54,7 +51,6 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.cfgxml.internal.ConfigLoader;
 import org.hibernate.boot.cfgxml.spi.LoadedConfig;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.QualifiedSequenceName;
@@ -85,15 +81,16 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateAdapterFactory;
 import org.xwiki.store.hibernate.HibernateStoreException;
+import org.xwiki.store.hibernate.internal.HibernateCfgXmlLoader;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
+import org.xwiki.store.hibernate.HibernateDataSourceProvider;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
@@ -115,16 +112,6 @@ public class HibernateStore implements Disposable, Initializable
 
     private static final String CONTEXT_TRANSACTION = "hibtransaction";
 
-    /**
-     * The name of the property for configuring the environment permanent directory.
-     */
-    private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
-
-    /**
-     * The name of the property for configuring the current timezone.
-     */
-    private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
-
     @Inject
     private Logger logger;
 
@@ -142,10 +129,13 @@ public class HibernateStore implements Disposable, Initializable
     private HibernateConfiguration hibernateConfiguration;
 
     @Inject
-    private Environment environment;
+    private LoggerConfiguration loggerConfiguration;
 
     @Inject
-    private LoggerConfiguration loggerConfiguration;
+    private HibernateDataSourceProvider dataSourceProvider;
+
+    @Inject
+    private HibernateCfgXmlLoader cfgXmlLoader;
 
     @Inject
     private List<HibernateAdapterFactory> adapterFactories;
@@ -191,51 +181,15 @@ public class HibernateStore implements Disposable, Initializable
         return this.dataMigrationManager;
     }
 
-    private URL getHibernateConfigurationURL()
-    {
-        String path = this.hibernateConfiguration.getPath();
-
-        if (path == null) {
-            return null;
-        }
-
-        File file = new File(path);
-        try {
-            if (file.exists()) {
-                return file.toURI().toURL();
-            }
-        } catch (Exception e) {
-            // Probably running under -security, which prevents calling File.exists()
-            this.logger.debug("Failed load resource [{}] using a file path", path);
-        }
-
-        try {
-            URL res = this.environment.getResource(path);
-            if (res != null) {
-                return res;
-            }
-        } catch (Exception e) {
-            this.logger.debug("Failed to load resource [{}] using the application context", path);
-        }
-
-        URL url = Thread.currentThread().getContextClassLoader().getResource(path);
-        if (url == null) {
-            this.logger.error("Failed to find hibernate configuration file corresponding to path [{}]",
-                this.hibernateConfiguration.getPath());
-        }
-
-        return url;
-    }
-
     @Override
     public void initialize() throws InitializationException
     {
         // Search for the base configuration file
-        this.configurationURL = getHibernateConfigurationURL();
+        this.configurationURL = this.cfgXmlLoader.getConfigurationURL();
 
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
-        replaceVariables(this.configuration);
+        this.cfgXmlLoader.resolveVariables(this.configuration);
     }
 
     private void disposeSessionFactory()
@@ -256,15 +210,21 @@ public class HibernateStore implements Disposable, Initializable
         this.adapter = null;
     }
 
-    private void createSessionFactory()
+    private void createSessionFactory() throws SQLException
     {
         this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build();
 
         // Load the base configuration file
-        ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
-        LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
-        // Resolve some variables
-        replaceVariables(baseConfiguration);
+        LoadedConfig baseConfiguration = this.cfgXmlLoader.loadConfig(this.bootstrapServiceRegistry,
+            this.configurationURL);
+
+        // Ensure that all Hibernate SessionFactory instances share the same JDBC connection pool.
+        //
+        // We do it by injecting a shared DataSource into Hibernate settings before building the registry.
+        // This allows using the same hibernate.cfg.xml without changing it.
+        DataSource dataSource = this.dataSourceProvider.getDataSource();
+        Map values = baseConfiguration.getConfigurationValues();
+        this.cfgXmlLoader.applySharedDataSourceOverrides(values, dataSource);
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -295,59 +255,6 @@ public class HibernateStore implements Disposable, Initializable
         build();
     }
 
-    private String resolveURL(String url)
-    {
-        // Replace variables
-        if (StringUtils.isNotEmpty(url) && url.matches(".*\\$\\{.*\\}.*")) {
-            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                this.environment.getPermanentDirectory().getAbsolutePath());
-
-            try {
-                return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
-                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
-     *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
-     */
-    private void replaceVariables(Configuration hibernateConfiguration)
-    {
-        String newURL = resolveURL(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
-    }
-
-    /**
-     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
-     *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
-     */
-    private void replaceVariables(LoadedConfig hibernateConfiguration)
-    {
-        Map values = hibernateConfiguration.getConfigurationValues();
-        String newURL = resolveURL((String) values.get(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
-    }
-
     /**
      * Reload the Hibernate setup.
      * <p>
@@ -366,6 +273,8 @@ public class HibernateStore implements Disposable, Initializable
             }
 
             createSessionFactory();
+        } catch (SQLException e) {
+            throw new HibernateException("Failed to initialize Hibernate", e);
         } finally {
             this.lock.writeLock().unlock();
         }
@@ -397,20 +306,16 @@ public class HibernateStore implements Disposable, Initializable
     public DatabaseProduct getDatabaseProductName()
     {
         if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
-            if (getSessionFactory() != null) {
-                DatabaseMetaData metaData = getDatabaseMetaData();
-                if (metaData != null) {
-                    try {
-                        this.databaseProductCache = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
-                    } catch (SQLException ignored) {
-                        // do not care, return UNKNOWN
-                    }
-                } else {
+            DatabaseMetaData metaData = getDatabaseMetaData();
+            if (metaData != null) {
+                try {
+                    this.databaseProductCache = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                } catch (SQLException ignored) {
                     // do not care, return UNKNOWN
                 }
             } else {
-                // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
-                // driver
+                // Something went wrong when trying to retrieve the database metadata, try to guess the database
+                // product from the connection URL scheme.
                 String connectionURL = this.configuration.getProperty("hibernate.connection.url");
                 if (connectionURL == null) {
                     connectionURL = this.configuration.getProperty("connection.url");
@@ -472,13 +377,21 @@ public class HibernateStore implements Disposable, Initializable
      */
     public DatabaseMetaData getDatabaseMetaData()
     {
-        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
-            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+        if (getSessionFactory() != null) {
+            try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+                JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
 
-            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                    return connection.getMetaData();
+                } catch (SQLException e) {
+                    // Log something ?
+                }
+            }
+        } else {
+            try (Connection connection = this.dataSourceProvider.getDataSource().getConnection()) {
                 return connection.getMetaData();
             } catch (SQLException e) {
-                // Log something ?
+                this.logger.debug("Failed to retrieve database metadata", e);
             }
         }
 
@@ -626,8 +539,11 @@ public class HibernateStore implements Disposable, Initializable
                 session.setProperty("xwiki.database", databaseName);
             }
         } catch (Exception e) {
-            // close session with rollback to avoid further usage
-            endTransaction(false);
+            // close session with rollback to avoid further usage, but only if it's the current session. This is to
+            // support using this method with a session obtained from a different session factory.
+            if (session == getCurrentSession()) {
+                endTransaction(false);
+            }
 
             Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

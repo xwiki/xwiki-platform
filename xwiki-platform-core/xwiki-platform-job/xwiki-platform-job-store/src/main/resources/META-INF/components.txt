@@ -1,0 +1,7 @@
+500:org.xwiki.job.store.internal.DatabaseJobStatusStore
+org.xwiki.job.store.internal.DatabaseLoggerTail
+org.xwiki.job.store.internal.FilesystemPersistentJobStatusStore
+org.xwiki.job.store.internal.JobStatusBlobStore
+org.xwiki.job.store.internal.JobStatusIdentifierSerializer
+org.xwiki.job.store.internal.hibernate.JobStatusHibernateExecutor
+org.xwiki.job.store.internal.hibernate.JobStatusHibernateStore

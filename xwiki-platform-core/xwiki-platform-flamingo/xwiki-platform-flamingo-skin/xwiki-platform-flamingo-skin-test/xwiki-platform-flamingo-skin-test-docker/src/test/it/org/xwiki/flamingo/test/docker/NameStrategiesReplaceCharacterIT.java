@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.validation.test.po.NameStrategiesAdministrationSectionPage;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -50,9 +51,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * The strategy is configured with its own forbidden character (nothing is inherited from the standard flavor, which is
  * not installed here). The mapping is seeded directly through the REST API rather than through the administration's
  * "Add new character" UI, because that UI relies on the configuration document (with its list properties) shipped by
- * the flavor, which is absent from this WAR. Seeding through REST also avoids triggering the name-strategy validation
- * (only invoked on the UI create/save actions): the strategy caches its replacement map in a singleton initialized on
- * first use, and it reads the seeded mapping when it is first initialized (on the first administration visit below).
+ * the flavor, which is absent from this WAR. The {@code ReplaceCharacterEntityNameValidation} strategy caches its
+ * replacement map in a singleton and only reloads it from {@code EntityNameValidationManager.resetStrategies()} (the
+ * "Add new character" UI is the only production caller); the REST seed alone does not refresh it, so {@code beforeAll}
+ * calls {@code resetStrategies()} explicitly once the mapping has been seeded.
  *
  * @version $Id$
  * @since 18.6.0RC1
@@ -73,10 +75,7 @@ class NameStrategiesReplaceCharacterIT
 
         // Configure the Character Replacement strategy with a custom "@" -> "-" mapping directly through the REST API.
         // The administration's "Add new character" UI is not used because it requires the configuration document (with
-        // its list properties) shipped by the standard flavor, which is not installed in this test's WAR. Seeding
-        // through REST also avoids the name-strategy validation (only invoked on the UI create/save actions): the
-        // strategy caches its replacement map in a singleton initialized on first use, and it reads this seeded mapping
-        // when it is first initialized (on the first administration visit in the tests below).
+        // its list properties) shipped by the standard flavor, which is not installed in this test's WAR.
         DocumentReference configReference =
             new DocumentReference("xwiki", List.of("XWiki", "EntityNameValidation"), "Configuration");
         Page configPage = setup.rest().page(configReference);
@@ -92,6 +91,14 @@ class NameStrategiesReplaceCharacterIT
         configObject.withProperties(RestTestUtils.property("replaceCharacters.replacementCharacters", "-"));
         objects.withObjectSummaries(configObject);
         setup.rest().save(configPage);
+
+        // The ReplaceCharacterEntityNameValidation strategy caches its replacement map at component initialisation and
+        // is only refreshed by EntityNameValidationManager.resetStrategies(). In this shared-instance test run the
+        // singleton has already been initialised (with an empty map) by an earlier test, and neither the REST save
+        // above nor the administration form save in the tests below refreshes it. Force the reload so the seeded
+        // "@" -> "-" mapping is actually used.
+        setup.executeWikiPlain("{{velocity}}$services.modelvalidation.manager.resetStrategies(){{/velocity}}",
+            Syntax.XWIKI_2_1);
     }
 
     /**

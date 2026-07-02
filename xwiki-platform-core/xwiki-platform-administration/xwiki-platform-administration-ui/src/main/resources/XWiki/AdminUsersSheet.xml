@@ -149,7 +149,7 @@
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
-          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+          &lt;button type="submit" class="btn btn-primary" form="register" disabled="disabled"&gt;
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
@@ -467,12 +467,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       createUserForm.find(':input').filter(':visible').first().focus();
       createUserButton.prop('disabled', !createUserForm.length);
     });
-  }).on('click', '.btn-primary', function(event) {
+  }).on('submit', 'form#register', function(event) {
+    event.preventDefault();
     var createUserForm = createUserModal.find('form#register');
     if (!validateCreateUserForm(createUserForm)) {
       return;
     }
-    var createUserButton = $(this).prop('disabled', true);
+    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
       'inprogress'

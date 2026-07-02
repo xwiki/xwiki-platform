@@ -267,8 +267,8 @@ XWiki.docisnew = null;
 #end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
-XWiki.hasEdit = $hasEdit;
-XWiki.hasProgramming = $hasProgramming;
+XWiki.hasEdit = "$!hasEdit" == 'true';
+XWiki.hasProgramming = "$!hasProgramming" == 'true';
 XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
 XWiki.hasRenderer = $services.rendering.availableRendererSyntaxes.contains($!doc.getSyntax());
 window.docviewurl = "${doc.getURL('view')}";

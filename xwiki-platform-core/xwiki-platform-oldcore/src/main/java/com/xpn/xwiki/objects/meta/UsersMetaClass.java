@@ -40,10 +40,6 @@ public class UsersMetaClass extends ListMetaClass
 {
     private static final long serialVersionUID = 1L;
 
-    private static final String DISPLAY_TYPE_YESNO = "yesno";
-
-    private static final String DISPLAY_FORM_TYPE_CHECKBOX = "checkbox";
-
     /**
      * Default constructor. Initializes the default meta properties of a List of Users XClass property.
      */
@@ -55,18 +51,18 @@ public class UsersMetaClass extends ListMetaClass
         BooleanClass useListClass = new BooleanClass(this);
         useListClass.setName("usesList");
         useListClass.setPrettyName("Uses List");
-        useListClass.setDisplayType(DISPLAY_TYPE_YESNO);
-        useListClass.setDisplayFormType(DISPLAY_FORM_TYPE_CHECKBOX);
+        useListClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        useListClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         useListClass.setDefaultValue(0);
         safeput(useListClass.getName(), useListClass);
 
         // When unchecked (the default), the picker suggests only active users, hiding users who have been disabled
         // (e.g. accounts that never validated their registration or were purposely disabled by an administrator).
         BooleanClass includeInactiveUsersClass = new BooleanClass(this);
-        includeInactiveUsersClass.setName("includeInactiveUsers");
+        includeInactiveUsersClass.setName(UsersClass.META_PROPERTY_INCLUDE_INACTIVE_USERS);
         includeInactiveUsersClass.setPrettyName("Include Inactive Users");
-        includeInactiveUsersClass.setDisplayType(DISPLAY_TYPE_YESNO);
-        includeInactiveUsersClass.setDisplayFormType(DISPLAY_FORM_TYPE_CHECKBOX);
+        includeInactiveUsersClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        includeInactiveUsersClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         includeInactiveUsersClass.setDefaultValue(0);
         safeput(includeInactiveUsersClass.getName(), includeInactiveUsersClass);
     }

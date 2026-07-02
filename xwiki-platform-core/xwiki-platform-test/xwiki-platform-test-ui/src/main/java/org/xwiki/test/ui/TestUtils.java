@@ -609,8 +609,10 @@ public class TestUtils
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
         org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
 
-        // Set password
+        // Set password and mark the user active (a real Admin user is active), so that queries filtering
+        // on active users (e.g. the user suggestion query) return this user.
         userObject.getProperties().add(RestTestUtils.property("password", password));
+        userObject.getProperties().add(RestTestUtils.property("active", "1"));
         userPage.getObjects().getObjectSummaries().add(userObject);
 
         // Save the user page

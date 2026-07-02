@@ -21,6 +21,7 @@
 import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
+import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
 import {
   AddCommentButton,
@@ -48,13 +49,14 @@ import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { JSX } from "react";
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
-  ctxForMacros: ContextForMacros | false;
 };
 
 export const CustomFormattingToolbar: React.FC<
@@ -63,7 +65,7 @@ export const CustomFormattingToolbar: React.FC<
   formattingToolbarProps,
   additionalBlockTypes,
   imageEditionOverrideFn,
-  ctxForMacros,
+  macros,
 }) => {
   const Components = useComponentsContext()!;
   const dict = useDictionary();
@@ -89,10 +91,7 @@ export const CustomFormattingToolbar: React.FC<
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(
-          combinedBlockTypeSelectItems,
-          ctxForMacros,
-        )
+        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros)
       )}
     </Components.FormattingToolbar.Root>
   );
@@ -100,7 +99,7 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  ctxForMacros: ContextForMacros | false,
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -138,11 +137,16 @@ const getDefaultFormattingToolbarItems = (
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
   ].concat(
-    ctxForMacros
+    macros
       ? [
+          <CustomMacroEditButton
+            key={"macroEditButton"}
+            macrosList={macros.list}
+            ctxForMacros={macros.ctx}
+          />,
           <CustomInsertMacroButton
             key={"insertMacroButton"}
-            openEditor={ctxForMacros.openInsertionEditor}
+            openEditor={macros.ctx.openInsertionEditor}
           />,
         ]
       : [],

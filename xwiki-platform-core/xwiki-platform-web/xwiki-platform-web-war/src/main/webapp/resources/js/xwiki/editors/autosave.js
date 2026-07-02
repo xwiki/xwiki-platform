@@ -45,7 +45,7 @@ editors.AutoSave = Class.create({
   /** Initialization */
   initialize : function(options) {
     this.options = Object.extend(Object.clone(this.options), options || { });
-    this.form = $(this.options.form) || ($("xwikieditcontent") && $("xwikieditcontent").up('form'));
+    this.form = $(this.options.form) || $("xwikieditcontent")?.up('form');
     if (!this.form || this.form.down('#autosaveControl')) {
       return;
     }
@@ -83,11 +83,11 @@ editors.AutoSave = Class.create({
   },
 
   /**
-   * The UI of the autosave feature is created and introduced at the beginning of the edit form. It comprises a checkbox
-   * for enabling / disabling the autosave and an input that allows to set the autosave frequency.
+   * The UI of the autosave feature is created and introduced towards the end of the edit form. 
+   * It contains a checkbox for toggling the autosave and an input that allows to set the autosave interval in minutes.
    */
   createUIElements : function() {
-    // Checkbox to enable/disable the autosave
+    // Toggle for the autosave feature.
     this.autosaveCheckbox = new Element('input', {
       type: "checkbox",
       checked: this.options.enabled,
@@ -102,26 +102,19 @@ editors.AutoSave = Class.create({
       "class": "autosave-frequency"
     });
     // Labels
-    var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
-    autosaveLabel.appendChild(this.autosaveCheckbox);
-    autosaveLabel.appendChild(document.createTextNode(" $services.localization.render('core.edit.autosave')"));
-    var frequencyLabel = new Element('label', {'class': 'frequency'});
-    frequencyLabel.appendChild(document.createTextNode("$services.localization.render('core.edit.autosave.every') "));
-    frequencyLabel.appendChild(this.autosaveInput);
-    this.timeUnit = new Element('span');
-    this.setTimeUnit();
-    frequencyLabel.appendChild(document.createTextNode(" "));
-    frequencyLabel.appendChild(this.timeUnit);
+    let autosaveLabel = new Element('label', {'class': 'autosave'});
+    autosaveLabel.append(this.autosaveCheckbox,
+      "$escapetool.javascript($services.localization.render('core.edit.autosave'))");
+    let frequencyLabel = new Element('label', {'class': 'frequency'});
+    frequencyLabel.append("$escapetool.javascript($services.localization.render('core.edit.autosave.frequency.label'))",
+      this.autosaveInput);
     // A paragraph containing the whole thing
-    var container = new Element('div', {"id": "autosaveControl"});
+    let container = new Element('div', {"id": "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
     if (!this.options.enabled) {
       container.addClassName(this.classNameAutosaveDisabled);
     }
-    container.appendChild(autosaveLabel);
-    container.appendChild(document.createTextNode(" "));
-    container.appendChild(frequencyLabel);
-    container.appendChild(document.createTextNode(" "));
+    container.append(autosaveLabel, " ", frequencyLabel, " ");
     // Insert in the editing UI
     this.form.down('.buttons').insert(container);
   },
@@ -150,11 +143,10 @@ editors.AutoSave = Class.create({
     // Set autosave frequency
     Event.observe(this.autosaveInput, "blur", function() {
       // is the given value valid?
-      var newFrequency = new Number(this.autosaveInput.value);
+      let newFrequency = Number(this.autosaveInput.value);
       if (newFrequency > 0) {
         // yes: memorize it
         this.options.frequency = newFrequency;
-        this.setTimeUnit();
         // reset autosave loop
         this.startTimer();
       } else {
@@ -164,19 +156,6 @@ editors.AutoSave = Class.create({
     }.bindAsEventListener(this));
 
     this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();
-  },
-
-  /**
-   * Changes the label text displaying the time measure unit for autosave freaquency,
-   * according to the value introduced by the user in the input (singular or plural).
-   * TODO This is bad, very difficult to internationalize.
-   */
-  setTimeUnit : function() {
-    if (this.options.frequency == 1) {
-      this.timeUnit.update("minute");
-    } else {
-      this.timeUnit.update("minutes");
-    }
   },
 
   /**

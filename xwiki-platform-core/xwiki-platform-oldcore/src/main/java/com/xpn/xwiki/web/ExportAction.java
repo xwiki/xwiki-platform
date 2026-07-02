@@ -190,7 +190,7 @@ public class ExportAction extends XWikiAction
         handleRevision(context);
 
         // We currently use the PDF export infrastructure but we have to redesign the export code.
-        XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
+        XWikiURLFactory urlFactory = new OfficeExporterURLFactory(true);
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
